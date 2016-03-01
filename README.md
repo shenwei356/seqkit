@@ -2,17 +2,31 @@
 
 FASTA kit
 
-## Plain
+## Plan
 
 1. github.com/shenwei356/bio
 
-    Improvments
+    - adding attribute for FastaRecord: `Head`
 
-        adding attribute for FastaRecord: Head
-        adding support for reading from stdin, '-' for stdin
-        rewrite fasta reader, change api and the error handles, adding cancellation, ref:breader
+    - adding support for reading from stdin, '-' for stdin
+
+    - rewrite fasta reader (ref:breader)
+
+        - chunked, adding attribute `ID` to keep the output order
+        - change api and the error handles,
+        - adding cancellation
+
+    - fasta reader data flow:
+
+        - read line by line, returns chunk of lines, but not create `Seq` object
+        - parallelly create `Seq` object and fan in a chanel
+
 
 2. commands except subseq and faidx
+
+    data flow:
+
+    - parallelly process fasta records and fan in
 
 3. github.com/shenwei356/bio
 
@@ -22,6 +36,10 @@ FASTA kit
         create github.com/shenwei356/bio/featio/gff
 
 4. finishing commands: subseq and faidx
+
+5. create web pages
+
+6. write paper
 
 ## Framework
 
@@ -40,6 +58,7 @@ FASTA kit
     common      find common seqs by names or seqs
     locate      locate seq/motif by names or seqs
     rmdup       remove duplicated sequence by names or seqs
+    sort        sort fasta records
     fa2tab      covert to tabular format, --length, --base-content
     tab2fa      covert from tabular format
 
