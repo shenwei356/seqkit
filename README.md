@@ -47,13 +47,13 @@ FASTA kit
 
 ## Subcommands
 
-    seq         revserse, complement, --no-names, --full-name
+    [x] seq         revserse, complement, --no-names, --full-name
     faidx       fasta index
     subseq      sub seqs, --bed,
     stat        counts, length,
 
     split       split into one-seq file
-    extract     extract seqs by names or seqs/motifs
+    [x] extract     extract seqs by names or seqs/motifs
     sample      sampling seqs
     common      find common seqs by names or seqs
     locate      locate seq/motif by names or seqs
@@ -84,3 +84,4 @@ global option
 - [pyfaidx](https://github.com/mdshw5/pyfaidx)
 - [seqtk](https://github.com/lh3/seqtk)
 - [fqtools](https://github.com/alastair-droop/fqtools)
+- [fasta_utilities](https://github.com/jimhester/fasta_utilities)
