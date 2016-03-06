@@ -65,7 +65,8 @@ var seqCmd = &cobra.Command{
 			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
 			checkError(err)
 			for chunk := range fastaReader.Ch {
-				checkError(err)
+				checkError(chunk.Err)
+
 				for _, record := range chunk.Data {
 					printName, printSeq = true, true
 					if onlyName && onlySeq {

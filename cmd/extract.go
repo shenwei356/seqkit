@@ -137,7 +137,6 @@ var extractCmd = &cobra.Command{
 					for _, id := range sortChunksID(chunks) {
 						chunk := chunks[id]
 						for _, record := range chunk.Data {
-							checkError(chunk.Err)
 							fmt.Fprintf(outfh, ">%s\n%s\n", record.Name, record.FormatSeq(lineWidth))
 						}
 					}
@@ -152,7 +151,7 @@ var extractCmd = &cobra.Command{
 			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
 			checkError(err)
 			for chunk := range fastaReader.Ch {
-				checkError(err)
+				checkError(chunk.Err)
 
 				tokens <- 1
 				wg.Add(1)
@@ -166,7 +165,6 @@ var extractCmd = &cobra.Command{
 					var hit bool
 					var chunkData []*fasta.FastaRecord
 					for _, record := range chunk.Data {
-						checkError(chunk.Err)
 
 						if byName {
 							subject = record.Name
