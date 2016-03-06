@@ -60,4 +60,5 @@ func init() {
 	RootCmd.PersistentFlags().IntP("line-width", "w", 70, "line width (0 for no wrap)")
 	RootCmd.PersistentFlags().StringP("id-regexp", "", fasta.DefaultIDRegexp, "seq id regexp")
 	RootCmd.PersistentFlags().StringP("out-file", "o", "-", `out file ("-" for stdout, suffix .gz for gzipped out)`)
+	RootCmd.PersistentFlags().BoolP("quiet", "", false, "be quiet and do not show information")
 }

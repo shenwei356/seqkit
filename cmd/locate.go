@@ -26,17 +26,24 @@ import (
 	"sync"
 
 	"github.com/brentp/xopen"
+	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fasta"
-	"github.com/shenwei356/breader"
 	"github.com/spf13/cobra"
 )
 
-// extractCmd represents the extract command
-var extractCmd = &cobra.Command{
-	Use:   "extract",
-	Short: "extract sequence by patterns",
-	Long: `extract sequence by patterns
+// locateCmd represents the extract command
+var locateCmd = &cobra.Command{
+	Use:   "locate",
+	Short: "locate subseq/motif",
+	Long: `locate subseq/motif
 
+motifs could be EITHER plain sequence containing "ACTGN" OR regular
+expression like "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" for ORFs.
+Degenerate bases like "RYMM.." are also supported by flag -d.
+
+In default, motifs are treated as regular expression.
+When flag -d given, regular expression may be wrong.
+For example: "\w" -> "\[AT]".
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		alphabet := getAlphabet(cmd, "seq-type")
@@ -48,11 +55,7 @@ var extractCmd = &cobra.Command{
 
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
-		useRegexp := getFlagBool(cmd, "use-regexp")
-		deleteMatched := getFlagBool(cmd, "delete-matched")
-		invertMatch := getFlagBool(cmd, "invert-match")
-		bySeq := getFlagBool(cmd, "by-seq")
-		byName := getFlagBool(cmd, "by-name")
+		degenerate := getFlagBool(cmd, "degenerate")
 
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags --pattern and --pattern-file needed"))
@@ -61,36 +64,41 @@ var extractCmd = &cobra.Command{
 		files := getFileList(args)
 
 		// prepare pattern
-		patterns := make(map[string]*regexp.Regexp)
+		regexps := make(map[string]*regexp.Regexp)
+		sequences := make(map[string]*seq.Seq)
+		var s string
 		if patternFile != "" {
-			reader, err := breader.NewDefaultBufferedReader(patternFile)
-			checkError(err)
-			for chunk := range reader.Ch {
-				checkError(chunk.Err)
-				for _, data := range chunk.Data {
-					pattern := data.(string)
-					if useRegexp {
-						r, err := regexp.Compile(pattern)
-						checkError(err)
-						patterns[pattern] = r
-					} else {
-						patterns[pattern] = nil
-					}
+			sequences := getSeqsAsMap(seq.Unlimit, patternFile)
+			for name, sequence := range sequences {
+				if degenerate {
+					s = sequence.Degenerate2Regexp()
+				} else {
+					s = string(sequence.Seq)
 				}
+
+				re, err := regexp.Compile(s)
+				checkError(err)
+				regexps[name] = re
 			}
 		} else {
-			if useRegexp {
-				for _, p := range pattern {
-					re, err := regexp.Compile(p)
-					checkError(err)
-					patterns[p] = re
+			for _, p := range pattern {
+				sequence, err := seq.NewSeq(alphabet, []byte(p))
+				checkError(err)
+
+				sequences[p] = sequence
+
+				if degenerate {
+					s = sequence.Degenerate2Regexp()
+				} else {
+					s = string(sequence.Seq)
 				}
-			} else {
-				for _, p := range pattern {
-					patterns[p] = nil
-				}
+
+				re, err := regexp.Compile(s)
+				checkError(err)
+				regexps[p] = re
 			}
 		}
+		fmt.Println(sequences, regexps)
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
@@ -162,49 +170,9 @@ var extractCmd = &cobra.Command{
 						<-tokens
 					}()
 
-					var subject []byte
-					var hit bool
-					var chunkData []*fasta.FastaRecord
-					for _, record := range chunk.Data {
-
-						if byName {
-							subject = record.Name
-						} else if bySeq {
-							subject = record.Seq.Seq
-						} else {
-							subject = record.ID
-						}
-
-						hit = false
-						if useRegexp {
-							for pattern, re := range patterns {
-								if re.Match(subject) {
-									hit = true
-									if deleteMatched {
-										delete(patterns, pattern)
-									}
-									break
-								}
-							}
-						} else {
-							if _, ok := patterns[string(subject)]; ok {
-								hit = true
-							}
-						}
-
-						if invertMatch {
-							if hit {
-								continue
-							}
-						} else {
-							if !hit {
-								continue
-							}
-						}
-
-						chunkData = append(chunkData, record)
-					}
-					ch <- fasta.FastaRecordChunk{chunk.ID, chunkData, nil}
+					// for _, record := range chunk.Data {
+					//
+					// }
 				}(chunk)
 			}
 			wg.Wait()
@@ -215,13 +183,9 @@ var extractCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(extractCmd)
+	RootCmd.AddCommand(locateCmd)
 
-	extractCmd.Flags().StringSliceP("pattern", "p", []string{""}, "search pattern (multiple values supported)")
-	extractCmd.Flags().StringP("pattern-file", "f", "", "pattern file")
-	extractCmd.Flags().BoolP("use-regexp", "r", false, "pattern os regular expression")
-	extractCmd.Flags().BoolP("delete-matched", "d", false, "delete matched pattern to speedup")
-	extractCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")
-	extractCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
-	extractCmd.Flags().BoolP("by-seq", "s", false, "match by seq")
+	locateCmd.Flags().StringSliceP("pattern", "p", []string{""}, "search pattern/motif (multiple values supported)")
+	locateCmd.Flags().StringP("pattern-file", "f", "", "pattern/motif file (FASTA format)")
+	locateCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
 }

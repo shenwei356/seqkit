@@ -21,7 +21,10 @@
 package cmd
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"os"
+	"runtime"
 	"sort"
 	"strings"
 
@@ -103,8 +106,28 @@ func sortChunksID(chunks map[uint64]fasta.FastaRecordChunk) sortutil.Uint64Slice
 	i := 0
 	for id := range chunks {
 		ids[i] = id
-		id++
+		i++
 	}
 	sort.Sort(ids)
 	return ids
+}
+
+// MD5 of a slice
+func MD5(s []byte) string {
+	h := md5.New()
+	h.Write(s)
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func getSeqsAsMap(alphabet *seq.Alphabet, file string) map[string]*seq.Seq {
+	sequences := make(map[string]*seq.Seq)
+	fastaReader, err := fasta.NewFastaReader(alphabet, file, 1000, runtime.NumCPU(), "")
+	checkError(err)
+	for chunk := range fastaReader.Ch {
+		checkError(chunk.Err)
+		for _, record := range chunk.Data {
+			sequences[string(record.Name)] = record.Seq
+		}
+	}
+	return sequences
 }

@@ -21,19 +21,19 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/brentp/xopen"
-	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fasta"
 	"github.com/spf13/cobra"
 )
 
-// seqCmd represents the seq command
-var seqCmd = &cobra.Command{
-	Use:   "seq",
-	Short: "revserse, complement seq",
-	Long: `sequence transform
+// rmdupCmd represents the seq command
+var rmdupCmd = &cobra.Command{
+	Use:   "rmdup",
+	Short: "remove duplicated seqs",
+	Long: `remove duplicated seqs
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -43,12 +43,11 @@ var seqCmd = &cobra.Command{
 		threads := getFlagInt(cmd, "threads")
 		lineWidth := getFlagInt(cmd, "line-width")
 		outFile := getFlagString(cmd, "out-file")
+		quiet := getFlagBool(cmd, "quiet")
 
-		reverse := getFlagBool(cmd, "reverse")
-		complement := getFlagBool(cmd, "complement")
-		onlyName := getFlagBool(cmd, "name")
-		onlySeq := getFlagBool(cmd, "seq")
-		onlyID := getFlagBool(cmd, "only-id")
+		bySeq := getFlagBool(cmd, "by-seq")
+		byName := getFlagBool(cmd, "by-name")
+		ignoreCase := getFlagBool(cmd, "ignore-case")
 
 		files := getFileList(args)
 
@@ -56,9 +55,9 @@ var seqCmd = &cobra.Command{
 		checkError(err)
 		defer outfh.Close()
 
-		var printName, printSeq bool
-		var head []byte
-		var sequence *seq.Seq
+		readed := make(map[string]bool)
+		var subject string
+		removed := 0
 		for _, file := range files {
 			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
 			checkError(err)
@@ -66,50 +65,37 @@ var seqCmd = &cobra.Command{
 				checkError(chunk.Err)
 
 				for _, record := range chunk.Data {
-					printName, printSeq = true, true
-					if onlyName && onlySeq {
-						printName, printSeq = true, true
-					} else if onlyName {
-						printName, printSeq = true, false
-					} else if onlySeq {
-						printName, printSeq = false, true
-					}
-					if printName {
-						if onlyID {
-							head = record.ID
+					if bySeq {
+						if ignoreCase {
+							subject = MD5(bytes.ToLower(record.Seq.Seq))
 						} else {
-							head = record.Name
+							subject = MD5(record.Seq.Seq)
 						}
-
-						if printSeq {
-							outfh.WriteString(fmt.Sprintf(">%s\n", head))
-						} else {
-							outfh.WriteString(fmt.Sprintf("%s\n", head))
-						}
+					} else if byName {
+						subject = string(record.Name)
+					} else { // byID
+						subject = string(record.ID)
 					}
 
-					if printSeq {
-						sequence = record.Seq
-						if reverse {
-							sequence = sequence.Reverse()
-						}
-						if complement {
-							sequence = sequence.Complement()
-						}
-						outfh.WriteString(fmt.Sprintf("%s\n", sequence.FormatSeq(lineWidth)))
+					if _, ok := readed[subject]; ok { // duplicated
+						removed++
+					} else { // new one
+						outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
+						readed[subject] = true
 					}
 				}
 			}
+		}
+		if !quiet {
+			log.Info("%d duplicated records removed", removed)
 		}
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(seqCmd)
+	RootCmd.AddCommand(rmdupCmd)
 
-	seqCmd.Flags().BoolP("reverse", "r", false, "reverse seq)")
-	seqCmd.Flags().BoolP("complement", "p", false, "complement seq (blank for Protein sequence)")
-	seqCmd.Flags().BoolP("name", "", false, "only print names")
-	seqCmd.Flags().BoolP("seq", "", false, "only print seqs")
-	seqCmd.Flags().BoolP("only-id", "", false, "print ID instead of full head")
+	rmdupCmd.Flags().BoolP("by-name", "n", false, "by full name instead of just id")
+	rmdupCmd.Flags().BoolP("by-seq", "s", false, "by seq")
+	rmdupCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 }
