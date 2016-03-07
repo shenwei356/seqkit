@@ -102,7 +102,6 @@ var extractCmd = &cobra.Command{
 			done := make(chan int)
 
 			// receiver
-			var j int
 			go func() {
 				var id uint64 = 0
 				chunks := make(map[uint64]fasta.FastaRecordChunk)
@@ -111,7 +110,6 @@ var extractCmd = &cobra.Command{
 
 					if chunk.ID == id {
 						for _, record := range chunk.Data {
-							j++
 							outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
 						}
 						id++
@@ -132,11 +130,10 @@ var extractCmd = &cobra.Command{
 				}
 
 				if len(chunks) > 0 {
-					sortedIDs := sortChunksID(chunks)
+					sortedIDs := sortFastaRecordChunkMapID(chunks)
 					for _, id := range sortedIDs {
 						chunk := chunks[id]
 						for _, record := range chunk.Data {
-							j++
 							outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
 						}
 					}

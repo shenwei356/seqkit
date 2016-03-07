@@ -101,7 +101,7 @@ func getAlphabet(cmd *cobra.Command, t string) *seq.Alphabet {
 	}
 }
 
-func sortChunksID(chunks map[uint64]fasta.FastaRecordChunk) sortutil.Uint64Slice {
+func sortFastaRecordChunkMapID(chunks map[uint64]fasta.FastaRecordChunk) sortutil.Uint64Slice {
 	ids := make(sortutil.Uint64Slice, len(chunks))
 	i := 0
 	for id := range chunks {

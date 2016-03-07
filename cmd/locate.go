@@ -23,9 +23,11 @@ package cmd
 import (
 	"fmt"
 	"regexp"
+	"sort"
 	"sync"
 
 	"github.com/brentp/xopen"
+	"github.com/cznic/sortutil"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fasta"
 	"github.com/spf13/cobra"
@@ -50,12 +52,13 @@ For example: "\w" -> "\[AT]".
 		idRegexp := getFlagString(cmd, "id-regexp")
 		chunkSize := getFlagInt(cmd, "chunk-size")
 		threads := getFlagInt(cmd, "threads")
-		lineWidth := getFlagInt(cmd, "line-width")
 		outFile := getFlagString(cmd, "out-file")
 
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
 		degenerate := getFlagBool(cmd, "degenerate")
+		ignoreCase := getFlagBool(cmd, "ignore-case")
+		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
 
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags --pattern and --pattern-file needed"))
@@ -65,69 +68,105 @@ For example: "\w" -> "\[AT]".
 
 		// prepare pattern
 		regexps := make(map[string]*regexp.Regexp)
-		sequences := make(map[string]*seq.Seq)
+		patterns := make(map[string][]byte)
 		var s string
 		if patternFile != "" {
 			sequences := getSeqsAsMap(seq.Unlimit, patternFile)
 			for name, sequence := range sequences {
+				patterns[name] = sequence.Seq
+
 				if degenerate {
 					s = sequence.Degenerate2Regexp()
 				} else {
 					s = string(sequence.Seq)
 				}
 
+				if ignoreCase {
+					s = "(?i)" + s
+				}
 				re, err := regexp.Compile(s)
 				checkError(err)
 				regexps[name] = re
 			}
 		} else {
 			for _, p := range pattern {
-				sequence, err := seq.NewSeq(alphabet, []byte(p))
-				checkError(err)
-
-				sequences[p] = sequence
+				patterns[p] = []byte(p)
 
 				if degenerate {
-					s = sequence.Degenerate2Regexp()
+					pattern2seq, err := seq.NewSeq(alphabet, []byte(p))
+					if err != nil {
+						checkError(fmt.Errorf("it seems that flag -d is given, "+
+							"but you provide regular expression instead of available %s sequence", alphabet))
+					}
+					s = pattern2seq.Degenerate2Regexp()
 				} else {
-					s = string(sequence.Seq)
+					s = p
 				}
 
+				if ignoreCase {
+					s = "(?i)" + s
+				}
 				re, err := regexp.Compile(s)
 				checkError(err)
 				regexps[p] = re
 			}
 		}
-		fmt.Println(sequences, regexps)
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Close()
 
+		outfh.WriteString("seqID\tpatternName\tpattern\tstrand\tstart\tend\tmatched\n")
 		for _, file := range files {
 
-			ch := make(chan fasta.FastaRecordChunk, threads)
+			ch := make(chan LocationChunk, threads)
 			done := make(chan int)
 
 			// receiver
-			var j int
 			go func() {
 				var id uint64 = 0
-				chunks := make(map[uint64]fasta.FastaRecordChunk)
+				chunks := make(map[uint64]LocationChunk)
 				for chunk := range ch {
-					checkError(chunk.Err)
-
 					if chunk.ID == id {
-						for _, record := range chunk.Data {
-							j++
-							outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
+						for _, locationInfo := range chunk.Data {
+							var s []byte
+							for _, loc := range locationInfo.Locations {
+								if locationInfo.Strand == 1 {
+									s = locationInfo.Record.Seq.Seq[loc[0]:loc[1]]
+								} else {
+									s = locationInfo.Record.Seq.SubSeq(loc[0]+1, loc[1]).Revcom().Seq
+								}
+								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\n",
+									locationInfo.Record.ID,
+									locationInfo.PatternName,
+									patterns[locationInfo.PatternName],
+									locationInfo.Strand,
+									loc[0]+1,
+									loc[1],
+									s))
+							}
 						}
 						id++
 					} else { // check bufferd result
 						for true {
 							if chunk, ok := chunks[id]; ok {
-								for _, record := range chunk.Data {
-									outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
+								for _, locationInfo := range chunk.Data {
+									var s []byte
+									for _, loc := range locationInfo.Locations {
+										if locationInfo.Strand == 1 {
+											s = locationInfo.Record.Seq.Seq[loc[0]:loc[1]]
+										} else {
+											s = locationInfo.Record.Seq.SubSeq(loc[0]+1, loc[1]).Revcom().Seq
+										}
+										outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\n",
+											locationInfo.Record.ID,
+											locationInfo.PatternName,
+											patterns[locationInfo.PatternName],
+											locationInfo.Strand,
+											loc[0]+1,
+											loc[1],
+											s))
+									}
 								}
 								id++
 								delete(chunks, chunk.ID)
@@ -140,12 +179,26 @@ For example: "\w" -> "\[AT]".
 				}
 
 				if len(chunks) > 0 {
-					sortedIDs := sortChunksID(chunks)
+					sortedIDs := sortLocationChunkMapID(chunks)
 					for _, id := range sortedIDs {
 						chunk := chunks[id]
-						for _, record := range chunk.Data {
-							j++
-							outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
+						for _, locationInfo := range chunk.Data {
+							var s []byte
+							for _, loc := range locationInfo.Locations {
+								if locationInfo.Strand == 1 {
+									s = locationInfo.Record.Seq.Seq[loc[0]:loc[1]]
+								} else {
+									s = locationInfo.Record.Seq.SubSeq(loc[0]+1, loc[1]).Revcom().Seq
+								}
+								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\n",
+									locationInfo.Record.ID,
+									locationInfo.PatternName,
+									patterns[locationInfo.PatternName],
+									locationInfo.Strand,
+									loc[0]+1,
+									loc[1],
+									s))
+							}
 						}
 					}
 				}
@@ -170,9 +223,30 @@ For example: "\w" -> "\[AT]".
 						<-tokens
 					}()
 
-					// for _, record := range chunk.Data {
-					//
-					// }
+					var locations []LocationInfo
+					for _, record := range chunk.Data {
+						for pName, re := range regexps {
+							found := re.FindAllSubmatchIndex(record.Seq.Seq, -1)
+							if len(found) > 0 {
+								locations = append(locations, LocationInfo{record, pName, 1, found})
+							}
+
+							if onlyPositiveStrand {
+								continue
+							}
+							seqRP := record.Seq.Revcom()
+							found = re.FindAllSubmatchIndex(seqRP.Seq, -1)
+							if len(found) > 0 {
+								l := len(seqRP.Seq)
+								tlocs := make([][]int, len(found))
+								for i, loc := range found {
+									tlocs[i] = []int{l - loc[1], l - loc[0]}
+								}
+								locations = append(locations, LocationInfo{record, pName, -1, tlocs})
+							}
+						}
+					}
+					ch <- LocationChunk{chunk.ID, locations}
 				}(chunk)
 			}
 			wg.Wait()
@@ -182,10 +256,37 @@ For example: "\w" -> "\[AT]".
 	},
 }
 
+// LocationChunk is LocationChunk
+type LocationChunk struct {
+	ID   uint64
+	Data []LocationInfo
+}
+
+// LocationInfo is LocationInfo
+type LocationInfo struct {
+	Record      *fasta.FastaRecord
+	PatternName string
+	Strand      int
+	Locations   [][]int
+}
+
+func sortLocationChunkMapID(chunks map[uint64]LocationChunk) sortutil.Uint64Slice {
+	ids := make(sortutil.Uint64Slice, len(chunks))
+	i := 0
+	for id := range chunks {
+		ids[i] = id
+		i++
+	}
+	sort.Sort(ids)
+	return ids
+}
+
 func init() {
 	RootCmd.AddCommand(locateCmd)
 
 	locateCmd.Flags().StringSliceP("pattern", "p", []string{""}, "search pattern/motif (multiple values supported)")
 	locateCmd.Flags().StringP("pattern-file", "f", "", "pattern/motif file (FASTA format)")
 	locateCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
+	locateCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
+	locateCmd.Flags().BoolP("only-positive-strand", "P", false, "only search at positive strand")
 }

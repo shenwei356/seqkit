@@ -24,6 +24,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seqio/fasta"
@@ -59,10 +60,11 @@ var commonCmd = &cobra.Command{
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Close()
-		// read all files
+
 		counter := make(map[string]map[string]int)
 		names := make(map[string]map[string]string)
 
+		// read all files
 		var subject string
 		for _, file := range files {
 			if !quiet {
@@ -81,9 +83,17 @@ var commonCmd = &cobra.Command{
 							subject = MD5(record.Seq.Seq)
 						}
 					} else if byName {
-						subject = string(record.Name)
+						if ignoreCase {
+							subject = strings.ToLower(string(record.Name))
+						} else {
+							subject = string(record.Name)
+						}
 					} else { // byID
-						subject = string(record.ID)
+						if ignoreCase {
+							subject = strings.ToLower(string(record.ID))
+						} else {
+							subject = string(record.ID)
+						}
 					}
 
 					if _, ok := counter[subject]; !ok {

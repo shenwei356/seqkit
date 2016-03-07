@@ -55,8 +55,8 @@ FASTA kit
     split       split into one-seq file
     [x] extract     extract seqs by names or seqs/motifs
     sample      sampling seqs
-    common      find common seqs by names or seqs
-    locate      locate subseq/motif in seqs
+    [x] common      find common seqs by names or seqs
+    [x] locate      locate subseq/motif in seqs
     [x] rmdup       remove duplicated sequence by names or seqs
     sort        sort fasta records
     fa2tab      covert to tabular format, --length, --base-content
