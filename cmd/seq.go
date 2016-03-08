@@ -32,8 +32,8 @@ import (
 // seqCmd represents the seq command
 var seqCmd = &cobra.Command{
 	Use:   "seq",
-	Short: "sequence transform (revserse, complement ...)",
-	Long: `sequence transform (revserse, complement ...)
+	Short: "transform sequence (revserse, complement, extract ID...)",
+	Long: `transform sequence (revserse, complement, extract ID...)
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -62,12 +62,9 @@ var seqCmd = &cobra.Command{
 		var head []byte
 		var sequence *seq.Seq
 		for _, file := range files {
-			if alphabet == seq.Unlimit {
-				alphabet, err = fasta.GuessAlphabet(file)
-				checkError(err)
-			}
 			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
 			checkError(err)
+
 			for chunk := range fastaReader.Ch {
 				checkError(chunk.Err)
 
@@ -109,6 +106,8 @@ var seqCmd = &cobra.Command{
 					}
 				}
 			}
+
+			outfh.Close()
 		}
 	},
 }

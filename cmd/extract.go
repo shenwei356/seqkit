@@ -26,7 +26,6 @@ import (
 	"sync"
 
 	"github.com/brentp/xopen"
-	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fasta"
 	"github.com/shenwei356/breader"
 	"github.com/spf13/cobra"
@@ -56,7 +55,7 @@ var extractCmd = &cobra.Command{
 		byName := getFlagBool(cmd, "by-name")
 
 		if len(pattern) == 0 && patternFile == "" {
-			checkError(fmt.Errorf("one of flags --pattern and --pattern-file needed"))
+			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
 		}
 
 		files := getFileList(args)
@@ -147,10 +146,6 @@ var extractCmd = &cobra.Command{
 			var wg sync.WaitGroup
 			tokens := make(chan int, threads)
 
-			if alphabet == seq.Unlimit {
-				alphabet, err = fasta.GuessAlphabet(file)
-				checkError(err)
-			}
 			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
 			checkError(err)
 			for chunk := range fastaReader.Ch {

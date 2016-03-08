@@ -27,7 +27,6 @@ import (
 	"strings"
 
 	"github.com/brentp/xopen"
-	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fasta"
 	"github.com/spf13/cobra"
 )
@@ -70,10 +69,6 @@ var commonCmd = &cobra.Command{
 		for _, file := range files {
 			if !quiet {
 				log.Info("read files: %s", file)
-			}
-			if alphabet == seq.Unlimit {
-				alphabet, err = fasta.GuessAlphabet(file)
-				checkError(err)
 			}
 			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
 			checkError(err)

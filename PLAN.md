@@ -53,7 +53,8 @@ FASTA kit
 
     split       split into one-seq file
     [x] extract     extract seqs by names or seqs/motifs
-    sample      sampling seqs
+    [x] sample      sample seqs
+    [x] shuffle     shuffle seqs
     [x] common      find common seqs by names or seqs
     [x] locate      locate subseq/motif in seqs
     [x] rmdup       remove duplicated sequence by names or seqs
@@ -61,6 +62,7 @@ FASTA kit
     [x] tab2fa      covert from tabular format
 
     sliding     sliding window
+    
 global option
 
     --gz

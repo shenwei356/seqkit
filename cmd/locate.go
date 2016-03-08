@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 	"regexp"
+	"runtime"
 	"sort"
 	"sync"
 
@@ -71,14 +72,15 @@ For example: "\w" -> "\[AT]".
 		patterns := make(map[string][]byte)
 		var s string
 		if patternFile != "" {
-			sequences := getSeqsAsMap(seq.Unlimit, patternFile)
-			for name, sequence := range sequences {
-				patterns[name] = sequence.Seq
+			records, err := fasta.GetSeqsMap(patternFile, nil, 1000, runtime.NumCPU(), "")
+			checkError(err)
+			for name, record := range records {
+				patterns[name] = record.Seq.Seq
 
 				if degenerate {
-					s = sequence.Degenerate2Regexp()
+					s = record.Seq.Degenerate2Regexp()
 				} else {
-					s = string(sequence.Seq)
+					s = string(record.Seq.Seq)
 				}
 
 				if ignoreCase {
@@ -210,10 +212,6 @@ For example: "\w" -> "\[AT]".
 			var wg sync.WaitGroup
 			tokens := make(chan int, threads)
 
-			if alphabet == seq.Unlimit {
-				alphabet, err = fasta.GuessAlphabet(file)
-				checkError(err)
-			}
 			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
 			checkError(err)
 			for chunk := range fastaReader.Ch {

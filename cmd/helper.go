@@ -24,7 +24,6 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"os"
-	"runtime"
 	"sort"
 	"strings"
 
@@ -77,6 +76,18 @@ func getFlagString(cmd *cobra.Command, flag string) string {
 	return value
 }
 
+func getFlagFloat64(cmd *cobra.Command, flag string) float64 {
+	value, err := cmd.Flags().GetFloat64(flag)
+	checkError(err)
+	return value
+}
+
+func getFlagInt64(cmd *cobra.Command, flag string) int64 {
+	value, err := cmd.Flags().GetInt64(flag)
+	checkError(err)
+	return value
+}
+
 func getFlagStringSlice(cmd *cobra.Command, flag string) []string {
 	value, err := cmd.Flags().GetStringSlice(flag)
 	checkError(err)
@@ -96,8 +107,10 @@ func getAlphabet(cmd *cobra.Command, t string) *seq.Alphabet {
 		return seq.Protein
 	case "unlimit":
 		return seq.Unlimit
+	case "auto":
+		return nil
 	default:
-		return seq.Unlimit
+		return nil
 	}
 }
 
@@ -117,17 +130,4 @@ func MD5(s []byte) string {
 	h := md5.New()
 	h.Write(s)
 	return hex.EncodeToString(h.Sum(nil))
-}
-
-func getSeqsAsMap(alphabet *seq.Alphabet, file string) map[string]*seq.Seq {
-	sequences := make(map[string]*seq.Seq)
-	fastaReader, err := fasta.NewFastaReader(alphabet, file, 1000, runtime.NumCPU(), "")
-	checkError(err)
-	for chunk := range fastaReader.Ch {
-		checkError(chunk.Err)
-		for _, record := range chunk.Data {
-			sequences[string(record.Name)] = record.Seq
-		}
-	}
-	return sequences
 }

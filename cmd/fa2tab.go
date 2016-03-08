@@ -24,7 +24,6 @@ import (
 	"fmt"
 
 	"github.com/brentp/xopen"
-	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fasta"
 	"github.com/spf13/cobra"
 )
@@ -72,12 +71,9 @@ like sequence length, GC content.
 			}
 			outfh.WriteString("\n")
 		}
+
 		var name []byte
 		for _, file := range files {
-			if alphabet == seq.Unlimit {
-				alphabet, err = fasta.GuessAlphabet(file)
-				checkError(err)
-			}
 			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
 			checkError(err)
 			for chunk := range fastaReader.Ch {

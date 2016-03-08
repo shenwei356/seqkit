@@ -21,19 +21,20 @@
 package cmd
 
 import (
-	"bytes"
 	"fmt"
+	"math/rand"
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seqio/fasta"
+	"github.com/shenwei356/util/randutil"
 	"github.com/spf13/cobra"
 )
 
-// rmdupCmd represents the seq command
-var rmdupCmd = &cobra.Command{
-	Use:   "rmdup",
-	Short: "remove duplicated sequences",
-	Long: `remove duplicated sequences
+// shuffleCmd represents the seq command
+var shuffleCmd = &cobra.Command{
+	Use:   "shuffle",
+	Short: "shuffle the sequences",
+	Long: `shuffle the sequences.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -45,19 +46,21 @@ var rmdupCmd = &cobra.Command{
 		outFile := getFlagString(cmd, "out-file")
 		quiet := getFlagBool(cmd, "quiet")
 
-		bySeq := getFlagBool(cmd, "by-seq")
-		byName := getFlagBool(cmd, "by-name")
-		ignoreCase := getFlagBool(cmd, "ignore-case")
-
 		files := getFileList(args)
+
+		seed := getFlagInt64(cmd, "rand-seed")
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Close()
 
-		readed := make(map[string]bool)
-		var subject string
-		removed := 0
+		sequences := make(map[string]*fasta.FastaRecord)
+		index2name := make(map[int]string)
+
+		if !quiet {
+			log.Infof("read sequences ...")
+		}
+		i := 0
 		for _, file := range files {
 			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
 			checkError(err)
@@ -65,37 +68,36 @@ var rmdupCmd = &cobra.Command{
 				checkError(chunk.Err)
 
 				for _, record := range chunk.Data {
-					if bySeq {
-						if ignoreCase {
-							subject = MD5(bytes.ToLower(record.Seq.Seq))
-						} else {
-							subject = MD5(record.Seq.Seq)
-						}
-					} else if byName {
-						subject = string(record.Name)
-					} else { // byID
-						subject = string(record.ID)
-					}
-
-					if _, ok := readed[subject]; ok { // duplicated
-						removed++
-					} else { // new one
-						outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
-						readed[subject] = true
-					}
+					sequences[string(record.Name)] = record
+					index2name[i] = string(record.Name)
+					i++
 				}
 			}
 		}
+
 		if !quiet {
-			log.Info("%d duplicated records removed", removed)
+			log.Infof("%d sequences loaded", len(sequences))
+			log.Infof("shuffle ...")
+		}
+		rand.Seed(seed)
+		indices := make([]int, len(index2name))
+		for i := 0; i < len(index2name); i++ {
+			indices[i] = i
+		}
+		randutil.Shuffle(indices)
+
+		if !quiet {
+			log.Infof("output ...")
+		}
+		var record *fasta.FastaRecord
+		for _, i := range indices {
+			record = sequences[index2name[i]]
+			outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
 		}
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(rmdupCmd)
-
-	rmdupCmd.Flags().BoolP("by-name", "n", false, "by full name instead of just id")
-	rmdupCmd.Flags().BoolP("by-seq", "s", false, "by seq")
-	rmdupCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
+	RootCmd.AddCommand(shuffleCmd)
+	shuffleCmd.Flags().Int64P("rand-seed", "s", 23, "rand seed for shuffle")
 }
