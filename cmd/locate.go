@@ -36,8 +36,8 @@ import (
 // locateCmd represents the extract command
 var locateCmd = &cobra.Command{
 	Use:   "locate",
-	Short: "locate subseq/motif",
-	Long: `locate subseq/motif
+	Short: "locate sub-sequences/motifs",
+	Long: `locate sub-sequences/motifs
 
 motifs could be EITHER plain sequence containing "ACTGN" OR regular
 expression like "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" for ORFs.
@@ -134,7 +134,7 @@ For example: "\w" -> "\[AT]".
 								if locationInfo.Strand == 1 {
 									s = locationInfo.Record.Seq.Seq[loc[0]:loc[1]]
 								} else {
-									s = locationInfo.Record.Seq.SubSeq(loc[0]+1, loc[1]).Revcom().Seq
+									s = locationInfo.Record.Seq.SubSeq(loc[0]+1, loc[1]).RevCom().Seq
 								}
 								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\n",
 									locationInfo.Record.ID,
@@ -156,7 +156,7 @@ For example: "\w" -> "\[AT]".
 										if locationInfo.Strand == 1 {
 											s = locationInfo.Record.Seq.Seq[loc[0]:loc[1]]
 										} else {
-											s = locationInfo.Record.Seq.SubSeq(loc[0]+1, loc[1]).Revcom().Seq
+											s = locationInfo.Record.Seq.SubSeq(loc[0]+1, loc[1]).RevCom().Seq
 										}
 										outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\n",
 											locationInfo.Record.ID,
@@ -188,7 +188,7 @@ For example: "\w" -> "\[AT]".
 								if locationInfo.Strand == 1 {
 									s = locationInfo.Record.Seq.Seq[loc[0]:loc[1]]
 								} else {
-									s = locationInfo.Record.Seq.SubSeq(loc[0]+1, loc[1]).Revcom().Seq
+									s = locationInfo.Record.Seq.SubSeq(loc[0]+1, loc[1]).RevCom().Seq
 								}
 								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\n",
 									locationInfo.Record.ID,
@@ -210,6 +210,10 @@ For example: "\w" -> "\[AT]".
 			var wg sync.WaitGroup
 			tokens := make(chan int, threads)
 
+			if alphabet == seq.Unlimit {
+				alphabet, err = fasta.GuessAlphabet(file)
+				checkError(err)
+			}
 			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
 			checkError(err)
 			for chunk := range fastaReader.Ch {
@@ -234,7 +238,7 @@ For example: "\w" -> "\[AT]".
 							if onlyPositiveStrand {
 								continue
 							}
-							seqRP := record.Seq.Revcom()
+							seqRP := record.Seq.RevCom()
 							found = re.FindAllSubmatchIndex(seqRP.Seq, -1)
 							if len(found) > 0 {
 								l := len(seqRP.Seq)

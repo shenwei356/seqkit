@@ -29,11 +29,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// seqCmd represents the seq command
-var seqCmd = &cobra.Command{
-	Use:   "seq",
-	Short: "sequence transform (revserse, complement ...)",
-	Long: `sequence transform (revserse, complement ...)
+// fa2tabCmd represents the seq command
+var fa2tabCmd = &cobra.Command{
+	Use:   "fa2tab",
+	Short: "covert FASTA to tabular format, and provide various information",
+	Long: `covert FASTA to tabular format, and provide various information,
+like sequence length, GC content.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -41,26 +42,37 @@ var seqCmd = &cobra.Command{
 		idRegexp := getFlagString(cmd, "id-regexp")
 		chunkSize := getFlagInt(cmd, "chunk-size")
 		threads := getFlagInt(cmd, "threads")
-		lineWidth := getFlagInt(cmd, "line-width")
 		outFile := getFlagString(cmd, "out-file")
 
-		reverse := getFlagBool(cmd, "reverse")
-		complement := getFlagBool(cmd, "complement")
-		onlyName := getFlagBool(cmd, "name")
-		onlySeq := getFlagBool(cmd, "seq")
-		onlyID := getFlagBool(cmd, "only-id")
-		removeGaps := getFlagBool(cmd, "remove-gaps")
-		gapLetters := getFlagString(cmd, "gap-letter")
-
 		files := getFileList(args)
+
+		onlyID := getFlagBool(cmd, "only-id")
+		printLength := getFlagBool(cmd, "length")
+		printGC := getFlagBool(cmd, "gc")
+		baseContents := getFlagStringSlice(cmd, "base-content")
+		onlyName := getFlagBool(cmd, "name")
+		printTitle := getFlagBool(cmd, "title")
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Close()
 
-		var printName, printSeq bool
-		var head []byte
-		var sequence *seq.Seq
+		if printTitle {
+			outfh.WriteString("# name\tseq")
+			if printLength {
+				outfh.WriteString("\tlength")
+			}
+			if printGC {
+				outfh.WriteString("\tGC")
+			}
+			if len(baseContents) > 0 {
+				for _, bc := range baseContents {
+					outfh.WriteString(fmt.Sprintf("\t%s", bc))
+				}
+			}
+			outfh.WriteString("\n")
+		}
+		var name []byte
 		for _, file := range files {
 			if alphabet == seq.Unlimit {
 				alphabet, err = fasta.GuessAlphabet(file)
@@ -72,41 +84,29 @@ var seqCmd = &cobra.Command{
 				checkError(chunk.Err)
 
 				for _, record := range chunk.Data {
-					printName, printSeq = true, true
-					if onlyName && onlySeq {
-						printName, printSeq = true, true
-					} else if onlyName {
-						printName, printSeq = true, false
-					} else if onlySeq {
-						printName, printSeq = false, true
+					if onlyID {
+						name = record.ID
+					} else {
+						name = record.Name
 					}
-					if printName {
-						if onlyID {
-							head = record.ID
-						} else {
-							head = record.Name
-						}
-
-						if printSeq {
-							outfh.WriteString(fmt.Sprintf(">%s\n", head))
-						} else {
-							outfh.WriteString(fmt.Sprintf("%s\n", head))
-						}
+					if onlyName {
+						outfh.WriteString(fmt.Sprintf("%s\t%s", name, ""))
+					} else {
+						outfh.WriteString(fmt.Sprintf("%s\t%s", name, record.Seq.Seq))
 					}
 
-					if printSeq {
-						sequence = record.Seq
-						if reverse {
-							sequence = sequence.Reverse()
-						}
-						if complement {
-							sequence = sequence.Complement()
-						}
-						if removeGaps {
-							sequence = sequence.RemoveGaps(gapLetters)
-						}
-						outfh.WriteString(fmt.Sprintf("%s\n", sequence.FormatSeq(lineWidth)))
+					if printLength {
+						outfh.WriteString(fmt.Sprintf("\t%d", record.Seq.Length()))
 					}
+					if printGC {
+						outfh.WriteString(fmt.Sprintf("\t%.2f", record.Seq.GC()*100))
+					}
+					if len(baseContents) > 0 {
+						for _, bc := range baseContents {
+							outfh.WriteString(fmt.Sprintf("\t%.2f", record.Seq.BaseContent(bc)*100))
+						}
+					}
+					outfh.WriteString("\n")
 				}
 			}
 		}
@@ -114,13 +114,12 @@ var seqCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(seqCmd)
+	RootCmd.AddCommand(fa2tabCmd)
 
-	seqCmd.Flags().BoolP("reverse", "r", false, "reverse sequence)")
-	seqCmd.Flags().BoolP("complement", "p", false, "complement sequence (blank for Protein sequence)")
-	seqCmd.Flags().BoolP("name", "n", false, "only print names")
-	seqCmd.Flags().BoolP("seq", "s", false, "only print sequences")
-	seqCmd.Flags().BoolP("only-id", "i", false, "print ID instead of full head")
-	seqCmd.Flags().BoolP("remove-gaps", "g", false, "remove gaps")
-	seqCmd.Flags().StringP("gap-letter", "l", "-", "gap letters")
+	fa2tabCmd.Flags().BoolP("length", "l", false, "show sequence length")
+	fa2tabCmd.Flags().BoolP("gc", "g", false, "show GC content")
+	fa2tabCmd.Flags().StringSliceP("base-content", "b", []string{}, "show base content. (case ignored, multiple values supported) e.g. -b AT -b N")
+	fa2tabCmd.Flags().BoolP("only-id", "i", false, "print ID instead of full head")
+	fa2tabCmd.Flags().BoolP("name", "n", false, "only print names")
+	fa2tabCmd.Flags().BoolP("title", "T", false, "print title line")
 }

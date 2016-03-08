@@ -25,6 +25,7 @@ import (
 	"fmt"
 
 	"github.com/brentp/xopen"
+	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fasta"
 	"github.com/spf13/cobra"
 )
@@ -32,8 +33,8 @@ import (
 // rmdupCmd represents the seq command
 var rmdupCmd = &cobra.Command{
 	Use:   "rmdup",
-	Short: "remove duplicated seqs",
-	Long: `remove duplicated seqs
+	Short: "remove duplicated sequences",
+	Long: `remove duplicated sequences
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -59,6 +60,10 @@ var rmdupCmd = &cobra.Command{
 		var subject string
 		removed := 0
 		for _, file := range files {
+			if alphabet == seq.Unlimit {
+				alphabet, err = fasta.GuessAlphabet(file)
+				checkError(err)
+			}
 			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
 			checkError(err)
 			for chunk := range fastaReader.Ch {

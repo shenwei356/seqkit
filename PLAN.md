@@ -50,7 +50,6 @@ FASTA kit
     [x] seq         revserse, complement, --no-names, --full-name
     faidx       fasta index
     subseq      sub seqs, --bed,
-    stat        counts, length,
 
     split       split into one-seq file
     [x] extract     extract seqs by names or seqs/motifs
@@ -58,13 +57,10 @@ FASTA kit
     [x] common      find common seqs by names or seqs
     [x] locate      locate subseq/motif in seqs
     [x] rmdup       remove duplicated sequence by names or seqs
-    sort        sort fasta records
-    fa2tab      covert to tabular format, --length, --base-content
-    tab2fa      covert from tabular format
+    [x] fa2tab      covert to tabular format, --length, --base-content
+    [x] tab2fa      covert from tabular format
 
     sliding     sliding window
-    clean       remove gaps
-
 global option
 
     --gz

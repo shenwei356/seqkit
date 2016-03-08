@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	"github.com/brentp/xopen"
+	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fasta"
 	"github.com/spf13/cobra"
 )
@@ -34,8 +35,8 @@ import (
 // commonCmd represents the seq command
 var commonCmd = &cobra.Command{
 	Use:   "common",
-	Short: "revserse, complement seq",
-	Long: `sequence transform
+	Short: "find common sequences of multiple files",
+	Long: `find common sequences of multiple files
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -69,6 +70,10 @@ var commonCmd = &cobra.Command{
 		for _, file := range files {
 			if !quiet {
 				log.Info("read files: %s", file)
+			}
+			if alphabet == seq.Unlimit {
+				alphabet, err = fasta.GuessAlphabet(file)
+				checkError(err)
 			}
 			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
 			checkError(err)

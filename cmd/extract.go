@@ -26,6 +26,7 @@ import (
 	"sync"
 
 	"github.com/brentp/xopen"
+	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fasta"
 	"github.com/shenwei356/breader"
 	"github.com/spf13/cobra"
@@ -34,8 +35,8 @@ import (
 // extractCmd represents the extract command
 var extractCmd = &cobra.Command{
 	Use:   "extract",
-	Short: "extract sequence by patterns",
-	Long: `extract sequence by patterns
+	Short: "extract sequences by patterns/motifs",
+	Long: `extract sequence by patterns/motifs
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -146,6 +147,10 @@ var extractCmd = &cobra.Command{
 			var wg sync.WaitGroup
 			tokens := make(chan int, threads)
 
+			if alphabet == seq.Unlimit {
+				alphabet, err = fasta.GuessAlphabet(file)
+				checkError(err)
+			}
 			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
 			checkError(err)
 			for chunk := range fastaReader.Ch {
@@ -216,7 +221,7 @@ func init() {
 
 	extractCmd.Flags().StringSliceP("pattern", "p", []string{""}, "search pattern (multiple values supported)")
 	extractCmd.Flags().StringP("pattern-file", "f", "", "pattern file")
-	extractCmd.Flags().BoolP("use-regexp", "r", false, "pattern os regular expression")
+	extractCmd.Flags().BoolP("use-regexp", "r", false, "patterns are regular expression")
 	extractCmd.Flags().BoolP("delete-matched", "d", false, "delete matched pattern to speedup")
 	extractCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")
 	extractCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
