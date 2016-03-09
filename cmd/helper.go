@@ -23,10 +23,14 @@ package cmd
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 	"os"
+	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
+	"github.com/brentp/xopen"
 	"github.com/cznic/sortutil"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fasta"
@@ -130,4 +134,28 @@ func MD5(s []byte) string {
 	h := md5.New()
 	h.Write(s)
 	return hex.EncodeToString(h.Sum(nil))
+}
+
+func filepathTrimExtension(file string) (string, string) {
+	extension := filepath.Ext(file)
+	name := file[0 : len(file)-len(extension)]
+	return name, extension
+}
+
+var reRegion = regexp.MustCompile(`\-?\d+:\-?\d+`)
+
+func writeSeqs(records []*fasta.FastaRecord, file string, lineWidth int, quiet bool) error {
+	if !quiet {
+		log.Infof("write %d sequences to file: %s\n", len(records), file)
+	}
+
+	outfh, err := xopen.Wopen(file)
+	checkError(err)
+	defer outfh.Close()
+
+	for _, record := range records {
+		outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
+	}
+
+	return nil
 }

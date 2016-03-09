@@ -22,19 +22,18 @@ package cmd
 
 import (
 	"fmt"
-	"math/rand"
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seqio/fasta"
-	"github.com/shenwei356/util/randutil"
+	"github.com/shenwei356/util/byteutil"
 	"github.com/spf13/cobra"
 )
 
-// shuffleCmd represents the seq command
-var shuffleCmd = &cobra.Command{
-	Use:   "shuffle",
-	Short: "shuffle sequences",
-	Long: `shuffle sequences.
+// slidingCmd represents the seq command
+var slidingCmd = &cobra.Command{
+	Use:   "sliding",
+	Short: "sliding sequences",
+	Long: `sliding sequences.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -44,23 +43,28 @@ var shuffleCmd = &cobra.Command{
 		threads := getFlagInt(cmd, "threads")
 		lineWidth := getFlagInt(cmd, "line-width")
 		outFile := getFlagString(cmd, "out-file")
-		quiet := getFlagBool(cmd, "quiet")
 
 		files := getFileList(args)
 
-		seed := getFlagInt64(cmd, "rand-seed")
+		circle := getFlagBool(cmd, "circle-genome")
+		step := getFlagInt(cmd, "step")
+		window := getFlagInt(cmd, "window")
+		if step == 0 || window == 0 {
+			checkError(fmt.Errorf("both flags -s (--step) and -W (--window) needed"))
+		}
+		if step < 1 {
+			checkError(fmt.Errorf("value of flag -s (--step) should be greater than 0: %d ", step))
+		}
+		if window < 1 {
+			checkError(fmt.Errorf("value of flag -W (--window) should be greater than 0: %d ", window))
+		}
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Close()
 
-		sequences := make(map[string]*fasta.FastaRecord)
-		index2name := make(map[int]string)
-
-		if !quiet {
-			log.Infof("read sequences ...")
-		}
-		i := 0
+		var sequence []byte
+		var originalLen, l, end, e int
 		for _, file := range files {
 			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
 			checkError(err)
@@ -68,36 +72,36 @@ var shuffleCmd = &cobra.Command{
 				checkError(chunk.Err)
 
 				for _, record := range chunk.Data {
-					sequences[string(record.Name)] = record
-					index2name[i] = string(record.Name)
-					i++
+					originalLen = len(record.Seq.Seq)
+					sequence = record.Seq.Seq
+					if circle {
+						sequence = append(sequence, sequence[0:window-1]...)
+					}
+
+					l = len(sequence)
+					end = l - window
+					if end < 0 {
+						end = 0
+					}
+					for i := 0; i <= end; i += step {
+						e = i + window
+						if e > originalLen {
+							e = e - originalLen
+						}
+						outfh.WriteString(fmt.Sprintf(">%s sliding:%d-%d\n%s\n",
+							record.Name, i+1, e,
+							byteutil.WrapByteSlice(sequence[i:i+window], lineWidth)))
+					}
 				}
 			}
-		}
-
-		if !quiet {
-			log.Infof("%d sequences loaded", len(sequences))
-			log.Infof("shuffle ...")
-		}
-		rand.Seed(seed)
-		indices := make([]int, len(index2name))
-		for i := 0; i < len(index2name); i++ {
-			indices[i] = i
-		}
-		randutil.Shuffle(indices)
-
-		if !quiet {
-			log.Infof("output ...")
-		}
-		var record *fasta.FastaRecord
-		for _, i := range indices {
-			record = sequences[index2name[i]]
-			outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
 		}
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(shuffleCmd)
-	shuffleCmd.Flags().Int64P("rand-seed", "s", 23, "rand seed for shuffle")
+	RootCmd.AddCommand(slidingCmd)
+
+	slidingCmd.Flags().IntP("step", "s", 0, "step size")
+	slidingCmd.Flags().IntP("window", "W", 0, "window size")
+	slidingCmd.Flags().BoolP("circle-genome", "C", false, "circle genome")
 }

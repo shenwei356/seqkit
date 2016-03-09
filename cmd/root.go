@@ -41,7 +41,10 @@ Version: 0.1
 
 Author: Wei Shen <shenwei356@gmail.com>
 
-Site: https://github.com/shenwei356/fakit`,
+Documents  : http://shenwei356.github.io/fakit
+Source code: https://github.com/shenwei356/fakit
+
+`,
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
