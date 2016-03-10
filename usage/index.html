@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="shenwei356">
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+
+	<title>Usage & Examples - fakit - FASTA kit</title>
+
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        
+        <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+            ga('create', 'UA-28948626-5', 'shenwei356.github.io/fakit');
+            ga('send', 'pageview');
+        </script>
+        
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+            <a class="navbar-brand" href="..">fakit - FASTA kit</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+            
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                
+                
+                    <li >
+                        <a href="..">Home</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../download/">Download</a>
+                    </li>
+                
+                
+                
+                    <li class="active">
+                        <a href="./">Usage & Examples</a>
+                    </li>
+                
+                
+                </ul>
+            
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                
+                    <li >
+                        <a rel="next" href="../download/">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li class="disabled">
+                        <a rel="prev" >
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+                
+                
+                    <li>
+                        <a href="https://github.com/shenwei356/fakit">
+                            
+                                <i class="fa fa-github"></i>
+                            
+                            GitHub
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+            
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    
+        <li class="main active"><a href="#usage-and-examples">Usage and Examples</a></li>
+        
+            <li><a href="#seq">seq</a></li>
+        
+            <li><a href="#fa2tab-fa2tab">fa2tab &amp; fa2tab</a></li>
+        
+            <li><a href="#extract">extract</a></li>
+        
+    
+        <li class="main "><a href="#common">common</a></li>
+        
+    
+        <li class="main "><a href="#rmdup">rmdup</a></li>
+        
+    
+        <li class="main "><a href="#split">split</a></li>
+        
+    
+        <li class="main "><a href="#sample">sample</a></li>
+        
+    
+        <li class="main "><a href="#shuffle">shuffle</a></li>
+        
+    
+        <li class="main "><a href="#locate">locate</a></li>
+        
+    
+        <li class="main "><a href="#sliding">sliding</a></li>
+        
+    
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h2 id="usage-and-examples">Usage and Examples</h2>
+<p>Datasets are from <a href="ftp://mirbase.org/pub/mirbase/21/">The miRBase Sequence Database -- Release 21</a></p>
+<ul>
+<li><a href="ftp://mirbase.org/pub/mirbase/21/hairpin.fa.gz">hairpin.fa.gz</a></li>
+<li><a href="ftp://mirbase.org/pub/mirbase/21/mature.fa.gz">mature.fa.gz</a></li>
+<li><a href="ftp://mirbase.org/pub/mirbase/21/miRNA.diff.gz">miRNA.diff.gz</a></li>
+</ul>
+<h3 id="seq">seq</h3>
+<p>Usage</p>
+<pre><code>transform sequence (revserse, complement, extract ID...)
+
+Usage:
+  fakit seq [flags]
+
+Flags:
+  -p, --complement          complement sequence (blank for Protein sequence)
+  -G, --gap-letter string   gap letters (default &quot;-&quot;)
+  -l, --lower-case          print sequences in lower case
+  -n, --name                only print names
+  -i, --only-id             print ID instead of full head
+  -g, --remove-gaps         remove gaps
+  -r, --reverse             reverse sequence)
+  -s, --seq                 only print sequences
+  -u, --upper-case          print sequences in upper case
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>Read and print</p>
+<ul>
+<li>
+<p>From file:</p>
+<pre><code>$ fakit seq hairpin.fa.gz
+&gt;cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
+UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
+</code></pre>
+</li>
+<li>
+<p>From stdin:</p>
+<pre><code>zcat hairpin.fa.gz | fakit seq
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>Only print names</p>
+<ul>
+<li>
+<p>Full name:</p>
+<pre><code>$ fakit seq hairpin.fa.gz -n
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+cel-lin-4 MI0000002 Caenorhabditis elegans lin-4 stem-loop
+cel-mir-1 MI0000003 Caenorhabditis elegans miR-1 stem-loop
+</code></pre>
+</li>
+<li>
+<p>Only ID:</p>
+<pre><code>$ fakit seq hairpin.fa.gz -i
+cel-let-7
+cel-lin-4
+cel-mir-1
+</code></pre>
+</li>
+<li>
+<p>Self defined ID region by regular expression (this could be applied to all subcommands):</p>
+<pre><code>$ fakit seq hairpin.fa.gz -n -i --id-regexp "^[^\s]+\s([^\s]+)\s"
+MI0000001
+MI0000002
+MI0000003
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>Only print seq (global flag -w defines the output line width, 0 for no wrap)</p>
+<pre><code>$ fakit seq hairpin.fa.gz -s -w 0
+UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAACUAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
+AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGAGUGUACUAUUGAUGCUUCACACCUGGGCUCUCCGGGUACCAGGACGGUUUGAGCAGAU
+AAAGUGACCGUACCGAGCUGCAUACUUCCUUACAUGCCCAUACUAUAUCAUAAAUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAGU
+</code></pre>
+</li>
+<li>
+<p>Reverse comlement sequence</p>
+<pre><code>$ fakit seq hairpin.fa.gz -r -p
+&gt;cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+UCGAAGAGUUCUGUCUCCGGUAAGGUAGAAAAUUGCAUAGUUCACCGGUGGUAAUAUUCC
+AAACUAUACAACCUACUACCUCACCGGAUCCACAGUGUA
+</code></pre>
+</li>
+</ol>
+<h3 id="fa2tab-fa2tab">fa2tab &amp; fa2tab</h3>
+<p>Usage (fa2tab)</p>
+<pre><code>covert FASTA to tabular format, and provide various information,
+like sequence length, GC content.
+
+Usage:
+  fakit fa2tab [flags]
+
+Flags:
+  -b, --base-content value   print base content. (case ignored, multiple values supported) e.g. -b AT -b N (default [])
+  -g, --gc                   print GC content
+  -l, --length               print sequence length
+  -n, --name                 only print names (no sequences)
+  -i, --only-id              print ID instead of full head
+  -T, --title                print title line
+</code></pre>
+
+<p>Usage (tab2fa)</p>
+<pre><code>covert tabular format (first two columns) to FASTA format
+
+Usage:
+  fakit tab2fa [flags]
+
+Flags:
+  -p, --comment-line-prefix value   comment line prefix (default [#,//])
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>Default output</p>
+<pre><code>$ fakit fa2tab hairpin.fa.gz
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop      UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAACUAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
+cel-lin-4 MI0000002 Caenorhabditis elegans lin-4 stem-loop      AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGAGUGUACUAUUGAUGCUUCACACCUGGGCUCUCCGGGUACCAGGACGGUUUGAGCAGAU
+cel-mir-1 MI0000003 Caenorhabditis elegans miR-1 stem-loop      AAAGUGACCGUACCGAGCUGCAUACUUCCUUACAUGCCCAUACUAUAUCAUAAAUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAGU
+</code></pre>
+</li>
+<li>
+<p>Print sequence length, GC content, and only print names (no sequences),
+we could also print title line by flag <code>-T</code>. </p>
+<pre><code>$ fakit fa2tab hairpin.fa.gz -l -g -n -T
+# name  seq     length  GC
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop              99      43.43
+cel-lin-4 MI0000002 Caenorhabditis elegans lin-4 stem-loop              94      54.26
+cel-mir-1 MI0000003 Caenorhabditis elegans miR-1 stem-loop              96      40.62
+</code></pre>
+</li>
+<li>
+<p>Use fa2tab and tab2fa in pipe</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit fa2tab | fakit tab2fa
+</code></pre>
+</li>
+<li>
+<p>Sort sequences by length</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit fa2tab -l | sort -t"`echo -e '\t'`" -n -k3,3 | fakit tab2fa
+&gt;cin-mir-4129 MI0015684 Ciona intestinalis miR-4129 stem-loop
+UUCGUUAUUGGAAGACCUUAGUCCGUUAAUAAAGGCAUC
+&gt;mmu-mir-7228 MI0023723 Mus musculus miR-7228 stem-loop
+UGGCGACCUGAACAGAUGUCGCAGUGUUCGGUCUCCAGU
+&gt;cin-mir-4103 MI0015657 Ciona intestinalis miR-4103 stem-loop
+ACCACGGGUCUGUGACGUAGCAGCGCUGCGGGUCCGCUGU
+</code></pre>
+<p>Sorting or filtering by GC (or other base by -flag <code>-b</code>) content could also achieved in similar way.</p>
+</li>
+<li>
+<p>Get first 1000 sequence</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit fa2tab | head -n 1000 | fakit tab2fa
+</code></pre>
+</li>
+</ol>
+<h3 id="extract">extract</h3>
+<p>Usage</p>
+<pre><code>extract sequences by pattern(s) of name or sequence motifs
+
+Usage:
+  fakit extract [flags]
+
+Flags:
+  -n, --by-name               match by full name instead of just id
+  -s, --by-seq                match by seq
+  -d, --degenerate            pattern/motif contains degenerate base
+      --delete-matched        delete matched pattern to speedup
+  -i, --ignore-case           ignore case
+  -v, --invert-match          invert the sense of matching, to select non-matching records
+  -p, --pattern value         search pattern (multiple values supported) (default [])
+  -f, --pattern-file string   pattern file
+  -r, --use-regexp            patterns are regular expression
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>Extract human hairpins (i.e. sequences with name starting with <code>hsa</code></p>
+<pre><code>$ zcat hairpin.fa.gz | fakit extract -r -p ^hsa
+&gt;hsa-let-7a-1 MI0000060 Homo sapiens let-7a-1 stem-loop
+UGGGAUGAGGUAGUAGGUUGUAUAGUUUUAGGGUCACACCCACCACUGGGAGAUAACUAU
+ACAAUCUACUGUCUUUCCUA
+&gt;hsa-let-7a-2 MI0000061 Homo sapiens let-7a-2 stem-loop
+AGGUUGAGGUAGUAGGUUGUAUAGUUUAGAAUUACAUCAAGGGAGAUAACUGUACAGCCU
+CCUAGCUUUCCU
+</code></pre>
+</li>
+<li>
+<p>Remove human and mice hairpins. </p>
+<pre><code>$ zcat hairpin.fa.gz | fakit extract -r -p ^hsa -p ^mmu -v
+</code></pre>
+</li>
+<li>
+<p>Extract new entries by information from miRNA.diff.gz</p>
+<ol>
+<li>
+<p>Get IDs of new entries.</p>
+<pre><code>$ zcat miRNA.diff.gz | grep ^# -v | grep NEW | cut -f 2 &gt; list
+$ more list
+cfa-mir-486
+cfa-mir-339-1
+pmi-let-7
+</code></pre>
+</li>
+<li>
+<p>Extract by ID list file</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit extract -f list &gt; new.fa
+</code></pre>
+</li>
+</ol>
+</li>
+<li>
+<p>Extract sequences containing start with AGGCG</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit extract -s -r -i -p ^aggcg
+</code></pre>
+</li>
+<li>
+<p>Extract sequences with TTSAA (AgsI digest site) in SEQUENCE. Base S stands for C or G.</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit extract -s -d -i -p TTSAA
+</code></pre>
+<p>It's equal to but simpler than:</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit extract -s -r -i -p TT[CG]AA
+</code></pre>
+</li>
+</ol>
+<h2 id="common">common</h2>
+<p>Usage</p>
+<pre><code>find common sequences of multiple files by id/name/sequence
+
+Usage:
+  fakit common [flags]
+
+Flags:
+  -n, --by-name       match by full name instead of just id
+  -s, --by-seq        match by sequence
+  -i, --ignore-case   ignore case
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>By ID (default)</p>
+<pre><code>fakit common file*.fa &gt; common.fasta
+</code></pre>
+</li>
+<li>
+<p>By full name</p>
+<pre><code>fakit common file*.fa -n &gt; common.fasta
+</code></pre>
+</li>
+<li>
+<p>By sequence</p>
+<pre><code>fakit common file*.fa -s &gt; common.fasta
+</code></pre>
+</li>
+</ol>
+<h2 id="rmdup">rmdup</h2>
+<p>Usage</p>
+<pre><code>remove duplicated sequences by id/name/sequence
+
+Usage:
+  fakit rmdup [flags]
+
+Flags:
+  -n, --by-name       by full name instead of just id
+  -s, --by-seq        by seq
+  -i, --ignore-case   ignore case
+</code></pre>
+
+<p>Examples</p>
+<p>Similar to <code>common</code>.</p>
+<h2 id="split">split</h2>
+<p>Usage</p>
+<pre><code>split sequences into files by name ID, sub sequence of given region,
+part size or number of parts.
+
+Usage:
+  fakit split [flags]
+
+Flags:
+  -i, --by-id              split squences according to sequence ID
+  -p, --by-part int        split squences into N parts
+  -r, --by-region string   split squences according to sub sequence of given region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases
+  -s, --by-size int        split squences into multi parts with N sequences
+  -d, --dry-run            dry run, just print message and no files will be created.
+  -m, --md5                use MD5 instead of region sequence in output file when using flag -r (--by-region)
+  -2, --two-pass           when sample by number 2-pass mode, low memory usage
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>Split sequences into parts with at most 10000 sequences</p>
+<pre><code>$ fakit split hairpin.fa.gz -s 10000
+[INFO] split into 10000 seqs per file
+[INFO] write 10000 sequences to file: hairpin.fa.part_001.gz
+[INFO] write 10000 sequences to file: hairpin.fa.part_002.gz
+[INFO] write 8645 sequences to file: hairpin.fa.part_003.gz
+</code></pre>
+</li>
+<li>
+<p>Split sequences into 4 parts</p>
+<pre><code>$ fakit split hairpin.fa.gz -p 4
+[INFO] split into 4 parts
+[INFO] read sequences ...
+[INFO] read 28645 sequences
+[INFO] write 7162 sequences to file: hairpin.fa.part_001.gz
+[INFO] write 7162 sequences to file: hairpin.fa.part_002.gz
+[INFO] write 7162 sequences to file: hairpin.fa.part_003.gz
+[INFO] write 7159 sequences to file: hairpin.fa.part_004.gz
+</code></pre>
+<p>To reduce memory usage when spliting big file, we could use flag <code>--two-pass</code></p>
+<pre><code>$ fakit split hairpin.fa.gz -p 4 -2
+[INFO] split into 4 parts                                                                           
+[INFO] first pass: get seq number
+[INFO] seq number: 28645
+[INFO] second pass: read and split
+[INFO] write 7162 sequences to file: hairpin.fa.part_001.gz
+[INFO] write 7162 sequences to file: hairpin.fa.part_002.gz
+[INFO] write 7162 sequences to file: hairpin.fa.part_003.gz
+[INFO] write 7159 sequences to file: hairpin.fa.part_004.gz
+</code></pre>
+</li>
+<li>
+<p>Split sequences by species. i.e. by self-defined IDs</p>
+<pre><code>$ fakit split hairpin.fa.gz -i --id-regexp "^([\w]+)\-"
+[INFO] split by ID. idRegexp: ^([\w]+)\-                                                            
+[INFO] read sequences ...
+[INFO] read 28645 sequences
+[INFO] write 97 sequences to file: hairpin.fa.id_asu.gz
+[INFO] write 267 sequences to file: hairpin.fa.id_chi.gz
+[INFO] write 296 sequences to file: hairpin.fa.id_gra.gz
+...
+</code></pre>
+</li>
+<li>
+<p>Split sequences by sequence region (for example, sequence barcode)</p>
+<pre><code>$ fakit split hairpin.fa.gz -r 1:12
+[INFO] split by region: ^([^\s]+)\s?
+[INFO] read sequences ...
+[INFO] read 28645 sequences
+[INFO] write 1 sequences to file: hairpin.fa.region_1:12_UGUUUGCUCAGC.gz
+[INFO] write 1 sequences to file: hairpin.fa.region_1:12_GAAGAAGAAGAC.gz
+[INFO] write 4 sequences to file: hairpin.fa.region_1:12_UGAGUGUAGUGC.gz
+</code></pre>
+<p>If region is too long, we could use falg <code>-m</code>, i.e. use MD5 instead of region sequence in output file.</p>
+<p>Sequence suffix could be defined as <code>-r -12:-1</code></p>
+</li>
+</ol>
+<h2 id="sample">sample</h2>
+<p>Usage</p>
+<pre><code>sample sequences by number or proportion.
+
+Usage:
+  fakit sample [flags]
+
+Flags:
+  -n, --number int         sample by number (result may not exactly match)
+  -p, --proportion float   sample by proportion
+  -s, --rand-seed int      rand seed for shuffle (default 11)
+  -2, --two-pass           when sample by number 2-pass mode, low memory usage
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>Sample by number.</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit sample -n 1000 -o sample.fa.gz
+[INFO] sample by number
+[INFO] 949 sequences outputed
+</code></pre>
+<p>To reduce memory usage when spliting big file, we could use flag <code>--two-pass</code></p>
+</li>
+<li>
+<p>Sample by proportion.</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit sample -p 0.1 -o sample.fa.gz 
+[INFO] sample by proportion
+[INFO] 2814 sequences outputed
+</code></pre>
+</li>
+<li>
+<p>Set rand seed to reproduce the result.</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit sample -p 0.1 -s 11
+</code></pre>
+</li>
+<li>
+<p>Most of the time, we could shuffle after sampling</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit sample -p 0.1 | fakit shuffle
+</code></pre>
+</li>
+</ol>
+<h2 id="shuffle">shuffle</h2>
+<p>Usage</p>
+<pre><code>shuffle sequences
+
+Usage:
+  fakit shuffle [flags]
+
+Flags:
+  -s, --rand-seed int   rand seed for shuffle (default 23)
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>General use.<pre><code>$ zcat hairpin.fa.gz | fakit shuffle -o shuffled.fa.gz
+[INFO] read sequences ...
+[INFO] 28645 sequences loaded
+[INFO] shuffle ...
+[INFO] output ...
+</code></pre>
+</li>
+</ol>
+<h2 id="locate">locate</h2>
+<p>Usage</p>
+<pre><code>locate subsequences/motifs
+
+Motifs could be EITHER plain sequence containing &quot;ACTGN&quot; OR regular
+expression like &quot;A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)&quot; for ORFs.
+Degenerate bases like &quot;RYMM..&quot; are also supported by flag -d.
+
+In default, motifs are treated as regular expression.
+When flag -d given, regular expression may be wrong.
+For example: &quot;\w&quot; will be wrongly converted to &quot;\[AT]&quot;.
+
+Usage:
+  fakit locate [flags]
+
+Flags:
+  -d, --degenerate             pattern/motif contains degenerate base
+  -i, --ignore-case            ignore case
+  -P, --only-positive-strand   only search at positive strand
+  -p, --pattern value          search pattern/motif (multiple values supported) (default [])
+  -f, --pattern-file string    pattern/motif file (FASTA format)
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>Locate ORFs.</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)"
+seqID   patternName     pattern strand  start   end     matched
+cel-lin-4       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        1  136      AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGA
+cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        1  54       95      AUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAG
+cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        -1 43       51      AUGAUAUAG
+</code></pre>
+</li>
+<li>
+<p>Locate Motif.</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit locate -i -p UUS
+seqID   patternName     pattern strand  start   end     matched
+bna-MIR396a     UUS     UUS     -1      105     107     UUS
+bna-MIR396a     UUS     UUS     -1      89      91      UUS
+</code></pre>
+<p>Notice that <code>fakit extract</code> only searches in positive strand, but <code>fakit loate</code> could recogize both strand</p>
+</li>
+</ol>
+<h2 id="sliding">sliding</h2>
+<p>Usage</p>
+<pre><code>sliding sequences, circle genome supported
+
+Usage:
+  fakit sliding [flags]
+
+Flags:
+  -C, --circle-genome   circle genome
+  -s, --step int        step size
+  -W, --window int      window size
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>General use</p>
+<pre><code>$ echo -e "&gt;seq\nACGTacgtNN" | fakit sliding -s 3 -W 6
+&gt;seq sliding:1-6
+ACGTac
+&gt;seq sliding:4-9
+TacgtN
+</code></pre>
+</li>
+<li>
+<p>Circle genome</p>
+<pre><code>$ echo -e "&gt;seq\nACGTacgtNN" | fakit sliding -s 3 -W 6 -C
+&gt;seq sliding:1-6
+ACGTac
+&gt;seq sliding:4-9
+TacgtN
+&gt;seq sliding:7-2
+gtNNAC
+&gt;seq sliding:10-5
+NACGTa
+</code></pre>
+</li>
+<li>
+<p>Generate GC content for ploting</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit fa2tab | head -n 1 | fakit tab2fa | fakit sliding -s 5 -W 30 | fakit fa2tab  -n -g   
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:1-30         50.00
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:6-35         46.67
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:11-40                43.33
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:16-45                36.67
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:21-50                33.33
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:26-55                40.00
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:31-60                40.00
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:36-65                43.33
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:41-70                36.67
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:46-75                40.00
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:51-80                40.00
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:56-85                40.00
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:61-90                40.00
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:66-95                40.00
+</code></pre>
+</li>
+</ol></div>
+            
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+
+        <script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script>
+        <script>var base_url = '..';</script>
+        <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
+        <script src="../js/base.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            From here you can search these documents. Enter
+                            your search terms below.
+                        </p>
+                        <form role="form">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                            </div>
+                        </form>
+                        <div id="mkdocs-search-results"></div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </body>
+</html>
