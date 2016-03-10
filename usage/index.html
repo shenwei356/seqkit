@@ -123,44 +123,36 @@
     
         <li class="main active"><a href="#usage-and-examples">Usage and Examples</a></li>
         
-    
-        <li class="main "><a href="#fakit">fakit</a></li>
-        
-            <li><a href="#datasets">Datasets</a></li>
+            <li><a href="#fakit">fakit</a></li>
         
             <li><a href="#seq">seq</a></li>
+        
+            <li><a href="#subseq">subseq</a></li>
         
             <li><a href="#fa2tab-fa2tab">fa2tab &amp; fa2tab</a></li>
         
             <li><a href="#extract">extract</a></li>
         
-    
-        <li class="main "><a href="#common">common</a></li>
+            <li><a href="#common">common</a></li>
         
-    
-        <li class="main "><a href="#rmdup">rmdup</a></li>
+            <li><a href="#rmdup">rmdup</a></li>
         
-    
-        <li class="main "><a href="#split">split</a></li>
+            <li><a href="#split">split</a></li>
         
-    
-        <li class="main "><a href="#sample">sample</a></li>
+            <li><a href="#sample">sample</a></li>
         
-    
-        <li class="main "><a href="#shuffle">shuffle</a></li>
+            <li><a href="#shuffle">shuffle</a></li>
         
-    
-        <li class="main "><a href="#locate">locate</a></li>
+            <li><a href="#locate">locate</a></li>
         
-    
-        <li class="main "><a href="#sliding">sliding</a></li>
+            <li><a href="#sliding">sliding</a></li>
         
     
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h2 id="usage-and-examples">Usage and Examples</h2>
+<h1 id="usage-and-examples">Usage and Examples</h1>
 <h2 id="fakit">fakit</h2>
 <p>Usage</p>
 <pre><code>fakit -- FASTA kit
@@ -186,6 +178,7 @@ Available Commands:
   shuffle     shuffle sequences
   sliding     sliding sequences, circle genome supported
   split       split sequences into files by id/seq region/size/parts
+  subseq      get subsequence by region
   tab2fa      covert tabular format to FASTA format
 
 Flags:
@@ -207,7 +200,7 @@ Use &quot;fakit [command] --help&quot; for more information about a command.
 <li><a href="ftp://mirbase.org/pub/mirbase/21/mature.fa.gz">mature.fa.gz</a></li>
 <li><a href="ftp://mirbase.org/pub/mirbase/21/miRNA.diff.gz">miRNA.diff.gz</a></li>
 </ul>
-<h3 id="seq">seq</h3>
+<h2 id="seq">seq</h2>
 <p>Usage</p>
 <pre><code>transform sequence (revserse, complement, extract ID...)
 
@@ -292,7 +285,53 @@ AAACUAUACAACCUACUACCUCACCGGAUCCACAGUGUA
 </code></pre>
 </li>
 </ol>
-<h3 id="fa2tab-fa2tab">fa2tab &amp; fa2tab</h3>
+<h2 id="subseq">subseq</h2>
+<p>Usage</p>
+<pre><code>get subsequence by region.
+
+The definition of region is 1-based and with some custom design.
+
+Examples:
+
+        seq   :   A C G T N a c g t n
+        index :   0 1 2 3 4 5 6 7 8 9
+
+        region &amp; seq
+
+           1:1    A
+           2:4        G T N
+          -4:-2               c g t
+          -4:-1               c g t n
+          -1:-1                     n
+           2:-2     C G T N a c g t
+           1:-1   A C G T N a c g t n
+
+Usage:
+  fakit subseq [flags]
+
+Flags:
+  -r, --region string   subsequence of given region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases, 13:-1 for cutting first 12 bases. type &quot;fakit subseq -h&quot; for more examples
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>first 12 bases</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit subseq -r 1:12
+</code></pre>
+</li>
+<li>
+<p>last 12 bases</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit subseq -r -12:-1
+</code></pre>
+</li>
+<li>
+<p>subsequence without first and last 12 bases</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit subseq -r 13:-13
+</code></pre>
+</li>
+</ol>
+<h2 id="fa2tab-fa2tab">fa2tab &amp; fa2tab</h2>
 <p>Usage (fa2tab)</p>
 <pre><code>covert FASTA to tabular format, and provide various information,
 like sequence length, GC content.
@@ -331,7 +370,7 @@ cel-mir-1 MI0000003 Caenorhabditis elegans miR-1 stem-loop      AAAGUGACCGUACCGA
 </li>
 <li>
 <p>Print sequence length, GC content, and only print names (no sequences),
-we could also print title line by flag <code>-T</code>. </p>
+we could also print title line by flag <code>-T</code>.</p>
 <pre><code>$ fakit fa2tab hairpin.fa.gz -l -g -n -T
 # name  seq     length  GC
 cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop              99      43.43
@@ -362,7 +401,7 @@ ACCACGGGUCUGUGACGUAGCAGCGCUGCGGGUCCGCUGU
 </code></pre>
 </li>
 </ol>
-<h3 id="extract">extract</h3>
+<h2 id="extract">extract</h2>
 <p>Usage</p>
 <pre><code>extract sequences by pattern(s) of name or sequence motifs
 
@@ -395,7 +434,7 @@ CCUAGCUUUCCU
 </code></pre>
 </li>
 <li>
-<p>Remove human and mice hairpins. </p>
+<p>Remove human and mice hairpins.</p>
 <pre><code>$ zcat hairpin.fa.gz | fakit extract -r -p ^hsa -p ^mmu -v
 </code></pre>
 </li>
@@ -483,13 +522,30 @@ Flags:
 <pre><code>split sequences into files by name ID, sub sequence of given region,
 part size or number of parts.
 
+The definition of region is 1-based and with some custom design.
+
+Examples:
+
+        seq   :   A C G T N a c g t n
+        index :   0 1 2 3 4 5 6 7 8 9
+
+        region &amp; seq
+
+           1:1    A
+           2:4        G T N
+          -4:-2               c g t
+          -4:-1               c g t n
+          -1:-1                     n
+           2:-2     C G T N a c g t
+           1:-1   A C G T N a c g t n
+
 Usage:
   fakit split [flags]
 
 Flags:
   -i, --by-id              split squences according to sequence ID
   -p, --by-part int        split squences into N parts
-  -r, --by-region string   split squences according to sub sequence of given region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases
+  -r, --by-region string   split squences according to subsequence of given region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type &quot;fakit split -h&quot; for more example
   -s, --by-size int        split squences into multi parts with N sequences
   -d, --dry-run            dry run, just print message and no files will be created.
   -m, --md5                use MD5 instead of region sequence in output file when using flag -r (--by-region)
@@ -582,7 +638,7 @@ Flags:
 </li>
 <li>
 <p>Sample by proportion.</p>
-<pre><code>$ zcat hairpin.fa.gz | fakit sample -p 0.1 -o sample.fa.gz 
+<pre><code>$ zcat hairpin.fa.gz | fakit sample -p 0.1 -o sample.fa.gz
 [INFO] sample by proportion
 [INFO] 2814 sequences outputed
 </code></pre>
@@ -708,15 +764,7 @@ cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:6-35         
 cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:11-40                43.33
 cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:16-45                36.67
 cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:21-50                33.33
-cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:26-55                40.00
-cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:31-60                40.00
-cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:36-65                43.33
-cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:41-70                36.67
-cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:46-75                40.00
-cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:51-80                40.00
-cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:56-85                40.00
-cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:61-90                40.00
-cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:66-95                40.00
+...
 </code></pre>
 </li>
 </ol></div>
