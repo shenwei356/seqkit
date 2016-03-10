@@ -27,6 +27,7 @@ import (
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seqio/fasta"
+	"github.com/shenwei356/util/byteutil"
 	"github.com/spf13/cobra"
 )
 
@@ -37,6 +38,22 @@ var splitCmd = &cobra.Command{
 	Long: `split sequences into files by name ID, sub sequence of given region,
 part size or number of parts.
 
+The definition of region is 1-based and with some custom design.
+
+Examples:
+
+	seq   :   A C G T N a c g t n
+	index :   0 1 2 3 4 5 6 7 8 9
+
+	region & seq
+
+	   1:1    A
+	   2:4        G T N
+	  -4:-2               c g t
+	  -4:-1               c g t n
+	  -1:-1                     n
+	   2:-2     C G T N a c g t
+	   1:-1   A C G T N a c g t n
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
@@ -250,7 +267,7 @@ part size or number of parts.
 
 		if region != "" {
 			if !reRegion.MatchString(region) {
-				checkError(fmt.Errorf("invalid region: %s", region))
+				checkError(fmt.Errorf(`invalid region: %s. type "fakit subseq -h" for more examples`, region))
 			}
 			r := strings.Split(region, ":")
 			start, err := strconv.Atoi(r[0])
@@ -260,11 +277,8 @@ part size or number of parts.
 			if start == 0 || end == 0 {
 				checkError(fmt.Errorf("both start and end should not be 0"))
 			}
-			if start*end < 0 {
-				checkError(fmt.Errorf("both start and end should be eigher greater or less than 0"))
-			}
-			if start > end {
-				checkError(fmt.Errorf("start (%d) should not be greater than end (%d)", start, end))
+			if start < 0 && end > 0 {
+				checkError(fmt.Errorf("when start < 0, end should not > 0"))
 			}
 
 			if !quiet {
@@ -285,27 +299,20 @@ part size or number of parts.
 			recordsBySeqs := make(map[string][]*fasta.FastaRecord)
 
 			var subseq string
-			var l, s, e int
+			var s, e int
 			for _, record := range allRecords {
-				l = len(record.Seq.Seq)
 				s, e = start, end
-				if s < 0 {
-					s = l + s + 1
-					if s < 1 {
-						s = 1
-					}
-					e = l + e + 1
-					if e < 0 {
-						e = 0
-					}
+				if s > 0 {
+					s--
 				}
-				if e > l {
-					e = l
+				if e < 0 {
+					e++
 				}
+
 				if usingMD5 {
-					subseq = string(MD5(record.Seq.Seq[s-1 : e]))
+					subseq = string(MD5(byteutil.SubSlice(record.Seq.Seq, s, e)))
 				} else {
-					subseq = string(record.Seq.Seq[s-1 : e])
+					subseq = string(byteutil.SubSlice(record.Seq.Seq, s, e))
 				}
 				if _, ok := recordsBySeqs[subseq]; !ok {
 					recordsBySeqs[subseq] = []*fasta.FastaRecord{}
@@ -331,8 +338,8 @@ func init() {
 	splitCmd.Flags().IntP("by-size", "s", 0, "split squences into multi parts with N sequences")
 	splitCmd.Flags().IntP("by-part", "p", 0, "split squences into N parts")
 	splitCmd.Flags().BoolP("by-id", "i", false, "split squences according to sequence ID")
-	splitCmd.Flags().StringP("by-region", "r", "", "split squences according to sub sequence of given region. "+
-		"e.g 1:12 for first 12 bases, -12:-1 for last 12 bases")
+	splitCmd.Flags().StringP("by-region", "r", "", "split squences according to subsequence of given region. "+
+		`e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type "fakit split -h" for more examples`)
 	splitCmd.Flags().BoolP("md5", "m", false, "use MD5 instead of region sequence in output file when using flag -r (--by-region)")
 	splitCmd.Flags().BoolP("two-pass", "2", false, "when sample by number 2-pass mode, low memory usage")
 	splitCmd.Flags().BoolP("dry-run", "d", false, "dry run, just print message and no files will be created.")

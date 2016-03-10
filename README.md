@@ -1,4 +1,4 @@
-## fakit - FASTA kit
+# fakit - FASTA kit
 
 Documents  : [http://shenwei356.github.io/fakit](http://shenwei356.github.io/fakit)
 
@@ -18,6 +18,7 @@ Source code: [https://github.com/shenwei356/fakit](https://github.com/shenwei356
 Basic
 
 - `seq`        transform sequence (revserse, complement, extract ID...)
+- `subseq`     get subsequence by region
 
 Format convert
 
@@ -34,11 +35,6 @@ More
 - `shuffle`    shuffle sequences
 - `locate`     locate subsequences/motifs
 - `sliding`    sliding sequences, circle genome supported
-
-TODO
-
-- `faidx`      create fasta index file
-- `subseq`     extract subsequences by region/bed/gff
 
 Global Flags
 
@@ -62,8 +58,10 @@ Global Flags
 
 ## Similar tools
 
+
 - [fastx_toolkit](http://hannonlab.cshl.edu/fastx_toolkit/)
 - [seqtk](https://github.com/lh3/seqtk)
 - [pyfaidx](https://github.com/mdshw5/pyfaidx)
 - [fqtools](https://github.com/alastair-droop/fqtools)
 - [fasta_utilities](https://github.com/jimhester/fasta_utilities)
+- [seqmagick](http://seqmagick.readthedocs.org/en/latest/index.html)
