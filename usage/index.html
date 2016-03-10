@@ -123,6 +123,11 @@
     
         <li class="main active"><a href="#usage-and-examples">Usage and Examples</a></li>
         
+    
+        <li class="main "><a href="#fakit">fakit</a></li>
+        
+            <li><a href="#datasets">Datasets</a></li>
+        
             <li><a href="#seq">seq</a></li>
         
             <li><a href="#fa2tab-fa2tab">fa2tab &amp; fa2tab</a></li>
@@ -156,6 +161,46 @@
                 <div class="col-md-9" role="main">
 
 <h2 id="usage-and-examples">Usage and Examples</h2>
+<h2 id="fakit">fakit</h2>
+<p>Usage</p>
+<pre><code>fakit -- FASTA kit
+
+Version: 0.1
+
+Author: Wei Shen &lt;shenwei356(at)gmail.com&gt;
+
+Documents  : http://shenwei356.github.io/fakit
+Source code: https://github.com/shenwei356/fakit
+
+Usage:
+  fakit [command]
+
+Available Commands:
+  common      find common sequences of multiple files by id/name/sequence
+  extract     extract sequences by pattern(s) of name or sequence motifs
+  fa2tab      covert FASTA to tabular format, and provide various information
+  locate      locate subsequences/motifs
+  rmdup       remove duplicated sequences by id/name/sequence
+  sample      sample sequences by number or proportion
+  seq         transform sequence (revserse, complement, extract ID...)
+  shuffle     shuffle sequences
+  sliding     sliding sequences, circle genome supported
+  split       split sequences into files by id/seq region/size/parts
+  tab2fa      covert tabular format to FASTA format
+
+Flags:
+  -c, --chunk-size int     chunk size (default 1000)
+      --id-regexp string   regular expression for parsing ID (default &quot;^([^\\s]+)\\s?&quot;)
+  -w, --line-width int     line width (0 for no wrap) (default 60)
+  -o, --out-file string    out file (&quot;-&quot; for stdout, suffix .gz for gzipped out) (default &quot;-&quot;)
+      --quiet              be quiet and do not show extra information
+  -t, --seq-type string    sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default &quot;auto&quot;)
+  -j, --threads int        number of CPUs (default value depends on your device) (default 4)
+
+Use &quot;fakit [command] --help&quot; for more information about a command.
+</code></pre>
+
+<h3 id="datasets">Datasets</h3>
 <p>Datasets are from <a href="ftp://mirbase.org/pub/mirbase/21/">The miRBase Sequence Database -- Release 21</a></p>
 <ul>
 <li><a href="ftp://mirbase.org/pub/mirbase/21/hairpin.fa.gz">hairpin.fa.gz</a></li>
