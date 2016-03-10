@@ -32,8 +32,8 @@ import (
 // rmdupCmd represents the seq command
 var rmdupCmd = &cobra.Command{
 	Use:   "rmdup",
-	Short: "remove duplicated sequences",
-	Long: `remove duplicated sequences
+	Short: "remove duplicated sequences by id/name/sequence",
+	Long: `remove duplicated sequences by id/name/sequence
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {

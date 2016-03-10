@@ -32,8 +32,8 @@ import (
 // slidingCmd represents the seq command
 var slidingCmd = &cobra.Command{
 	Use:   "sliding",
-	Short: "sliding sequences",
-	Long: `sliding sequences.
+	Short: "sliding sequences, circle genome supported",
+	Long: `sliding sequences, circle genome supported
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {

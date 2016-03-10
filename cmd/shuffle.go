@@ -34,7 +34,7 @@ import (
 var shuffleCmd = &cobra.Command{
 	Use:   "shuffle",
 	Short: "shuffle sequences",
-	Long: `shuffle sequences.
+	Long: `shuffle sequences
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {

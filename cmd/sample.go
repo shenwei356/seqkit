@@ -32,8 +32,8 @@ import (
 // sampleCmd represents the seq command
 var sampleCmd = &cobra.Command{
 	Use:   "sample",
-	Short: "sample sequences",
-	Long: `sequences sampling.
+	Short: "sample sequences by number or proportion",
+	Long: `sample sequences by number or proportion.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -75,6 +75,7 @@ var sampleCmd = &cobra.Command{
 
 		file := files[0]
 
+		n := 0
 		if number > 0 { // by number
 			if !quiet {
 				log.Info("sample by number")
@@ -108,6 +109,7 @@ var sampleCmd = &cobra.Command{
 
 					for _, record := range chunk.Data {
 						if rand.Float64() <= proportion {
+							n++
 							outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
 						}
 					}
@@ -120,6 +122,7 @@ var sampleCmd = &cobra.Command{
 
 				for _, record := range records {
 					if rand.Float64() <= proportion {
+						n++
 						outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
 					}
 				}
@@ -136,10 +139,15 @@ var sampleCmd = &cobra.Command{
 
 				for _, record := range chunk.Data {
 					if rand.Float64() <= proportion {
+						n++
 						outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
 					}
 				}
 			}
+		}
+
+		if !quiet {
+			log.Info("%d sequences outputed", n)
 		}
 	},
 }
@@ -148,7 +156,7 @@ func init() {
 	RootCmd.AddCommand(sampleCmd)
 
 	sampleCmd.Flags().Int64P("rand-seed", "s", 11, "rand seed for shuffle")
-	sampleCmd.Flags().Int64P("number", "n", 0, "sample by number (-1 for all)")
+	sampleCmd.Flags().Int64P("number", "n", 0, "sample by number (result may not exactly match)")
 	sampleCmd.Flags().Float64P("proportion", "p", 0, "sample by proportion")
 	sampleCmd.Flags().BoolP("two-pass", "2", false, "when sample by number 2-pass mode, low memory usage")
 }

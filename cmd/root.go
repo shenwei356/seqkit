@@ -60,7 +60,7 @@ func init() {
 	RootCmd.PersistentFlags().StringP("seq-type", "t", "auto", "sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence)")
 	RootCmd.PersistentFlags().IntP("chunk-size", "c", 1000, "chunk size")
 	RootCmd.PersistentFlags().IntP("threads", "j", runtime.NumCPU(), "number of CPUs (default value depends on your device)")
-	RootCmd.PersistentFlags().IntP("line-width", "w", 70, "line width (0 for no wrap)")
+	RootCmd.PersistentFlags().IntP("line-width", "w", 60, "line width (0 for no wrap)")
 	RootCmd.PersistentFlags().StringP("id-regexp", "", fasta.DefaultIDRegexp, "regular expression for parsing ID")
 	RootCmd.PersistentFlags().StringP("out-file", "o", "-", `out file ("-" for stdout, suffix .gz for gzipped out)`)
 	RootCmd.PersistentFlags().BoolP("quiet", "", false, "be quiet and do not show extra information")

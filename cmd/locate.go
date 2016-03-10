@@ -37,16 +37,16 @@ import (
 // locateCmd represents the extract command
 var locateCmd = &cobra.Command{
 	Use:   "locate",
-	Short: "locate sub-sequences/motifs",
-	Long: `locate sub-sequences/motifs
+	Short: "locate subsequences/motifs",
+	Long: `locate subsequences/motifs
 
-motifs could be EITHER plain sequence containing "ACTGN" OR regular
+Motifs could be EITHER plain sequence containing "ACTGN" OR regular
 expression like "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" for ORFs.
 Degenerate bases like "RYMM.." are also supported by flag -d.
 
 In default, motifs are treated as regular expression.
 When flag -d given, regular expression may be wrong.
-For example: "\w" -> "\[AT]".
+For example: "\w" will be wrongly converted to "\[AT]".
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		alphabet := getAlphabet(cmd, "seq-type")

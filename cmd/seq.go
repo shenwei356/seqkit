@@ -21,11 +21,13 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fasta"
+	"github.com/shenwei356/util/byteutil"
 	"github.com/spf13/cobra"
 )
 
@@ -51,6 +53,12 @@ var seqCmd = &cobra.Command{
 		onlyID := getFlagBool(cmd, "only-id")
 		removeGaps := getFlagBool(cmd, "remove-gaps")
 		gapLetters := getFlagString(cmd, "gap-letter")
+		lowerCase := getFlagBool(cmd, "lower-case")
+		upperCase := getFlagBool(cmd, "upper-case")
+
+		if lowerCase && upperCase {
+			checkError(fmt.Errorf("could not give both flags -l (--lower-case) and -u (--upper-case)"))
+		}
 
 		files := getFileList(args)
 
@@ -102,7 +110,13 @@ var seqCmd = &cobra.Command{
 						if removeGaps {
 							sequence = sequence.RemoveGaps(gapLetters)
 						}
-						outfh.WriteString(fmt.Sprintf("%s\n", sequence.FormatSeq(lineWidth)))
+						if lowerCase {
+							outfh.WriteString(fmt.Sprintf("%s\n", byteutil.WrapByteSlice(bytes.ToLower(sequence.Seq), lineWidth)))
+						} else if upperCase {
+							outfh.WriteString(fmt.Sprintf("%s\n", byteutil.WrapByteSlice(bytes.ToUpper(sequence.Seq), lineWidth)))
+						} else {
+							outfh.WriteString(fmt.Sprintf("%s\n", byteutil.WrapByteSlice(sequence.Seq, lineWidth)))
+						}
 					}
 				}
 			}
@@ -121,5 +135,7 @@ func init() {
 	seqCmd.Flags().BoolP("seq", "s", false, "only print sequences")
 	seqCmd.Flags().BoolP("only-id", "i", false, "print ID instead of full head")
 	seqCmd.Flags().BoolP("remove-gaps", "g", false, "remove gaps")
-	seqCmd.Flags().StringP("gap-letter", "l", "-", "gap letters")
+	seqCmd.Flags().StringP("gap-letter", "G", "-", "gap letters")
+	seqCmd.Flags().BoolP("lower-case", "l", false, "print sequences in lower case")
+	seqCmd.Flags().BoolP("upper-case", "u", false, "print sequences in upper case")
 }

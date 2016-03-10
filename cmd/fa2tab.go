@@ -112,10 +112,10 @@ like sequence length, GC content.
 func init() {
 	RootCmd.AddCommand(fa2tabCmd)
 
-	fa2tabCmd.Flags().BoolP("length", "l", false, "show sequence length")
-	fa2tabCmd.Flags().BoolP("gc", "g", false, "show GC content")
-	fa2tabCmd.Flags().StringSliceP("base-content", "b", []string{}, "show base content. (case ignored, multiple values supported) e.g. -b AT -b N")
+	fa2tabCmd.Flags().BoolP("length", "l", false, "print sequence length")
+	fa2tabCmd.Flags().BoolP("gc", "g", false, "print GC content")
+	fa2tabCmd.Flags().StringSliceP("base-content", "b", []string{}, "print base content. (case ignored, multiple values supported) e.g. -b AT -b N")
 	fa2tabCmd.Flags().BoolP("only-id", "i", false, "print ID instead of full head")
-	fa2tabCmd.Flags().BoolP("name", "n", false, "only print names")
+	fa2tabCmd.Flags().BoolP("name", "n", false, "only print names (no sequences)")
 	fa2tabCmd.Flags().BoolP("title", "T", false, "print title line")
 }

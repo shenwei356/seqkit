@@ -34,8 +34,8 @@ import (
 // commonCmd represents the seq command
 var commonCmd = &cobra.Command{
 	Use:   "common",
-	Short: "find common sequences of multiple files",
-	Long: `find common sequences of multiple files
+	Short: "find common sequences of multiple files by id/name/sequence",
+	Long: `find common sequences of multiple files by id/name/sequence
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -150,6 +150,6 @@ func init() {
 	RootCmd.AddCommand(commonCmd)
 
 	commonCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
-	commonCmd.Flags().BoolP("by-seq", "s", false, "match by seq")
+	commonCmd.Flags().BoolP("by-seq", "s", false, "match by sequence")
 	commonCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 }

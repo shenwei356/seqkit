@@ -144,9 +144,12 @@ func filepathTrimExtension(file string) (string, string) {
 
 var reRegion = regexp.MustCompile(`\-?\d+:\-?\d+`)
 
-func writeSeqs(records []*fasta.FastaRecord, file string, lineWidth int, quiet bool) error {
+func writeSeqs(records []*fasta.FastaRecord, file string, lineWidth int, quiet bool, dryRun bool) error {
 	if !quiet {
 		log.Infof("write %d sequences to file: %s\n", len(records), file)
+	}
+	if dryRun {
+		return nil
 	}
 
 	outfh, err := xopen.Wopen(file)

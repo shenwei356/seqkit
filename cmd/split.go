@@ -68,6 +68,7 @@ part size or number of parts.
 		if usingMD5 && region == "" {
 			checkError(fmt.Errorf("flag -m (--md5) can only used when giving -r (--region)"))
 		}
+		dryRun := getFlagBool(cmd, "dry-run")
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
@@ -103,7 +104,7 @@ part size or number of parts.
 					records = append(records, record)
 					if len(records) == size {
 						outfile = fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt)
-						writeSeqs(records, outfile, lineWidth, quiet)
+						writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 						i++
 						records = []*fasta.FastaRecord{}
 					}
@@ -111,7 +112,7 @@ part size or number of parts.
 			}
 			if len(records) > 0 {
 				outfile = fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt)
-				writeSeqs(records, outfile, lineWidth, quiet)
+				writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 			}
 			return
 		}
@@ -160,7 +161,7 @@ part size or number of parts.
 						records = append(records, record)
 						if len(records) == size {
 							outfile = fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt)
-							writeSeqs(records, outfile, lineWidth, quiet)
+							writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 							i++
 							records = []*fasta.FastaRecord{}
 						}
@@ -168,7 +169,7 @@ part size or number of parts.
 				}
 				if len(records) > 0 {
 					outfile = fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt)
-					writeSeqs(records, outfile, lineWidth, quiet)
+					writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 				}
 			} else {
 				i := 1
@@ -199,14 +200,14 @@ part size or number of parts.
 					records = append(records, record)
 					if len(records) == size {
 						outfile = fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt)
-						writeSeqs(records, outfile, lineWidth, quiet)
+						writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 						i++
 						records = []*fasta.FastaRecord{}
 					}
 				}
 				if len(records) > 0 {
 					outfile = fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt)
-					writeSeqs(records, outfile, lineWidth, quiet)
+					writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 				}
 			}
 			return
@@ -242,7 +243,7 @@ part size or number of parts.
 			var outfile string
 			for id, records := range recordsByID {
 				outfile = fmt.Sprintf("%s.id_%s%s", fileName, id, fileExt)
-				writeSeqs(records, outfile, lineWidth, quiet)
+				writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 			}
 			return
 		}
@@ -315,7 +316,7 @@ part size or number of parts.
 			var outfile string
 			for subseq, records := range recordsBySeqs {
 				outfile = fmt.Sprintf("%s.region_%d:%d_%s%s", fileName, start, end, subseq, fileExt)
-				writeSeqs(records, outfile, lineWidth, quiet)
+				writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 			}
 			return
 		}
@@ -334,4 +335,5 @@ func init() {
 		"e.g 1:12 for first 12 bases, -12:-1 for last 12 bases")
 	splitCmd.Flags().BoolP("md5", "m", false, "use MD5 instead of region sequence in output file when using flag -r (--by-region)")
 	splitCmd.Flags().BoolP("two-pass", "2", false, "when sample by number 2-pass mode, low memory usage")
+	splitCmd.Flags().BoolP("dry-run", "d", false, "dry run, just print message and no files will be created.")
 }

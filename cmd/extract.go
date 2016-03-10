@@ -26,6 +26,7 @@ import (
 	"sync"
 
 	"github.com/brentp/xopen"
+	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fasta"
 	"github.com/shenwei356/breader"
 	"github.com/spf13/cobra"
@@ -34,8 +35,8 @@ import (
 // extractCmd represents the extract command
 var extractCmd = &cobra.Command{
 	Use:   "extract",
-	Short: "extract sequences by patterns/motifs",
-	Long: `extract sequence by patterns/motifs
+	Short: "extract sequences by pattern(s) of name or sequence motifs",
+	Long: `extract sequences by pattern(s) of name or sequence motifs
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -53,9 +54,14 @@ var extractCmd = &cobra.Command{
 		invertMatch := getFlagBool(cmd, "invert-match")
 		bySeq := getFlagBool(cmd, "by-seq")
 		byName := getFlagBool(cmd, "by-name")
+		ignoreCase := getFlagBool(cmd, "ignore-case")
+		degenerate := getFlagBool(cmd, "degenerate")
 
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
+		}
+		if useRegexp && degenerate {
+			checkError(fmt.Errorf("could not give both flags -d (--degenerat) and -r (--use-regexp)"))
 		}
 
 		files := getFileList(args)
@@ -68,19 +74,42 @@ var extractCmd = &cobra.Command{
 			for chunk := range reader.Ch {
 				checkError(chunk.Err)
 				for _, data := range chunk.Data {
-					pattern := data.(string)
-					if useRegexp {
-						r, err := regexp.Compile(pattern)
+					p := data.(string)
+					if degenerate || useRegexp {
+						if degenerate {
+							pattern2seq, err := seq.NewSeq(alphabet, []byte(p))
+							if err != nil {
+								checkError(fmt.Errorf("it seems that flag -d is given, "+
+									"but you provide regular expression instead of available %s sequence", alphabet))
+							}
+							p = pattern2seq.Degenerate2Regexp()
+						}
+						if ignoreCase {
+							p = "(?i)" + p
+						}
+						r, err := regexp.Compile(p)
 						checkError(err)
-						patterns[pattern] = r
+						patterns[p] = r
 					} else {
-						patterns[pattern] = nil
+						patterns[p] = nil
 					}
 				}
 			}
 		} else {
-			if useRegexp {
+			if degenerate || useRegexp {
 				for _, p := range pattern {
+					if degenerate {
+						pattern2seq, err := seq.NewSeq(alphabet, []byte(p))
+						if err != nil {
+							checkError(fmt.Errorf("it seems that flag -d is given, "+
+								"but you provide regular expression instead of available %s sequence", alphabet))
+						}
+						p = pattern2seq.Degenerate2Regexp()
+					}
+					if ignoreCase {
+						p = "(?i)" + p
+					}
+					
 					re, err := regexp.Compile(p)
 					checkError(err)
 					patterns[p] = re
@@ -173,7 +202,7 @@ var extractCmd = &cobra.Command{
 						}
 
 						hit = false
-						if useRegexp {
+						if degenerate || useRegexp {
 							for pattern, re := range patterns {
 								if re.Match(subject) {
 									hit = true
@@ -217,8 +246,10 @@ func init() {
 	extractCmd.Flags().StringSliceP("pattern", "p", []string{""}, "search pattern (multiple values supported)")
 	extractCmd.Flags().StringP("pattern-file", "f", "", "pattern file")
 	extractCmd.Flags().BoolP("use-regexp", "r", false, "patterns are regular expression")
-	extractCmd.Flags().BoolP("delete-matched", "d", false, "delete matched pattern to speedup")
+	extractCmd.Flags().BoolP("delete-matched", "", false, "delete matched pattern to speedup")
 	extractCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")
 	extractCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
 	extractCmd.Flags().BoolP("by-seq", "s", false, "match by seq")
+	extractCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
+	extractCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
 }
