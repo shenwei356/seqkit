@@ -9,6 +9,7 @@ Source code: [https://github.com/shenwei356/fakit](https://github.com/shenwei356
 - Cross-platform (Linux/Windows/Mac OS X/OpenBSD/FreeBSD,
   see [download](http://shenwei356.github.io/fakit/download/))
 - Out-of-the-box, no dependencies, without compilation, light weight
+  see [download](http://shenwei356.github.io/fakit/download/))
 - Fast (see benchmark)
 - Practical functions (see subcommands and
   [examples](http://shenwei356.github.io/fakit/usage/) )
@@ -57,12 +58,20 @@ Global Flags
 
 ## Benchmark
 
+TODO
+
+## Contact
+
+Email me for any problem when using fakit. shenwei356(at)gmail.com
+
+[Create an issue](https://github.com/shenwei356/fakit/issues) to report bugs,
+propose new functions or ask for help.
+
 ## License
 
 [MIT License](https://github.com/shenwei356/bio_scripts/blob/master/LICENSE)
 
 ## Similar tools
-
 
 - [fastx_toolkit](http://hannonlab.cshl.edu/fastx_toolkit/)
 - [seqtk](https://github.com/lh3/seqtk)
