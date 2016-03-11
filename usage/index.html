@@ -80,6 +80,12 @@
                     </li>
                 
                 
+                
+                    <li >
+                        <a href="../extension/">Extension</a>
+                    </li>
+                
+                
                 </ul>
             
 
@@ -95,8 +101,8 @@
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
-                    <li class="disabled">
-                        <a rel="prev" >
+                    <li >
+                        <a rel="prev" href="../extension/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -170,7 +176,7 @@ Usage:
 Available Commands:
   common      find common sequences of multiple files by id/name/sequence
   extract     extract sequences by pattern(s) of name or sequence motifs
-  fa2tab      covert FASTA to tabular format, and provide various information
+        covert FASTA to tabular format, and provide various information
   locate      locate subsequences/motifs
   rmdup       remove duplicated sequences by id/name/sequence
   sample      sample sequences by number or proportion
@@ -252,14 +258,14 @@ cel-mir-1 MI0000003 Caenorhabditis elegans miR-1 stem-loop
 </li>
 <li>
 <p>Only ID:</p>
-<pre><code>$ fakit seq hairpin.fa.gz -i
+<pre><code>$ fakit seq hairpin.fa.gz -n -i
 cel-let-7
 cel-lin-4
 cel-mir-1
 </code></pre>
 </li>
 <li>
-<p>Self defined ID region by regular expression (this could be applied to all subcommands):</p>
+<p>Custom ID region by regular expression (this could be applied to all subcommands):</p>
 <pre><code>$ fakit seq hairpin.fa.gz -n -i --id-regexp "^[^\s]+\s([^\s]+)\s"
 MI0000001
 MI0000002
@@ -284,6 +290,13 @@ UCGAAGAGUUCUGUCUCCGGUAAGGUAGAAAAUUGCAUAGUUCACCGGUGGUAAUAUUCC
 AAACUAUACAACCUACUACCUCACCGGAUCCACAGUGUA
 </code></pre>
 </li>
+<li>
+<p>Remove gaps and to lower/upper case</p>
+<pre><code>$ echo -e "&gt;seq\nACGT-ACTGC-ACC" | fakit seq -i -g
+&gt;seq
+ACGTACTGCACC
+</code></pre>
+</li>
 </ol>
 <h2 id="subseq">subseq</h2>
 <p>Usage</p>
@@ -293,18 +306,17 @@ The definition of region is 1-based and with some custom design.
 
 Examples:
 
-        seq   :   A C G T N a c g t n
-        index :   0 1 2 3 4 5 6 7 8 9
-
-        region &amp; seq
-
+ 0-based index    0 1 2 3 4 5 6 7 8 9
+ 1-based index    1 2 3 4 5 6 7 8 9 10
+negative index    0-9-8-7-6-5-4-3-2-1
+           seq    A C G T N a c g t n
            1:1    A
            2:4        G T N
-          -4:-2               c g t
-          -4:-1               c g t n
-          -1:-1                     n
-           2:-2     C G T N a c g t
-           1:-1   A C G T N a c g t n
+         -4:-2                c g t
+         -4:-1                c g t n
+         -1:-1                      n
+          2:-2      C G T N a c g t
+          1:-1    A C G T N a c g t n
 
 Usage:
   fakit subseq [flags]
@@ -334,7 +346,7 @@ Flags:
 <h2 id="fa2tab-fa2tab">fa2tab &amp; fa2tab</h2>
 <p>Usage (fa2tab)</p>
 <pre><code>covert FASTA to tabular format, and provide various information,
-like sequence length, GC content.
+like sequence length, GC content/GC skew.
 
 Usage:
   fakit fa2tab [flags]
@@ -342,10 +354,12 @@ Usage:
 Flags:
   -b, --base-content value   print base content. (case ignored, multiple values supported) e.g. -b AT -b N (default [])
   -g, --gc                   print GC content
+  -G, --gc-skew              print GC-Skew
   -l, --length               print sequence length
   -n, --name                 only print names (no sequences)
   -i, --only-id              print ID instead of full head
   -T, --title                print title line
+
 </code></pre>
 
 <p>Usage (tab2fa)</p>
@@ -371,11 +385,11 @@ cel-mir-1 MI0000003 Caenorhabditis elegans miR-1 stem-loop      AAAGUGACCGUACCGA
 <li>
 <p>Print sequence length, GC content, and only print names (no sequences),
 we could also print title line by flag <code>-T</code>.</p>
-<pre><code>$ fakit fa2tab hairpin.fa.gz -l -g -n -T
+<pre><code>$ fakit fa2tab hairpin.fa.gz -i -l -g -n -T
 # name  seq     length  GC
-cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop              99      43.43
-cel-lin-4 MI0000002 Caenorhabditis elegans lin-4 stem-loop              94      54.26
-cel-mir-1 MI0000003 Caenorhabditis elegans miR-1 stem-loop              96      40.62
+cel-let-7               99      43.43
+cel-lin-4               94      54.26
+cel-mir-1               96      40.62
 </code></pre>
 </li>
 <li>
@@ -423,7 +437,7 @@ Flags:
 <p>Examples</p>
 <ol>
 <li>
-<p>Extract human hairpins (i.e. sequences with name starting with <code>hsa</code></p>
+<p>Extract human hairpins (i.e. sequences with name starting with <code>hsa</code>)</p>
 <pre><code>$ zcat hairpin.fa.gz | fakit extract -r -p ^hsa
 &gt;hsa-let-7a-1 MI0000060 Homo sapiens let-7a-1 stem-loop
 UGGGAUGAGGUAGUAGGUUGUAUAGUUUUAGGGUCACACCCACCACUGGGAGAUAACUAU
@@ -458,7 +472,7 @@ pmi-let-7
 </ol>
 </li>
 <li>
-<p>Extract sequences containing start with AGGCG</p>
+<p>Extract sequences starting with AGGCG</p>
 <pre><code>$ zcat hairpin.fa.gz | fakit extract -s -r -i -p ^aggcg
 </code></pre>
 </li>
@@ -517,27 +531,32 @@ Flags:
 
 <p>Examples</p>
 <p>Similar to <code>common</code>.</p>
+<ol>
+<li>General use<pre><code>$ zcat hairpin.fa.gz | fakit rmdup -s -o clean.fa.gz
+[INFO] 2226 duplicated records removed
+</code></pre>
+</li>
+</ol>
 <h2 id="split">split</h2>
 <p>Usage</p>
-<pre><code>split sequences into files by name ID, sub sequence of given region,
+<pre><code>split sequences into files by name ID, subsequence of given region,
 part size or number of parts.
 
 The definition of region is 1-based and with some custom design.
 
 Examples:
 
-        seq   :   A C G T N a c g t n
-        index :   0 1 2 3 4 5 6 7 8 9
-
-        region &amp; seq
-
+ 0-based index    0 1 2 3 4 5 6 7 8 9
+ 1-based index    1 2 3 4 5 6 7 8 9 10
+negative index    0-9-8-7-6-5-4-3-2-1
+           seq    A C G T N a c g t n
            1:1    A
            2:4        G T N
-          -4:-2               c g t
-          -4:-1               c g t n
-          -1:-1                     n
-           2:-2     C G T N a c g t
-           1:-1   A C G T N a c g t n
+         -4:-2                c g t
+         -4:-1                c g t n
+         -1:-1                      n
+          2:-2      C G T N a c g t
+          1:-1    A C G T N a c g t n
 
 Usage:
   fakit split [flags]
@@ -549,7 +568,7 @@ Flags:
   -s, --by-size int        split squences into multi parts with N sequences
   -d, --dry-run            dry run, just print message and no files will be created.
   -m, --md5                use MD5 instead of region sequence in output file when using flag -r (--by-region)
-  -2, --two-pass           when sample by number 2-pass mode, low memory usage
+  -2, --two-pass           2-pass mode read files twice to lower memory usage. Not allowed when reading from stdin
 </code></pre>
 
 <p>Examples</p>
@@ -576,7 +595,7 @@ Flags:
 </code></pre>
 <p>To reduce memory usage when spliting big file, we could use flag <code>--two-pass</code></p>
 <pre><code>$ fakit split hairpin.fa.gz -p 4 -2
-[INFO] split into 4 parts                                                                           
+[INFO] split into 4 parts
 [INFO] first pass: get seq number
 [INFO] seq number: 28645
 [INFO] second pass: read and split
@@ -587,9 +606,9 @@ Flags:
 </code></pre>
 </li>
 <li>
-<p>Split sequences by species. i.e. by self-defined IDs</p>
+<p>Split sequences by species. i.e. by custom IDs (first three letters)</p>
 <pre><code>$ fakit split hairpin.fa.gz -i --id-regexp "^([\w]+)\-"
-[INFO] split by ID. idRegexp: ^([\w]+)\-                                                            
+[INFO] split by ID. idRegexp: ^([\w]+)\-
 [INFO] read sequences ...
 [INFO] read 28645 sequences
 [INFO] write 97 sequences to file: hairpin.fa.id_asu.gz
@@ -623,13 +642,13 @@ Flags:
   -n, --number int         sample by number (result may not exactly match)
   -p, --proportion float   sample by proportion
   -s, --rand-seed int      rand seed for shuffle (default 11)
-  -2, --two-pass           when sample by number 2-pass mode, low memory usage
+  -2, --two-pass           2-pass mode read files twice to lower memory usage. Not allowed when reading from stdin
 </code></pre>
 
 <p>Examples</p>
 <ol>
 <li>
-<p>Sample by number.</p>
+<p>Sample by number</p>
 <pre><code>$ zcat hairpin.fa.gz | fakit sample -n 1000 -o sample.fa.gz
 [INFO] sample by number
 [INFO] 949 sequences outputed
@@ -637,20 +656,20 @@ Flags:
 <p>To reduce memory usage when spliting big file, we could use flag <code>--two-pass</code></p>
 </li>
 <li>
-<p>Sample by proportion.</p>
+<p>Sample by proportion</p>
 <pre><code>$ zcat hairpin.fa.gz | fakit sample -p 0.1 -o sample.fa.gz
 [INFO] sample by proportion
 [INFO] 2814 sequences outputed
 </code></pre>
 </li>
 <li>
-<p>Set rand seed to reproduce the result.</p>
+<p>Set rand seed to reproduce the result</p>
 <pre><code>$ zcat hairpin.fa.gz | fakit sample -p 0.1 -s 11
 </code></pre>
 </li>
 <li>
 <p>Most of the time, we could shuffle after sampling</p>
-<pre><code>$ zcat hairpin.fa.gz | fakit sample -p 0.1 | fakit shuffle
+<pre><code>$ zcat hairpin.fa.gz | fakit sample -p 0.1 | fakit shuffle -o sample.fa.gz
 </code></pre>
 </li>
 </ol>
@@ -758,7 +777,7 @@ NACGTa
 </li>
 <li>
 <p>Generate GC content for ploting</p>
-<pre><code>$ zcat hairpin.fa.gz | fakit fa2tab | head -n 1 | fakit tab2fa | fakit sliding -s 5 -W 30 | fakit fa2tab  -n -g   
+<pre><code>$ zcat hairpin.fa.gz | fakit fa2tab | head -n 1 | fakit tab2fa | fakit sliding -s 5 -W 30 | fakit fa2tab  -n -g
 cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:1-30         50.00
 cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:6-35         46.67
 cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:11-40                43.33
