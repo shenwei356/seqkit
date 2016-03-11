@@ -1,0 +1,12 @@
+site_name: fakit - FASTA kit
+pages:
+- Home: index.md
+- Download: download.md
+- Usage & Examples: usage.md
+- Extension: extension.md
+theme: mkdocs
+
+repo_url: https://github.com/shenwei356/fakit
+site_description: fakit - FASTA kit
+site_author: shenwei356
+google_analytics: ['UA-28948626-5', 'shenwei356.github.io/fakit']

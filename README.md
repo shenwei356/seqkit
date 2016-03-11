@@ -6,12 +6,15 @@ Source code: [https://github.com/shenwei356/fakit](https://github.com/shenwei356
 
 ## Features
 
-- Cross-platform (Linux/Windows/Mac OS X/OpenBSD/FreeBSD)
+- Cross-platform (Linux/Windows/Mac OS X/OpenBSD/FreeBSD,
+  see [download](http://shenwei356.github.io/fakit/download/))
 - Out-of-the-box, no dependencies, without compilation, light weight
 - Fast (see benchmark)
-- Practical functions (see subcommands)
-- Reproducible results (sample and shuffle)
+- Practical functions (see subcommands and
+  [examples](http://shenwei356.github.io/fakit/usage/) )
 - Support STDIN and gziped input/output file, could be used in pipe
+- Support custom sequence ID regular expression (especially useful for quering with ID list)
+- Reproducible results (configurable rand seed in `sample` and `shuffle`)
 
 ## Subcommands
 
@@ -51,6 +54,8 @@ Global Flags
 ## Usage && Examples
 
 [http://shenwei356.github.io/fakit/usage/](http://shenwei356.github.io/fakit/usage/)
+
+## Benchmark
 
 ## License
 
