@@ -135,6 +135,8 @@
         
             <li><a href="#subseq">subseq</a></li>
         
+            <li><a href="#stat">stat</a></li>
+        
             <li><a href="#fa2tab-fa2tab">fa2tab &amp; fa2tab</a></li>
         
             <li><a href="#extract">extract</a></li>
@@ -163,7 +165,7 @@
 <p>Usage</p>
 <pre><code>fakit -- FASTA kit
 
-Version: 0.1
+Version: 0.1.1
 
 Author: Wei Shen &lt;shenwei356(at)gmail.com&gt;
 
@@ -184,11 +186,12 @@ Available Commands:
   shuffle     shuffle sequences
   sliding     sliding sequences, circle genome supported
   split       split sequences into files by id/seq region/size/parts
+  stat        simple statistics of FASTA files
   subseq      get subsequence by region
   tab2fa      covert tabular format to FASTA format
 
 Flags:
-  -c, --chunk-size int     chunk size (default 1000)
+  -c, --chunk-size int     chunk size (attention: unit is FASTA records not lines) (default 1000)
       --id-regexp string   regular expression for parsing ID (default &quot;^([^\\s]+)\\s?&quot;)
   -w, --line-width int     line width (0 for no wrap) (default 60)
   -o, --out-file string    out file (&quot;-&quot; for stdout, suffix .gz for gzipped out) (default &quot;-&quot;)
@@ -340,6 +343,23 @@ Flags:
 <li>
 <p>subsequence without first and last 12 bases</p>
 <pre><code>$ zcat hairpin.fa.gz | fakit subseq -r 13:-13
+</code></pre>
+</li>
+</ol>
+<h2 id="stat">stat</h2>
+<p>Usage</p>
+<pre><code>simple statistics of FASTA files
+
+Usage:
+  fakit stat [flags]
+</code></pre>
+
+<p>Eexamples</p>
+<ol>
+<li>General use<pre><code>$ fakit stat *.fa.gz
+file    type    num_seqs        min_len avg_len max_len
+hairpin.fa.gz   RNA     28645   39      103.0   2354
+mature.fa.gz    RNA     35828   15      21.8    34
 </code></pre>
 </li>
 </ol>

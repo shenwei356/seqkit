@@ -169,6 +169,7 @@
 <ul>
 <li><code>seq</code>        transform sequence (revserse, complement, extract ID...)</li>
 <li><code>subseq</code>     get subsequence by region</li>
+<li><code>stat</code>       simple statistics of FASTA files</li>
 </ul>
 <p>Format convert</p>
 <ul>
@@ -187,7 +188,7 @@
 <li><code>sliding</code>    sliding sequences, circle genome supported</li>
 </ul>
 <p>Global Flags</p>
-<pre><code>-c, --chunk-size int     chunk size (default 1000)
+<pre><code>-c, --chunk-size int     chunk size (attention: unit is FASTA records not lines) (default 1000)
     --id-regexp string   regular expression for parsing ID (default &quot;^([^\\s]+)\\s?&quot;)
 -w, --line-width int     line width (0 for no wrap) (default 60)
 -o, --out-file string    out file (&quot;-&quot; for stdout, suffix .gz for gzipped out) (default &quot;-&quot;)
@@ -261,5 +262,5 @@ propose new functions or ask for help.</p>
 
 <!--
 MkDocs version : 0.15.3
-Build Date UTC : 2016-03-11 05:15:00.317614
+Build Date UTC : 2016-03-11 17:14:43.867975
 -->
