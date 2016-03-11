@@ -55,6 +55,11 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		threads := getFlagInt(cmd, "threads")
 		outFile := getFlagString(cmd, "out-file")
 
+		if chunkSize <= 0 || threads <= 0 {
+			checkError(fmt.Errorf("value of flag -c, -j, -w should be greater than 0"))
+		}
+		runtime.GOMAXPROCS(threads)
+
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
 		degenerate := getFlagBool(cmd, "degenerate")
@@ -212,7 +217,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 			var wg sync.WaitGroup
 			tokens := make(chan int, threads)
 
-			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
+			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
 			for chunk := range fastaReader.Ch {
 				checkError(chunk.Err)

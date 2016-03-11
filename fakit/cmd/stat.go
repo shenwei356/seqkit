@@ -23,95 +23,74 @@ package cmd
 import (
 	"fmt"
 	"runtime"
-	"strconv"
-	"strings"
 
 	"github.com/brentp/xopen"
+	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fasta"
-	"github.com/shenwei356/util/byteutil"
 	"github.com/spf13/cobra"
 )
 
-// subseqCmd represents the seq command
-var subseqCmd = &cobra.Command{
-	Use:   "subseq",
-	Short: "get subsequence by region",
-	Long: fmt.Sprintf(`get subsequence by region.
+// statCmd represents the seq command
+var statCmd = &cobra.Command{
+	Use:   "stat",
+	Short: "simple statistics of FASTA files",
+	Long: `simple statistics of FASTA files
 
-The definition of region is 1-based and with some custom design.
-
-Examples:
-%s
-`, regionExample),
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		alphabet := getAlphabet(cmd, "seq-type")
 		idRegexp := getFlagString(cmd, "id-regexp")
 		chunkSize := getFlagInt(cmd, "chunk-size")
 		threads := getFlagInt(cmd, "threads")
-		lineWidth := getFlagInt(cmd, "line-width")
 		outFile := getFlagString(cmd, "out-file")
 
-		if chunkSize <= 0 || threads <= 0 || lineWidth <= 0 {
+		if chunkSize <= 0 || threads <= 0 {
 			checkError(fmt.Errorf("value of flag -c, -j, -w should be greater than 0"))
 		}
 		runtime.GOMAXPROCS(threads)
 
 		files := getFileList(args)
 
-		region := getFlagString(cmd, "region")
-
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Close()
 
-		if region == "" {
-			checkError(fmt.Errorf("flag -r (--region) needed"))
-		}
-
-		if region != "" {
-			if !reRegion.MatchString(region) {
-				checkError(fmt.Errorf(`invalid region: %s. type "fakit subseq -h" for more examples`, region))
-			}
-			r := strings.Split(region, ":")
-			start, err := strconv.Atoi(r[0])
+		outfh.WriteString(fmt.Sprintf("file\ttype\tnum_seqs\tmin_len\tavg_len\tmax_len\n"))
+		var num, l, lenMin, lenMax, lenSum uint64
+		var t string
+		for _, file := range files {
+			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
-			end, err := strconv.Atoi(r[1])
-			checkError(err)
-			if start == 0 || end == 0 {
-				checkError(fmt.Errorf("both start and end should not be 0"))
-			}
-			if start < 0 && end > 0 {
-				checkError(fmt.Errorf("when start < 0, end should not > 0"))
-			}
 
-			var s, e int
-			for _, file := range files {
-				fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
-				checkError(err)
-				for chunk := range fastaReader.Ch {
-					checkError(chunk.Err)
+			num, lenMin, lenMax, lenSum = 0, ^uint64(0), 0, 0
+			for chunk := range fastaReader.Ch {
+				checkError(chunk.Err)
 
-					for _, record := range chunk.Data {
-						s, e = start, end
-						if s > 0 {
-							s--
-						}
-						if e < 0 {
-							e++
-						}
-						outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name,
-							byteutil.WrapByteSlice(byteutil.SubSlice(record.Seq.Seq, s, e), lineWidth)))
+				num += uint64(len(chunk.Data))
+				for _, record := range chunk.Data {
+					l = uint64(len(record.Seq.Seq))
+					lenSum += l
+					if l < lenMin {
+						lenMin = l
+					}
+					if l > lenMax {
+						lenMax = l
 					}
 				}
 			}
+			if fastaReader.Alphabet() == seq.DNAredundant {
+				t = "DNA"
+			} else if fastaReader.Alphabet() == seq.RNAredundant {
+				t = "RNA"
+			} else {
+				t = fmt.Sprintf("%s", fastaReader.Alphabet())
+			}
+			outfh.WriteString(fmt.Sprintf("%s\t%s\t%d\t%d\t%.1f\t%d\n",
+				file, t, num, lenMin, float64(lenSum)/float64(num), lenMax))
 		}
-
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(subseqCmd)
-
-	subseqCmd.Flags().StringP("region", "r", "", "subsequence of given region. "+
-		`e.g 1:12 for first 12 bases, -12:-1 for last 12 bases, 13:-1 for cutting first 12 bases. type "fakit subseq -h" for more examples`)
+	RootCmd.AddCommand(statCmd)
 }

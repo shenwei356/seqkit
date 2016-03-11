@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 	"regexp"
+	"runtime"
 	"sync"
 
 	"github.com/brentp/xopen"
@@ -46,6 +47,11 @@ var extractCmd = &cobra.Command{
 		threads := getFlagInt(cmd, "threads")
 		lineWidth := getFlagInt(cmd, "line-width")
 		outFile := getFlagString(cmd, "out-file")
+
+		if chunkSize <= 0 || threads <= 0 || lineWidth <= 0 {
+			checkError(fmt.Errorf("value of flag -c, -j, -w should be greater than 0"))
+		}
+		runtime.GOMAXPROCS(threads)
 
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
@@ -109,7 +115,7 @@ var extractCmd = &cobra.Command{
 					if ignoreCase {
 						p = "(?i)" + p
 					}
-					
+
 					re, err := regexp.Compile(p)
 					checkError(err)
 					patterns[p] = re
@@ -175,7 +181,7 @@ var extractCmd = &cobra.Command{
 			var wg sync.WaitGroup
 			tokens := make(chan int, threads)
 
-			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
+			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
 			for chunk := range fastaReader.Ch {
 				checkError(chunk.Err)

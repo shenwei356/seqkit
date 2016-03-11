@@ -22,6 +22,7 @@ package cmd
 
 import (
 	"fmt"
+	"runtime"
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seqio/fasta"
@@ -43,6 +44,11 @@ var slidingCmd = &cobra.Command{
 		threads := getFlagInt(cmd, "threads")
 		lineWidth := getFlagInt(cmd, "line-width")
 		outFile := getFlagString(cmd, "out-file")
+
+		if chunkSize <= 0 || threads <= 0 || lineWidth <= 0 {
+			checkError(fmt.Errorf("value of flag -c, -j, -w should be greater than 0"))
+		}
+		runtime.GOMAXPROCS(threads)
 
 		files := getFileList(args)
 
@@ -66,7 +72,7 @@ var slidingCmd = &cobra.Command{
 		var sequence []byte
 		var originalLen, l, end, e int
 		for _, file := range files {
-			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
+			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
 			for chunk := range fastaReader.Ch {
 				checkError(chunk.Err)

@@ -23,6 +23,7 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"runtime"
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seq"
@@ -45,6 +46,11 @@ var seqCmd = &cobra.Command{
 		threads := getFlagInt(cmd, "threads")
 		lineWidth := getFlagInt(cmd, "line-width")
 		outFile := getFlagString(cmd, "out-file")
+
+		if chunkSize <= 0 || threads <= 0 || lineWidth <= 0 {
+			checkError(fmt.Errorf("value of flag -c, -j, -w should be greater than 0"))
+		}
+		runtime.GOMAXPROCS(threads)
 
 		reverse := getFlagBool(cmd, "reverse")
 		complement := getFlagBool(cmd, "complement")
@@ -70,7 +76,7 @@ var seqCmd = &cobra.Command{
 		var head []byte
 		var sequence *seq.Seq
 		for _, file := range files {
-			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
+			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
 
 			for chunk := range fastaReader.Ch {

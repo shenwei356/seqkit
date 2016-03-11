@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 	"math/rand"
+	"runtime"
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seqio/fasta"
@@ -46,6 +47,11 @@ var shuffleCmd = &cobra.Command{
 		outFile := getFlagString(cmd, "out-file")
 		quiet := getFlagBool(cmd, "quiet")
 
+		if chunkSize <= 0 || threads <= 0 || lineWidth <= 0 {
+			checkError(fmt.Errorf("value of flag -c, -j, -w should be greater than 0"))
+		}
+		runtime.GOMAXPROCS(threads)
+
 		files := getFileList(args)
 
 		seed := getFlagInt64(cmd, "rand-seed")
@@ -62,7 +68,7 @@ var shuffleCmd = &cobra.Command{
 		}
 		i := 0
 		for _, file := range files {
-			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
+			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
 			for chunk := range fastaReader.Ch {
 				checkError(chunk.Err)

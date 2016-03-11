@@ -23,6 +23,7 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"runtime"
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seqio/fasta"
@@ -45,6 +46,11 @@ var rmdupCmd = &cobra.Command{
 		outFile := getFlagString(cmd, "out-file")
 		quiet := getFlagBool(cmd, "quiet")
 
+		if chunkSize <= 0 || threads <= 0 || lineWidth <= 0 {
+			checkError(fmt.Errorf("value of flag -c, -j, -w should be greater than 0"))
+		}
+		runtime.GOMAXPROCS(threads)
+
 		bySeq := getFlagBool(cmd, "by-seq")
 		byName := getFlagBool(cmd, "by-name")
 		ignoreCase := getFlagBool(cmd, "ignore-case")
@@ -59,7 +65,7 @@ var rmdupCmd = &cobra.Command{
 		var subject string
 		removed := 0
 		for _, file := range files {
-			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
+			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
 			for chunk := range fastaReader.Ch {
 				checkError(chunk.Err)

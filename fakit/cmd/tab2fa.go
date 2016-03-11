@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 	"reflect"
+	"runtime"
 	"strings"
 
 	"github.com/brentp/xopen"
@@ -43,6 +44,11 @@ var tab2faCmd = &cobra.Command{
 		threads := getFlagInt(cmd, "threads")
 		outFile := getFlagString(cmd, "out-file")
 		lineWidth := getFlagInt(cmd, "line-width")
+
+		if chunkSize <= 0 || threads <= 0 || lineWidth <= 0 {
+			checkError(fmt.Errorf("value of flag -c, -j, -w should be greater than 0"))
+		}
+		runtime.GOMAXPROCS(threads)
 
 		files := getFileList(args)
 

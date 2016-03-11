@@ -23,6 +23,7 @@ Basic
 
 - `seq`        transform sequence (revserse, complement, extract ID...)
 - `subseq`     get subsequence by region
+- `stat`       simple statistics of FASTA files
 
 Format convert
 
@@ -43,7 +44,7 @@ More
 Global Flags
 
 ```
--c, --chunk-size int     chunk size (default 1000)
+-c, --chunk-size int     chunk size (attention: unit is FASTA records not lines) (default 1000)
     --id-regexp string   regular expression for parsing ID (default "^([^\\s]+)\\s?")
 -w, --line-width int     line width (0 for no wrap) (default 60)
 -o, --out-file string    out file ("-" for stdout, suffix .gz for gzipped out) (default "-")

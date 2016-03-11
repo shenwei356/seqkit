@@ -22,6 +22,7 @@ package cmd
 
 import (
 	"fmt"
+	"runtime"
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seqio/fasta"
@@ -42,6 +43,11 @@ like sequence length, GC content/GC skew.
 		chunkSize := getFlagInt(cmd, "chunk-size")
 		threads := getFlagInt(cmd, "threads")
 		outFile := getFlagString(cmd, "out-file")
+
+		if chunkSize <= 0 || threads <= 0 {
+			checkError(fmt.Errorf("value of flag -c, -j, -w should be greater than 0"))
+		}
+		runtime.GOMAXPROCS(threads)
 
 		files := getFileList(args)
 
@@ -79,7 +85,7 @@ like sequence length, GC content/GC skew.
 		var name []byte
 		var g, c float64
 		for _, file := range files {
-			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
+			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
 			for chunk := range fastaReader.Ch {
 				checkError(chunk.Err)

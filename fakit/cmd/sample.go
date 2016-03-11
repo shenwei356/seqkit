@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 	"math/rand"
+	"runtime"
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seqio/fasta"
@@ -48,6 +49,11 @@ var sampleCmd = &cobra.Command{
 		lineWidth := getFlagInt(cmd, "line-width")
 		outFile := getFlagString(cmd, "out-file")
 		quiet := getFlagBool(cmd, "quiet")
+
+		if chunkSize <= 0 || threads <= 0 || lineWidth <= 0 {
+			checkError(fmt.Errorf("value of flag -c, -j, -w should be greater than 0"))
+		}
+		runtime.GOMAXPROCS(threads)
 
 		files := getFileList(args)
 
@@ -102,7 +108,7 @@ var sampleCmd = &cobra.Command{
 				if !quiet {
 					log.Info("second pass: read and sample")
 				}
-				fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
+				fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
 				checkError(err)
 				for chunk := range fastaReader.Ch {
 					checkError(chunk.Err)
@@ -132,7 +138,7 @@ var sampleCmd = &cobra.Command{
 				log.Info("sample by proportion")
 			}
 
-			fastaReader, err := fasta.NewFastaReader(alphabet, file, chunkSize, threads, idRegexp)
+			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
 			for chunk := range fastaReader.Ch {
 				checkError(chunk.Err)

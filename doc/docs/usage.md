@@ -7,7 +7,7 @@ Usage
 ```
 fakit -- FASTA kit
 
-Version: 0.1
+Version: 0.1.1
 
 Author: Wei Shen <shenwei356(at)gmail.com>
 
@@ -28,11 +28,12 @@ Available Commands:
   shuffle     shuffle sequences
   sliding     sliding sequences, circle genome supported
   split       split sequences into files by id/seq region/size/parts
+  stat        simple statistics of FASTA files
   subseq      get subsequence by region
   tab2fa      covert tabular format to FASTA format
 
 Flags:
-  -c, --chunk-size int     chunk size (default 1000)
+  -c, --chunk-size int     chunk size (attention: unit is FASTA records not lines) (default 1000)
       --id-regexp string   regular expression for parsing ID (default "^([^\\s]+)\\s?")
   -w, --line-width int     line width (0 for no wrap) (default 60)
   -o, --out-file string    out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
@@ -175,6 +176,26 @@ Examples
 1. subsequence without first and last 12 bases
 
         $ zcat hairpin.fa.gz | fakit subseq -r 13:-13
+
+## stat
+
+Usage
+
+```
+simple statistics of FASTA files
+
+Usage:
+  fakit stat [flags]
+```
+
+Eexamples
+
+1. General use
+
+        $ fakit stat *.fa.gz
+        file    type    num_seqs        min_len avg_len max_len
+        hairpin.fa.gz   RNA     28645   39      103.0   2354
+        mature.fa.gz    RNA     35828   15      21.8    34
 
 ## fa2tab & fa2tab
 

@@ -37,7 +37,7 @@ var RootCmd = &cobra.Command{
 	Short: "FASTA kit",
 	Long: `fakit -- FASTA kit
 
-Version: 0.1
+Version: 0.1.1
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -58,7 +58,7 @@ func Execute() {
 
 func init() {
 	RootCmd.PersistentFlags().StringP("seq-type", "t", "auto", "sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence)")
-	RootCmd.PersistentFlags().IntP("chunk-size", "c", 1000, "chunk size")
+	RootCmd.PersistentFlags().IntP("chunk-size", "c", 1000, "chunk size (attention: unit is FASTA records not lines)")
 	RootCmd.PersistentFlags().IntP("threads", "j", runtime.NumCPU(), "number of CPUs (default value depends on your device)")
 	RootCmd.PersistentFlags().IntP("line-width", "w", 60, "line width (0 for no wrap)")
 	RootCmd.PersistentFlags().StringP("id-regexp", "", fasta.DefaultIDRegexp, "regular expression for parsing ID")
