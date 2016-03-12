@@ -27,6 +27,14 @@
 
     
     <url>
+     <loc>None/benchmark/</loc>
+     <lastmod>2016-03-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
      <loc>None/extension/</loc>
      <lastmod>2016-03-12</lastmod>
      <changefreq>daily</changefreq>

@@ -9,7 +9,7 @@
         
         <link rel="shortcut icon" href="../img/favicon.ico">
 
-	<title>Usage & Examples - fakit - FASTA kit</title>
+	<title>Usage - fakit - FASTA kit</title>
 
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
@@ -76,7 +76,13 @@
                 
                 
                     <li class="active">
-                        <a href="./">Usage & Examples</a>
+                        <a href="./">Usage</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../benchmark/">Benchmark</a>
                     </li>
                 
                 
@@ -102,7 +108,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../extension/">
+                        <a rel="prev" href="../benchmark/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -130,6 +136,8 @@
         <li class="main active"><a href="#usage-and-examples">Usage and Examples</a></li>
         
             <li><a href="#fakit">fakit</a></li>
+        
+            <li><a href="#performance-tips">Performance Tips</a></li>
         
             <li><a href="#seq">seq</a></li>
         
@@ -167,7 +175,7 @@
 
 Version: 0.1.1
 
-Author: Wei Shen &lt;shenwei356(at)gmail.com&gt;
+Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
 Documents  : http://shenwei356.github.io/fakit
 Source code: https://github.com/shenwei356/fakit
@@ -178,7 +186,7 @@ Usage:
 Available Commands:
   common      find common sequences of multiple files by id/name/sequence
   extract     extract sequences by pattern(s) of name or sequence motifs
-        covert FASTA to tabular format, and provide various information
+  fa2tab      covert FASTA to tabular format, and provide various information
   locate      locate subsequences/motifs
   rmdup       remove duplicated sequences by id/name/sequence
   sample      sample sequences by number or proportion
@@ -191,17 +199,35 @@ Available Commands:
   tab2fa      covert tabular format to FASTA format
 
 Flags:
-  -c, --chunk-size int     chunk size (attention: unit is FASTA records not lines) (default 1000)
+  -c, --chunk-size int     chunk size (attention: unit is FASTA records not lines) (default 100)
       --id-regexp string   regular expression for parsing ID (default &quot;^([^\\s]+)\\s?&quot;)
   -w, --line-width int     line width (0 for no wrap) (default 60)
   -o, --out-file string    out file (&quot;-&quot; for stdout, suffix .gz for gzipped out) (default &quot;-&quot;)
       --quiet              be quiet and do not show extra information
   -t, --seq-type string    sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default &quot;auto&quot;)
-  -j, --threads int        number of CPUs (default value depends on your device) (default 4)
+  -j, --threads int        number of CPUs. since most of the subcommands are I/O intensive, so default value is 1. For computation intensive jobs, like extract and locate, you may set bigger value (default 1)
 
 Use &quot;fakit [command] --help&quot; for more information about a command.
 </code></pre>
 
+<h2 id="performance-tips">Performance Tips</h2>
+<p>Since most of the subcommands are I/O intensive,
+so default value of flag -j (--threads) is 1.
+For computation intensive jobs, like extract and locate,
+ you may set a bigger value.</p>
+<p>For example</p>
+<ol>
+<li>
+<p>Extract sequences by names or sequences using regular expression.</p>
+<pre><code>zcat hairpin.fa.gz | fakit extract -s -r -i -p TT[CG]AA -j 4
+</code></pre>
+</li>
+<li>
+<p>Locate sequence motifs</p>
+<pre><code>zcat hairpin.fa.gz | fakit extract -s -d -i -f motif.fa -j 4
+</code></pre>
+</li>
+</ol>
 <h3 id="datasets">Datasets</h3>
 <p>Datasets are from <a href="ftp://mirbase.org/pub/mirbase/21/">The miRBase Sequence Database -- Release 21</a></p>
 <ul>
@@ -493,12 +519,12 @@ pmi-let-7
 </li>
 <li>
 <p>Extract sequences starting with AGGCG</p>
-<pre><code>$ zcat hairpin.fa.gz | fakit extract -s -r -i -p ^aggcg
+<pre><code>$ zcat hairpin.fa.gz | fakit extract -s -r -i -p ^aggcg -j 4
 </code></pre>
 </li>
 <li>
 <p>Extract sequences with TTSAA (AgsI digest site) in SEQUENCE. Base S stands for C or G.</p>
-<pre><code>$ zcat hairpin.fa.gz | fakit extract -s -d -i -p TTSAA
+<pre><code>$ zcat hairpin.fa.gz | fakit extract -s -d -i -p TTSAA -j 4
 </code></pre>
 <p>It's equal to but simpler than:</p>
 <pre><code>$ zcat hairpin.fa.gz | fakit extract -s -r -i -p TT[CG]AA
@@ -741,7 +767,7 @@ Flags:
 <ol>
 <li>
 <p>Locate ORFs.</p>
-<pre><code>$ zcat hairpin.fa.gz | fakit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)"
+<pre><code>$ zcat hairpin.fa.gz | fakit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" -j 4
 seqID   patternName     pattern strand  start   end     matched
 cel-lin-4       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        1  136      AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGA
 cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        1  54       95      AUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAG
@@ -750,7 +776,7 @@ cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:A
 </li>
 <li>
 <p>Locate Motif.</p>
-<pre><code>$ zcat hairpin.fa.gz | fakit locate -i -p UUS
+<pre><code>$ zcat hairpin.fa.gz | fakit locate -i -p UUS -j 4
 seqID   patternName     pattern strand  start   end     matched
 bna-MIR396a     UUS     UUS     -1      105     107     UUS
 bna-MIR396a     UUS     UUS     -1      89      91      UUS
