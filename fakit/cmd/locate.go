@@ -58,7 +58,6 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		if chunkSize <= 0 || threads <= 0 {
 			checkError(fmt.Errorf("value of flag -c, -j, -w should be greater than 0"))
 		}
-		runtime.GOMAXPROCS(threads)
 
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
@@ -69,6 +68,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags --pattern and --pattern-file needed"))
 		}
+		runtime.GOMAXPROCS(threads)
 
 		files := getFileList(args)
 

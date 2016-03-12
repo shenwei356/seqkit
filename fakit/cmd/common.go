@@ -74,7 +74,7 @@ var commonCmd = &cobra.Command{
 		var subject string
 		for _, file := range files {
 			if !quiet {
-				log.Info("read files: %s", file)
+				log.Info("read file: %s", file)
 			}
 			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)

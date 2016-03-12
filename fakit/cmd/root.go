@@ -23,13 +23,10 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"runtime"
 
 	"github.com/shenwei356/bio/seqio/fasta"
 	"github.com/spf13/cobra"
 )
-
-var cfgFile string
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -58,8 +55,8 @@ func Execute() {
 
 func init() {
 	RootCmd.PersistentFlags().StringP("seq-type", "t", "auto", "sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence)")
-	RootCmd.PersistentFlags().IntP("chunk-size", "c", 1000, "chunk size (attention: unit is FASTA records not lines)")
-	RootCmd.PersistentFlags().IntP("threads", "j", runtime.NumCPU(), "number of CPUs (default value depends on your device)")
+	RootCmd.PersistentFlags().IntP("chunk-size", "c", 100, "chunk size (attention: unit is FASTA records not lines)")
+	RootCmd.PersistentFlags().IntP("threads", "j", 1, "number of CPUs. since most of the subcommands are I/O intensive, so default value is 1. For computation intensive jobs, like extract and locate, you may set bigger value")
 	RootCmd.PersistentFlags().IntP("line-width", "w", 60, "line width (0 for no wrap)")
 	RootCmd.PersistentFlags().StringP("id-regexp", "", fasta.DefaultIDRegexp, "regular expression for parsing ID")
 	RootCmd.PersistentFlags().StringP("out-file", "o", "-", `out file ("-" for stdout, suffix .gz for gzipped out)`)

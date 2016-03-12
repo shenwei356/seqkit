@@ -2,7 +2,8 @@ site_name: fakit - FASTA kit
 pages:
 - Home: index.md
 - Download: download.md
-- Usage & Examples: usage.md
+- Usage: usage.md
+- Benchmark: benchmark.md
 - Extension: extension.md
 theme: mkdocs
 

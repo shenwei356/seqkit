@@ -9,7 +9,7 @@ fakit -- FASTA kit
 
 Version: 0.1.1
 
-Author: Wei Shen <shenwei356(at)gmail.com>
+Author: Wei Shen <shenwei356@gmail.com>
 
 Documents  : http://shenwei356.github.io/fakit
 Source code: https://github.com/shenwei356/fakit
@@ -20,7 +20,7 @@ Usage:
 Available Commands:
   common      find common sequences of multiple files by id/name/sequence
   extract     extract sequences by pattern(s) of name or sequence motifs
-        covert FASTA to tabular format, and provide various information
+  fa2tab      covert FASTA to tabular format, and provide various information
   locate      locate subsequences/motifs
   rmdup       remove duplicated sequences by id/name/sequence
   sample      sample sequences by number or proportion
@@ -33,16 +33,33 @@ Available Commands:
   tab2fa      covert tabular format to FASTA format
 
 Flags:
-  -c, --chunk-size int     chunk size (attention: unit is FASTA records not lines) (default 1000)
+  -c, --chunk-size int     chunk size (attention: unit is FASTA records not lines) (default 100)
       --id-regexp string   regular expression for parsing ID (default "^([^\\s]+)\\s?")
   -w, --line-width int     line width (0 for no wrap) (default 60)
   -o, --out-file string    out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
       --quiet              be quiet and do not show extra information
   -t, --seq-type string    sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
-  -j, --threads int        number of CPUs (default value depends on your device) (default 4)
+  -j, --threads int        number of CPUs. since most of the subcommands are I/O intensive, so default value is 1. For computation intensive jobs, like extract and locate, you may set bigger value (default 1)
 
 Use "fakit [command] --help" for more information about a command.
 ```
+
+## Performance Tips
+
+Since most of the subcommands are I/O intensive,
+so default value of flag -j (--threads) is 1.
+For computation intensive jobs, like extract and locate,
+ you may set a bigger value.
+
+For example
+
+1. Extract sequences by names or sequences using regular expression.
+
+        zcat hairpin.fa.gz | fakit extract -s -r -i -p TT[CG]AA -j 4
+
+1. Locate sequence motifs
+
+        zcat hairpin.fa.gz | fakit extract -s -d -i -f motif.fa -j 4
 
 ### Datasets
 
@@ -325,11 +342,11 @@ Examples
 
 1. Extract sequences starting with AGGCG
 
-        $ zcat hairpin.fa.gz | fakit extract -s -r -i -p ^aggcg
+        $ zcat hairpin.fa.gz | fakit extract -s -r -i -p ^aggcg -j 4
 
 1. Extract sequences with TTSAA (AgsI digest site) in SEQUENCE. Base S stands for C or G.
 
-        $ zcat hairpin.fa.gz | fakit extract -s -d -i -p TTSAA
+        $ zcat hairpin.fa.gz | fakit extract -s -d -i -p TTSAA -j 4
 
     It's equal to but simpler than:
 
@@ -582,7 +599,7 @@ Examples
 
 1. Locate ORFs.
 
-        $ zcat hairpin.fa.gz | fakit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)"
+        $ zcat hairpin.fa.gz | fakit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" -j 4
         seqID   patternName     pattern strand  start   end     matched
         cel-lin-4       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        1  136      AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGA
         cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        1  54       95      AUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAG
@@ -590,7 +607,7 @@ Examples
 
 1. Locate Motif.
 
-        $ zcat hairpin.fa.gz | fakit locate -i -p UUS
+        $ zcat hairpin.fa.gz | fakit locate -i -p UUS -j 4
         seqID   patternName     pattern strand  start   end     matched
         bna-MIR396a     UUS     UUS     -1      105     107     UUS
         bna-MIR396a     UUS     UUS     -1      89      91      UUS

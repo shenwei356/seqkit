@@ -276,7 +276,7 @@ Examples:
 			}
 
 			if !quiet {
-				log.Infof("split by region: %s", idRegexp)
+				log.Infof("split by region: %s", region)
 			}
 			if twoPass {
 				log.Warning("no need for two-pass, ignored")

@@ -51,7 +51,6 @@ var extractCmd = &cobra.Command{
 		if chunkSize <= 0 || threads <= 0 || lineWidth <= 0 {
 			checkError(fmt.Errorf("value of flag -c, -j, -w should be greater than 0"))
 		}
-		runtime.GOMAXPROCS(threads)
 
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
@@ -69,6 +68,7 @@ var extractCmd = &cobra.Command{
 		if useRegexp && degenerate {
 			checkError(fmt.Errorf("could not give both flags -d (--degenerat) and -r (--use-regexp)"))
 		}
+		runtime.GOMAXPROCS(threads)
 
 		files := getFileList(args)
 

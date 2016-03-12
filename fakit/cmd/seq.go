@@ -65,6 +65,7 @@ var seqCmd = &cobra.Command{
 		if lowerCase && upperCase {
 			checkError(fmt.Errorf("could not give both flags -l (--lower-case) and -u (--upper-case)"))
 		}
+		runtime.GOMAXPROCS(threads)
 
 		files := getFileList(args)
 
