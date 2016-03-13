@@ -139,6 +139,14 @@
         
             <li><a href="#datasets">Datasets</a></li>
         
+            <li><a href="#reverse-complement">Reverse Complement</a></li>
+        
+            <li><a href="#extract-sequencs-by-id-list">Extract sequencs by ID list</a></li>
+        
+            <li><a href="#deduplication">Deduplication</a></li>
+        
+            <li><a href="#todo">TODO</a></li>
+        
     
     </ul>
 </div></div>
@@ -146,6 +154,24 @@
 
 <h1 id="benchmark">Benchmark</h1>
 <h2 id="softwares">Softwares</h2>
+<ol>
+<li><a href="https://github.com/shenwei356/fakit">fakit</a>. (Go).
+  Version <a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.2">v0.1.2</a></li>
+<li><a href="https://github.com/mdshw5/pyfaidx">pyfaidx</a>. (Python).
+  Version <a href="https://pypi.python.org/packages/source/p/pyfaidx/pyfaidx-0.4.7.1.tar.gz#md5=f33604a3550c2fa115ac7d33b952127d">0.4.7.1</a></li>
+<li><a href="http://seqmagick.readthedocs.org/en/latest/index.html">seqmagick</a>. (Python).
+  Version 0.6.1</li>
+<li><a href="https://github.com/lh3/seqtk">seqtk</a>. (C).
+Version <a href="https://github.com/lh3/seqtk/commit/4feb6e81444ab6bc44139dd3a125068f81ae4ad8">1.0-r82-dirty</a></li>
+</ol>
+<p>Unused:</p>
+<ol>
+<li><a href="https://github.com/jimhester/fasta_utilities">fasta_utilities</a>. (Perl).  Very difficult to install.
+  Version
+  <a href="https://github.com/jimhester/fasta_utilities/commit/329f7ca9266d4a0a96cb5576c464c1bd106865a0">329f7ca</a></li>
+<li><a href="http://hannonlab.cshl.edu/fastx_toolkit/">fastx_toolkit</a>. (Perl). Can't handle multi-line FASTA files.
+Version <a href="http://hannonlab.cshl.edu/fastx_toolkit/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2">0.0.13</a></li>
+</ol>
 <h2 id="datasets">Datasets</h2>
 <p>Original datasets included:</p>
 <ul>
@@ -165,36 +191,123 @@
 </code></pre>
 </li>
 </ol>
+<p>And some tools do not support RNA sequences,
+ and are not able to directly read .gz file,
+ so the files are uncompressed, and convert to DNA by <code>fakit seq --rna2dna dataset_A.fa.gz &gt; dataset_A.fa</code>.</p>
 <table>
 <thead>
 <tr>
-<th>file</th>
-<th>type</th>
-<th>num_seqs</th>
-<th>min_len</th>
-<th>avg_len</th>
-<th>max_len</th>
+<th align="center">file</th>
+<th align="center">type</th>
+<th align="center">num_seqs</th>
+<th align="center">min_len</th>
+<th align="center">avg_len</th>
+<th align="center">max_len</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>dataset_A.fa.gz (48.5M)</td>
-<td>RNA</td>
-<td>175364</td>
-<td>900</td>
-<td>1419.6</td>
-<td>3725</td>
+<td align="center">dataset_A.fa (261.7M)</td>
+<td align="center">DNA</td>
+<td align="center">175364</td>
+<td align="center">900</td>
+<td align="center">1419.6</td>
+<td align="center">3725</td>
 </tr>
 <tr>
-<td>dataset_B.fa.gz (90.6M)</td>
-<td>DNA</td>
-<td>6</td>
-<td>46709983</td>
-<td>59698489.0</td>
-<td>80373285</td>
+<td align="center">dataset_B.fa (346.5M)</td>
+<td align="center">DNA</td>
+<td align="center">6</td>
+<td align="center">46709983</td>
+<td align="center">59698489.0</td>
+<td align="center">80373285</td>
 </tr>
 </tbody>
-</table></div>
+</table>
+<h2 id="reverse-complement">Reverse Complement</h2>
+<h3 id="commands">Commands</h3>
+<ol>
+<li>fakit:   <code>for f in *.fa; do time fakit seq -r -p $f &gt; /dev/null; done</code></li>
+<li>pyfaidx: <code>for f in *.fa; do time faidx -c -r dataset_A.fa &gt; /dev/null; done</code>.
+first run creates fasta index file, and evaluate the second run.</li>
+<li>seqmagick: <code>for f in *.fa; do time seqmagick convert --reverse-complement $f - &gt; /dev/null; done</code></li>
+<li>seqtk:   <code>for f in *.fa; do time seqtk seq -r $f &gt; /dev/null; done</code></li>
+</ol>
+<h3 id="results">Results:</h3>
+<table>
+<thead>
+<tr>
+<th align="center">datasets</th>
+<th align="center">fakit</th>
+<th align="center">pyfaidx</th>
+<th align="center">seqmagick</th>
+<th align="center">seqtk</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">dataset_A.fa</td>
+<td align="center">9.88s</td>
+<td align="center">25.92s</td>
+<td align="center">23.08s</td>
+<td align="center">1.74s</td>
+</tr>
+<tr>
+<td align="center">dataset_B.fa</td>
+<td align="center">17.37s</td>
+<td align="center">26.05s</td>
+<td align="center">20.47s</td>
+<td align="center">2.25s</td>
+</tr>
+</tbody>
+</table>
+<h2 id="extract-sequencs-by-id-list">Extract sequencs by ID list</h2>
+<h3 id="id-list">ID list</h3>
+<p>ID list comes from sampling 80% of dataset_A and shuffling. n=140261.</p>
+<pre><code>$ time fakit sample -p 0.8 dataset_A.fa | fakit shuffle | fakit seq -n -i &gt; ids.txt
+$ head -n 5 ids.txt
+GQ103704.1.1352
+FR853054.1.1478
+GU214562.1.1781
+DQ796266.1.1393
+HM309604.1.1340
+</code></pre>
+<h3 id="commands_1">Commands</h3>
+<p>Before each run, run <code>sudo sh -c 'echo 1 &gt;/proc/sys/vm/drop_caches'</code> to empty page caches.</p>
+<ol>
+<li>fakit:<ol>
+<li>default parameters: <code>time fakit extract -f ids.txt dataset_A.fa -j 1 -c 100 &gt; /dev/null</code></li>
+<li>single thread and bigger chunk-sze: <code>time fakit extract -f ids.txt dataset_A.fa -j 1 -c 10000 &gt; /dev/null</code>;</li>
+<li>multiple threads and bigger chunk-size: <code>time fakit extract -f ids.txt dataset_A.fa -j 4 -c 10000 &gt; /dev/null</code></li>
+</ol>
+</li>
+<li>pyfaidx: unsupported</li>
+<li>seqmagick: only support single pattern by <code>--pattern-include</code></li>
+<li>seqtk: <code>time seqtk subseq dataset_A.fa ids.txt &gt; /dev/null</code></li>
+</ol>
+<h3 id="results_1">Results</h3>
+<table>
+<thead>
+<tr>
+<th align="center">datasets</th>
+<th align="center">fakit (-j 1 -c 100)</th>
+<th align="center">fakit (-j 1 -c 10000)</th>
+<th align="center">fakit (-j 1 -c 10000)</th>
+<th align="center">seqtk</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">dataset_A.fa</td>
+<td align="center">8.12s</td>
+<td align="center">6.13s</td>
+<td align="center">4.76s</td>
+<td align="center">2.32s</td>
+</tr>
+</tbody>
+</table>
+<h2 id="deduplication">Deduplication</h2>
+<h2 id="todo">TODO</h2></div>
             
         </div>
 
