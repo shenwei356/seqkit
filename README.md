@@ -1,4 +1,4 @@
-# fakit - FASTA kit
+# fakit - Practical FASTA kit
 
 Documents  : [http://shenwei356.github.io/fakit](http://shenwei356.github.io/fakit)
 
