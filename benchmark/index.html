@@ -226,12 +226,16 @@ Version <a href="http://hannonlab.cshl.edu/fastx_toolkit/fastx_toolkit_0.0.13_bi
 </table>
 <h2 id="reverse-complement">Reverse Complement</h2>
 <h3 id="commands">Commands</h3>
+<p>Before each run, run <code>su -c 'sync; echo 1 &gt; /proc/sys/vm/drop_caches'</code> to empty page caches.</p>
 <ol>
 <li>fakit:   <code>for f in *.fa; do time fakit seq -r -p $f &gt; /dev/null; done</code></li>
-<li>pyfaidx: <code>for f in *.fa; do time faidx -c -r dataset_A.fa &gt; /dev/null; done</code>.
+<li>pyfaidx: <code>for f in *.fa; do time faidx -c -r $f &gt; /dev/null; done</code>.
 first run creates fasta index file, and evaluate the second run.</li>
 <li>seqmagick: <code>for f in *.fa; do time seqmagick convert --reverse-complement $f - &gt; /dev/null; done</code></li>
 <li>seqtk:   <code>for f in *.fa; do time seqtk seq -r $f &gt; /dev/null; done</code></li>
+<li><code>revcom_biogo</code> using <a href="https://github.com/biogo/biogo">biogo</a>
+(<a href="../file/revcom_biogo.go">source</a>, <a href="../file/revcom_biogo.gz">binary</a> ). (Go).
+<code>for f in *.fa; do time ./revcom_biogo $f &gt; /dev/null; done</code></li>
 </ol>
 <h3 id="results">Results:</h3>
 <table>
@@ -242,29 +246,32 @@ first run creates fasta index file, and evaluate the second run.</li>
 <th align="center">pyfaidx</th>
 <th align="center">seqmagick</th>
 <th align="center">seqtk</th>
+<th align="center">revcom_biogo</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td align="center">dataset_A.fa</td>
-<td align="center">9.88s</td>
-<td align="center">25.92s</td>
-<td align="center">23.08s</td>
-<td align="center">1.74s</td>
+<td align="center">8.40s</td>
+<td align="center">26.43s</td>
+<td align="center">13.61s</td>
+<td align="center">0.84s</td>
+<td align="center">9.95s</td>
 </tr>
 <tr>
 <td align="center">dataset_B.fa</td>
-<td align="center">17.37s</td>
-<td align="center">26.05s</td>
-<td align="center">20.47s</td>
-<td align="center">2.25s</td>
+<td align="center">14.15s</td>
+<td align="center">18.30s</td>
+<td align="center">9.98s</td>
+<td align="center">1.44s</td>
+<td align="center">10.43s</td>
 </tr>
 </tbody>
 </table>
 <h2 id="extract-sequencs-by-id-list">Extract sequencs by ID list</h2>
 <h3 id="id-list">ID list</h3>
 <p>ID list comes from sampling 80% of dataset_A and shuffling. n=140261.</p>
-<pre><code>$ time fakit sample -p 0.8 dataset_A.fa | fakit shuffle | fakit seq -n -i &gt; ids.txt
+<pre><code>$ fakit sample -p 0.8 dataset_A.fa | fakit shuffle | fakit seq -n -i &gt; ids.txt
 $ head -n 5 ids.txt
 GQ103704.1.1352
 FR853054.1.1478
@@ -273,7 +280,7 @@ DQ796266.1.1393
 HM309604.1.1340
 </code></pre>
 <h3 id="commands_1">Commands</h3>
-<p>Before each run, run <code>sudo sh -c 'echo 1 &gt;/proc/sys/vm/drop_caches'</code> to empty page caches.</p>
+<p>Before each run, run <code>su -c 'sync; echo 1 &gt; /proc/sys/vm/drop_caches'</code> to empty page caches.</p>
 <ol>
 <li>fakit:<ol>
 <li>default parameters: <code>time fakit extract -f ids.txt dataset_A.fa -j 1 -c 100 &gt; /dev/null</code></li>
@@ -292,21 +299,51 @@ HM309604.1.1340
 <th align="center">datasets</th>
 <th align="center">fakit (-j 1 -c 100)</th>
 <th align="center">fakit (-j 1 -c 10000)</th>
-<th align="center">fakit (-j 1 -c 10000)</th>
+<th align="center">fakit (-j 4 -c 10000)</th>
 <th align="center">seqtk</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td align="center">dataset_A.fa</td>
-<td align="center">8.12s</td>
-<td align="center">6.13s</td>
-<td align="center">4.76s</td>
-<td align="center">2.32s</td>
+<td align="center">7.87s</td>
+<td align="center">6.14s</td>
+<td align="center">4.72s</td>
+<td align="center">2.34s</td>
 </tr>
 </tbody>
 </table>
 <h2 id="deduplication">Deduplication</h2>
+<h3 id="dataset">Dataset</h3>
+<p>Number: 175364 + 17411 = 192775</p>
+<pre><code>$ cat &lt;(fakit sample -p 0.1 dataset_A.fa) dataset_A.fa | fakit shuffle &gt; dataset_A_dup.fa
+</code></pre>
+<p>Unique seqs:</p>
+<pre><code>$ fakit fa2tab dataset_A_dup.fa  | cut -f 2 | sort | uniq | wc -l
+161864
+</code></pre>
+<h3 id="commands_2">Commands</h3>
+<ol>
+<li>fakit: <code>time fakit rmdup -s dataset_A_dup.fa &gt; /dev/null</code></li>
+<li>seqmagick: <code>time seqmagick convert --deduplicate-sequences dataset_A_dup.fa - &gt; /dev/null</code></li>
+</ol>
+<h3 id="results_2">Results</h3>
+<table>
+<thead>
+<tr>
+<th align="center">datasets</th>
+<th align="center">fakit</th>
+<th align="center">seqmagick</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">dataset_A.fa</td>
+<td align="center">8.10s</td>
+<td align="center">13.31s</td>
+</tr>
+</tbody>
+</table>
 <h2 id="todo">TODO</h2></div>
             
         </div>
