@@ -42,7 +42,7 @@
         }, 
         {
             "location": "/download/", 
-            "text": "Download\n\n\nfakit\n is implemented in \nGolang\n programming language,\n executable binary files for most popular operating system are freely available\n  in \nrelease\n page.\n\n\nCurrent Version\n\n\nfakit v0.1.1\n\n\nInstallation\n\n\nJust \ndownload\n executable file\n of your operating system and rename it to \nfakit.exe\n (Windows) or\n \nfakit\n (other operating systems) for convenience,\n and then run it in command-line interface, no dependencies,\n without complicated compilation process.\n\n\nYou can also add the directory of the executable file to environment variable\n\nPATH\n, so you can run \nfakit\n anywhere.\n\n\n\n\n\n\nFor windows, the simplest way is copy it to \nC:\\WINDOWS\\system32\n.\n\n\n\n\n\n\nFor Linux, type:\n\n\nchmod a+x /PATH/OF/FASTCOV/fakit\necho export PATH=\\$PATH:/PATH/OF/FASTCOV \n ~/.bashrc\n\n\n\nor simply copy it to \n/usr/local/bin\n\n\n\n\n\n\nPrevious Versions\n\n\nfakit v0.1", 
+            "text": "Download\n\n\nfakit\n is implemented in \nGolang\n programming language,\n executable binary files for most popular operating system are freely available\n  in \nrelease\n page.\n\n\nCurrent Version\n\n\nfakit v0.1.2\n\n\nInstallation\n\n\nJust \ndownload\n executable file\n of your operating system and rename it to \nfakit.exe\n (Windows) or\n \nfakit\n (other operating systems) for convenience,\n and then run it in command-line interface, no dependencies,\n without complicated compilation process.\n\n\nYou can also add the directory of the executable file to environment variable\n\nPATH\n, so you can run \nfakit\n anywhere.\n\n\n\n\n\n\nFor windows, the simplest way is copy it to \nC:\\WINDOWS\\system32\n.\n\n\n\n\n\n\nFor Linux, type:\n\n\nchmod a+x /PATH/OF/FASTCOV/fakit\necho export PATH=\\$PATH:/PATH/OF/FASTCOV \n ~/.bashrc\n\n\n\nor simply copy it to \n/usr/local/bin\n\n\n\n\n\n\nPrevious Versions\n\n\n\n\nfakit v0.1.1\n\n\nfakit v0.1", 
             "title": "Download"
         }, 
         {
@@ -52,7 +52,7 @@
         }, 
         {
             "location": "/download/#current-version", 
-            "text": "fakit v0.1.1", 
+            "text": "fakit v0.1.2", 
             "title": "Current Version"
         }, 
         {
@@ -62,7 +62,7 @@
         }, 
         {
             "location": "/download/#previous-versions", 
-            "text": "fakit v0.1", 
+            "text": "fakit v0.1.1  fakit v0.1", 
             "title": "Previous Versions"
         }, 
         {
