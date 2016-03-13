@@ -39,5 +39,8 @@ func init() {
 }
 
 func main() {
+	// f, _ := os.Create("pprof")
+	// pprof.StartCPUProfile(f)
+	// defer pprof.StopCPUProfile()
 	cmd.Execute()
 }

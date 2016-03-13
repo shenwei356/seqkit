@@ -1,14 +1,14 @@
-## Download
+# Download
 
 `fakit` is implemented in [Golang](https://golang.org/) programming language,
  executable binary files for most popular operating system are freely available
   in [release](https://github.com/shenwei356/fakit/releases) page.
 
-### Current Version
+## Current Version
 
-[fakit v0.1](https://github.com/shenwei356/fakit/releases/tag/v0.1)
+[fakit v0.1.1](https://github.com/shenwei356/fakit/releases/tag/v0.1.1)
 
-### Installation
+## Installation
 
 Just [download](https://github.com/shenwei356/fakit/releases) executable file
  of your operating system and rename it to `fakit.exe` (Windows) or
@@ -27,3 +27,7 @@ You can also add the directory of the executable file to environment variable
         echo export PATH=\$PATH:/PATH/OF/FASTCOV >> ~/.bashrc
 
     or simply copy it to `/usr/local/bin`
+
+## Previous Versions
+
+[fakit v0.1](https://github.com/shenwei356/fakit/releases/tag/v0.1)
