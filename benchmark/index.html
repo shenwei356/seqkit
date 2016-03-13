@@ -230,7 +230,7 @@ Version <a href="http://hannonlab.cshl.edu/fastx_toolkit/fastx_toolkit_0.0.13_bi
 <ol>
 <li>fakit:   <code>for f in *.fa; do time fakit seq -r -p $f &gt; /dev/null; done</code></li>
 <li>pyfaidx: <code>for f in *.fa; do time faidx -c -r $f &gt; /dev/null; done</code>.
-first run creates fasta index file, and evaluate the second run.</li>
+Two runs needed, first run creates fasta index file, and the second one evaluates.</li>
 <li>seqmagick: <code>for f in *.fa; do time seqmagick convert --reverse-complement $f - &gt; /dev/null; done</code></li>
 <li>seqtk:   <code>for f in *.fa; do time seqtk seq -r $f &gt; /dev/null; done</code></li>
 <li><code>revcom_biogo</code> using <a href="https://github.com/biogo/biogo">biogo</a>
@@ -331,16 +331,16 @@ HM309604.1.1340
 <table>
 <thead>
 <tr>
-<th align="center">datasets</th>
-<th align="center">fakit</th>
-<th align="center">seqmagick</th>
+<th align="left">datasets</th>
+<th align="left">fakit</th>
+<th align="left">seqmagick</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="center">dataset_A.fa</td>
-<td align="center">8.10s</td>
-<td align="center">13.31s</td>
+<td align="left">dataset_A_dup.fa</td>
+<td align="left">8.10s</td>
+<td align="left">13.31s</td>
 </tr>
 </tbody>
 </table>

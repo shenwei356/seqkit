@@ -173,7 +173,7 @@
 <p>Usage</p>
 <pre><code>fakit -- FASTA kit
 
-Version: 0.1.1
+Version: 0.1.2
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -244,12 +244,14 @@ Usage:
 
 Flags:
   -p, --complement          complement sequence (blank for Protein sequence)
+      --dna2rna             DNA to RNA
   -G, --gap-letter string   gap letters (default &quot;-&quot;)
   -l, --lower-case          print sequences in lower case
   -n, --name                only print names
   -i, --only-id             print ID instead of full head
   -g, --remove-gaps         remove gaps
   -r, --reverse             reverse sequence)
+      --rna2dna             RNA to DNA
   -s, --seq                 only print sequences
   -u, --upper-case          print sequences in upper case
 </code></pre>
@@ -325,6 +327,16 @@ AAACUAUACAACCUACUACCUCACCGGAUCCACAGUGUA
 &gt;seq
 ACGTACTGCACC
 </code></pre>
+<ol>
+<li>
+<p>RNA to DNA</p>
+<p>$ echo -e "&gt;seq\nUCAUAUGCUUGUCUCAAAGAUUA" | fakit seq --rna2dna</p>
+<blockquote>
+<p>seq
+TCATATGCTTGTCTCAAAGATTA</p>
+</blockquote>
+</li>
+</ol>
 </li>
 </ol>
 <h2 id="subseq">subseq</h2>
