@@ -61,6 +61,8 @@ var seqCmd = &cobra.Command{
 		gapLetters := getFlagString(cmd, "gap-letter")
 		lowerCase := getFlagBool(cmd, "lower-case")
 		upperCase := getFlagBool(cmd, "upper-case")
+		dna2rna := getFlagBool(cmd, "dna2rna")
+		rna2dna := getFlagBool(cmd, "rna2dna")
 
 		if lowerCase && upperCase {
 			checkError(fmt.Errorf("could not give both flags -l (--lower-case) and -u (--upper-case)"))
@@ -80,6 +82,7 @@ var seqCmd = &cobra.Command{
 			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
 
+			once := true
 			for chunk := range fastaReader.Ch {
 				checkError(chunk.Err)
 
@@ -117,6 +120,42 @@ var seqCmd = &cobra.Command{
 						if removeGaps {
 							sequence = sequence.RemoveGaps(gapLetters)
 						}
+						if dna2rna {
+							ab := fastaReader.Alphabet()
+							if ab == seq.RNA || ab == seq.RNAredundant {
+								if once {
+									log.Warningf("it's already RNA, no need to convert")
+									once = false
+								}
+							} else {
+								for i, b := range sequence.Seq {
+									switch b {
+									case 't':
+										sequence.Seq[i] = 'u'
+									case 'T':
+										sequence.Seq[i] = 'U'
+									}
+								}
+							}
+						}
+						if rna2dna {
+							ab := fastaReader.Alphabet()
+							if ab == seq.DNA || ab == seq.DNAredundant {
+								if once {
+									log.Warningf("it's already DNA, no need to convert")
+									once = false
+								}
+							} else {
+								for i, b := range sequence.Seq {
+									switch b {
+									case 'u':
+										sequence.Seq[i] = 't'
+									case 'U':
+										sequence.Seq[i] = 'T'
+									}
+								}
+							}
+						}
 						if lowerCase {
 							outfh.WriteString(fmt.Sprintf("%s\n", byteutil.WrapByteSlice(bytes.ToLower(sequence.Seq), lineWidth)))
 						} else if upperCase {
@@ -145,4 +184,6 @@ func init() {
 	seqCmd.Flags().StringP("gap-letter", "G", "-", "gap letters")
 	seqCmd.Flags().BoolP("lower-case", "l", false, "print sequences in lower case")
 	seqCmd.Flags().BoolP("upper-case", "u", false, "print sequences in upper case")
+	seqCmd.Flags().BoolP("dna2rna", "", false, "DNA to RNA")
+	seqCmd.Flags().BoolP("rna2dna", "", false, "RNA to DNA")
 }

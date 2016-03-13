@@ -59,7 +59,7 @@ Global Flags
 
 ## Benchmark
 
-TODO
+[http://blog.shenwei.me/fakit/benchmark/](http://blog.shenwei.me/fakit/benchmark/)
 
 ## Contact
 
@@ -71,12 +71,3 @@ propose new functions or ask for help.
 ## License
 
 [MIT License](https://github.com/shenwei356/bio_scripts/blob/master/LICENSE)
-
-## Similar tools
-
-- [fastx_toolkit](http://hannonlab.cshl.edu/fastx_toolkit/)
-- [seqtk](https://github.com/lh3/seqtk)
-- [pyfaidx](https://github.com/mdshw5/pyfaidx)
-- [fqtools](https://github.com/alastair-droop/fqtools)
-- [fasta_utilities](https://github.com/jimhester/fasta_utilities)
-- [seqmagick](http://seqmagick.readthedocs.org/en/latest/index.html)

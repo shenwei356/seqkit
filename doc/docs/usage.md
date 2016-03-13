@@ -7,7 +7,7 @@ Usage
 ```
 fakit -- FASTA kit
 
-Version: 0.1.1
+Version: 0.1.2
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -82,12 +82,14 @@ Usage:
 
 Flags:
   -p, --complement          complement sequence (blank for Protein sequence)
+      --dna2rna             DNA to RNA
   -G, --gap-letter string   gap letters (default "-")
   -l, --lower-case          print sequences in lower case
   -n, --name                only print names
   -i, --only-id             print ID instead of full head
   -g, --remove-gaps         remove gaps
   -r, --reverse             reverse sequence)
+      --rna2dna             RNA to DNA
   -s, --seq                 only print sequences
   -u, --upper-case          print sequences in upper case
 ```
@@ -149,6 +151,12 @@ Examples
         $ echo -e ">seq\nACGT-ACTGC-ACC" | fakit seq -i -g
         >seq
         ACGTACTGCACC
+1. RNA to DNA
+
+        $ echo -e ">seq\nUCAUAUGCUUGUCUCAAAGAUUA" | fakit seq --rna2dna
+        >seq
+        TCATATGCTTGTCTCAAAGATTA
+
 
 ## subseq
 

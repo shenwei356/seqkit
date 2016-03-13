@@ -34,7 +34,7 @@ var RootCmd = &cobra.Command{
 	Short: "FASTA kit",
 	Long: `fakit -- FASTA kit
 
-Version: 0.1.1
+Version: 0.1.2
 
 Author: Wei Shen <shenwei356@gmail.com>
 
