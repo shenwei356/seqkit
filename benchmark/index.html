@@ -234,7 +234,7 @@ first run creates fasta index file, and evaluate the second run.</li>
 <li>seqmagick: <code>for f in *.fa; do time seqmagick convert --reverse-complement $f - &gt; /dev/null; done</code></li>
 <li>seqtk:   <code>for f in *.fa; do time seqtk seq -r $f &gt; /dev/null; done</code></li>
 <li><code>revcom_biogo</code> using <a href="https://github.com/biogo/biogo">biogo</a>
-(<a href="../file/revcom_biogo.go">source</a>, <a href="../file/revcom_biogo.gz">binary</a> ). (Go).
+(<a href="../files/revcom_biogo.go">source</a>, <a href="../files/revcom_biogo.gz">binary</a> ). (Go).
 <code>for f in *.fa; do time ./revcom_biogo $f &gt; /dev/null; done</code></li>
 </ol>
 <h3 id="results">Results:</h3>
@@ -315,7 +315,7 @@ HM309604.1.1340
 </table>
 <h2 id="deduplication">Deduplication</h2>
 <h3 id="dataset">Dataset</h3>
-<p>Number: 175364 + 17411 = 192775</p>
+<p>Randomly extract 10% sequences from dataset_A.fa and merge back and then shuffle. Number: 175364 + 17411 = 192775</p>
 <pre><code>$ cat &lt;(fakit sample -p 0.1 dataset_A.fa) dataset_A.fa | fakit shuffle &gt; dataset_A_dup.fa
 </code></pre>
 <p>Unique seqs:</p>
