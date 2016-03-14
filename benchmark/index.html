@@ -137,15 +137,21 @@
         
             <li><a href="#softwares">Softwares</a></li>
         
+            <li><a href="#features">Features</a></li>
+        
             <li><a href="#datasets">Datasets</a></li>
         
-            <li><a href="#reverse-complement">Reverse Complement</a></li>
+            <li><a href="#platform">Platform</a></li>
         
-            <li><a href="#extract-sequencs-by-id-list">Extract sequencs by ID list</a></li>
+            <li><a href="#test-1-reverse-complement">Test 1. Reverse Complement</a></li>
         
-            <li><a href="#deduplication">Deduplication</a></li>
+            <li><a href="#test-2extract-sequencs-by-id-list">Test 2.Extract sequencs by ID list</a></li>
         
-            <li><a href="#todo">TODO</a></li>
+            <li><a href="#test-3-deduplication">Test 3. Deduplication</a></li>
+        
+            <li><a href="#test-4-sampling">Test 4. Sampling</a></li>
+        
+            <li><a href="#test-5-spliting">Test 5. Spliting</a></li>
         
     
     </ul>
@@ -156,22 +162,217 @@
 <h2 id="softwares">Softwares</h2>
 <ol>
 <li><a href="https://github.com/shenwei356/fakit">fakit</a>. (Go).
-  Version <a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.2">v0.1.2</a></li>
+   Version <a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.3">v0.1.3</a>.</li>
+<li><a href="https://github.com/jimhester/fasta_utilities">fasta_utilities</a>. (Perl).
+   Version
+   <a href="https://github.com/jimhester/fasta_utilities/commit/329f7ca9266d4a0a96cb5576c464c1bd106865a0">329f7ca</a>.
+   <em>Lots of dependencies to install</em>.</li>
+<li><a href="http://hannonlab.cshl.edu/fastx_toolkit/">fastx_toolkit</a>. (Perl).
+   Version <a href="http://hannonlab.cshl.edu/fastx_toolkit/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2">0.0.13</a>.
+   <em>Can't handle multi-line FASTA files</em>.</li>
 <li><a href="https://github.com/mdshw5/pyfaidx">pyfaidx</a>. (Python).
-  Version <a href="https://pypi.python.org/packages/source/p/pyfaidx/pyfaidx-0.4.7.1.tar.gz#md5=f33604a3550c2fa115ac7d33b952127d">0.4.7.1</a></li>
+   Version <a href="https://pypi.python.org/packages/source/p/pyfaidx/pyfaidx-0.4.7.1.tar.gz#md5=f33604a3550c2fa115ac7d33b952127d">0.4.7.1</a>.</li>
 <li><a href="http://seqmagick.readthedocs.org/en/latest/index.html">seqmagick</a>. (Python).
-  Version 0.6.1</li>
+   Version 0.6.1</li>
 <li><a href="https://github.com/lh3/seqtk">seqtk</a>. (C).
-Version <a href="https://github.com/lh3/seqtk/commit/4feb6e81444ab6bc44139dd3a125068f81ae4ad8">1.0-r82-dirty</a></li>
+   Version <a href="https://github.com/lh3/seqtk/commit/4feb6e81444ab6bc44139dd3a125068f81ae4ad8">1.0-r82-dirty</a>.</li>
 </ol>
-<p>Unused:</p>
-<ol>
-<li><a href="https://github.com/jimhester/fasta_utilities">fasta_utilities</a>. (Perl).  Very difficult to install.
-  Version
-  <a href="https://github.com/jimhester/fasta_utilities/commit/329f7ca9266d4a0a96cb5576c464c1bd106865a0">329f7ca</a></li>
-<li><a href="http://hannonlab.cshl.edu/fastx_toolkit/">fastx_toolkit</a>. (Perl). Can't handle multi-line FASTA files.
-Version <a href="http://hannonlab.cshl.edu/fastx_toolkit/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2">0.0.13</a></li>
-</ol>
+<h2 id="features">Features</h2>
+<table>
+<thead>
+<tr>
+<th align="left">Features</th>
+<th align="center">fakit</th>
+<th align="center">fasta_utilities</th>
+<th align="center">fastx_toolkit</th>
+<th align="center">pyfaidx</th>
+<th align="center">seqmagick</th>
+<th align="left">seqtk</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Cross platform</td>
+<td align="center">Yes</td>
+<td align="center">Partly</td>
+<td align="center">Partly</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr>
+<td align="left">Mutli-line FASTA</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr>
+<td align="left">Recognize RNA</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr>
+<td align="left">Read STDIN</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr>
+<td align="left">Read Gzip</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr>
+<td align="left">Grep</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr>
+<td align="left">Mutli-grep</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr>
+<td align="left">Sample</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr>
+<td align="left">Subseq</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr>
+<td align="left">Deduplicate</td>
+<td align="center">Yes</td>
+<td align="center">Partly</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Partly</td>
+<td align="left">--</td>
+</tr>
+<tr>
+<td align="left">Split</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="left">--</td>
+</tr>
+<tr>
+<td align="left">Barcode split</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="left">--</td>
+</tr>
+<tr>
+<td align="left">Shuffle</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="left">--</td>
+</tr>
+<tr>
+<td align="left">Locate motifs</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="left">--</td>
+</tr>
+<tr>
+<td align="left">Common</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="left">--</td>
+</tr>
+<tr>
+<td align="left">Clean</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="left">--</td>
+</tr>
+<tr>
+<td align="left">Transcribe</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr>
+<td align="left">Translate</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="left">--</td>
+</tr>
+<tr>
+<td align="left">Size select</td>
+<td align="center">Indirect</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="left">--</td>
+</tr>
+<tr>
+<td align="left">Rename name</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="left">Yes</td>
+</tr>
+</tbody>
+</table>
 <h2 id="datasets">Datasets</h2>
 <p>Original datasets included:</p>
 <ul>
@@ -197,7 +398,7 @@ Version <a href="http://hannonlab.cshl.edu/fastx_toolkit/fastx_toolkit_0.0.13_bi
 <table>
 <thead>
 <tr>
-<th align="center">file</th>
+<th align="center">File</th>
 <th align="center">type</th>
 <th align="center">num_seqs</th>
 <th align="center">min_len</th>
@@ -224,11 +425,24 @@ Version <a href="http://hannonlab.cshl.edu/fastx_toolkit/fastx_toolkit_0.0.13_bi
 </tr>
 </tbody>
 </table>
-<h2 id="reverse-complement">Reverse Complement</h2>
+<h2 id="platform">Platform</h2>
+<p>PC:</p>
+<ul>
+<li>CPU: Intel Core i5-3320M @ 2.60GHz, two cores/4 threads</li>
+<li>RAM: DDR3 1600MHz, 12GB</li>
+<li>SSD: SAMSUNG 850 EVO 250G, SATA-3</li>
+<li>OS: Fedora 23 (Scientific KDE spin),  Kernal: 4.4.3-300.fc23.x86_64</li>
+</ul>
+<p>Softwares:</p>
+<ul>
+<li>Perl: perl 5, version 22, subversion 1 (v5.22.1) built for x86_64-linux-thread-multi</li>
+<li>Python: Python 2.7.10 (default, Sep  8 2015, 17:20:17) [GCC 5.1.1 20150618 (Red Hat 5.1.1-4)] on linux2</li>
+</ul>
+<h2 id="test-1-reverse-complement">Test 1. Reverse Complement</h2>
 <h3 id="commands">Commands</h3>
-<p>Before each run, run <code>su -c 'sync; echo 1 &gt; /proc/sys/vm/drop_caches'</code> to empty page caches.</p>
 <ol>
 <li>fakit:   <code>for f in *.fa; do time fakit seq -r -p $f &gt; /dev/null; done</code></li>
+<li>fasta_utilities: <code>for f in *.fa; do time reverse_complement.pl $f &gt; /dev/null; done</code></li>
 <li>pyfaidx: <code>for f in *.fa; do time faidx -c -r $f &gt; /dev/null; done</code>.
 Two runs needed, first run creates fasta index file, and the second one evaluates.</li>
 <li>seqmagick: <code>for f in *.fa; do time seqmagick convert --reverse-complement $f - &gt; /dev/null; done</code></li>
@@ -241,8 +455,9 @@ Two runs needed, first run creates fasta index file, and the second one evaluate
 <table>
 <thead>
 <tr>
-<th align="center">datasets</th>
+<th align="center">Datasets</th>
 <th align="center">fakit</th>
+<th align="center">fasta_utilities</th>
 <th align="center">pyfaidx</th>
 <th align="center">seqmagick</th>
 <th align="center">seqtk</th>
@@ -252,99 +467,193 @@ Two runs needed, first run creates fasta index file, and the second one evaluate
 <tbody>
 <tr>
 <td align="center">dataset_A.fa</td>
-<td align="center">8.40s</td>
-<td align="center">26.43s</td>
-<td align="center">13.61s</td>
-<td align="center">0.84s</td>
-<td align="center">9.95s</td>
+<td align="center">5.38s</td>
+<td align="center">4.02s</td>
+<td align="center">25.98s</td>
+<td align="center">13.10s</td>
+<td align="center">0.66s</td>
+<td align="center">10.92s</td>
 </tr>
 <tr>
 <td align="center">dataset_B.fa</td>
-<td align="center">14.15s</td>
-<td align="center">18.30s</td>
-<td align="center">9.98s</td>
-<td align="center">1.44s</td>
-<td align="center">10.43s</td>
+<td align="center">7.68s</td>
+<td align="center">2.70s</td>
+<td align="center">17.52s</td>
+<td align="center">9.42s</td>
+<td align="center">0.81s</td>
+<td align="center">10.48s</td>
 </tr>
 </tbody>
 </table>
-<h2 id="extract-sequencs-by-id-list">Extract sequencs by ID list</h2>
-<h3 id="id-list">ID list</h3>
-<p>ID list comes from sampling 80% of dataset_A and shuffling. n=140261.</p>
-<pre><code>$ fakit sample -p 0.8 dataset_A.fa | fakit shuffle | fakit seq -n -i &gt; ids.txt
-$ head -n 5 ids.txt
+<h2 id="test-2extract-sequencs-by-id-list">Test 2.Extract sequencs by ID list</h2>
+<h3 id="id-lists">ID lists</h3>
+<p>ID lists come from sampling 80% of dataset_A and shuffling.</p>
+<pre><code>$ fakit sample -p 0.8 dataset_A.fa | fakit shuffle | fakit seq -n -i &gt; ids_A.txt
+$ wc -l ids_A.txt
+140261 ids_A.txt
+$ head -n 2 ids_A.txt
 GQ103704.1.1352
 FR853054.1.1478
-GU214562.1.1781
-DQ796266.1.1393
-HM309604.1.1340
+
+$ time fakit sample -p 0.8 dataset_B.fa | fakit shuffle | fakit seq -n -i --id-regexp 'gi\|(.+?)\|'  &gt; ids_B.txt
+wc -l ids_B.txt
+4 ids_B.txt
+$ head -n 2 ids_B.txt
+568815574
+568815580
 </code></pre>
 <h3 id="commands_1">Commands</h3>
-<p>Before each run, run <code>su -c 'sync; echo 1 &gt; /proc/sys/vm/drop_caches'</code> to empty page caches.</p>
 <ol>
-<li>fakit:<ol>
-<li>default parameters: <code>time fakit extract -f ids.txt dataset_A.fa -j 1 -c 100 &gt; /dev/null</code></li>
-<li>single thread and bigger chunk-sze: <code>time fakit extract -f ids.txt dataset_A.fa -j 1 -c 10000 &gt; /dev/null</code>;</li>
-<li>multiple threads and bigger chunk-size: <code>time fakit extract -f ids.txt dataset_A.fa -j 4 -c 10000 &gt; /dev/null</code></li>
-</ol>
-</li>
+<li>fakit: <code>for g in A B; do time fakit grep -f ids_$g.txt dataset_$g.fa &gt; /dev/null; done</code></li>
+<li>fasta_utilities: (using an <a href="https://github.com/shenwei356/fasta_utilities/commit/cac7f14f952fab9bc4a209c6bc2b7cfad47e60d8">fixed</a>
+   version of <code>in_list.pl</code>)
+   <code>for g in A B; do time in_list.pl -files ids_$g.txt dataset_$g.fa &gt; /dev/null; done</code></li>
+<li>fastx_toolkit: can't handle multi-line FASTA files</li>
 <li>pyfaidx: unsupported</li>
-<li>seqmagick: only support single pattern by <code>--pattern-include</code></li>
-<li>seqtk: <code>time seqtk subseq dataset_A.fa ids.txt &gt; /dev/null</code></li>
+<li>seqmagick: <code>for g in A B; do time seqmagick convert --include-from-file ids_$g.txt dataset_$g.fa - &gt; /dev/null; done</code></li>
+<li>seqtk: <code>for g in A B; do time seqtk subseq  dataset_$g.fa ids_$g.txt &gt; /dev/null; done</code></li>
 </ol>
 <h3 id="results_1">Results</h3>
 <table>
 <thead>
 <tr>
-<th align="center">datasets</th>
-<th align="center">fakit (-j 1 -c 100)</th>
-<th align="center">fakit (-j 1 -c 10000)</th>
-<th align="center">fakit (-j 4 -c 10000)</th>
-<th align="center">seqtk</th>
+<th align="left">Datasets</th>
+<th align="left">fakit</th>
+<th align="left">fasta_utilities</th>
+<th align="left">seqmagick</th>
+<th align="left">seqtk</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="center">dataset_A.fa</td>
-<td align="center">7.87s</td>
-<td align="center">6.14s</td>
-<td align="center">4.72s</td>
-<td align="center">2.34s</td>
+<td align="left">dataset_A.fa</td>
+<td align="left">5.40s</td>
+<td align="left">3.88s</td>
+<td align="left">8.78s</td>
+<td align="left">2.31s</td>
+</tr>
+<tr>
+<td align="left">dataset_A.fa</td>
+<td align="left">2.82s</td>
+<td align="left">1.50s</td>
+<td align="left">4.58s</td>
+<td align="left">0.49s</td>
 </tr>
 </tbody>
 </table>
-<h2 id="deduplication">Deduplication</h2>
+<h2 id="test-3-deduplication">Test 3. Deduplication</h2>
 <h3 id="dataset">Dataset</h3>
-<p>Randomly extract 10% sequences from dataset_A.fa and merge back and then shuffle. Number: 175364 + 17411 = 192775</p>
-<pre><code>$ cat &lt;(fakit sample -p 0.1 dataset_A.fa) dataset_A.fa | fakit shuffle &gt; dataset_A_dup.fa
+<p>Randomly extract 10% sequences from dataset_*.fa and merge back and then shuffle.</p>
+<pre><code>$ cat &lt;(fakit sample -p 0.1 dataset_A.fa) dataset_A.fa | fakit shuffle &gt; dataset_A_dup.fasta
+$ cat &lt;(fakit sample -p 0.2 dataset_B.fa) dataset_B.fa | fakit shuffle &gt; dataset_B_dup.fasta
+</code></pre>
+<p>Numbers:</p>
+<pre><code>dataset_A_dup.fasta: 175364 + 17411 = 192775
+dataset_B_dup.fasta: 6 + 2 = 8
 </code></pre>
 <p>Unique seqs:</p>
-<pre><code>$ fakit fa2tab dataset_A_dup.fa  | cut -f 2 | sort | uniq | wc -l
+<pre><code>$ fakit fa2tab dataset_A_dup.fasta  | cut -f 2 | sort | uniq | wc -l
 161864
+$ fakit fa2tab dataset_B_dup.fasta  | cut -f 2 | sort | uniq | wc -l
+6
 </code></pre>
 <h3 id="commands_2">Commands</h3>
+<p>By sequence</p>
 <ol>
-<li>fakit: <code>time fakit rmdup -s dataset_A_dup.fa &gt; /dev/null</code></li>
-<li>seqmagick: <code>time seqmagick convert --deduplicate-sequences dataset_A_dup.fa - &gt; /dev/null</code></li>
+<li>fakit: <code>for f in *_dup.fasta; do time fakit rmdup -s $f &gt; /dev/null; done</code></li>
+<li>seqmagick: <code>for f in *_dup.fasta; do time seqmagick convert --deduplicate-sequences $f - &gt; /dev/null; done</code></li>
+</ol>
+<p>By name</p>
+<ol>
+<li>fakit: <code>for f in *_dup.fasta; do time fakit rmdup -n $f &gt; /dev/null; done</code></li>
+<li>fasta_utilities: <code>for f in *_dup.fasta; do time unique_headers.pl $f &gt; /dev/null; done</code></li>
 </ol>
 <h3 id="results_2">Results</h3>
+<p>By sequence</p>
 <table>
 <thead>
 <tr>
-<th align="left">datasets</th>
+<th align="left">Datasets</th>
 <th align="left">fakit</th>
 <th align="left">seqmagick</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left">dataset_A_dup.fa</td>
-<td align="left">8.10s</td>
-<td align="left">13.31s</td>
+<td align="left">dataset_A_dup.fasta</td>
+<td align="left">5.18s</td>
+<td align="left">12.08s</td>
+</tr>
+<tr>
+<td align="left">dataset_B_dup.fasta</td>
+<td align="left">5.55s</td>
+<td align="left">11.75s</td>
 </tr>
 </tbody>
 </table>
-<h2 id="todo">TODO</h2></div>
+<p>By name</p>
+<table>
+<thead>
+<tr>
+<th align="left">Datasets</th>
+<th align="left">fakit</th>
+<th align="left">fasta_utilities</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">dataset_A_dup.fasta</td>
+<td align="left">4.86s</td>
+<td align="left">4.35s</td>
+</tr>
+<tr>
+<td align="left">dataset_B_dup.fasta</td>
+<td align="left">4.76s</td>
+<td align="left">2.44s</td>
+</tr>
+</tbody>
+</table>
+<h2 id="test-4-sampling">Test 4. Sampling</h2>
+<h3 id="commands_3">Commands</h3>
+<p>Sample by number</p>
+<ol>
+<li>fakit: <code>for g in A B; do time fakit sample -n 1000 dataset_$g.fa &gt; /dev/null; done</code></li>
+<li>fasta_utilities: (<em>Not randomly</em>) <code>for g in A B; do time subset_fasta.pl -size 1000 dataset_$g.fa &gt; /dev/null; done</code></li>
+<li>fastx_toolkit: unsupported</li>
+<li>pyfaidx: unsupported</li>
+<li>seqmagick: <code>for g in A B; do time seqmagick convert --sample 1000  dataset_$g.fa - &gt; /dev/null; done</code></li>
+<li>seqtk: <code>for g in A B; do time seqtk sample  dataset_$g.fa 1000 &gt; /dev/null; done</code></li>
+</ol>
+<h3 id="results_3">Results</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Datasets</th>
+<th align="left">fakit</th>
+<th align="left">fasta_utilities</th>
+<th align="left">seqmagick</th>
+<th align="left">seqtk</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">dataset_A.fa</td>
+<td align="left">2.68s</td>
+<td align="left">3.01s</td>
+<td align="left">5.75s</td>
+<td align="left">0.38s</td>
+</tr>
+<tr>
+<td align="left">dataset_A.fa</td>
+<td align="left">3.62s</td>
+<td align="left">1.96s</td>
+<td align="left">7.81s</td>
+<td align="left">0.60s</td>
+</tr>
+</tbody>
+</table>
+<h2 id="test-5-spliting">Test 5. Spliting</h2>
+<p>TODO</p></div>
             
         </div>
 
