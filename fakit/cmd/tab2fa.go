@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	"github.com/brentp/xopen"
+	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/breader"
 	"github.com/shenwei356/util/byteutil"
 	"github.com/spf13/cobra"
@@ -40,14 +41,11 @@ var tab2faCmd = &cobra.Command{
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		chunkSize := getFlagInt(cmd, "chunk-size")
-		threads := getFlagInt(cmd, "threads")
+		chunkSize := getFlagPositiveInt(cmd, "chunk-size")
+		threads := getFlagPositiveInt(cmd, "threads")
 		outFile := getFlagString(cmd, "out-file")
-		lineWidth := getFlagInt(cmd, "line-width")
-
-		if chunkSize <= 0 || threads <= 0 || lineWidth <= 0 {
-			checkError(fmt.Errorf("value of flag -c, -j, -w should be greater than 0"))
-		}
+		lineWidth := getFlagNonNegativeInt(cmd, "line-width")
+		seq.AlphabetGuessSeqLenghtThreshold = getFlagalphabetGuessSeqLength(cmd, "alphabet-guess-seq-length")
 		runtime.GOMAXPROCS(threads)
 
 		files := getFileList(args)

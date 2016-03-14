@@ -68,6 +68,24 @@ func getFlagInt(cmd *cobra.Command, flag string) int {
 	return value
 }
 
+func getFlagPositiveInt(cmd *cobra.Command, flag string) int {
+	value, err := cmd.Flags().GetInt(flag)
+	checkError(err)
+	if value <= 0 {
+		checkError(fmt.Errorf("value of flag --%s should be greater than 0", flag))
+	}
+	return value
+}
+
+func getFlagNonNegativeInt(cmd *cobra.Command, flag string) int {
+	value, err := cmd.Flags().GetInt(flag)
+	checkError(err)
+	if value < 0 {
+		checkError(fmt.Errorf("value of flag --%s should be greater than 0", flag))
+	}
+	return value
+}
+
 func getFlagBool(cmd *cobra.Command, flag string) bool {
 	value, err := cmd.Flags().GetBool(flag)
 	checkError(err)
@@ -98,8 +116,8 @@ func getFlagStringSlice(cmd *cobra.Command, flag string) []string {
 	return value
 }
 
-func getAlphabet(cmd *cobra.Command, t string) *seq.Alphabet {
-	value, err := cmd.Flags().GetString(t)
+func getAlphabet(cmd *cobra.Command, flag string) *seq.Alphabet {
+	value, err := cmd.Flags().GetString(flag)
 	checkError(err)
 
 	switch strings.ToLower(value) {
@@ -116,6 +134,14 @@ func getAlphabet(cmd *cobra.Command, t string) *seq.Alphabet {
 	default:
 		return nil
 	}
+}
+
+func getFlagalphabetGuessSeqLength(cmd *cobra.Command, flag string) int {
+	alphabetGuessSeqLength := getFlagInt(cmd, flag)
+	if alphabetGuessSeqLength < 10000 {
+		checkError(fmt.Errorf("value of flag --%s too small, should >= 10000", flag))
+	}
+	return alphabetGuessSeqLength
 }
 
 func sortFastaRecordChunkMapID(chunks map[uint64]fasta.FastaRecordChunk) sortutil.Uint64Slice {

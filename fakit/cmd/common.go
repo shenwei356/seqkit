@@ -28,6 +28,7 @@ import (
 	"strings"
 
 	"github.com/brentp/xopen"
+	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fasta"
 	"github.com/spf13/cobra"
 )
@@ -46,15 +47,13 @@ var commonCmd = &cobra.Command{
 
 		alphabet := getAlphabet(cmd, "seq-type")
 		idRegexp := getFlagString(cmd, "id-regexp")
-		chunkSize := getFlagInt(cmd, "chunk-size")
-		threads := getFlagInt(cmd, "threads")
-		lineWidth := getFlagInt(cmd, "line-width")
+		chunkSize := getFlagPositiveInt(cmd, "chunk-size")
+		threads := getFlagPositiveInt(cmd, "threads")
+		lineWidth := getFlagNonNegativeInt(cmd, "line-width")
 		outFile := getFlagString(cmd, "out-file")
 		quiet := getFlagBool(cmd, "quiet")
-
-		if chunkSize <= 0 || threads <= 0 || lineWidth <= 0 {
-			checkError(fmt.Errorf("value of flag -c, -j, -w should be greater than 0"))
-		}
+		seq.AlphabetGuessSeqLenghtThreshold = getFlagalphabetGuessSeqLength(cmd, "alphabet-guess-seq-length")
+		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(threads)
 
 		bySeq := getFlagBool(cmd, "by-seq")

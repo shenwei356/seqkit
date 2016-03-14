@@ -33,24 +33,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// extractCmd represents the extract command
-var extractCmd = &cobra.Command{
-	Use:   "extract",
-	Short: "extract sequences by pattern(s) of name or sequence motifs",
-	Long: `extract sequences by pattern(s) of name or sequence motifs
+// grepCmd represents the extract command
+var grepCmd = &cobra.Command{
+	Use:   "grep",
+	Short: "grep sequences by pattern(s) of name or sequence motifs",
+	Long: `grep sequences by pattern(s) of name or sequence motifs
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		alphabet := getAlphabet(cmd, "seq-type")
 		idRegexp := getFlagString(cmd, "id-regexp")
-		chunkSize := getFlagInt(cmd, "chunk-size")
-		threads := getFlagInt(cmd, "threads")
-		lineWidth := getFlagInt(cmd, "line-width")
+		chunkSize := getFlagPositiveInt(cmd, "chunk-size")
+		threads := getFlagPositiveInt(cmd, "threads")
+		lineWidth := getFlagNonNegativeInt(cmd, "line-width")
 		outFile := getFlagString(cmd, "out-file")
-
-		if chunkSize <= 0 || threads <= 0 || lineWidth <= 0 {
-			checkError(fmt.Errorf("value of flag -c, -j, -w should be greater than 0"))
-		}
+		seq.AlphabetGuessSeqLenghtThreshold = getFlagalphabetGuessSeqLength(cmd, "alphabet-guess-seq-length")
+		seq.ValidateSeq = false
+		runtime.GOMAXPROCS(threads)
 
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
@@ -68,7 +67,6 @@ var extractCmd = &cobra.Command{
 		if useRegexp && degenerate {
 			checkError(fmt.Errorf("could not give both flags -d (--degenerat) and -r (--use-regexp)"))
 		}
-		runtime.GOMAXPROCS(threads)
 
 		files := getFileList(args)
 
@@ -247,15 +245,15 @@ var extractCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(extractCmd)
+	RootCmd.AddCommand(grepCmd)
 
-	extractCmd.Flags().StringSliceP("pattern", "p", []string{""}, "search pattern (multiple values supported)")
-	extractCmd.Flags().StringP("pattern-file", "f", "", "pattern file")
-	extractCmd.Flags().BoolP("use-regexp", "r", false, "patterns are regular expression")
-	extractCmd.Flags().BoolP("delete-matched", "", false, "delete matched pattern to speedup")
-	extractCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")
-	extractCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
-	extractCmd.Flags().BoolP("by-seq", "s", false, "match by seq")
-	extractCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
-	extractCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
+	grepCmd.Flags().StringSliceP("pattern", "p", []string{""}, "search pattern (multiple values supported)")
+	grepCmd.Flags().StringP("pattern-file", "f", "", "pattern file")
+	grepCmd.Flags().BoolP("use-regexp", "r", false, "patterns are regular expression")
+	grepCmd.Flags().BoolP("delete-matched", "", false, "delete matched pattern to speedup")
+	grepCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")
+	grepCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
+	grepCmd.Flags().BoolP("by-seq", "s", false, "match by seq")
+	grepCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
+	grepCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
 }

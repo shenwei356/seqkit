@@ -7,7 +7,7 @@ Usage
 ```
 fakit -- FASTA kit
 
-Version: 0.1.2
+Version: 0.1.3
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -19,8 +19,8 @@ Usage:
 
 Available Commands:
   common      find common sequences of multiple files by id/name/sequence
-  extract     extract sequences by pattern(s) of name or sequence motifs
   fa2tab      covert FASTA to tabular format, and provide various information
+  grep        grep sequences by pattern(s) of name or sequence motifs
   locate      locate subsequences/motifs
   rmdup       remove duplicated sequences by id/name/sequence
   sample      sample sequences by number or proportion
@@ -33,33 +33,21 @@ Available Commands:
   tab2fa      covert tabular format to FASTA format
 
 Flags:
-  -c, --chunk-size int     chunk size (attention: unit is FASTA records not lines) (default 100)
-      --id-regexp string   regular expression for parsing ID (default "^([^\\s]+)\\s?")
-  -w, --line-width int     line width (0 for no wrap) (default 60)
-  -o, --out-file string    out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
-      --quiet              be quiet and do not show extra information
-  -t, --seq-type string    sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
-  -j, --threads int        number of CPUs. since most of the subcommands are I/O intensive, so default value is 1. For computation intensive jobs, like extract and locate, you may set bigger value (default 1)
+      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which fakit guess the sequence type (default 10000)
+  -c, --chunk-size int                  chunk size (attention: unit is FASTA records not lines) (default 1000)
+      --id-regexp string                regular expression for parsing ID (default "^([^\\s]+)\\s?")
+  -w, --line-width int                  line width (0 for no wrap) (default 60)
+  -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
+      --quiet                           be quiet and do not show extra information
+  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
+  -j, --threads int                     number of CPUs. (default value depends on your device) (default 4)
 
 Use "fakit [command] --help" for more information about a command.
 ```
 
 ## Performance Tips
 
-Since most of the subcommands are I/O intensive,
-so default value of flag -j (--threads) is 1.
-For computation intensive jobs, like extract and locate,
- you may set a bigger value.
-
-For example
-
-1. Extract sequences by names or sequences using regular expression.
-
-        zcat hairpin.fa.gz | fakit extract -s -r -i -p TT[CG]AA -j 4
-
-1. Locate sequence motifs
-
-        zcat hairpin.fa.gz | fakit extract -s -d -i -f motif.fa -j 4
+``--chunk-size`
 
 ### Datasets
 
@@ -151,6 +139,7 @@ Examples
         $ echo -e ">seq\nACGT-ACTGC-ACC" | fakit seq -i -g
         >seq
         ACGTACTGCACC
+
 1. RNA to DNA
 
         $ echo -e ">seq\nUCAUAUGCUUGUCUCAAAGAUUA" | fakit seq --rna2dna
@@ -295,15 +284,15 @@ we could also print title line by flag `-T`.
 
         $ zcat hairpin.fa.gz | fakit fa2tab | head -n 1000 | fakit tab2fa
 
-## extract
+## grep
 
 Usage
 
 ```
-extract sequences by pattern(s) of name or sequence motifs
+grep sequences by pattern(s) of name or sequence motifs
 
 Usage:
-  fakit extract [flags]
+  fakit grep [flags]
 
 Flags:
   -n, --by-name               match by full name instead of just id
@@ -321,7 +310,7 @@ Examples
 
 1. Extract human hairpins (i.e. sequences with name starting with `hsa`)
 
-        $ zcat hairpin.fa.gz | fakit extract -r -p ^hsa
+        $ zcat hairpin.fa.gz | fakit grep -r -p ^hsa
         >hsa-let-7a-1 MI0000060 Homo sapiens let-7a-1 stem-loop
         UGGGAUGAGGUAGUAGGUUGUAUAGUUUUAGGGUCACACCCACCACUGGGAGAUAACUAU
         ACAAUCUACUGUCUUUCCUA
@@ -331,7 +320,7 @@ Examples
 
 1. Remove human and mice hairpins.
 
-        $ zcat hairpin.fa.gz | fakit extract -r -p ^hsa -p ^mmu -v
+        $ zcat hairpin.fa.gz | fakit grep -r -p ^hsa -p ^mmu -v
 
 1. Extract new entries by information from miRNA.diff.gz
 
@@ -346,19 +335,19 @@ Examples
 
     2. Extract by ID list file
 
-            $ zcat hairpin.fa.gz | fakit extract -f list > new.fa
+            $ zcat hairpin.fa.gz | fakit grep -f list > new.fa
 
 1. Extract sequences starting with AGGCG
 
-        $ zcat hairpin.fa.gz | fakit extract -s -r -i -p ^aggcg -j 4
+        $ zcat hairpin.fa.gz | fakit grep -s -r -i -p ^aggcg -j 4
 
 1. Extract sequences with TTSAA (AgsI digest site) in SEQUENCE. Base S stands for C or G.
 
-        $ zcat hairpin.fa.gz | fakit extract -s -d -i -p TTSAA -j 4
+        $ zcat hairpin.fa.gz | fakit grep -s -d -i -p TTSAA -j 4
 
     It's equal to but simpler than:
 
-        $ zcat hairpin.fa.gz | fakit extract -s -r -i -p TT[CG]AA
+        $ zcat hairpin.fa.gz | fakit grep -s -r -i -p TT[CG]AA
 
 ## common
 

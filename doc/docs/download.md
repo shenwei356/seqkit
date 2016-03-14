@@ -6,7 +6,7 @@
 
 ## Current Version
 
-[fakit v0.1.2](https://github.com/shenwei356/fakit/releases/tag/v0.1.2)
+[fakit v0.1.3](https://github.com/shenwei356/fakit/releases/tag/v0.1.3)
 
 ## Installation
 
@@ -30,5 +30,6 @@ You can also add the directory of the executable file to environment variable
 
 ## Previous Versions
 
+- [fakit v0.1.2](https://github.com/shenwei356/fakit/releases/tag/v0.1.2)
 - [fakit v0.1.1](https://github.com/shenwei356/fakit/releases/tag/v0.1.1)
 - [fakit v0.1](https://github.com/shenwei356/fakit/releases/tag/v0.1)
