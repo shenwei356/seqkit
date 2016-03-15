@@ -33,7 +33,7 @@ Mutli-grep       |  Yes        |   Yes           |   --          |   --    |   Y
 Sample           |  Yes        |   Yes           |   --          |   --    |   Yes     |   Yes
 Subseq           |  Yes        |   Yes           |   --          |   Yes   |   Yes     |   Yes
 Deduplicate      |  Yes        |  Partly         |   --          |   --    |   Partly  |   --
-Split            |  Yes        |   Yes           |   --          |   Yes   |   --      |   --
+Split            |  Yes        |   Yes           |   --          |  Partly |   --      |   --
 Barcode split    |  Yes        |   --            |   Yes         |   Yes   |   --      |   --
 Shuffle          |  Yes        |   --            |   --          |   --    |   --      |   --
 Locate motifs    |  Yes        |   --            |   --          |   --    |   --      |   --
@@ -218,4 +218,14 @@ dataset_A.fa  |  3.62s    |    1.96s        |   7.81s     | 0.60s
 
 ## Test 5. Spliting
 
-TODO
+1. fakit: `for g in A B; do time fakit split -n 3 dataset_$g.fa; done`
+1. fasta_utilities: failed to run `split_fasta.pl`
+1. fastx_toolkit: unsupported
+1. pyfaidx: only support to write each region to a separate file by flag `-x`
+1. seqmagick: unsupported
+1. seqtk: unsupported
+
+Datasets      |  fakit    | fasta_utilities
+:-------------|:----------|:---------------
+dataset_A.fa  |  4.31s    |    --  
+dataset_A.fa  |  3.57s    |    --

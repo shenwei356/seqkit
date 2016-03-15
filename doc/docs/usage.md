@@ -339,11 +339,11 @@ Examples
 
 1. Extract sequences starting with AGGCG
 
-        $ zcat hairpin.fa.gz | fakit grep -s -r -i -p ^aggcg -j 4
+        $ zcat hairpin.fa.gz | fakit grep -s -r -i -p ^aggcg
 
 1. Extract sequences with TTSAA (AgsI digest site) in SEQUENCE. Base S stands for C or G.
 
-        $ zcat hairpin.fa.gz | fakit grep -s -d -i -p TTSAA -j 4
+        $ zcat hairpin.fa.gz | fakit grep -s -d -i -p TTSAA
 
     It's equal to but simpler than:
 
@@ -596,7 +596,7 @@ Examples
 
 1. Locate ORFs.
 
-        $ zcat hairpin.fa.gz | fakit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" -j 4
+        $ zcat hairpin.fa.gz | fakit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)"
         seqID   patternName     pattern strand  start   end     matched
         cel-lin-4       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        1  136      AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGA
         cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        1  54       95      AUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAG
@@ -604,7 +604,7 @@ Examples
 
 1. Locate Motif.
 
-        $ zcat hairpin.fa.gz | fakit locate -i -p UUS -j 4
+        $ zcat hairpin.fa.gz | fakit locate -i -p UUS
         seqID   patternName     pattern strand  start   end     matched
         bna-MIR396a     UUS     UUS     -1      105     107     UUS
         bna-MIR396a     UUS     UUS     -1      89      91      UUS

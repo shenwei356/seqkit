@@ -6,16 +6,20 @@ Source code: [https://github.com/shenwei356/fakit](https://github.com/shenwei356
 
 ## Features
 
-- Cross-platform (Linux/Windows/Mac OS X/OpenBSD/FreeBSD,
+- **Cross-platform** (Linux/Windows/Mac OS X/OpenBSD/FreeBSD,
   see [download](http://shenwei356.github.io/fakit/download/))
-- Out-of-the-box, no dependencies, without compilation, light weight
+- **Out-of-the-box, no dependencies, without compilation, light weight**
   see [download](http://shenwei356.github.io/fakit/download/))
-- Fast (see [benchmark](http://shenwei356.github.io/fakit/benchmark/))
-- Practical functions (see subcommands and
+- **Fast** (see [benchmark](http://shenwei356.github.io/fakit/benchmark/)),
+  **multiple-threads supported**, more significant speedup for `grep` and `locate`.
+- **Practical functions by 13 subcommands** (see subcommands and
   [usage](http://shenwei356.github.io/fakit/usage/) )
+- **Well documented** (detailed [usage](http://shenwei356.github.io/fakit/usage/) 
+  and [benchmark](http://shenwei356.github.io/fakit/benchmark/) )
 - Support STDIN and gziped input/output file, could be used in pipe
 - Support custom sequence ID regular expression (especially useful for quering with ID list)
 - Reproducible results (configurable rand seed in `sample` and `shuffle`)
+- Well organized source code, friendly to use and easy to extend.
 
 ## Subcommands
 
