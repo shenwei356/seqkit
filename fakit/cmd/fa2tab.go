@@ -33,7 +33,7 @@ import (
 // fa2tabCmd represents the seq command
 var fa2tabCmd = &cobra.Command{
 	Use:   "fa2tab",
-	Short: "covert FASTA to tabular format, and provide various information",
+	Short: "covert FASTA to tabular format (and length/GC content/GC skew) to filter and sort",
 	Long: `covert FASTA to tabular format, and provide various information,
 like sequence length, GC content/GC skew.
 

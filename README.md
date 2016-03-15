@@ -31,7 +31,7 @@ Basic
 
 Format convert
 
-- `fa2tab`     covert FASTA to tabular format, and provide various information
+- `fa2tab`     covert FASTA to tabular format (and length/GC content/GC skew) to filter and sort
 - `tab2fa`     covert tabular format to FASTA format
 
 More

@@ -106,7 +106,7 @@ Two runs needed, first run creates fasta index file, and the second one evaluate
 dataset_A.fa  |  5.38s   |   4.02s         | 25.98s  |  13.10s   | 0.66s   | 10.92s
 dataset_B.fa  |  7.68s   |   2.70s         | 17.52s  |  9.42s    | 0.81s   | 10.48s
 
-## Test 2.Extract sequencs by ID list
+## Test 2. Extract sequencs by ID list
 
 ### ID lists
 
