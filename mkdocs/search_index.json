@@ -42,7 +42,7 @@
         }, 
         {
             "location": "/download/", 
-            "text": "Download\n\n\nfakit\n is implemented in \nGolang\n programming language,\n executable binary files for most popular operating system are freely available\n  in \nrelease\n page.\n\n\nCurrent Version\n\n\nfakit v0.1.3\n\n\nInstallation\n\n\nJust \ndownload\n executable file\n of your operating system and rename it to \nfakit.exe\n (Windows) or\n \nfakit\n (other operating systems) for convenience,\n and then run it in command-line interface, no dependencies,\n without complicated compilation process.\n\n\nYou can also add the directory of the executable file to environment variable\n\nPATH\n, so you can run \nfakit\n anywhere.\n\n\n\n\n\n\nFor windows, the simplest way is copy it to \nC:\\WINDOWS\\system32\n.\n\n\n\n\n\n\nFor Linux, type:\n\n\nchmod a+x /PATH/OF/FASTCOV/fakit\necho export PATH=\\$PATH:/PATH/OF/FASTCOV \n ~/.bashrc\n\n\n\nor simply copy it to \n/usr/local/bin\n\n\n\n\n\n\nPrevious Versions\n\n\n\n\nfakit v0.1.2\n\n\nfakit v0.1.1\n\n\nfakit v0.1", 
+            "text": "Download\n\n\nfakit\n is implemented in \nGolang\n programming language,\n executable binary files for most popular operating system are freely available\n  in \nrelease\n page.\n\n\nCurrent Version\n\n\n\n\nfakit v0.1.3\n\n\nFurther performance improvement\n\n\nRename sub command \nextract\n to \ngrep\n\n\nChange default value of flag \n--threads\n back CPU number of current device,\n  change default value of flag \n--chunk-size\n back 10000 sequences.\n\n\nUpdate benchmark\n\n\n\n\n\n\n\n\nInstallation\n\n\nJust \ndownload\n executable file\n of your operating system and rename it to \nfakit.exe\n (Windows) or\n \nfakit\n (other operating systems) for convenience,\n and then run it in command-line interface, no dependencies,\n without complicated compilation process.\n\n\nYou can also add the directory of the executable file to environment variable\n\nPATH\n, so you can run \nfakit\n anywhere.\n\n\n\n\n\n\nFor windows, the simplest way is copy it to \nC:\\WINDOWS\\system32\n.\n\n\n\n\n\n\nFor Linux, type:\n\n\nchmod a+x /PATH/OF/FASTCOV/fakit\necho export PATH=\\$PATH:/PATH/OF/FASTCOV \n ~/.bashrc\n\n\n\nor simply copy it to \n/usr/local/bin\n\n\n\n\n\n\nPrevious Versions\n\n\n\n\nfakit v0.1.2\n\n\nAdd flag \n--dna2rna\n and \n--rna2dna\n to subcommand \nseq\n.\n\n\n\n\n\n\nfakit v0.1.1\n\n\n5.5X speedup of FASTA file parsing\n by avoid using regular expression to remove spaces (\ndetail\n ) and using slice indexing instead of map to validate letters (\ndetail\n)\n\n\nChange default value of global flag \n-- thread\n to 1. Since most of the subcommands are I/O intensive,  For computation intensive jobs, like extract and locate, you may set a bigger value.\n\n\nChange default value of global flag \n--chunk-size\n to 100.\n\n\nAdd subcommand \nstat\n\n\nFix bug of failing to automatically detect alphabet when only one record in file.\n\n\n\n\n\n\nfakit v0.1\n\n\nfirst release of fakit", 
             "title": "Download"
         }, 
         {
@@ -52,7 +52,7 @@
         }, 
         {
             "location": "/download/#current-version", 
-            "text": "fakit v0.1.3", 
+            "text": "fakit v0.1.3  Further performance improvement  Rename sub command  extract  to  grep  Change default value of flag  --threads  back CPU number of current device,\n  change default value of flag  --chunk-size  back 10000 sequences.  Update benchmark", 
             "title": "Current Version"
         }, 
         {
@@ -62,7 +62,7 @@
         }, 
         {
             "location": "/download/#previous-versions", 
-            "text": "fakit v0.1.2  fakit v0.1.1  fakit v0.1", 
+            "text": "fakit v0.1.2  Add flag  --dna2rna  and  --rna2dna  to subcommand  seq .    fakit v0.1.1  5.5X speedup of FASTA file parsing  by avoid using regular expression to remove spaces ( detail  ) and using slice indexing instead of map to validate letters ( detail )  Change default value of global flag  -- thread  to 1. Since most of the subcommands are I/O intensive,  For computation intensive jobs, like extract and locate, you may set a bigger value.  Change default value of global flag  --chunk-size  to 100.  Add subcommand  stat  Fix bug of failing to automatically detect alphabet when only one record in file.    fakit v0.1  first release of fakit", 
             "title": "Previous Versions"
         }, 
         {
