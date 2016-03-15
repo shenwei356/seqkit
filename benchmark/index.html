@@ -286,7 +286,7 @@
 <td align="center">Yes</td>
 <td align="center">Yes</td>
 <td align="center">--</td>
-<td align="center">Yes</td>
+<td align="center">Partly</td>
 <td align="center">--</td>
 <td align="left">--</td>
 </tr>
@@ -653,7 +653,35 @@ $ fakit fa2tab dataset_B_dup.fasta  | cut -f 2 | sort | uniq | wc -l
 </tbody>
 </table>
 <h2 id="test-5-spliting">Test 5. Spliting</h2>
-<p>TODO</p></div>
+<ol>
+<li>fakit: <code>for g in A B; do time fakit split -n 3 dataset_$g.fa; done</code></li>
+<li>fasta_utilities: failed to run <code>split_fasta.pl</code></li>
+<li>fastx_toolkit: unsupported</li>
+<li>pyfaidx: only support to write each region to a separate file by flag <code>-x</code></li>
+<li>seqmagick: unsupported</li>
+<li>seqtk: unsupported</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="left">Datasets</th>
+<th align="left">fakit</th>
+<th align="left">fasta_utilities</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">dataset_A.fa</td>
+<td align="left">4.31s</td>
+<td align="left">--</td>
+</tr>
+<tr>
+<td align="left">dataset_A.fa</td>
+<td align="left">3.57s</td>
+<td align="left">--</td>
+</tr>
+</tbody>
+</table></div>
             
         </div>
 
