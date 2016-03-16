@@ -6,7 +6,9 @@
 
 ## Current Version
 
-[fakit v0.1.3](https://github.com/shenwei356/fakit/releases/tag/v0.1.3)
+- [fakit v0.1.3.1](https://github.com/shenwei356/fakit/releases/tag/v0.1.3.1)
+    - Performance improvement by reducing time of cleaning spaces
+    - Document update
 
 ## Installation
 
@@ -30,6 +32,19 @@ You can also add the directory of the executable file to environment variable
 
 ## Previous Versions
 
+- [fakit v0.1.3](https://github.com/shenwei356/fakit/releases/tag/v0.1.3)
+    - **Further performance improvement**
+    - Rename sub command `extract` to `grep`
+    - Change default value of flag `--threads` back CPU number of current device,
+      change default value of flag `--chunk-size` back 10000 sequences.
+    - Update benchmark
 - [fakit v0.1.2](https://github.com/shenwei356/fakit/releases/tag/v0.1.2)
+    - Add flag `--dna2rna` and `--rna2dna` to subcommand `seq`.
 - [fakit v0.1.1](https://github.com/shenwei356/fakit/releases/tag/v0.1.1)
+    - **5.5X speedup of FASTA file parsing** by avoid using regular expression to remove spaces ([detail](https://github.com/shenwei356/bio/commit/2457b877cf1b8d79d05adb1a8952f2dff9046eaf) ) and using slice indexing instead of map to validate letters ([detail](https://github.com/shenwei356/bio/commit/0f5912f6a3c6d737faacf9212f62d11c94e5044a))
+    - Change default value of global flag `-- thread` to 1. Since most of the subcommands are I/O intensive,  For computation intensive jobs, like extract and locate, you may set a bigger value.
+    - Change default value of global flag `--chunk-size` to 100.
+    - Add subcommand `stat`
+    - Fix bug of failing to automatically detect alphabet when only one record in file.
 - [fakit v0.1](https://github.com/shenwei356/fakit/releases/tag/v0.1)
+    - first release of fakit

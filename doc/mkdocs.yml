@@ -8,6 +8,6 @@ pages:
 theme: mkdocs
 
 repo_url: https://github.com/shenwei356/fakit
-site_description: fakit - FASTA kit
+site_description: fakit - Practical FASTA kit
 site_author: shenwei356
-google_analytics: ['UA-28948626-5', 'shenwei356.github.io/fakit']
+google_analytics: ['UA-28948626-3', 'blog.shenwei.me/fakit']

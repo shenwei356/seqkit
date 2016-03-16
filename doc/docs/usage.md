@@ -5,9 +5,9 @@
 Usage
 
 ```
-fakit -- FASTA kit
+fakit -- Practical FASTA kit
 
-Version: 0.1.3
+Version: 0.1.3.1
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -33,7 +33,7 @@ Available Commands:
   tab2fa      covert tabular format to FASTA format
 
 Flags:
-      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which fakit guess the sequence type (default 10000)
+      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which fakit guesses the sequence type (default 10000)
   -c, --chunk-size int                  chunk size (attention: unit is FASTA records not lines) (default 1000)
       --id-regexp string                regular expression for parsing ID (default "^([^\\s]+)\\s?")
   -w, --line-width int                  line width (0 for no wrap) (default 60)
@@ -43,11 +43,13 @@ Flags:
   -j, --threads int                     number of CPUs. (default value depends on your device) (default 4)
 
 Use "fakit [command] --help" for more information about a command.
+
 ```
 
 ## Performance Tips
 
-``--chunk-size`
+- `--chunk-size`, for large sequences like human genome,
+you could set a small value, like 1.
 
 ### Datasets
 
@@ -71,7 +73,7 @@ Usage:
 Flags:
   -p, --complement          complement sequence (blank for Protein sequence)
       --dna2rna             DNA to RNA
-  -G, --gap-letter string   gap letters (default "-")
+  -G, --gap-letter string   gap letters (default "- ")
   -l, --lower-case          print sequences in lower case
   -n, --name                only print names
   -i, --only-id             print ID instead of full head
@@ -96,6 +98,29 @@ Examples
     - From stdin:
 
             zcat hairpin.fa.gz | fakit seq
+
+1. Sequence types
+
+    1. In default, `fakit seq` automatically detect the sequence type
+
+            $ echo -e ">seq\nacgtryswkmbdhvACGTRYSWKMBDHV" | fakit stat
+            file    type    num_seqs        min_len avg_len max_len
+            -       DNA     1       28      28.0    28
+
+            $ echo -e ">seq\nACGUN ACGUN" | fakit stat
+            file    type    num_seqs        min_len avg_len max_len
+            -       RNA     1       11      11.0    11
+
+            $ echo -e ">seq\nabcdefghijklmnpqrstvwyz" | fakit stat
+            file    type    num_seqs        min_len avg_len max_len
+            -       Protein 1       23      23.0    23
+
+
+    2. You can also set sequence type by flag `-t` (`--seq-type`).
+      But this only take effect on subcommands `seq` and `locate`.
+
+            $ echo -e ">seq\nabcdefghijklmnpqrstvwyz" | fakit seq -t dna
+            [ERRO] error when parsing seq: seq (invalid DNAredundant letter: e)
 
 1. Only print names
 
@@ -280,7 +305,7 @@ we could also print title line by flag `-T`.
 
     Sorting or filtering by GC (or other base by -flag `-b`) content could also achieved in similar way.
 
-1. Get first 1000 sequence
+1. Get first 1000 sequences
 
         $ zcat hairpin.fa.gz | fakit fa2tab | head -n 1000 | fakit tab2fa
 

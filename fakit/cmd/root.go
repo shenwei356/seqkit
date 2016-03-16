@@ -32,10 +32,10 @@ import (
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "fakit",
-	Short: "FASTA kit",
-	Long: `fakit -- FASTA kit
+	Short: "Practical FASTA kit",
+	Long: `fakit -- Practical FASTA kit
 
-Version: 0.1.3
+Version: 0.1.3.1
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -62,5 +62,5 @@ func init() {
 	RootCmd.PersistentFlags().StringP("id-regexp", "", fasta.DefaultIDRegexp, "regular expression for parsing ID")
 	RootCmd.PersistentFlags().StringP("out-file", "o", "-", `out file ("-" for stdout, suffix .gz for gzipped out)`)
 	RootCmd.PersistentFlags().BoolP("quiet", "", false, "be quiet and do not show extra information")
-	RootCmd.PersistentFlags().IntP("alphabet-guess-seq-length", "", 10000, "length of sequence prefix of the first FASTA record based on which fakit guess the sequence type")
+	RootCmd.PersistentFlags().IntP("alphabet-guess-seq-length", "", 10000, "length of sequence prefix of the first FASTA record based on which fakit guesses the sequence type")
 }
