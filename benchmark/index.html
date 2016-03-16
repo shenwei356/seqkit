@@ -162,7 +162,7 @@
 <h2 id="softwares">Softwares</h2>
 <ol>
 <li><a href="https://github.com/shenwei356/fakit">fakit</a>. (Go).
-   Version <a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.3">v0.1.3</a>.</li>
+   Version <a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.3.1">v0.1.3.1</a>.</li>
 <li><a href="https://github.com/jimhester/fasta_utilities">fasta_utilities</a>. (Perl).
    Version
    <a href="https://github.com/jimhester/fasta_utilities/commit/329f7ca9266d4a0a96cb5576c464c1bd106865a0">329f7ca</a>.
@@ -210,7 +210,7 @@
 <td align="left">Yes</td>
 </tr>
 <tr>
-<td align="left">Validation</td>
+<td align="left">Validate</td>
 <td align="center">Yes</td>
 <td align="center">--</td>
 <td align="center">Yes</td>
@@ -237,7 +237,7 @@
 <td align="left">Yes</td>
 </tr>
 <tr>
-<td align="left">Read Gzip</td>
+<td align="left">Read gzip</td>
 <td align="center">Yes</td>
 <td align="center">Yes</td>
 <td align="center">--</td>
@@ -246,7 +246,16 @@
 <td align="left">Yes</td>
 </tr>
 <tr>
-<td align="left">Grep</td>
+<td align="left">Write gzip</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="left">--</td>
+</tr>
+<tr>
+<td align="left">search</td>
 <td align="center">Yes</td>
 <td align="center">Yes</td>
 <td align="center">--</td>
@@ -255,7 +264,7 @@
 <td align="left">Yes</td>
 </tr>
 <tr>
-<td align="left">Mutli-grep</td>
+<td align="left">Multi-search</td>
 <td align="center">Yes</td>
 <td align="center">Yes</td>
 <td align="center">--</td>
@@ -327,7 +336,7 @@
 <td align="left">--</td>
 </tr>
 <tr>
-<td align="left">Common</td>
+<td align="left">Common seqs</td>
 <td align="center">Yes</td>
 <td align="center">--</td>
 <td align="center">--</td>
@@ -383,7 +392,7 @@
 </tbody>
 </table>
 <h2 id="datasets">Datasets</h2>
-<p>Original datasets included:</p>
+<p>Original datasets include:</p>
 <ul>
 <li><a href="http://www.arb-silva.de/fileadmin/silva_databases/current/Exports/SILVA_123_SSURef_tax_silva.fasta.gz">SILVA_123_SSURef_tax_silva.fasta.gz</a></li>
 <li><a href="ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/H_sapiens/Assembled_chromosomes/seq/">hs_ref_GRCh38.p2_*.mfa.gz</a></li>
@@ -401,9 +410,10 @@
 </code></pre>
 </li>
 </ol>
-<p>And some tools do not support RNA sequences,
+<p>Some tools do not support RNA sequences,
  and are not able to directly read .gz file,
- so the files are uncompressed, and convert to DNA by <code>fakit seq --rna2dna dataset_A.fa.gz &gt; dataset_A.fa</code>.</p>
+ so the files are uncompressed, and converted to DNA by
+ <code>fakit seq --rna2dna dataset_A.fa.gz &gt; dataset_A.fa</code>.</p>
 <table>
 <thead>
 <tr>
@@ -476,21 +486,21 @@ Two runs needed, first run creates fasta index file, and the second one evaluate
 <tbody>
 <tr>
 <td align="center">dataset_A.fa</td>
-<td align="center">5.38s</td>
-<td align="center">4.02s</td>
-<td align="center">25.98s</td>
-<td align="center">13.10s</td>
-<td align="center">0.66s</td>
-<td align="center">10.92s</td>
+<td align="center">4.72s</td>
+<td align="center">4.08s</td>
+<td align="center">25.04s</td>
+<td align="center">12.49s</td>
+<td align="center">0.65s</td>
+<td align="center">11.07s</td>
 </tr>
 <tr>
 <td align="center">dataset_B.fa</td>
-<td align="center">7.68s</td>
-<td align="center">2.70s</td>
-<td align="center">17.52s</td>
-<td align="center">9.42s</td>
+<td align="center">5.78s</td>
+<td align="center">2.61s</td>
+<td align="center">16.64s</td>
+<td align="center">9.27s</td>
 <td align="center">0.81s</td>
-<td align="center">10.48s</td>
+<td align="center">10.62s</td>
 </tr>
 </tbody>
 </table>
@@ -536,17 +546,17 @@ $ head -n 2 ids_B.txt
 <tbody>
 <tr>
 <td align="left">dataset_A.fa</td>
-<td align="left">5.40s</td>
-<td align="left">3.88s</td>
-<td align="left">8.78s</td>
-<td align="left">2.31s</td>
+<td align="left">4.19s</td>
+<td align="left">3.81s</td>
+<td align="left">8.30s</td>
+<td align="left">2.21s</td>
 </tr>
 <tr>
 <td align="left">dataset_A.fa</td>
-<td align="left">2.82s</td>
-<td align="left">1.50s</td>
-<td align="left">4.58s</td>
-<td align="left">0.49s</td>
+<td align="left">1.33s</td>
+<td align="left">1.59s</td>
+<td align="left">4.29s</td>
+<td align="left">0.52s</td>
 </tr>
 </tbody>
 </table>
@@ -590,13 +600,13 @@ $ fakit fa2tab dataset_B_dup.fasta  | cut -f 2 | sort | uniq | wc -l
 <tbody>
 <tr>
 <td align="left">dataset_A_dup.fasta</td>
-<td align="left">5.18s</td>
-<td align="left">12.08s</td>
+<td align="left">3.49s</td>
+<td align="left">12.95s</td>
 </tr>
 <tr>
 <td align="left">dataset_B_dup.fasta</td>
-<td align="left">5.55s</td>
-<td align="left">11.75s</td>
+<td align="left">3.70s</td>
+<td align="left">11.41s</td>
 </tr>
 </tbody>
 </table>
@@ -612,13 +622,13 @@ $ fakit fa2tab dataset_B_dup.fasta  | cut -f 2 | sort | uniq | wc -l
 <tbody>
 <tr>
 <td align="left">dataset_A_dup.fasta</td>
-<td align="left">4.86s</td>
-<td align="left">4.35s</td>
+<td align="left">3.24s</td>
+<td align="left">4.19s</td>
 </tr>
 <tr>
 <td align="left">dataset_B_dup.fasta</td>
-<td align="left">4.76s</td>
-<td align="left">2.44s</td>
+<td align="left">2.76s</td>
+<td align="left">2.51s</td>
 </tr>
 </tbody>
 </table>
@@ -647,23 +657,23 @@ $ fakit fa2tab dataset_B_dup.fasta  | cut -f 2 | sort | uniq | wc -l
 <tbody>
 <tr>
 <td align="left">dataset_A.fa</td>
-<td align="left">2.68s</td>
-<td align="left">3.01s</td>
-<td align="left">5.75s</td>
-<td align="left">0.38s</td>
+<td align="left">1.69s</td>
+<td align="left">3.10s</td>
+<td align="left">5.88s</td>
+<td align="left">0.37s</td>
 </tr>
 <tr>
 <td align="left">dataset_A.fa</td>
-<td align="left">3.62s</td>
-<td align="left">1.96s</td>
-<td align="left">7.81s</td>
-<td align="left">0.60s</td>
+<td align="left">2.08s</td>
+<td align="left">1.89s</td>
+<td align="left">7.89s</td>
+<td align="left">0.62s</td>
 </tr>
 </tbody>
 </table>
 <h2 id="test-5-spliting">Test 5. Spliting</h2>
 <ol>
-<li>fakit: <code>for g in A B; do time fakit split -n 3 dataset_$g.fa; done</code></li>
+<li>fakit: <code>for g in A B; do time fakit split -p 3 dataset_$g.fa; done</code></li>
 <li>fasta_utilities: failed to run <code>split_fasta.pl</code></li>
 <li>fastx_toolkit: unsupported</li>
 <li>pyfaidx: only support to write each region to a separate file by flag <code>-x</code></li>
@@ -681,12 +691,12 @@ $ fakit fa2tab dataset_B_dup.fasta  | cut -f 2 | sort | uniq | wc -l
 <tbody>
 <tr>
 <td align="left">dataset_A.fa</td>
-<td align="left">4.31s</td>
+<td align="left">3.24s</td>
 <td align="left">--</td>
 </tr>
 <tr>
 <td align="left">dataset_A.fa</td>
-<td align="left">3.57s</td>
+<td align="left">2.52s</td>
 <td align="left">--</td>
 </tr>
 </tbody>
