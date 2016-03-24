@@ -36,8 +36,8 @@ import (
 // grepCmd represents the extract command
 var grepCmd = &cobra.Command{
 	Use:   "grep",
-	Short: "grep sequences by pattern(s) of name or sequence motifs",
-	Long: `grep sequences by pattern(s) of name or sequence motifs
+	Short: "search sequences by pattern(s) of name or sequence motifs",
+	Long: `search sequences by pattern(s) of name or sequence motifs
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {

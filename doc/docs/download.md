@@ -1,14 +1,16 @@
 # Download
 
 `fakit` is implemented in [Golang](https://golang.org/) programming language,
- executable binary files for most popular operating system are freely available
+ executable binary files **for most popular operating system** are freely available
   in [release](https://github.com/shenwei356/fakit/releases) page.
 
 ## Current Version
 
-- [fakit v0.1.3.1](https://github.com/shenwei356/fakit/releases/tag/v0.1.3.1)
-    - Performance improvement by reducing time of cleaning spaces
-    - Document update
+- [fakit v0.1.4](https://github.com/shenwei356/fakit/releases/tag/v0.1.4)
+    - add subcommand `sort`
+    - improve subcommand `subseq`: supporting for getting subsequences by GTF and BED files
+    - change name format of `sliding` result
+    - prettier output of `stat`
 
 ## Installation
 
@@ -32,6 +34,9 @@ You can also add the directory of the executable file to environment variable
 
 ## Previous Versions
 
+- [fakit v0.1.3.1](https://github.com/shenwei356/fakit/releases/tag/v0.1.3.1)
+    - Performance improvement by reducing time of cleaning spaces
+    - Document update
 - [fakit v0.1.3](https://github.com/shenwei356/fakit/releases/tag/v0.1.3)
     - **Further performance improvement**
     - Rename sub command `extract` to `grep`

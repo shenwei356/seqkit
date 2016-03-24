@@ -3,10 +3,10 @@
 ## Softwares
 
 1. [fakit](https://github.com/shenwei356/fakit). (Go).
-   Version [v0.1.3.1](https://github.com/shenwei356/fakit/releases/tag/v0.1.3.1).
+   Version [v0.1.4](https://github.com/shenwei356/fakit/releases/tag/v0.1.4).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version
-   [329f7ca](https://github.com/jimhester/fasta_utilities/commit/329f7ca9266d4a0a96cb5576c464c1bd106865a0).
+   [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    *Lots of dependencies to install*.
 1. [fastx_toolkit](http://hannonlab.cshl.edu/fastx_toolkit/). (Perl).
    Version [0.0.13](http://hannonlab.cshl.edu/fastx_toolkit/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2).
@@ -30,14 +30,15 @@ Recognize RNA    |  Yes        |   Yes           |   --          |   --    |   Y
 Read STDIN       |  Yes        |   Yes           |   Yes         |   --    |   Yes     |   Yes
 Read gzip        |  Yes        |   Yes           |   --          |   --    |   Yes     |   Yes
 Write gzip       |  Yes        |   --            |   --          |   --    |   Yes     |   --
-search           |  Yes        |   Yes           |   --          |   --    |   Yes     |   Yes
+Search           |  Yes        |   Yes           |   --          |   --    |   Yes     |   Yes
 Multi-search     |  Yes        |   Yes           |   --          |   --    |   Yes     |   Yes
 Sample           |  Yes        |   Yes           |   --          |   --    |   Yes     |   Yes
 Subseq           |  Yes        |   Yes           |   --          |   Yes   |   Yes     |   Yes
 Deduplicate      |  Yes        |  Partly         |   --          |   --    |   Partly  |   --
 Split            |  Yes        |   Yes           |   --          |  Partly |   --      |   --
-Barcode split    |  Yes        |   --            |   Yes         |   Yes   |   --      |   --
+Split by seq     |  Yes        |   --            |   Yes         |   Yes   |   --      |   --
 Shuffle          |  Yes        |   --            |   --          |   --    |   --      |   --
+Sort             |  Yes        |   --            |   --          |   --    |   Yes     |   --
 Locate motifs    |  Yes        |   --            |   --          |   --    |   --      |   --
 Common seqs      |  Yes        |   --            |   --          |   --    |   --      |   --
 Clean            |  Yes        |   Yes           |   Yes         |   Yes   |   --      |   --
@@ -48,30 +49,61 @@ Rename name      |  --         |   Yes           |   --          |   --    |   Y
 
 ## Datasets
 
-Original datasets include:
+### dataset_A - large number of short sequences
 
-- [SILVA_123_SSURef_tax_silva.fasta.gz](http://www.arb-silva.de/fileadmin/silva_databases/current/Exports/SILVA_123_SSURef_tax_silva.fasta.gz)
-- [hs_ref_GRCh38.p2_*.mfa.gz](ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/H_sapiens/Assembled_chromosomes/seq/)
+dataset_A came from [SILVA rRNA database](http://www.arb-silva.de/).
 
-They are so large, so only subsets are used.
+- [`SILVA_123_SSURef_tax_silva.fasta.gz`](http://www.arb-silva.de/fileadmin/silva_databases/current/Exports/SILVA_123_SSURef_tax_silva.fasta.gz)
 
-1. `dataset_A`. Sampling by proption of 0.1 for `SILVA_123_SSURef_tax_silva.fasta.gz`
+Only sampled subsets (~ 10%) are used:
 
-        fakit sample SILVA_123_SSURef_tax_silva.fasta.gz -p 0.1 -o dataset_A.fa.gz
-
-2. `dataset_B`. Merging chr18,19,20,21,22,Y to a single file
-
-        zcat hs_ref_GRCh38.p2_chr{18,19,20,21,22,Y}.mfa.gz | pigz -c > dataset_B.fa.gz
+    fakit sample SILVA_123_SSURef_tax_silva.fasta.gz -p 0.1 -o dataset_A.fa.gz
 
 Some tools do not support RNA sequences,
  and are not able to directly read .gz file,
- so the files are uncompressed, and converted to DNA by
- `fakit seq --rna2dna dataset_A.fa.gz > dataset_A.fa`.
+ so the file are uncompressed, and converted to DNA by
 
- File                   | type  |  num_seqs   |     min_len |  avg_len    |  max_len
-:----------------------:|:-----:|:-----------:|:-----------:|:-----------:|:---------:
-dataset_A.fa (261.7M)   | DNA   |    175364   |    900      | 1419.6      |  3725
-dataset_B.fa (346.5M)   | DNA   |    6        |   46709983  | 59698489.0  |  80373285
+    fakit seq --rna2dna dataset_A.fa.gz > dataset_A.fa
+
+### dataset_B - small number of large sequences
+
+Human genome from [ensembl](http://uswest.ensembl.org/info/data/ftp/index.html)
+
+- Genome DNA:  [`Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz`](ftp://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz)
+- GTF:  [`Homo_sapiens.GRCh38.84.gtf.gz`](ftp://ftp.ensembl.org/pub/release-84/gtf/homo_sapiens/Homo_sapiens.GRCh38.84.gtf.gz)
+- BED: `Homo_sapiens.GRCh38.84.bed.gz` was converted from `Homo_sapiens.GRCh38.84.gtf.gz`
+by [`gtf2bed`](http://bedops.readthedocs.org/en/latest/content/reference/file-management/conversion/gtf2bed.html?highlight=gtf2bed)
+with command
+
+        zcat Homo_sapiens.GRCh38.84.gtf.gz | gtf2bed --do-not-sort | gzip -c > Homo_sapiens.GRCh38.84.bed.gz
+
+Only subsets of serveral chromosomes (chr18,19,20,21,22,Y) were used:
+
+        fakit grep Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz -c 1 -p 18 -p 19 -p 20 -p 21 -p 22 -p Y  -o dataset_B.fa
+
+Datasets summary:
+
+    $ fakit stat *.fa
+            file    seq_type    num_seqs       min_len       avg_len       max_len
+    dataset_A.fa         DNA     175,364           900       1,419.6         3,725
+    dataset_B.fa         DNA           6    46,709,983    59,698,489    80,373,285
+
+
+### Chr1
+
+DNA and gtf/bed data of Chr1 were used for testing of extracting subsequence:
+
+- `chr1.fa.gz`
+
+        fakit grep -p 1 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz -o chr1.fa.gz
+
+- `chr1.gtf.gz`
+
+        zcat Homo_sapiens.GRCh38.84.gtf.gz | grep -w '^1' | gzip -c > chr1.gtf.gz
+
+- `chr1.bed.gz`
+
+        zcat Homo_sapiens.GRCh38.84.bed.gz | grep -w '^1' | gzip -c > chr1.bed.gz
 
 ## Platform
 
@@ -109,11 +141,34 @@ Two runs needed, first run creates fasta index file, and the second one evaluate
 dataset_A.fa  |  4.72s   |   4.08s         | 25.04s  |  12.49s   | 0.65s   | 11.07s
 dataset_B.fa  |  5.78s   |   2.61s         | 16.64s  |  9.27s    | 0.81s   | 10.62s
 
-## Test 2. Extract sequencs by ID list
+## Test 2. Extract subsequencs by BED file
+
+### Commands
+
+1. fakit: `fakit subseq -c 1 chr1.fa.gz --bed chr1.bed.gz > chr1.bed.gz.fakit.fa`
+1. seqtk: `seqtk subseq chr1.fa.gz chr1.bed.gz > chr1.bed.gz.seqtk.fa`
+
+TODO: bedtools
+
+### Results
+
+Datasets      |  fakit    |  seqtk
+:-------------|:----------|:---------------
+chr1.fa.gz    |  15.64s   |    10.39s
+
+Result are the same:
+
+    $ fakit stat chr1.bed.gz.*.fa
+                    file    seq_type    num_seqs    min_len    avg_len      max_len
+    chr1.bed.gz.fakit.fa         DNA     231,974          1    3,089.5    1,551,957
+    chr1.bed.gz.seqtk.fa         DNA     231,974          1    3,089.5    1,551,957
+
+
+## Test 3. Extract sequencs by ID list
 
 ### ID lists
 
-ID lists come from sampling 80% of dataset_A and shuffling.
+ID lists come from sampling 80% of the corresponding dataset and shuffling.
 
     $ fakit sample -p 0.8 dataset_A.fa | fakit shuffle | fakit seq -n -i > ids_A.txt
     $ wc -l ids_A.txt
@@ -132,9 +187,7 @@ ID lists come from sampling 80% of dataset_A and shuffling.
 ### Commands
 
 1. fakit: `for g in A B; do time fakit grep -f ids_$g.txt dataset_$g.fa > /dev/null; done`
-1. fasta_utilities: (using an [fixed](https://github.com/shenwei356/fasta_utilities/commit/cac7f14f952fab9bc4a209c6bc2b7cfad47e60d8)
-   version of `in_list.pl`)
-   `for g in A B; do time in_list.pl -files ids_$g.txt dataset_$g.fa > /dev/null; done`
+1. fasta_utilities: `for g in A B; do time in_list.pl -files ids_$g.txt dataset_$g.fa > /dev/null; done`
 1. fastx_toolkit: can't handle multi-line FASTA files
 1. pyfaidx: unsupported
 1. seqmagick: `for g in A B; do time seqmagick convert --include-from-file ids_$g.txt dataset_$g.fa - > /dev/null; done`
@@ -149,7 +202,7 @@ dataset_A.fa  |  1.33s    |    1.59s        |   4.29s     | 0.52s
 
 
 
-## Test 3. Deduplication
+## Test 4. Deduplication
 
 ### Dataset
 
@@ -198,7 +251,7 @@ Datasets             |  fakit  | fasta_utilities
 dataset_A_dup.fasta  |  3.24s  |  4.19s
 dataset_B_dup.fasta  |  2.76s  |  2.51s
 
-## Test 4. Sampling
+## Test 5. Sampling
 
 ### Commands
 
@@ -219,7 +272,9 @@ dataset_A.fa  |  1.69s    |    3.10s        |   5.88s     | 0.37s
 dataset_A.fa  |  2.08s    |    1.89s        |   7.89s     | 0.62s
 
 
-## Test 5. Spliting
+## Test 6. Spliting
+
+### Commands
 
 1. fakit: `for g in A B; do time fakit split -p 3 dataset_$g.fa; done`
 1. fasta_utilities: failed to run `split_fasta.pl`
@@ -227,6 +282,8 @@ dataset_A.fa  |  2.08s    |    1.89s        |   7.89s     | 0.62s
 1. pyfaidx: only support to write each region to a separate file by flag `-x`
 1. seqmagick: unsupported
 1. seqtk: unsupported
+
+### Results
 
 Datasets      |  fakit    | fasta_utilities
 :-------------|:----------|:---------------

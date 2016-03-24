@@ -1,49 +1,61 @@
-# fakit - Practical FASTA kit
+# fakit - Swiss army knife of FASTA format
 
 Documents  : [http://shenwei356.github.io/fakit](http://shenwei356.github.io/fakit)
 
 Source code: [https://github.com/shenwei356/fakit](https://github.com/shenwei356/fakit)
+
+## Introduction
+
+
 
 ## Features
 
 - **Cross-platform** (Linux/Windows/Mac OS X/OpenBSD/FreeBSD,
   see [download](http://shenwei356.github.io/fakit/download/))
 - **Out-of-the-box, no dependencies, without compilation, light weight**
-  see [download](http://shenwei356.github.io/fakit/download/))
+  (see [download](http://shenwei356.github.io/fakit/download/))
 - **Fast** (see [benchmark](http://shenwei356.github.io/fakit/benchmark/)),
   **multiple-threads supported**, more significant speedup for `grep` and `locate`.
-- **Practical functions by 13 subcommands** (see subcommands and
+- **Practical functions by 14 subcommands** (see subcommands and
   [usage](http://shenwei356.github.io/fakit/usage/) )
-- **Well documented** (detailed [usage](http://shenwei356.github.io/fakit/usage/) 
+- **Well documented** (detailed [usage](http://shenwei356.github.io/fakit/usage/)
   and [benchmark](http://shenwei356.github.io/fakit/benchmark/) )
-- Support STDIN and gziped input/output file, could be used in pipe
+- **Support STDIN and gziped input/output file, could be used in pipe**
 - Support custom sequence ID regular expression (especially useful for quering with ID list)
 - Reproducible results (configurable rand seed in `sample` and `shuffle`)
 - Well organized source code, friendly to use and easy to extend.
 
 ## Subcommands
 
-Basic
+Sequence and subsequence
 
-- `seq`        transform sequence (revserse, complement, extract ID...)
-- `subseq`     get subsequence by region
+- `seq`        transform sequences (revserse, complement, extract ID...)
+- `subseq`     get subsequences by region/gtf/bed, including flanking sequences
+- `sliding`    sliding sequences, circle genome supported
 - `stat`       simple statistics of FASTA files
 
-Format convert
+Format conversion
 
 - `fa2tab`     covert FASTA to tabular format (and length/GC content/GC skew) to filter and sort
 - `tab2fa`     covert tabular format to FASTA format
 
-More
+Searching
 
-- `grep`       grep sequences by pattern(s) of name or sequence motifs
-- `common`     find common sequences of multiple files by id/name/sequence
+- `grep`       search sequences by pattern(s) of name or sequence motifs
+- `locate`     locate subsequences/motifs
+
+Set operations
+
 - `rmdup`      remove duplicated sequences by id/name/sequence
+- `common`     find common sequences of multiple files by id/name/sequence
 - `split`      split sequences into files by id/seq region/size/parts
 - `sample`     sample sequences by number or proportion
+
+Ordering
+
 - `shuffle`    shuffle sequences
-- `locate`     locate subsequences/motifs
-- `sliding`    sliding sequences, circle genome supported
+- `sort`       sort sequences by id/name/sequence
+
 
 Global Flags
 

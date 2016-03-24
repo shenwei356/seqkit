@@ -25,8 +25,10 @@ import (
 	"runtime"
 
 	"github.com/brentp/xopen"
+	"github.com/dustin/go-humanize"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fasta"
+	"github.com/shenwei356/util/math"
 	"github.com/spf13/cobra"
 )
 
@@ -53,9 +55,9 @@ var statCmd = &cobra.Command{
 		checkError(err)
 		defer outfh.Close()
 
-		outfh.WriteString(fmt.Sprintf("file\ttype\tnum_seqs\tmin_len\tavg_len\tmax_len\n"))
 		var num, l, lenMin, lenMax, lenSum uint64
 		var t string
+		statInfos := []statInfo{}
 		for _, file := range files {
 			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
@@ -83,10 +85,66 @@ var statCmd = &cobra.Command{
 			} else {
 				t = fmt.Sprintf("%s", fastaReader.Alphabet())
 			}
-			outfh.WriteString(fmt.Sprintf("%s\t%s\t%d\t%d\t%.1f\t%d\n",
-				file, t, num, lenMin, float64(lenSum)/float64(num), lenMax))
+
+			statInfos = append(statInfos, statInfo{file, t, int64(num), int64(lenMin),
+				math.Round(float64(lenSum)/float64(num), 1), int64(lenMax)})
+		}
+
+		// format output
+		fileLen, tLen, numLen, lenMinLen, lenAvgLen, lenMaxLen := len("file"),
+			len("seq_type"), len("num_seqs"), len("min_len"), len("avg_len"), len("max_len")
+
+		l2 := 0
+		for _, info := range statInfos {
+			if len(info.file) > fileLen {
+				fileLen = len(info.file)
+			}
+			if len(info.t) > tLen {
+				tLen = len(info.t)
+			}
+			l2 = len(humanize.Comma(info.num))
+			if l2 > numLen {
+				numLen = l2
+			}
+			l2 = len(humanize.Comma(info.lenMin))
+			if l2 > lenMinLen {
+				lenMinLen = l2
+			}
+			l2 = len(humanize.Commaf(info.lenAvg))
+			if l2 > lenAvgLen {
+				lenAvgLen = l2
+			}
+			l2 = len(humanize.Comma(info.lenMax))
+			if l2 > lenMaxLen {
+				lenMaxLen = l2
+			}
+		}
+
+		format := "%" + fmt.Sprintf("%d", fileLen) + "s"
+		for _, d := range []int{tLen, numLen, lenMinLen, lenAvgLen, lenMaxLen} {
+			format += "    %" + fmt.Sprintf("%d", d) + "s"
+		}
+		format += "\n"
+
+		outfh.WriteString(fmt.Sprintf(format, "file", "seq_type", "num_seqs",
+			"min_len", "avg_len", "max_len"))
+		for _, info := range statInfos {
+			outfh.WriteString(fmt.Sprintf(format, info.file, info.t,
+				humanize.Comma(info.num),
+				humanize.Comma(info.lenMin),
+				humanize.Commaf(info.lenAvg),
+				humanize.Comma(info.lenMax)))
 		}
 	},
+}
+
+type statInfo struct {
+	file   string
+	t      string
+	num    int64
+	lenMin int64
+	lenAvg float64
+	lenMax int64
 }
 
 func init() {

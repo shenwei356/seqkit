@@ -22,7 +22,6 @@ package cmd
 
 import (
 	"fmt"
-	"reflect"
 	"runtime"
 	"strings"
 
@@ -56,8 +55,9 @@ var tab2faCmd = &cobra.Command{
 		checkError(err)
 		defer outfh.Close()
 
+		type Slice []string
 		fn := func(line string) (interface{}, bool, error) {
-			line = strings.TrimRight(line, "\n")
+			line = strings.TrimRight(line, "\r\n")
 
 			// check comment line
 			isCommentLine := false
@@ -75,7 +75,7 @@ var tab2faCmd = &cobra.Command{
 			if len(items) < 2 {
 				return items, false, fmt.Errorf("at least two columns needed: %s", line)
 			}
-			return items[0:2], true, nil
+			return Slice(items[0:2]), true, nil
 		}
 
 		for _, file := range files {
@@ -84,15 +84,8 @@ var tab2faCmd = &cobra.Command{
 
 			for chunk := range reader.Ch {
 				for _, data := range chunk.Data {
-					switch reflect.TypeOf(data).Kind() {
-					case reflect.Slice:
-						s := reflect.ValueOf(data)
-						items := make([]string, s.Len())
-						for i := 0; i < s.Len(); i++ {
-							items[i] = s.Index(i).String()
-						}
-						outfh.WriteString(fmt.Sprintf(">%s\n%s\n", items[0], byteutil.WrapByteSlice([]byte(items[1]), lineWidth)))
-					}
+					items := data.(Slice)
+					outfh.WriteString(fmt.Sprintf(">%s\n%s\n", items[0], byteutil.WrapByteSlice([]byte(items[1]), lineWidth)))
 				}
 			}
 		}
