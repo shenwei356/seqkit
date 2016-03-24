@@ -139,9 +139,13 @@
         
             <li><a href="#performance-tips">Performance Tips</a></li>
         
+            <li><a href="#datasets">Datasets</a></li>
+        
             <li><a href="#seq">seq</a></li>
         
             <li><a href="#subseq">subseq</a></li>
+        
+            <li><a href="#sliding">sliding</a></li>
         
             <li><a href="#stat">stat</a></li>
         
@@ -149,9 +153,11 @@
         
             <li><a href="#grep">grep</a></li>
         
-            <li><a href="#common">common</a></li>
+            <li><a href="#locate">locate</a></li>
         
             <li><a href="#rmdup">rmdup</a></li>
+        
+            <li><a href="#common">common</a></li>
         
             <li><a href="#split">split</a></li>
         
@@ -159,9 +165,7 @@
         
             <li><a href="#shuffle">shuffle</a></li>
         
-            <li><a href="#locate">locate</a></li>
-        
-            <li><a href="#sliding">sliding</a></li>
+            <li><a href="#sort">sort</a></li>
         
     
     </ul>
@@ -169,11 +173,11 @@
                 <div class="col-md-9" role="main">
 
 <h1 id="usage-and-examples">Usage and Examples</h1>
-<h2 id="fakit">fakit</h2>
+<h3 id="fakit">fakit</h3>
 <p>Usage</p>
-<pre><code>fakit -- Practical FASTA kit
+<pre><code>fakit -- Swiss army knife of FASTA format
 
-Version: 0.1.3.1
+Version: 0.1.4
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -185,17 +189,18 @@ Usage:
 
 Available Commands:
   common      find common sequences of multiple files by id/name/sequence
-  fa2tab      covert FASTA to tabular format (and length/GC content/GC skew) to filter and sort
-  grep        grep sequences by pattern(s) of name or sequence motifs
+  fa2tab      covert FASTA to tabular format (with length/GC content/GC skew) to filter and sort
+  grep        search sequences by pattern(s) of name or sequence motifs
   locate      locate subsequences/motifs
   rmdup       remove duplicated sequences by id/name/sequence
   sample      sample sequences by number or proportion
-  seq         transform sequence (revserse, complement, extract ID...)
+  seq         transform sequences (revserse, complement, extract ID...)
   shuffle     shuffle sequences
   sliding     sliding sequences, circle genome supported
+  sort        sort sequences by id/name/sequence
   split       split sequences into files by id/seq region/size/parts
   stat        simple statistics of FASTA files
-  subseq      get subsequence by region
+  subseq      get subsequences by region/gtf/bed, including flanking sequences
   tab2fa      covert tabular format to FASTA format
 
 Flags:
@@ -208,21 +213,48 @@ Flags:
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default &quot;auto&quot;)
   -j, --threads int                     number of CPUs. (default value depends on your device) (default 4)
 
-Use &quot;fakit [command] --help&quot; for more information about a command.
-
 </code></pre>
 
-<h2 id="performance-tips">Performance Tips</h2>
+<h3 id="performance-tips">Performance Tips</h3>
 <ul>
 <li><code>--chunk-size</code>, for large sequences like human genome,
-you could set a small value, like 1.</li>
+you could set a small value, like 1, to reduce memory usage.</li>
 </ul>
 <h3 id="datasets">Datasets</h3>
-<p>Datasets are from <a href="ftp://mirbase.org/pub/mirbase/21/">The miRBase Sequence Database -- Release 21</a></p>
+<p>Datasets from <a href="ftp://mirbase.org/pub/mirbase/21/">The miRBase Sequence Database -- Release 21</a></p>
 <ul>
-<li><a href="ftp://mirbase.org/pub/mirbase/21/hairpin.fa.gz">hairpin.fa.gz</a></li>
-<li><a href="ftp://mirbase.org/pub/mirbase/21/mature.fa.gz">mature.fa.gz</a></li>
-<li><a href="ftp://mirbase.org/pub/mirbase/21/miRNA.diff.gz">miRNA.diff.gz</a></li>
+<li><a href="ftp://mirbase.org/pub/mirbase/21/hairpin.fa.gz"><code>hairpin.fa.gz</code></a></li>
+<li><a href="ftp://mirbase.org/pub/mirbase/21/mature.fa.gz"><code>mature.fa.gz</code></a></li>
+<li><a href="ftp://mirbase.org/pub/mirbase/21/miRNA.diff.gz"><code>miRNA.diff.gz</code></a></li>
+</ul>
+<p>Human genome from <a href="http://uswest.ensembl.org/info/data/ftp/index.html">ensembl</a>
+(For <code>fakit subseq</code>)</p>
+<ul>
+<li><a href="ftp://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz"><code>Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz</code></a></li>
+<li><a href="ftp://ftp.ensembl.org/pub/release-84/gtf/homo_sapiens/Homo_sapiens.GRCh38.84.gtf.gz"><code>Homo_sapiens.GRCh38.84.gtf.gz</code></a></li>
+<li><code>Homo_sapiens.GRCh38.84.bed.gz</code> is converted from <code>Homo_sapiens.GRCh38.84.gtf.gz</code>
+by <a href="http://bedops.readthedocs.org/en/latest/content/reference/file-management/conversion/gtf2bed.html?highlight=gtf2bed"><code>gtf2bed</code></a>
+with command<pre><code>zcat Homo_sapiens.GRCh38.84.gtf.gz | gtf2bed --do-not-sort | gzip -c &gt; Homo_sapiens.GRCh38.84.bed.gz
+</code></pre>
+</li>
+</ul>
+<p>Only DNA and gtf/bed data of Chr1 were used:</p>
+<ul>
+<li>
+<p><code>chr1.fa.gz</code></p>
+<pre><code>    fakit grep -p 1 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz -o chr1.fa.gz
+</code></pre>
+</li>
+<li>
+<p><code>chr1.gtf.gz</code></p>
+<pre><code>    zcat Homo_sapiens.GRCh38.84.gtf.gz | grep -w '^1' | gzip -c &gt; chr1.gtf.gz
+</code></pre>
+</li>
+<li>
+<p><code>chr1.bed.gz</code></p>
+<pre><code>    zcat Homo_sapiens.GRCh38.84.bed.gz | grep -w '^1' | gzip -c &gt; chr1.bed.gz
+</code></pre>
+</li>
 </ul>
 <h2 id="seq">seq</h2>
 <p>Usage</p>
@@ -243,6 +275,7 @@ Flags:
       --rna2dna             RNA to DNA
   -s, --seq                 only print sequences
   -u, --upper-case          print sequences in upper case
+
 </code></pre>
 
 <p>Examples</p>
@@ -267,20 +300,20 @@ UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 </li>
 <li>
 <p>Sequence types</p>
-<ol>
+<ul>
 <li>
 <p>In default, <code>fakit seq</code> automatically detect the sequence type</p>
 <pre><code>$ echo -e "&gt;seq\nacgtryswkmbdhvACGTRYSWKMBDHV" | fakit stat
-file    type    num_seqs        min_len avg_len max_len
--       DNA     1       28      28.0    28
+file    seq_type    num_seqs    min_len    avg_len    max_len
+   -         DNA           1         28         28         28
 
 $ echo -e "&gt;seq\nACGUN ACGUN" | fakit stat
-file    type    num_seqs        min_len avg_len max_len
--       RNA     1       11      11.0    11
+file    seq_type    num_seqs    min_len    avg_len    max_len
+   -         RNA           1         11         11         11
 
 $ echo -e "&gt;seq\nabcdefghijklmnpqrstvwyz" | fakit stat
-file    type    num_seqs        min_len avg_len max_len
--       Protein 1       23      23.0    23
+file    seq_type    num_seqs    min_len    avg_len    max_len
+   -     Protein           1         23         23         23
 </code></pre>
 </li>
 <li>
@@ -290,7 +323,7 @@ file    type    num_seqs        min_len avg_len max_len
 [ERRO] error when parsing seq: seq (invalid DNAredundant letter: e)
 </code></pre>
 </li>
-</ol>
+</ul>
 </li>
 <li>
 <p>Only print names</p>
@@ -322,7 +355,7 @@ MI0000003
 </ul>
 </li>
 <li>
-<p>Only print seq (global flag -w defines the output line width, 0 for no wrap)</p>
+<p>Only print seq (global flag <code>-w</code> defines the output line width, 0 for no wrap)</p>
 <pre><code>$ fakit seq hairpin.fa.gz -s -w 0
 UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAACUAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGAGUGUACUAUUGAUGCUUCACACCUGGGCUCUCCGGGUACCAGGACGGUUUGAGCAGAU
@@ -354,7 +387,7 @@ TCATATGCTTGTCTCAAAGATTA
 </ol>
 <h2 id="subseq">subseq</h2>
 <p>Usage</p>
-<pre><code>get subsequence by region.
+<pre><code>get subsequences by region/gtf/bed, including flanking sequences.
 
 The definition of region is 1-based and with some custom design.
 
@@ -375,24 +408,132 @@ Usage:
   fakit subseq [flags]
 
 Flags:
-  -r, --region string   subsequence of given region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases, 13:-1 for cutting first 12 bases. type &quot;fakit subseq -h&quot; for more examples
+  -b, --bed string        by BED file
+  -d, --down-stream int   down stream length
+  -T, --feature string    feature type (&quot;.&quot; for all, case ignored) (default &quot;.&quot;)
+  -g, --gtf string        by GTF (version 2.2) file
+  -f, --only-flank        only return up/down stream sequence
+  -r, --region string     by region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases, 13:-1 for cutting first 12 bases. type &quot;fakit subseq -h&quot; for more examples
+  -u, --up-stream int     up stream length
+
 </code></pre>
 
 <p>Examples</p>
 <ol>
 <li>
-<p>first 12 bases</p>
+<p>First 12 bases</p>
 <pre><code>$ zcat hairpin.fa.gz | fakit subseq -r 1:12
 </code></pre>
 </li>
 <li>
-<p>last 12 bases</p>
+<p>Last 12 bases</p>
 <pre><code>$ zcat hairpin.fa.gz | fakit subseq -r -12:-1
 </code></pre>
 </li>
 <li>
-<p>subsequence without first and last 12 bases</p>
+<p>Subsequences without first and last 12 bases</p>
 <pre><code>$ zcat hairpin.fa.gz | fakit subseq -r 13:-13
+</code></pre>
+</li>
+<li>
+<p>Get subsequence by GTF file</p>
+<pre><code>$ cat t.fa
+&gt;seq
+actgACTGactgn
+$ cat t.gtf
+seq     test    CDS     5       8       .       .       .       gene_id "A"; transcript_id "";
+seq     test    CDS     5       8       .       -       .       gene_id "B"; transcript_id "";
+$ fakit
+
+fakit subseq --gtf t.gtf t.fa
+&gt;seq_5:8:. A
+ACTG
+&gt;seq_5:8:- B
+CAGT
+</code></pre>
+</li>
+<li>
+<p>Get CDS and 3bp up-stream sequences</p>
+<pre><code>$ fakit subseq --gtf t.gtf t.fa -u 3
+&gt;seq_5:8:._us:3 A
+ctgACTG
+&gt;seq_5:8:-_us:3 B
+agtCAGT
+</code></pre>
+</li>
+<li>
+<p>Get 3bp up-stream sequences of CDS, not including CDS</p>
+<pre><code>$ fakit subseq --gtf t.gtf t.fa -u 3 -f
+&gt;seq_5:8:._usf:3 A
+ctg
+&gt;seq_5:8:-_usf:3 B
+agt
+</code></pre>
+</li>
+<li>
+<p>Get subsequences by BED file. <strong>Note that flag <code>-c 1</code> is used for large genome</strong>.</p>
+<pre><code>$ fakit subseq -c 1 --bed chr1.bed.gz chr1.fa.gz -o chr1.bed.gz.fa.gz
+</code></pre>
+<p>We may need to remove duplicated sequences</p>
+<pre><code>$ fakit subseq -c 1 --bed chr1.bed.gz chr1.fa.gz | fakit rmdup -o chr1.bed.gz.rmdup.fa.gz
+[INFO] 141060 duplicated records removed
+</code></pre>
+<p>Summary:</p>
+<pre><code>$ fakit stat chr1.bed.gz.*.gz
+                   file    seq_type    num_seqs    min_len    avg_len      max_len
+      chr1.bed.gz.fa.gz         DNA     231,974          1    3,089.5    1,551,957
+chr1.bed.gz.rmdup.fa.gz         DNA      90,914          1    6,455.8    1,551,957
+</code></pre>
+</li>
+</ol>
+<h2 id="sliding">sliding</h2>
+<p>Usage</p>
+<pre><code>sliding sequences, circle genome supported
+
+Usage:
+  fakit sliding [flags]
+
+Flags:
+  -C, --circle-genome   circle genome
+  -s, --step int        step size
+  -W, --window int      window size
+
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>General use</p>
+<pre><code>$ echo -e "&gt;seq\nACGTacgtNN" | fakit sliding -s 3 -W 6
+&gt;seq_sliding:1:6
+ACGTac
+&gt;seq_sliding:4:9
+TacgtN
+</code></pre>
+</li>
+<li>
+<p>Circle genome</p>
+<pre><code>$ echo -e "&gt;seq\nACGTacgtNN" | fakit sliding -s 3 -W 6 -C
+&gt;seq_sliding:1:6
+ACGTac
+&gt;seq_sliding:4:9
+TacgtN
+&gt;seq_sliding:7:2
+gtNNAC
+&gt;seq_sliding:10:5
+NACGTa
+</code></pre>
+</li>
+<li>
+<p>Generate GC content for ploting</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit fa2tab | head -n 1 | fakit tab2fa | fakit sliding -s 5 -W 30 | fakit fa2tab -n -g
+cel-let-7_sliding:1:30          50.00
+cel-let-7_sliding:6:35          46.67
+cel-let-7_sliding:11:40         43.33
+cel-let-7_sliding:16:45         36.67
+cel-let-7_sliding:21:50         33.33
+cel-let-7_sliding:26:55         40.00
+...
 </code></pre>
 </li>
 </ol>
@@ -402,14 +543,15 @@ Flags:
 
 Usage:
   fakit stat [flags]
+
 </code></pre>
 
 <p>Eexamples</p>
 <ol>
 <li>General use<pre><code>$ fakit stat *.fa.gz
-file    type    num_seqs        min_len avg_len max_len
-hairpin.fa.gz   RNA     28645   39      103.0   2354
-mature.fa.gz    RNA     35828   15      21.8    34
+         file    seq_type    num_seqs    min_len    avg_len    max_len
+hairpin.fa.gz         RNA      28,645         39        103      2,354
+ mature.fa.gz         RNA      35,828         15       21.8         34
 </code></pre>
 </li>
 </ol>
@@ -440,6 +582,7 @@ Usage:
 
 Flags:
   -p, --comment-line-prefix value   comment line prefix (default [#,//])
+
 </code></pre>
 
 <p>Examples</p>
@@ -468,7 +611,7 @@ cel-mir-1               96      40.62
 </code></pre>
 </li>
 <li>
-<p>Sort sequences by length</p>
+<p>Sort sequences by length (use <code>fakit sort -l</code>)</p>
 <pre><code>$ zcat hairpin.fa.gz | fakit fa2tab -l | sort -t"`echo -e '\t'`" -n -k3,3 | fakit tab2fa
 &gt;cin-mir-4129 MI0015684 Ciona intestinalis miR-4129 stem-loop
 UUCGUUAUUGGAAGACCUUAGUCCGUUAAUAAAGGCAUC
@@ -476,6 +619,8 @@ UUCGUUAUUGGAAGACCUUAGUCCGUUAAUAAAGGCAUC
 UGGCGACCUGAACAGAUGUCGCAGUGUUCGGUCUCCAGU
 &gt;cin-mir-4103 MI0015657 Ciona intestinalis miR-4103 stem-loop
 ACCACGGGUCUGUGACGUAGCAGCGCUGCGGGUCCGCUGU
+
+$ fakit sort -l hairpin.fa.gz
 </code></pre>
 <p>Sorting or filtering by GC (or other base by -flag <code>-b</code>) content could also achieved in similar way.</p>
 </li>
@@ -487,7 +632,7 @@ ACCACGGGUCUGUGACGUAGCAGCGCUGCGGGUCCGCUGU
 </ol>
 <h2 id="grep">grep</h2>
 <p>Usage</p>
-<pre><code>grep sequences by pattern(s) of name or sequence motifs
+<pre><code>search sequences by pattern(s) of name or sequence motifs
 
 Usage:
   fakit grep [flags]
@@ -502,6 +647,7 @@ Flags:
   -p, --pattern value         search pattern (multiple values supported) (default [])
   -f, --pattern-file string   pattern file
   -r, --use-regexp            patterns are regular expression
+
 </code></pre>
 
 <p>Examples</p>
@@ -555,35 +701,49 @@ pmi-let-7
 </code></pre>
 </li>
 </ol>
-<h2 id="common">common</h2>
+<h2 id="locate">locate</h2>
 <p>Usage</p>
-<pre><code>find common sequences of multiple files by id/name/sequence
+<pre><code>locate subsequences/motifs
+
+Motifs could be EITHER plain sequence containing &quot;ACTGN&quot; OR regular
+expression like &quot;A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)&quot; for ORFs.
+Degenerate bases like &quot;RYMM..&quot; are also supported by flag -d.
+
+In default, motifs are treated as regular expression.
+When flag -d given, regular expression may be wrong.
+For example: &quot;\w&quot; will be wrongly converted to &quot;\[AT]&quot;.
 
 Usage:
-  fakit common [flags]
+  fakit locate [flags]
 
 Flags:
-  -n, --by-name       match by full name instead of just id
-  -s, --by-seq        match by sequence
-  -i, --ignore-case   ignore case
+  -d, --degenerate             pattern/motif contains degenerate base
+  -i, --ignore-case            ignore case
+  -P, --only-positive-strand   only search at positive strand
+  -p, --pattern value          search pattern/motif (multiple values supported) (default [])
+  -f, --pattern-file string    pattern/motif file (FASTA format)
+
 </code></pre>
 
 <p>Examples</p>
 <ol>
 <li>
-<p>By ID (default)</p>
-<pre><code>fakit common file*.fa &gt; common.fasta
+<p>Locate ORFs.</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)"
+seqID   patternName     pattern strand  start   end     matched
+cel-lin-4       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        1  136      AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGA
+cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        1  54       95      AUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAG
+cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        -1 43       51      AUGAUAUAG
 </code></pre>
 </li>
 <li>
-<p>By full name</p>
-<pre><code>fakit common file*.fa -n &gt; common.fasta
+<p>Locate Motif.</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit locate -i -p UUS
+seqID   patternName     pattern strand  start   end     matched
+bna-MIR396a     UUS     UUS     -1      105     107     UUS
+bna-MIR396a     UUS     UUS     -1      89      91      UUS
 </code></pre>
-</li>
-<li>
-<p>By sequence</p>
-<pre><code>fakit common file*.fa -s &gt; common.fasta
-</code></pre>
+<p>Notice that <code>fakit grep</code> only searches in positive strand, but <code>fakit loate</code> could recogize both strand</p>
 </li>
 </ol>
 <h2 id="rmdup">rmdup</h2>
@@ -597,6 +757,7 @@ Flags:
   -n, --by-name       by full name instead of just id
   -s, --by-seq        by seq
   -i, --ignore-case   ignore case
+
 </code></pre>
 
 <p>Examples</p>
@@ -604,6 +765,38 @@ Flags:
 <ol>
 <li>General use<pre><code>$ zcat hairpin.fa.gz | fakit rmdup -s -o clean.fa.gz
 [INFO] 2226 duplicated records removed
+</code></pre>
+</li>
+</ol>
+<h2 id="common">common</h2>
+<p>Usage</p>
+<pre><code>find common sequences of multiple files by id/name/sequence
+
+Usage:
+  fakit common [flags]
+
+Flags:
+  -n, --by-name       match by full name instead of just id
+  -s, --by-seq        match by sequence
+  -i, --ignore-case   ignore case
+
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>By ID (default)</p>
+<pre><code>fakit common file*.fa -o common.fasta
+</code></pre>
+</li>
+<li>
+<p>By full name</p>
+<pre><code>fakit common file*.fa -n -o common.fasta
+</code></pre>
+</li>
+<li>
+<p>By sequence</p>
+<pre><code>fakit common file*.fa -s -o common.fasta
 </code></pre>
 </li>
 </ol>
@@ -639,6 +832,7 @@ Flags:
   -d, --dry-run            dry run, just print message and no files will be created.
   -m, --md5                use MD5 instead of region sequence in output file when using flag -r (--by-region)
   -2, --two-pass           2-pass mode read files twice to lower memory usage. Not allowed when reading from stdin
+
 </code></pre>
 
 <p>Examples</p>
@@ -713,6 +907,7 @@ Flags:
   -p, --proportion float   sample by proportion
   -s, --rand-seed int      rand seed for shuffle (default 11)
   -2, --two-pass           2-pass mode read files twice to lower memory usage. Not allowed when reading from stdin
+
 </code></pre>
 
 <p>Examples</p>
@@ -752,6 +947,7 @@ Usage:
 
 Flags:
   -s, --rand-seed int   rand seed for shuffle (default 23)
+
 </code></pre>
 
 <p>Examples</p>
@@ -764,96 +960,60 @@ Flags:
 </code></pre>
 </li>
 </ol>
-<h2 id="locate">locate</h2>
+<h2 id="sort">sort</h2>
 <p>Usage</p>
-<pre><code>locate subsequences/motifs
-
-Motifs could be EITHER plain sequence containing &quot;ACTGN&quot; OR regular
-expression like &quot;A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)&quot; for ORFs.
-Degenerate bases like &quot;RYMM..&quot; are also supported by flag -d.
-
-In default, motifs are treated as regular expression.
-When flag -d given, regular expression may be wrong.
-For example: &quot;\w&quot; will be wrongly converted to &quot;\[AT]&quot;.
+<pre><code>sort sequences by id/name/sequence/length
 
 Usage:
-  fakit locate [flags]
+  fakit sort [flags]
 
 Flags:
-  -d, --degenerate             pattern/motif contains degenerate base
-  -i, --ignore-case            ignore case
-  -P, --only-positive-strand   only search at positive strand
-  -p, --pattern value          search pattern/motif (multiple values supported) (default [])
-  -f, --pattern-file string    pattern/motif file (FASTA format)
+  -l, --by-length     by sequence length
+  -n, --by-name       by full name instead of just id
+  -s, --by-seq        by sequence
+  -i, --ignore-case   ignore case
+  -r, --reverse       reverse the result
+
 </code></pre>
 
 <p>Examples</p>
 <ol>
 <li>
-<p>Locate ORFs.</p>
-<pre><code>$ zcat hairpin.fa.gz | fakit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)"
-seqID   patternName     pattern strand  start   end     matched
-cel-lin-4       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        1  136      AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGA
-cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        1  54       95      AUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAG
-cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        -1 43       51      AUGAUAUAG
+<p>sort by ID</p>
+<pre><code>$ echo -e "&gt;seq1\nACGTNcccc\n&gt;SEQ2\nacgtnAAAA" | fakit sort --quiet
+&gt;SEQ2
+acgtnAAAA
+&gt;seq1
+ACGTNcccc
 </code></pre>
 </li>
 <li>
-<p>Locate Motif.</p>
-<pre><code>$ zcat hairpin.fa.gz | fakit locate -i -p UUS
-seqID   patternName     pattern strand  start   end     matched
-bna-MIR396a     UUS     UUS     -1      105     107     UUS
-bna-MIR396a     UUS     UUS     -1      89      91      UUS
-</code></pre>
-<p>Notice that <code>fakit extract</code> only searches in positive strand, but <code>fakit loate</code> could recogize both strand</p>
-</li>
-</ol>
-<h2 id="sliding">sliding</h2>
-<p>Usage</p>
-<pre><code>sliding sequences, circle genome supported
-
-Usage:
-  fakit sliding [flags]
-
-Flags:
-  -C, --circle-genome   circle genome
-  -s, --step int        step size
-  -W, --window int      window size
-</code></pre>
-
-<p>Examples</p>
-<ol>
-<li>
-<p>General use</p>
-<pre><code>$ echo -e "&gt;seq\nACGTacgtNN" | fakit sliding -s 3 -W 6
-&gt;seq sliding:1-6
-ACGTac
-&gt;seq sliding:4-9
-TacgtN
+<p>sort by ID, ignoring case.</p>
+<pre><code>$ echo -e "&gt;seq1\nACGTNcccc\n&gt;SEQ2\nacgtnAAAA" | fakit sort --quiet -i
+&gt;seq1
+ACGTNcccc
+&gt;SEQ2
+acgtnAAAA
 </code></pre>
 </li>
 <li>
-<p>Circle genome</p>
-<pre><code>$ echo -e "&gt;seq\nACGTacgtNN" | fakit sliding -s 3 -W 6 -C
-&gt;seq sliding:1-6
-ACGTac
-&gt;seq sliding:4-9
-TacgtN
-&gt;seq sliding:7-2
-gtNNAC
-&gt;seq sliding:10-5
-NACGTa
+<p>sort by seq, ignoring case.</p>
+<pre><code>$ echo -e "&gt;seq1\nACGTNcccc\n&gt;SEQ2\nacgtnAAAA" | fakit sort --quiet -s -i
+&gt;SEQ2
+acgtnAAAA
+&gt;seq1
+ACGTNcccc
 </code></pre>
 </li>
 <li>
-<p>Generate GC content for ploting</p>
-<pre><code>$ zcat hairpin.fa.gz | fakit fa2tab | head -n 1 | fakit tab2fa | fakit sliding -s 5 -W 30 | fakit fa2tab  -n -g
-cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:1-30         50.00
-cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:6-35         46.67
-cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:11-40                43.33
-cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:16-45                36.67
-cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop sliding:21-50                33.33
-...
+<p>sort by sequence length</p>
+<pre><code>$ echo -e "&gt;seq1\nACGTNcccc\n&gt;SEQ2\nacgtnAAAAnnn\n&gt;seq3\nacgt" | fakit sort --quiet -l
+&gt;seq3
+acgt
+&gt;seq1
+ACGTNcccc
+&gt;SEQ2
+acgtnAAAAnnn
 </code></pre>
 </li>
 </ol></div>

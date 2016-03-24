@@ -133,7 +133,9 @@
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
     
-        <li class="main active"><a href="#fakit-practical-fasta-kit">fakit - Practical FASTA kit</a></li>
+        <li class="main active"><a href="#fakit-swiss-army-knife-of-fasta-format">fakit - Swiss army knife of FASTA format</a></li>
+        
+            <li><a href="#introduction">Introduction</a></li>
         
             <li><a href="#features">Features</a></li>
         
@@ -152,48 +154,56 @@
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="fakit-practical-fasta-kit">fakit - Practical FASTA kit</h1>
+<h1 id="fakit-swiss-army-knife-of-fasta-format">fakit - Swiss army knife of FASTA format</h1>
 <p>Documents  : <a href="http://shenwei356.github.io/fakit">http://shenwei356.github.io/fakit</a></p>
 <p>Source code: <a href="https://github.com/shenwei356/fakit">https://github.com/shenwei356/fakit</a></p>
+<h2 id="introduction">Introduction</h2>
 <h2 id="features">Features</h2>
 <ul>
 <li><strong>Cross-platform</strong> (Linux/Windows/Mac OS X/OpenBSD/FreeBSD,
   see <a href="http://shenwei356.github.io/fakit/download/">download</a>)</li>
 <li><strong>Out-of-the-box, no dependencies, without compilation, light weight</strong>
-  see <a href="http://shenwei356.github.io/fakit/download/">download</a>)</li>
+  (see <a href="http://shenwei356.github.io/fakit/download/">download</a>)</li>
 <li><strong>Fast</strong> (see <a href="http://shenwei356.github.io/fakit/benchmark/">benchmark</a>),
   <strong>multiple-threads supported</strong>, more significant speedup for <code>grep</code> and <code>locate</code>.</li>
-<li><strong>Practical functions by 13 subcommands</strong> (see subcommands and
+<li><strong>Practical functions by 14 subcommands</strong> (see subcommands and
   <a href="http://shenwei356.github.io/fakit/usage/">usage</a> )</li>
-<li><strong>Well documented</strong> (detailed <a href="http://shenwei356.github.io/fakit/usage/">usage</a> 
+<li><strong>Well documented</strong> (detailed <a href="http://shenwei356.github.io/fakit/usage/">usage</a>
   and <a href="http://shenwei356.github.io/fakit/benchmark/">benchmark</a> )</li>
-<li>Support STDIN and gziped input/output file, could be used in pipe</li>
+<li><strong>Support STDIN and gziped input/output file, could be used in pipe</strong></li>
 <li>Support custom sequence ID regular expression (especially useful for quering with ID list)</li>
 <li>Reproducible results (configurable rand seed in <code>sample</code> and <code>shuffle</code>)</li>
 <li>Well organized source code, friendly to use and easy to extend.</li>
 </ul>
 <h2 id="subcommands">Subcommands</h2>
-<p>Basic</p>
+<p>Sequence and subsequence</p>
 <ul>
-<li><code>seq</code>        transform sequence (revserse, complement, extract ID...)</li>
-<li><code>subseq</code>     get subsequence by region</li>
+<li><code>seq</code>        transform sequences (revserse, complement, extract ID...)</li>
+<li><code>subseq</code>     get subsequences by region/gtf/bed, including flanking sequences</li>
+<li><code>sliding</code>    sliding sequences, circle genome supported</li>
 <li><code>stat</code>       simple statistics of FASTA files</li>
 </ul>
-<p>Format convert</p>
+<p>Format conversion</p>
 <ul>
 <li><code>fa2tab</code>     covert FASTA to tabular format (and length/GC content/GC skew) to filter and sort</li>
 <li><code>tab2fa</code>     covert tabular format to FASTA format</li>
 </ul>
-<p>More</p>
+<p>Searching</p>
 <ul>
-<li><code>grep</code>       grep sequences by pattern(s) of name or sequence motifs</li>
-<li><code>common</code>     find common sequences of multiple files by id/name/sequence</li>
+<li><code>grep</code>       search sequences by pattern(s) of name or sequence motifs</li>
+<li><code>locate</code>     locate subsequences/motifs</li>
+</ul>
+<p>Set operations</p>
+<ul>
 <li><code>rmdup</code>      remove duplicated sequences by id/name/sequence</li>
+<li><code>common</code>     find common sequences of multiple files by id/name/sequence</li>
 <li><code>split</code>      split sequences into files by id/seq region/size/parts</li>
 <li><code>sample</code>     sample sequences by number or proportion</li>
+</ul>
+<p>Ordering</p>
+<ul>
 <li><code>shuffle</code>    shuffle sequences</li>
-<li><code>locate</code>     locate subsequences/motifs</li>
-<li><code>sliding</code>    sliding sequences, circle genome supported</li>
+<li><code>sort</code>       sort sequences by id/name/sequence</li>
 </ul>
 <p>Global Flags</p>
 <pre><code>    --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which fakit guess the sequence type (default 10000)
@@ -262,5 +272,5 @@ propose new functions or ask for help.</p>
 
 <!--
 MkDocs version : 0.15.3
-Build Date UTC : 2016-03-19 08:52:06.770892
+Build Date UTC : 2016-03-24 17:20:48.045702
 -->
