@@ -162,7 +162,7 @@
 <ul>
 <li><strong>Cross-platform</strong> (Linux/Windows/Mac OS X/OpenBSD/FreeBSD,
   see <a href="http://shenwei356.github.io/fakit/download/">download</a>)</li>
-<li><strong>Out-of-the-box, no dependencies, without compilation, light weight</strong>
+<li><strong>Light weight and out-of-the-box, no dependencies, no compilation, no configuration</strong>
   (see <a href="http://shenwei356.github.io/fakit/download/">download</a>)</li>
 <li><strong>Fast</strong> (see <a href="http://shenwei356.github.io/fakit/benchmark/">benchmark</a>),
   <strong>multiple-threads supported</strong>, more significant speedup for <code>grep</code> and <code>locate</code>.</li>
@@ -175,6 +175,220 @@
 <li>Reproducible results (configurable rand seed in <code>sample</code> and <code>shuffle</code>)</li>
 <li>Well organized source code, friendly to use and easy to extend.</li>
 </ul>
+<p>Features comparison</p>
+<table>
+<thead>
+<tr>
+<th align="left">Features</th>
+<th>fakit</th>
+<th>fasta_utilities</th>
+<th>fastx_toolkit</th>
+<th>pyfaidx</th>
+<th>seqmagick</th>
+<th>seqtk</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Cross-platform</td>
+<td>Yes</td>
+<td>Partly</td>
+<td>Partly</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td align="left">Mutli-line FASTA</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>--</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td align="left">Validate</td>
+<td>Yes</td>
+<td>--</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>--</td>
+<td>--</td>
+</tr>
+<tr>
+<td align="left">Recognize RNA</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>--</td>
+<td>--</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td align="left">Read STDIN</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>--</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td align="left">Read gzip</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>--</td>
+<td>--</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td align="left">Write gzip</td>
+<td>Yes</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+<td>Yes</td>
+<td>--</td>
+</tr>
+<tr>
+<td align="left">Search</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>--</td>
+<td>--</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td align="left">Sample</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>--</td>
+<td>--</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td align="left">Subseq</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>--</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td align="left">Deduplicate</td>
+<td>Yes</td>
+<td>Partly</td>
+<td>--</td>
+<td>--</td>
+<td>Partly</td>
+<td>--</td>
+</tr>
+<tr>
+<td align="left">Split</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>--</td>
+<td>Partly</td>
+<td>--</td>
+<td>--</td>
+</tr>
+<tr>
+<td align="left">Split by seq</td>
+<td>Yes</td>
+<td>--</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>--</td>
+<td>--</td>
+</tr>
+<tr>
+<td align="left">Shuffle</td>
+<td>Yes</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+</tr>
+<tr>
+<td align="left">Sort</td>
+<td>Yes</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+<td>Yes</td>
+<td>--</td>
+</tr>
+<tr>
+<td align="left">Locate motifs</td>
+<td>Yes</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+</tr>
+<tr>
+<td align="left">Common seqs</td>
+<td>Yes</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+<td>--</td>
+</tr>
+<tr>
+<td align="left">Clean</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>--</td>
+<td>--</td>
+</tr>
+<tr>
+<td align="left">Transcribe</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td align="left">Translate</td>
+<td>--</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>--</td>
+</tr>
+<tr>
+<td align="left">Size select</td>
+<td>Indirect</td>
+<td>Yes</td>
+<td>--</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>--</td>
+</tr>
+<tr>
+<td align="left">Rename name</td>
+<td>--</td>
+<td>Yes</td>
+<td>--</td>
+<td>--</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
 <h2 id="subcommands">Subcommands</h2>
 <p>Sequence and subsequence</p>
 <ul>
@@ -219,7 +433,8 @@
 <h2 id="usage-examples">Usage &amp;&amp; Examples</h2>
 <p><a href="http://shenwei356.github.io/fakit/usage/">http://shenwei356.github.io/fakit/usage/</a></p>
 <h2 id="benchmark">Benchmark</h2>
-<p><a href="http://blog.shenwei.me/fakit/benchmark/">http://shenwei356.github.io/fakit/benchmark/</a></p>
+<p>Details: <a href="http://blog.shenwei.me/fakit/benchmark/">http://shenwei356.github.io/fakit/benchmark/</a></p>
+<p><img alt="benchmark_colorful.png" src="./benchmark/benchmark_colorful.png" /></p>
 <h2 id="contact">Contact</h2>
 <p>Email me for any problem when using fakit. shenwei356(at)gmail.com</p>
 <p><a href="https://github.com/shenwei356/fakit/issues">Create an issue</a> to report bugs,
@@ -272,5 +487,5 @@ propose new functions or ask for help.</p>
 
 <!--
 MkDocs version : 0.15.3
-Build Date UTC : 2016-03-24 17:20:48.045702
+Build Date UTC : 2016-03-25 11:22:15.283610
 -->
