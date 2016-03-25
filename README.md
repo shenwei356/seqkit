@@ -12,7 +12,7 @@ Source code: [https://github.com/shenwei356/fakit](https://github.com/shenwei356
 
 - **Cross-platform** (Linux/Windows/Mac OS X/OpenBSD/FreeBSD,
   see [download](http://shenwei356.github.io/fakit/download/))
-- **Out-of-the-box, no dependencies, without compilation, light weight**
+- **Light weight and out-of-the-box, no dependencies, no compilation, no configuration**
   (see [download](http://shenwei356.github.io/fakit/download/))
 - **Fast** (see [benchmark](http://shenwei356.github.io/fakit/benchmark/)),
   **multiple-threads supported**, more significant speedup for `grep` and `locate`.
@@ -24,6 +24,33 @@ Source code: [https://github.com/shenwei356/fakit](https://github.com/shenwei356
 - Support custom sequence ID regular expression (especially useful for quering with ID list)
 - Reproducible results (configurable rand seed in `sample` and `shuffle`)
 - Well organized source code, friendly to use and easy to extend.
+
+Features comparison
+
+Features         | fakit    | fasta_utilities | fastx_toolkit | pyfaidx | seqmagick | seqtk
+:--------------- | :------: | :-------------: | :-----------: | :-----: | :-------: | :----
+Cross-platform   | Yes      | Partly          | Partly        | Yes     | Yes       | Yes
+Mutli-line FASTA | Yes      | Yes             | --            | Yes     | Yes       | Yes
+Validate         | Yes      | --              | Yes           | Yes     | --        | --
+Recognize RNA    | Yes      | Yes             | --            | --      | Yes       | Yes
+Read STDIN       | Yes      | Yes             | Yes           | --      | Yes       | Yes
+Read gzip        | Yes      | Yes             | --            | --      | Yes       | Yes
+Write gzip       | Yes      | --              | --            | --      | Yes       | --
+Search           | Yes      | Yes             | --            | --      | Yes       | Yes
+Sample           | Yes      | Yes             | --            | --      | Yes       | Yes
+Subseq           | Yes      | Yes             | --            | Yes     | Yes       | Yes
+Deduplicate      | Yes      | Partly          | --            | --      | Partly    | --
+Split            | Yes      | Yes             | --            | Partly  | --        | --
+Split by seq     | Yes      | --              | Yes           | Yes     | --        | --
+Shuffle          | Yes      | --              | --            | --      | --        | --
+Sort             | Yes      | --              | --            | --      | Yes       | --
+Locate motifs    | Yes      | --              | --            | --      | --        | --
+Common seqs      | Yes      | --              | --            | --      | --        | --
+Clean            | Yes      | Yes             | Yes           | Yes     | --        | --
+Transcribe       | Yes      | Yes             | Yes           | Yes     | Yes       | Yes
+Translate        | --       | Yes             | Yes           | Yes     | Yes       | --
+Size select      | Indirect | Yes             | --            | Yes     | Yes       | --
+Rename name      | --       | Yes             | --            | --      | Yes       | Yes
 
 ## Subcommands
 
@@ -76,7 +103,9 @@ Global Flags
 
 ## Benchmark
 
-[http://shenwei356.github.io/fakit/benchmark/](http://blog.shenwei.me/fakit/benchmark/)
+Details: [http://shenwei356.github.io/fakit/benchmark/](http://blog.shenwei.me/fakit/benchmark/)
+
+![benchmark_colorful.png](benchmark/benchmark_colorful.png)
 
 ## Contact
 

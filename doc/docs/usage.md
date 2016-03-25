@@ -130,16 +130,19 @@ Examples
 
             $ echo -e ">seq\nacgtryswkmbdhvACGTRYSWKMBDHV" | fakit stat
             file    seq_type    num_seqs    min_len    avg_len    max_len
-               -         DNA           1         28         28         28
+            -            DNA           1         28         28         28
+
 
             $ echo -e ">seq\nACGUN ACGUN" | fakit stat
             file    seq_type    num_seqs    min_len    avg_len    max_len
-               -         RNA           1         11         11         11
+            -            RNA           1         11         11         11
+
 
 
             $ echo -e ">seq\nabcdefghijklmnpqrstvwyz" | fakit stat
             file    seq_type    num_seqs    min_len    avg_len    max_len
-               -     Protein           1         23         23         23
+            -        Protein           1         23         23         23
+
 
 
     - You can also set sequence type by flag `-t` (`--seq-type`).
@@ -292,8 +295,8 @@ Examples
     Summary:
 
         $ fakit stat chr1.bed.gz.*.gz
-                           file    seq_type    num_seqs    min_len    avg_len      max_len
-              chr1.bed.gz.fa.gz         DNA     231,974          1    3,089.5    1,551,957
+        file                       seq_type    num_seqs    min_len    avg_len      max_len
+        chr1.bed.gz.fa.gz               DNA     231,974          1    3,089.5    1,551,957
         chr1.bed.gz.rmdup.fa.gz         DNA      90,914          1    6,455.8    1,551,957
 
 ## sliding
@@ -363,9 +366,9 @@ Eexamples
 1. General use
 
         $ fakit stat *.fa.gz
-                 file    seq_type    num_seqs    min_len    avg_len    max_len
+        file             seq_type    num_seqs    min_len    avg_len    max_len
         hairpin.fa.gz         RNA      28,645         39        103      2,354
-         mature.fa.gz         RNA      35,828         15       21.8         34
+        mature.fa.gz          RNA      35,828         15       21.8         34
 
 
 ## fa2tab & fa2tab

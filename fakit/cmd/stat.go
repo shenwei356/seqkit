@@ -120,7 +120,7 @@ var statCmd = &cobra.Command{
 			}
 		}
 
-		format := "%" + fmt.Sprintf("%d", fileLen) + "s"
+		format := "%" + fmt.Sprintf("-%d", fileLen) + "s"
 		for _, d := range []int{tLen, numLen, lenMinLen, lenAvgLen, lenMaxLen} {
 			format += "    %" + fmt.Sprintf("%d", d) + "s"
 		}

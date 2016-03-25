@@ -8,7 +8,7 @@
 
 - [fakit v0.1.4](https://github.com/shenwei356/fakit/releases/tag/v0.1.4)
     - add subcommand `sort`
-    - improve subcommand `subseq`: supporting for getting subsequences by GTF and BED files
+    - improve subcommand `subseq`: supporting of getting subsequences by GTF and BED files
     - change name format of `sliding` result
     - prettier output of `stat`
 
