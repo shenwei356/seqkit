@@ -158,19 +158,30 @@
 <p>Documents  : <a href="http://shenwei356.github.io/fakit">http://shenwei356.github.io/fakit</a></p>
 <p>Source code: <a href="https://github.com/shenwei356/fakit">https://github.com/shenwei356/fakit</a></p>
 <h2 id="introduction">Introduction</h2>
+<p>FASTA is a basic format for storing nucleotide and protein sequences. 
+The manipulation of FASTA file includes converting, clipping, searching, filtering,
+deduplication, splitting, shuffling, sampling and so on. 
+Existed tools only implemented parts of the functions,
+and some of them are only available for specific operating systems. 
+Furthermore, the complicated installation process of dependencies packages and
+running environment also make them less friendly to common users.</p>
+<p>Fakit is cross-platform, efficient, and practical FASTA manipulations tool 
+that is friendly for researchers to complete wide ranges of FASTA file processing. 
+The suite supports plain or gzip-compressed input and output
+from either standard stream or files, therefore, it could be easily used in pipelines.</p>
 <h2 id="features">Features</h2>
 <ul>
 <li><strong>Cross-platform</strong> (Linux/Windows/Mac OS X/OpenBSD/FreeBSD,
   see <a href="http://shenwei356.github.io/fakit/download/">download</a>)</li>
 <li><strong>Light weight and out-of-the-box, no dependencies, no compilation, no configuration</strong>
   (see <a href="http://shenwei356.github.io/fakit/download/">download</a>)</li>
-<li><strong>Fast</strong> (see <a href="http://shenwei356.github.io/fakit/benchmark/">benchmark</a>),
-  <strong>multiple-threads supported</strong>, more significant speedup for <code>grep</code> and <code>locate</code>.</li>
-<li><strong>Practical functions by 14 subcommands</strong> (see subcommands and
+<li><strong>Fast</strong> (see <a href="./#performance-comparison-with-other-tools">benchmark</a>),
+  <strong>multiple-threads supported</strong> (see <a href="./#speedup-with-multi-threads">benchmark</a>).</li>
+<li><strong>Practical functions supported by 14 subcommands</strong> (see subcommands and
   <a href="http://shenwei356.github.io/fakit/usage/">usage</a> )</li>
 <li><strong>Well documented</strong> (detailed <a href="http://shenwei356.github.io/fakit/usage/">usage</a>
   and <a href="http://shenwei356.github.io/fakit/benchmark/">benchmark</a> )</li>
-<li><strong>Support STDIN and gziped input/output file, could be used in pipe</strong></li>
+<li><strong>Support STDIN and gziped input/output file, easy being used in pipe</strong></li>
 <li>Support custom sequence ID regular expression (especially useful for quering with ID list)</li>
 <li>Reproducible results (configurable rand seed in <code>sample</code> and <code>shuffle</code>)</li>
 <li>Well organized source code, friendly to use and easy to extend.</li>
@@ -208,7 +219,7 @@
 <td>Yes</td>
 </tr>
 <tr>
-<td align="left">Validate</td>
+<td align="left">Validate bases</td>
 <td>Yes</td>
 <td>--</td>
 <td>Yes</td>
@@ -253,7 +264,7 @@
 <td>--</td>
 </tr>
 <tr>
-<td align="left">Search</td>
+<td align="left">Search by motifs</td>
 <td>Yes</td>
 <td>Yes</td>
 <td>--</td>
@@ -262,7 +273,7 @@
 <td>Yes</td>
 </tr>
 <tr>
-<td align="left">Sample</td>
+<td align="left">Sample seqs</td>
 <td>Yes</td>
 <td>Yes</td>
 <td>--</td>
@@ -280,16 +291,16 @@
 <td>Yes</td>
 </tr>
 <tr>
-<td align="left">Deduplicate</td>
+<td align="left">Deduplicate seqs</td>
 <td>Yes</td>
-<td>Partly</td>
+<td>--</td>
 <td>--</td>
 <td>--</td>
 <td>Partly</td>
 <td>--</td>
 </tr>
 <tr>
-<td align="left">Split</td>
+<td align="left">Split seqs</td>
 <td>Yes</td>
 <td>Yes</td>
 <td>--</td>
@@ -307,7 +318,7 @@
 <td>--</td>
 </tr>
 <tr>
-<td align="left">Shuffle</td>
+<td align="left">Shuffle seqs</td>
 <td>Yes</td>
 <td>--</td>
 <td>--</td>
@@ -316,9 +327,9 @@
 <td>--</td>
 </tr>
 <tr>
-<td align="left">Sort</td>
+<td align="left">Sort seqs</td>
 <td>Yes</td>
-<td>--</td>
+<td>Yes</td>
 <td>--</td>
 <td>--</td>
 <td>Yes</td>
@@ -343,7 +354,7 @@
 <td>--</td>
 </tr>
 <tr>
-<td align="left">Clean</td>
+<td align="left">Clean bases</td>
 <td>Yes</td>
 <td>Yes</td>
 <td>Yes</td>
@@ -379,7 +390,7 @@
 <td>--</td>
 </tr>
 <tr>
-<td align="left">Rename name</td>
+<td align="left">Rename head</td>
 <td>--</td>
 <td>Yes</td>
 <td>--</td>
@@ -434,7 +445,11 @@
 <p><a href="http://shenwei356.github.io/fakit/usage/">http://shenwei356.github.io/fakit/usage/</a></p>
 <h2 id="benchmark">Benchmark</h2>
 <p>Details: <a href="http://blog.shenwei.me/fakit/benchmark/">http://shenwei356.github.io/fakit/benchmark/</a></p>
+<h3 id="performance-comparison-with-other-tools">Performance comparison with other tools</h3>
+<p>All tests were repeated 4 times</p>
 <p><img alt="benchmark_colorful.png" src="./benchmark/benchmark_colorful.png" /></p>
+<h3 id="speedup-with-multi-threads">Speedup with multi-threads</h3>
+<p><img alt="benchmark_colorful.png" src="./benchmark/fakit_multi_threads/benchmark_colorful.png" /></p>
 <h2 id="contact">Contact</h2>
 <p>Email me for any problem when using fakit. shenwei356(at)gmail.com</p>
 <p><a href="https://github.com/shenwei356/fakit/issues">Create an issue</a> to report bugs,
@@ -487,5 +502,5 @@ propose new functions or ask for help.</p>
 
 <!--
 MkDocs version : 0.15.3
-Build Date UTC : 2016-03-25 11:22:15.283610
+Build Date UTC : 2016-03-26 14:42:13.234576
 -->

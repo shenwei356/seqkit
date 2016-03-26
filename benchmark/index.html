@@ -143,7 +143,7 @@
         
             <li><a href="#platform">Platform</a></li>
         
-            <li><a href="#automatic-benchmark-script">Automatic benchmark script</a></li>
+            <li><a href="#automatic-benchmark-and-ploting-scripts">Automatic benchmark and ploting scripts</a></li>
         
             <li><a href="#test-1-reverse-complement">Test 1. Reverse Complement</a></li>
         
@@ -166,7 +166,7 @@
 <h2 id="softwares">Softwares</h2>
 <ol>
 <li><a href="https://github.com/shenwei356/fakit">fakit</a>. (Go).
-   Version <a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.4">v0.1.4</a>.</li>
+   Version <a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.4.1">v0.1.4.1</a>.</li>
 <li><a href="https://github.com/jimhester/fasta_utilities">fasta_utilities</a>. (Perl).
    Version <a href="https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579">3dcc0bc</a>.
    Lots of dependencies to install_.</li>
@@ -213,7 +213,7 @@
 <td>Yes</td>
 </tr>
 <tr>
-<td align="left">Validate</td>
+<td align="left">Validate bases</td>
 <td>Yes</td>
 <td>--</td>
 <td>Yes</td>
@@ -258,7 +258,7 @@
 <td>--</td>
 </tr>
 <tr>
-<td align="left">Search</td>
+<td align="left">Search by motifs</td>
 <td>Yes</td>
 <td>Yes</td>
 <td>--</td>
@@ -267,7 +267,7 @@
 <td>Yes</td>
 </tr>
 <tr>
-<td align="left">Sample</td>
+<td align="left">Sample seqs</td>
 <td>Yes</td>
 <td>Yes</td>
 <td>--</td>
@@ -285,7 +285,7 @@
 <td>Yes</td>
 </tr>
 <tr>
-<td align="left">Deduplicate</td>
+<td align="left">Deduplicate seqs</td>
 <td>Yes</td>
 <td>Partly</td>
 <td>--</td>
@@ -294,7 +294,7 @@
 <td>--</td>
 </tr>
 <tr>
-<td align="left">Split</td>
+<td align="left">Split seqs</td>
 <td>Yes</td>
 <td>Yes</td>
 <td>--</td>
@@ -312,7 +312,7 @@
 <td>--</td>
 </tr>
 <tr>
-<td align="left">Shuffle</td>
+<td align="left">Shuffle seqs</td>
 <td>Yes</td>
 <td>--</td>
 <td>--</td>
@@ -321,9 +321,9 @@
 <td>--</td>
 </tr>
 <tr>
-<td align="left">Sort</td>
+<td align="left">Sort seqs</td>
 <td>Yes</td>
-<td>--</td>
+<td>Yes</td>
 <td>--</td>
 <td>--</td>
 <td>Yes</td>
@@ -348,7 +348,7 @@
 <td>--</td>
 </tr>
 <tr>
-<td align="left">Clean</td>
+<td align="left">Clean bases</td>
 <td>Yes</td>
 <td>Yes</td>
 <td>Yes</td>
@@ -384,7 +384,7 @@
 <td>--</td>
 </tr>
 <tr>
-<td align="left">Rename name</td>
+<td align="left">Rename head</td>
 <td>--</td>
 <td>Yes</td>
 <td>--</td>
@@ -460,14 +460,14 @@ dataset_B.fa         DNA           6    46,709,983    59,698,489    80,373,285
 <li>Perl: perl 5, version 22, subversion 1 (v5.22.1) built for x86_64-linux-thread-multi</li>
 <li>Python: Python 2.7.10 (default, Sep  8 2015, 17:20:17) [GCC 5.1.1 20150618 (Red Hat 5.1.1-4)] on linux2</li>
 </ul>
-<h2 id="automatic-benchmark-script">Automatic benchmark script</h2>
+<h2 id="automatic-benchmark-and-ploting-scripts">Automatic benchmark and ploting scripts</h2>
 <p>Scripts are available at:  <a href="https://github.com/shenwei356/fakit/tree/master/benchmark">https://github.com/shenwei356/fakit/tree/master/benchmark</a></p>
 <h2 id="test-1-reverse-complement">Test 1. Reverse Complement</h2>
 <h3 id="commands">Commands</h3>
-<p><code>revcom_biogo</code>, a tool written in Golang using <a href="https://github.com/biogo/biogo">biogo</a> package
- (<a href="https://github.com/shenwei356/fakit/blob/master/benchmark/revcom_biogo.go">source</a>,
- <a href="https://github.com/shenwei356/fakit/raw/master/benchmark/revcom_biogo">binary</a> )
-is also used.</p>
+<p><code>revcom_biogo</code> (<a href="https://github.com/shenwei356/fakit/blob/master/benchmark/revcom_biogo.go">source</a>,
+ <a href="https://github.com/shenwei356/fakit/raw/master/benchmark/revcom_biogo">binary</a> ), 
+ a tool written in Golang using <a href="https://github.com/biogo/biogo">biogo</a> package,
+ is also used for comparison of FASTA file parsing performance.</p>
 <pre><code>echo == fakit
 for f in dataset_{A,B}.fa; do echo data: $f; time fakit seq -r -p $f &gt; $f.fakit.rc; done
 
@@ -567,14 +567,6 @@ echo == seqmagick
 for f in dataset_{A,B}_dup.fasta; do echo data: $f; time seqmagick convert --deduplicate-sequences $f - &gt; $f.rmdup.seqmagick.fa; done
 </code></pre>
 
-<p>By name</p>
-<pre><code>echo == fakit
-for f in dataset_{A,B}_dup.fasta; do echo data: $f; time fakit rmdup -n $f &gt; $f.rmdup.fakit.fa; done
-
-echo == fasta_utilities
-for f in dataset_{A,B}_dup.fasta; do echo data: $f; time unique_headers.pl $f &gt; $f.rmdup.fautil.fa; done
-</code></pre>
-
 <h2 id="test-5-extract-subsequencs-by-bed-file">Test 5. Extract subsequencs by BED file</h2>
 <h3 id="commands_4">Commands</h3>
 <pre><code>echo ==  fakit
@@ -586,7 +578,12 @@ echo data: chr1.fa.gz; time seqtk subseq chr1.fa.gz chr1.bed.gz &gt; chr1.bed.gz
 
 <p>TODO: bedtools</p>
 <h2 id="result">Result</h2>
-<p><img alt="benchmark_colorful.png" src="../benchmark/benchmark_colorful.png" /></p></div>
+<p>All tests were repeated 4 times.</p>
+<h3 id="performance-comparison-with-other-tools">Performance comparison with other tools</h3>
+<p>Fakit used all CPUs (4 for my computer) by default.</p>
+<p><img alt="benchmark_colorful.png" src="../benchmark/benchmark_colorful.png" /></p>
+<h3 id="speedup-with-multi-threads">Speedup with multi-threads</h3>
+<p><img alt="benchmark_colorful.png" src="../benchmark/fakit_multi_threads/benchmark_colorful.png" /></p></div>
             
         </div>
 
