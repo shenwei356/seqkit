@@ -6,7 +6,18 @@ Source code: [https://github.com/shenwei356/fakit](https://github.com/shenwei356
 
 ## Introduction
 
+FASTA is a basic format for storing nucleotide and protein sequences. 
+The manipulation of FASTA file includes converting, clipping, searching, filtering,
+deduplication, splitting, shuffling, sampling and so on. 
+Existed tools only implemented parts of the functions,
+and some of them are only available for specific operating systems. 
+Furthermore, the complicated installation process of dependencies packages and
+running environment also make them less friendly to common users.
 
+Fakit is cross-platform, efficient, and practical FASTA manipulations tool 
+that is friendly for researchers to complete wide ranges of FASTA file processing. 
+The suite supports plain or gzip-compressed input and output
+from either standard stream or files, therefore, it could be easily used in pipelines.
 
 ## Features
 
@@ -14,13 +25,13 @@ Source code: [https://github.com/shenwei356/fakit](https://github.com/shenwei356
   see [download](http://shenwei356.github.io/fakit/download/))
 - **Light weight and out-of-the-box, no dependencies, no compilation, no configuration**
   (see [download](http://shenwei356.github.io/fakit/download/))
-- **Fast** (see [benchmark](http://shenwei356.github.io/fakit/benchmark/)),
-  **multiple-threads supported**, more significant speedup for `grep` and `locate`.
-- **Practical functions by 14 subcommands** (see subcommands and
+- **Fast** (see [benchmark](/#performance-comparison-with-other-tools)),
+  **multiple-threads supported** (see [benchmark](/#speedup-with-multi-threads)).
+- **Practical functions supported by 14 subcommands** (see subcommands and
   [usage](http://shenwei356.github.io/fakit/usage/) )
 - **Well documented** (detailed [usage](http://shenwei356.github.io/fakit/usage/)
   and [benchmark](http://shenwei356.github.io/fakit/benchmark/) )
-- **Support STDIN and gziped input/output file, could be used in pipe**
+- **Support STDIN and gziped input/output file, easy being used in pipe**
 - Support custom sequence ID regular expression (especially useful for quering with ID list)
 - Reproducible results (configurable rand seed in `sample` and `shuffle`)
 - Well organized source code, friendly to use and easy to extend.
@@ -31,26 +42,26 @@ Features         | fakit    | fasta_utilities | fastx_toolkit | pyfaidx | seqmag
 :--------------- | :------: | :-------------: | :-----------: | :-----: | :-------: | :----
 Cross-platform   | Yes      | Partly          | Partly        | Yes     | Yes       | Yes
 Mutli-line FASTA | Yes      | Yes             | --            | Yes     | Yes       | Yes
-Validate         | Yes      | --              | Yes           | Yes     | --        | --
+Validate bases   | Yes      | --              | Yes           | Yes     | --        | --
 Recognize RNA    | Yes      | Yes             | --            | --      | Yes       | Yes
 Read STDIN       | Yes      | Yes             | Yes           | --      | Yes       | Yes
 Read gzip        | Yes      | Yes             | --            | --      | Yes       | Yes
 Write gzip       | Yes      | --              | --            | --      | Yes       | --
-Search           | Yes      | Yes             | --            | --      | Yes       | Yes
-Sample           | Yes      | Yes             | --            | --      | Yes       | Yes
+Search by motifs | Yes      | Yes             | --            | --      | Yes       | Yes
+Sample seqs      | Yes      | Yes             | --            | --      | Yes       | Yes
 Subseq           | Yes      | Yes             | --            | Yes     | Yes       | Yes
-Deduplicate      | Yes      | Partly          | --            | --      | Partly    | --
-Split            | Yes      | Yes             | --            | Partly  | --        | --
+Deduplicate seqs | Yes      | --              | --            | --      | Partly    | --
+Split seqs       | Yes      | Yes             | --            | Partly  | --        | --
 Split by seq     | Yes      | --              | Yes           | Yes     | --        | --
-Shuffle          | Yes      | --              | --            | --      | --        | --
-Sort             | Yes      | --              | --            | --      | Yes       | --
+Shuffle seqs     | Yes      | --              | --            | --      | --        | --
+Sort seqs        | Yes      | Yes             | --            | --      | Yes       | --
 Locate motifs    | Yes      | --              | --            | --      | --        | --
 Common seqs      | Yes      | --              | --            | --      | --        | --
-Clean            | Yes      | Yes             | Yes           | Yes     | --        | --
+Clean bases      | Yes      | Yes             | Yes           | Yes     | --        | --
 Transcribe       | Yes      | Yes             | Yes           | Yes     | Yes       | Yes
 Translate        | --       | Yes             | Yes           | Yes     | Yes       | --
 Size select      | Indirect | Yes             | --            | Yes     | Yes       | --
-Rename name      | --       | Yes             | --            | --      | Yes       | Yes
+Rename head      | --       | Yes             | --            | --      | Yes       | Yes
 
 ## Subcommands
 
@@ -105,7 +116,15 @@ Global Flags
 
 Details: [http://shenwei356.github.io/fakit/benchmark/](http://blog.shenwei.me/fakit/benchmark/)
 
+### Performance comparison with other tools
+
+All tests were repeated 4 times
+
 ![benchmark_colorful.png](benchmark/benchmark_colorful.png)
+
+### Speedup with multi-threads
+
+![benchmark_colorful.png](benchmark/fakit_multi_threads/benchmark_colorful.png)
 
 ## Contact
 

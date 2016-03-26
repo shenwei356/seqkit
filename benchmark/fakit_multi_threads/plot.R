@@ -2,6 +2,7 @@
 library(ggplot2)
 library(scales)
 library(ggthemes)
+library(dplyr)
 
 df <- read.csv("run_benchmark_00_all.pl.benchmark.csv", sep = "\t")
 
@@ -9,24 +10,29 @@ df$test <- factor(df$test, levels = unique(df$test), ordered = TRUE)
 df$app <- factor(df$app, levels = unique(df$app), ordered = TRUE)
 df$dataset <- factor(df$dataset, levels = unique(df$dataset), ordered = TRUE)
 
+# speedup relative to CPU=1
+func <- function(app, time){
+  i <- app[app=1] # time of CPU==1
+  return(round(time[i]/time, 1))
+}
+df <- df  %>%
+  group_by(test, dataset) %>%
+  mutate(speedup=func(app, time_mean))
 
-p <-
-  ggplot(df, aes(x = app, y = time_mean, 
-                 ymax=time_mean+time_stdev, ymin=time_mean+time_stdev,
-                 group = dataset, fill = dataset, label=time_mean)) +
-  geom_bar(stat = "identity", position = "dodge", width = 0.7,  color = "black") +
-  geom_errorbar(width = 0.3, position = position_dodge(0.6), size = 0.2) +
-  geom_text(aes(y=time_mean+4), position = position_dodge(1), size=3)+
   
-  # geom_hline(yintercept = 0, linetype = 1, size = 1) +
+p <-
+  ggplot(df, aes(x = app, y = speedup,
+                 group = dataset, fill = dataset, label=sprintf("%.1fX", speedup))) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7,  color = "black") +
+  geom_text(aes(y=speedup+0.2), position = position_dodge(0.7), size=3)+
   
   scale_fill_manual(values = rev(stata_pal("s2color")(5)), labels = c("A", "B", "A_dup", "B_dup", "chr1")) +
   
-  scale_y_continuous(limits=c(0, max(df$time_mean)+5))+
+  scale_y_continuous(limits=c(0, max(df$speedup)*1.15))+
   facet_grid(test ~ .) +
-  ggtitle("FASTA Manipulation Performance") +
-  ylab("Time (s)") +
-  xlab(NULL)
+  ggtitle("FASTA Manipulation Benchmark\nfakit with N CPUs") +
+  ylab("Speedup") +
+  xlab("CPUs")
 
 p <- p +
   theme_bw() +
@@ -38,10 +44,7 @@ p <- p +
     axis.line = element_line(colour = "black", size = 0.8),
     axis.ticks.y = element_line(size = 0.8),
     axis.ticks.x = element_line(size = 0.8),
-    axis.text.x = element_text(
-      angle = 20, hjust = 1, vjust = 1
-    ),
-    
+
     strip.background = element_rect(
       colour = "white", fill = "white",
       size = 0.2

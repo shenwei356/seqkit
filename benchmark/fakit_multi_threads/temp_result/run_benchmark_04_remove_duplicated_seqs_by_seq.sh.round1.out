@@ -1,0 +1,53 @@
+Test: Dup_s
+== 1
+data: dataset_A_dup.fasta
+[INFO][0m 30911 duplicated records removed
+
+real	0m5.485s
+user	0m5.277s
+sys	0m0.213s
+data: dataset_B_dup.fasta
+[INFO][0m 2 duplicated records removed
+
+real	0m3.656s
+user	0m3.054s
+sys	0m0.607s
+== 2
+data: dataset_A_dup.fasta
+[INFO][0m 30911 duplicated records removed
+
+real	0m3.704s
+user	0m5.814s
+sys	0m0.325s
+data: dataset_B_dup.fasta
+[INFO][0m 2 duplicated records removed
+
+real	0m3.699s
+user	0m3.263s
+sys	0m0.765s
+== 3
+data: dataset_A_dup.fasta
+[INFO][0m 30911 duplicated records removed
+
+real	0m3.558s
+user	0m6.272s
+sys	0m0.400s
+data: dataset_B_dup.fasta
+[INFO][0m 2 duplicated records removed
+
+real	0m3.694s
+user	0m3.338s
+sys	0m0.711s
+== 4
+data: dataset_A_dup.fasta
+[INFO][0m 30911 duplicated records removed
+
+real	0m3.396s
+user	0m6.196s
+sys	0m0.393s
+data: dataset_B_dup.fasta
+[INFO][0m 2 duplicated records removed
+
+real	0m3.731s
+user	0m3.330s
+sys	0m0.745s

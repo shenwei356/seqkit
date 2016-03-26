@@ -1,0 +1,46 @@
+Test: Sample
+== fakit
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m 1001 sequences outputed
+
+real	0m1.552s
+user	0m1.890s
+sys	0m0.189s
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m 6 sequences outputed
+
+real	0m2.489s
+user	0m2.172s
+sys	0m0.651s
+== seqmagick
+data: dataset_A.fa
+
+real	0m5.536s
+user	0m5.444s
+sys	0m0.093s
+data: dataset_B.fa
+
+real	0m8.528s
+user	0m7.743s
+sys	0m0.785s
+== seqtk
+data: dataset_A.fa
+
+real	0m0.326s
+user	0m0.289s
+sys	0m0.037s
+data: dataset_B.fa
+
+real	0m0.850s
+user	0m0.480s
+sys	0m0.369s
+Result summary
+file                                seq_type    num_seqs       min_len       avg_len       max_len
+dataset_A.fa.sample.fakit.fa             DNA       1,001           902       1,418.2         3,038
+dataset_A.fa.sample.seqmagick.fa         DNA       1,000           913       1,419.3         2,109
+dataset_A.fa.sample.seqtk.fa             DNA       1,000           901       1,412.3         1,980
+dataset_B.fa.sample.fakit.fa             DNA           6    46,709,983    59,698,489    80,373,285
+dataset_B.fa.sample.seqmagick.fa         DNA           6    46,709,983    59,698,489    80,373,285
+dataset_B.fa.sample.seqtk.fa             DNA           6    46,709,983    59,698,489    80,373,285

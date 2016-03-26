@@ -4,7 +4,7 @@
 ## Softwares
 
 1. [fakit](https://github.com/shenwei356/fakit). (Go).
-   Version [v0.1.4](https://github.com/shenwei356/fakit/releases/tag/v0.1.4).
+   Version [v0.1.4.1](https://github.com/shenwei356/fakit/releases/tag/v0.1.4.1).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    Lots of dependencies to install_.
@@ -24,26 +24,26 @@ Features         | fakit    | fasta_utilities | fastx_toolkit | pyfaidx | seqmag
 :--------------- | :------: | :-------------: | :-----------: | :-----: | :-------: | :----
 Cross-platform   | Yes      | Partly          | Partly        | Yes     | Yes       | Yes
 Mutli-line FASTA | Yes      | Yes             | --            | Yes     | Yes       | Yes
-Validate         | Yes      | --              | Yes           | Yes     | --        | --
+Validate bases   | Yes      | --              | Yes           | Yes     | --        | --
 Recognize RNA    | Yes      | Yes             | --            | --      | Yes       | Yes
 Read STDIN       | Yes      | Yes             | Yes           | --      | Yes       | Yes
 Read gzip        | Yes      | Yes             | --            | --      | Yes       | Yes
 Write gzip       | Yes      | --              | --            | --      | Yes       | --
-Search           | Yes      | Yes             | --            | --      | Yes       | Yes
-Sample           | Yes      | Yes             | --            | --      | Yes       | Yes
+Search by motifs | Yes      | Yes             | --            | --      | Yes       | Yes
+Sample seqs      | Yes      | Yes             | --            | --      | Yes       | Yes
 Subseq           | Yes      | Yes             | --            | Yes     | Yes       | Yes
-Deduplicate      | Yes      | Partly          | --            | --      | Partly    | --
-Split            | Yes      | Yes             | --            | Partly  | --        | --
+Deduplicate seqs | Yes      | Partly          | --            | --      | Partly    | --
+Split seqs       | Yes      | Yes             | --            | Partly  | --        | --
 Split by seq     | Yes      | --              | Yes           | Yes     | --        | --
-Shuffle          | Yes      | --              | --            | --      | --        | --
-Sort             | Yes      | --              | --            | --      | Yes       | --
+Shuffle seqs     | Yes      | --              | --            | --      | --        | --
+Sort seqs        | Yes      | Yes             | --            | --      | Yes       | --
 Locate motifs    | Yes      | --              | --            | --      | --        | --
 Common seqs      | Yes      | --              | --            | --      | --        | --
-Clean            | Yes      | Yes             | Yes           | Yes     | --        | --
+Clean bases      | Yes      | Yes             | Yes           | Yes     | --        | --
 Transcribe       | Yes      | Yes             | Yes           | Yes     | Yes       | Yes
 Translate        | --       | Yes             | Yes           | Yes     | Yes       | --
 Size select      | Indirect | Yes             | --            | Yes     | Yes       | --
-Rename name      | --       | Yes             | --            | --      | Yes       | Yes
+Rename head      | --       | Yes             | --            | --      | Yes       | Yes
 
 ## Datasets
 
@@ -125,7 +125,7 @@ Softwares:
 - Python: Python 2.7.10 (default, Sep  8 2015, 17:20:17) [GCC 5.1.1 20150618 (Red Hat 5.1.1-4)] on linux2
 
 
-## Automatic benchmark script
+## Automatic benchmark and ploting scripts
 
 Scripts are available at:  [https://github.com/shenwei356/fakit/tree/master/benchmark](https://github.com/shenwei356/fakit/tree/master/benchmark)
 
@@ -134,10 +134,10 @@ Scripts are available at:  [https://github.com/shenwei356/fakit/tree/master/benc
 
 ### Commands
 
-`revcom_biogo`, a tool written in Golang using [biogo](https://github.com/biogo/biogo) package
- ([source](https://github.com/shenwei356/fakit/blob/master/benchmark/revcom_biogo.go),
- [binary](https://github.com/shenwei356/fakit/raw/master/benchmark/revcom_biogo) )
-is also used.
+`revcom_biogo` ([source](https://github.com/shenwei356/fakit/blob/master/benchmark/revcom_biogo.go),
+ [binary](https://github.com/shenwei356/fakit/raw/master/benchmark/revcom_biogo) ), 
+ a tool written in Golang using [biogo](https://github.com/biogo/biogo) package,
+ is also used for comparison of FASTA file parsing performance.
 
 ```
 echo == fakit
@@ -261,16 +261,6 @@ echo == seqmagick
 for f in dataset_{A,B}_dup.fasta; do echo data: $f; time seqmagick convert --deduplicate-sequences $f - > $f.rmdup.seqmagick.fa; done
 ```
 
-By name
-
-```
-echo == fakit
-for f in dataset_{A,B}_dup.fasta; do echo data: $f; time fakit rmdup -n $f > $f.rmdup.fakit.fa; done
-
-echo == fasta_utilities
-for f in dataset_{A,B}_dup.fasta; do echo data: $f; time unique_headers.pl $f > $f.rmdup.fautil.fa; done
-```
-
 ## Test 5. Extract subsequencs by BED file
 
 ### Commands
@@ -287,4 +277,15 @@ TODO: bedtools
 
 ## Result
 
+All tests were repeated 4 times.
+
+### Performance comparison with other tools
+
+Fakit used all CPUs (4 for my computer) by default.
+
 ![benchmark_colorful.png](benchmark/benchmark_colorful.png)
+
+### Speedup with multi-threads
+
+![benchmark_colorful.png](benchmark/fakit_multi_threads/benchmark_colorful.png)
+

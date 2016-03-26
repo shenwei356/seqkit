@@ -1,0 +1,45 @@
+Test: Search
+== 1
+data: dataset_A.fa
+
+real	0m4.374s
+user	0m4.186s
+sys	0m0.193s
+data: dataset_B.fa
+
+real	0m2.002s
+user	0m1.546s
+sys	0m0.461s
+== 2
+data: dataset_A.fa
+
+real	0m3.818s
+user	0m5.485s
+sys	0m0.309s
+data: dataset_B.fa
+
+real	0m2.044s
+user	0m1.843s
+sys	0m0.490s
+== 3
+data: dataset_A.fa
+
+real	0m3.760s
+user	0m5.728s
+sys	0m0.354s
+data: dataset_B.fa
+
+real	0m2.105s
+user	0m1.795s
+sys	0m0.540s
+== 4
+data: dataset_A.fa
+
+real	0m3.638s
+user	0m5.704s
+sys	0m0.367s
+data: dataset_B.fa
+
+real	0m2.090s
+user	0m1.857s
+sys	0m0.519s

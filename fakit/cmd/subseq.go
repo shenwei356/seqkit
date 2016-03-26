@@ -106,6 +106,7 @@ Examples:
 			}
 			gtfFeaturesMap = make(map[string]type2gtfFeatures)
 
+			gtf.Threads = threads // threads of gtf.ReadFeatures
 			features, err := gtf.ReadFeatures(gtfFile)
 			checkError(err)
 			for _, feature := range features {
@@ -125,6 +126,7 @@ Examples:
 				checkError(fmt.Errorf("when given flag -b (--bed), flag -f (--feature) is not allowed"))
 			}
 			bedFeatureMap = make(map[string][]BedFeature)
+			Threads = threads // threads of ReadBedFeatures
 			features, err := ReadBedFeatures(bedFile)
 			checkError(err)
 			for _, feature := range features {

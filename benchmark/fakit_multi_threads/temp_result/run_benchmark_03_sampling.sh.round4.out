@@ -1,0 +1,61 @@
+Test: Sample
+== 1
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m 1001 sequences outputed
+
+real	0m1.781s
+user	0m1.613s
+sys	0m0.170s
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m 6 sequences outputed
+
+real	0m2.335s
+user	0m1.792s
+sys	0m0.546s
+== 2
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m 1001 sequences outputed
+
+real	0m1.610s
+user	0m1.739s
+sys	0m0.181s
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m 6 sequences outputed
+
+real	0m2.321s
+user	0m2.083s
+sys	0m0.606s
+== 3
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m 1001 sequences outputed
+
+real	0m1.645s
+user	0m1.924s
+sys	0m0.211s
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m 6 sequences outputed
+
+real	0m2.450s
+user	0m2.083s
+sys	0m0.660s
+== 4
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m 1001 sequences outputed
+
+real	0m1.479s
+user	0m1.848s
+sys	0m0.192s
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m 6 sequences outputed
+
+real	0m2.474s
+user	0m2.152s
+sys	0m0.631s

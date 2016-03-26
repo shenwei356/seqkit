@@ -1,0 +1,87 @@
+Test: Revcom
+== fakit
+data: dataset_A.fa
+
+real	0m4.965s
+user	0m8.987s
+sys	0m0.301s
+data: dataset_B.fa
+
+real	0m6.118s
+user	0m7.341s
+sys	0m0.628s
+== fasta_utilities
+data: dataset_A.fa
+[Sat Mar 26 21:03:59 2016] dataset_A.fa:  26%
+[Sat Mar 26 21:04:00 2016] dataset_A.fa:  38%
+[Sat Mar 26 21:04:00 2016] dataset_A.fa:  51%
+[Sat Mar 26 21:04:01 2016] dataset_A.fa:  65%
+[Sat Mar 26 21:04:01 2016] dataset_A.fa:  77%
+[Sat Mar 26 21:04:02 2016] dataset_A.fa:  90%
+
+real	0m4.617s
+user	0m4.184s
+sys	0m0.431s
+data: dataset_B.fa
+[Sat Mar 26 21:04:04 2016] dataset_B.fa:  69%
+[Sat Mar 26 21:04:05 2016] dataset_B.fa: 100%
+
+real	0m2.954s
+user	0m1.952s
+sys	0m0.955s
+== pyfaidx
+data: dataset_A.fa
+
+real	0m27.542s
+user	0m26.507s
+sys	0m0.659s
+data: dataset_B.fa
+
+real	0m18.660s
+user	0m17.183s
+sys	0m1.453s
+== seqmagick
+data: dataset_A.fa
+
+real	0m13.908s
+user	0m13.354s
+sys	0m0.551s
+data: dataset_B.fa
+
+real	0m11.055s
+user	0m9.951s
+sys	0m1.103s
+== seqtk
+data: dataset_A.fa
+
+real	0m0.907s
+user	0m0.642s
+sys	0m0.263s
+data: dataset_B.fa
+
+real	0m1.080s
+user	0m0.786s
+sys	0m0.245s
+== biogo
+data: dataset_A.fa
+
+real	0m12.914s
+user	0m11.795s
+sys	0m1.294s
+data: dataset_B.fa
+
+real	0m10.755s
+user	0m11.071s
+sys	0m0.412s
+Result summary
+file                         seq_type    num_seqs       min_len       avg_len       max_len
+dataset_A.fa.biogo.rc             DNA     175,364           900       1,419.6         3,725
+dataset_A.fa.fakit.rc             DNA     175,364           900       1,419.6         3,725
+dataset_A.fa.pyfaidx.rc           DNA     175,364           900       1,419.6         3,725
+dataset_A.fa.seqmagick.rc         DNA     175,364           900       1,419.6         3,725
+dataset_A.fa.seqtk.rc             DNA     175,364           900       1,419.6         3,725
+dataset_B.fa.biogo.rc             DNA           6    46,709,983    59,698,489    80,373,285
+dataset_B.fa.fakit.rc             DNA           6    46,709,983    59,698,489    80,373,285
+dataset_B.fa.pyfaidx.rc           DNA           6    46,709,983    59,698,489    80,373,285
+dataset_B.fa.seqmagick.rc         DNA           6    46,709,983    59,698,489    80,373,285
+dataset_B.fa.seqtk.rc             DNA           6    46,709,983    59,698,489    80,373,285

@@ -1,0 +1,13 @@
+test	dataset	app	time_mean	time_stdev
+Revcom	dataset_A.fa	biogo	12.98	0.07
+Revcom	dataset_A.fa	fakit	4.76	0.12
+Revcom	dataset_A.fa	fasta_utilities	4.52	0.13
+Revcom	dataset_A.fa	pyfaidx	27.96	0.34
+Revcom	dataset_A.fa	seqmagick	14.21	0.42
+Revcom	dataset_A.fa	seqtk	0.99	0.10
+Revcom	dataset_B.fa	biogo	10.93	0.19
+Revcom	dataset_B.fa	fakit	6.03	0.07
+Revcom	dataset_B.fa	fasta_utilities	3.11	0.10
+Revcom	dataset_B.fa	pyfaidx	18.86	0.25
+Revcom	dataset_B.fa	seqmagick	10.81	0.39
+Revcom	dataset_B.fa	seqtk	1.08	0.01

@@ -40,6 +40,9 @@ type BedFeature struct {
 	Strand *string
 }
 
+// Threads for bread.NewBufferedReader()
+var Threads = runtime.NumCPU()
+
 // ReadBedFeatures returns gtf BedFeatures of a file
 func ReadBedFeatures(file string) ([]BedFeature, error) {
 	if _, err := os.Stat(file); os.IsNotExist(err) {
@@ -80,7 +83,7 @@ func ReadBedFeatures(file string) ([]BedFeature, error) {
 
 		return BedFeature{items[0], start + 1, end, name, strand}, true, nil
 	}
-	reader, err := breader.NewBufferedReader(file, runtime.NumCPU(), 100, fn)
+	reader, err := breader.NewBufferedReader(file, Threads, 100, fn)
 	if err != nil {
 		return nil, err
 	}

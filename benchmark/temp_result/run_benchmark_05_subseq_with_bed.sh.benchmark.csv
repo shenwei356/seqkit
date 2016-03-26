@@ -1,0 +1,3 @@
+test	dataset	app	time_mean	time_stdev
+Subseq	chr1.fa.gz	fakit	14.93	0.27
+Subseq	chr1.fa.gz	seqtk	10.64	0.49

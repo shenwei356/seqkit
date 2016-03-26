@@ -1,0 +1,33 @@
+Test: Subseq
+== 1
+data: chr1.fa.gz
+[INFO][0m read BED file ...
+[INFO][0m read sequences ...
+
+real	0m21.094s
+user	0m20.252s
+sys	0m0.872s
+== 2
+data: chr1.fa.gz
+[INFO][0m read BED file ...
+[INFO][0m read sequences ...
+
+real	0m16.233s
+user	0m23.639s
+sys	0m1.000s
+== 3
+data: chr1.fa.gz
+[INFO][0m read BED file ...
+[INFO][0m read sequences ...
+
+real	0m15.145s
+user	0m27.904s
+sys	0m1.087s
+== 4
+data: chr1.fa.gz
+[INFO][0m read BED file ...
+[INFO][0m read sequences ...
+
+real	0m14.795s
+user	0m30.625s
+sys	0m1.162s

@@ -6,11 +6,9 @@
 
 ## Current Version
 
-- [fakit v0.1.4](https://github.com/shenwei356/fakit/releases/tag/v0.1.4)
-    - add subcommand `sort`
-    - improve subcommand `subseq`: supporting of getting subsequences by GTF and BED files
-    - change name format of `sliding` result
-    - prettier output of `stat`
+- [fakit v0.1.4.1](https://github.com/shenwei356/fakit/releases/tag/v0.1.4.1)
+    - change alignment of `stat` output
+    - preciser CPUs number control
 
 ## Installation
 
@@ -34,6 +32,11 @@ You can also add the directory of the executable file to environment variable
 
 ## Previous Versions
 
+- [fakit v0.1.4](https://github.com/shenwei356/fakit/releases/tag/v0.1.4)
+    - add subcommand `sort`
+    - improve subcommand `subseq`: supporting of getting subsequences by GTF and BED files
+    - change name format of `sliding` result
+    - prettier output of `stat`
 - [fakit v0.1.3.1](https://github.com/shenwei356/fakit/releases/tag/v0.1.3.1)
     - Performance improvement by reducing time of cleaning spaces
     - Document update
