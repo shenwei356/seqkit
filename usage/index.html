@@ -82,13 +82,13 @@
                 
                 
                     <li >
-                        <a href="../benchmark/">Benchmark</a>
+                        <a href="../tutorial/">Tutorial</a>
                     </li>
                 
                 
                 
                     <li >
-                        <a href="../extension/">Extension</a>
+                        <a href="../benchmark/">Benchmark</a>
                     </li>
                 
                 
@@ -108,7 +108,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../benchmark/">
+                        <a rel="prev" href="../tutorial/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -177,7 +177,7 @@
 <p>Usage</p>
 <pre><code>fakit -- Swiss army knife of FASTA format
 
-Version: 0.1.4
+Version: 0.1.4.2
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -206,6 +206,7 @@ Available Commands:
 Flags:
       --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which fakit guesses the sequence type (default 10000)
   -c, --chunk-size int                  chunk size (attention: unit is FASTA records not lines) (default 1000)
+      --id-ncbi                         FASTA head is NCBI-style, e.g. &gt;gi|110645304|ref|NC_002516.2| Pseud...
       --id-regexp string                regular expression for parsing ID (default &quot;^([^\\s]+)\\s?&quot;)
   -w, --line-width int                  line width (0 for no wrap) (default 60)
   -o, --out-file string                 out file (&quot;-&quot; for stdout, suffix .gz for gzipped out) (default &quot;-&quot;)
@@ -505,34 +506,34 @@ Flags:
 <li>
 <p>General use</p>
 <pre><code>$ echo -e "&gt;seq\nACGTacgtNN" | fakit sliding -s 3 -W 6
-&gt;seq_sliding:1:6
+&gt;seq_sliding:1-6
 ACGTac
-&gt;seq_sliding:4:9
+&gt;seq_sliding:4-9
 TacgtN
 </code></pre>
 </li>
 <li>
 <p>Circle genome</p>
 <pre><code>$ echo -e "&gt;seq\nACGTacgtNN" | fakit sliding -s 3 -W 6 -C
-&gt;seq_sliding:1:6
+&gt;seq_sliding:1-6
 ACGTac
-&gt;seq_sliding:4:9
+&gt;seq_sliding:4-9
 TacgtN
-&gt;seq_sliding:7:2
+&gt;seq_sliding:7-2
 gtNNAC
-&gt;seq_sliding:10:5
+&gt;seq_sliding:10-5
 NACGTa
 </code></pre>
 </li>
 <li>
 <p>Generate GC content for ploting</p>
 <pre><code>$ zcat hairpin.fa.gz | fakit fa2tab | head -n 1 | fakit tab2fa | fakit sliding -s 5 -W 30 | fakit fa2tab -n -g
-cel-let-7_sliding:1:30          50.00
-cel-let-7_sliding:6:35          46.67
-cel-let-7_sliding:11:40         43.33
-cel-let-7_sliding:16:45         36.67
-cel-let-7_sliding:21:50         33.33
-cel-let-7_sliding:26:55         40.00
+cel-let-7_sliding:1-30          50.00
+cel-let-7_sliding:6-35          46.67
+cel-let-7_sliding:11-40         43.33
+cel-let-7_sliding:16-45         36.67
+cel-let-7_sliding:21-50         33.33
+cel-let-7_sliding:26-55         40.00
 ...
 </code></pre>
 </li>
@@ -630,6 +631,21 @@ $ fakit sort -l hairpin.fa.gz
 </code></pre>
 </li>
 </ol>
+<p><strong>Extension</strong></p>
+<p>After converting FASTA to tabular format with <code>fakit fa2tab</code>,
+it could be handled with CSV/TSV tools,
+ e.g. <a href="https://github.com/shenwei356/datakit">datakit</a> (CSV/TSV file manipulation and more)</p>
+<ul>
+<li><a href="https://github.com/shenwei356/datakit/tree/master/csv_grep.go">csv_grep</a>
+(go version) or <a href="https://github.com/shenwei356/datakit/blob/master/csv_grep.py">csv_grep.py</a>
+(python version), could be used to filter sequences (similar with <code>fakit extract</code>)</li>
+<li><a href="https://github.com/shenwei356/datakit/blob/master/intersection">intersection</a>
+computates intersection of multiple files. It could achieve similar function
+as <code>fakit common -n</code> along with shell.</li>
+<li><a href="https://github.com/shenwei356/datakit/blob/master/csv_join">csv_join</a> joins multiple CSV/TSV files by multiple IDs.</li>
+<li><a href="https://github.com/shenwei356/datakit/blob/master/csv_melt">csv_melt</a>
+provides melt function, could be used in preparation of data for ploting.</li>
+</ul>
 <h2 id="grep">grep</h2>
 <p>Usage</p>
 <pre><code>search sequences by pattern(s) of name or sequence motifs
@@ -731,17 +747,17 @@ Flags:
 <p>Locate ORFs.</p>
 <pre><code>$ zcat hairpin.fa.gz | fakit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)"
 seqID   patternName     pattern strand  start   end     matched
-cel-lin-4       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        1  136      AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGA
-cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        1  54       95      AUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAG
-cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        -1 43       51      AUGAUAUAG
+cel-lin-4       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        +  136      AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGA
+cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        +  54       95      AUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAG
+cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        -  43       51      AUGAUAUAG
 </code></pre>
 </li>
 <li>
 <p>Locate Motif.</p>
 <pre><code>$ zcat hairpin.fa.gz | fakit locate -i -p UUS
 seqID   patternName     pattern strand  start   end     matched
-bna-MIR396a     UUS     UUS     -1      105     107     UUS
-bna-MIR396a     UUS     UUS     -1      89      91      UUS
+bna-MIR396a     UUS     UUS     -       105     107     UUS
+bna-MIR396a     UUS     UUS     -       89      91      UUS
 </code></pre>
 <p>Notice that <code>fakit grep</code> only searches in positive strand, but <code>fakit loate</code> could recogize both strand</p>
 </li>
@@ -754,17 +770,33 @@ Usage:
   fakit rmdup [flags]
 
 Flags:
-  -n, --by-name       by full name instead of just id
-  -s, --by-seq        by seq
-  -i, --ignore-case   ignore case
+    -n, --by-name                by full name instead of just id
+    -s, --by-seq                 by seq
+    -D, --dup-num-file string    file to save number and list of duplicated seqs
+    -d, --dup-seqs-file string   file to save duplicated seqs
+    -i, --ignore-case            ignore case
+    -m, --md5                    use MD5 instead of original seqs to reduce memory usage when comparing by seqs
 
 </code></pre>
 
 <p>Examples</p>
 <p>Similar to <code>common</code>.</p>
 <ol>
-<li>General use<pre><code>$ zcat hairpin.fa.gz | fakit rmdup -s -o clean.fa.gz
+<li>
+<p>General use</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit rmdup -s -o clean.fa.gz
 [INFO] 2226 duplicated records removed
+</code></pre>
+</li>
+<li>
+<p>Save duplicated sequences to file</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit rmdup -s -i -m -o clean.fa.gz -d duplicated.fa.gz -D duplicated.detail.txt
+
+$ cat duplicated.detail.txt   # here is not the entire list
+3   hsa-mir-424, mml-mir-424, ppy-mir-424
+3   hsa-mir-342, mml-mir-342, ppy-mir-342
+2   ngi-mir-932, nlo-mir-932
+2   ssc-mir-9784-1, ssc-mir-9784-2
 </code></pre>
 </li>
 </ol>
@@ -776,9 +808,10 @@ Usage:
   fakit common [flags]
 
 Flags:
-  -n, --by-name       match by full name instead of just id
-  -s, --by-seq        match by sequence
-  -i, --ignore-case   ignore case
+    -n, --by-name       match by full name instead of just id
+    -s, --by-seq        match by sequence
+    -i, --ignore-case   ignore case
+    -m, --md5           use MD5 instead of original seqs to reduce memory usage when comparing by seqs
 
 </code></pre>
 
@@ -796,7 +829,12 @@ Flags:
 </li>
 <li>
 <p>By sequence</p>
-<pre><code>fakit common file*.fa -s -o common.fasta
+<pre><code>fakit common file*.fa -s -i -o common.fasta
+</code></pre>
+</li>
+<li>
+<p>By sequence (large sequences)</p>
+<pre><code>fakit common file*.fa -s -i -o common.fasta -m
 </code></pre>
 </li>
 </ol>

@@ -4,7 +4,7 @@
     
     <url>
      <loc>None/</loc>
-     <lastmod>2016-03-26</lastmod>
+     <lastmod>2016-03-27</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -12,7 +12,7 @@
     
     <url>
      <loc>None/download/</loc>
-     <lastmod>2016-03-26</lastmod>
+     <lastmod>2016-03-27</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -20,7 +20,15 @@
     
     <url>
      <loc>None/usage/</loc>
-     <lastmod>2016-03-26</lastmod>
+     <lastmod>2016-03-27</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>None/tutorial/</loc>
+     <lastmod>2016-03-27</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -28,15 +36,7 @@
     
     <url>
      <loc>None/benchmark/</loc>
-     <lastmod>2016-03-26</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-    
-
-    
-    <url>
-     <loc>None/extension/</loc>
-     <lastmod>2016-03-26</lastmod>
+     <lastmod>2016-03-27</lastmod>
      <changefreq>daily</changefreq>
     </url>
     

@@ -81,14 +81,14 @@
                 
                 
                 
-                    <li class="active">
-                        <a href="./">Benchmark</a>
+                    <li >
+                        <a href="../tutorial/">Tutorial</a>
                     </li>
                 
                 
                 
-                    <li >
-                        <a href="../extension/">Extension</a>
+                    <li class="active">
+                        <a href="./">Benchmark</a>
                     </li>
                 
                 
@@ -103,12 +103,12 @@
                 </li>
                 
                     <li >
-                        <a rel="next" href="../usage/">
+                        <a rel="next" href="../tutorial/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
-                    <li >
-                        <a rel="prev" href="../extension/">
+                    <li class="disabled">
+                        <a rel="prev" >
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -166,7 +166,7 @@
 <h2 id="softwares">Softwares</h2>
 <ol>
 <li><a href="https://github.com/shenwei356/fakit">fakit</a>. (Go).
-   Version <a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.4.1">v0.1.4.1</a>.</li>
+   Version <a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.4.2">v0.1.4.2</a>.</li>
 <li><a href="https://github.com/jimhester/fasta_utilities">fasta_utilities</a>. (Perl).
    Version <a href="https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579">3dcc0bc</a>.
    Lots of dependencies to install_.</li>
@@ -465,7 +465,7 @@ dataset_B.fa         DNA           6    46,709,983    59,698,489    80,373,285
 <h2 id="test-1-reverse-complement">Test 1. Reverse Complement</h2>
 <h3 id="commands">Commands</h3>
 <p><code>revcom_biogo</code> (<a href="https://github.com/shenwei356/fakit/blob/master/benchmark/revcom_biogo.go">source</a>,
- <a href="https://github.com/shenwei356/fakit/raw/master/benchmark/revcom_biogo">binary</a> ), 
+ <a href="https://github.com/shenwei356/fakit/raw/master/benchmark/revcom_biogo">binary</a> ),
  a tool written in Golang using <a href="https://github.com/biogo/biogo">biogo</a> package,
  is also used for comparison of FASTA file parsing performance.</p>
 <pre><code>echo == fakit
