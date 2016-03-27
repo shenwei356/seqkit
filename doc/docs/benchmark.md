@@ -4,7 +4,7 @@
 ## Softwares
 
 1. [fakit](https://github.com/shenwei356/fakit). (Go).
-   Version [v0.1.4.2](https://github.com/shenwei356/fakit/releases/tag/v0.1.4.2).
+   Version [v0.1.5](https://github.com/shenwei356/fakit/releases/tag/v0.1.5).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    Lots of dependencies to install_.
@@ -29,8 +29,8 @@ Recognize RNA    | Yes      | Yes             | --            | --      | Yes   
 Read STDIN       | Yes      | Yes             | Yes           | --      | Yes       | Yes
 Read gzip        | Yes      | Yes             | --            | --      | Yes       | Yes
 Write gzip       | Yes      | --              | --            | --      | Yes       | --
-Search by motifs | Yes      | Yes             | --            | --      | Yes       | Yes
-Sample seqs      | Yes      | Yes             | --            | --      | Yes       | Yes
+Search by pattern| Yes      | Yes             | --            | --      | Yes       | Yes
+Sample seqs      | Yes      | --              | --            | --      | Yes       | Yes
 Subseq           | Yes      | Yes             | --            | Yes     | Yes       | Yes
 Deduplicate seqs | Yes      | Partly          | --            | --      | Partly    | --
 Split seqs       | Yes      | Yes             | --            | Partly  | --        | --
@@ -125,10 +125,11 @@ Softwares:
 - Python: Python 2.7.10 (default, Sep  8 2015, 17:20:17) [GCC 5.1.1 20150618 (Red Hat 5.1.1-4)] on linux2
 
 
-## Automatic benchmark and ploting scripts
+## Automatic benchmark and plotting scripts
 
 Scripts are available at:  [https://github.com/shenwei356/fakit/tree/master/benchmark](https://github.com/shenwei356/fakit/tree/master/benchmark)
 
+All tests were repeated 4 times.
 
 ## Test 1. Reverse Complement
 
@@ -174,7 +175,7 @@ GQ103704.1.1352
 FR853054.1.1478
 
 $ fakit sample -p 0.8 dataset_B.fa | fakit shuffle | fakit seq -n -i  > ids_B.txt
-wc -l ids_B.txt
+$ wc -l ids_B.txt
 4 ids_B.txt
 $ cat ids_B.txt
 Y
@@ -226,7 +227,8 @@ for f in dataset_{A,B}.fa; do echo data: $f; time seqtk sample $f $n > $f.sample
 
 ### Dataset
 
-Randomly extract 10% sequences from dataset_*.fa and merge back and then shuffle.
+10% or 20% sequences were randomly extract sequences from dataset_A.fa 
+or dataset_B.fa and merge dback and then shuffled.
 
 ```
 $ cat <(fakit sample -p 0.1 dataset_A.fa) dataset_A.fa | fakit shuffle > dataset_A_dup.fasta

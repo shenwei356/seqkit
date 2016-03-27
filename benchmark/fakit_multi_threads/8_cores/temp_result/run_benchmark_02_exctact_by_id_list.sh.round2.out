@@ -1,0 +1,89 @@
+Test: Search
+== 1
+data: dataset_A.fa
+
+real	0m7.312s
+user	0m6.370s
+sys	0m0.390s
+data: dataset_B.fa
+
+real	0m3.381s
+user	0m2.180s
+sys	0m0.612s
+== 2
+data: dataset_A.fa
+
+real	0m5.826s
+user	0m7.552s
+sys	0m0.401s
+data: dataset_B.fa
+
+real	0m3.450s
+user	0m2.546s
+sys	0m0.629s
+== 3
+data: dataset_A.fa
+
+real	0m5.822s
+user	0m7.870s
+sys	0m0.365s
+data: dataset_B.fa
+
+real	0m3.506s
+user	0m2.547s
+sys	0m0.604s
+== 4
+data: dataset_A.fa
+
+real	0m5.896s
+user	0m8.568s
+sys	0m0.453s
+data: dataset_B.fa
+
+real	0m3.492s
+user	0m2.571s
+sys	0m0.639s
+== 5
+data: dataset_A.fa
+
+real	0m6.037s
+user	0m8.668s
+sys	0m0.478s
+data: dataset_B.fa
+
+real	0m3.471s
+user	0m2.573s
+sys	0m0.628s
+== 6
+data: dataset_A.fa
+
+real	0m6.207s
+user	0m9.186s
+sys	0m0.513s
+data: dataset_B.fa
+
+real	0m3.518s
+user	0m2.559s
+sys	0m0.679s
+== 7
+data: dataset_A.fa
+
+real	0m6.217s
+user	0m9.289s
+sys	0m0.505s
+data: dataset_B.fa
+
+real	0m3.497s
+user	0m2.552s
+sys	0m0.632s
+== 8
+data: dataset_A.fa
+
+real	0m6.210s
+user	0m9.456s
+sys	0m0.500s
+data: dataset_B.fa
+
+real	0m3.590s
+user	0m2.657s
+sys	0m0.660s

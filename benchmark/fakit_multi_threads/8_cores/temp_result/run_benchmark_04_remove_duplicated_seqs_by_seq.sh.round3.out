@@ -1,0 +1,105 @@
+Test: Dup_s
+== 1
+data: dataset_A_dup.fasta
+[INFO][0m 30911 duplicated records removed
+
+real	0m5.617s
+user	0m4.481s
+sys	0m0.524s
+data: dataset_B_dup.fasta
+[INFO][0m 2 duplicated records removed
+
+real	0m5.099s
+user	0m3.258s
+sys	0m1.040s
+== 2
+data: dataset_A_dup.fasta
+[INFO][0m 30911 duplicated records removed
+
+real	0m4.139s
+user	0m5.467s
+sys	0m0.660s
+data: dataset_B_dup.fasta
+[INFO][0m 2 duplicated records removed
+
+real	0m5.197s
+user	0m3.760s
+sys	0m1.046s
+== 3
+data: dataset_A_dup.fasta
+[INFO][0m 30911 duplicated records removed
+
+real	0m3.728s
+user	0m5.621s
+sys	0m0.710s
+data: dataset_B_dup.fasta
+[INFO][0m 2 duplicated records removed
+
+real	0m5.039s
+user	0m3.527s
+sys	0m1.062s
+== 4
+data: dataset_A_dup.fasta
+[INFO][0m 30911 duplicated records removed
+
+real	0m3.586s
+user	0m5.524s
+sys	0m0.713s
+data: dataset_B_dup.fasta
+[INFO][0m 2 duplicated records removed
+
+real	0m5.307s
+user	0m3.732s
+sys	0m1.075s
+== 5
+data: dataset_A_dup.fasta
+[INFO][0m 30911 duplicated records removed
+
+real	0m3.861s
+user	0m5.926s
+sys	0m0.635s
+data: dataset_B_dup.fasta
+[INFO][0m 2 duplicated records removed
+
+real	0m5.354s
+user	0m3.911s
+sys	0m0.942s
+== 6
+data: dataset_A_dup.fasta
+[INFO][0m 30911 duplicated records removed
+
+real	0m3.827s
+user	0m5.932s
+sys	0m0.741s
+data: dataset_B_dup.fasta
+[INFO][0m 2 duplicated records removed
+
+real	0m5.320s
+user	0m3.783s
+sys	0m1.082s
+== 7
+data: dataset_A_dup.fasta
+[INFO][0m 30911 duplicated records removed
+
+real	0m3.833s
+user	0m5.965s
+sys	0m0.710s
+data: dataset_B_dup.fasta
+[INFO][0m 2 duplicated records removed
+
+real	0m5.268s
+user	0m3.813s
+sys	0m0.977s
+== 8
+data: dataset_A_dup.fasta
+[INFO][0m 30911 duplicated records removed
+
+real	0m3.860s
+user	0m5.996s
+sys	0m0.734s
+data: dataset_B_dup.fasta
+[INFO][0m 2 duplicated records removed
+
+real	0m5.149s
+user	0m3.612s
+sys	0m0.974s

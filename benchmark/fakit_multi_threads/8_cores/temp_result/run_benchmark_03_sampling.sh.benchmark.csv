@@ -1,0 +1,17 @@
+test	dataset	app	time_mean	time_stdev
+Sample	dataset_A.fa	1	2.62	0.01
+Sample	dataset_A.fa	2	2.29	0.06
+Sample	dataset_A.fa	3	2.25	0.08
+Sample	dataset_A.fa	4	2.22	0.04
+Sample	dataset_A.fa	5	2.22	0.02
+Sample	dataset_A.fa	6	2.22	0.04
+Sample	dataset_A.fa	7	2.19	0.01
+Sample	dataset_A.fa	8	2.19	0.03
+Sample	dataset_B.fa	1	4.20	0.02
+Sample	dataset_B.fa	2	4.31	0.03
+Sample	dataset_B.fa	3	4.26	0.05
+Sample	dataset_B.fa	4	4.25	0.04
+Sample	dataset_B.fa	5	4.30	0.04
+Sample	dataset_B.fa	6	4.29	0.03
+Sample	dataset_B.fa	7	4.34	0.05
+Sample	dataset_B.fa	8	4.32	0.06

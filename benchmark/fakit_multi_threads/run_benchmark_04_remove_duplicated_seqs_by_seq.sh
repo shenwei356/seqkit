@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo Test: Dup_s
+echo Test: Rmdup
 
 
 NCPUs=$(grep -c processor /proc/cpuinfo)

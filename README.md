@@ -14,7 +14,7 @@ and some of them are only available for specific operating systems.
 Furthermore, the complicated installation process of dependencies packages and
 running environment also make them less friendly to common users.
 
-Fakit is cross-platform, efficient, and practical FASTA manipulations tool
+Fakit is a cross-platform, efficient, and practical FASTA manipulations tool
 that is friendly for researchers to complete wide ranges of FASTA file processing.
 The suite supports plain or gzip-compressed input and output
 from either standard stream or files, therefore, it could be easily used in pipelines.

@@ -1,0 +1,121 @@
+Test: Sample
+== 1
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m 1001 sequences outputed
+
+real	0m2.614s
+user	0m2.297s
+sys	0m0.310s
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m 6 sequences outputed
+
+real	0m4.209s
+user	0m2.476s
+sys	0m0.852s
+== 2
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m 1001 sequences outputed
+
+real	0m2.298s
+user	0m2.555s
+sys	0m0.315s
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m 6 sequences outputed
+
+real	0m4.350s
+user	0m2.887s
+sys	0m0.859s
+== 3
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m 1001 sequences outputed
+
+real	0m2.369s
+user	0m2.669s
+sys	0m0.337s
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m 6 sequences outputed
+
+real	0m4.224s
+user	0m2.836s
+sys	0m0.814s
+== 4
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m 1001 sequences outputed
+
+real	0m2.252s
+user	0m2.716s
+sys	0m0.326s
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m 6 sequences outputed
+
+real	0m4.263s
+user	0m2.814s
+sys	0m0.905s
+== 5
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m 1001 sequences outputed
+
+real	0m2.209s
+user	0m2.713s
+sys	0m0.318s
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m 6 sequences outputed
+
+real	0m4.260s
+user	0m2.855s
+sys	0m0.799s
+== 6
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m 1001 sequences outputed
+
+real	0m2.229s
+user	0m2.731s
+sys	0m0.344s
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m 6 sequences outputed
+
+real	0m4.298s
+user	0m2.871s
+sys	0m0.862s
+== 7
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m 1001 sequences outputed
+
+real	0m2.213s
+user	0m2.696s
+sys	0m0.368s
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m 6 sequences outputed
+
+real	0m4.288s
+user	0m2.905s
+sys	0m0.828s
+== 8
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m 1001 sequences outputed
+
+real	0m2.177s
+user	0m2.738s
+sys	0m0.345s
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m 6 sequences outputed
+
+real	0m4.216s
+user	0m2.781s
+sys	0m0.845s

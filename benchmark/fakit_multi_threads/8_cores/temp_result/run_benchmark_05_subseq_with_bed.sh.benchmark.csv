@@ -1,0 +1,9 @@
+test	dataset	app	time_mean	time_stdev
+Subseq	chr1.fa.gz	1	33.39	0.79
+Subseq	chr1.fa.gz	2	24.16	0.13
+Subseq	chr1.fa.gz	3	21.20	0.20
+Subseq	chr1.fa.gz	4	19.78	0.38
+Subseq	chr1.fa.gz	5	18.84	0.33
+Subseq	chr1.fa.gz	6	18.31	0.36
+Subseq	chr1.fa.gz	7	17.90	0.43
+Subseq	chr1.fa.gz	8	17.62	0.24
