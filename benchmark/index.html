@@ -143,7 +143,7 @@
         
             <li><a href="#platform">Platform</a></li>
         
-            <li><a href="#automatic-benchmark-and-ploting-scripts">Automatic benchmark and ploting scripts</a></li>
+            <li><a href="#automatic-benchmark-and-plotting-scripts">Automatic benchmark and plotting scripts</a></li>
         
             <li><a href="#test-1-reverse-complement">Test 1. Reverse Complement</a></li>
         
@@ -258,7 +258,7 @@
 <td>--</td>
 </tr>
 <tr>
-<td align="left">Search by motifs</td>
+<td align="left">Search by pattern</td>
 <td>Yes</td>
 <td>Yes</td>
 <td>--</td>
@@ -269,7 +269,7 @@
 <tr>
 <td align="left">Sample seqs</td>
 <td>Yes</td>
-<td>Yes</td>
+<td>--</td>
 <td>--</td>
 <td>--</td>
 <td>Yes</td>
@@ -460,8 +460,9 @@ dataset_B.fa         DNA           6    46,709,983    59,698,489    80,373,285
 <li>Perl: perl 5, version 22, subversion 1 (v5.22.1) built for x86_64-linux-thread-multi</li>
 <li>Python: Python 2.7.10 (default, Sep  8 2015, 17:20:17) [GCC 5.1.1 20150618 (Red Hat 5.1.1-4)] on linux2</li>
 </ul>
-<h2 id="automatic-benchmark-and-ploting-scripts">Automatic benchmark and ploting scripts</h2>
+<h2 id="automatic-benchmark-and-plotting-scripts">Automatic benchmark and plotting scripts</h2>
 <p>Scripts are available at:  <a href="https://github.com/shenwei356/fakit/tree/master/benchmark">https://github.com/shenwei356/fakit/tree/master/benchmark</a></p>
+<p>All tests were repeated 4 times.</p>
 <h2 id="test-1-reverse-complement">Test 1. Reverse Complement</h2>
 <h3 id="commands">Commands</h3>
 <p><code>revcom_biogo</code> (<a href="https://github.com/shenwei356/fakit/blob/master/benchmark/revcom_biogo.go">source</a>,
@@ -498,7 +499,7 @@ GQ103704.1.1352
 FR853054.1.1478
 
 $ fakit sample -p 0.8 dataset_B.fa | fakit shuffle | fakit seq -n -i  &gt; ids_B.txt
-wc -l ids_B.txt
+$ wc -l ids_B.txt
 4 ids_B.txt
 $ cat ids_B.txt
 Y
@@ -541,7 +542,8 @@ for f in dataset_{A,B}.fa; do echo data: $f; time seqtk sample $f $n &gt; $f.sam
 
 <h2 id="test-4-remove-duplicated-sequences">Test 4. Remove duplicated sequences</h2>
 <h3 id="dataset">Dataset</h3>
-<p>Randomly extract 10% sequences from dataset_*.fa and merge back and then shuffle.</p>
+<p>10% or 20% sequences were randomly extract sequences from dataset_A.fa 
+or dataset_B.fa and merge dback and then shuffled.</p>
 <pre><code>$ cat &lt;(fakit sample -p 0.1 dataset_A.fa) dataset_A.fa | fakit shuffle &gt; dataset_A_dup.fasta
 $ cat &lt;(fakit sample -p 0.2 dataset_B.fa) dataset_B.fa | fakit shuffle &gt; dataset_B_dup.fasta
 </code></pre>
