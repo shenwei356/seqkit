@@ -51,7 +51,7 @@ Examples:
 		}
 
 		alphabet := getAlphabet(cmd, "seq-type")
-		idRegexp := getFlagString(cmd, "id-regexp")
+		idRegexp := getIDRegexp(cmd, "id-regexp")
 		chunkSize := getFlagPositiveInt(cmd, "chunk-size")
 		threads := getFlagPositiveInt(cmd, "threads")
 		lineWidth := getFlagNonNegativeInt(cmd, "line-width")
@@ -76,7 +76,7 @@ Examples:
 		twoPass := getFlagBool(cmd, "two-pass")
 		usingMD5 := getFlagBool(cmd, "md5")
 		if usingMD5 && region == "" {
-			checkError(fmt.Errorf("flag -m (--md5) can only used when giving -r (--region)"))
+			checkError(fmt.Errorf("flag -m (--md5) must be used with flag -r (--region)"))
 		}
 		dryRun := getFlagBool(cmd, "dry-run")
 

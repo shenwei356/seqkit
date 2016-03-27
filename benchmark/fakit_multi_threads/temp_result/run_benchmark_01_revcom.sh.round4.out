@@ -2,44 +2,44 @@ Test: Revcom
 == 1
 data: dataset_A.fa
 
-real	0m7.233s
-user	0m7.041s
-sys	0m0.201s
+real	0m7.202s
+user	0m6.985s
+sys	0m0.223s
 data: dataset_B.fa
 
-real	0m6.245s
-user	0m5.648s
-sys	0m0.604s
+real	0m6.212s
+user	0m5.643s
+sys	0m0.579s
 == 2
 data: dataset_A.fa
 
-real	0m5.103s
-user	0m8.198s
-sys	0m0.350s
+real	0m5.071s
+user	0m7.955s
+sys	0m0.356s
 data: dataset_B.fa
 
-real	0m6.015s
-user	0m6.213s
-sys	0m0.654s
+real	0m6.159s
+user	0m6.204s
+sys	0m0.662s
 == 3
 data: dataset_A.fa
 
-real	0m4.820s
-user	0m8.270s
-sys	0m0.353s
+real	0m4.809s
+user	0m8.145s
+sys	0m0.341s
 data: dataset_B.fa
 
-real	0m5.947s
-user	0m6.485s
-sys	0m0.662s
+real	0m6.045s
+user	0m6.517s
+sys	0m0.703s
 == 4
 data: dataset_A.fa
 
-real	0m4.733s
-user	0m8.500s
-sys	0m0.385s
+real	0m4.782s
+user	0m8.448s
+sys	0m0.387s
 data: dataset_B.fa
 
-real	0m6.109s
-user	0m7.237s
-sys	0m0.651s
+real	0m5.983s
+user	0m6.744s
+sys	0m0.721s

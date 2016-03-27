@@ -1,28 +1,28 @@
-Test: Dup_s
+Test: Rmdup
 == fakit
 data: dataset_A_dup.fasta
 [INFO][0m 30911 duplicated records removed
 
-real	0m3.346s
-user	0m6.223s
-sys	0m0.351s
+real	0m2.468s
+user	0m4.436s
+sys	0m0.424s
 data: dataset_B_dup.fasta
 [INFO][0m 2 duplicated records removed
 
-real	0m3.670s
-user	0m3.393s
-sys	0m0.713s
+real	0m3.097s
+user	0m2.707s
+sys	0m0.746s
 == seqmagick
 data: dataset_A_dup.fasta
 
-real	0m14.407s
-user	0m13.790s
-sys	0m0.614s
+real	0m15.586s
+user	0m14.926s
+sys	0m0.647s
 data: dataset_B_dup.fasta
 
-real	0m13.135s
-user	0m11.777s
-sys	0m1.091s
+real	0m13.755s
+user	0m12.428s
+sys	0m1.106s
 Result summary
 file                                      seq_type    num_seqs       min_len       avg_len       max_len
 dataset_A_dup.fasta.rmdup.fakit.fa             DNA     161,864           900       1,418.9         3,725

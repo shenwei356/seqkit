@@ -50,7 +50,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		alphabet := getAlphabet(cmd, "seq-type")
-		idRegexp := getFlagString(cmd, "id-regexp")
+		idRegexp := getIDRegexp(cmd, "id-regexp")
 		chunkSize := getFlagPositiveInt(cmd, "chunk-size")
 		threads := getFlagPositiveInt(cmd, "threads")
 		outFile := getFlagString(cmd, "out-file")
@@ -137,12 +137,12 @@ For example: "\w" will be wrongly converted to "\[AT]".
 						for _, locationInfo := range chunk.Data {
 							var s []byte
 							for _, loc := range locationInfo.Locations {
-								if locationInfo.Strand == 1 {
+								if locationInfo.Strand == "+" {
 									s = locationInfo.Record.Seq.Seq[loc[0]:loc[1]]
 								} else {
 									s = locationInfo.Record.Seq.SubSeq(loc[0]+1, loc[1]).RevCom().Seq
 								}
-								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\n",
+								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 									locationInfo.Record.ID,
 									locationInfo.PatternName,
 									patterns[locationInfo.PatternName],
@@ -159,12 +159,12 @@ For example: "\w" will be wrongly converted to "\[AT]".
 								for _, locationInfo := range chunk.Data {
 									var s []byte
 									for _, loc := range locationInfo.Locations {
-										if locationInfo.Strand == 1 {
+										if locationInfo.Strand == "+" {
 											s = locationInfo.Record.Seq.Seq[loc[0]:loc[1]]
 										} else {
 											s = locationInfo.Record.Seq.SubSeq(loc[0]+1, loc[1]).RevCom().Seq
 										}
-										outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\n",
+										outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 											locationInfo.Record.ID,
 											locationInfo.PatternName,
 											patterns[locationInfo.PatternName],
@@ -191,12 +191,12 @@ For example: "\w" will be wrongly converted to "\[AT]".
 						for _, locationInfo := range chunk.Data {
 							var s []byte
 							for _, loc := range locationInfo.Locations {
-								if locationInfo.Strand == 1 {
+								if locationInfo.Strand == "+" {
 									s = locationInfo.Record.Seq.Seq[loc[0]:loc[1]]
 								} else {
 									s = locationInfo.Record.Seq.SubSeq(loc[0]+1, loc[1]).RevCom().Seq
 								}
-								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\n",
+								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 									locationInfo.Record.ID,
 									locationInfo.PatternName,
 									patterns[locationInfo.PatternName],
@@ -234,7 +234,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 						for pName, re := range regexps {
 							found := re.FindAllSubmatchIndex(record.Seq.Seq, -1)
 							if len(found) > 0 {
-								locations = append(locations, LocationInfo{record, pName, 1, found})
+								locations = append(locations, LocationInfo{record, pName, "+", found})
 							}
 
 							if onlyPositiveStrand {
@@ -248,7 +248,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 								for i, loc := range found {
 									tlocs[i] = []int{l - loc[1], l - loc[0]}
 								}
-								locations = append(locations, LocationInfo{record, pName, -1, tlocs})
+								locations = append(locations, LocationInfo{record, pName, "-", tlocs})
 							}
 						}
 					}
@@ -272,7 +272,7 @@ type LocationChunk struct {
 type LocationInfo struct {
 	Record      *fasta.FastaRecord
 	PatternName string
-	Strand      int
+	Strand      string
 	Locations   [][]int
 }
 

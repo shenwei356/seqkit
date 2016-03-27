@@ -46,7 +46,7 @@ var commonCmd = &cobra.Command{
 		}
 
 		alphabet := getAlphabet(cmd, "seq-type")
-		idRegexp := getFlagString(cmd, "id-regexp")
+		idRegexp := getIDRegexp(cmd, "id-regexp")
 		chunkSize := getFlagPositiveInt(cmd, "chunk-size")
 		threads := getFlagPositiveInt(cmd, "threads")
 		lineWidth := getFlagNonNegativeInt(cmd, "line-width")
@@ -59,6 +59,14 @@ var commonCmd = &cobra.Command{
 		bySeq := getFlagBool(cmd, "by-seq")
 		byName := getFlagBool(cmd, "by-name")
 		ignoreCase := getFlagBool(cmd, "ignore-case")
+		usingMD5 := getFlagBool(cmd, "md5")
+
+		if bySeq && byName {
+			checkError(fmt.Errorf("only one/none of the flags -s (--by-seq) and -n (--by-name) is allowed"))
+		}
+		if usingMD5 && !bySeq {
+			checkError(fmt.Errorf("flag -m (--md5) must be used with flag -s (--by-seq)"))
+		}
 
 		files := getFileList(args)
 
@@ -83,9 +91,17 @@ var commonCmd = &cobra.Command{
 				for _, record := range chunk.Data {
 					if bySeq {
 						if ignoreCase {
-							subject = MD5(bytes.ToLower(record.Seq.Seq))
+							if usingMD5 {
+								subject = MD5(bytes.ToLower(record.Seq.Seq))
+							} else {
+								subject = string(bytes.ToLower(record.Seq.Seq))
+							}
 						} else {
-							subject = MD5(record.Seq.Seq)
+							if usingMD5 {
+								subject = MD5(record.Seq.Seq)
+							} else {
+								subject = string(record.Seq.Seq)
+							}
 						}
 					} else if byName {
 						if ignoreCase {
@@ -156,5 +172,6 @@ func init() {
 
 	commonCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
 	commonCmd.Flags().BoolP("by-seq", "s", false, "match by sequence")
+	commonCmd.Flags().BoolP("md5", "m", false, "use MD5 instead of original seqs to reduce memory usage when comparing by seqs")
 	commonCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 }

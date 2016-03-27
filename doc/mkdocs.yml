@@ -3,8 +3,8 @@ pages:
 - Home: index.md
 - Download: download.md
 - Usage: usage.md
+- Tutorial: tutorial.md
 - Benchmark: benchmark.md
-- Extension: extension.md
 theme: mkdocs
 
 repo_url: https://github.com/shenwei356/fakit

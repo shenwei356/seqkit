@@ -24,6 +24,8 @@ import (
 	"bytes"
 	"fmt"
 	"runtime"
+	"sort"
+	"strings"
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seq"
@@ -40,7 +42,7 @@ var rmdupCmd = &cobra.Command{
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		alphabet := getAlphabet(cmd, "seq-type")
-		idRegexp := getFlagString(cmd, "id-regexp")
+		idRegexp := getIDRegexp(cmd, "id-regexp")
 		chunkSize := getFlagPositiveInt(cmd, "chunk-size")
 		threads := getFlagPositiveInt(cmd, "threads")
 		lineWidth := getFlagNonNegativeInt(cmd, "line-width")
@@ -53,6 +55,16 @@ var rmdupCmd = &cobra.Command{
 		bySeq := getFlagBool(cmd, "by-seq")
 		byName := getFlagBool(cmd, "by-name")
 		ignoreCase := getFlagBool(cmd, "ignore-case")
+		dupFile := getFlagString(cmd, "dup-seqs-file")
+		numFile := getFlagString(cmd, "dup-num-file")
+		usingMD5 := getFlagBool(cmd, "md5")
+
+		if bySeq && byName {
+			checkError(fmt.Errorf("only one/none of the flags -s (--by-seq) and -n (--by-name) is allowed"))
+		}
+		if usingMD5 && !bySeq {
+			checkError(fmt.Errorf("flag -m (--md5) must be used with flag -s (--by-seq)"))
+		}
 
 		files := getFileList(args)
 
@@ -60,7 +72,16 @@ var rmdupCmd = &cobra.Command{
 		checkError(err)
 		defer outfh.Close()
 
-		readed := make(map[string]bool)
+		var outfhDup *xopen.Writer
+		if len(dupFile) > 0 {
+			outfhDup, err = xopen.Wopen(dupFile)
+			checkError(err)
+			defer outfhDup.Close()
+		}
+
+		counter := make(map[string]int)
+		names := make(map[string][]string)
+
 		var subject string
 		removed := 0
 		for _, file := range files {
@@ -72,9 +93,17 @@ var rmdupCmd = &cobra.Command{
 				for _, record := range chunk.Data {
 					if bySeq {
 						if ignoreCase {
-							subject = MD5(bytes.ToLower(record.Seq.Seq))
+							if usingMD5 {
+								subject = MD5(bytes.ToLower(record.Seq.Seq))
+							} else {
+								subject = string(bytes.ToLower(record.Seq.Seq))
+							}
 						} else {
-							subject = MD5(record.Seq.Seq)
+							if usingMD5 {
+								subject = MD5(record.Seq.Seq)
+							} else {
+								subject = string(record.Seq.Seq)
+							}
 						}
 					} else if byName {
 						subject = string(record.Name)
@@ -82,15 +111,44 @@ var rmdupCmd = &cobra.Command{
 						subject = string(record.ID)
 					}
 
-					if _, ok := readed[subject]; ok { // duplicated
+					if _, ok := counter[subject]; ok { // duplicated
+						counter[subject]++
 						removed++
+						if len(dupFile) > 0 {
+							outfhDup.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
+						}
+						if len(numFile) > 0 {
+							names[subject] = append(names[subject], string(record.ID))
+						}
 					} else { // new one
 						outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
-						readed[subject] = true
+						counter[subject]++
+
+						if len(numFile) > 0 {
+							names[subject] = []string{}
+							names[subject] = append(names[subject], string(record.ID))
+						}
 					}
 				}
 			}
 		}
+		if removed > 0 && len(numFile) > 0 {
+			outfhNum, err := xopen.Wopen(numFile)
+			checkError(err)
+			defer outfhNum.Close()
+
+			list := new(listOfStringSlice)
+			for _, l := range names {
+				if len(l) > 1 {
+					list.data = append(list.data, l)
+				}
+			}
+			sort.Sort(list)
+			for _, l := range list.data {
+				outfhNum.WriteString(fmt.Sprintf("%d\t%s\n", len(l), strings.Join(l, ", ")))
+			}
+		}
+
 		if !quiet {
 			log.Info("%d duplicated records removed", removed)
 		}
@@ -102,5 +160,16 @@ func init() {
 
 	rmdupCmd.Flags().BoolP("by-name", "n", false, "by full name instead of just id")
 	rmdupCmd.Flags().BoolP("by-seq", "s", false, "by seq")
+	rmdupCmd.Flags().BoolP("md5", "m", false, "use MD5 instead of original seqs to reduce memory usage when comparing by seqs")
 	rmdupCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
+	rmdupCmd.Flags().StringP("dup-seqs-file", "d", "", "file to save duplicated seqs")
+	rmdupCmd.Flags().StringP("dup-num-file", "D", "", "file to save number and list of duplicated seqs")
 }
+
+type listOfStringSlice struct {
+	data [][]string
+}
+
+func (l listOfStringSlice) Len() int           { return len(l.data) }
+func (l listOfStringSlice) Less(i, j int) bool { return len(l.data[i]) > len(l.data[j]) }
+func (l listOfStringSlice) Swap(i, j int)      { l.data[i], l.data[j] = l.data[j], l.data[i] }

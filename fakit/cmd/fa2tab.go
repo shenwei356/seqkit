@@ -40,7 +40,7 @@ like sequence length, GC content/GC skew.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		alphabet := getAlphabet(cmd, "seq-type")
-		idRegexp := getFlagString(cmd, "id-regexp")
+		idRegexp := getIDRegexp(cmd, "id-regexp")
 		chunkSize := getFlagPositiveInt(cmd, "chunk-size")
 		threads := getFlagPositiveInt(cmd, "threads")
 		outFile := getFlagString(cmd, "out-file")

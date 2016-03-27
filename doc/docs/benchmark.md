@@ -4,7 +4,7 @@
 ## Softwares
 
 1. [fakit](https://github.com/shenwei356/fakit). (Go).
-   Version [v0.1.4.1](https://github.com/shenwei356/fakit/releases/tag/v0.1.4.1).
+   Version [v0.1.4.2](https://github.com/shenwei356/fakit/releases/tag/v0.1.4.2).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    Lots of dependencies to install_.
@@ -135,7 +135,7 @@ Scripts are available at:  [https://github.com/shenwei356/fakit/tree/master/benc
 ### Commands
 
 `revcom_biogo` ([source](https://github.com/shenwei356/fakit/blob/master/benchmark/revcom_biogo.go),
- [binary](https://github.com/shenwei356/fakit/raw/master/benchmark/revcom_biogo) ), 
+ [binary](https://github.com/shenwei356/fakit/raw/master/benchmark/revcom_biogo) ),
  a tool written in Golang using [biogo](https://github.com/biogo/biogo) package,
  is also used for comparison of FASTA file parsing performance.
 
@@ -288,4 +288,3 @@ Fakit used all CPUs (4 for my computer) by default.
 ### Speedup with multi-threads
 
 ![benchmark_colorful.png](benchmark/fakit_multi_threads/benchmark_colorful.png)
-

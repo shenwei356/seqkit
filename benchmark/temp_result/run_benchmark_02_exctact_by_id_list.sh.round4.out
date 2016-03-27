@@ -2,57 +2,59 @@ Test: Search
 == fakit
 data: dataset_A.fa
 
-real	0m3.750s
-user	0m5.940s
-sys	0m0.301s
+real	0m3.941s
+user	0m5.994s
+sys	0m0.271s
 data: dataset_B.fa
 
-real	0m2.000s
-user	0m1.808s
-sys	0m0.495s
+real	0m2.132s
+user	0m1.883s
+sys	0m0.534s
 == fasta_utilities
 data: dataset_A.fa
 number in list 140261
-[Sat Mar 26 21:14:29 2016] dataset_A.fa:  29%
-[Sat Mar 26 21:14:29 2016] dataset_A.fa:  43%
+[Sun Mar 27 15:35:47 2016] dataset_A.fa:  13%
+[Sun Mar 27 15:35:48 2016] dataset_A.fa:  27%
+[Sun Mar 27 15:35:48 2016] dataset_A.fa:  41%
+[Sun Mar 27 15:35:49 2016] dataset_A.fa:  54%
 Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 100001.
-: 100000 79900[Sat Mar 26 21:14:30 2016] dataset_A.fa:  58%
-[Sat Mar 26 21:14:31 2016] dataset_A.fa:  72%
-[Sat Mar 26 21:14:31 2016] dataset_A.fa:  87%
+: 100000 79900[Sun Mar 27 15:35:49 2016] dataset_A.fa:  67%
+[Sun Mar 27 15:35:50 2016] dataset_A.fa:  80%
+[Sun Mar 27 15:35:50 2016] dataset_A.fa:  93%
 
-real	0m4.212s
-user	0m3.884s
-sys	0m0.328s
+real	0m4.603s
+user	0m4.258s
+sys	0m0.341s
 data: dataset_B.fa
 number in list 4
-[Sat Mar 26 21:14:33 2016] dataset_B.fa:  56%
-[Sat Mar 26 21:14:34 2016] dataset_B.fa: 100%
+[Sun Mar 27 15:35:52 2016] dataset_B.fa:  56%
+[Sun Mar 27 15:35:52 2016] dataset_B.fa: 100%
 
-real	0m1.996s
-user	0m1.388s
-sys	0m0.608s
+real	0m1.988s
+user	0m1.425s
+sys	0m0.561s
 == seqmagick
 data: dataset_A.fa
 
-real	0m9.314s
-user	0m8.901s
-sys	0m0.413s
+real	0m11.156s
+user	0m10.067s
+sys	0m0.537s
 data: dataset_B.fa
 
-real	0m7.912s
-user	0m7.164s
-sys	0m0.649s
+real	0m8.073s
+user	0m7.382s
+sys	0m0.682s
 == seqtk
 data: dataset_A.fa
 
-real	0m2.602s
-user	0m2.317s
-sys	0m0.282s
+real	0m2.704s
+user	0m2.406s
+sys	0m0.298s
 data: dataset_B.fa
 
-real	0m2.787s
-user	0m2.490s
-sys	0m0.297s
+real	0m2.994s
+user	0m2.659s
+sys	0m0.334s
 Result summary
 file                     seq_type    num_seqs       min_len         avg_len       max_len
 ids_A.txt.fakit.fa            DNA     140,261           900         1,419.2         3,725

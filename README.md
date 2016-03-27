@@ -6,16 +6,16 @@ Source code: [https://github.com/shenwei356/fakit](https://github.com/shenwei356
 
 ## Introduction
 
-FASTA is a basic format for storing nucleotide and protein sequences. 
+FASTA is a basic format for storing nucleotide and protein sequences.
 The manipulation of FASTA file includes converting, clipping, searching, filtering,
-deduplication, splitting, shuffling, sampling and so on. 
+deduplication, splitting, shuffling, sampling and so on.
 Existed tools only implemented parts of the functions,
-and some of them are only available for specific operating systems. 
+and some of them are only available for specific operating systems.
 Furthermore, the complicated installation process of dependencies packages and
 running environment also make them less friendly to common users.
 
-Fakit is cross-platform, efficient, and practical FASTA manipulations tool 
-that is friendly for researchers to complete wide ranges of FASTA file processing. 
+Fakit is cross-platform, efficient, and practical FASTA manipulations tool
+that is friendly for researchers to complete wide ranges of FASTA file processing.
 The suite supports plain or gzip-compressed input and output
 from either standard stream or files, therefore, it could be easily used in pipelines.
 
@@ -98,23 +98,27 @@ Ordering
 Global Flags
 
 ```
-    --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which fakit guess the sequence type (default 10000)
--c, --chunk-size int                  chunk size (attention: unit is FASTA records not lines) (default 1000)
-    --id-regexp string                regular expression for parsing ID (default "^([^\\s]+)\\s?")
--w, --line-width int                  line width (0 for no wrap) (default 60)
--o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
-    --quiet                           be quiet and do not show extra information
--t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
--j, --threads int                     number of CPUs. (default value depends on your device) (default 4)
+      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which fakit guesses the sequence type (default 10000)
+  -c, --chunk-size int                  chunk size (attention: unit is FASTA records not lines) (default 1000)
+      --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
+      --id-regexp string                regular expression for parsing ID (default "^([^\\s]+)\\s?")
+  -w, --line-width int                  line width (0 for no wrap) (default 60)
+  -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
+      --quiet                           be quiet and do not show extra information
+  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
+  -j, --threads int                     number of CPUs. (default value depends on your device) (default 4)
+
 ```
 
 ## Usage && Examples
 
-[http://shenwei356.github.io/fakit/usage/](http://shenwei356.github.io/fakit/usage/)
+[Usage and examples](http://shenwei356.github.io/fakit/usage/)
+
+[Tutorial](http://shenwei356.github.io/fakit/tutorial/)
 
 ## Benchmark
 
-Details: [http://shenwei356.github.io/fakit/benchmark/](http://blog.shenwei.me/fakit/benchmark/)
+Details: [http://shenwei356.github.io/fakit/benchmark/](http://shenwei356.github.io/fakit/benchmark/)
 
 ### Performance comparison with other tools
 

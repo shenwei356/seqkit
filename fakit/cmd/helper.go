@@ -116,6 +116,19 @@ func getFlagStringSlice(cmd *cobra.Command, flag string) []string {
 	return value
 }
 
+func getIDRegexp(cmd *cobra.Command, flag string) string {
+	var idRegexp string
+	f := getFlagBool(cmd, "id-ncbi")
+	if f {
+		// e.g. >gi|110645304|ref|NC_002516.2| Pseudomonas aeruginosa PAO1 chromosome, complete genome
+		// NC_002516.2 is ID
+		idRegexp = `\|([^\|]+)\| `
+	} else {
+		idRegexp = getFlagString(cmd, "id-regexp")
+	}
+	return idRegexp
+}
+
 func getAlphabet(cmd *cobra.Command, flag string) *seq.Alphabet {
 	value, err := cmd.Flags().GetString(flag)
 	checkError(err)
@@ -163,8 +176,15 @@ func MD5(s []byte) string {
 }
 
 func filepathTrimExtension(file string) (string, string) {
+	gz := strings.HasSuffix(file, ".gz") || strings.HasSuffix(file, ".GZ")
+	if gz {
+		file = file[0 : len(file)-3]
+	}
 	extension := filepath.Ext(file)
 	name := file[0 : len(file)-len(extension)]
+	if gz {
+		extension += ".gz"
+	}
 	return name, extension
 }
 

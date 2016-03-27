@@ -6,9 +6,12 @@
 
 ## Current Version
 
-- [fakit v0.1.4.1](https://github.com/shenwei356/fakit/releases/tag/v0.1.4.1)
-    - change alignment of `stat` output
-    - preciser CPUs number control
+- [fakit v0.1.5](https://github.com/shenwei356/fakit/releases/tag/v0.1.5)
+    - add global flag `--id-ncbi`
+    - add flag `-d` (`--dup-seqs-file`) and `-D` (`--dup-num-file`) for subcommand `rmdup`
+    - make using MD5 as an optional flag `-m` (`--md5`) in subcommand `rmdup` and `common`
+    - fix file name suffix of `fakit split` result
+    - minor modification of `sliding` output
 
 ## Installation
 
@@ -32,6 +35,9 @@ You can also add the directory of the executable file to environment variable
 
 ## Previous Versions
 
+- [fakit v0.1.4.1](https://github.com/shenwei356/fakit/releases/tag/v0.1.4.1)
+    - change alignment of `stat` output
+    - preciser CPUs number control
 - [fakit v0.1.4](https://github.com/shenwei356/fakit/releases/tag/v0.1.4)
     - add subcommand `sort`
     - improve subcommand `subseq`: supporting of getting subsequences by GTF and BED files
