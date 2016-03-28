@@ -14,7 +14,7 @@ df <- filter(df, app != "biogo")
 
 p <-
   ggplot(df, aes(x = app, y = time_mean, 
-                 ymax=time_mean+time_stdev, ymin=time_mean+time_stdev,
+                 ymax=time_mean+time_stdev, ymin=time_mean,
                  group = dataset, fill = dataset, label=time_mean)) +
   geom_bar(stat = "identity", position = position_dodge(0.7), width = 0.7,  color = "black") +
   geom_errorbar(width = 0.3, position = position_dodge(0.7), size = 0.4) +
