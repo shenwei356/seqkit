@@ -1,4 +1,4 @@
-# fakit - Swiss army knife of FASTA format
+# fakit - a cross-platform and efficient suit for FASTA file manipulation
 
 Documents  : [http://shenwei356.github.io/fakit](http://shenwei356.github.io/fakit)
 
@@ -26,13 +26,13 @@ from either standard stream or files, therefore, it could be easily used in pipe
 - **Light weight and out-of-the-box, no dependencies, no compilation, no configuration**
   (see [download](http://shenwei356.github.io/fakit/download/))
 - **Fast** (see [benchmark](/#performance-comparison-with-other-tools)),
-  **multiple-threads supported** (see [benchmark](/#speedup-with-multi-threads)).
+  **multiple-CPUs supported** (see [benchmark](/#speedup-with-multi-threads)).
 - **Practical functions supported by 14 subcommands** (see subcommands and
   [usage](http://shenwei356.github.io/fakit/usage/) )
 - **Well documented** (detailed [usage](http://shenwei356.github.io/fakit/usage/)
   and [benchmark](http://shenwei356.github.io/fakit/benchmark/) )
 - **Support STDIN and gziped input/output file, easy being used in pipe**
-- Support custom sequence ID regular expression (especially useful for quering with ID list)
+- **Support custom sequence ID regular expression** (especially useful for quering with ID list)
 - Reproducible results (configurable rand seed in `sample` and `shuffle`)
 - Well organized source code, friendly to use and easy to extend.
 
@@ -65,37 +65,37 @@ Rename head      | --       | Yes             | --            | --      | Yes   
 
 ## Subcommands
 
-Sequence and subsequence
+**Sequence and subsequence**
 
 - `seq`        transform sequences (revserse, complement, extract ID...)
 - `subseq`     get subsequences by region/gtf/bed, including flanking sequences
 - `sliding`    sliding sequences, circle genome supported
 - `stat`       simple statistics of FASTA files
 
-Format conversion
+**Format conversion**
 
 - `fa2tab`     covert FASTA to tabular format (and length/GC content/GC skew) to filter and sort
 - `tab2fa`     covert tabular format to FASTA format
 
-Searching
+**Searching**
 
 - `grep`       search sequences by pattern(s) of name or sequence motifs
 - `locate`     locate subsequences/motifs
 
-Set operations
+**Set operations**
 
 - `rmdup`      remove duplicated sequences by id/name/sequence
 - `common`     find common sequences of multiple files by id/name/sequence
 - `split`      split sequences into files by id/seq region/size/parts
 - `sample`     sample sequences by number or proportion
 
-Ordering
+**Ordering**
 
 - `shuffle`    shuffle sequences
 - `sort`       sort sequences by id/name/sequence
 
 
-Global Flags
+**Global Flags**
 
 ```
       --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which fakit guesses the sequence type (default 10000)
@@ -126,7 +126,7 @@ All tests were repeated 4 times
 
 ![benchmark_colorful.png](benchmark/benchmark_colorful.png)
 
-### Speedup with multi-threads
+### Acceleration with multi-CPUs
 
 ![benchmark_colorful.png](benchmark/fakit_multi_threads/benchmark_colorful.png)
 
