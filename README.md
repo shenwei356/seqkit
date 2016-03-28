@@ -36,7 +36,7 @@ from either standard stream or files, therefore, it could be easily used in pipe
 - Reproducible results (configurable rand seed in `sample` and `shuffle`)
 - Well organized source code, friendly to use and easy to extend.
 
-Features comparison
+**Features comparison**
 
 Features         | fakit    | fasta_utilities | fastx_toolkit | pyfaidx | seqmagick | seqtk
 :--------------- | :------: | :-------------: | :-----------: | :-----: | :-------: | :----
@@ -63,6 +63,19 @@ Translate        | --       | Yes             | Yes           | Yes     | Yes   
 Size select      | Indirect | Yes             | --            | Yes     | Yes       | --
 Rename head      | --       | Yes             | --            | --      | Yes       | Yes
 
+# Download
+
+`fakit` is implemented in [Golang](https://golang.org/) programming language,
+ executable binary files **for most popular operating system** are freely available
+  in [release](https://github.com/shenwei356/fakit/releases) page.
+  
+Just [download](https://github.com/shenwei356/fakit/releases) executable file
+ of your operating system and rename it to `fakit.exe` (Windows) or
+ `fakit` (other operating systems) for convenience,
+ and then run it in command-line interface, no dependencies,
+ no complicated compilation process.
+
+  
 ## Subcommands
 
 **Sequence and subsequence**

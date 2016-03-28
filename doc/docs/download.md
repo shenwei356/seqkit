@@ -19,7 +19,7 @@ Just [download](https://github.com/shenwei356/fakit/releases) executable file
  of your operating system and rename it to `fakit.exe` (Windows) or
  `fakit` (other operating systems) for convenience,
  and then run it in command-line interface, no dependencies,
- without complicated compilation process.
+ no complicated compilation process.
 
 You can also add the directory of the executable file to environment variable
 `PATH`, so you can run `fakit` anywhere.
