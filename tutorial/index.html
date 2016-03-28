@@ -135,6 +135,8 @@
     
         <li class="main active"><a href="#tutorial">Tutorial</a></li>
         
+            <li><a href="#handling-of-aligned-sequences">Handling of aligned sequences</a></li>
+        
             <li><a href="#play-with-mirna-hairpins">Play with miRNA hairpins</a></li>
         
             <li><a href="#bacteria-genome">Bacteria genome</a></li>
@@ -145,14 +147,66 @@
                 <div class="col-md-9" role="main">
 
 <h1 id="tutorial">Tutorial</h1>
-<h3 id="play-with-mirna-hairpins">Play with miRNA hairpins</h3>
-<h4 id="dataset">Dataset</h4>
-<p><a href="ftp://mirbase.org/pub/mirbase/21/hairpin.fa.gz"><code>hairpin.fa.gz</code></a>
-from <a href="ftp://mirbase.org/pub/mirbase/21/">The miRBase Sequence Database -- Release 21</a></p>
-<h4 id="quick-glance">Quick glance</h4>
+<h2 id="handling-of-aligned-sequences">Handling of aligned sequences</h2>
 <ol>
 <li>
-<p>Amount</p>
+<p>Some mock sequences (usually they will be much longer)</p>
+<pre><code>$ cat seqs.fa
+&gt;seq1
+ACAACGTCTACTTACGTTGCATCGTCATGCTGCATTACGTAGTCTGATGATG
+&gt;seq2
+ACACCGTCTACTTTCATGCTGCATTACGTAGTCTGATGATG
+&gt;seq3
+ACAACGTCTACTTACGTTGCATCGTCATGCTGCACTGATGATG
+&gt;seq4
+ACAACGTCTACTTACGTTGCATCTTCGGTCATGCTGCATTACGTAGTCTGATGATG
+</code></pre>
+</li>
+<li>
+<p>Run multiple sequence alignment (clustalo)</p>
+<pre><code>clustalo -i seqs.fa -o seqs.msa.fa --force --outfmt fasta --threads=4
+</code></pre>
+</li>
+<li>
+<p>Convert FASTA format to tabular format.    </p>
+<pre><code>$ fakit fa2tab seqs.msa.fa
+seq1    ACAACGTCTACTTACGTTGCAT----CGTCATGCTGCATTACGTAGTCTGATGATG
+seq2    ---------------ACACCGTCTACTTTCATGCTGCATTACGTAGTCTGATGATG
+seq3    ACAACGTCTACTTACGTTGCATCGTCATGCTGCACTGATGATG-------------
+seq4    ACAACGTCTACTTACGTTGCATCTTCGGTCATGCTGCATTACGTAGTCTGATGATG
+</code></pre>
+<p>or</p>
+<pre><code>$ fakit fa2tab seqs.msa.fa | cut -f 2
+ACAACGTCTACTTACGTTGCAT----CGTCATGCTGCATTACGTAGTCTGATGATG
+---------------ACACCGTCTACTTTCATGCTGCATTACGTAGTCTGATGATG
+ACAACGTCTACTTACGTTGCATCGTCATGCTGCACTGATGATG-------------
+ACAACGTCTACTTACGTTGCATCTTCGGTCATGCTGCATTACGTAGTCTGATGATG
+</code></pre>
+<p>For me, it's useful when 1) manually assembling Sanger sequencing result,
+2) designing site specific PCR primers.</p>
+</li>
+<li>
+<p>Remove gaps</p>
+<pre><code>$ fakit seq seqs.msa.fa -g
+&gt;seq1
+ACAACGTCTACTTACGTTGCATCGTCATGCTGCATTACGTAGTCTGATGATG
+&gt;seq2
+ACACCGTCTACTTTCATGCTGCATTACGTAGTCTGATGATG
+&gt;seq3
+ACAACGTCTACTTACGTTGCATCGTCATGCTGCACTGATGATG
+&gt;seq4
+ACAACGTCTACTTACGTTGCATCTTCGGTCATGCTGCATTACGTAGTCTGATGATG
+</code></pre>
+</li>
+</ol>
+<h2 id="play-with-mirna-hairpins">Play with miRNA hairpins</h2>
+<h3 id="dataset">Dataset</h3>
+<p><a href="ftp://mirbase.org/pub/mirbase/21/hairpin.fa.gz"><code>hairpin.fa.gz</code></a>
+from <a href="ftp://mirbase.org/pub/mirbase/21/">The miRBase Sequence Database -- Release 21</a></p>
+<h3 id="quick-glance">Quick glance</h3>
+<ol>
+<li>
+<p>Sequence number</p>
 <pre><code>$ fakit stat hairpin.fa.gz
 file             seq_type    num_seqs    min_len    avg_len    max_len
 hairpin.fa.gz         RNA      28,645         39        103      2,354
@@ -172,13 +226,16 @@ AAAAAAACAU
 AAAAAAACGA
 AAAAAAAUUA
 </code></pre>
-<p>hmm, nothing special.</p>
+<p>hmm, nothing special, non-coding RNA~</p>
 </li>
 </ol>
-<h4 id="repeated-hairpin-sequences">Repeated hairpin sequences.</h4>
-<p>The result shows the most conserved miRNAs among different species,
-mir-29b, mir-125, mir-19b-1 and mir-20a.
-And the dre-miR-430c has the most multicopies in <em>Danio rerio</em>.</p>
+<h3 id="repeated-hairpin-sequences">Repeated hairpin sequences</h3>
+<p>We may want to check how may identical hairpins among different species there are.
+<code>fakit rmdup</code> could remove duplicated sequences by sequence content,
+and save the replicates to another file (here is <code>duplicated.fa.gz</code>),
+as well as replicating details (<code>duplicated.detail.txt</code>,
+1th column is the repeated number,
+2nd column contains sequence IDs seperated by comma).</p>
 <pre><code>$ fakit rmdup -s -i hairpin.fa.gz -o clean.fa.gz -d duplicated.fa.gz -D duplicated.detail.txt
 
 $ head -n 5 duplicated.detail.txt
@@ -188,15 +245,59 @@ $ head -n 5 duplicated.detail.txt
 13      hsa-mir-19b-1, ggo-mir-19b-1, age-mir-19b-1, ppa-mir-19b-1, ppy-mir-19b-1, ptr-mir-19b-1, mml-mir-19b-1, sla-mir-19b-1, lla-mir-19b-1, mne-mir-19b-1, bta-mir-19b, oar-mir-19b, chi-mir-19b
 13      hsa-mir-20a, ssc-mir-20a, ggo-mir-20a, age-mir-20, ppa-mir-20, ppy-mir-20a, ptr-mir-20a, mml-mir-20a, sla-mir-20, lla-mir-20, mne-mir-20, bta-mir-20a, eca-mir-20a
 </code></pre>
-<h4 id="hairpins-in-different-species">Hairpins in different species</h4>
+<p>The result shows the most conserved miRNAs among different species,
+<code>mir-29b</code>, <code>mir-125</code>, <code>mir-19b-1</code> and <code>mir-20a</code>.
+And the <code>dre-miR-430c</code> has the most multicopies in <em>Danio rerio</em>.</p>
+<h3 id="hairpins-in-different-species">Hairpins in different species</h3>
 <ol>
 <li>
-<p>Split sequences by species</p>
+<p>Before spliting by species, let's take a look at the sequence names.</p>
+<pre><code>$ fakit seq hairpin.fa.gz -n | head -n 3
+cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+cel-lin-4 MI0000002 Caenorhabditis elegans lin-4 stem-loop
+cel-mir-1 MI0000003 Caenorhabditis elegans miR-1 stem-loop
+</code></pre>
+<p>The first three letters (e.g. <code>cel</code>) are the abbreviation of species names.
+So we could split hairpins by the first letters by defining custom
+sequence ID parsing regular expression <code>^([\w]+)\-</code>.</p>
+<p>In default, <code>fakit</code> takes the first non-space letters as sequence ID.
+For example,</p>
+<table>
+<thead>
+<tr>
+<th align="left">FASTA head</th>
+<th align="left">ID</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">&gt;123456 gene name</td>
+<td align="left">123456</td>
+</tr>
+<tr>
+<td align="left">&gt;longname</td>
+<td align="left">longname</td>
+</tr>
+<tr>
+<td align="left">&gt;gi&#124;110645304&#124;ref&#124;NC_002516.2&#124; Pseudomona</td>
+<td align="left">gi&#124;110645304&#124;ref&#124;NC_002516.2&#124;</td>
+</tr>
+</tbody>
+</table>
+<p>But for some sequences from NCBI,
+e.g. <code>&gt;gi|110645304|ref|NC_002516.2| Pseudomona</code>, the ID is <code>NC_002516.2</code>.
+In this case, we could set sequence ID parsing regular expression by flag
+<code>--id-regexp "\|([^\|]+)\| "</code> or just use flag <code>--id-ncbi</code>. If you want
+the <code>gi</code> number, then use <code>--id-regexp "^gi\|([^\|]+)\|"</code>.</p>
+</li>
+<li>
+<p>Split sequences by species.
+A custom ID parsing regular expression is used, <code>^([\w]+)\-</code>.</p>
 <pre><code>$ fakit split hairpin.fa.gz -i --id-regexp "^([\w]+)\-"
 </code></pre>
 </li>
 <li>
-<p>Species with most miRNA hairpins</p>
+<p>Species with most miRNA hairpins. Third column is the sequences number.</p>
 <pre><code>$ fakit stat hairpin.id_*.gz | sort -k3,3nr
 hairpin.id_hsa.fa.gz           RNA       1,881         41       81.9        180
 hairpin.id_mmu.fa.gz           RNA       1,193         39       83.4        147
@@ -209,15 +310,17 @@ hairpin.id_eca.fa.gz           RNA         715         52      104.6        145
 <p>For human miRNA hairpins</p>
 <ol>
 <li>
-<p>Length distribution (
+<p>Length distribution.
+ <code>fakit fa2tab</code> could show extra information like sequence length, GC content.
+ A distribution ploting script is used, (
  <a href="https://github.com/shenwei356/bio_scripts/blob/master/plot/plot_distribution.py">plot_distribution.py</a> )</p>
-<pre><code>$ fakit fa2tab hairpin.id_hsa.fa.gz -n -i -l | cut -f 3  | plot_distribution.py -o hairpin.id_hsa.fa.gz.lendist.png
+<pre><code>$ fakit fa2tab hairpin.id_hsa.fa.gz -l | cut -f 3  | plot_distribution.py -o hairpin.id_hsa.fa.gz.lendist.png
 </code></pre>
 <p><img alt="hairpin.id_hsa.fa.gz.lendist.png" src="../files/hairpin/hairpin.id_hsa.fa.gz.lendist.png" /></p>
 </li>
 </ol>
-<h3 id="bacteria-genome">Bacteria genome</h3>
-<h4 id="dataset_1">Dataset</h4>
+<h2 id="bacteria-genome">Bacteria genome</h2>
+<h3 id="dataset_1">Dataset</h3>
 <p><a href="http://www.ncbi.nlm.nih.gov/nuccore/110645304">Pseudomonas aeruginosa PAO1</a>,
 files:</p>
 <ul>
@@ -227,7 +330,7 @@ files:</p>
 </code></pre>
 </li>
 </ul>
-<h4 id="motif-distribution">Motif distribution</h4>
+<h3 id="motif-distribution">Motif distribution</h3>
 <p>Motifs</p>
 <pre><code>$ cat motifs.fa
 &gt;GTAGCGS
@@ -237,7 +340,9 @@ GGWGKTCG
 </code></pre>
 <ol>
 <li>
-<p>sliding</p>
+<p>Sliding. Remember flag <code>--id-ncbi</code>, do you?
+  By the way, do not be scared by the long flag <code>--circle-genome</code>, <code>--step</code>
+  and so on. They have short ones, <code>-c</code>, <code>-s</code></p>
 <pre><code>$ fakit sliding --id-ncbi --circle-genome --step 20000 --window 200000 PAO1.fasta -o PAO1.fasta.sliding.fa
 
 $ fakit stat PAO1.fasta.sliding.fa
@@ -246,12 +351,12 @@ PAO1.fasta.sliding.fa         DNA         314    200,000    200,000    200,000
 </code></pre>
 </li>
 <li>
-<p>locating motifs</p>
-<pre><code>$ fakit locate --id-ncbi -i -d -f motifs.fa  PAO1.fasta.sliding.fa -o  PAO1.fasta.sliding.fa.motifs.tsv
+<p>Locating motifs</p>
+<pre><code>$ fakit locate --id-ncbi --ignore-case --degenerate --pattern-file motifs.fa  PAO1.fasta.sliding.fa -o  PAO1.fasta.sliding.fa.motifs.tsv
 </code></pre>
 </li>
 <li>
-<p>ploting distribution (<a href="../files/PAO1/plot_motif_distribution.R">plot_motif_distribution.R</a>)</p>
+<p>Ploting distribution (<a href="../files/PAO1/plot_motif_distribution.R">plot_motif_distribution.R</a>)</p>
 <pre><code># preproccess
 $ perl -ne 'if (/_sliding:(\d+)-(\d+)\t(.+)/) {$loc= $1 + 100000; print "$loc\t$3\n";} else {print}' PAO1.fasta.sliding.fa.motifs.tsv  &gt; PAO1.fasta.sliding.fa.motifs.tsv2
 
@@ -262,7 +367,7 @@ $ ./plot_motif_distribution.R
 <p><img alt="motif_distribution.png" src="../files/PAO1/motif_distribution.png" /></p>
 </li>
 </ol>
-<h4 id="find-multicopy-genes">Find multicopy genes</h4>
+<h3 id="find-multicopy-genes">Find multicopy genes</h3>
 <ol>
 <li>
 <p>Get all CDS sequences</p>
@@ -275,19 +380,27 @@ PAO1.fasta             DNA           1    6,264,404    6,264,404    6,264,404
 </code></pre>
 </li>
 <li>
-<p>Get 1000 bp upstream sequence of CDS</p>
-<pre><code>$ fakit subseq --id-ncbi --gtf PAO1.gtf --feature cds PAO1.fasta --up-stream 1000 --only-flank -o PAO1.cds.u1k.fasta
-</code></pre>
-</li>
-<li>
 <p>Get duplicated sequences</p>
-<pre><code>$ fakit rmdup -s -i PAO1.cds.fasta -o PAO1.cds.uniq.fasta -d PAO1.cds.dup.fasta -D PAO1.cds.dup.text
+<pre><code>$ fakit rmdup --by-seq --ignore-case PAO1.cds.fasta -o PAO1.cds.uniq.fasta --dup-seqs-file PAO1.cds.dup.fasta --dup-num-file PAO1.cds.dup.text
 
 $ cat PAO1.cds.dup.text
 6       NC_002516.2_500104:501120:-, NC_002516.2_2556948:2557964:+, NC_002516.2_3043750:3044766:-, NC_002516.2_3842274:3843290:-, NC_002516.2_4473623:4474639:+, NC_002516.2_5382796:5383812:-
 2       NC_002516.2_2073555:2075438:+, NC_002516.2_4716660:4718543:+
 2       NC_002516.2_2072935:2073558:+, NC_002516.2_4716040:4716663:+
 2       NC_002516.2_2075452:2076288:+, NC_002516.2_4718557:4719393:+
+</code></pre>
+</li>
+</ol>
+<h3 id="flanking-sequences">Flanking sequences</h3>
+<ol>
+<li>
+<p>Get CDS and 1000 bp upstream sequence</p>
+<pre><code>$ fakit subseq --id-ncbi --gtf PAO1.gtf --feature cds PAO1.fasta --up-stream 1000
+</code></pre>
+</li>
+<li>
+<p>Get 1000 bp upstream sequence of CDS, <em>NOT</em> including CDS.</p>
+<pre><code>$ fakit subseq --id-ncbi --gtf PAO1.gtf --feature cds PAO1.fasta --up-stream 1000 --only-flank
 </code></pre>
 </li>
 </ol></div>
