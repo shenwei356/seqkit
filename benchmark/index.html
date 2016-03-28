@@ -581,6 +581,7 @@ echo data: chr1.fa.gz; time seqtk subseq chr1.fa.gz chr1.bed.gz &gt; chr1.bed.gz
 <p>TODO: bedtools</p>
 <h2 id="result">Result</h2>
 <p>All tests were repeated 4 times.</p>
+<p>Result shows that the self-implemented FASTA parsing module has better performance than the <a href="https://github.com/biogo/biogo">Biogo</a>, a bioinformatics library for Go.</p>
 <h3 id="performance-comparison-with-other-tools">Performance comparison with other tools</h3>
 <p>Fakit used all CPUs (4 for my computer) by default.</p>
 <p><img alt="benchmark_colorful.png" src="../benchmark/benchmark_colorful.png" /></p>
