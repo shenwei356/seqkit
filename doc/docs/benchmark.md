@@ -281,6 +281,8 @@ TODO: bedtools
 
 All tests were repeated 4 times.
 
+Result shows that the self-implemented FASTA parsing module has better performance than the [Biogo](https://github.com/biogo/biogo), a bioinformatics library for Go.
+
 ### Performance comparison with other tools
 
 Fakit used all CPUs (4 for my computer) by default.

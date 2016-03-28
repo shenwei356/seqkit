@@ -135,7 +135,9 @@ Details: [http://shenwei356.github.io/fakit/benchmark/](http://shenwei356.github
 
 ### Performance comparison with other tools
 
-All tests were repeated 4 times
+All tests were repeated 4 times.
+
+Result shows that the self-implemented FASTA parsing module has better performance than the [Biogo](https://github.com/biogo/biogo), a bioinformatics library for Go.
 
 ![benchmark_colorful.png](benchmark/benchmark_colorful.png)
 
