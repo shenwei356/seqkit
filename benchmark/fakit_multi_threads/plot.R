@@ -23,10 +23,10 @@ df <- df  %>%
 p <-
   ggplot(df, aes(x = app, y = speedup,
                  group = dataset, fill = dataset, label=sprintf("%.1fX", speedup))) +
-  geom_bar(stat = "identity", position = "dodge", width = 0.7,  color = "black") +
-  geom_text(aes(y=speedup+0.2), position = position_dodge(0.7), size=3)+
+  geom_bar(stat = "identity", position = position_dodge(0.6), width = 0.6,  color = "black") +
+  geom_text(aes(y=speedup+0.2), position = position_dodge(0.6), size=3)+
   
-  scale_fill_manual(values = rev(stata_pal("s2color")(5)), labels = c("A", "B", "A_dup", "B_dup", "chr1")) +
+  scale_fill_manual(values = rev(stata_pal("s2color")(5)), labels = c("A", "B", "A_dup", "B_dup", "Chr1")) +
   
   scale_y_continuous(limits=c(0, max(df$speedup)*1.15))+
   facet_grid(test ~ .) +

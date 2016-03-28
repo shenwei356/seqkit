@@ -16,13 +16,13 @@ p <-
   ggplot(df, aes(x = app, y = time_mean, 
                  ymax=time_mean+time_stdev, ymin=time_mean+time_stdev,
                  group = dataset, fill = dataset, label=time_mean)) +
-  geom_bar(stat = "identity", position = "dodge", width = 0.7,  color = "black") +
-  geom_errorbar(width = 0.3, position = position_dodge(0.6), size = 0.2) +
+  geom_bar(stat = "identity", position = position_dodge(0.7), width = 0.7,  color = "black") +
+  geom_errorbar(width = 0.3, position = position_dodge(0.7), size = 0.4) +
   geom_text(aes(y=time_mean+4), position = position_dodge(1), size=3)+
   
   # geom_hline(yintercept = 0, linetype = 1, size = 1) +
   
-  scale_fill_manual(values = rev(stata_pal("s2color")(5)), labels = c("A", "B", "A_dup", "B_dup", "chr1")) +
+  scale_fill_manual(values = rev(stata_pal("s2color")(5)), labels = c("A", "B", "A_dup", "B_dup", "Chr1")) +
   
   scale_y_continuous(limits=c(0, max(df$time_mean)+5))+
   facet_grid(test ~ .) +
