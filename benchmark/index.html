@@ -166,7 +166,7 @@
 <h2 id="softwares">Softwares</h2>
 <ol>
 <li><a href="https://github.com/shenwei356/fakit">fakit</a>. (Go).
-   Version <a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.5">v0.1.5</a>.</li>
+   Version <a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.5.1">v0.1.5.1</a>.</li>
 <li><a href="https://github.com/jimhester/fasta_utilities">fasta_utilities</a>. (Perl).
    Version <a href="https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579">3dcc0bc</a>.
    Lots of dependencies to install_.</li>
@@ -526,18 +526,19 @@ for g in A B; do echo data: dataset_$g.fa; time seqtk subseq  dataset_$g.fa ids_
 <h3 id="commands_2">Commands</h3>
 <p>Sample by number</p>
 <pre><code>n=1000
+n2=4
 
 echo == fakit
-for f in dataset_{A,B}.fa; do echo data: $f; time fakit sample -n $n $f &gt; $f.sample.fakit.fa; done
-
-echo == fasta_utilities
-for f in dataset_{A,B}.fa; do echo data: $f; time subset_fasta.pl -size $n $f &gt; $f.sample.fautil.fa; done
+for f in dataset_{A}.fa; do echo data: $f; time fakit sample -n $n  $f &gt; $f.sample.fakit.fa; done
+for f in dataset_{B}.fa; do echo data: $f; time fakit sample -n $n2 $f &gt; $f.sample.fakit.fa; done
 
 echo == seqmagick
-for f in dataset_{A,B}.fa; do echo data: $f; time seqmagick convert --sample $n $f - &gt; $f.sample.seqmagick.fa; done
+for f in dataset_{A}.fa; do echo data: $f; time seqmagick convert --sample $n  $f - &gt; $f.sample.seqmagick.fa; done
+for f in dataset_{B}.fa; do echo data: $f; time seqmagick convert --sample $n2 $f - &gt; $f.sample.seqmagick.fa; done
 
 echo == seqtk
-for f in dataset_{A,B}.fa; do echo data: $f; time seqtk sample $f $n &gt; $f.sample.seqtk.fa; done
+for f in dataset_{A}.fa; do echo data: $f; time seqtk sample $f $n  &gt; $f.sample.seqtk.fa; done
+for f in dataset_{B}.fa; do echo data: $f; time seqtk sample $f $n2 &gt; $f.sample.seqtk.fa; done
 </code></pre>
 
 <h2 id="test-4-remove-duplicated-sequences">Test 4. Remove duplicated sequences</h2>
@@ -581,8 +582,12 @@ echo data: chr1.fa.gz; time seqtk subseq chr1.fa.gz chr1.bed.gz &gt; chr1.bed.gz
 <p>TODO: bedtools</p>
 <h2 id="result">Result</h2>
 <p>All tests were repeated 4 times.</p>
-<p>Result shows that the self-implemented FASTA parsing module has better performance than the <a href="https://github.com/biogo/biogo">Biogo</a>, a bioinformatics library for Go.</p>
 <h3 id="performance-comparison-with-other-tools">Performance comparison with other tools</h3>
+<p>Missing data indicates that the tool does not have the function.</p>
+<p>Result also shows that <strong>the self-implemented FASTA parsing module has better performance than
+the <a href="https://github.com/biogo/biogo">biogo</a></strong>, a bioinformatics library for Go.</p>
+<p>For the revese complementary sequence test, 
+the <code>fasta_utilities</code>, <code>seqmagick</code> and <code>seqtk</code> do not validate the bases/residues, which save some times.</p>
 <p>Fakit used all CPUs (4 for my computer) by default.</p>
 <p><img alt="benchmark_colorful.png" src="../benchmark/benchmark_colorful.png" /></p>
 <h3 id="speedup-with-multi-threads">Speedup with multi-threads</h3>

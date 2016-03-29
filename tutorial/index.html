@@ -168,7 +168,7 @@ ACAACGTCTACTTACGTTGCATCTTCGGTCATGCTGCATTACGTAGTCTGATGATG
 </code></pre>
 </li>
 <li>
-<p>Convert FASTA format to tabular format.    </p>
+<p>Convert FASTA format to tabular format.</p>
 <pre><code>$ fakit fa2tab seqs.msa.fa
 seq1    ACAACGTCTACTTACGTTGCAT----CGTCATGCTGCATTACGTAGTCTGATGATG
 seq2    ---------------ACACCGTCTACTTTCATGCTGCATTACGTAGTCTGATGATG
@@ -214,7 +214,7 @@ hairpin.fa.gz         RNA      28,645         39        103      2,354
 </li>
 <li>
 <p>First 10 bases</p>
-<pre><code>$ zcat hairpin.fa.gz | fakit subseq -r 1:10 | fakit sort -s  | fakit seq -t rna  -s | head -n 10
+<pre><code>$ zcat hairpin.fa.gz | fakit subseq -r 1:10 | fakit sort -s | fakit seq -t rna -s | head -n 10
 AAAAAAAAAA
 AAAAAAAAAA
 AAAAAAAAAG
