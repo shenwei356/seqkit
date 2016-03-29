@@ -5,58 +5,59 @@ data: dataset_B.fa
 == fakit
 data: dataset_A.fa
 
-real	0m4.029s
-user	0m6.110s
-sys	0m0.314s
+real	0m3.734s
+user	0m5.824s
+sys	0m0.299s
 data: dataset_B.fa
 
-real	0m2.029s
-user	0m1.852s
-sys	0m0.445s
+real	0m2.054s
+user	0m1.857s
+sys	0m0.480s
 == fasta_utilities
 data: dataset_A.fa
 number in list 140261
-[Tue Mar 29 13:01:51 2016] dataset_A.fa:  26%
-[Tue Mar 29 13:01:51 2016] dataset_A.fa:  40%
-[Tue Mar 29 13:01:52 2016] dataset_A.fa:  53%
+[Tue Mar 29 14:24:20 2016] dataset_A.fa:  14%
+[Tue Mar 29 14:24:21 2016] dataset_A.fa:  28%
+[Tue Mar 29 14:24:21 2016] dataset_A.fa:  43%
+[Tue Mar 29 14:24:22 2016] dataset_A.fa:  56%
 Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 100001.
-: 100000 79900[Tue Mar 29 13:01:52 2016] dataset_A.fa:  65%
-[Tue Mar 29 13:01:53 2016] dataset_A.fa:  78%
-[Tue Mar 29 13:01:54 2016] dataset_A.fa:  91%
+: 100000 79900[Tue Mar 29 14:24:22 2016] dataset_A.fa:  69%
+[Tue Mar 29 14:24:23 2016] dataset_A.fa:  82%
+[Tue Mar 29 14:24:23 2016] dataset_A.fa:  95%
 
-real	0m4.671s
-user	0m4.290s
-sys	0m0.378s
+real	0m4.521s
+user	0m4.169s
+sys	0m0.350s
 data: dataset_B.fa
 number in list 4
-[Tue Mar 29 13:01:55 2016] dataset_B.fa:  56%
-[Tue Mar 29 13:01:56 2016] dataset_B.fa: 100%
+[Tue Mar 29 14:24:25 2016] dataset_B.fa:  56%
+[Tue Mar 29 14:24:25 2016] dataset_B.fa: 100%
 
-real	0m2.060s
-user	0m1.458s
-sys	0m0.598s
+real	0m1.851s
+user	0m1.363s
+sys	0m0.487s
 == seqmagick
 data: dataset_A.fa
 
-real	0m10.495s
-user	0m9.808s
-sys	0m0.566s
+real	0m9.894s
+user	0m9.314s
+sys	0m0.491s
 data: dataset_B.fa
 
-real	0m8.070s
-user	0m7.256s
-sys	0m0.809s
+real	0m7.286s
+user	0m6.649s
+sys	0m0.636s
 == seqtk
 data: dataset_A.fa
 
-real	0m3.062s
-user	0m2.667s
-sys	0m0.391s
+real	0m2.793s
+user	0m2.440s
+sys	0m0.351s
 data: dataset_B.fa
 
-real	0m3.030s
-user	0m2.641s
-sys	0m0.389s
+real	0m2.904s
+user	0m2.549s
+sys	0m0.355s
 Result summary
 file                     seq_type    num_seqs       min_len         avg_len       max_len
 ids_A.txt.fakit.fa            DNA     140,261           900         1,419.2         3,725

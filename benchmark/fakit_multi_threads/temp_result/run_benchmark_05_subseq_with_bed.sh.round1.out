@@ -5,30 +5,30 @@ data: chr1.fa.gz
 [INFO][0m read BED file ...
 [INFO][0m read sequences ...
 
-real	0m22.189s
-user	0m21.163s
-sys	0m1.047s
+real	0m21.531s
+user	0m20.616s
+sys	0m0.941s
 == 2
 data: chr1.fa.gz
 [INFO][0m read BED file ...
 [INFO][0m read sequences ...
 
-real	0m16.356s
-user	0m23.327s
-sys	0m1.134s
+real	0m15.884s
+user	0m23.355s
+sys	0m0.990s
 == 3
 data: chr1.fa.gz
 [INFO][0m read BED file ...
 [INFO][0m read sequences ...
 
-real	0m16.011s
-user	0m27.615s
-sys	0m1.230s
+real	0m15.109s
+user	0m27.798s
+sys	0m1.100s
 == 4
 data: chr1.fa.gz
 [INFO][0m read BED file ...
 [INFO][0m read sequences ...
 
-real	0m15.377s
-user	0m31.281s
-sys	0m1.119s
+real	0m14.563s
+user	0m30.226s
+sys	0m1.211s

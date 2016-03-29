@@ -7,58 +7,58 @@ data: dataset_A.fa
 [INFO][0m sample by number
 [INFO][0m 1000 sequences outputed
 
-real	0m1.860s
-user	0m1.681s
-sys	0m0.180s
+real	0m1.814s
+user	0m1.633s
+sys	0m0.184s
 data: dataset_B.fa
 [INFO][0m sample by number
 [INFO][0m 3 sequences outputed
 
-real	0m2.186s
-user	0m1.657s
-sys	0m0.530s
+real	0m2.009s
+user	0m1.514s
+sys	0m0.495s
 == 2
 data: dataset_A.fa
 [INFO][0m sample by number
 [INFO][0m 1000 sequences outputed
 
-real	0m1.677s
-user	0m1.899s
-sys	0m0.194s
+real	0m1.659s
+user	0m1.766s
+sys	0m0.213s
 data: dataset_B.fa
 [INFO][0m sample by number
 [INFO][0m 3 sequences outputed
 
-real	0m2.011s
-user	0m1.741s
-sys	0m0.538s
+real	0m1.861s
+user	0m1.705s
+sys	0m0.452s
 == 3
 data: dataset_A.fa
 [INFO][0m sample by number
 [INFO][0m 1000 sequences outputed
 
-real	0m1.579s
-user	0m1.856s
-sys	0m0.194s
+real	0m1.570s
+user	0m1.866s
+sys	0m0.200s
 data: dataset_B.fa
 [INFO][0m sample by number
 [INFO][0m 3 sequences outputed
 
-real	0m2.008s
-user	0m1.713s
-sys	0m0.559s
+real	0m1.951s
+user	0m1.661s
+sys	0m0.525s
 == 4
 data: dataset_A.fa
 [INFO][0m sample by number
 [INFO][0m 1000 sequences outputed
 
-real	0m1.611s
-user	0m1.925s
-sys	0m0.226s
+real	0m1.484s
+user	0m1.860s
+sys	0m0.197s
 data: dataset_B.fa
 [INFO][0m sample by number
 [INFO][0m 3 sequences outputed
 
-real	0m1.998s
-user	0m1.809s
-sys	0m0.488s
+real	0m1.976s
+user	0m1.733s
+sys	0m0.533s

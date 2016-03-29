@@ -5,79 +5,78 @@ data: dataset_B.fa
 == fakit
 data: dataset_A.fa
 
-real	0m4.845s
-user	0m8.690s
-sys	0m0.336s
+real	0m4.843s
+user	0m8.731s
+sys	0m0.360s
 data: dataset_B.fa
 
-real	0m6.168s
-user	0m7.380s
-sys	0m0.628s
+real	0m6.085s
+user	0m7.349s
+sys	0m0.591s
 == fasta_utilities
 data: dataset_A.fa
-[Tue Mar 29 12:57:35 2016] dataset_A.fa:  13%
-[Tue Mar 29 12:57:35 2016] dataset_A.fa:  27%
-[Tue Mar 29 12:57:36 2016] dataset_A.fa:  40%
-[Tue Mar 29 12:57:36 2016] dataset_A.fa:  52%
-[Tue Mar 29 12:57:37 2016] dataset_A.fa:  66%
-[Tue Mar 29 12:57:37 2016] dataset_A.fa:  78%
-[Tue Mar 29 12:57:38 2016] dataset_A.fa:  90%
+[Tue Mar 29 14:20:11 2016] dataset_A.fa:  26%
+[Tue Mar 29 14:20:11 2016] dataset_A.fa:  40%
+[Tue Mar 29 14:20:12 2016] dataset_A.fa:  53%
+[Tue Mar 29 14:20:12 2016] dataset_A.fa:  66%
+[Tue Mar 29 14:20:13 2016] dataset_A.fa:  80%
+[Tue Mar 29 14:20:13 2016] dataset_A.fa:  93%
 
-real	0m4.640s
-user	0m4.121s
-sys	0m0.519s
+real	0m4.509s
+user	0m4.071s
+sys	0m0.436s
 data: dataset_B.fa
-[Tue Mar 29 12:57:40 2016] dataset_B.fa:  38%
-[Tue Mar 29 12:57:40 2016] dataset_B.fa:  69%
-[Tue Mar 29 12:57:41 2016] dataset_B.fa: 100%
+[Tue Mar 29 14:20:15 2016] dataset_B.fa:  38%
+[Tue Mar 29 14:20:16 2016] dataset_B.fa:  69%
+[Tue Mar 29 14:20:17 2016] dataset_B.fa: 100%
 
-real	0m3.269s
-user	0m1.994s
-sys	0m1.174s
+real	0m3.102s
+user	0m2.013s
+sys	0m1.037s
 == pyfaidx
 data: dataset_A.fa
 
-real	0m28.184s
-user	0m27.026s
-sys	0m0.783s
+real	0m27.642s
+user	0m26.895s
+sys	0m0.681s
 data: dataset_B.fa
 
-real	0m19.981s
-user	0m18.205s
-sys	0m1.772s
+real	0m19.233s
+user	0m17.532s
+sys	0m1.683s
 == seqmagick
 data: dataset_A.fa
 
-real	0m14.738s
-user	0m14.080s
-sys	0m0.650s
+real	0m14.328s
+user	0m13.761s
+sys	0m0.561s
 data: dataset_B.fa
 
-real	0m10.559s
-user	0m9.330s
-sys	0m1.227s
+real	0m11.080s
+user	0m10.001s
+sys	0m1.075s
 == seqtk
 data: dataset_A.fa
 
-real	0m1.358s
-user	0m0.882s
-sys	0m0.475s
+real	0m0.957s
+user	0m0.658s
+sys	0m0.298s
 data: dataset_B.fa
 
-real	0m1.284s
-user	0m0.909s
-sys	0m0.285s
+real	0m1.197s
+user	0m0.897s
+sys	0m0.276s
 == biogo
 data: dataset_A.fa
 
-real	0m11.898s
-user	0m10.746s
-sys	0m1.446s
+real	0m12.351s
+user	0m11.416s
+sys	0m1.233s
 data: dataset_B.fa
 
-real	0m11.091s
-user	0m11.380s
-sys	0m0.382s
+real	0m10.705s
+user	0m10.947s
+sys	0m0.373s
 Result summary
 file                         seq_type    num_seqs       min_len       avg_len       max_len
 dataset_A.fa.biogo.rc             DNA     175,364           900       1,419.6         3,725

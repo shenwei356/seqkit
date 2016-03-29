@@ -2,44 +2,44 @@ Test: Search
 == 1
 data: dataset_A.fa
 
-real	0m4.468s
-user	0m4.253s
-sys	0m0.212s
+real	0m4.451s
+user	0m4.275s
+sys	0m0.179s
 data: dataset_B.fa
 
-real	0m2.117s
-user	0m1.606s
-sys	0m0.511s
+real	0m2.031s
+user	0m1.613s
+sys	0m0.423s
 == 2
 data: dataset_A.fa
 
-real	0m3.942s
-user	0m5.616s
-sys	0m0.345s
+real	0m3.768s
+user	0m5.320s
+sys	0m0.315s
 data: dataset_B.fa
 
-real	0m2.198s
-user	0m1.928s
-sys	0m0.567s
+real	0m2.110s
+user	0m1.836s
+sys	0m0.550s
 == 3
 data: dataset_A.fa
 
-real	0m3.996s
-user	0m5.965s
-sys	0m0.349s
+real	0m3.786s
+user	0m5.736s
+sys	0m0.351s
 data: dataset_B.fa
 
-real	0m2.143s
-user	0m1.860s
-sys	0m0.551s
+real	0m2.132s
+user	0m1.832s
+sys	0m0.545s
 == 4
 data: dataset_A.fa
 
-real	0m3.939s
-user	0m6.032s
-sys	0m0.348s
+real	0m3.689s
+user	0m5.725s
+sys	0m0.385s
 data: dataset_B.fa
 
-real	0m2.220s
-user	0m1.950s
-sys	0m0.547s
+real	0m2.139s
+user	0m1.873s
+sys	0m0.518s

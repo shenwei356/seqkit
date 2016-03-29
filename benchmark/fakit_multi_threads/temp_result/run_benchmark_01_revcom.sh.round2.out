@@ -5,44 +5,44 @@ data: dataset_B.fa
 == 1
 data: dataset_A.fa
 
-real	0m7.841s
-user	0m7.577s
-sys	0m0.269s
+real	0m7.376s
+user	0m7.165s
+sys	0m0.221s
 data: dataset_B.fa
 
-real	0m6.426s
-user	0m5.826s
-sys	0m0.605s
+real	0m6.282s
+user	0m5.704s
+sys	0m0.584s
 == 2
 data: dataset_A.fa
 
-real	0m5.341s
-user	0m8.431s
-sys	0m0.393s
+real	0m5.112s
+user	0m8.047s
+sys	0m0.380s
 data: dataset_B.fa
 
-real	0m6.457s
-user	0m6.622s
-sys	0m0.673s
+real	0m6.107s
+user	0m6.220s
+sys	0m0.639s
 == 3
 data: dataset_A.fa
 
-real	0m5.223s
-user	0m8.858s
-sys	0m0.392s
+real	0m4.867s
+user	0m8.276s
+sys	0m0.409s
 data: dataset_B.fa
 
-real	0m6.396s
-user	0m6.950s
-sys	0m0.703s
+real	0m6.102s
+user	0m6.568s
+sys	0m0.642s
 == 4
 data: dataset_A.fa
 
-real	0m5.307s
-user	0m9.266s
-sys	0m0.398s
+real	0m5.065s
+user	0m8.822s
+sys	0m0.384s
 data: dataset_B.fa
 
-real	0m6.816s
-user	0m7.288s
-sys	0m0.717s
+real	0m6.053s
+user	0m7.142s
+sys	0m0.661s

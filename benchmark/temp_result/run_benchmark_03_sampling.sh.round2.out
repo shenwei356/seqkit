@@ -7,43 +7,43 @@ data: dataset_A.fa
 [INFO][0m sample by number
 [INFO][0m 1000 sequences outputed
 
-real	0m1.551s
-user	0m1.884s
-sys	0m0.195s
+real	0m1.535s
+user	0m1.913s
+sys	0m0.170s
 data: dataset_B.fa
 [INFO][0m sample by number
 [INFO][0m 3 sequences outputed
 
-real	0m1.958s
-user	0m1.839s
-sys	0m0.418s
+real	0m1.980s
+user	0m1.820s
+sys	0m0.457s
 == seqmagick
 data: dataset_A.fa
 
-real	0m5.801s
-user	0m5.713s
-sys	0m0.086s
+real	0m5.725s
+user	0m5.618s
+sys	0m0.106s
 data: dataset_B.fa
 
-real	0m7.610s
-user	0m6.718s
-sys	0m0.892s
+real	0m7.728s
+user	0m7.031s
+sys	0m0.694s
 == seqtk
 data: dataset_A.fa
 
-real	0m0.358s
-user	0m0.307s
-sys	0m0.051s
+real	0m0.344s
+user	0m0.301s
+sys	0m0.043s
 data: dataset_B.fa
 
-real	0m0.708s
-user	0m0.464s
-sys	0m0.243s
+real	0m0.713s
+user	0m0.460s
+sys	0m0.253s
 Result summary
 file                                seq_type    num_seqs       min_len         avg_len       max_len
 dataset_A.fa.sample.fakit.fa             DNA       1,000           902         1,418.3         3,038
-dataset_A.fa.sample.seqmagick.fa         DNA       1,000           906         1,428.2         2,160
+dataset_A.fa.sample.seqmagick.fa         DNA       1,000           910         1,420.8         3,725
 dataset_A.fa.sample.seqtk.fa             DNA       1,000           901         1,412.3         1,980
 dataset_B.fa.sample.fakit.fa             DNA           3    46,709,983    61,436,894.3    80,373,285
-dataset_B.fa.sample.seqmagick.fa         DNA           4    50,818,468    57,776,916.5    64,444,167
+dataset_B.fa.sample.seqmagick.fa         DNA           4    46,709,983    54,800,008.3    64,444,167
 dataset_B.fa.sample.seqtk.fa             DNA           4    46,709,983    54,800,008.3    64,444,167

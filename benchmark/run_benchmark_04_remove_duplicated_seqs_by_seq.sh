@@ -7,7 +7,7 @@ for f in dataset_{A,B}_dup.fasta; do echo data: $f; cat $f > /dev/null; done
 
 
 echo == fakit
-for f in dataset_{A,B}_dup.fasta; do echo data: $f; time fakit rmdup -s $f > $f.rmdup.fakit.fa; done
+for f in dataset_{A,B}_dup.fasta; do echo data: $f; time fakit rmdup -s -m $f > $f.rmdup.fakit.fa; done
 
 echo == seqmagick
 for f in dataset_{A,B}_dup.fasta; do echo data: $f; time seqmagick convert --deduplicate-sequences $f - > $f.rmdup.seqmagick.fa; done
