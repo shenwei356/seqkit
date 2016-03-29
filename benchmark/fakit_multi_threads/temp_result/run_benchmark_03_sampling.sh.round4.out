@@ -1,61 +1,64 @@
 Test: Sample
+warm-up
+data: dataset_A.fa
+data: dataset_B.fa
 == 1
 data: dataset_A.fa
 [INFO][0m sample by number
-[INFO][0m 1001 sequences outputed
+[INFO][0m 1000 sequences outputed
 
-real	0m1.871s
-user	0m1.701s
-sys	0m0.172s
-data: dataset_B.fa
-[INFO][0m sample by number
-[INFO][0m 6 sequences outputed
-
-real	0m2.461s
-user	0m1.867s
-sys	0m0.598s
-== 2
-data: dataset_A.fa
-[INFO][0m sample by number
-[INFO][0m 1001 sequences outputed
-
-real	0m1.535s
-user	0m1.662s
-sys	0m0.193s
-data: dataset_B.fa
-[INFO][0m sample by number
-[INFO][0m 6 sequences outputed
-
-real	0m2.373s
-user	0m2.089s
-sys	0m0.635s
-== 3
-data: dataset_A.fa
-[INFO][0m sample by number
-[INFO][0m 1001 sequences outputed
-
-real	0m1.556s
-user	0m1.882s
+real	0m1.850s
+user	0m1.667s
 sys	0m0.185s
 data: dataset_B.fa
 [INFO][0m sample by number
-[INFO][0m 6 sequences outputed
+[INFO][0m 3 sequences outputed
 
-real	0m2.377s
-user	0m2.043s
-sys	0m0.621s
+real	0m2.052s
+user	0m1.526s
+sys	0m0.526s
+== 2
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m 1000 sequences outputed
+
+real	0m1.704s
+user	0m1.947s
+sys	0m0.191s
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m 3 sequences outputed
+
+real	0m2.003s
+user	0m1.720s
+sys	0m0.544s
+== 3
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m 1000 sequences outputed
+
+real	0m1.596s
+user	0m1.847s
+sys	0m0.214s
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m 3 sequences outputed
+
+real	0m2.013s
+user	0m1.762s
+sys	0m0.533s
 == 4
 data: dataset_A.fa
 [INFO][0m sample by number
-[INFO][0m 1001 sequences outputed
+[INFO][0m 1000 sequences outputed
 
-real	0m1.518s
-user	0m1.888s
-sys	0m0.199s
+real	0m1.568s
+user	0m1.918s
+sys	0m0.194s
 data: dataset_B.fa
 [INFO][0m sample by number
-[INFO][0m 6 sequences outputed
+[INFO][0m 3 sequences outputed
 
-real	0m2.447s
-user	0m2.145s
-sys	0m0.610s
+real	0m2.030s
+user	0m1.824s
+sys	0m0.517s

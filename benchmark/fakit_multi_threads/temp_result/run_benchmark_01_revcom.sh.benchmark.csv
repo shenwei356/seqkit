@@ -1,9 +1,9 @@
 test	dataset	app	time_mean	time_stdev
-Revcom	dataset_A.fa	1	7.70	0.35
-Revcom	dataset_A.fa	2	5.17	0.16
-Revcom	dataset_A.fa	3	5.02	0.22
-Revcom	dataset_A.fa	4	5.10	0.24
-Revcom	dataset_B.fa	1	6.34	0.09
-Revcom	dataset_B.fa	2	6.20	0.14
-Revcom	dataset_B.fa	3	6.22	0.20
-Revcom	dataset_B.fa	4	6.12	0.10
+Revcom	dataset_A.fa	1	7.83	0.11
+Revcom	dataset_A.fa	2	5.32	0.08
+Revcom	dataset_A.fa	3	5.17	0.03
+Revcom	dataset_A.fa	4	5.31	0.07
+Revcom	dataset_B.fa	1	6.51	0.05
+Revcom	dataset_B.fa	2	6.37	0.06
+Revcom	dataset_B.fa	3	6.34	0.06
+Revcom	dataset_B.fa	4	6.87	0.39

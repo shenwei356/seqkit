@@ -2,6 +2,9 @@
 
 echo  Test: Subseq
 
+echo warm-up
+zcat chr1.fa.gz chr1.bed.gz > /dev/null
+
 
 NCPUs=$(grep -c processor /proc/cpuinfo)
 for i in $(seq 1 $NCPUs); do 

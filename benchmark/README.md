@@ -1,6 +1,6 @@
 # Benchmark
 
-Dataset and results is described at [http://shenwei356.github.io/fakit/benchmark](http://shenwei356.github.io/fakit/benchmark)
+Datasets and results are described at [http://shenwei356.github.io/fakit/benchmark](http://shenwei356.github.io/fakit/benchmark)
 
 **The benchmark needs be performed in Linux-like operating systems.**
 
@@ -25,7 +25,7 @@ Softwares
 
 
 **Attention**: the `fasta_utilities` uses Perl module `Term-ProgressBar`
-which make it failed to run when using benchmark script `run_benchmark_00_all.pl`.
+which makes it failed to run when using benchmark script `run_benchmark_00_all.pl`.
 Please change the source code of ProgressBar.pm (for me, the path is
 /usr/share/perl5/vendor_perl/Term/ProgressBar.pm). Add the code below after line `535`:
 
@@ -57,7 +57,7 @@ perl run_benchmark_00_all.pl run_*.sh
 
 perl run_benchmark_00_all.pl run_benchmark_04_remove_duplicated_seqs_by_name.sh
 
-3. Custom repeate times:
+3. Custom repeating times:
 
 perl run_benchmark_00_all.pl -n 5 run_benchmark_04_remove_duplicated_seqs_by_name.sh
 ```
@@ -68,7 +68,7 @@ Before this, you need to run
 
     perl run_benchmark_00_all.pl run_*.sh
 
-Libraries `ggplot2` and `scales` are needed.
+R libraries `ggplot2`, `scales` and `ggthemes` are needed.
 
 Run:
 

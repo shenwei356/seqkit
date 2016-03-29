@@ -2,7 +2,8 @@
 
 echo Test: Search
 
-
+echo warm-up
+for f in dataset_{A,B}.fa; do echo data: $f; cat $f > /dev/null; done
 
 echo == fakit
 for g in A B; do echo data: dataset_$g.fa; time fakit grep -f ids_$g.txt dataset_$g.fa > ids_$g.txt.fakit.fa; done

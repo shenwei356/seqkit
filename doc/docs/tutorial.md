@@ -18,7 +18,7 @@
 
         clustalo -i seqs.fa -o seqs.msa.fa --force --outfmt fasta --threads=4
 
-1. Convert FASTA format to tabular format.    
+1. Convert FASTA format to tabular format.
 
         $ fakit fa2tab seqs.msa.fa
         seq1    ACAACGTCTACTTACGTTGCAT----CGTCATGCTGCATTACGTAGTCTGATGATG
@@ -70,7 +70,7 @@ from [The miRBase Sequence Database -- Release 21](ftp://mirbase.org/pub/mirbase
 
 1. First 10 bases
 
-        $ zcat hairpin.fa.gz | fakit subseq -r 1:10 | fakit sort -s  | fakit seq -t rna  -s | head -n 10
+        $ zcat hairpin.fa.gz | fakit subseq -r 1:10 | fakit sort -s | fakit seq -t rna -s | head -n 10
         AAAAAAAAAA
         AAAAAAAAAA
         AAAAAAAAAG

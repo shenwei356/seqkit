@@ -80,7 +80,7 @@ var sampleCmd = &cobra.Command{
 
 		file := files[0]
 
-		n := 0
+		n := int64(0)
 		if number > 0 { // by number
 			if !quiet {
 				log.Info("sample by number")
@@ -109,6 +109,7 @@ var sampleCmd = &cobra.Command{
 				}
 				fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
 				checkError(err)
+			LOOP:
 				for chunk := range fastaReader.Ch {
 					checkError(chunk.Err)
 
@@ -116,6 +117,9 @@ var sampleCmd = &cobra.Command{
 						if rand.Float64() <= proportion {
 							n++
 							outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
+							if n == number {
+								break LOOP
+							}
 						}
 					}
 				}
@@ -129,6 +133,9 @@ var sampleCmd = &cobra.Command{
 					if rand.Float64() <= proportion {
 						n++
 						outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
+						if n == number {
+							break
+						}
 					}
 				}
 			}

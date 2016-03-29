@@ -4,7 +4,7 @@
 ## Softwares
 
 1. [fakit](https://github.com/shenwei356/fakit). (Go).
-   Version [v0.1.5](https://github.com/shenwei356/fakit/releases/tag/v0.1.5).
+   Version [v0.1.5.1](https://github.com/shenwei356/fakit/releases/tag/v0.1.5.1).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    Lots of dependencies to install_.
@@ -208,18 +208,19 @@ Sample by number
 
 ```
 n=1000
+n2=4
 
 echo == fakit
-for f in dataset_{A,B}.fa; do echo data: $f; time fakit sample -n $n $f > $f.sample.fakit.fa; done
-
-echo == fasta_utilities
-for f in dataset_{A,B}.fa; do echo data: $f; time subset_fasta.pl -size $n $f > $f.sample.fautil.fa; done
+for f in dataset_{A}.fa; do echo data: $f; time fakit sample -n $n  $f > $f.sample.fakit.fa; done
+for f in dataset_{B}.fa; do echo data: $f; time fakit sample -n $n2 $f > $f.sample.fakit.fa; done
 
 echo == seqmagick
-for f in dataset_{A,B}.fa; do echo data: $f; time seqmagick convert --sample $n $f - > $f.sample.seqmagick.fa; done
+for f in dataset_{A}.fa; do echo data: $f; time seqmagick convert --sample $n  $f - > $f.sample.seqmagick.fa; done
+for f in dataset_{B}.fa; do echo data: $f; time seqmagick convert --sample $n2 $f - > $f.sample.seqmagick.fa; done
 
 echo == seqtk
-for f in dataset_{A,B}.fa; do echo data: $f; time seqtk sample $f $n > $f.sample.seqtk.fa; done
+for f in dataset_{A}.fa; do echo data: $f; time seqtk sample $f $n  > $f.sample.seqtk.fa; done
+for f in dataset_{B}.fa; do echo data: $f; time seqtk sample $f $n2 > $f.sample.seqtk.fa; done
 ```
 
 
@@ -281,9 +282,15 @@ TODO: bedtools
 
 All tests were repeated 4 times.
 
-Result shows that the self-implemented FASTA parsing module has better performance than the [Biogo](https://github.com/biogo/biogo), a bioinformatics library for Go.
-
 ### Performance comparison with other tools
+
+Missing data indicates that the tool does not have the function.
+
+Result also shows that **the self-implemented FASTA parsing module has better performance than
+the [biogo](https://github.com/biogo/biogo)**, a bioinformatics library for Go.
+
+For the revese complementary sequence test, 
+the `fasta_utilities`, `seqmagick` and `seqtk` do not validate the bases/residues, which save some times.
 
 Fakit used all CPUs (4 for my computer) by default.
 

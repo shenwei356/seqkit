@@ -5,9 +5,9 @@
 Usage
 
 ```
-fakit -- Swiss army knife of FASTA format
+fakit -- a cross-platform and efficient suit for FASTA file manipulation
 
-Version: 0.1.5
+Version: 0.1.5.1
 
 Author: Wei Shen <shenwei356@gmail.com>
 

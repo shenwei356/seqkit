@@ -1,53 +1,56 @@
-Test: Dup_s
+Test: Rmdup
+warm-up
+data: dataset_A_dup.fasta
+data: dataset_B_dup.fasta
 == 1
 data: dataset_A_dup.fasta
 [INFO][0m 30911 duplicated records removed
 
-real	0m3.532s
-user	0m3.193s
-sys	0m0.343s
+real	0m3.624s
+user	0m3.258s
+sys	0m0.366s
 data: dataset_B_dup.fasta
 [INFO][0m 2 duplicated records removed
 
-real	0m3.139s
-user	0m2.389s
-sys	0m0.755s
+real	0m3.238s
+user	0m2.485s
+sys	0m0.753s
 == 2
 data: dataset_A_dup.fasta
 [INFO][0m 30911 duplicated records removed
 
-real	0m2.510s
-user	0m3.891s
-sys	0m0.506s
+real	0m2.585s
+user	0m3.969s
+sys	0m0.522s
 data: dataset_B_dup.fasta
 [INFO][0m 2 duplicated records removed
 
-real	0m3.103s
-user	0m2.701s
-sys	0m0.803s
+real	0m3.345s
+user	0m2.904s
+sys	0m0.856s
 == 3
 data: dataset_A_dup.fasta
 [INFO][0m 30911 duplicated records removed
 
-real	0m2.719s
-user	0m4.548s
-sys	0m0.510s
+real	0m2.670s
+user	0m4.638s
+sys	0m0.525s
 data: dataset_B_dup.fasta
 [INFO][0m 2 duplicated records removed
 
-real	0m3.107s
-user	0m2.655s
-sys	0m0.825s
+real	0m3.346s
+user	0m2.814s
+sys	0m0.894s
 == 4
 data: dataset_A_dup.fasta
 [INFO][0m 30911 duplicated records removed
 
-real	0m2.423s
-user	0m4.226s
-sys	0m0.471s
+real	0m2.548s
+user	0m4.489s
+sys	0m0.521s
 data: dataset_B_dup.fasta
 [INFO][0m 2 duplicated records removed
 
-real	0m3.022s
-user	0m2.614s
-sys	0m0.812s
+real	0m3.266s
+user	0m2.837s
+sys	0m0.791s

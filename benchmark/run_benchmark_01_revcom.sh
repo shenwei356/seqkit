@@ -2,7 +2,8 @@
 
 echo  Test: Revcom
 
-
+echo warm-up
+for f in dataset_{A,B}.fa; do echo data: $f; cat $f > /dev/null; done
 
 echo == fakit
 for f in dataset_{A,B}.fa; do echo data: $f; time fakit seq -r -p $f > $f.fakit.rc; done

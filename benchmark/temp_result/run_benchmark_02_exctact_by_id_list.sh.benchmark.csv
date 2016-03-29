@@ -1,9 +1,9 @@
 test	dataset	app	time_mean	time_stdev
-Search	dataset_A.fa	fakit	3.93	0.06
-Search	dataset_A.fa	fasta_utilities	4.62	0.03
-Search	dataset_A.fa	seqmagick	10.77	0.39
-Search	dataset_A.fa	seqtk	2.72	0.05
-Search	dataset_B.fa	fakit	2.15	0.01
-Search	dataset_B.fa	fasta_utilities	1.99	0.00
-Search	dataset_B.fa	seqmagick	8.01	0.07
-Search	dataset_B.fa	seqtk	3.02	0.06
+Search	dataset_A.fa	fakit	3.97	0.09
+Search	dataset_A.fa	fasta_utilities	4.61	0.13
+Search	dataset_A.fa	seqmagick	10.59	0.21
+Search	dataset_A.fa	seqtk	2.93	0.11
+Search	dataset_B.fa	fakit	2.15	0.10
+Search	dataset_B.fa	fasta_utilities	2.08	0.02
+Search	dataset_B.fa	seqmagick	7.88	0.52
+Search	dataset_B.fa	seqtk	3.06	0.10

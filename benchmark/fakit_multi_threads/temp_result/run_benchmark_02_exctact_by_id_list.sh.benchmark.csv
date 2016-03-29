@@ -1,9 +1,9 @@
 test	dataset	app	time_mean	time_stdev
-Search	dataset_A.fa	1	4.38	0.06
-Search	dataset_A.fa	2	3.66	0.09
-Search	dataset_A.fa	3	3.77	0.05
-Search	dataset_A.fa	4	3.73	0.05
-Search	dataset_B.fa	1	2.04	0.03
-Search	dataset_B.fa	2	2.09	0.04
-Search	dataset_B.fa	3	2.06	0.05
-Search	dataset_B.fa	4	2.13	0.02
+Search	dataset_A.fa	1	4.54	0.06
+Search	dataset_A.fa	2	3.93	0.09
+Search	dataset_A.fa	3	3.99	0.05
+Search	dataset_A.fa	4	3.91	0.03
+Search	dataset_B.fa	1	2.13	0.01
+Search	dataset_B.fa	2	2.18	0.01
+Search	dataset_B.fa	3	2.17	0.02
+Search	dataset_B.fa	4	2.16	0.05

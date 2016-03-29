@@ -1,45 +1,48 @@
 Test: Revcom
+warm-up
+data: dataset_A.fa
+data: dataset_B.fa
 == 1
 data: dataset_A.fa
 
-real	0m8.176s
-user	0m7.935s
-sys	0m0.249s
+real	0m7.841s
+user	0m7.577s
+sys	0m0.269s
 data: dataset_B.fa
 
-real	0m6.435s
-user	0m5.868s
-sys	0m0.572s
+real	0m6.426s
+user	0m5.826s
+sys	0m0.605s
 == 2
 data: dataset_A.fa
 
-real	0m5.416s
-user	0m8.388s
-sys	0m0.382s
+real	0m5.341s
+user	0m8.431s
+sys	0m0.393s
 data: dataset_B.fa
 
-real	0m6.445s
-user	0m6.593s
-sys	0m0.663s
+real	0m6.457s
+user	0m6.622s
+sys	0m0.673s
 == 3
 data: dataset_A.fa
 
-real	0m5.147s
-user	0m8.463s
-sys	0m0.413s
+real	0m5.223s
+user	0m8.858s
+sys	0m0.392s
 data: dataset_B.fa
 
-real	0m6.299s
-user	0m6.729s
-sys	0m0.735s
+real	0m6.396s
+user	0m6.950s
+sys	0m0.703s
 == 4
 data: dataset_A.fa
 
-real	0m5.430s
-user	0m8.886s
-sys	0m0.427s
+real	0m5.307s
+user	0m9.266s
+sys	0m0.398s
 data: dataset_B.fa
 
-real	0m6.098s
-user	0m6.767s
-sys	0m0.674s
+real	0m6.816s
+user	0m7.288s
+sys	0m0.717s

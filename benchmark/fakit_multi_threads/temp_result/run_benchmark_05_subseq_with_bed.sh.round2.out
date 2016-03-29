@@ -1,33 +1,34 @@
 Test: Subseq
+warm-up
 == 1
 data: chr1.fa.gz
 [INFO][0m read BED file ...
 [INFO][0m read sequences ...
 
-real	0m22.012s
-user	0m21.073s
-sys	0m0.964s
+real	0m22.598s
+user	0m21.552s
+sys	0m1.050s
 == 2
 data: chr1.fa.gz
 [INFO][0m read BED file ...
 [INFO][0m read sequences ...
 
-real	0m16.218s
-user	0m23.060s
-sys	0m1.110s
+real	0m17.079s
+user	0m24.344s
+sys	0m1.011s
 == 3
 data: chr1.fa.gz
 [INFO][0m read BED file ...
 [INFO][0m read sequences ...
 
-real	0m15.047s
-user	0m27.372s
-sys	0m1.149s
+real	0m16.267s
+user	0m28.903s
+sys	0m1.117s
 == 4
 data: chr1.fa.gz
 [INFO][0m read BED file ...
 [INFO][0m read sequences ...
 
-real	0m14.755s
-user	0m30.629s
-sys	0m1.207s
+real	0m15.839s
+user	0m31.800s
+sys	0m1.115s

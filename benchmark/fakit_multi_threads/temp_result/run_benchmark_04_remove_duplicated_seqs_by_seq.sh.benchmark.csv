@@ -1,9 +1,9 @@
 test	dataset	app	time_mean	time_stdev
-Rmdup	dataset_A_dup.fasta	1	3.61	0.15
-Rmdup	dataset_A_dup.fasta	2	2.64	0.12
-Rmdup	dataset_A_dup.fasta	3	2.65	0.05
-Rmdup	dataset_A_dup.fasta	4	2.53	0.08
-Rmdup	dataset_B_dup.fasta	1	3.16	0.11
-Rmdup	dataset_B_dup.fasta	2	3.17	0.07
-Rmdup	dataset_B_dup.fasta	3	3.15	0.07
-Rmdup	dataset_B_dup.fasta	4	3.13	0.07
+Rmdup	dataset_A_dup.fasta	1	3.67	0.05
+Rmdup	dataset_A_dup.fasta	2	2.65	0.12
+Rmdup	dataset_A_dup.fasta	3	2.62	0.07
+Rmdup	dataset_A_dup.fasta	4	2.60	0.08
+Rmdup	dataset_B_dup.fasta	1	3.26	0.02
+Rmdup	dataset_B_dup.fasta	2	3.31	0.02
+Rmdup	dataset_B_dup.fasta	3	3.29	0.06
+Rmdup	dataset_B_dup.fasta	4	3.31	0.05

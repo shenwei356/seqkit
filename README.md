@@ -133,11 +133,17 @@ Just [download](https://github.com/shenwei356/fakit/releases) executable file
 
 Details: [http://shenwei356.github.io/fakit/benchmark/](http://shenwei356.github.io/fakit/benchmark/)
 
-### Performance comparison with other tools
-
 All tests were repeated 4 times.
 
-Result shows that the self-implemented FASTA parsing module has better performance than the [Biogo](https://github.com/biogo/biogo), a bioinformatics library for Go.
+### Performance comparison with other tools
+
+Missing data indicates that the tool does not have the function.
+
+Result also shows that **the self-implemented FASTA parsing module has better performance than
+the [biogo](https://github.com/biogo/biogo)**, a bioinformatics library for Go.
+
+For the revese complementary sequence test, 
+the `fasta_utilities`, `seqmagick` and `seqtk` do not validate the bases/residues, which save some times.
 
 ![benchmark_colorful.png](benchmark/benchmark_colorful.png)
 

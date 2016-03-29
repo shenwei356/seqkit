@@ -2,6 +2,8 @@
 
 echo Test: Rmdup
 
+echo warm-up
+for f in dataset_{A,B}_dup.fasta; do echo data: $f; cat $f > /dev/null; done
 
 
 echo == fakit
