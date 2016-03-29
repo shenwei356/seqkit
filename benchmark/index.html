@@ -564,7 +564,7 @@ $ fakit fa2tab dataset_B_dup.fasta  | cut -f 2 | sort | uniq | wc -l
 <h3 id="commands_3">Commands</h3>
 <p>By sequence</p>
 <pre><code>echo == fakit
-for f in dataset_{A,B}_dup.fasta; do echo data: $f; time fakit rmdup -s $f &gt; $f.rmdup.fakit.fa; done
+for f in dataset_{A,B}_dup.fasta; do echo data: $f; time fakit rmdup -s -m $f &gt; $f.rmdup.fakit.fa; done
 
 echo == seqmagick
 for f in dataset_{A,B}_dup.fasta; do echo data: $f; time seqmagick convert --deduplicate-sequences $f - &gt; $f.rmdup.seqmagick.fa; done
