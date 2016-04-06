@@ -160,4 +160,4 @@ propose new functions or ask for help.
 
 ## License
 
-[MIT License](https://github.com/shenwei356/bio_scripts/blob/master/LICENSE)
+[MIT License](https://github.com/shenwei356/fakit/blob/master/LICENSE)

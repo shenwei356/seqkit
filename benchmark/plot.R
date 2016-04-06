@@ -35,7 +35,8 @@ p <- p +
     panel.background = element_blank(),
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
-    axis.line = element_line(colour = "black", size = 0.8),
+    axis.line.x = element_line(colour = "black", size = 0.8),
+    axis.line.y = element_line(colour = "black", size = 0.8),
     axis.ticks.y = element_line(size = 0.8),
     axis.ticks.x = element_line(size = 0.8),
     axis.text.x = element_text(
@@ -61,6 +62,6 @@ p <- p +
 ggsave(p, file = "benchmark_colorful.png", width = 5, height = 6)
 
 p <-p +scale_fill_manual(values = c("grey100", "grey80", "grey60", "grey40", "grey20"),
-                  labels = c("A", "B", "A_dup", "B_dup", "chr1"))
+                  labels = c("A", "B", "A_dup", "B_dup", "Chr1"))
   
 ggsave(p, file = "benchmark.png", width = 5, height = 6)

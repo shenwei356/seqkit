@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"regexp"
 	"runtime"
+	"strings"
 	"sync"
 
 	"github.com/brentp/xopen"
@@ -95,7 +96,11 @@ var grepCmd = &cobra.Command{
 						checkError(err)
 						patterns[p] = r
 					} else {
-						patterns[p] = nil
+						if ignoreCase {
+							patterns[strings.ToLower(p)] = nil
+						} else {
+							patterns[p] = nil
+						}
 					}
 				}
 			}
@@ -120,7 +125,11 @@ var grepCmd = &cobra.Command{
 				}
 			} else {
 				for _, p := range pattern {
-					patterns[p] = nil
+					if ignoreCase {
+						patterns[strings.ToLower(p)] = nil
+					} else {
+						patterns[p] = nil
+					}
 				}
 			}
 		}
@@ -217,7 +226,11 @@ var grepCmd = &cobra.Command{
 								}
 							}
 						} else {
-							if _, ok := patterns[string(subject)]; ok {
+							k := string(subject)
+							if useRegexp {
+								k = strings.ToLower(k)
+							}
+							if _, ok := patterns[k]; ok {
 								hit = true
 							}
 						}
@@ -234,7 +247,7 @@ var grepCmd = &cobra.Command{
 
 						chunkData = append(chunkData, record)
 					}
-					ch <- fasta.FastaRecordChunk{chunk.ID, chunkData, nil}
+					ch <- fasta.FastaRecordChunk{ID: chunk.ID, Data: chunkData, Err: nil}
 				}(chunk)
 			}
 			wg.Wait()

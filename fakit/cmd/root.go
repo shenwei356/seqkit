@@ -35,7 +35,7 @@ var RootCmd = &cobra.Command{
 	Short: "Swiss army knife of FASTA format",
 	Long: `fakit -- Swiss army knife of FASTA format
 
-Version: 0.1.5.1
+Version: 0.1.5.2
 
 Author: Wei Shen <shenwei356@gmail.com>
 
