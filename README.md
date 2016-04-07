@@ -27,7 +27,7 @@ from either standard stream or files, therefore, it could be easily used in pipe
   (see [download](http://shenwei356.github.io/fakit/download/))
 - **Fast** (see [benchmark](/#performance-comparison-with-other-tools)),
   **multiple-CPUs supported** (see [benchmark](/#speedup-with-multi-threads)).
-- **Practical functions supported by 14 subcommands** (see subcommands and
+- **Practical functions supported by 15 subcommands** (see subcommands and
   [usage](http://shenwei356.github.io/fakit/usage/) )
 - **Well documented** (detailed [usage](http://shenwei356.github.io/fakit/usage/)
   and [benchmark](http://shenwei356.github.io/fakit/benchmark/) )
@@ -76,7 +76,7 @@ Just [download](https://github.com/shenwei356/fakit/releases) executable file
  no complicated compilation process.
 
 
-## Subcommands
+## Subcommands (15)
 
 **Sequence and subsequence**
 
