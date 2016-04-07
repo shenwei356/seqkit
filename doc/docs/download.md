@@ -6,8 +6,8 @@
 
 ## Current Version
 
-- [fakit v0.1.5.2](https://github.com/shenwei356/fakit/releases/tag/v0.1.5.2)
-    - fix bug of `grep`, when not using flag `-r`, flag `-i` will not take effect.
+- [fakit v0.1.6](https://github.com/shenwei356/fakit/releases/tag/v0.1.6)
+    - add subcommand `replace`
 
 ## Installation
 
@@ -31,9 +31,11 @@ You can also add the directory of the executable file to environment variable
 
 ## Previous Versions
 
+- [fakit v0.1.5.2](https://github.com/shenwei356/fakit/releases/tag/v0.1.5.2)
+    - fix bug of `grep`, when not using flag `-r`, flag `-i` will not take effect.
 - [fakit v0.1.5.1](https://github.com/shenwei356/fakit/releases/tag/v0.1.5.1)
     - fix result of `fakit sample -n`
-    - fix benchmark script 
+    - fix benchmark script
 - [fakit v0.1.5](https://github.com/shenwei356/fakit/releases/tag/v0.1.5)
     - add global flag `--id-ncbi`
     - add flag `-d` (`--dup-seqs-file`) and `-D` (`--dup-num-file`) for subcommand `rmdup`

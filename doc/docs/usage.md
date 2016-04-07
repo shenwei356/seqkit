@@ -5,9 +5,9 @@
 Usage
 
 ```
-fakit -- a cross-platform and efficient suit for FASTA file manipulation
+fakit -- Swiss army knife of FASTA format
 
-Version: 0.1.5.1
+Version: 0.1.6
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -22,6 +22,7 @@ Available Commands:
   fa2tab      covert FASTA to tabular format (with length/GC content/GC skew) to filter and sort
   grep        search sequences by pattern(s) of name or sequence motifs
   locate      locate subsequences/motifs
+  replace     replace name/sequence/by regular expression
   rmdup       remove duplicated sequences by id/name/sequence
   sample      sample sequences by number or proportion
   seq         transform sequences (revserse, complement, extract ID...)
@@ -44,6 +45,7 @@ Flags:
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
   -j, --threads int                     number of CPUs. (default value depends on your device) (default 4)
 
+Use "fakit [command] --help" for more information about a command.
 ```
 
 ### Performance Tips
@@ -191,7 +193,7 @@ Examples
 
 1. Remove gaps and to lower/upper case
 
-        $ echo -e ">seq\nACGT-ACTGC-ACC" | fakit seq -i -g
+        $ echo -e ">seq\nACGT-ACTGC-ACC" | fakit seq -g -u
         >seq
         ACGTACTGCACC
 
@@ -575,7 +577,7 @@ Examples
         bna-MIR396a     UUS     UUS     -       105     107     UUS
         bna-MIR396a     UUS     UUS     -       89      91      UUS
 
-    Notice that `fakit grep` only searches in positive strand, but `fakit loate` could recogize both strand
+    Notice that `fakit grep` only searches in positive strand, but `fakit loate` could recognize both strand
 
 
 ## rmdup
@@ -792,6 +794,76 @@ Examples
 1. Most of the time, we could shuffle after sampling
 
         $ zcat hairpin.fa.gz | fakit sample -p 0.1 | fakit shuffle -o sample.fa.gz
+
+## replace
+
+Usage
+
+```
+replace name/sequence/by regular expression.
+
+Note that the replacement supports capture variables.
+e.g. $1 represents the text of the first submatch.
+ATTENTION: use SINGLE quote NOT double quotes in *nix OS.
+
+Examples: Adding space to all bases.
+
+    fakit replace -p "(.)" -r '$1 ' -s
+
+Or use the \ escape character.
+
+    fakit replace -p "(.)" -r "\$1 " -s
+
+more on: http://shenwei356.github.io/fakit/usage/#replace
+
+Usage:
+  fakit replace [flags]
+
+Flags:
+  -s, --by-seq               replace seq
+  -i, --ignore-case          ignore case
+  -p, --pattern string       search regular expression
+  -r, --replacement string   replacement. supporting capture variables.  e.g. $1 represents the text of the first submatch. ATTENTION: use SINGLE quote NOT double quotes in *nix OS or use the \ escape character.
+
+```
+
+Examples
+
+1. Remove descriptions
+
+        $ echo -e ">seq1 abc-123\nACGT-ACGT" | fakit replace -p " .+"
+        >seq1
+        ACGT-ACGT
+
+1. Replace "-" with "="
+
+        $ echo -e ">seq1 abc-123\nACGT-ACGT" | fakit replace -p "\-" -r '='
+        >seq1 abc=123
+        ACGT-ACGT
+
+1. Remove gaps in sequences.
+
+        $ echo -e ">seq1 abc-123\nACGT-ACGT" | fakit replace -p " |-" -s
+        >seq1 abc-123
+        ACGTACGT
+
+1. Add space to every base. **ATTENTION: use SINGLE quote NOT double quotes in *nix OS**
+
+        $ echo -e ">seq1 abc-123\nACGT-ACGT" | fakit replace -p "(.)" -r '$1 ' -s
+        >seq1 abc-123
+        A C G T - A C G T
+
+1. Transpose sequence with [csvtk](https://github.com/shenwei356/csvtk)
+
+        $ echo -e ">seq1\nACTGACGT\n>seq2\nactgccgt" | fakit replace -p "(.)" -r     "\$1 " -s | fakit seq -s -u | csvtk space2tab | csvtk -t transpose
+        A       A
+        C       C
+        T       T
+        G       G
+        A       C
+        C       C
+        G       G
+        T       T
 
 
 ## shuffle

@@ -43,7 +43,7 @@ Clean bases      | Yes      | Yes             | Yes           | Yes     | --    
 Transcribe       | Yes      | Yes             | Yes           | Yes     | Yes       | Yes
 Translate        | --       | Yes             | Yes           | Yes     | Yes       | --
 Size select      | Indirect | Yes             | --            | Yes     | Yes       | --
-Rename head      | --       | Yes             | --            | --      | Yes       | Yes
+Rename head      | Yes      | Yes             | --            | --      | Yes       | Yes
 
 ## Datasets
 
@@ -228,7 +228,7 @@ for f in dataset_{B}.fa; do echo data: $f; time seqtk sample $f $n2 > $f.sample.
 
 ### Dataset
 
-10% or 20% sequences were randomly extract sequences from dataset_A.fa 
+10% or 20% sequences were randomly extract sequences from dataset_A.fa
 or dataset_B.fa and merge dback and then shuffled.
 
 ```
@@ -289,7 +289,7 @@ Missing data indicates that the tool does not have the function.
 Result also shows that **the self-implemented FASTA parsing module has better performance than
 the [biogo](https://github.com/biogo/biogo)**, a bioinformatics library for Go.
 
-For the revese complementary sequence test, 
+For the revese complementary sequence test,
 the `fasta_utilities`, `seqmagick` and `seqtk` do not validate the bases/residues, which save some times.
 
 Fakit used all CPUs (4 for my computer) by default.

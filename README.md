@@ -61,21 +61,21 @@ Clean bases      | Yes      | Yes             | Yes           | Yes     | --    
 Transcribe       | Yes      | Yes             | Yes           | Yes     | Yes       | Yes
 Translate        | --       | Yes             | Yes           | Yes     | Yes       | --
 Size select      | Indirect | Yes             | --            | Yes     | Yes       | --
-Rename head      | --       | Yes             | --            | --      | Yes       | Yes
+Rename head      | Yes      | Yes             | --            | --      | Yes       | Yes
 
 # Download
 
 `fakit` is implemented in [Golang](https://golang.org/) programming language,
  executable binary files **for most popular operating system** are freely available
   in [release](https://github.com/shenwei356/fakit/releases) page.
-  
+
 Just [download](https://github.com/shenwei356/fakit/releases) executable file
  of your operating system and rename it to `fakit.exe` (Windows) or
  `fakit` (other operating systems) for convenience,
  and then run it in command-line interface, no dependencies,
  no complicated compilation process.
 
-  
+
 ## Subcommands
 
 **Sequence and subsequence**
@@ -101,6 +101,10 @@ Just [download](https://github.com/shenwei356/fakit/releases) executable file
 - `common`     find common sequences of multiple files by id/name/sequence
 - `split`      split sequences into files by id/seq region/size/parts
 - `sample`     sample sequences by number or proportion
+
+**Edit**
+
+- `replace`    replace name/sequence/by regular expression
 
 **Ordering**
 
@@ -142,7 +146,7 @@ Missing data indicates that the tool does not have the function.
 Result also shows that **the self-implemented FASTA parsing module has better performance than
 the [biogo](https://github.com/biogo/biogo)**, a bioinformatics library for Go.
 
-For the revese complementary sequence test, 
+For the revese complementary sequence test,
 the `fasta_utilities`, `seqmagick` and `seqtk` do not validate the bases/residues, which save some times.
 
 ![benchmark_colorful.png](benchmark/benchmark_colorful.png)
