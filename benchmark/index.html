@@ -385,7 +385,7 @@
 </tr>
 <tr>
 <td align="left">Rename head</td>
-<td>--</td>
+<td>Yes</td>
 <td>Yes</td>
 <td>--</td>
 <td>--</td>
@@ -543,7 +543,7 @@ for f in dataset_{B}.fa; do echo data: $f; time seqtk sample $f $n2 &gt; $f.samp
 
 <h2 id="test-4-remove-duplicated-sequences">Test 4. Remove duplicated sequences</h2>
 <h3 id="dataset">Dataset</h3>
-<p>10% or 20% sequences were randomly extract sequences from dataset_A.fa 
+<p>10% or 20% sequences were randomly extract sequences from dataset_A.fa
 or dataset_B.fa and merge dback and then shuffled.</p>
 <pre><code>$ cat &lt;(fakit sample -p 0.1 dataset_A.fa) dataset_A.fa | fakit shuffle &gt; dataset_A_dup.fasta
 $ cat &lt;(fakit sample -p 0.2 dataset_B.fa) dataset_B.fa | fakit shuffle &gt; dataset_B_dup.fasta
@@ -586,7 +586,7 @@ echo data: chr1.fa.gz; time seqtk subseq chr1.fa.gz chr1.bed.gz &gt; chr1.bed.gz
 <p>Missing data indicates that the tool does not have the function.</p>
 <p>Result also shows that <strong>the self-implemented FASTA parsing module has better performance than
 the <a href="https://github.com/biogo/biogo">biogo</a></strong>, a bioinformatics library for Go.</p>
-<p>For the revese complementary sequence test, 
+<p>For the revese complementary sequence test,
 the <code>fasta_utilities</code>, <code>seqmagick</code> and <code>seqtk</code> do not validate the bases/residues, which save some times.</p>
 <p>Fakit used all CPUs (4 for my computer) by default.</p>
 <p><img alt="benchmark_colorful.png" src="../benchmark/benchmark_colorful.png" /></p>

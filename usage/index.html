@@ -163,6 +163,8 @@
         
             <li><a href="#sample">sample</a></li>
         
+            <li><a href="#replace">replace</a></li>
+        
             <li><a href="#shuffle">shuffle</a></li>
         
             <li><a href="#sort">sort</a></li>
@@ -175,9 +177,9 @@
 <h1 id="usage-and-examples">Usage and Examples</h1>
 <h3 id="fakit">fakit</h3>
 <p>Usage</p>
-<pre><code>fakit -- a cross-platform and efficient suit for FASTA file manipulation
+<pre><code>fakit -- Swiss army knife of FASTA format
 
-Version: 0.1.5.1
+Version: 0.1.6
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -192,6 +194,7 @@ Available Commands:
   fa2tab      covert FASTA to tabular format (with length/GC content/GC skew) to filter and sort
   grep        search sequences by pattern(s) of name or sequence motifs
   locate      locate subsequences/motifs
+  replace     replace name/sequence/by regular expression
   rmdup       remove duplicated sequences by id/name/sequence
   sample      sample sequences by number or proportion
   seq         transform sequences (revserse, complement, extract ID...)
@@ -214,6 +217,7 @@ Flags:
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default &quot;auto&quot;)
   -j, --threads int                     number of CPUs. (default value depends on your device) (default 4)
 
+Use &quot;fakit [command] --help&quot; for more information about a command.
 </code></pre>
 
 <h3 id="performance-tips">Performance Tips</h3>
@@ -373,7 +377,7 @@ AAACUAUACAACCUACUACCUCACCGGAUCCACAGUGUA
 </li>
 <li>
 <p>Remove gaps and to lower/upper case</p>
-<pre><code>$ echo -e "&gt;seq\nACGT-ACTGC-ACC" | fakit seq -i -g
+<pre><code>$ echo -e "&gt;seq\nACGT-ACTGC-ACC" | fakit seq -g -u
 &gt;seq
 ACGTACTGCACC
 </code></pre>
@@ -759,7 +763,7 @@ seqID   patternName     pattern strand  start   end     matched
 bna-MIR396a     UUS     UUS     -       105     107     UUS
 bna-MIR396a     UUS     UUS     -       89      91      UUS
 </code></pre>
-<p>Notice that <code>fakit grep</code> only searches in positive strand, but <code>fakit loate</code> could recogize both strand</p>
+<p>Notice that <code>fakit grep</code> only searches in positive strand, but <code>fakit loate</code> could recognize both strand</p>
 </li>
 </ol>
 <h2 id="rmdup">rmdup</h2>
@@ -973,6 +977,79 @@ Flags:
 <li>
 <p>Most of the time, we could shuffle after sampling</p>
 <pre><code>$ zcat hairpin.fa.gz | fakit sample -p 0.1 | fakit shuffle -o sample.fa.gz
+</code></pre>
+</li>
+</ol>
+<h2 id="replace">replace</h2>
+<p>Usage</p>
+<pre><code>replace name/sequence/by regular expression.
+
+Note that the replacement supports capture variables.
+e.g. $1 represents the text of the first submatch.
+ATTENTION: use SINGLE quote NOT double quotes in *nix OS.
+
+Examples: Adding space to all bases.
+
+    fakit replace -p &quot;(.)&quot; -r '$1 ' -s
+
+Or use the \ escape character.
+
+    fakit replace -p &quot;(.)&quot; -r &quot;\$1 &quot; -s
+
+more on: http://shenwei356.github.io/fakit/usage/#replace
+
+Usage:
+  fakit replace [flags]
+
+Flags:
+  -s, --by-seq               replace seq
+  -i, --ignore-case          ignore case
+  -p, --pattern string       search regular expression
+  -r, --replacement string   replacement. supporting capture variables.  e.g. $1 represents the text of the first submatch. ATTENTION: use SINGLE quote NOT double quotes in *nix OS or use the \ escape character.
+
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>Remove descriptions</p>
+<pre><code>$ echo -e "&gt;seq1 abc-123\nACGT-ACGT" | fakit replace -p " .+"
+&gt;seq1
+ACGT-ACGT
+</code></pre>
+</li>
+<li>
+<p>Replace "-" with "="</p>
+<pre><code>$ echo -e "&gt;seq1 abc-123\nACGT-ACGT" | fakit replace -p "\-" -r '='
+&gt;seq1 abc=123
+ACGT-ACGT
+</code></pre>
+</li>
+<li>
+<p>Remove gaps in sequences.</p>
+<pre><code>$ echo -e "&gt;seq1 abc-123\nACGT-ACGT" | fakit replace -p " |-" -s
+&gt;seq1 abc-123
+ACGTACGT
+</code></pre>
+</li>
+<li>
+<p>Add space to every base. <strong>ATTENTION: use SINGLE quote NOT double quotes in *nix OS</strong></p>
+<pre><code>$ echo -e "&gt;seq1 abc-123\nACGT-ACGT" | fakit replace -p "(.)" -r '$1 ' -s
+&gt;seq1 abc-123
+A C G T - A C G T
+</code></pre>
+</li>
+<li>
+<p>Transpose sequence with <a href="https://github.com/shenwei356/csvtk">csvtk</a></p>
+<pre><code>$ echo -e "&gt;seq1\nACTGACGT\n&gt;seq2\nactgccgt" | fakit replace -p "(.)" -r     "\$1 " -s | fakit seq -s -u | csvtk space2tab | csvtk -t transpose
+A       A
+C       C
+T       T
+G       G
+A       C
+C       C
+G       G
+T       T
 </code></pre>
 </li>
 </ol>

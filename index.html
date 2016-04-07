@@ -394,7 +394,7 @@ from either standard stream or files, therefore, it could be easily used in pipe
 </tr>
 <tr>
 <td align="left">Rename head</td>
-<td>--</td>
+<td>Yes</td>
 <td>Yes</td>
 <td>--</td>
 <td>--</td>
@@ -437,6 +437,10 @@ from either standard stream or files, therefore, it could be easily used in pipe
 <li><code>split</code>      split sequences into files by id/seq region/size/parts</li>
 <li><code>sample</code>     sample sequences by number or proportion</li>
 </ul>
+<p><strong>Edit</strong></p>
+<ul>
+<li><code>replace</code>    replace name/sequence/by regular expression</li>
+</ul>
 <p><strong>Ordering</strong></p>
 <ul>
 <li><code>shuffle</code>    shuffle sequences</li>
@@ -465,7 +469,7 @@ from either standard stream or files, therefore, it could be easily used in pipe
 <p>Missing data indicates that the tool does not have the function.</p>
 <p>Result also shows that <strong>the self-implemented FASTA parsing module has better performance than
 the <a href="https://github.com/biogo/biogo">biogo</a></strong>, a bioinformatics library for Go.</p>
-<p>For the revese complementary sequence test, 
+<p>For the revese complementary sequence test,
 the <code>fasta_utilities</code>, <code>seqmagick</code> and <code>seqtk</code> do not validate the bases/residues, which save some times.</p>
 <p><img alt="benchmark_colorful.png" src="./benchmark/benchmark_colorful.png" /></p>
 <h3 id="acceleration-with-multi-cpus">Acceleration with multi-CPUs</h3>
@@ -522,5 +526,5 @@ propose new functions or ask for help.</p>
 
 <!--
 MkDocs version : 0.15.3
-Build Date UTC : 2016-04-06 03:13:01.041009
+Build Date UTC : 2016-04-07 06:23:40.339500
 -->
