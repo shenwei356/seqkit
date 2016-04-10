@@ -638,15 +638,13 @@ $ fakit sort -l hairpin.fa.gz
 <p><strong>Extension</strong></p>
 <p>After converting FASTA to tabular format with <code>fakit fa2tab</code>,
 it could be handled with CSV/TSV tools,
- e.g. <a href="https://github.com/shenwei356/datakit">datakit</a> (CSV/TSV file manipulation and more)</p>
+ e.g. <a href="https://github.com/shenwei356/csvtkt">csvtk</a>, a cross-platform, efficient and practical CSV/TSV toolkit</p>
 <ul>
-<li><a href="https://github.com/shenwei356/datakit/tree/master/csv_grep.go">csv_grep</a>
-(go version) or <a href="https://github.com/shenwei356/datakit/blob/master/csv_grep.py">csv_grep.py</a>
-(python version), could be used to filter sequences (similar with <code>fakit extract</code>)</li>
-<li><a href="https://github.com/shenwei356/datakit/blob/master/intersection">intersection</a>
+<li><code>csvtk grep</code> could be used to filter sequences (similar with <code>fakit extract</code>)</li>
+<li><code>csvtk inter</code>
 computates intersection of multiple files. It could achieve similar function
 as <code>fakit common -n</code> along with shell.</li>
-<li><a href="https://github.com/shenwei356/datakit/blob/master/csv_join">csv_join</a> joins multiple CSV/TSV files by multiple IDs.</li>
+<li><code>csvtk join</code> joins multiple CSV/TSV files by multiple IDs.</li>
 <li><a href="https://github.com/shenwei356/datakit/blob/master/csv_melt">csv_melt</a>
 provides melt function, could be used in preparation of data for ploting.</li>
 </ul>
