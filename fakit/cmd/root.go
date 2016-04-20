@@ -25,7 +25,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/shenwei356/bio/seqio/fasta"
+	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/spf13/cobra"
 )
 
@@ -35,7 +35,7 @@ var RootCmd = &cobra.Command{
 	Short: "Swiss army knife of FASTA format",
 	Long: `fakit -- Swiss army knife of FASTA format
 
-Version: 0.1.6
+Version: 0.1.7
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -59,7 +59,7 @@ func init() {
 	RootCmd.PersistentFlags().IntP("chunk-size", "c", 1000, "chunk size (attention: unit is FASTA records not lines)")
 	RootCmd.PersistentFlags().IntP("threads", "j", runtime.NumCPU(), "number of CPUs. (default value depends on your device)")
 	RootCmd.PersistentFlags().IntP("line-width", "w", 60, "line width (0 for no wrap)")
-	RootCmd.PersistentFlags().StringP("id-regexp", "", fasta.DefaultIDRegexp, "regular expression for parsing ID")
+	RootCmd.PersistentFlags().StringP("id-regexp", "", fastx.DefaultIDRegexp, "regular expression for parsing ID")
 	RootCmd.PersistentFlags().BoolP("id-ncbi", "", false, "FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...")
 	RootCmd.PersistentFlags().StringP("out-file", "o", "-", `out file ("-" for stdout, suffix .gz for gzipped out)`)
 	RootCmd.PersistentFlags().BoolP("quiet", "", false, "be quiet and do not show extra information")

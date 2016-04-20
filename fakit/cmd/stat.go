@@ -27,9 +27,10 @@ import (
 	"github.com/brentp/xopen"
 	"github.com/dustin/go-humanize"
 	"github.com/shenwei356/bio/seq"
-	"github.com/shenwei356/bio/seqio/fasta"
+	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/util/math"
 	"github.com/spf13/cobra"
+	"github.com/tatsushid/go-prettytable"
 )
 
 // statCmd represents the seq command
@@ -40,12 +41,13 @@ var statCmd = &cobra.Command{
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		alphabet := getAlphabet(cmd, "seq-type")
-		idRegexp := getIDRegexp(cmd, "id-regexp")
-		chunkSize := getFlagPositiveInt(cmd, "chunk-size")
-		threads := getFlagPositiveInt(cmd, "threads")
-		outFile := getFlagString(cmd, "out-file")
-		seq.AlphabetGuessSeqLenghtThreshold = getFlagalphabetGuessSeqLength(cmd, "alphabet-guess-seq-length")
+		config := getConfigs(cmd)
+		alphabet := config.Alphabet
+		idRegexp := config.IDRegexp
+		chunkSize := config.ChunkSize
+		threads := config.Threads
+		outFile := config.OutFile
+		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(threads)
 
@@ -56,18 +58,27 @@ var statCmd = &cobra.Command{
 		defer outfh.Close()
 
 		var num, l, lenMin, lenMax, lenSum uint64
-		var t string
+		var seqFormat, t string
 		statInfos := []statInfo{}
 		for _, file := range files {
-			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
+			var fastxReader *fastx.Reader
+			fastxReader, err = fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
 
+			seqFormat = ""
 			num, lenMin, lenMax, lenSum = 0, ^uint64(0), 0, 0
-			for chunk := range fastaReader.Ch {
+			for chunk := range fastxReader.Ch {
 				checkError(chunk.Err)
 
 				num += uint64(len(chunk.Data))
 				for _, record := range chunk.Data {
+					if seqFormat == "" {
+						if len(record.Seq.Qual) > 0 {
+							seqFormat = "FASTQ"
+						} else {
+							seqFormat = "FASTA"
+						}
+					}
 					l = uint64(len(record.Seq.Seq))
 					lenSum += l
 					if l < lenMin {
@@ -78,68 +89,47 @@ var statCmd = &cobra.Command{
 					}
 				}
 			}
-			if fastaReader.Alphabet() == seq.DNAredundant {
+			if fastxReader.Alphabet() == seq.DNAredundant {
 				t = "DNA"
-			} else if fastaReader.Alphabet() == seq.RNAredundant {
+			} else if fastxReader.Alphabet() == seq.RNAredundant {
 				t = "RNA"
 			} else {
-				t = fmt.Sprintf("%s", fastaReader.Alphabet())
+				t = fmt.Sprintf("%s", fastxReader.Alphabet())
 			}
 
-			statInfos = append(statInfos, statInfo{file, t, int64(num), int64(lenMin),
+			statInfos = append(statInfos, statInfo{file, seqFormat, t, int64(num), int64(lenMin),
 				math.Round(float64(lenSum)/float64(num), 1), int64(lenMax)})
 		}
 
 		// format output
-		fileLen, tLen, numLen, lenMinLen, lenAvgLen, lenMaxLen := len("file"),
-			len("seq_type"), len("num_seqs"), len("min_len"), len("avg_len"), len("max_len")
+		tbl, err := prettytable.NewTable([]prettytable.Column{
+			{Header: "file"},
+			{Header: "seq_format"},
+			{Header: "seq_type"},
+			{Header: "num_seqs", AlignRight: true},
+			{Header: "min_len", AlignRight: true},
+			{Header: "avg_len", AlignRight: true},
+			{Header: "max_len", AlignRight: true}}...)
+		checkError(err)
+		tbl.Separator = "   "
 
-		l2 := 0
 		for _, info := range statInfos {
-			if len(info.file) > fileLen {
-				fileLen = len(info.file)
-			}
-			if len(info.t) > tLen {
-				tLen = len(info.t)
-			}
-			l2 = len(humanize.Comma(info.num))
-			if l2 > numLen {
-				numLen = l2
-			}
-			l2 = len(humanize.Comma(info.lenMin))
-			if l2 > lenMinLen {
-				lenMinLen = l2
-			}
-			l2 = len(humanize.Commaf(info.lenAvg))
-			if l2 > lenAvgLen {
-				lenAvgLen = l2
-			}
-			l2 = len(humanize.Comma(info.lenMax))
-			if l2 > lenMaxLen {
-				lenMaxLen = l2
-			}
-		}
-
-		format := "%" + fmt.Sprintf("-%d", fileLen) + "s"
-		for _, d := range []int{tLen, numLen, lenMinLen, lenAvgLen, lenMaxLen} {
-			format += "    %" + fmt.Sprintf("%d", d) + "s"
-		}
-		format += "\n"
-
-		outfh.WriteString(fmt.Sprintf(format, "file", "seq_type", "num_seqs",
-			"min_len", "avg_len", "max_len"))
-		for _, info := range statInfos {
-			outfh.WriteString(fmt.Sprintf(format, info.file, info.t,
+			tbl.AddRow(
+				info.file,
+				info.format,
+				info.t,
 				humanize.Comma(info.num),
 				humanize.Comma(info.lenMin),
 				humanize.Commaf(info.lenAvg),
-				humanize.Comma(info.lenMax)))
+				humanize.Comma(info.lenMax))
 		}
+		outfh.Write(tbl.Bytes())
 	},
 }
 
 type statInfo struct {
 	file   string
+	format string
 	t      string
 	num    int64
 	lenMin int64

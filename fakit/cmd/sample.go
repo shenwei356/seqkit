@@ -27,7 +27,7 @@ import (
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seq"
-	"github.com/shenwei356/bio/seqio/fasta"
+	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/spf13/cobra"
 )
 
@@ -43,14 +43,15 @@ var sampleCmd = &cobra.Command{
 			checkError(fmt.Errorf("no more than one file needed (%d)", len(args)))
 		}
 
-		alphabet := getAlphabet(cmd, "seq-type")
-		idRegexp := getIDRegexp(cmd, "id-regexp")
-		chunkSize := getFlagPositiveInt(cmd, "chunk-size")
-		threads := getFlagPositiveInt(cmd, "threads")
-		lineWidth := getFlagNonNegativeInt(cmd, "line-width")
-		outFile := getFlagString(cmd, "out-file")
-		quiet := getFlagBool(cmd, "quiet")
-		seq.AlphabetGuessSeqLenghtThreshold = getFlagalphabetGuessSeqLength(cmd, "alphabet-guess-seq-length")
+		config := getConfigs(cmd)
+		alphabet := config.Alphabet
+		idRegexp := config.IDRegexp
+		chunkSize := config.ChunkSize
+		threads := config.Threads
+		lineWidth := config.LineWidth
+		outFile := config.OutFile
+		quiet := config.Quiet
+		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(threads)
 
@@ -94,7 +95,7 @@ var sampleCmd = &cobra.Command{
 				if !quiet {
 					log.Info("first pass: get seq number")
 				}
-				names, err := fasta.GetSeqNames(file)
+				names, err := fastx.GetSeqNames(file)
 				checkError(err)
 
 				if !quiet {
@@ -107,10 +108,10 @@ var sampleCmd = &cobra.Command{
 				if !quiet {
 					log.Info("second pass: read and sample")
 				}
-				fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
 				checkError(err)
 			LOOP:
-				for chunk := range fastaReader.Ch {
+				for chunk := range fastxReader.Ch {
 					checkError(chunk.Err)
 
 					for _, record := range chunk.Data {
@@ -124,7 +125,7 @@ var sampleCmd = &cobra.Command{
 					}
 				}
 			} else {
-				records, err := fasta.GetSeqs(file, alphabet, chunkSize, threads, idRegexp)
+				records, err := fastx.GetSeqs(file, alphabet, chunkSize, threads, idRegexp)
 				checkError(err)
 
 				proportion = float64(number) / float64(len(records))
@@ -144,9 +145,9 @@ var sampleCmd = &cobra.Command{
 				log.Info("sample by proportion")
 			}
 
-			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
-			for chunk := range fastaReader.Ch {
+			for chunk := range fastxReader.Ch {
 				checkError(chunk.Err)
 
 				for _, record := range chunk.Data {

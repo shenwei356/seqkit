@@ -30,7 +30,7 @@ import (
 	"github.com/brentp/xopen"
 	"github.com/cznic/sortutil"
 	"github.com/shenwei356/bio/seq"
-	"github.com/shenwei356/bio/seqio/fasta"
+	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/spf13/cobra"
 )
 
@@ -49,12 +49,13 @@ When flag -d given, regular expression may be wrong.
 For example: "\w" will be wrongly converted to "\[AT]".
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		alphabet := getAlphabet(cmd, "seq-type")
-		idRegexp := getIDRegexp(cmd, "id-regexp")
-		chunkSize := getFlagPositiveInt(cmd, "chunk-size")
-		threads := getFlagPositiveInt(cmd, "threads")
-		outFile := getFlagString(cmd, "out-file")
-		seq.AlphabetGuessSeqLenghtThreshold = getFlagalphabetGuessSeqLength(cmd, "alphabet-guess-seq-length")
+		config := getConfigs(cmd)
+		alphabet := config.Alphabet
+		idRegexp := config.IDRegexp
+		chunkSize := config.ChunkSize
+		threads := config.Threads
+		outFile := config.OutFile
+		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = true
 		runtime.GOMAXPROCS(threads)
 
@@ -76,7 +77,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		patterns := make(map[string][]byte)
 		var s string
 		if patternFile != "" {
-			records, err := fasta.GetSeqsMap(patternFile, nil, 1000, runtime.NumCPU(), "")
+			records, err := fastx.GetSeqsMap(patternFile, nil, 1000, runtime.NumCPU(), "")
 			checkError(err)
 			for name, record := range records {
 				patterns[name] = record.Seq.Seq
@@ -216,14 +217,14 @@ For example: "\w" will be wrongly converted to "\[AT]".
 			var wg sync.WaitGroup
 			tokens := make(chan int, threads)
 
-			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
-			for chunk := range fastaReader.Ch {
+			for chunk := range fastxReader.Ch {
 				checkError(chunk.Err)
 				tokens <- 1
 				wg.Add(1)
 
-				go func(chunk fasta.FastaRecordChunk) {
+				go func(chunk fastx.RecordChunk) {
 					defer func() {
 						wg.Done()
 						<-tokens
@@ -270,7 +271,7 @@ type LocationChunk struct {
 
 // LocationInfo is LocationInfo
 type LocationInfo struct {
-	Record      *fasta.FastaRecord
+	Record      *fastx.Record
 	PatternName string
 	Strand      string
 	Locations   [][]int

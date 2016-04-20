@@ -28,7 +28,7 @@ import (
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seq"
-	"github.com/shenwei356/bio/seqio/fasta"
+	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/util/byteutil"
 	"github.com/spf13/cobra"
 )
@@ -50,14 +50,15 @@ Examples:
 			checkError(fmt.Errorf("no more than one file needed (%d)", len(args)))
 		}
 
-		alphabet := getAlphabet(cmd, "seq-type")
-		idRegexp := getIDRegexp(cmd, "id-regexp")
-		chunkSize := getFlagPositiveInt(cmd, "chunk-size")
-		threads := getFlagPositiveInt(cmd, "threads")
-		lineWidth := getFlagNonNegativeInt(cmd, "line-width")
-		outFile := getFlagString(cmd, "out-file")
-		quiet := getFlagBool(cmd, "quiet")
-		seq.AlphabetGuessSeqLenghtThreshold = getFlagalphabetGuessSeqLength(cmd, "alphabet-guess-seq-length")
+		config := getConfigs(cmd)
+		alphabet := config.Alphabet
+		idRegexp := config.IDRegexp
+		chunkSize := config.ChunkSize
+		threads := config.Threads
+		lineWidth := config.LineWidth
+		outFile := config.OutFile
+		quiet := config.Quiet
+		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(threads)
 
@@ -87,7 +88,7 @@ Examples:
 		file := files[0]
 		var fileName, fileExt string
 		if file == "-" {
-			fileName, fileExt = "stdin", ".fasta"
+			fileName, fileExt = "stdin", ".fastx"
 		} else {
 			fileName, fileExt = filepathTrimExtension(file)
 		}
@@ -103,12 +104,12 @@ Examples:
 			}
 
 			i := 1
-			records := []*fasta.FastaRecord{}
+			records := []*fastx.Record{}
 
-			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
 
-			for chunk := range fastaReader.Ch {
+			for chunk := range fastxReader.Ch {
 				checkError(chunk.Err)
 				for _, record := range chunk.Data {
 					records = append(records, record)
@@ -116,7 +117,7 @@ Examples:
 						outfile = fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt)
 						writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 						i++
-						records = []*fasta.FastaRecord{}
+						records = []*fastx.Record{}
 					}
 				}
 			}
@@ -139,7 +140,7 @@ Examples:
 				if !quiet {
 					log.Info("first pass: get seq number")
 				}
-				names, err := fasta.GetSeqNames(file)
+				names, err := fastx.GetSeqNames(file)
 				checkError(err)
 
 				if !quiet {
@@ -162,10 +163,10 @@ Examples:
 					log.Info("second pass: read and split")
 				}
 				i := 1
-				records := []*fasta.FastaRecord{}
-				fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
+				records := []*fastx.Record{}
+				fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
 				checkError(err)
-				for chunk := range fastaReader.Ch {
+				for chunk := range fastxReader.Ch {
 					checkError(chunk.Err)
 					for _, record := range chunk.Data {
 						records = append(records, record)
@@ -173,7 +174,7 @@ Examples:
 							outfile = fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt)
 							writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 							i++
-							records = []*fasta.FastaRecord{}
+							records = []*fastx.Record{}
 						}
 					}
 				}
@@ -183,12 +184,12 @@ Examples:
 				}
 			} else {
 				i := 1
-				records := []*fasta.FastaRecord{}
+				records := []*fastx.Record{}
 
 				if !quiet {
 					log.Info("read sequences ...")
 				}
-				allRecords, err := fasta.GetSeqs(file, alphabet, chunkSize, threads, idRegexp)
+				allRecords, err := fastx.GetSeqs(file, alphabet, chunkSize, threads, idRegexp)
 				checkError(err)
 				if !quiet {
 					log.Infof("read %d sequences", len(allRecords))
@@ -212,7 +213,7 @@ Examples:
 						outfile = fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt)
 						writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 						i++
-						records = []*fasta.FastaRecord{}
+						records = []*fastx.Record{}
 					}
 				}
 				if len(records) > 0 {
@@ -233,19 +234,19 @@ Examples:
 			if !quiet {
 				log.Info("read sequences ...")
 			}
-			allRecords, err := fasta.GetSeqs(file, alphabet, chunkSize, threads, idRegexp)
+			allRecords, err := fastx.GetSeqs(file, alphabet, chunkSize, threads, idRegexp)
 			checkError(err)
 			if !quiet {
 				log.Infof("read %d sequences", len(allRecords))
 			}
 
-			recordsByID := make(map[string][]*fasta.FastaRecord)
+			recordsByID := make(map[string][]*fastx.Record)
 
 			var id string
 			for _, record := range allRecords {
 				id = string(record.ID)
 				if _, ok := recordsByID[id]; !ok {
-					recordsByID[id] = []*fasta.FastaRecord{}
+					recordsByID[id] = []*fastx.Record{}
 				}
 				recordsByID[id] = append(recordsByID[id], record)
 			}
@@ -283,13 +284,13 @@ Examples:
 			if !quiet {
 				log.Info("read sequences ...")
 			}
-			allRecords, err := fasta.GetSeqs(file, alphabet, chunkSize, threads, idRegexp)
+			allRecords, err := fastx.GetSeqs(file, alphabet, chunkSize, threads, idRegexp)
 			checkError(err)
 			if !quiet {
 				log.Infof("read %d sequences", len(allRecords))
 			}
 
-			recordsBySeqs := make(map[string][]*fasta.FastaRecord)
+			recordsBySeqs := make(map[string][]*fastx.Record)
 
 			var subseq string
 			var s, e int
@@ -308,7 +309,7 @@ Examples:
 					subseq = string(byteutil.SubSlice(record.Seq.Seq, s, e))
 				}
 				if _, ok := recordsBySeqs[subseq]; !ok {
-					recordsBySeqs[subseq] = []*fasta.FastaRecord{}
+					recordsBySeqs[subseq] = []*fastx.Record{}
 				}
 				recordsBySeqs[subseq] = append(recordsBySeqs[subseq], record)
 			}

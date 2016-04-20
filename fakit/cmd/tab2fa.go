@@ -40,11 +40,12 @@ var tab2faCmd = &cobra.Command{
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		chunkSize := getFlagPositiveInt(cmd, "chunk-size")
-		threads := getFlagPositiveInt(cmd, "threads")
-		outFile := getFlagString(cmd, "out-file")
-		lineWidth := getFlagNonNegativeInt(cmd, "line-width")
-		seq.AlphabetGuessSeqLenghtThreshold = getFlagalphabetGuessSeqLength(cmd, "alphabet-guess-seq-length")
+		config := getConfigs(cmd)
+		chunkSize := config.ChunkSize
+		threads := config.Threads
+		lineWidth := config.LineWidth
+		outFile := config.OutFile
+		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		runtime.GOMAXPROCS(threads)
 
 		files := getFileList(args)

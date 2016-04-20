@@ -25,3 +25,4 @@ _testmain.go
 *.directory
 doc/site/*
 *.Rhistory
+fakit/fakit*

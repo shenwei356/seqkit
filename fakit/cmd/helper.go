@@ -33,7 +33,7 @@ import (
 	"github.com/brentp/xopen"
 	"github.com/cznic/sortutil"
 	"github.com/shenwei356/bio/seq"
-	"github.com/shenwei356/bio/seqio/fasta"
+	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/spf13/cobra"
 )
 
@@ -157,7 +157,34 @@ func getFlagalphabetGuessSeqLength(cmd *cobra.Command, flag string) int {
 	return alphabetGuessSeqLength
 }
 
-func sortFastaRecordChunkMapID(chunks map[uint64]fasta.FastaRecordChunk) sortutil.Uint64Slice {
+type Config struct {
+	Alphabet               *seq.Alphabet
+	ChunkSize              int
+	Threads                int
+	LineWidth              int
+	IDRegexp               string
+	IDNCBI                 bool
+	OutFile                string
+	Quiet                  bool
+	AlphabetGuessSeqLength int
+}
+
+func getConfigs(cmd *cobra.Command) Config {
+	return Config{
+		Alphabet:  getAlphabet(cmd, "seq-type"),
+		ChunkSize: getFlagPositiveInt(cmd, "chunk-size"),
+		Threads:   getFlagPositiveInt(cmd, "threads"),
+		LineWidth: getFlagNonNegativeInt(cmd, "line-width"),
+		IDRegexp:  getIDRegexp(cmd, "id-regexp"),
+		IDNCBI:    getFlagBool(cmd, "id-ncbi"),
+		OutFile:   getFlagString(cmd, "out-file"),
+		Quiet:     getFlagBool(cmd, "quiet"),
+		AlphabetGuessSeqLength: getFlagalphabetGuessSeqLength(cmd, "alphabet-guess-seq-length"),
+	}
+
+}
+
+func sortRecordChunkMapID(chunks map[uint64]fastx.RecordChunk) sortutil.Uint64Slice {
 	ids := make(sortutil.Uint64Slice, len(chunks))
 	i := 0
 	for id := range chunks {
@@ -203,7 +230,7 @@ negative index    0-9-8-7-6-5-4-3-2-1
           1:-1    A C G T N a c g t n
 `
 
-func writeSeqs(records []*fasta.FastaRecord, file string, lineWidth int, quiet bool, dryRun bool) error {
+func writeSeqs(records []*fastx.Record, file string, lineWidth int, quiet bool, dryRun bool) error {
 	if !quiet {
 		log.Infof("write %d sequences to file: %s\n", len(records), file)
 	}

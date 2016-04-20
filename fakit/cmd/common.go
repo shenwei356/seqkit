@@ -29,7 +29,7 @@ import (
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seq"
-	"github.com/shenwei356/bio/seqio/fasta"
+	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/spf13/cobra"
 )
 
@@ -44,15 +44,15 @@ var commonCmd = &cobra.Command{
 		if len(args) < 2 {
 			checkError(errors.New("at least 2 files needed"))
 		}
-
-		alphabet := getAlphabet(cmd, "seq-type")
-		idRegexp := getIDRegexp(cmd, "id-regexp")
-		chunkSize := getFlagPositiveInt(cmd, "chunk-size")
-		threads := getFlagPositiveInt(cmd, "threads")
-		lineWidth := getFlagNonNegativeInt(cmd, "line-width")
-		outFile := getFlagString(cmd, "out-file")
-		quiet := getFlagBool(cmd, "quiet")
-		seq.AlphabetGuessSeqLenghtThreshold = getFlagalphabetGuessSeqLength(cmd, "alphabet-guess-seq-length")
+		config := getConfigs(cmd)
+		alphabet := config.Alphabet
+		idRegexp := config.IDRegexp
+		chunkSize := config.ChunkSize
+		threads := config.Threads
+		lineWidth := config.LineWidth
+		outFile := config.OutFile
+		quiet := config.Quiet
+		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(threads)
 
@@ -83,9 +83,9 @@ var commonCmd = &cobra.Command{
 			if !quiet {
 				log.Info("read file: %s", file)
 			}
-			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
-			for chunk := range fastaReader.Ch {
+			for chunk := range fastxReader.Ch {
 				checkError(chunk.Err)
 
 				for _, record := range chunk.Data {
@@ -151,9 +151,9 @@ var commonCmd = &cobra.Command{
 		}
 
 		// extract
-		fastaReader, err := fasta.NewFastaReader(alphabet, firstFile, chunkSize, threads, idRegexp)
+		fastxReader, err := fastx.NewReader(alphabet, firstFile, chunkSize, threads, idRegexp)
 		checkError(err)
-		for chunk := range fastaReader.Ch {
+		for chunk := range fastxReader.Ch {
 			checkError(chunk.Err)
 
 			for _, record := range chunk.Data {

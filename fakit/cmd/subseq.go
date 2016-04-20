@@ -29,7 +29,7 @@ import (
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/featio/gtf"
 	"github.com/shenwei356/bio/seq"
-	"github.com/shenwei356/bio/seqio/fasta"
+	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/util/byteutil"
 	"github.com/spf13/cobra"
 )
@@ -46,14 +46,15 @@ Examples:
 %s
 `, regionExample),
 	Run: func(cmd *cobra.Command, args []string) {
-		alphabet := getAlphabet(cmd, "seq-type")
-		idRegexp := getIDRegexp(cmd, "id-regexp")
-		chunkSize := getFlagPositiveInt(cmd, "chunk-size")
-		threads := getFlagPositiveInt(cmd, "threads")
-		lineWidth := getFlagNonNegativeInt(cmd, "line-width")
-		outFile := getFlagString(cmd, "out-file")
-		quiet := getFlagBool(cmd, "quiet")
-		seq.AlphabetGuessSeqLenghtThreshold = getFlagalphabetGuessSeqLength(cmd, "alphabet-guess-seq-length")
+		config := getConfigs(cmd)
+		alphabet := config.Alphabet
+		idRegexp := config.IDRegexp
+		chunkSize := config.ChunkSize
+		threads := config.Threads
+		lineWidth := config.LineWidth
+		outFile := config.OutFile
+		quiet := config.Quiet
+		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(threads)
 
@@ -144,9 +145,9 @@ Examples:
 		var s, e int
 		var subseq *seq.Seq
 		for _, file := range files {
-			fastaReader, err := fasta.NewFastaReader(alphabet, file, threads, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
-			for chunk := range fastaReader.Ch {
+			for chunk := range fastxReader.Ch {
 				checkError(chunk.Err)
 
 				for _, record := range chunk.Data {

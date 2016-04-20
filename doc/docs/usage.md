@@ -453,15 +453,13 @@ we could also print title line by flag `-T`.
 
 After converting FASTA to tabular format with `fakit fa2tab`,
 it could be handled with CSV/TSV tools,
- e.g. [datakit](https://github.com/shenwei356/datakit) (CSV/TSV file manipulation and more)
+ e.g. [csvtk](https://github.com/shenwei356/csvtkt), a cross-platform, efficient and practical CSV/TSV toolkit
 
-- [csv_grep](https://github.com/shenwei356/datakit/tree/master/csv_grep.go)
-(go version) or [csv_grep.py](https://github.com/shenwei356/datakit/blob/master/csv_grep.py)
-(python version), could be used to filter sequences (similar with `fakit extract`)
-- [intersection](https://github.com/shenwei356/datakit/blob/master/intersection)
+- `csvtk grep` could be used to filter sequences (similar with `fakit extract`)
+- `csvtk inter`
 computates intersection of multiple files. It could achieve similar function
 as `fakit common -n` along with shell.
-- [csv_join](https://github.com/shenwei356/datakit/blob/master/csv_join) joins multiple CSV/TSV files by multiple IDs.
+- `csvtk join` joins multiple CSV/TSV files by multiple IDs.
 - [csv_melt](https://github.com/shenwei356/datakit/blob/master/csv_melt)
 provides melt function, could be used in preparation of data for ploting.
 
@@ -946,3 +944,26 @@ Examples
         ACGTNcccc
         >SEQ2
         acgtnAAAAnnn
+
+<div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//fastakit.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
