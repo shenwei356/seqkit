@@ -243,7 +243,7 @@ func writeSeqs(records []*fastx.Record, file string, lineWidth int, quiet bool, 
 	defer outfh.Close()
 
 	for _, record := range records {
-		outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
+		outfh.WriteString(record.Format(lineWidth))
 	}
 
 	return nil

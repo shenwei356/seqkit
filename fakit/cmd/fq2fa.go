@@ -21,72 +21,48 @@
 package cmd
 
 import (
-	"fmt"
 	"runtime"
-	"strings"
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seq"
-	"github.com/shenwei356/breader"
-	"github.com/shenwei356/util/byteutil"
+	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/spf13/cobra"
 )
 
-// tab2faCmd represents the seq command
-var tab2faCmd = &cobra.Command{
-	Use:   "tab2fa",
-	Short: "covert tabular format to FASTA format",
-	Long: `covert tabular format (first two columns) to FASTA format
+// fq2faCmd represents the seq command
+var fq2faCmd = &cobra.Command{
+	Use:   "fq2fa",
+	Short: "covert FASTQ to FASTA",
+	Long: `covert FASTQ to FASTA
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
+		alphabet := config.Alphabet
+		idRegexp := config.IDRegexp
 		chunkSize := config.ChunkSize
 		threads := config.Threads
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
+		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(threads)
 
 		files := getFileList(args)
-
-		commentPrefixes := getFlagStringSlice(cmd, "comment-line-prefix")
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Close()
 
-		type Slice []string
-		fn := func(line string) (interface{}, bool, error) {
-			line = strings.TrimRight(line, "\r\n")
-
-			// check comment line
-			isCommentLine := false
-			for _, p := range commentPrefixes {
-				if strings.HasPrefix(line, p) {
-					isCommentLine = true
-					break
-				}
-			}
-			if isCommentLine {
-				return "", false, nil
-			}
-
-			items := strings.Split(line, "\t")
-			if len(items) < 2 {
-				return items, false, fmt.Errorf("at least two columns needed: %s", line)
-			}
-			return Slice(items[0:2]), true, nil
-		}
-
 		for _, file := range files {
-			reader, err := breader.NewBufferedReader(file, threads, chunkSize, fn)
+			fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
+			for chunk := range fastxReader.Ch {
+				checkError(chunk.Err)
 
-			for chunk := range reader.Ch {
-				for _, data := range chunk.Data {
-					items := data.(Slice)
-					outfh.WriteString(fmt.Sprintf(">%s\n%s\n", items[0], byteutil.WrapByteSlice([]byte(items[1]), lineWidth)))
+				for _, record := range chunk.Data {
+					record.Seq.Qual = []byte{}
+					outfh.WriteString(record.Format(lineWidth))
 				}
 			}
 		}
@@ -94,6 +70,5 @@ var tab2faCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(tab2faCmd)
-	tab2faCmd.Flags().StringSliceP("comment-line-prefix", "p", []string{"#", "//"}, "comment line prefix")
+	RootCmd.AddCommand(fq2faCmd)
 }

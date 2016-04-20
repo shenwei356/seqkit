@@ -1,4 +1,4 @@
-# fakit - a cross-platform and efficient suit for FASTA file manipulation
+# fakit - a cross-platform and efficient suit for FASTA/Q file manipulation
 
 Documents  : [http://shenwei356.github.io/fakit](http://shenwei356.github.io/fakit)
 
@@ -6,15 +6,15 @@ Source code: [https://github.com/shenwei356/fakit](https://github.com/shenwei356
 
 ## Introduction
 
-FASTA is a basic format for storing nucleotide and protein sequences.
-The manipulation of FASTA file includes converting, clipping, searching, filtering,
+FASTA and FASTQ is a basic format for storing nucleotide and protein sequences.
+The manipulation of FASTA/Q file includes converting, clipping, searching, filtering,
 deduplication, splitting, shuffling, sampling and so on.
 Existed tools only implemented parts of the functions,
 and some of them are only available for specific operating systems.
 Furthermore, the complicated installation process of dependencies packages and
 running environment also make them less friendly to common users.
 
-Fakit is a cross-platform, efficient, and practical FASTA manipulations tool
+fakit is a cross-platform, efficient, and practical FASTA/Q manipulations tool
 that is friendly for researchers to complete wide ranges of FASTA file processing.
 The suite supports plain or gzip-compressed input and output
 from either standard stream or files, therefore, it could be easily used in pipelines.
@@ -76,7 +76,7 @@ Just [download](https://github.com/shenwei356/fakit/releases) executable file
  no complicated compilation process.
 
 
-## Subcommands (15)
+## Subcommands (16 in total)
 
 **Sequence and subsequence**
 
@@ -87,8 +87,9 @@ Just [download](https://github.com/shenwei356/fakit/releases) executable file
 
 **Format conversion**
 
-- `fa2tab`     covert FASTA to tabular format (and length/GC content/GC skew) to filter and sort
-- `tab2fa`     covert tabular format to FASTA format
+- `fx2tab`     covert FASTA/Q to tabular format (and length/GC content/GC skew) to filter and sort
+- `tab2fx`     covert tabular format to FASTA/Q format
+- `fq2fa`      covert FASTQ to FASTA
 
 **Searching**
 

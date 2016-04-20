@@ -21,88 +21,88 @@
 package cmd
 
 import (
-	"math/rand"
+	"fmt"
 	"runtime"
+	"strings"
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seq"
-	"github.com/shenwei356/bio/seqio/fastx"
-	"github.com/shenwei356/util/randutil"
+	"github.com/shenwei356/breader"
+	"github.com/shenwei356/util/byteutil"
 	"github.com/spf13/cobra"
 )
 
-// shuffleCmd represents the seq command
-var shuffleCmd = &cobra.Command{
-	Use:   "shuffle",
-	Short: "shuffle sequences",
-	Long: `shuffle sequences
+// tab2faCmd represents the seq command
+var tab2faCmd = &cobra.Command{
+	Use:   "tab2fx",
+	Short: "covert tabular format to FASTA/Q format",
+	Long: `covert tabular format (first three columns) to FASTA/Q format
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
-		alphabet := config.Alphabet
-		idRegexp := config.IDRegexp
 		chunkSize := config.ChunkSize
 		threads := config.Threads
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
-		quiet := config.Quiet
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
-		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(threads)
 
 		files := getFileList(args)
 
-		seed := getFlagInt64(cmd, "rand-seed")
+		commentPrefixes := getFlagStringSlice(cmd, "comment-line-prefix")
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Close()
 
-		sequences := make(map[string]*fastx.Record)
-		index2name := make(map[int]string)
+		type Slice []string
+		fn := func(line string) (interface{}, bool, error) {
+			line = strings.TrimRight(line, "\r\n")
 
-		if !quiet {
-			log.Infof("read sequences ...")
-		}
-		i := 0
-		for _, file := range files {
-			fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
-			checkError(err)
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
-
-				for _, record := range chunk.Data {
-					sequences[string(record.Name)] = record
-					index2name[i] = string(record.Name)
-					i++
+			// check comment line
+			isCommentLine := false
+			for _, p := range commentPrefixes {
+				if strings.HasPrefix(line, p) {
+					isCommentLine = true
+					break
 				}
 			}
+			if isCommentLine {
+				return "", false, nil
+			}
+
+			items := strings.Split(line, "\t")
+			if len(items) < 2 {
+				return items, false, fmt.Errorf("at least two columns needed: %s", line)
+			}
+			if len(items) > 2 {
+				return Slice(items[0:3]), true, nil
+			}
+			return Slice(items[0:2]), true, nil
 		}
 
-		if !quiet {
-			log.Infof("%d sequences loaded", len(sequences))
-			log.Infof("shuffle ...")
-		}
-		rand.Seed(seed)
-		indices := make([]int, len(index2name))
-		for i := 0; i < len(index2name); i++ {
-			indices[i] = i
-		}
-		randutil.Shuffle(indices)
+		for _, file := range files {
+			reader, err := breader.NewBufferedReader(file, threads, chunkSize, fn)
+			checkError(err)
 
-		if !quiet {
-			log.Infof("output ...")
-		}
-		var record *fastx.Record
-		for _, i := range indices {
-			record = sequences[index2name[i]]
-			outfh.WriteString(record.Format(lineWidth))
+			for chunk := range reader.Ch {
+				for _, data := range chunk.Data {
+					items := data.(Slice)
+					if len(items) == 3 && len(items[2]) > 0 {
+						outfh.WriteString(fmt.Sprintf("@%s\n%s\n+\n%s\n",
+							items[0], items[1], items[2]))
+					} else {
+						outfh.WriteString(fmt.Sprintf(">%s\n%s\n", items[0],
+							byteutil.WrapByteSlice([]byte(items[1]), lineWidth)))
+					}
+				}
+			}
 		}
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(shuffleCmd)
-	shuffleCmd.Flags().Int64P("rand-seed", "s", 23, "rand seed for shuffle")
+	RootCmd.AddCommand(tab2faCmd)
+	tab2faCmd.Flags().StringSliceP("comment-line-prefix", "p", []string{"#", "//"}, "comment line prefix")
 }

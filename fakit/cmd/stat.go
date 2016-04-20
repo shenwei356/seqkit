@@ -57,11 +57,11 @@ var statCmd = &cobra.Command{
 		checkError(err)
 		defer outfh.Close()
 
+		var fastxReader *fastx.Reader
 		var num, l, lenMin, lenMax, lenSum uint64
 		var seqFormat, t string
 		statInfos := []statInfo{}
 		for _, file := range files {
-			var fastxReader *fastx.Reader
 			fastxReader, err = fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
 

@@ -30,7 +30,6 @@ import (
 	"github.com/shenwei356/bio/featio/gtf"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
-	"github.com/shenwei356/util/byteutil"
 	"github.com/spf13/cobra"
 )
 
@@ -152,8 +151,8 @@ Examples:
 
 				for _, record := range chunk.Data {
 					if region != "" {
-						outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name,
-							byteutil.WrapByteSlice(record.Seq.SubSeq(start, end).Seq, lineWidth)))
+						record.Seq = record.Seq.SubSeq(start, end)
+						outfh.WriteString(record.Format(lineWidth))
 					} else if gtfFile != "" {
 						seqname := string(record.ID)
 						if _, ok := gtfFeaturesMap[seqname]; !ok {
@@ -224,7 +223,8 @@ Examples:
 									flankInfo = ""
 								}
 								outname = fmt.Sprintf("%s_%d:%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, geneID)
-								outfh.WriteString(fmt.Sprintf(">%s\n%s\n", outname, byteutil.WrapByteSlice(subseq.Seq, lineWidth)))
+								record.Name, record.Seq = []byte(outname), subseq
+								outfh.WriteString(record.Format(lineWidth))
 							}
 
 						}
@@ -291,7 +291,8 @@ Examples:
 								flankInfo = ""
 							}
 							outname = fmt.Sprintf("%s_%d:%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, geneID)
-							outfh.WriteString(fmt.Sprintf(">%s\n%s\n", outname, byteutil.WrapByteSlice(subseq.Seq, lineWidth)))
+							record.Name, record.Seq = []byte(outname), subseq
+							outfh.WriteString(record.Format(lineWidth))
 						}
 					}
 

@@ -32,8 +32,8 @@ import (
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "fakit",
-	Short: "Swiss army knife of FASTA format",
-	Long: `fakit -- Swiss army knife of FASTA format
+	Short: "Swiss army knife of FASTA/Q format",
+	Long: `fakit -- Swiss army knife of FASTA/Q format
 
 Version: 0.1.7
 

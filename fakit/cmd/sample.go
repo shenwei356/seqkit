@@ -117,7 +117,7 @@ var sampleCmd = &cobra.Command{
 					for _, record := range chunk.Data {
 						if rand.Float64() <= proportion {
 							n++
-							outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
+							outfh.WriteString(record.Format(lineWidth))
 							if n == number {
 								break LOOP
 							}
@@ -133,7 +133,7 @@ var sampleCmd = &cobra.Command{
 				for _, record := range records {
 					if rand.Float64() <= proportion {
 						n++
-						outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
+						outfh.WriteString(record.Format(lineWidth))
 						if n == number {
 							break
 						}
@@ -153,7 +153,7 @@ var sampleCmd = &cobra.Command{
 				for _, record := range chunk.Data {
 					if rand.Float64() <= proportion {
 						n++
-						outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
+						outfh.WriteString(record.Format(lineWidth))
 					}
 				}
 			}

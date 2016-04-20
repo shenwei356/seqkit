@@ -30,11 +30,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// fa2tabCmd represents the seq command
-var fa2tabCmd = &cobra.Command{
-	Use:   "fa2tab",
-	Short: "covert FASTA to tabular format (with length/GC content/GC skew) to filter and sort",
-	Long: `covert FASTA to tabular format, and provide various information,
+// fx2tabCmd represents the seq command
+var fx2tabCmd = &cobra.Command{
+	Use:   "fx2tab",
+	Short: "covert FASTA/Q to tabular format (with length/GC content/GC skew) to filter and sort",
+	Long: `covert FASTA/Q to tabular format, and provide various information,
 like sequence length, GC content/GC skew.
 
 `,
@@ -64,7 +64,7 @@ like sequence length, GC content/GC skew.
 		defer outfh.Close()
 
 		if printTitle {
-			outfh.WriteString("# name\tseq")
+			outfh.WriteString("#name\tseq\tqual")
 			if printLength {
 				outfh.WriteString("\tlength")
 			}
@@ -99,7 +99,8 @@ like sequence length, GC content/GC skew.
 					if onlyName {
 						outfh.WriteString(fmt.Sprintf("%s\t%s", name, ""))
 					} else {
-						outfh.WriteString(fmt.Sprintf("%s\t%s", name, record.Seq.Seq))
+						outfh.WriteString(fmt.Sprintf("%s\t%s\t%s", name,
+							record.Seq.Seq, record.Seq.Qual))
 					}
 
 					if printLength {
@@ -130,13 +131,13 @@ like sequence length, GC content/GC skew.
 }
 
 func init() {
-	RootCmd.AddCommand(fa2tabCmd)
+	RootCmd.AddCommand(fx2tabCmd)
 
-	fa2tabCmd.Flags().BoolP("length", "l", false, "print sequence length")
-	fa2tabCmd.Flags().BoolP("gc", "g", false, "print GC content")
-	fa2tabCmd.Flags().BoolP("gc-skew", "G", false, "print GC-Skew")
-	fa2tabCmd.Flags().StringSliceP("base-content", "b", []string{}, "print base content. (case ignored, multiple values supported) e.g. -b AT -b N")
-	fa2tabCmd.Flags().BoolP("only-id", "i", false, "print ID instead of full head")
-	fa2tabCmd.Flags().BoolP("name", "n", false, "only print names (no sequences)")
-	fa2tabCmd.Flags().BoolP("title", "T", false, "print title line")
+	fx2tabCmd.Flags().BoolP("length", "l", false, "print sequence length")
+	fx2tabCmd.Flags().BoolP("gc", "g", false, "print GC content")
+	fx2tabCmd.Flags().BoolP("gc-skew", "G", false, "print GC-Skew")
+	fx2tabCmd.Flags().StringSliceP("base-content", "b", []string{}, "print base content. (case ignored, multiple values supported) e.g. -b AT -b N")
+	fx2tabCmd.Flags().BoolP("only-id", "i", false, "print ID instead of full head")
+	fx2tabCmd.Flags().BoolP("name", "n", false, "only print names (no sequences and qualities)")
+	fx2tabCmd.Flags().BoolP("title", "T", false, "print title line")
 }

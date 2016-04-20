@@ -161,12 +161,12 @@ var sortCmd = &cobra.Command{
 		if byName || byID || bySeq {
 			for _, kv := range name2sequence {
 				record = sequences[kv.Key]
-				outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
+				outfh.WriteString(record.Format(lineWidth))
 			}
 		} else if byLength {
 			for _, kv := range name2length {
 				record = sequences[kv.Key]
-				outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
+				outfh.WriteString(record.Format(lineWidth))
 			}
 		}
 	},

@@ -116,13 +116,13 @@ var rmdupCmd = &cobra.Command{
 						counter[subject]++
 						removed++
 						if len(dupFile) > 0 {
-							outfhDup.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
+							outfhDup.WriteString(record.Format(lineWidth))
 						}
 						if len(numFile) > 0 {
 							names[subject] = append(names[subject], string(record.ID))
 						}
 					} else { // new one
-						outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
+						outfh.WriteString(record.Format(lineWidth))
 						counter[subject]++
 
 						if len(numFile) > 0 {

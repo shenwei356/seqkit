@@ -55,6 +55,7 @@ var seqCmd = &cobra.Command{
 		complement := getFlagBool(cmd, "complement")
 		onlyName := getFlagBool(cmd, "name")
 		onlySeq := getFlagBool(cmd, "seq")
+		onlyQual := getFlagBool(cmd, "qual")
 		onlyID := getFlagBool(cmd, "only-id")
 		removeGaps := getFlagBool(cmd, "remove-gaps")
 		gapLetters := getFlagString(cmd, "gap-letter")
@@ -74,7 +75,9 @@ var seqCmd = &cobra.Command{
 		checkError(err)
 		defer outfh.Close()
 
-		var printName, printSeq bool
+		var isFastq bool
+		checkSeqType := true
+		var printName, printSeq, printQual bool
 		var head []byte
 		var sequence *seq.Seq
 		for _, file := range files {
@@ -86,13 +89,28 @@ var seqCmd = &cobra.Command{
 				checkError(chunk.Err)
 
 				for _, record := range chunk.Data {
+					if checkSeqType {
+						if len(record.Seq.Qual) > 0 {
+							isFastq = true
+						}
+						checkSeqType = false
+					}
+					printQual = false
+					if isFastq {
+						printQual = true
+					}
 					printName, printSeq = true, true
 					if onlyName && onlySeq {
 						printName, printSeq = true, true
 					} else if onlyName {
-						printName, printSeq = true, false
+						printName, printSeq, printQual = true, false, false
 					} else if onlySeq {
-						printName, printSeq = false, true
+						printName, printSeq, printQual = false, true, false
+					} else if onlyQual {
+						if !isFastq {
+							checkError(fmt.Errorf("FASTA format has no quality. So do not just use flag -q (--qual)"))
+						}
+						printName, printSeq, printQual = false, false, true
 					}
 					if printName {
 						if onlyID {
@@ -102,7 +120,11 @@ var seqCmd = &cobra.Command{
 						}
 
 						if printSeq {
-							outfh.WriteString(fmt.Sprintf(">%s\n", head))
+							if isFastq {
+								outfh.WriteString(fmt.Sprintf("@%s\n", head))
+							} else {
+								outfh.WriteString(fmt.Sprintf(">%s\n", head))
+							}
 						} else {
 							outfh.WriteString(fmt.Sprintf("%s\n", head))
 						}
@@ -156,11 +178,33 @@ var seqCmd = &cobra.Command{
 							}
 						}
 						if lowerCase {
-							outfh.WriteString(fmt.Sprintf("%s\n", byteutil.WrapByteSlice(bytes.ToLower(sequence.Seq), lineWidth)))
+							sequence.Seq = bytes.ToLower(sequence.Seq)
 						} else if upperCase {
-							outfh.WriteString(fmt.Sprintf("%s\n", byteutil.WrapByteSlice(bytes.ToUpper(sequence.Seq), lineWidth)))
+							sequence.Seq = bytes.ToUpper(sequence.Seq)
+						}
+
+						if isFastq {
+							outfh.WriteString(fmt.Sprintf("%s\n", sequence.Seq))
 						} else {
 							outfh.WriteString(fmt.Sprintf("%s\n", byteutil.WrapByteSlice(sequence.Seq, lineWidth)))
+						}
+					}
+
+					if printQual {
+						sequence = record.Seq
+						if reverse {
+							sequence = sequence.Reverse()
+						}
+						if complement {
+							sequence = sequence.Complement()
+						}
+						if removeGaps {
+							sequence = sequence.RemoveGaps(gapLetters)
+						}
+						if onlyQual {
+							outfh.WriteString(fmt.Sprintf("%s\n", sequence.Qual))
+						} else {
+							outfh.WriteString(fmt.Sprintf("+\n%s\n", sequence.Qual))
 						}
 					}
 				}
@@ -178,6 +222,7 @@ func init() {
 	seqCmd.Flags().BoolP("complement", "p", false, "complement sequence (blank for Protein sequence)")
 	seqCmd.Flags().BoolP("name", "n", false, "only print names")
 	seqCmd.Flags().BoolP("seq", "s", false, "only print sequences")
+	seqCmd.Flags().BoolP("qual", "q", false, "only print qualities")
 	seqCmd.Flags().BoolP("only-id", "i", false, "print ID instead of full head")
 	seqCmd.Flags().BoolP("remove-gaps", "g", false, "remove gaps")
 	seqCmd.Flags().StringP("gap-letter", "G", "- ", "gap letters")

@@ -76,6 +76,7 @@ var commonCmd = &cobra.Command{
 
 		counter := make(map[string]map[string]int)
 		names := make(map[string]map[string]string)
+		var fastxReader *fastx.Reader
 
 		// read all files
 		var subject string
@@ -83,7 +84,7 @@ var commonCmd = &cobra.Command{
 			if !quiet {
 				log.Info("read file: %s", file)
 			}
-			fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
+			fastxReader, err = fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
 			checkError(err)
 			for chunk := range fastxReader.Ch {
 				checkError(chunk.Err)
@@ -151,7 +152,7 @@ var commonCmd = &cobra.Command{
 		}
 
 		// extract
-		fastxReader, err := fastx.NewReader(alphabet, firstFile, chunkSize, threads, idRegexp)
+		fastxReader, err = fastx.NewReader(alphabet, firstFile, chunkSize, threads, idRegexp)
 		checkError(err)
 		for chunk := range fastxReader.Ch {
 			checkError(chunk.Err)
@@ -159,7 +160,7 @@ var commonCmd = &cobra.Command{
 			for _, record := range chunk.Data {
 				name := string(record.Name)
 				if _, ok := namesOK[name]; ok && namesOK[name] > 0 {
-					outfh.WriteString(fmt.Sprintf(">%s\n%s\n", record.Name, record.FormatSeq(lineWidth)))
+					outfh.WriteString(record.Format(lineWidth))
 					namesOK[name] = 0
 				}
 			}
