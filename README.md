@@ -151,7 +151,7 @@ You can also add the directory of the executable file to environment variable
 
 ```
 
-## Technical Details and Guides for use
+## Technical details and guides for use
 
 ### Reading FASTA/Q
 
@@ -190,6 +190,22 @@ flag `-j` or `--threads`.
 Most of the time you can just use the default value. i.e. the number of CPUs
 of your computer.
 
+### Memory occupation
+
+Most of the subcommands do not read whole FASTA/Q records in to memory,
+including `stat`, `fq2fa`, `fx2tab`, `tab2fx`, `grep`, `locate`, `replace`,
+ `seq`, `sliding`, `subseq`. The just temporarily buffer chunks of records.
+
+Some subcommands need to store sequences or heads in memory, but there are
+strategy to reduce memory occupation, including `rmdup` and `common`.
+When comparing with sequences, MD5 digest could be used to replace sequence by
+flag `-m` (`--md5`).
+
+Some subcommands could either read all records or read the files twice by flag
+`-2` (`--two-pass`), including `sample` and `split`.
+
+Two subcommands must read all records in memory right now, `shuffle` and `sort`.
+But I'll improve this later.
 
 
 ## Usage && Examples

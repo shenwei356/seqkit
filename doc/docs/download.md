@@ -7,7 +7,7 @@
 ## Current Version
 
 - [fakit v0.1.7](https://github.com/shenwei356/fakit/releases/tag/v0.1.7)
-    - ***add support FASTQ format***
+    - ***add support for (multi-line) FASTQ format***
     - update document, add technical details
     - rename subcommands `fa2tab` and `tab2fa` to `fx2tab` and `tab2fx`
     - add subcommand `fq2fa`
