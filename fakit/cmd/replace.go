@@ -58,12 +58,12 @@ more on: http://shenwei356.github.io/fakit/usage/#replace
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
 		chunkSize := config.ChunkSize
-		threads := config.Threads
+		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
-		runtime.GOMAXPROCS(threads)
+		runtime.GOMAXPROCS(config.Threads)
 
 		pattern := getFlagString(cmd, "pattern")
 		replacement := []byte(getFlagString(cmd, "replacement"))
@@ -90,7 +90,7 @@ more on: http://shenwei356.github.io/fakit/usage/#replace
 
 		for _, file := range files {
 
-			ch := make(chan fastx.RecordChunk, threads)
+			ch := make(chan fastx.RecordChunk, config.Threads)
 			done := make(chan int)
 
 			// receiver
@@ -136,9 +136,9 @@ more on: http://shenwei356.github.io/fakit/usage/#replace
 
 			// producer and worker
 			var wg sync.WaitGroup
-			tokens := make(chan int, threads)
+			tokens := make(chan int, config.Threads)
 
-			fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
 			checkError(err)
 			for chunk := range fastxReader.Ch {
 				checkError(chunk.Err)

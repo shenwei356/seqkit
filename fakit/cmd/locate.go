@@ -53,11 +53,11 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
 		chunkSize := config.ChunkSize
-		threads := config.Threads
+		bufferSize := config.BufferSize
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = true
-		runtime.GOMAXPROCS(threads)
+		runtime.GOMAXPROCS(config.Threads)
 
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
@@ -68,7 +68,6 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags --pattern and --pattern-file needed"))
 		}
-		runtime.GOMAXPROCS(threads)
 
 		files := getFileList(args)
 
@@ -126,7 +125,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		outfh.WriteString("seqID\tpatternName\tpattern\tstrand\tstart\tend\tmatched\n")
 		for _, file := range files {
 
-			ch := make(chan LocationChunk, threads)
+			ch := make(chan LocationChunk, config.Threads)
 			done := make(chan int)
 
 			// receiver
@@ -215,9 +214,9 @@ For example: "\w" will be wrongly converted to "\[AT]".
 
 			// producer and worker
 			var wg sync.WaitGroup
-			tokens := make(chan int, threads)
+			tokens := make(chan int, config.Threads)
 
-			fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
 			checkError(err)
 			for chunk := range fastxReader.Ch {
 				checkError(chunk.Err)

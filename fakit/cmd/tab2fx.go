@@ -36,17 +36,17 @@ import (
 var tab2faCmd = &cobra.Command{
 	Use:   "tab2fx",
 	Short: "covert tabular format to FASTA/Q format",
-	Long: `covert tabular format (first three columns) to FASTA/Q format
+	Long: `covert tabular format (first two/three columns) to FASTA/Q format
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
 		chunkSize := config.ChunkSize
-		threads := config.Threads
+		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
-		runtime.GOMAXPROCS(threads)
+		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileList(args)
 
@@ -60,6 +60,9 @@ var tab2faCmd = &cobra.Command{
 		fn := func(line string) (interface{}, bool, error) {
 			line = strings.TrimRight(line, "\r\n")
 
+			if line == "" {
+				return "", false, nil
+			}
 			// check comment line
 			isCommentLine := false
 			for _, p := range commentPrefixes {
@@ -74,7 +77,7 @@ var tab2faCmd = &cobra.Command{
 
 			items := strings.Split(line, "\t")
 			if len(items) < 2 {
-				return items, false, fmt.Errorf("at least two columns needed: %s", line)
+				return Slice(items), false, fmt.Errorf("at least two columns needed: %s", line)
 			}
 			if len(items) > 2 {
 				return Slice(items[0:3]), true, nil
@@ -83,7 +86,7 @@ var tab2faCmd = &cobra.Command{
 		}
 
 		for _, file := range files {
-			reader, err := breader.NewBufferedReader(file, threads, chunkSize, fn)
+			reader, err := breader.NewBufferedReader(file, bufferSize, chunkSize, fn)
 			checkError(err)
 
 			for chunk := range reader.Ch {
@@ -91,7 +94,9 @@ var tab2faCmd = &cobra.Command{
 					items := data.(Slice)
 					if len(items) == 3 && len(items[2]) > 0 {
 						outfh.WriteString(fmt.Sprintf("@%s\n%s\n+\n%s\n",
-							items[0], items[1], items[2]))
+							items[0],
+							byteutil.WrapByteSlice([]byte(items[1]), lineWidth),
+							byteutil.WrapByteSlice([]byte(items[2]), lineWidth)))
 					} else {
 						outfh.WriteString(fmt.Sprintf(">%s\n%s\n", items[0],
 							byteutil.WrapByteSlice([]byte(items[1]), lineWidth)))

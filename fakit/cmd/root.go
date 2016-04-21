@@ -32,8 +32,8 @@ import (
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "fakit",
-	Short: "Swiss army knife of FASTA/Q format",
-	Long: `fakit -- Swiss army knife of FASTA/Q format
+	Short: "a cross-platform and efficient suit for FASTA/Q file manipulation",
+	Long: `fakit --  a cross-platform and efficient suit for FASTA/Q file manipulation
 
 Version: 0.1.7
 
@@ -57,8 +57,9 @@ func Execute() {
 func init() {
 	RootCmd.PersistentFlags().StringP("seq-type", "t", "auto", "sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence)")
 	RootCmd.PersistentFlags().IntP("chunk-size", "c", 1000, "chunk size (attention: unit is FASTA records not lines)")
-	RootCmd.PersistentFlags().IntP("threads", "j", runtime.NumCPU(), "number of CPUs. (default value depends on your device)")
-	RootCmd.PersistentFlags().IntP("line-width", "w", 60, "line width (0 for no wrap)")
+	RootCmd.PersistentFlags().IntP("buffer-size", "b", runtime.NumCPU(), "buffer size of chunks (default value is the CPUs number of your computer)")
+	RootCmd.PersistentFlags().IntP("threads", "j", runtime.NumCPU(), "number of CPUs. (default value is the CPUs number of your computer)")
+	RootCmd.PersistentFlags().IntP("line-width", "w", 60, "line width when outputing FASTA format (0 for no wrap)")
 	RootCmd.PersistentFlags().StringP("id-regexp", "", fastx.DefaultIDRegexp, "regular expression for parsing ID")
 	RootCmd.PersistentFlags().BoolP("id-ncbi", "", false, "FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...")
 	RootCmd.PersistentFlags().StringP("out-file", "o", "-", `out file ("-" for stdout, suffix .gz for gzipped out)`)

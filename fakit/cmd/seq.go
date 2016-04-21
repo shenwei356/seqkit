@@ -44,12 +44,12 @@ var seqCmd = &cobra.Command{
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
 		chunkSize := config.ChunkSize
-		threads := config.Threads
+		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = true
-		runtime.GOMAXPROCS(threads)
+		runtime.GOMAXPROCS(config.Threads)
 
 		reverse := getFlagBool(cmd, "reverse")
 		complement := getFlagBool(cmd, "complement")
@@ -67,7 +67,6 @@ var seqCmd = &cobra.Command{
 		if lowerCase && upperCase {
 			checkError(fmt.Errorf("could not give both flags -l (--lower-case) and -u (--upper-case)"))
 		}
-		runtime.GOMAXPROCS(threads)
 
 		files := getFileList(args)
 
@@ -81,7 +80,7 @@ var seqCmd = &cobra.Command{
 		var head []byte
 		var sequence *seq.Seq
 		for _, file := range files {
-			fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
 			checkError(err)
 
 			once := true
@@ -183,11 +182,7 @@ var seqCmd = &cobra.Command{
 							sequence.Seq = bytes.ToUpper(sequence.Seq)
 						}
 
-						if isFastq {
-							outfh.WriteString(fmt.Sprintf("%s\n", sequence.Seq))
-						} else {
-							outfh.WriteString(fmt.Sprintf("%s\n", byteutil.WrapByteSlice(sequence.Seq, lineWidth)))
-						}
+						outfh.WriteString(fmt.Sprintf("%s\n", byteutil.WrapByteSlice(sequence.Seq, lineWidth)))
 					}
 
 					if printQual {
@@ -202,9 +197,9 @@ var seqCmd = &cobra.Command{
 							sequence = sequence.RemoveGaps(gapLetters)
 						}
 						if onlyQual {
-							outfh.WriteString(fmt.Sprintf("%s\n", sequence.Qual))
+							outfh.WriteString(fmt.Sprintf("%s\n", byteutil.WrapByteSlice(sequence.Qual, lineWidth)))
 						} else {
-							outfh.WriteString(fmt.Sprintf("+\n%s\n", sequence.Qual))
+							outfh.WriteString(fmt.Sprintf("+\n%s\n", byteutil.WrapByteSlice(sequence.Qual, lineWidth)))
 						}
 					}
 				}

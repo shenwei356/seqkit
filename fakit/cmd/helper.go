@@ -160,6 +160,7 @@ func getFlagalphabetGuessSeqLength(cmd *cobra.Command, flag string) int {
 type Config struct {
 	Alphabet               *seq.Alphabet
 	ChunkSize              int
+	BufferSize             int
 	Threads                int
 	LineWidth              int
 	IDRegexp               string
@@ -171,14 +172,15 @@ type Config struct {
 
 func getConfigs(cmd *cobra.Command) Config {
 	return Config{
-		Alphabet:  getAlphabet(cmd, "seq-type"),
-		ChunkSize: getFlagPositiveInt(cmd, "chunk-size"),
-		Threads:   getFlagPositiveInt(cmd, "threads"),
-		LineWidth: getFlagNonNegativeInt(cmd, "line-width"),
-		IDRegexp:  getIDRegexp(cmd, "id-regexp"),
-		IDNCBI:    getFlagBool(cmd, "id-ncbi"),
-		OutFile:   getFlagString(cmd, "out-file"),
-		Quiet:     getFlagBool(cmd, "quiet"),
+		Alphabet:   getAlphabet(cmd, "seq-type"),
+		ChunkSize:  getFlagPositiveInt(cmd, "chunk-size"),
+		BufferSize: getFlagPositiveInt(cmd, "buffer-size"),
+		Threads:    getFlagPositiveInt(cmd, "threads"),
+		LineWidth:  getFlagNonNegativeInt(cmd, "line-width"),
+		IDRegexp:   getIDRegexp(cmd, "id-regexp"),
+		IDNCBI:     getFlagBool(cmd, "id-ncbi"),
+		OutFile:    getFlagString(cmd, "out-file"),
+		Quiet:      getFlagBool(cmd, "quiet"),
 		AlphabetGuessSeqLength: getFlagalphabetGuessSeqLength(cmd, "alphabet-guess-seq-length"),
 	}
 

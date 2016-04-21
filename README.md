@@ -1,14 +1,21 @@
 # fakit - a cross-platform and efficient suit for FASTA/Q file manipulation
 
+
+
 Documents  : [http://shenwei356.github.io/fakit](http://shenwei356.github.io/fakit)
 
 Source code: [https://github.com/shenwei356/fakit](https://github.com/shenwei356/fakit)
 
+## About the name
+
+Origionally, `fakit` (abbreviation of `FASTA kit`) was designed to handle FASTA
+format. And the name was remained after adding seamless support for FASTQ fromat.
+
 ## Introduction
 
-FASTA and FASTQ is a basic format for storing nucleotide and protein sequences.
-The manipulation of FASTA/Q file includes converting, clipping, searching, filtering,
-deduplication, splitting, shuffling, sampling and so on.
+FASTA and FASTQ are basic formats for storing nucleotide and protein sequences.
+The manipulation of FASTA/Q file includes converting, clipping, searching,
+filtering, deduplication, splitting, shuffling, sampling and so on.
 Existed tools only implemented parts of the functions,
 and some of them are only available for specific operating systems.
 Furthermore, the complicated installation process of dependencies packages and
@@ -27,10 +34,11 @@ from either standard stream or files, therefore, it could be easily used in pipe
   (see [download](http://shenwei356.github.io/fakit/download/))
 - **Fast** (see [benchmark](/#performance-comparison-with-other-tools)),
   **multiple-CPUs supported** (see [benchmark](/#speedup-with-multi-threads)).
-- **Practical functions supported by 15 subcommands** (see subcommands and
+- **Practical functions supported by 16 subcommands** (see subcommands and
   [usage](http://shenwei356.github.io/fakit/usage/) )
 - **Well documented** (detailed [usage](http://shenwei356.github.io/fakit/usage/)
   and [benchmark](http://shenwei356.github.io/fakit/benchmark/) )
+- **Seamlessly parses both FASTA and FASTQ formats**
 - **Support STDIN and gziped input/output file, easy being used in pipe**
 - **Support custom sequence ID regular expression** (especially useful for quering with ID list)
 - Reproducible results (configurable rand seed in `sample` and `shuffle`)
@@ -42,6 +50,8 @@ Features         | fakit    | fasta_utilities | fastx_toolkit | pyfaidx | seqmag
 :--------------- | :------: | :-------------: | :-----------: | :-----: | :-------: | :----
 Cross-platform   | Yes      | Partly          | Partly        | Yes     | Yes       | Yes
 Mutli-line FASTA | Yes      | Yes             | --            | Yes     | Yes       | Yes
+Read FASTQ       | Yes      | Yes             | Yes           | --      | Yes       | Yes
+Mutli-line FASTQ | Yes      | Yes             | --            | --      | Yes       | Yes
 Validate bases   | Yes      | --              | Yes           | Yes     | --        | --
 Recognize RNA    | Yes      | Yes             | --            | --      | Yes       | Yes
 Read STDIN       | Yes      | Yes             | Yes           | --      | Yes       | Yes
@@ -63,17 +73,29 @@ Translate        | --       | Yes             | Yes           | Yes     | Yes   
 Size select      | Indirect | Yes             | --            | Yes     | Yes       | --
 Rename head      | Yes      | Yes             | --            | --      | Yes       | Yes
 
-# Download
+# Installation
 
 `fakit` is implemented in [Golang](https://golang.org/) programming language,
  executable binary files **for most popular operating system** are freely available
   in [release](https://github.com/shenwei356/fakit/releases) page.
 
-Just [download](https://github.com/shenwei356/fakit/releases) executable file
- of your operating system and rename it to `fakit.exe` (Windows) or
- `fakit` (other operating systems) for convenience,
- and then run it in command-line interface, no dependencies,
- no complicated compilation process.
+Just [download](https://github.com/shenwei356/fakit/releases) gzip-compressed
+executable file of your operating system, and uncompress it with `gzip -d *.gz` command,
+rename it to `fakit.exe` (Windows) or `fakit` (other operating systems) for convenience.
+
+You may need to add executable permision by `chmod a+x fakit`.
+
+You can also add the directory of the executable file to environment variable
+`PATH`, so you can run `fakit` anywhere.
+
+1. For windows, the simplest way is copy it to `C:\WINDOWS\system32`.
+
+2. For Linux, type:
+
+      chmod a+x /PATH/OF/FASTCOV/fakit
+      echo export PATH=\$PATH:/PATH/OF/FASTCOV >> ~/.bashrc
+
+  or simply copy it to `/usr/local/bin`
 
 
 ## Subcommands (16 in total)
@@ -117,16 +139,58 @@ Just [download](https://github.com/shenwei356/fakit/releases) executable file
 
 ```
       --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which fakit guesses the sequence type (default 10000)
+  -b, --buffer-size int                 buffer size of chunks (default value is the CPUs number of your computer) (default 4)
   -c, --chunk-size int                  chunk size (attention: unit is FASTA records not lines) (default 1000)
       --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
       --id-regexp string                regular expression for parsing ID (default "^([^\\s]+)\\s?")
-  -w, --line-width int                  line width (0 for no wrap) (default 60)
+  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
   -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
       --quiet                           be quiet and do not show extra information
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
-  -j, --threads int                     number of CPUs. (default value depends on your device) (default 4)
+  -j, --threads int                     number of CPUs. (default value is the CPUs number of your computer) (default 4)
 
 ```
+
+## Technical Details and Guides for use
+
+### Reading FASTA/Q
+
+fakit use author's bioinformatics packages [bio](https://github.com/shenwei356/bio)
+for FASTA/Q parsing, which **asynchronously parse FASTA/Q records and buffer them
+in chunks**. The parser return one chunk of records for each call.
+
+**Asynchronous parsing** saves much time because these's no waiting interval for
+parsed records being handled.
+The strategy of **records chunks** reduces data exchange in parallelly handling
+of sequences, which could also improve performance.
+
+Since using of buffers and chunks, the memory occupation will be higher than
+cases of reading sequence one by one.
+The default value of chunk size (configurable by global flag `-c` or `--chunk-size`)
+is 1000, which is suitable for manipulating "small" sequences, e.g. FASTQ.
+But for big genomes like human genome, smaller chunk size is prefered, e.g. 1.
+And the buffer size is configurable by  global flag `-b` or `--buffer-size`
+(default value is the number of CPUs), therefore, you may set with smaller
+value to reduce memory usage.
+
+***In summary, set smaller value for `-c` and `-b` when handling big FASTA file
+like human genomes.***
+
+### Parallelization of CPU intensive jobs
+
+Most of the manipulations of FASTA/Q files are I/O intensive, to improve the
+performance, asynchronous parsing strategy is used.
+
+For CPU intensive jobs like `grep` with regular expressions, `locate` with
+sequence motifs, and `subseq` by GTF/BED files. The processes are parallelized
+with MapReduce model by multiple goroutine in golang, similar to but much
+lighter weight than threads. The concurrency number is configurable with global
+flag `-j` or `--threads`.
+
+Most of the time you can just use the default value. i.e. the number of CPUs
+of your computer.
+
+
 
 ## Usage && Examples
 

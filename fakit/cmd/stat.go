@@ -45,11 +45,11 @@ var statCmd = &cobra.Command{
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
 		chunkSize := config.ChunkSize
-		threads := config.Threads
+		bufferSize := config.BufferSize
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
-		runtime.GOMAXPROCS(threads)
+		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileList(args)
 
@@ -62,7 +62,7 @@ var statCmd = &cobra.Command{
 		var seqFormat, t string
 		statInfos := []statInfo{}
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
+			fastxReader, err = fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
 			checkError(err)
 
 			seqFormat = ""

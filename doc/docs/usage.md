@@ -1,13 +1,54 @@
 # Usage and Examples
 
-### fakit
+## Technical Details and Guides for use
+
+### Reading FASTA/Q
+
+fakit use author's bioinformatics packages [bio](https://github.com/shenwei356/bio)
+for FASTA/Q parsing, which **asynchronously parse FASTA/Q records and buffer them
+in chunks**. The parser return one chunk of records for each call.
+
+**Asynchronous parsing** saves much time because these's no waiting interval for
+parsed records being handled.
+The strategy of **records chunks** reduces data exchange in parallelly handling
+of sequences, which could also improve performance.
+
+Since using of buffers and chunks, the memory occupation will be higher than
+cases of reading sequence one by one.
+The default value of chunk size (configurable by global flag `-c` or `--chunk-size`)
+is 1000, which is suitable for manipulating "small" sequences, e.g. FASTQ.
+But for big genomes like human genome, smaller chunk size is prefered, e.g. 1.
+And the buffer size is configurable by  global flag `-b` or `--buffer-size`
+(default value is the number of CPUs), therefore, you may set with smaller
+value to reduce memory usage.
+
+***In summary, set smaller value for `-c` and `-b` when handling big FASTA file
+like human genomes.***
+
+### Parallelization of CPU intensive jobs
+
+Most of the manipulations of FASTA/Q files are I/O intensive, to improve the
+performance, asynchronous parsing strategy is used.
+
+For CPU intensive jobs like `grep` with regular expressions, `locate` with
+sequence motifs, and `subseq` by GTF/BED files. The processes are parallelized
+with MapReduce model by multiple goroutine in golang, similar to but much
+lighter weight than threads. The concurrency number is configurable with global
+flag `-j` or `--threads`.
+
+Most of the time you can just use the default value. i.e. the number of CPUs
+of your computer.
+
+
+
+## fakit
 
 Usage
 
 ```
-fakit -- Swiss army knife of FASTA format
+fakit --  a cross-platform and efficient suit for FASTA/Q file manipulation
 
-Version: 0.1.6
+Version: 0.1.7
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -19,7 +60,8 @@ Usage:
 
 Available Commands:
   common      find common sequences of multiple files by id/name/sequence
-  fa2tab      covert FASTA to tabular format (with length/GC content/GC skew) to filter and sort
+  fq2fa       covert FASTQ to FASTA
+  fx2tab      covert FASTA/Q to tabular format (with length/GC content/GC skew) to filter and sort
   grep        search sequences by pattern(s) of name or sequence motifs
   locate      locate subsequences/motifs
   replace     replace name/sequence/by regular expression
@@ -32,26 +74,23 @@ Available Commands:
   split       split sequences into files by id/seq region/size/parts
   stat        simple statistics of FASTA files
   subseq      get subsequences by region/gtf/bed, including flanking sequences
-  tab2fa      covert tabular format to FASTA format
+  tab2fx      covert tabular format to FASTA/Q format
 
 Flags:
       --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which fakit guesses the sequence type (default 10000)
+  -b, --buffer-size int                 buffer size of chunks (default value is the CPUs number of your computer) (default 4)
   -c, --chunk-size int                  chunk size (attention: unit is FASTA records not lines) (default 1000)
       --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
       --id-regexp string                regular expression for parsing ID (default "^([^\\s]+)\\s?")
-  -w, --line-width int                  line width (0 for no wrap) (default 60)
+  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
   -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
       --quiet                           be quiet and do not show extra information
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
-  -j, --threads int                     number of CPUs. (default value depends on your device) (default 4)
+  -j, --threads int                     number of CPUs. (default value is the CPUs number of your computer) (default 4)
 
 Use "fakit [command] --help" for more information about a command.
+
 ```
-
-### Performance Tips
-
-- `--chunk-size`, for large sequences like human genome,
-you could set a small value, like 1, to reduce memory usage.
 
 ### Datasets
 
@@ -92,7 +131,7 @@ Only DNA and gtf/bed data of Chr1 were used:
 Usage
 
 ```
-transform sequence (revserse, complement, extract ID...)
+transform sequences (revserse, complement, extract ID...)
 
 Usage:
   fakit seq [flags]
@@ -104,6 +143,7 @@ Flags:
   -l, --lower-case          print sequences in lower case
   -n, --name                only print names
   -i, --only-id             print ID instead of full head
+  -q, --qual                only print qualities
   -g, --remove-gaps         remove gaps
   -r, --reverse             reverse sequence)
       --rna2dna             RNA to DNA
@@ -123,30 +163,42 @@ Examples
             UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
             UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 
+            $ fakit seq read_1.fq.gz
+            @HWI-D00523:240:HF3WGBCXX:1:1101:2574:2226 1:N:0:CTGTAG
+            TGAGGAATATTGGTCAATGGGCGCGAGCCTGAACCAGCCAAGTAGCGTGAAGGATGACTG
+            CCCTACGGGTTGTAAACTTCTTTTATAAAGGAATAAAGTGAGGCACGTGTGCCTTTTTGT
+            ATGTACTTTATGAATAAGGATCGGCTAACTCCGTGCCAGCAGCCGCGGTAATACGGAGGA
+            TCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGTGCGCAGGCGGT
+            +
+            HIHIIIIIHIIHGHHIHHIIIIIIIIIIIIIIIHHIIIIIHHIHIIIIIGIHIIIIHHHH
+            HHGHIHIIIIIIIIIIIGHIIIIIGHIIIIHIIHIHHIIIIHIHHIIIIIIIGIIIIIII
+            HIIIIIGHIIIIHIIIH?DGHEEGHIIIIIIIIIIIHIIHIIIHHIIHIHHIHCHHIIHG
+            IHHHHHHH<GG?B@EHDE-BEHHHII5B@GHHF?CGEHHHDHIHIIH
+
     - From stdin:
 
             zcat hairpin.fa.gz | fakit seq
+
 
 1. Sequence types
 
     - In default, `fakit seq` automatically detect the sequence type
 
             $ echo -e ">seq\nacgtryswkmbdhvACGTRYSWKMBDHV" | fakit stat
-            file    seq_type    num_seqs    min_len    avg_len    max_len
-            -            DNA           1         28         28         28
-
+            file   seq_format   seq_type   num_seqs   min_len   avg_len   max_len
+            -      FASTA        DNA               1        28        28        28
 
             $ echo -e ">seq\nACGUN ACGUN" | fakit stat
-            file    seq_type    num_seqs    min_len    avg_len    max_len
-            -            RNA           1         11         11         11
-
-
+            file   seq_format   seq_type   num_seqs   min_len   avg_len   max_len
+            -      FASTA        RNA               1        11        11        11
 
             $ echo -e ">seq\nabcdefghijklmnpqrstvwyz" | fakit stat
-            file    seq_type    num_seqs    min_len    avg_len    max_len
-            -        Protein           1         23         23         23
+            file   seq_format   seq_type   num_seqs   min_len   avg_len   max_len
+            -      FASTA        Protein           1        23        23        23
 
-
+            $ echo -e "@read\nACTGCN\n+\n@IICCG" | fakit stat
+            file   seq_format   seq_type   num_seqs   min_len   avg_len   max_len
+            -      FASTQ        DNA               1         6         6         6
 
     - You can also set sequence type by flag `-t` (`--seq-type`).
       But this only take effect on subcommands `seq` and `locate`.
@@ -183,6 +235,10 @@ Examples
         UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAACUAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
         AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGAGUGUACUAUUGAUGCUUCACACCUGGGCUCUCCGGGUACCAGGACGGUUUGAGCAGAU
         AAAGUGACCGUACCGAGCUGCAUACUUCCUUACAUGCCCAUACUAUAUCAUAAAUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAGU
+
+1. Convert multi-line FASTQ to 4-line FASTQ
+
+        $fakit seq read_1.fq.gz -w 0
 
 1. Reverse comlement sequence
 
@@ -230,10 +286,10 @@ Usage:
   fakit subseq [flags]
 
 Flags:
-  -b, --bed string        by BED file
+      --bed string        by BED file
   -d, --down-stream int   down stream length
   -T, --feature string    feature type ("." for all, case ignored) (default ".")
-  -g, --gtf string        by GTF (version 2.2) file
+      --gtf string        by GTF (version 2.2) file
   -f, --only-flank        only return up/down stream sequence
   -r, --region string     by region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases, 13:-1 for cutting first 12 bases. type "fakit subseq -h" for more examples
   -u, --up-stream int     up stream length
@@ -343,7 +399,7 @@ Examples
 
 3. Generate GC content for ploting
 
-        $ zcat hairpin.fa.gz | fakit fa2tab | head -n 1 | fakit tab2fa | fakit sliding -s 5 -W 30 | fakit fa2tab -n -g
+        $ zcat hairpin.fa.gz | fakit fx2tab | head -n 1 | fakit tab2fx | fakit sliding -s 5 -W 30 | fakit fx2tab -n -g
         cel-let-7_sliding:1-30          50.00
         cel-let-7_sliding:6-35          46.67
         cel-let-7_sliding:11-40         43.33
@@ -368,44 +424,64 @@ Eexamples
 
 1. General use
 
-        $ fakit stat *.fa.gz
-        file             seq_type    num_seqs    min_len    avg_len    max_len
-        hairpin.fa.gz         RNA      28,645         39        103      2,354
-        mature.fa.gz          RNA      35,828         15       21.8         34
+        $ fakit stat *.f{a,q}.gz
+        file            seq_format   seq_type   num_seqs   min_len   avg_len   max_len
+        clean.fa.gz     FASTA        RNA          26,419        39     104.2     2,354
+        hairpin.fa.gz   FASTA        RNA          28,645        39       103     2,354
+        mature.fa.gz    FASTA        RNA          35,828        15      21.8        34
+        reads_1.fq.gz   FASTQ        DNA           2,500       226       227       229
+        reads_2.fq.gz   FASTQ        DNA           2,500       223       224       225
 
+## fq2fa
 
-## fa2tab & fa2tab
-
-Usage (fa2tab)
+Usage
 
 ```
-covert FASTA to tabular format, and provide various information,
+covert FASTQ to FASTA
+
+Usage:
+  fakit fq2fa [flags]
+
+```
+
+Examples
+
+    fakit fq2fa reads_1.fq.gz -o reads1_.fa.gz
+
+
+## fx2tab & tab2fx
+
+Usage (fx2tab)
+
+```
+covert FASTA/Q to tabular format, and provide various information,
 like sequence length, GC content/GC skew.
 
 Usage:
-  fakit fa2tab [flags]
+  fakit fx2tab [flags]
 
 Flags:
-  -b, --base-content value   print base content. (case ignored, multiple values supported) e.g. -b AT -b N (default [])
+  -B, --base-content value   print base content. (case ignored, multiple values supported) e.g. -b AT -b N (default [])
   -g, --gc                   print GC content
   -G, --gc-skew              print GC-Skew
   -l, --length               print sequence length
-  -n, --name                 only print names (no sequences)
+  -n, --name                 only print names (no sequences and qualities)
   -i, --only-id              print ID instead of full head
   -T, --title                print title line
 
 ```
 
-Usage (tab2fa)
+Usage (tab2fx)
 
 ```
-covert tabular format (first two columns) to FASTA format
+covert tabular format (first two/three columns) to FASTA/Q format
 
 Usage:
-  fakit tab2fa [flags]
+  fakit tab2fx [flags]
 
 Flags:
   -p, --comment-line-prefix value   comment line prefix (default [#,//])
+
 
 ```
 
@@ -413,27 +489,29 @@ Examples
 
 1. Default output
 
-        $ fakit fa2tab hairpin.fa.gz
+        $ fakit fx2tab hairpin.fa.gz | head -n 2
         cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop      UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAACUAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
         cel-lin-4 MI0000002 Caenorhabditis elegans lin-4 stem-loop      AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGAGUGUACUAUUGAUGCUUCACACCUGGGCUCUCCGGGUACCAGGACGGUUUGAGCAGAU
-        cel-mir-1 MI0000003 Caenorhabditis elegans miR-1 stem-loop      AAAGUGACCGUACCGAGCUGCAUACUUCCUUACAUGCCCAUACUAUAUCAUAAAUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAGU
+
 
 1. Print sequence length, GC content, and only print names (no sequences),
 we could also print title line by flag `-T`.
 
-        $ fakit fa2tab hairpin.fa.gz -i -l -g -n -T
-        # name  seq     length  GC
-        cel-let-7               99      43.43
-        cel-lin-4               94      54.26
-        cel-mir-1               96      40.62
+        $ fakit fx2tab hairpin.fa.gz -l -g -n -i -T | head -n 4 | csvtk -t -C '&' pretty
+        #name       seq   qual   length   GC
+        cel-let-7                99       43.43
+        cel-lin-4                94       54.26
+        cel-mir-1                96       40.62
 
-1. Use fa2tab and tab2fa in pipe
+1. Use fx2tab and tab2fx in pipe
 
-        $ zcat hairpin.fa.gz | fakit fa2tab | fakit tab2fa
+        $ zcat hairpin.fa.gz | fakit fx2tab | fakit tab2fx
+
+        $ zcat reads_1.fq.gz | fakit fx2tab | fakit tab2fx
 
 1. Sort sequences by length (use `fakit sort -l`)
 
-        $ zcat hairpin.fa.gz | fakit fa2tab -l | sort -t"`echo -e '\t'`" -n -k3,3 | fakit tab2fa
+        $ zcat hairpin.fa.gz | fakit fx2tab -l | sort -t"`echo -e '\t'`" -n -k4,4 | fakit tab2fx
         >cin-mir-4129 MI0015684 Ciona intestinalis miR-4129 stem-loop
         UUCGUUAUUGGAAGACCUUAGUCCGUUAAUAAAGGCAUC
         >mmu-mir-7228 MI0023723 Mus musculus miR-7228 stem-loop
@@ -443,15 +521,15 @@ we could also print title line by flag `-T`.
 
         $ fakit sort -l hairpin.fa.gz
 
-    Sorting or filtering by GC (or other base by -flag `-b`) content could also achieved in similar way.
+    Sorting or filtering by GC (or other base by -flag `-B`) content could also achieved in similar way.
 
 1. Get first 1000 sequences
 
-        $ zcat hairpin.fa.gz | fakit fa2tab | head -n 1000 | fakit tab2fa
+        $ zcat hairpin.fa.gz | fakit fx2tab | head -n 1000 | fakit tab2fx
 
 **Extension**
 
-After converting FASTA to tabular format with `fakit fa2tab`,
+After converting FASTA to tabular format with `fakit fx2tab`,
 it could be handled with CSV/TSV tools,
  e.g. [csvtk](https://github.com/shenwei356/csvtkt), a cross-platform, efficient and practical CSV/TSV toolkit
 
@@ -606,6 +684,9 @@ Similar to `common`.
 
         $ zcat hairpin.fa.gz | fakit rmdup -s -o clean.fa.gz
         [INFO] 2226 duplicated records removed
+
+        $ zcat reads_1.fq.gz | fakit rmdup -s -o clean.fa.gz
+        [INFO] 1086 duplicated records removed
 
 1. Save duplicated sequences to file
 

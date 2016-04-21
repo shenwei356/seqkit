@@ -49,13 +49,13 @@ Examples:
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
 		chunkSize := config.ChunkSize
-		threads := config.Threads
+		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
-		runtime.GOMAXPROCS(threads)
+		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileList(args)
 
@@ -106,7 +106,7 @@ Examples:
 			}
 			gtfFeaturesMap = make(map[string]type2gtfFeatures)
 
-			gtf.Threads = threads // threads of gtf.ReadFeatures
+			gtf.Threads = config.Threads // threads of gtf.ReadFeatures
 			features, err := gtf.ReadFeatures(gtfFile)
 			checkError(err)
 			for _, feature := range features {
@@ -126,7 +126,7 @@ Examples:
 				checkError(fmt.Errorf("when given flag -b (--bed), flag -f (--feature) is not allowed"))
 			}
 			bedFeatureMap = make(map[string][]BedFeature)
-			Threads = threads // threads of ReadBedFeatures
+			Threads = config.Threads // threads of ReadBedFeatures
 			features, err := ReadBedFeatures(bedFile)
 			checkError(err)
 			for _, feature := range features {
@@ -144,7 +144,7 @@ Examples:
 		var s, e int
 		var subseq *seq.Seq
 		for _, file := range files {
-			fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
 			checkError(err)
 			for chunk := range fastxReader.Ch {
 				checkError(chunk.Err)
@@ -295,11 +295,9 @@ Examples:
 							outfh.WriteString(record.Format(lineWidth))
 						}
 					}
-
 				}
 			}
 		}
-
 	},
 }
 
@@ -310,11 +308,11 @@ func init() {
 		"e.g 1:12 for first 12 bases, -12:-1 for last 12 bases,"+
 		` 13:-1 for cutting first 12 bases. type "fakit subseq -h" for more examples`)
 
-	subseqCmd.Flags().StringP("gtf", "g", "", "by GTF (version 2.2) file")
+	subseqCmd.Flags().StringP("gtf", "", "", "by GTF (version 2.2) file")
 	subseqCmd.Flags().StringP("feature", "T", ".", `feature type ("." for all, case ignored)`)
 	subseqCmd.Flags().IntP("up-stream", "u", 0, "up stream length")
 	subseqCmd.Flags().IntP("down-stream", "d", 0, "down stream length")
 	subseqCmd.Flags().BoolP("only-flank", "f", false, "only return up/down stream sequence")
 
-	subseqCmd.Flags().StringP("bed", "b", "", "by BED file")
+	subseqCmd.Flags().StringP("bed", "", "", "by BED file")
 }

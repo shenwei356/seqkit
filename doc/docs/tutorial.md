@@ -1,5 +1,7 @@
 # Tutorial
 
+## Remove contaminated reads
+
 ## Handling of aligned sequences
 
 1. Some mock sequences (usually they will be much longer)

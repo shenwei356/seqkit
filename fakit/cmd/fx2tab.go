@@ -43,11 +43,11 @@ like sequence length, GC content/GC skew.
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
 		chunkSize := config.ChunkSize
-		threads := config.Threads
+		bufferSize := config.BufferSize
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
-		runtime.GOMAXPROCS(threads)
+		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileList(args)
 
@@ -85,7 +85,7 @@ like sequence length, GC content/GC skew.
 		var name []byte
 		var g, c float64
 		for _, file := range files {
-			fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
 			checkError(err)
 			for chunk := range fastxReader.Ch {
 				checkError(chunk.Err)
@@ -97,7 +97,7 @@ like sequence length, GC content/GC skew.
 						name = record.Name
 					}
 					if onlyName {
-						outfh.WriteString(fmt.Sprintf("%s\t%s", name, ""))
+						outfh.WriteString(fmt.Sprintf("%s\t%s\t%s", name, "", ""))
 					} else {
 						outfh.WriteString(fmt.Sprintf("%s\t%s\t%s", name,
 							record.Seq.Seq, record.Seq.Qual))
@@ -136,7 +136,7 @@ func init() {
 	fx2tabCmd.Flags().BoolP("length", "l", false, "print sequence length")
 	fx2tabCmd.Flags().BoolP("gc", "g", false, "print GC content")
 	fx2tabCmd.Flags().BoolP("gc-skew", "G", false, "print GC-Skew")
-	fx2tabCmd.Flags().StringSliceP("base-content", "b", []string{}, "print base content. (case ignored, multiple values supported) e.g. -b AT -b N")
+	fx2tabCmd.Flags().StringSliceP("base-content", "B", []string{}, "print base content. (case ignored, multiple values supported) e.g. -b AT -b N")
 	fx2tabCmd.Flags().BoolP("only-id", "i", false, "print ID instead of full head")
 	fx2tabCmd.Flags().BoolP("name", "n", false, "only print names (no sequences and qualities)")
 	fx2tabCmd.Flags().BoolP("title", "T", false, "print title line")

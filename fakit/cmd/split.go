@@ -54,13 +54,13 @@ Examples:
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
 		chunkSize := config.ChunkSize
-		threads := config.Threads
+		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
-		runtime.GOMAXPROCS(threads)
+		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileList(args)
 
@@ -106,7 +106,7 @@ Examples:
 			i := 1
 			records := []*fastx.Record{}
 
-			fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
 			checkError(err)
 
 			for chunk := range fastxReader.Ch {
@@ -164,7 +164,7 @@ Examples:
 				}
 				i := 1
 				records := []*fastx.Record{}
-				fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
 				checkError(err)
 				for chunk := range fastxReader.Ch {
 					checkError(chunk.Err)
@@ -189,7 +189,7 @@ Examples:
 				if !quiet {
 					log.Info("read sequences ...")
 				}
-				allRecords, err := fastx.GetSeqs(file, alphabet, chunkSize, threads, idRegexp)
+				allRecords, err := fastx.GetSeqs(file, alphabet, bufferSize, chunkSize, idRegexp)
 				checkError(err)
 				if !quiet {
 					log.Infof("read %d sequences", len(allRecords))
@@ -234,7 +234,7 @@ Examples:
 			if !quiet {
 				log.Info("read sequences ...")
 			}
-			allRecords, err := fastx.GetSeqs(file, alphabet, chunkSize, threads, idRegexp)
+			allRecords, err := fastx.GetSeqs(file, alphabet, bufferSize, chunkSize, idRegexp)
 			checkError(err)
 			if !quiet {
 				log.Infof("read %d sequences", len(allRecords))
@@ -284,7 +284,7 @@ Examples:
 			if !quiet {
 				log.Info("read sequences ...")
 			}
-			allRecords, err := fastx.GetSeqs(file, alphabet, chunkSize, threads, idRegexp)
+			allRecords, err := fastx.GetSeqs(file, alphabet, bufferSize, chunkSize, idRegexp)
 			checkError(err)
 			if !quiet {
 				log.Infof("read %d sequences", len(allRecords))

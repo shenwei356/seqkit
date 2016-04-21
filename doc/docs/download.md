@@ -6,8 +6,14 @@
 
 ## Current Version
 
-- [fakit v0.1.6](https://github.com/shenwei356/fakit/releases/tag/v0.1.6)
-    - add subcommand `replace`
+- [fakit v0.1.7](https://github.com/shenwei356/fakit/releases/tag/v0.1.7)
+    - ***add support FASTQ format***
+    - update document, add technical details
+    - rename subcommands `fa2tab` and `tab2fa` to `fx2tab` and `tab2fx`
+    - add subcommand `fq2fa`
+    - add column "seq_format" to `stat`
+    - add global flag `-b` (`--bufer-size`)
+    - little change of flag in `subseq` and some other commands
 
 ## Installation
 
@@ -31,6 +37,8 @@ You can also add the directory of the executable file to environment variable
 
 ## Previous Versions
 
+- [fakit v0.1.6](https://github.com/shenwei356/fakit/releases/tag/v0.1.6)
+    - add subcommand `replace`
 - [fakit v0.1.5.2](https://github.com/shenwei356/fakit/releases/tag/v0.1.5.2)
     - fix bug of `grep`, when not using flag `-r`, flag `-i` will not take effect.
 - [fakit v0.1.5.1](https://github.com/shenwei356/fakit/releases/tag/v0.1.5.1)

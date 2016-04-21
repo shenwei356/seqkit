@@ -46,12 +46,12 @@ var grepCmd = &cobra.Command{
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
 		chunkSize := config.ChunkSize
-		threads := config.Threads
+		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
-		runtime.GOMAXPROCS(threads)
+		runtime.GOMAXPROCS(config.Threads)
 
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
@@ -141,7 +141,7 @@ var grepCmd = &cobra.Command{
 
 		for _, file := range files {
 
-			ch := make(chan fastx.RecordChunk, threads)
+			ch := make(chan fastx.RecordChunk, config.Threads)
 			done := make(chan int)
 
 			// receiver
@@ -187,9 +187,9 @@ var grepCmd = &cobra.Command{
 
 			// producer and worker
 			var wg sync.WaitGroup
-			tokens := make(chan int, threads)
+			tokens := make(chan int, config.Threads)
 
-			fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
 			checkError(err)
 			for chunk := range fastxReader.Ch {
 				checkError(chunk.Err)

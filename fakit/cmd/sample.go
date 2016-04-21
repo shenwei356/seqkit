@@ -47,13 +47,13 @@ var sampleCmd = &cobra.Command{
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
 		chunkSize := config.ChunkSize
-		threads := config.Threads
+		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
-		runtime.GOMAXPROCS(threads)
+		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileList(args)
 
@@ -108,7 +108,7 @@ var sampleCmd = &cobra.Command{
 				if !quiet {
 					log.Info("second pass: read and sample")
 				}
-				fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
 				checkError(err)
 			LOOP:
 				for chunk := range fastxReader.Ch {
@@ -125,7 +125,7 @@ var sampleCmd = &cobra.Command{
 					}
 				}
 			} else {
-				records, err := fastx.GetSeqs(file, alphabet, chunkSize, threads, idRegexp)
+				records, err := fastx.GetSeqs(file, alphabet, chunkSize, bufferSize, idRegexp)
 				checkError(err)
 
 				proportion = float64(number) / float64(len(records))
@@ -145,7 +145,7 @@ var sampleCmd = &cobra.Command{
 				log.Info("sample by proportion")
 			}
 
-			fastxReader, err := fastx.NewReader(alphabet, file, threads, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
 			checkError(err)
 			for chunk := range fastxReader.Ch {
 				checkError(chunk.Err)
