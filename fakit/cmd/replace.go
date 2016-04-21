@@ -32,7 +32,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// replaceCmd represents the extract command
+// replaceCmd represents the replace command
 var replaceCmd = &cobra.Command{
 	Use:   "replace",
 	Short: "replace name/sequence/by regular expression",

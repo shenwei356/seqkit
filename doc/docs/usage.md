@@ -56,6 +56,12 @@ Some subcommands could either read all records or read the files twice by flag
 Two subcommands must read all records in memory right now, `shuffle` and `sort`.
 But I'll improve this later.
 
+### Reproducibility
+
+Subcommands `sample` and `shuffle` use random function, random seed could be
+given by flag `-s` (`--rand-seed`). This make sure that sample result could be
+reproduced in different environments with same random seed.
+
 
 ## fakit
 
@@ -890,6 +896,9 @@ Examples
 
         $ zcat hairpin.fa.gz | fakit sample -p 0.1 | fakit shuffle -o sample.fa.gz
 
+Note that when sampling on FASTQ files, make sure using same random seed by
+flag `-s` (`--rand-seed`)
+
 ## replace
 
 Usage
@@ -986,6 +995,8 @@ Examples
         [INFO] shuffle ...
         [INFO] output ...
 
+Note that when sampling on FASTQ files, make sure using same random seed by
+flag `-s` (`--rand-seed`)
 
 ## sort
 

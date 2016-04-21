@@ -31,7 +31,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// slidingCmd represents the seq command
+// slidingCmd represents the sliding command
 var slidingCmd = &cobra.Command{
 	Use:   "sliding",
 	Short: "sliding sequences, circle genome supported",

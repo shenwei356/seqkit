@@ -30,7 +30,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// fx2tabCmd represents the seq command
+// fx2tabCmd represents the fx2tab command
 var fx2tabCmd = &cobra.Command{
 	Use:   "fx2tab",
 	Short: "covert FASTA/Q to tabular format (with length/GC content/GC skew) to filter and sort",

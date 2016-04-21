@@ -31,7 +31,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// sampleCmd represents the seq command
+// sampleCmd represents the sample command
 var sampleCmd = &cobra.Command{
 	Use:   "sample",
 	Short: "sample sequences by number or proportion",

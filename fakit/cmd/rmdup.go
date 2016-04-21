@@ -33,7 +33,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// rmdupCmd represents the seq command
+// rmdupCmd represents the rmdup command
 var rmdupCmd = &cobra.Command{
 	Use:   "rmdup",
 	Short: "remove duplicated sequences by id/name/sequence",

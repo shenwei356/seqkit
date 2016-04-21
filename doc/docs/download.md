@@ -6,14 +6,9 @@
 
 ## Current Version
 
-- [fakit v0.1.7](https://github.com/shenwei356/fakit/releases/tag/v0.1.7)
-    - ***add support for (multi-line) FASTQ format***
-    - update document, add technical details
-    - rename subcommands `fa2tab` and `tab2fa` to `fx2tab` and `tab2fx`
-    - add subcommand `fq2fa`
-    - add column "seq_format" to `stat`
-    - add global flag `-b` (`--bufer-size`)
-    - little change of flag in `subseq` and some other commands
+- [fakit v0.1.8](https://github.com/shenwei356/fakit/releases/tag/v0.1.8)
+    - add subcommand `rename` to rename duplicated IDs
+    - add subcommand `faidx` to create FASTA index file
 
 ## Installation
 
@@ -37,6 +32,14 @@ You can also add the directory of the executable file to environment variable
 
 ## Previous Versions
 
+- [fakit v0.1.7](https://github.com/shenwei356/fakit/releases/tag/v0.1.7)
+    - ***add support for (multi-line) FASTQ format***
+    - update document, add technical details
+    - rename subcommands `fa2tab` and `tab2fa` to `fx2tab` and `tab2fx`
+    - add subcommand `fq2fa`
+    - add column "seq_format" to `stat`
+    - add global flag `-b` (`--bufer-size`)
+    - little change of flag in `subseq` and some other commands
 - [fakit v0.1.6](https://github.com/shenwei356/fakit/releases/tag/v0.1.6)
     - add subcommand `replace`
 - [fakit v0.1.5.2](https://github.com/shenwei356/fakit/releases/tag/v0.1.5.2)

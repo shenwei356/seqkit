@@ -34,7 +34,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// sortCmd represents the seq command
+// sortCmd represents the sort command
 var sortCmd = &cobra.Command{
 	Use:   "sort",
 	Short: "sort sequences by id/name/sequence/length",

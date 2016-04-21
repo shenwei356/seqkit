@@ -33,7 +33,7 @@ import (
 	"github.com/tatsushid/go-prettytable"
 )
 
-// statCmd represents the seq command
+// statCmd represents the stat command
 var statCmd = &cobra.Command{
 	Use:   "stat",
 	Short: "simple statistics of FASTA files",

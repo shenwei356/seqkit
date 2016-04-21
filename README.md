@@ -1,7 +1,5 @@
 # fakit - a cross-platform and efficient suit for FASTA/Q file manipulation
 
-
-
 Documents  : [http://shenwei356.github.io/fakit](http://shenwei356.github.io/fakit)
 
 Source code: [https://github.com/shenwei356/fakit](https://github.com/shenwei356/fakit)
@@ -34,7 +32,7 @@ from either standard stream or files, therefore, it could be easily used in pipe
   (see [download](http://shenwei356.github.io/fakit/download/))
 - **Fast** (see [benchmark](/#performance-comparison-with-other-tools)),
   **multiple-CPUs supported** (see [benchmark](/#speedup-with-multi-threads)).
-- **Practical functions supported by 16 subcommands** (see subcommands and
+- **Practical functions supported by 18 subcommands** (see subcommands and
   [usage](http://shenwei356.github.io/fakit/usage/) )
 - **Well documented** (detailed [usage](http://shenwei356.github.io/fakit/usage/)
   and [benchmark](http://shenwei356.github.io/fakit/benchmark/) )
@@ -98,7 +96,7 @@ You can also add the directory of the executable file to environment variable
   or simply copy it to `/usr/local/bin`
 
 
-## Subcommands (16 in total)
+## Subcommands (17 in total)
 
 **Sequence and subsequence**
 
@@ -128,6 +126,7 @@ You can also add the directory of the executable file to environment variable
 **Edit**
 
 - `replace`    replace name/sequence/by regular expression
+- `rename`     rename duplicated IDs
 
 **Ordering**
 
@@ -207,6 +206,11 @@ Some subcommands could either read all records or read the files twice by flag
 Two subcommands must read all records in memory right now, `shuffle` and `sort`.
 But I'll improve this later.
 
+### Reproducibility
+
+Subcommands `sample` and `shuffle` use random function, random seed could be
+given by flag `-s` (`--rand-seed`). This make sure that sample result could be
+reproduced in different environments with same random seed.
 
 ## Usage && Examples
 

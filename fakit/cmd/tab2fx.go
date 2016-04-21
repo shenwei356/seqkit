@@ -32,7 +32,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// tab2faCmd represents the seq command
+// tab2faCmd represents the tab2fx command
 var tab2faCmd = &cobra.Command{
 	Use:   "tab2fx",
 	Short: "covert tabular format to FASTA/Q format",

@@ -33,7 +33,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// commonCmd represents the seq command
+// commonCmd represents the common command
 var commonCmd = &cobra.Command{
 	Use:   "common",
 	Short: "find common sequences of multiple files by id/name/sequence",

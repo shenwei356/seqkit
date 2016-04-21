@@ -31,7 +31,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// shuffleCmd represents the seq command
+// shuffleCmd represents the shuffle command
 var shuffleCmd = &cobra.Command{
 	Use:   "shuffle",
 	Short: "shuffle sequences",

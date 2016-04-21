@@ -34,7 +34,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// grepCmd represents the extract command
+// grepCmd represents the grep command
 var grepCmd = &cobra.Command{
 	Use:   "grep",
 	Short: "search sequences by pattern(s) of name or sequence motifs",

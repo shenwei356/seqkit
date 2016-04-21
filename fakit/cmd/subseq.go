@@ -33,7 +33,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// subseqCmd represents the seq command
+// subseqCmd represents the subseq command
 var subseqCmd = &cobra.Command{
 	Use:   "subseq",
 	Short: "get subsequences by region/gtf/bed, including flanking sequences",

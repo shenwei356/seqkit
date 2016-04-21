@@ -29,7 +29,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// fq2faCmd represents the seq command
+// fq2faCmd represents the fq2fa command
 var fq2faCmd = &cobra.Command{
 	Use:   "fq2fa",
 	Short: "covert FASTQ to FASTA",

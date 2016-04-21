@@ -33,7 +33,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// splitCmd represents the seq command
+// splitCmd represents the split command
 var splitCmd = &cobra.Command{
 	Use:   "split",
 	Short: "split sequences into files by id/seq region/size/parts",

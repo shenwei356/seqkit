@@ -35,7 +35,7 @@ var RootCmd = &cobra.Command{
 	Short: "a cross-platform and efficient suit for FASTA/Q file manipulation",
 	Long: `fakit --  a cross-platform and efficient suit for FASTA/Q file manipulation
 
-Version: 0.1.7
+Version: 0.1.8
 
 Author: Wei Shen <shenwei356@gmail.com>
 

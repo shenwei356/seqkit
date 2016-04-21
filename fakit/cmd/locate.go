@@ -34,7 +34,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// locateCmd represents the extract command
+// locateCmd represents the locate command
 var locateCmd = &cobra.Command{
 	Use:   "locate",
 	Short: "locate subsequences/motifs",
