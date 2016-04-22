@@ -167,22 +167,30 @@ of sequences, which could also improve performance.
 Since using of buffers and chunks, the memory occupation will be higher than
 cases of reading sequence one by one.
 The default value of chunk size (configurable by global flag `-c` or `--chunk-size`)
-is 1000, which is suitable for manipulating "small" sequences, e.g. FASTQ.
-But for big genomes like human genome, smaller chunk size is prefered, e.g. 1.
+is 1, which is suitable for most of cases. 
+But for manipulating short sequences, e.g. FASTQ or FASTA of short sequences,
+you could set higher value, e.g. 1000.
+For big genomes like human genome, smaller chunk size is prefered, e.g. 1.
 And the buffer size is configurable by  global flag `-b` or `--buffer-size`
-(default value is the number of CPUs), therefore, you may set with smaller
-value to reduce memory usage.
+(default value is 1), therefore, you may set with higher
+value for short sequences to imporve performance.
 
 ***In summary, set smaller value for `-c` and `-b` when handling big FASTA file
 like human genomes.***
+
+### FASTA index
+
+For some commands, e.g. `subseq`, `sort` and `shuffle`,
+when input files are plain FASTA files, FASTA index file .fai will be created for
+rapid acccess of sequences and reducing memory occupation.
 
 ### Parallelization of CPU intensive jobs
 
 Most of the manipulations of FASTA/Q files are I/O intensive, to improve the
 performance, asynchronous parsing strategy is used.
 
-For CPU intensive jobs like `grep` with regular expressions, `locate` with
-sequence motifs, and `subseq` by GTF/BED files. The processes are parallelized
+For CPU intensive jobs like `grep` with regular expressions and `locate` with
+sequence motifs. The processes are parallelized
 with MapReduce model by multiple goroutine in golang, similar to but much
 lighter weight than threads. The concurrency number is configurable with global
 flag `-j` or `--threads`.
@@ -194,7 +202,11 @@ of your computer.
 
 Most of the subcommands do not read whole FASTA/Q records in to memory,
 including `stat`, `fq2fa`, `fx2tab`, `tab2fx`, `grep`, `locate`, `replace`,
- `seq`, `sliding`, `subseq`. The just temporarily buffer chunks of records.
+ `seq`, `sliding`, `subseq`. They just temporarily buffer chunks of records.
+ 
+Note that when using `subseq --gtf | --bed`, if the GTF/BED files are too
+big, the memory usage will increase. 
+You could use `--chr` to specify chromesomes and `--feature` to limit features.
 
 Some subcommands need to store sequences or heads in memory, but there are
 strategy to reduce memory occupation, including `rmdup` and `common`.
