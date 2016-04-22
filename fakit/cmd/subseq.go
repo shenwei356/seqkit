@@ -29,7 +29,9 @@ import (
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/featio/gtf"
 	"github.com/shenwei356/bio/seq"
+	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/util/byteutil"
 	"github.com/spf13/cobra"
 )
 
@@ -59,6 +61,7 @@ Examples:
 
 		files := getFileList(args)
 
+		chrName := getFlagString(cmd, "seq")
 		region := getFlagString(cmd, "region")
 		gtfFile := getFlagString(cmd, "gtf")
 		bedFile := getFlagString(cmd, "bed")
@@ -81,7 +84,7 @@ Examples:
 		defer outfh.Close()
 
 		var start, end int
-		type type2gtfFeatures map[string][]gtf.Feature
+
 		var gtfFeaturesMap map[string]type2gtfFeatures
 		var bedFeatureMap map[string][]BedFeature
 
@@ -137,13 +140,45 @@ Examples:
 			}
 		}
 
-		if !quiet {
-			log.Info("read sequences ...")
-		}
-		var strand, geneID, outname, flankInfo string
-		var s, e int
-		var subseq *seq.Seq
 		for _, file := range files {
+			// plain fasta
+			if chrName != "" &&
+				file != "" && !strings.HasSuffix(strings.ToLower(file), ".gz") {
+				var isFastq bool
+				fastxReader, err := fastx.NewReader(seq.Unlimit, file, 1, 1, "")
+				checkError(err)
+			LOOP:
+				for {
+					select {
+					case chunk := <-fastxReader.Ch:
+						checkError(chunk.Err)
+
+						isFastq = fastxReader.IsFastq
+
+						fastxReader.Cancel()
+						break LOOP
+					default:
+					}
+				}
+				if !isFastq {
+					index, err := fai.New(file)
+					checkError(err)
+
+					if region != "" {
+						r, ok := index.Index[chrName]
+						if !ok {
+							log.Warningf(`sequence (%s) not found in file: %s`, chrName, file)
+							continue
+						}
+						subseq := subseqByFaix(index, chrName, r, start, end)
+						outfh.WriteString(fmt.Sprintf(">%s\n%s\n",
+							chrName, byteutil.WrapByteSlice(subseq, lineWidth)))
+					}
+
+					continue
+				}
+			}
+
 			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
 			checkError(err)
 			for chunk := range fastxReader.Ch {
@@ -151,149 +186,17 @@ Examples:
 
 				for _, record := range chunk.Data {
 					if region != "" {
-						record.Seq = record.Seq.SubSeq(start, end)
-						outfh.WriteString(record.Format(lineWidth))
+						subseqByRegion(outfh, record, lineWidth, start, end)
+
 					} else if gtfFile != "" {
-						seqname := string(record.ID)
-						if _, ok := gtfFeaturesMap[seqname]; !ok {
-							continue
-						}
+						subseqByGTFFile(outfh, record, lineWidth,
+							gtfFeaturesMap, choosedFeature,
+							onlyFlank, upStream, downStream, start, end)
 
-						for featureType := range gtfFeaturesMap[seqname] {
-							if choosedFeature != "." && strings.ToLower(featureType) != choosedFeature {
-								continue
-							}
-							for _, feature := range gtfFeaturesMap[seqname][featureType] {
-								s, e = feature.Start, feature.End
-								if feature.Strand != nil && *feature.Strand == "-" {
-									if onlyFlank {
-										if upStream > 0 {
-											s = feature.End + 1
-											e = feature.End + upStream
-										} else {
-											s = feature.Start - downStream
-											e = feature.Start - 1
-										}
-									} else {
-										s = feature.Start - downStream // seq.SubSeq will check it
-										e = feature.End + upStream
-									}
-									subseq = record.Seq.SubSeq(s, e).RevCom()
-								} else {
-									if onlyFlank {
-										if upStream > 0 {
-											s = feature.Start - upStream
-											e = feature.Start - 1
-										} else {
-											s = e + 1
-											e = e + downStream
-										}
-									} else {
-										s = feature.Start - upStream
-										e = feature.End + downStream
-									}
-									subseq = record.Seq.SubSeq(s, e)
-								}
-
-								if feature.Strand == nil {
-									strand = "."
-								} else {
-									strand = *feature.Strand
-								}
-								geneID = ""
-								for _, arrtribute := range feature.Attributes {
-									if arrtribute.Tag == "gene_id" {
-										geneID = arrtribute.Value
-										break
-									}
-								}
-								if upStream > 0 {
-									if onlyFlank {
-										flankInfo = fmt.Sprintf("_usf:%d", upStream)
-									} else {
-										flankInfo = fmt.Sprintf("_us:%d", upStream)
-									}
-								} else if downStream > 0 {
-									if onlyFlank {
-										flankInfo = fmt.Sprintf("_dsf:%d", downStream)
-									} else {
-										flankInfo = fmt.Sprintf("_ds:%d", downStream)
-									}
-								} else {
-									flankInfo = ""
-								}
-								outname = fmt.Sprintf("%s_%d:%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, geneID)
-								record.Name, record.Seq = []byte(outname), subseq
-								outfh.WriteString(record.Format(lineWidth))
-							}
-
-						}
 					} else if bedFile != "" {
-						seqname := string(record.ID)
-						if _, ok := bedFeatureMap[seqname]; !ok {
-							continue
-						}
-
-						for _, feature := range bedFeatureMap[seqname] {
-							s, e = feature.Start, feature.End
-							if feature.Strand != nil && *feature.Strand == "-" {
-								if onlyFlank {
-									if upStream > 0 {
-										s = feature.End + 1
-										e = feature.End + upStream
-									} else {
-										s = feature.Start - downStream
-										e = feature.Start - 1
-									}
-								} else {
-									s = feature.Start - downStream // seq.SubSeq will check it
-									e = feature.End + upStream
-								}
-								subseq = record.Seq.SubSeq(s, e).RevCom()
-							} else {
-								if onlyFlank {
-									if upStream > 0 {
-										s = feature.Start - upStream
-										e = feature.Start - 1
-									} else {
-										s = e + 1
-										e = e + downStream
-									}
-								} else {
-									s = feature.Start - upStream
-									e = feature.End + downStream
-								}
-								subseq = record.Seq.SubSeq(s, e)
-							}
-
-							if feature.Strand == nil {
-								strand = "."
-							} else {
-								strand = *feature.Strand
-							}
-							geneID = ""
-							if feature.Name != nil {
-								geneID = *feature.Name
-							}
-							if upStream > 0 {
-								if onlyFlank {
-									flankInfo = fmt.Sprintf("_usf:%d", upStream)
-								} else {
-									flankInfo = fmt.Sprintf("_us:%d", upStream)
-								}
-							} else if downStream > 0 {
-								if onlyFlank {
-									flankInfo = fmt.Sprintf("_dsf:%d", downStream)
-								} else {
-									flankInfo = fmt.Sprintf("_ds:%d", downStream)
-								}
-							} else {
-								flankInfo = ""
-							}
-							outname = fmt.Sprintf("%s_%d:%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, geneID)
-							record.Name, record.Seq = []byte(outname), subseq
-							outfh.WriteString(record.Format(lineWidth))
-						}
+						subSeqByBEDFile(outfh, record, lineWidth,
+							bedFeatureMap, choosedFeature,
+							onlyFlank, upStream, downStream, start, end)
 					}
 				}
 			}
@@ -301,9 +204,185 @@ Examples:
 	},
 }
 
+func subseqByFaix(index *fai.Faidx, chrName string, r fai.Record, start, end int) []byte {
+	start, end, ok := seq.SubLocation(r.Length, start, end)
+	if !ok {
+		return []byte("")
+	}
+	subseq, _ := index.SubSeq(chrName, start, end)
+	return subseq
+}
+
+type type2gtfFeatures map[string][]gtf.Feature
+
+func subseqByRegion(outfh *xopen.Writer, record *fastx.Record, lineWidth int, start, end int) {
+	record.Seq = record.Seq.SubSeq(start, end)
+	outfh.WriteString(record.Format(lineWidth))
+}
+
+func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
+	gtfFeaturesMap map[string]type2gtfFeatures, choosedFeature string,
+	onlyFlank bool, upStream, downStream int,
+	start, end int) {
+
+	seqname := string(record.ID)
+	if _, ok := gtfFeaturesMap[seqname]; !ok {
+		return
+	}
+
+	var strand, geneID, outname, flankInfo string
+	var s, e int
+	var subseq *seq.Seq
+
+	for featureType := range gtfFeaturesMap[seqname] {
+		if choosedFeature != "." && strings.ToLower(featureType) != choosedFeature {
+			continue
+		}
+		for _, feature := range gtfFeaturesMap[seqname][featureType] {
+			s, e = feature.Start, feature.End
+			if feature.Strand != nil && *feature.Strand == "-" {
+				if onlyFlank {
+					if upStream > 0 {
+						s = feature.End + 1
+						e = feature.End + upStream
+					} else {
+						s = feature.Start - downStream
+						e = feature.Start - 1
+					}
+				} else {
+					s = feature.Start - downStream // seq.SubSeq will check it
+					e = feature.End + upStream
+				}
+				subseq = record.Seq.SubSeq(s, e).RevCom()
+			} else {
+				if onlyFlank {
+					if upStream > 0 {
+						s = feature.Start - upStream
+						e = feature.Start - 1
+					} else {
+						s = e + 1
+						e = e + downStream
+					}
+				} else {
+					s = feature.Start - upStream
+					e = feature.End + downStream
+				}
+				subseq = record.Seq.SubSeq(s, e)
+			}
+
+			if feature.Strand == nil {
+				strand = "."
+			} else {
+				strand = *feature.Strand
+			}
+			geneID = ""
+			for _, arrtribute := range feature.Attributes {
+				if arrtribute.Tag == "gene_id" {
+					geneID = arrtribute.Value
+					break
+				}
+			}
+			if upStream > 0 {
+				if onlyFlank {
+					flankInfo = fmt.Sprintf("_usf:%d", upStream)
+				} else {
+					flankInfo = fmt.Sprintf("_us:%d", upStream)
+				}
+			} else if downStream > 0 {
+				if onlyFlank {
+					flankInfo = fmt.Sprintf("_dsf:%d", downStream)
+				} else {
+					flankInfo = fmt.Sprintf("_ds:%d", downStream)
+				}
+			} else {
+				flankInfo = ""
+			}
+			outname = fmt.Sprintf("%s_%d:%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, geneID)
+			record.Name, record.Seq = []byte(outname), subseq
+			outfh.WriteString(record.Format(lineWidth))
+		}
+	}
+}
+
+func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
+	bedFeatureMap map[string][]BedFeature, choosedFeature string,
+	onlyFlank bool, upStream, downStream int,
+	start, end int) {
+	seqname := string(record.ID)
+	if _, ok := bedFeatureMap[seqname]; !ok {
+		return
+	}
+
+	var strand, geneID, outname, flankInfo string
+	var s, e int
+	var subseq *seq.Seq
+
+	for _, feature := range bedFeatureMap[seqname] {
+		s, e = feature.Start, feature.End
+		if feature.Strand != nil && *feature.Strand == "-" {
+			if onlyFlank {
+				if upStream > 0 {
+					s = feature.End + 1
+					e = feature.End + upStream
+				} else {
+					s = feature.Start - downStream
+					e = feature.Start - 1
+				}
+			} else {
+				s = feature.Start - downStream // seq.SubSeq will check it
+				e = feature.End + upStream
+			}
+			subseq = record.Seq.SubSeq(s, e).RevCom()
+		} else {
+			if onlyFlank {
+				if upStream > 0 {
+					s = feature.Start - upStream
+					e = feature.Start - 1
+				} else {
+					s = e + 1
+					e = e + downStream
+				}
+			} else {
+				s = feature.Start - upStream
+				e = feature.End + downStream
+			}
+			subseq = record.Seq.SubSeq(s, e)
+		}
+
+		if feature.Strand == nil {
+			strand = "."
+		} else {
+			strand = *feature.Strand
+		}
+		geneID = ""
+		if feature.Name != nil {
+			geneID = *feature.Name
+		}
+		if upStream > 0 {
+			if onlyFlank {
+				flankInfo = fmt.Sprintf("_usf:%d", upStream)
+			} else {
+				flankInfo = fmt.Sprintf("_us:%d", upStream)
+			}
+		} else if downStream > 0 {
+			if onlyFlank {
+				flankInfo = fmt.Sprintf("_dsf:%d", downStream)
+			} else {
+				flankInfo = fmt.Sprintf("_ds:%d", downStream)
+			}
+		} else {
+			flankInfo = ""
+		}
+		outname = fmt.Sprintf("%s_%d:%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, geneID)
+		record.Name, record.Seq = []byte(outname), subseq
+		outfh.WriteString(record.Format(lineWidth))
+	}
+}
+
 func init() {
 	RootCmd.AddCommand(subseqCmd)
 
+	subseqCmd.Flags().StringP("seq", "s", "", "specify seq name")
 	subseqCmd.Flags().StringP("region", "r", "", "by region. "+
 		"e.g 1:12 for first 12 bases, -12:-1 for last 12 bases,"+
 		` 13:-1 for cutting first 12 bases. type "fakit subseq -h" for more examples`)

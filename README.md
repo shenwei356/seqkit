@@ -96,7 +96,7 @@ You can also add the directory of the executable file to environment variable
   or simply copy it to `/usr/local/bin`
 
 
-## Subcommands (17 in total)
+## Subcommands (18 in total)
 
 **Sequence and subsequence**
 
@@ -104,6 +104,7 @@ You can also add the directory of the executable file to environment variable
 - `subseq`     get subsequences by region/gtf/bed, including flanking sequences
 - `sliding`    sliding sequences, circle genome supported
 - `stat`       simple statistics of FASTA files
+- `faidx`      create FASTA index file
 
 **Format conversion**
 
