@@ -41,6 +41,10 @@ var subseqCmd = &cobra.Command{
 	Short: "get subsequences by region/gtf/bed, including flanking sequences",
 	Long: fmt.Sprintf(`get subsequences by region/gtf/bed, including flanking sequences.
 
+Usage guide:
+
+    1. Recommond use text FASTA file, so fakit could utilize FASTA index.
+
 The definition of region is 1-based and with some custom design.
 
 Examples:
@@ -61,11 +65,22 @@ Examples:
 
 		files := getFileList(args)
 
-		chrName := getFlagString(cmd, "seq")
+		chrs := getFlagStringSlice(cmd, "chr")
+		chrsMap := make(map[string]struct{}, len(chrs))
+		for _, chr := range chrs {
+			chrsMap[strings.ToLower(chr)] = struct{}{}
+		}
 		region := getFlagString(cmd, "region")
+
 		gtfFile := getFlagString(cmd, "gtf")
 		bedFile := getFlagString(cmd, "bed")
-		choosedFeature := strings.ToLower(getFlagString(cmd, "feature"))
+		choosedFeatures := getFlagStringSlice(cmd, "feature")
+		choosedFeatures2 := make([]string, len(choosedFeatures))
+		for i, f := range choosedFeatures {
+			choosedFeatures2[i] = strings.ToLower(f)
+		}
+		choosedFeatures = choosedFeatures2
+
 		upStream := getFlagNonNegativeInt(cmd, "up-stream")
 		downStream := getFlagNonNegativeInt(cmd, "down-stream")
 		onlyFlank := getFlagBool(cmd, "only-flank")
@@ -76,6 +91,12 @@ Examples:
 			} else if upStream == 0 && downStream == 0 {
 				checkError(fmt.Errorf("when flag -f (--only-flank) given," +
 					" one of flags -u (--up-stream) and -d (--down-stream) should be given"))
+			}
+		}
+		if region != "" {
+			if upStream > 0 || downStream > 0 || onlyFlank {
+				checkError(fmt.Errorf("when flag -r (--region) given," +
+					" any of flags -u (--up-stream), -d (--down-stream) and -f (--only-flank) is not allowed"))
 			}
 		}
 
@@ -110,8 +131,15 @@ Examples:
 			gtfFeaturesMap = make(map[string]type2gtfFeatures)
 
 			gtf.Threads = config.Threads // threads of gtf.ReadFeatures
-			features, err := gtf.ReadFeatures(gtfFile)
+			var features []gtf.Feature
+			var err error
+			if len(chrs) > 0 || len(choosedFeatures) > 0 {
+				features, err = gtf.ReadFilteredFeatures(gtfFile, chrs, choosedFeatures)
+			} else {
+				features, err = gtf.ReadFeatures(gtfFile)
+			}
 			checkError(err)
+
 			for _, feature := range features {
 				if _, ok := gtfFeaturesMap[feature.SeqName]; !ok {
 					gtfFeaturesMap[feature.SeqName] = make(map[string][]gtf.Feature)
@@ -125,13 +153,21 @@ Examples:
 			if !quiet {
 				log.Info("read BED file ...")
 			}
-			if choosedFeature != "." {
+			if len(choosedFeatures) > 0 {
 				checkError(fmt.Errorf("when given flag -b (--bed), flag -f (--feature) is not allowed"))
 			}
 			bedFeatureMap = make(map[string][]BedFeature)
 			Threads = config.Threads // threads of ReadBedFeatures
-			features, err := ReadBedFeatures(bedFile)
+
+			var features []BedFeature
+			var err error
+			if len(chrs) > 0 {
+				features, err = ReadBedFilteredFeatures(gtfFile, chrs)
+			} else {
+				features, err = ReadBedFeatures(bedFile)
+			}
 			checkError(err)
+
 			for _, feature := range features {
 				if _, ok := bedFeatureMap[feature.Chr]; !ok {
 					bedFeatureMap[feature.Chr] = []BedFeature{}
@@ -141,11 +177,13 @@ Examples:
 		}
 
 		for _, file := range files {
-			// plain fasta
-			if chrName != "" &&
-				file != "" && !strings.HasSuffix(strings.ToLower(file), ".gz") {
+			// plain fasta, using Faidx
+			if file != "" && !strings.HasSuffix(strings.ToLower(file), ".gz") {
+
+				// check seq format, ignoring fastq
 				var isFastq bool
-				fastxReader, err := fastx.NewReader(seq.Unlimit, file, 1, 1, "")
+				var alphabet *seq.Alphabet
+				fastxReader, err := fastx.NewReader(alphabet, file, 1, 1, "")
 				checkError(err)
 			LOOP:
 				for {
@@ -154,31 +192,90 @@ Examples:
 						checkError(chunk.Err)
 
 						isFastq = fastxReader.IsFastq
+						alphabet = fastxReader.Alphabet()
 
 						fastxReader.Cancel()
 						break LOOP
 					default:
 					}
 				}
-				if !isFastq {
+				if !isFastq { // ok, it's fasta!
 					index, err := fai.New(file)
 					checkError(err)
 
 					if region != "" {
-						r, ok := index.Index[chrName]
-						if !ok {
-							log.Warningf(`sequence (%s) not found in file: %s`, chrName, file)
+						if len(chrs) > 0 {
+							for _, chr := range chrs {
+								r, ok := index.Index[chr]
+								if !ok {
+									log.Warningf(`sequence (%s) not found in file: %s`, chr, file)
+									continue
+								}
+
+								s, e, _ := seq.SubLocation(r.Length, start, end)
+								subseq := subseqByFaix(index, chr, r, start, end)
+								outfh.WriteString(fmt.Sprintf(">%s_%d-%d\n%s\n",
+									chr, s, e, byteutil.WrapByteSlice(subseq, lineWidth)))
+							}
 							continue
+						} else {
+							// read all sequence
 						}
-						subseq := subseqByFaix(index, chrName, r, start, end)
-						outfh.WriteString(fmt.Sprintf(">%s\n%s\n",
-							chrName, byteutil.WrapByteSlice(subseq, lineWidth)))
+
+					} else if gtfFile != "" {
+						for chr := range gtfFeaturesMap {
+							if len(chrs) > 0 { // selected chrs
+								if _, ok := chrsMap[strings.ToLower(chr)]; !ok {
+									continue
+								}
+							}
+
+							r, ok := index.Index[chr]
+							if !ok {
+								log.Warningf(`sequence (%s) not found in file: %s`, chr, file)
+								continue
+							}
+
+							subseq := subseqByFaix(index, chr, r, 1, -1)
+							record, err := fastx.NewRecord(alphabet, []byte(chr), []byte(chr), subseq)
+							checkError(err)
+
+							subseqByGTFFile(outfh, record, lineWidth,
+								gtfFeaturesMap, choosedFeatures,
+								onlyFlank, upStream, downStream)
+						}
+
+						continue
+					} else if bedFile != "" {
+						for chr := range bedFeatureMap {
+							if len(chrs) > 0 { // selected chrs
+								if _, ok := chrsMap[strings.ToLower(chr)]; !ok {
+									continue
+								}
+							}
+
+							r, ok := index.Index[chr]
+							if !ok {
+								log.Warningf(`sequence (%s) not found in file: %s`, chr, file)
+								continue
+							}
+
+							subseq := subseqByFaix(index, chr, r, 1, -1)
+							record, err := fastx.NewRecord(alphabet, []byte(chr), []byte(chr), subseq)
+							checkError(err)
+
+							subSeqByBEDFile(outfh, record, lineWidth,
+								bedFeatureMap,
+								onlyFlank, upStream, downStream)
+						}
+
+						continue
 					}
 
-					continue
 				}
 			}
 
+			// Parse all sequences
 			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
 			checkError(err)
 			for chunk := range fastxReader.Ch {
@@ -189,14 +286,24 @@ Examples:
 						subseqByRegion(outfh, record, lineWidth, start, end)
 
 					} else if gtfFile != "" {
+						seqname := string(record.ID)
+						if _, ok := gtfFeaturesMap[seqname]; !ok {
+							continue
+						}
+
 						subseqByGTFFile(outfh, record, lineWidth,
-							gtfFeaturesMap, choosedFeature,
-							onlyFlank, upStream, downStream, start, end)
+							gtfFeaturesMap, choosedFeatures,
+							onlyFlank, upStream, downStream)
 
 					} else if bedFile != "" {
+						seqname := string(record.ID)
+						if _, ok := bedFeatureMap[seqname]; !ok {
+							return
+						}
+
 						subSeqByBEDFile(outfh, record, lineWidth,
-							bedFeatureMap, choosedFeature,
-							onlyFlank, upStream, downStream, start, end)
+							bedFeatureMap,
+							onlyFlank, upStream, downStream)
 					}
 				}
 			}
@@ -204,12 +311,12 @@ Examples:
 	},
 }
 
-func subseqByFaix(index *fai.Faidx, chrName string, r fai.Record, start, end int) []byte {
+func subseqByFaix(index *fai.Faidx, chrs string, r fai.Record, start, end int) []byte {
 	start, end, ok := seq.SubLocation(r.Length, start, end)
 	if !ok {
 		return []byte("")
 	}
-	subseq, _ := index.SubSeq(chrName, start, end)
+	subseq, _ := index.SubSeq(chrs, start, end)
 	return subseq
 }
 
@@ -221,22 +328,25 @@ func subseqByRegion(outfh *xopen.Writer, record *fastx.Record, lineWidth int, st
 }
 
 func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
-	gtfFeaturesMap map[string]type2gtfFeatures, choosedFeature string,
-	onlyFlank bool, upStream, downStream int,
-	start, end int) {
+	gtfFeaturesMap map[string]type2gtfFeatures, choosedFeatures []string,
+	onlyFlank bool, upStream int, downStream int) {
 
 	seqname := string(record.ID)
-	if _, ok := gtfFeaturesMap[seqname]; !ok {
-		return
-	}
 
 	var strand, geneID, outname, flankInfo string
 	var s, e int
 	var subseq *seq.Seq
 
+	featsMap := make(map[string]struct{}, len(choosedFeatures))
+	for _, chr := range choosedFeatures {
+		featsMap[chr] = struct{}{}
+	}
+
 	for featureType := range gtfFeaturesMap[seqname] {
-		if choosedFeature != "." && strings.ToLower(featureType) != choosedFeature {
-			continue
+		if len(choosedFeatures) > 0 {
+			if _, ok := featsMap[strings.ToLower(featureType)]; !ok {
+				continue
+			}
 		}
 		for _, feature := range gtfFeaturesMap[seqname][featureType] {
 			s, e = feature.Start, feature.End
@@ -297,21 +407,18 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 			} else {
 				flankInfo = ""
 			}
-			outname = fmt.Sprintf("%s_%d:%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, geneID)
-			record.Name, record.Seq = []byte(outname), subseq
-			outfh.WriteString(record.Format(lineWidth))
+			outname = fmt.Sprintf("%s_%d-%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, geneID)
+			newRecord, err := fastx.NewRecord(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq)
+			checkError(err)
+			outfh.WriteString(newRecord.Format(lineWidth))
 		}
 	}
 }
 
 func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
-	bedFeatureMap map[string][]BedFeature, choosedFeature string,
-	onlyFlank bool, upStream, downStream int,
-	start, end int) {
+	bedFeatureMap map[string][]BedFeature,
+	onlyFlank bool, upStream, downStream int) {
 	seqname := string(record.ID)
-	if _, ok := bedFeatureMap[seqname]; !ok {
-		return
-	}
 
 	var strand, geneID, outname, flankInfo string
 	var s, e int
@@ -373,25 +480,25 @@ func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 		} else {
 			flankInfo = ""
 		}
-		outname = fmt.Sprintf("%s_%d:%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, geneID)
-		record.Name, record.Seq = []byte(outname), subseq
-		outfh.WriteString(record.Format(lineWidth))
+		outname = fmt.Sprintf("%s_%d-%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, geneID)
+		newRecord, err := fastx.NewRecord(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq)
+		checkError(err)
+		outfh.WriteString(newRecord.Format(lineWidth))
 	}
 }
 
 func init() {
 	RootCmd.AddCommand(subseqCmd)
 
-	subseqCmd.Flags().StringP("seq", "s", "", "specify seq name")
+	subseqCmd.Flags().StringSliceP("chr", "", []string{}, "select limited sequence with sequence IDs (multiple value supported)")
 	subseqCmd.Flags().StringP("region", "r", "", "by region. "+
 		"e.g 1:12 for first 12 bases, -12:-1 for last 12 bases,"+
 		` 13:-1 for cutting first 12 bases. type "fakit subseq -h" for more examples`)
 
 	subseqCmd.Flags().StringP("gtf", "", "", "by GTF (version 2.2) file")
-	subseqCmd.Flags().StringP("feature", "T", ".", `feature type ("." for all, case ignored)`)
+	subseqCmd.Flags().StringSliceP("feature", "", []string{}, `select limited feature types (multiple value supported, case ignored, only works with GTF)`)
 	subseqCmd.Flags().IntP("up-stream", "u", 0, "up stream length")
 	subseqCmd.Flags().IntP("down-stream", "d", 0, "down stream length")
 	subseqCmd.Flags().BoolP("only-flank", "f", false, "only return up/down stream sequence")
-
 	subseqCmd.Flags().StringP("bed", "", "", "by BED file")
 }

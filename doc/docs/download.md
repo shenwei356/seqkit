@@ -9,6 +9,7 @@
 - [fakit v0.1.8](https://github.com/shenwei356/fakit/releases/tag/v0.1.8)
     - add subcommand `rename` to rename duplicated IDs
     - add subcommand `faidx` to create FASTA index file
+    - ***utilize faidx to improve performance of `subseq`***
 
 ## Installation
 

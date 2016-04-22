@@ -56,8 +56,8 @@ func Execute() {
 
 func init() {
 	RootCmd.PersistentFlags().StringP("seq-type", "t", "auto", "sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence)")
-	RootCmd.PersistentFlags().IntP("chunk-size", "c", 1000, "chunk size (attention: unit is FASTA records not lines)")
-	RootCmd.PersistentFlags().IntP("buffer-size", "b", runtime.NumCPU(), "buffer size of chunks (default value is the CPUs number of your computer)")
+	RootCmd.PersistentFlags().IntP("chunk-size", "c", 1, "chunk size (attention: unit is FASTA records not lines)")
+	RootCmd.PersistentFlags().IntP("buffer-size", "b", 1, "buffer size of chunks")
 	RootCmd.PersistentFlags().IntP("threads", "j", runtime.NumCPU(), "number of CPUs. (default value is the CPUs number of your computer)")
 	RootCmd.PersistentFlags().IntP("line-width", "w", 60, "line width when outputing FASTA format (0 for no wrap)")
 	RootCmd.PersistentFlags().StringP("id-regexp", "", fastx.DefaultIDRegexp, "regular expression for parsing ID")

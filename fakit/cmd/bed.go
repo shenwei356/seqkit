@@ -45,9 +45,19 @@ var Threads = runtime.NumCPU()
 
 // ReadBedFeatures returns gtf BedFeatures of a file
 func ReadBedFeatures(file string) ([]BedFeature, error) {
+	return ReadBedFilteredFeatures(file, []string{})
+}
+
+// ReadBedFilteredFeatures returns gtf BedFeatures of selected chrs from file
+func ReadBedFilteredFeatures(file string, chrs []string) ([]BedFeature, error) {
 	if _, err := os.Stat(file); os.IsNotExist(err) {
 		return nil, err
 	}
+	chrsMap := make(map[string]struct{}, len(chrs))
+	for _, chr := range chrs {
+		chrsMap[chr] = struct{}{}
+	}
+
 	fn := func(line string) (interface{}, bool, error) {
 		if len(line) == 0 || line[0] == '#' || string(line[0:7]) == "browser" || string(line[0:5]) == "track" {
 			return nil, false, nil
@@ -58,6 +68,12 @@ func ReadBedFeatures(file string) ([]BedFeature, error) {
 		n := len(items)
 		if n < 3 {
 			return nil, false, nil
+		}
+
+		if len(chrs) > 0 { // selected chrs
+			if _, ok := chrsMap[items[0]]; !ok {
+				return nil, false, nil
+			}
 		}
 
 		start, err := strconv.Atoi(items[1])
