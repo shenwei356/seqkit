@@ -178,42 +178,28 @@ Examples:
 
 		for _, file := range files {
 			// plain fasta, using Faidx
-			if file != "" && !strings.HasSuffix(strings.ToLower(file), ".gz") {
+			if isPlainFile(file) {
 
 				// check seq format, ignoring fastq
-				var isFastq bool
-				var alphabet *seq.Alphabet
-				fastxReader, err := fastx.NewReader(alphabet, file, 1, 1, "")
+				alphabet2, isFastq, err := fastx.GuessAlphabet(file)
 				checkError(err)
-			LOOP:
-				for {
-					select {
-					case chunk := <-fastxReader.Ch:
-						checkError(chunk.Err)
 
-						isFastq = fastxReader.IsFastq
-						alphabet = fastxReader.Alphabet()
-
-						fastxReader.Cancel()
-						break LOOP
-					default:
-					}
-				}
 				if !isFastq { // ok, it's fasta!
-					index, err := fai.New(file)
-					checkError(err)
+					// faidx, err := fai.New(file)
+					// checkError(err)
+					faidx := getFaidx(file)
 
 					if region != "" {
 						if len(chrs) > 0 {
 							for _, chr := range chrs {
-								r, ok := index.Index[chr]
+								r, ok := faidx.Index[chr]
 								if !ok {
 									log.Warningf(`sequence (%s) not found in file: %s`, chr, file)
 									continue
 								}
 
 								s, e, _ := seq.SubLocation(r.Length, start, end)
-								subseq := subseqByFaix(index, chr, r, start, end)
+								subseq := subseqByFaix(faidx, chr, r, start, end)
 								outfh.WriteString(fmt.Sprintf(">%s_%d-%d\n%s\n",
 									chr, s, e, byteutil.WrapByteSlice(subseq, lineWidth)))
 							}
@@ -230,14 +216,14 @@ Examples:
 								}
 							}
 
-							r, ok := index.Index[chr]
+							r, ok := faidx.Index[chr]
 							if !ok {
 								log.Warningf(`sequence (%s) not found in file: %s`, chr, file)
 								continue
 							}
 
-							subseq := subseqByFaix(index, chr, r, 1, -1)
-							record, err := fastx.NewRecord(alphabet, []byte(chr), []byte(chr), subseq)
+							subseq := subseqByFaix(faidx, chr, r, 1, -1)
+							record, err := fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), subseq)
 							checkError(err)
 
 							subseqByGTFFile(outfh, record, lineWidth,
@@ -254,14 +240,14 @@ Examples:
 								}
 							}
 
-							r, ok := index.Index[chr]
+							r, ok := faidx.Index[chr]
 							if !ok {
 								log.Warningf(`sequence (%s) not found in file: %s`, chr, file)
 								continue
 							}
 
-							subseq := subseqByFaix(index, chr, r, 1, -1)
-							record, err := fastx.NewRecord(alphabet, []byte(chr), []byte(chr), subseq)
+							subseq := subseqByFaix(faidx, chr, r, 1, -1)
+							record, err := fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), subseq)
 							checkError(err)
 
 							subSeqByBEDFile(outfh, record, lineWidth,
@@ -311,12 +297,12 @@ Examples:
 	},
 }
 
-func subseqByFaix(index *fai.Faidx, chrs string, r fai.Record, start, end int) []byte {
+func subseqByFaix(faidx *fai.Faidx, chrs string, r fai.Record, start, end int) []byte {
 	start, end, ok := seq.SubLocation(r.Length, start, end)
 	if !ok {
 		return []byte("")
 	}
-	subseq, _ := index.SubSeq(chrs, start, end)
+	subseq, _ := faidx.SubSeq(chrs, start, end)
 	return subseq
 }
 

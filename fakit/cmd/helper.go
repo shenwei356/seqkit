@@ -27,13 +27,16 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"sort"
 	"strings"
 
 	"github.com/brentp/xopen"
 	"github.com/cznic/sortutil"
 	"github.com/shenwei356/bio/seq"
+	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/breader"
 	"github.com/spf13/cobra"
 )
 
@@ -157,6 +160,7 @@ func getFlagalphabetGuessSeqLength(cmd *cobra.Command, flag string) int {
 	return alphabetGuessSeqLength
 }
 
+// Config is the global falgs
 type Config struct {
 	Alphabet               *seq.Alphabet
 	ChunkSize              int
@@ -215,6 +219,61 @@ func filepathTrimExtension(file string) (string, string) {
 		extension += ".gz"
 	}
 	return name, extension
+}
+
+func isPlainFile(file string) bool {
+	return file != "" && !strings.HasSuffix(strings.ToLower(file), ".gz")
+}
+
+func fileNotExists(file string) bool {
+	_, err := os.Stat(file)
+	return os.IsNotExist(err)
+}
+
+func getFaidx(file string) *fai.Faidx {
+	var idx fai.Index
+	var err error
+	fileFai := file + ".fai"
+	if fileNotExists(fileFai) {
+		log.Infof("create FASTA index for %s", file)
+		idx, err = fai.Create(file)
+		checkError(err)
+	} else {
+		idx, err = fai.Read(fileFai)
+		checkError(err)
+	}
+	faidx, err := fai.NewWithIndex(file, idx)
+	checkError(err)
+	return faidx
+}
+
+func getSeqIDsFromFaidxFile(file string) ([]string, error) {
+	ids := []string{}
+
+	fn := func(line string) (interface{}, bool, error) {
+		if len(line) == 0 {
+			return nil, false, nil
+		}
+		items := strings.Split(strings.TrimRight(line, "\r\n"), "\t")
+		if len(items) != 5 {
+			return nil, false, nil
+		}
+		return items[0], true, nil
+	}
+	reader, err := breader.NewBufferedReader(file, runtime.NumCPU(), 100, fn)
+	if err != nil {
+		return ids, err
+	}
+	for chunk := range reader.Ch {
+		if chunk.Err != nil {
+			return ids, err
+		}
+		for _, data := range chunk.Data {
+			ids = append(ids, data.(string))
+		}
+	}
+
+	return ids, nil
 }
 
 var reRegion = regexp.MustCompile(`\-?\d+:\-?\d+`)

@@ -180,4 +180,7 @@ func init() {
 	sortCmd.Flags().BoolP("reverse", "r", false, "reverse the result")
 	sortCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 
+	sortCmd.Flags().BoolP("two-pass", "2", false, "2-pass mode read files twice to lower memory usage. (only for FASTA format)")
+	sortCmd.Flags().BoolP("keep-temp", "k", false, "keep tempory FASTA and .fai file when using 2-pass mode")
+	sortCmd.Flags().IntP("seq-length", "L", 10000, "length of sequence prefix on which fakit sorts by sequences")
 }

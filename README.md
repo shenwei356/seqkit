@@ -180,7 +180,7 @@ like human genomes.***
 
 ### FASTA index
 
-For some commands, e.g. `subseq`, `sort` and `shuffle`,
+For some commands, e.g. `subseq`, `split`, `sort` and `shuffle`,
 when input files are plain FASTA files, FASTA index file .fai will be created for
 rapid acccess of sequences and reducing memory occupation.
 
