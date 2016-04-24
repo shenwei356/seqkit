@@ -135,6 +135,8 @@
     
         <li class="main active"><a href="#tutorial">Tutorial</a></li>
         
+            <li><a href="#some-manipulations-on-big-genomes">Some manipulations on big genomes</a></li>
+        
             <li><a href="#remove-contaminated-reads">Remove contaminated reads</a></li>
         
             <li><a href="#handling-of-aligned-sequences">Handling of aligned sequences</a></li>
@@ -149,7 +151,147 @@
                 <div class="col-md-9" role="main">
 
 <h1 id="tutorial">Tutorial</h1>
+<h2 id="some-manipulations-on-big-genomes">Some manipulations on big genomes</h2>
+<p>A script <a href="https://gist.github.com/netj/526585">memusg</a> is
+used to check the peek memory usage. Usage: <code>memusg command</code>.</p>
+<ol>
+<li>
+<p>Human genome</p>
+<pre><code>$  fakit stat hsa.fa
+file     seq_format   seq_type   num_seqs   min_len        avg_len       max_len
+hsa.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
+</code></pre>
+</li>
+<li>
+<p>Sorting by sequence length</p>
+<pre><code>$ time fakit sort --by-length --reverse --two-pass hsa.fa &gt; hsa.sorted.fa
+[INFO] create and read FASTA index ...
+[INFO] read sequence IDs and lengths from FASTA index ...
+[INFO] 194 sequences loaded
+[INFO] sorting ...
+[INFO] output ...
+
+real    0m26.002s
+user    0m34.735s
+sys     0m2.686s
+</code></pre>
+<p>The peak meomory usage is about 4.45G (2.7G before run)</p>
+<p>Detail:</p>
+<pre><code>$ fakit fx2tab --length hsa.sorted.fa --name --only-id | cut -f 1,4 | more
+1       248956422
+2       242193529
+3       198295559
+4       190214555
+5       181538259
+6       170805979
+7       159345973
+X       156040895
+8       145138636
+9       138394717
+11      135086622
+10      133797422
+12      133275309
+13      114364328
+14      107043718
+15      101991189
+16      90338345
+17      83257441
+18      80373285
+20      64444167
+19      58617616
+Y       57227415
+22      50818468
+21      46709983
+KI270728.1      1872759
+KI270727.1      448248
+...
+
+real    0m10.697s
+user    0m11.153s
+sys     0m0.917s
+</code></pre>
+</li>
+<li>
+<p>Shuffling sequences</p>
+<pre><code>$ time fakit shuffle hsa.fa --two-pass &gt; hsa.shuffled.fa
+[INFO] create and read FASTA index ...
+[INFO] read sequence IDs from FASTA index ...
+[INFO] 194 sequences loaded
+[INFO] shuffle ...
+[INFO] output ...
+
+real    0m28.331s
+user    0m35.320s
+sys     0m3.309s
+</code></pre>
+<p>The peak meomory usage is about 4.45G (2.7G before run)</p>
+</li>
+<li>
+<p>Spliting into files with single sequence</p>
+<pre><code>$ time fakit split --by-id hsa.fa --two-pass
+[INFO] split by ID. idRegexp: ^([^\s]+)\s?
+[INFO] create and read FASTA index ...
+[INFO] read sequence IDs from FASTA index ...
+[INFO] 194 sequences loaded
+[INFO] write 1 sequences to file: hsa.id_KI270743.1.fa
+[INFO] write 1 sequences to file: hsa.id_KI270706.1.fa
+[INFO] write 1 sequences to file: hsa.id_KI270717.1.fa
+[INFO] write 1 sequences to file: hsa.id_KI270718.1.fa
+[INFO] write 1 sequences to file: hsa.id_KI270468.1.fa
+...
+
+real    0m25.233s
+user    0m34.189s
+sys     0m3.002s
+</code></pre>
+</li>
+<li>
+<p>Geting subsequence of some chromesomes</p>
+<pre><code>$ fakit subseq -r 1:10 --chr X --chr Y  hsa.fa
+&gt;X_1-10 X dna_sm:chromosome chromosome:GRCh38:X:1:156040895:1 REF
+nnnnnnnnnn
+&gt;Y_1-10 Y dna_sm:chromosome chromosome:GRCh38:Y:2781480:56887902:1 REF
+NNNNNNNNNN
+</code></pre>
+</li>
+<li>
+<p>Geting CDS sequence of chr 1 by GTF files</p>
+<pre><code>$ time fakit subseq --gtf Homo_sapiens.GRCh38.84.gtf.gz --chr X --feature cds  hsa.fa &gt; chrX.gtf.cds.fa
+[INFO] read GTF file ...
+[INFO] 22420 GTF features loaded
+
+real    0m8.881s
+user    0m20.124s
+sys     0m0.682s
+</code></pre>
+</li>
+</ol>
 <h2 id="remove-contaminated-reads">Remove contaminated reads</h2>
+<ol>
+<li>
+<p>Mapping with reads on some potential contaminate genomes, and get the reads IDs list.</p>
+<pre><code>$ wc -l contaminate.list
+244 contaminate.list
+
+$ head -n 2 contaminate.list
+HWI-D00523:240:HF3WGBCXX:1:1101:2574:2226
+HWI-D00523:240:HF3WGBCXX:1:1101:12616:2205
+</code></pre>
+</li>
+<li>
+<p>Remove contaminated reads</p>
+<pre><code>$ fakit grep -f contaminate.list -v reads_1.fq.gz -o reads_1.clean.fq.gz
+$ fakit grep -f contaminate.list -v reads_2.fq.gz -o reads_2.clean.fq.gz
+
+$ fakit stat *.fq.gz
+file                  seq_format   seq_type   num_seqs   min_len   avg_len   max_len
+reads_1.clean.fq.gz   FASTQ        DNA           2,256       226       227       229
+reads_1.fq.gz         FASTQ        DNA           2,500       226       227       229
+reads_2.clean.fq.gz   FASTQ        DNA           2,256       223       224       225
+reads_2.fq.gz         FASTQ        DNA           2,500       223       224       225
+</code></pre>
+</li>
+</ol>
 <h2 id="handling-of-aligned-sequences">Handling of aligned sequences</h2>
 <ol>
 <li>
@@ -172,14 +314,14 @@ ACAACGTCTACTTACGTTGCATCTTCGGTCATGCTGCATTACGTAGTCTGATGATG
 </li>
 <li>
 <p>Convert FASTA format to tabular format.</p>
-<pre><code>$ fakit fa2tab seqs.msa.fa
+<pre><code>$ fakit fx2tab seqs.msa.fa
 seq1    ACAACGTCTACTTACGTTGCAT----CGTCATGCTGCATTACGTAGTCTGATGATG
 seq2    ---------------ACACCGTCTACTTTCATGCTGCATTACGTAGTCTGATGATG
 seq3    ACAACGTCTACTTACGTTGCATCGTCATGCTGCACTGATGATG-------------
 seq4    ACAACGTCTACTTACGTTGCATCTTCGGTCATGCTGCATTACGTAGTCTGATGATG
 </code></pre>
 <p>or</p>
-<pre><code>$ fakit fa2tab seqs.msa.fa | cut -f 2
+<pre><code>$ fakit fx2tab seqs.msa.fa | cut -f 2
 ACAACGTCTACTTACGTTGCAT----CGTCATGCTGCATTACGTAGTCTGATGATG
 ---------------ACACCGTCTACTTTCATGCTGCATTACGTAGTCTGATGATG
 ACAACGTCTACTTACGTTGCATCGTCATGCTGCACTGATGATG-------------
@@ -263,7 +405,7 @@ cel-mir-1 MI0000003 Caenorhabditis elegans miR-1 stem-loop
 <p>The first three letters (e.g. <code>cel</code>) are the abbreviation of species names.
 So we could split hairpins by the first letters by defining custom
 sequence ID parsing regular expression <code>^([\w]+)\-</code>.</p>
-<p>In default, <code>fakit</code> takes the first non-space letters as sequence ID.
+<p>By default, <code>fakit</code> takes the first non-space letters as sequence ID.
 For example,</p>
 <table>
 <thead>
@@ -296,28 +438,33 @@ the <code>gi</code> number, then use <code>--id-regexp "^gi\|([^\|]+)\|"</code>.
 <li>
 <p>Split sequences by species.
 A custom ID parsing regular expression is used, <code>^([\w]+)\-</code>.</p>
-<pre><code>$ fakit split hairpin.fa.gz -i --id-regexp "^([\w]+)\-"
+<pre><code>$ fakit split hairpin.fa.gz -i --id-regexp "^([\w]+)\-" --two-pass
 </code></pre>
+<p><strong><em>To reduce memory usage when spliting big file, we should alwasy use flag <code>--two-pass</code></em></strong></p>
 </li>
 <li>
 <p>Species with most miRNA hairpins. Third column is the sequences number.</p>
-<pre><code>$ fakit stat hairpin.id_*.gz | sort -k3,3nr
-hairpin.id_hsa.fa.gz           RNA       1,881         41       81.9        180
-hairpin.id_mmu.fa.gz           RNA       1,193         39       83.4        147
-hairpin.id_bta.fa.gz           RNA         808         53       80.1        149
-hairpin.id_gga.fa.gz           RNA         740         48       91.5        169
-hairpin.id_eca.fa.gz           RNA         715         52      104.6        145
+<pre><code>$ fakit stat hairpin.id_*.gz | csvtk space2tab | csvtk -t sort -k num_seqs:nr | csvtk -t pretty| more
+file                     seq_format   seq_type   num_seqs   min_len   avg_len   max_len
+hairpin.id_hsa.fa.gz     FASTA        RNA        1,881      41        81.9      180
+hairpin.id_mmu.fa.gz     FASTA        RNA        1,193      39        83.4      147
+hairpin.id_bta.fa.gz     FASTA        RNA        808        53        80.1      149
+hairpin.id_gga.fa.gz     FASTA        RNA        740        48        91.5      169
+hairpin.id_eca.fa.gz     FASTA        RNA        715        52        104.6     145
+hairpin.id_mtr.fa.gz     FASTA        RNA        672        54        165.3     910
 </code></pre>
+<p>Here, a CSV/TSV tool <a href="https://github.com/shenwei356/csvtk">csvtk</a>
+is used to sort and view the result.</p>
 </li>
 </ol>
 <p>For human miRNA hairpins</p>
 <ol>
 <li>
 <p>Length distribution.
- <code>fakit fa2tab</code> could show extra information like sequence length, GC content.
+ <code>fakit fx2tab</code> could show extra information like sequence length, GC content.
  A distribution ploting script is used, (
  <a href="https://github.com/shenwei356/bio_scripts/blob/master/plot/plot_distribution.py">plot_distribution.py</a> )</p>
-<pre><code>$ fakit fa2tab hairpin.id_hsa.fa.gz -l | cut -f 3  | plot_distribution.py -o hairpin.id_hsa.fa.gz.lendist.png
+<pre><code>$ fakit fx2tab hairpin.id_hsa.fa.gz -l | cut -f 3  | plot_distribution.py -o hairpin.id_hsa.fa.gz.lendist.png
 </code></pre>
 <p><img alt="hairpin.id_hsa.fa.gz.lendist.png" src="../files/hairpin/hairpin.id_hsa.fa.gz.lendist.png" /></p>
 </li>

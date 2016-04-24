@@ -179,7 +179,7 @@
 <h3 id="reading-fastaq">Reading FASTA/Q</h3>
 <p>fakit use author's bioinformatics packages <a href="https://github.com/shenwei356/bio">bio</a>
 for FASTA/Q parsing, which <strong>asynchronously parse FASTA/Q records and buffer them
-in chunks</strong>. The parser return one chunk of records for each call.</p>
+in chunks</strong>. The parser returns one chunk of records for each call.</p>
 <p><strong>Asynchronous parsing</strong> saves much time because these's no waiting interval for
 parsed records being handled.
 The strategy of <strong>records chunks</strong> reduces data exchange in parallelly handling
@@ -187,19 +187,28 @@ of sequences, which could also improve performance.</p>
 <p>Since using of buffers and chunks, the memory occupation will be higher than
 cases of reading sequence one by one.
 The default value of chunk size (configurable by global flag <code>-c</code> or <code>--chunk-size</code>)
-is 1000, which is suitable for manipulating "small" sequences, e.g. FASTQ.
-But for big genomes like human genome, smaller chunk size is prefered, e.g. 1.
-And the buffer size is configurable by  global flag <code>-b</code> or <code>--buffer-size</code>
-(default value is the number of CPUs), therefore, you may set with smaller
-value to reduce memory usage.</p>
+is 1, which is suitable for most of cases.
+But for manipulating short sequences, e.g. FASTQ or FASTA of short sequences,
+you could set higher value, e.g. 1000.
+For big genomes like human genome, smaller chunk size is prefered, e.g. 1.
+And the buffer size is configurable by global flag <code>-b</code> or <code>--buffer-size</code>
+(default value is 1). You may set with higher
+value for short sequences to imporve performance.</p>
 <p><strong><em>In summary, set smaller value for <code>-c</code> and <code>-b</code> when handling big FASTA file
 like human genomes.</em></strong></p>
+<h3 id="fasta-index">FASTA index</h3>
+<p>For commands, including <code>subseq</code>, <code>split</code>, <code>sort</code> and <code>shuffle</code>,
+when input files are FASTA files, FASTA index would be optional used for
+rapid acccess of sequences and reducing memory occupation.</p>
+<p>ATTENTION: the .fai file created by fakit is a little different from .fai file
+created by samtools. fakit uses full sequence head instead of just ID as key.
+So please delete .fai file created by samtools.</p>
 <h3 id="parallelization-of-cpu-intensive-jobs">Parallelization of CPU intensive jobs</h3>
 <p>Most of the manipulations of FASTA/Q files are I/O intensive, to improve the
 performance, asynchronous parsing strategy is used.</p>
-<p>For CPU intensive jobs like <code>grep</code> with regular expressions, <code>locate</code> with
-sequence motifs, and <code>subseq</code> by GTF/BED files. The processes are parallelized
-with MapReduce model by multiple goroutine in golang, similar to but much
+<p>For CPU intensive jobs like <code>grep</code> with regular expressions and <code>locate</code> with
+sequence motifs. The processes are parallelized
+with "Map-Reduce" model by multiple goroutines in golang which are similar to but much
 lighter weight than threads. The concurrency number is configurable with global
 flag <code>-j</code> or <code>--threads</code>.</p>
 <p>Most of the time you can just use the default value. i.e. the number of CPUs
@@ -207,20 +216,26 @@ of your computer.</p>
 <h3 id="memory-occupation">Memory occupation</h3>
 <p>Most of the subcommands do not read whole FASTA/Q records in to memory,
 including <code>stat</code>, <code>fq2fa</code>, <code>fx2tab</code>, <code>tab2fx</code>, <code>grep</code>, <code>locate</code>, <code>replace</code>,
- <code>seq</code>, <code>sliding</code>, <code>subseq</code>. The just temporarily buffer chunks of records.</p>
+ <code>seq</code>, <code>sliding</code>, <code>subseq</code>. They just temporarily buffer chunks of records.</p>
+<p>Note that when using <code>subseq --gtf | --bed</code>, if the GTF/BED files are too
+big, the memory usage will increase.
+You could use <code>--chr</code> to specify chromesomes and <code>--feature</code> to limit features.</p>
 <p>Some subcommands need to store sequences or heads in memory, but there are
 strategy to reduce memory occupation, including <code>rmdup</code> and <code>common</code>.
 When comparing with sequences, MD5 digest could be used to replace sequence by
 flag <code>-m</code> (<code>--md5</code>).</p>
 <p>Some subcommands could either read all records or read the files twice by flag
-<code>-2</code> (<code>--two-pass</code>), including <code>sample</code> and <code>split</code>.</p>
-<p>Two subcommands must read all records in memory right now, <code>shuffle</code> and <code>sort</code>.
-But I'll improve this later.</p>
+<code>-2</code> (<code>--two-pass</code>), including <code>sample</code>, <code>split</code>, <code>shuffle</code> and <code>sort</code>.
+They use FASTA index for rapid acccess of sequences and reducing memory occupation.</p>
+<h3 id="reproducibility">Reproducibility</h3>
+<p>Subcommands <code>sample</code> and <code>shuffle</code> use random function, random seed could be
+given by flag <code>-s</code> (<code>--rand-seed</code>). This makes sure that sampling result could be
+reproduced in different environments with same random seed.</p>
 <h2 id="fakit">fakit</h2>
 <p>Usage</p>
-<pre><code>fakit --  a cross-platform and efficient suit for FASTA/Q file manipulation
+<pre><code>fakit -- a cross-platform and efficient suit for FASTA/Q file manipulation
 
-Version: 0.1.7
+Version: 0.1.8
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -232,10 +247,12 @@ Usage:
 
 Available Commands:
   common      find common sequences of multiple files by id/name/sequence
+  faidx       create FASTA index file
   fq2fa       covert FASTQ to FASTA
-  fx2tab      covert FASTA/Q to tabular format (with length/GC content/GC skew) to filter and sort
+  fx2tab      covert FASTA/Q to tabular format (with length/GC content/GC skew)
   grep        search sequences by pattern(s) of name or sequence motifs
   locate      locate subsequences/motifs
+  rename      rename duplicated IDs
   replace     replace name/sequence/by regular expression
   rmdup       remove duplicated sequences by id/name/sequence
   sample      sample sequences by number or proportion
@@ -250,8 +267,8 @@ Available Commands:
 
 Flags:
       --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which fakit guesses the sequence type (default 10000)
-  -b, --buffer-size int                 buffer size of chunks (default value is the CPUs number of your computer) (default 4)
-  -c, --chunk-size int                  chunk size (attention: unit is FASTA records not lines) (default 1000)
+  -b, --buffer-size int                 buffer size of chunks (default 1)
+  -c, --chunk-size int                  chunk size (attention: unit is FASTA records not lines) (default 1)
       --id-ncbi                         FASTA head is NCBI-style, e.g. &gt;gi|110645304|ref|NC_002516.2| Pseud...
       --id-regexp string                regular expression for parsing ID (default &quot;^([^\\s]+)\\s?&quot;)
   -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
@@ -359,7 +376,7 @@ IHHHHHHH&lt;GG?B@EHDE-BEHHHII5B@GHHF?CGEHHHDHIHIIH
 <p>Sequence types</p>
 <ul>
 <li>
-<p>In default, <code>fakit seq</code> automatically detect the sequence type</p>
+<p>By default, <code>fakit seq</code> automatically detect the sequence type</p>
 <pre><code>$ echo -e "&gt;seq\nacgtryswkmbdhvACGTRYSWKMBDHV" | fakit stat
 file   seq_format   seq_type   num_seqs   min_len   avg_len   max_len
 -      FASTA        DNA               1        28        28        28
@@ -425,7 +442,7 @@ AAAGUGACCGUACCGAGCUGCAUACUUCCUUACAUGCCCAUACUAUAUCAUAAAUGGAUAUGGAAUGUAAAGAAGUAUGU
 </li>
 <li>
 <p>Convert multi-line FASTQ to 4-line FASTQ</p>
-<pre><code>$fakit seq read_1.fq.gz -w 0
+<pre><code>$ fakit seq read_1.fq.gz -w 0
 </code></pre>
 </li>
 <li>
@@ -455,6 +472,8 @@ TCATATGCTTGTCTCAAAGATTA
 <p>Usage</p>
 <pre><code>get subsequences by region/gtf/bed, including flanking sequences.
 
+Recommendation: use plain FASTA file, so fakit could utilize FASTA index.
+
 The definition of region is 1-based and with some custom design.
 
 Examples:
@@ -475,8 +494,9 @@ Usage:
 
 Flags:
       --bed string        by BED file
+      --chr value         select limited sequence with sequence IDs (multiple value supported, case ignored) (default [])
   -d, --down-stream int   down stream length
-  -T, --feature string    feature type (&quot;.&quot; for all, case ignored) (default &quot;.&quot;)
+      --feature value     select limited feature types (multiple value supported, case ignored, only works with GTF) (default [])
       --gtf string        by GTF (version 2.2) file
   -f, --only-flank        only return up/down stream sequence
   -r, --region string     by region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases, 13:-1 for cutting first 12 bases. type &quot;fakit subseq -h&quot; for more examples
@@ -485,6 +505,7 @@ Flags:
 </code></pre>
 
 <p>Examples</p>
+<p><strong><em>Recommendation: use plain FASTA file, so fakit could utilize FASTA index.</em></strong></p>
 <ol>
 <li>
 <p>First 12 bases</p>
@@ -511,11 +532,21 @@ seq     test    CDS     5       8       .       .       .       gene_id "A"; tra
 seq     test    CDS     5       8       .       -       .       gene_id "B"; transcript_id "";
 $ fakit
 
-fakit subseq --gtf t.gtf t.fa
+$ fakit subseq --gtf t.gtf t.fa
 &gt;seq_5:8:. A
 ACTG
 &gt;seq_5:8:- B
 CAGT
+</code></pre>
+<p>Human genome example:</p>
+<p><strong><em>AVOID loading all data from Homo_sapiens.GRCh38.84.gtf.gz,
+the uncompressed data are so big and may exhaust your RAM.</em></strong></p>
+<p>We could specify chromesomes and features.</p>
+<pre><code>$ fakit subseq --gtf Homo_sapiens.GRCh38.84.gtf.gz --chr 1 --feature cds  hsa.fa &gt; chr1.gtf.cds.fa
+
+$ fakit stat chr1.gtf.cds.fa
+file              seq_format   seq_type   num_seqs   min_len   avg_len   max_len
+chr1.gtf.cds.fa   FASTA        DNA          65,012         1     151.4    12,045
 </code></pre>
 </li>
 <li>
@@ -537,18 +568,20 @@ agt
 </code></pre>
 </li>
 <li>
-<p>Get subsequences by BED file. <strong>Note that flag <code>-c 1</code> is used for large genome</strong>.</p>
-<pre><code>$ fakit subseq -c 1 --bed chr1.bed.gz chr1.fa.gz -o chr1.bed.gz.fa.gz
+<p>Get subsequences by BED file.</p>
+<p><strong><em>AVOID loading all data from Homo_sapiens.GRCh38.84.gtf.gz,
+the uncompressed data are so big and may exhaust your RAM.</em></strong></p>
+<pre><code>$  fakit subseq --bed Homo_sapiens.GRCh38.84.bed.gz --chr 1 hsa.fa &gt;  chr1.bed.gz.fa
 </code></pre>
 <p>We may need to remove duplicated sequences</p>
-<pre><code>$ fakit subseq -c 1 --bed chr1.bed.gz chr1.fa.gz | fakit rmdup -o chr1.bed.gz.rmdup.fa.gz
+<pre><code>$ fakit subseq --bed Homo_sapiens.GRCh38.84.bed.gz --chr 1 hsa.fa | fakit rmdup &gt; chr1.bed.rmdup.fa
 [INFO] 141060 duplicated records removed
 </code></pre>
 <p>Summary:</p>
-<pre><code>$ fakit stat chr1.bed.gz.*.gz
-file                       seq_type    num_seqs    min_len    avg_len      max_len
-chr1.bed.gz.fa.gz               DNA     231,974          1    3,089.5    1,551,957
-chr1.bed.gz.rmdup.fa.gz         DNA      90,914          1    6,455.8    1,551,957
+<pre><code>$ fakit stat chr1.gz.*.gz
+file               seq_format   seq_type   num_seqs   min_len   avg_len     max_len
+chr1.gz.fa         FASTA        DNA         231,974         1   3,089.5   1,551,957
+chr1.gz.rmdup.fa   FASTA        DNA          90,914         1   6,455.8   1,551,957
 </code></pre>
 </li>
 </ol>
@@ -648,10 +681,10 @@ Flags:
   -B, --base-content value   print base content. (case ignored, multiple values supported) e.g. -b AT -b N (default [])
   -g, --gc                   print GC content
   -G, --gc-skew              print GC-Skew
+  -H, --header-line          print header line
   -l, --length               print sequence length
   -n, --name                 only print names (no sequences and qualities)
   -i, --only-id              print ID instead of full head
-  -T, --title                print title line
 
 </code></pre>
 
@@ -709,7 +742,9 @@ $ fakit sort -l hairpin.fa.gz
 </li>
 <li>
 <p>Get first 1000 sequences</p>
-<pre><code>$ zcat hairpin.fa.gz | fakit fx2tab | head -n 1000 | fakit tab2fx
+<pre><code>$ fakit fx2tab hairpin.fa.gz | head -n 1000 | fakit tab2fx
+
+$ fakit fx2tab reads_1.fq.gz | head -n 1000 | fakit tab2fx
 </code></pre>
 </li>
 </ol>
@@ -805,7 +840,7 @@ Motifs could be EITHER plain sequence containing &quot;ACTGN&quot; OR regular
 expression like &quot;A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)&quot; for ORFs.
 Degenerate bases like &quot;RYMM..&quot; are also supported by flag -d.
 
-In default, motifs are treated as regular expression.
+By default, motifs are treated as regular expression.
 When flag -d given, regular expression may be wrong.
 For example: &quot;\w&quot; will be wrongly converted to &quot;\[AT]&quot;.
 
@@ -916,8 +951,8 @@ Flags:
 </code></pre>
 </li>
 <li>
-<p>By sequence (large sequences)</p>
-<pre><code>fakit common file*.fa -s -i -o common.fasta -m
+<p>By sequence (<strong><em>for large sequences</em></strong>)</p>
+<pre><code>fakit common file*.fa -s -i -o common.fasta --md5
 </code></pre>
 </li>
 </ol>
@@ -930,12 +965,11 @@ The definition of region is 1-based and with some custom design.
 
 Examples:
 
- 0-based index    0 1 2 3 4 5 6 7 8 9
  1-based index    1 2 3 4 5 6 7 8 9 10
 negative index    0-9-8-7-6-5-4-3-2-1
            seq    A C G T N a c g t n
            1:1    A
-           2:4        G T N
+           2:4      C G T
          -4:-2                c g t
          -4:-1                c g t n
          -1:-1                      n
@@ -948,11 +982,12 @@ Usage:
 Flags:
   -i, --by-id              split squences according to sequence ID
   -p, --by-part int        split squences into N parts
-  -r, --by-region string   split squences according to subsequence of given region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type &quot;fakit split -h&quot; for more example
+  -r, --by-region string   split squences according to subsequence of given region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type &quot;fakit split -h&quot; for more examples
   -s, --by-size int        split squences into multi parts with N sequences
   -d, --dry-run            dry run, just print message and no files will be created.
+  -k, --keep-temp          keep tempory FASTA and .fai file when using 2-pass mode
   -m, --md5                use MD5 instead of region sequence in output file when using flag -r (--by-region)
-  -2, --two-pass           2-pass mode read files twice to lower memory usage. Not allowed when reading from stdin
+  -2, --two-pass           two-pass mode read files twice to lower memory usage. (only for FASTA format)
 
 </code></pre>
 
@@ -978,41 +1013,48 @@ Flags:
 [INFO] write 7162 sequences to file: hairpin.fa.part_003.gz
 [INFO] write 7159 sequences to file: hairpin.fa.part_004.gz
 </code></pre>
-<p>To reduce memory usage when spliting big file, we could use flag <code>--two-pass</code></p>
+<p><strong><em>To reduce memory usage when spliting big file, we should alwasy use flag <code>--two-pass</code></em></strong></p>
 <pre><code>$ fakit split hairpin.fa.gz -p 4 -2
 [INFO] split into 4 parts
-[INFO] first pass: get seq number
-[INFO] seq number: 28645
-[INFO] second pass: read and split
-[INFO] write 7162 sequences to file: hairpin.fa.part_001.gz
-[INFO] write 7162 sequences to file: hairpin.fa.part_002.gz
-[INFO] write 7162 sequences to file: hairpin.fa.part_003.gz
-[INFO] write 7159 sequences to file: hairpin.fa.part_004.gz
+[INFO] read and write sequences to tempory file: hairpin.fa.gz.fa ...
+[INFO] create and read FASTA index ...
+[INFO] read sequence IDs from FASTA index ...
+[INFO] 28645 sequences loaded
+[INFO] write 7162 sequences to file: hairpin.part_001.fa.gz
+[INFO] write 7162 sequences to file: hairpin.part_002.fa.gz
+[INFO] write 7162 sequences to file: hairpin.part_003.fa.gz
+[INFO] write 7159 sequences to file: hairpin.part_004.fa.gz
 </code></pre>
 </li>
 <li>
 <p>Split sequences by species. i.e. by custom IDs (first three letters)</p>
-<pre><code>$ fakit split hairpin.fa.gz -i --id-regexp "^([\w]+)\-"
+<pre><code>$ fakit split hairpin.fa.gz -i --id-regexp "^([\w]+)\-" -2
 [INFO] split by ID. idRegexp: ^([\w]+)\-
-[INFO] read sequences ...
-[INFO] read 28645 sequences
-[INFO] write 97 sequences to file: hairpin.fa.id_asu.gz
-[INFO] write 267 sequences to file: hairpin.fa.id_chi.gz
-[INFO] write 296 sequences to file: hairpin.fa.id_gra.gz
+[INFO] read and write sequences to tempory file: hairpin.fa.gz.fa ...
+[INFO] create and read FASTA index ...
+[INFO] create FASTA index for hairpin.fa.gz.fa
+[INFO] read sequence IDs from FASTA index ...
+[INFO] 28645 sequences loaded
+[INFO] write 48 sequences to file: hairpin.id_cca.fa.gz
+[INFO] write 3 sequences to file: hairpin.id_hci.fa.gz
+[INFO] write 106 sequences to file: hairpin.id_str.fa.gz
+[INFO] write 1 sequences to file: hairpin.id_bkv.fa.gz
 ...
 </code></pre>
 </li>
 <li>
 <p>Split sequences by sequence region (for example, sequence barcode)</p>
-<pre><code>$ fakit split hairpin.fa.gz -r 1:12
-[INFO] split by region: ^([^\s]+)\s?
-[INFO] read sequences ...
-[INFO] read 28645 sequences
-[INFO] write 1 sequences to file: hairpin.fa.region_1:12_UGUUUGCUCAGC.gz
-[INFO] write 1 sequences to file: hairpin.fa.region_1:12_GAAGAAGAAGAC.gz
-[INFO] write 4 sequences to file: hairpin.fa.region_1:12_UGAGUGUAGUGC.gz
+<pre><code>$ fakit split hairpin.fa.gz -r 1:3 -2
+[INFO] split by region: 1:3
+[INFO] read and write sequences to tempory file: hairpin.fa.gz.fa ...
+[INFO] read sequence IDs and sequence region from FASTA file ...
+[INFO] create and read FASTA index ...
+[INFO] write 463 sequences to file: hairpin.region_1:3_AUG.fa.gz
+[INFO] write 349 sequences to file: hairpin.region_1:3_ACU.fa.gz
+[INFO] write 311 sequences to file: hairpin.region_1:3_CGG.fa.gz
 </code></pre>
-<p>If region is too long, we could use falg <code>-m</code>, i.e. use MD5 instead of region sequence in output file.</p>
+<p><strong>If region is too long, we could use falg <code>--md5</code></strong>,
+i.e. use MD5 instead of region sequence in output file.</p>
 <p>Sequence suffix could be defined as <code>-r -12:-1</code></p>
 </li>
 </ol>
@@ -1039,7 +1081,7 @@ Flags:
 [INFO] sample by number
 [INFO] 949 sequences outputed
 </code></pre>
-<p>To reduce memory usage when spliting big file, we could use flag <code>--two-pass</code></p>
+<p><strong><em>To reduce memory usage when spliting big file, we could use flag <code>--two-pass</code></em></strong></p>
 </li>
 <li>
 <p>Sample by proportion</p>
@@ -1059,6 +1101,8 @@ Flags:
 </code></pre>
 </li>
 </ol>
+<p>Note that when sampling on FASTQ files, make sure using same random seed by
+flag <code>-s</code> (<code>--rand-seed</code>)</p>
 <h2 id="replace">replace</h2>
 <p>Usage</p>
 <pre><code>replace name/sequence/by regular expression.
@@ -1134,43 +1178,96 @@ T       T
 </ol>
 <h2 id="shuffle">shuffle</h2>
 <p>Usage</p>
-<pre><code>shuffle sequences
+<pre><code>shuffle sequences.
+
+By default, all records will be readed into memory.
+For FASTA format, use flag -2 (--two-pass) to reduce memory usage. FASTQ not
+supported.
+
+Firstly, fakit reads the sequence IDs. If the file is not plain FASTA file,
+fakit will write the sequences to tempory files, and create FASTA index.
+
+Secondly, fakit shuffles sequence IDs and extract sequences by FASTA index.
+
+ATTENTION: the .fai file created by fakit is a little different from .fai file
+created by samtools. Fakit use full sequence head instead of just ID as key.
+So please delete .fai file created by samtools.
 
 Usage:
   fakit shuffle [flags]
 
 Flags:
+  -k, --keep-temp       keep tempory FASTA and .fai file when using 2-pass mode
   -s, --rand-seed int   rand seed for shuffle (default 23)
+  -2, --two-pass        two-pass mode read files twice to lower memory usage. (only for FASTA format)
 
 </code></pre>
 
 <p>Examples</p>
 <ol>
-<li>General use.<pre><code>$ zcat hairpin.fa.gz | fakit shuffle -o shuffled.fa.gz
+<li>
+<p>General use.</p>
+<pre><code>$ fakit shuffle hairpin.fa.gz &gt; shuffled.fa
 [INFO] read sequences ...
 [INFO] 28645 sequences loaded
 [INFO] shuffle ...
 [INFO] output ...
 </code></pre>
 </li>
+<li>
+<p><strong><em>For big genome, you'd better use plain FASTA file</em></strong></p>
+<pre><code>$ time fakit shuffle -2 hsa.fa &gt; shuffle.fa
+[INFO] create and read FASTA index ...
+[INFO] create FASTA index for hsa.fa
+[INFO] read sequence IDs from FASTA index ...
+[INFO] 194 sequences loaded
+[INFO] shuffle ...
+[INFO] output ...
+
+real    0m35.080s
+user    0m45.521s
+sys     0m3.411s
+</code></pre>
+</li>
 </ol>
+<p>Note that when sampling on FASTQ files, make sure using same random seed by
+flag <code>-s</code> (<code>--rand-seed</code>) for read 1 and 2 files.</p>
 <h2 id="sort">sort</h2>
 <p>Usage</p>
-<pre><code>sort sequences by id/name/sequence/length
+<pre><code>sort sequences by id/name/sequence/length.
+
+By default, all records will be readed into memory.
+For FASTA format, use flag -2 (--two-pass) to reduce memory usage. FASTQ not
+supported.
+
+Firstly, fakit reads the sequence head and length information.
+If the file is not plain FASTA file,
+fakit will write the sequences to tempory files, and create FASTA index.
+
+Secondly, fakit sort sequence by head and length information
+and extract sequences by FASTA index.
+
+ATTENTION: the .fai file created by fakit is a little different from .fai file
+created by samtools. Fakit use full sequence head instead of just ID as key.
+So please delete .fai file created by samtools.
 
 Usage:
   fakit sort [flags]
 
 Flags:
-  -l, --by-length     by sequence length
-  -n, --by-name       by full name instead of just id
-  -s, --by-seq        by sequence
-  -i, --ignore-case   ignore case
-  -r, --reverse       reverse the result
+  -l, --by-length               by sequence length
+  -n, --by-name                 by full name instead of just id
+  -s, --by-seq                  by sequence
+  -i, --ignore-case             ignore case
+  -k, --keep-temp               keep tempory FASTA and .fai file when using 2-pass mode
+  -r, --reverse                 reverse the result
+  -L, --seq-prefix-length int   length of sequence prefix on which fakit sorts by sequences (0 for whole sequence) (default 10000)
+  -2, --two-pass                two-pass mode read files twice to lower memory usage. (only for FASTA format)
 
 </code></pre>
 
 <p>Examples</p>
+<p><strong><em>For FASTA format, use flag -2 (--two-pass) to reduce memory usage</em></strong></p>
 <ol>
 <li>
 <p>sort by ID</p>

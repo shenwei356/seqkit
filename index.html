@@ -144,7 +144,7 @@
     
         <li class="main "><a href="#installation">Installation</a></li>
         
-            <li><a href="#subcommands-16-in-total">Subcommands (16 in total)</a></li>
+            <li><a href="#subcommands">Subcommands</a></li>
         
             <li><a href="#technical-details-and-guides-for-use">Technical details and guides for use</a></li>
         
@@ -187,7 +187,7 @@ from either standard stream or files, therefore, it could be easily used in pipe
   (see <a href="http://shenwei356.github.io/fakit/download/">download</a>)</li>
 <li><strong>Fast</strong> (see <a href="./#performance-comparison-with-other-tools">benchmark</a>),
   <strong>multiple-CPUs supported</strong> (see <a href="./#speedup-with-multi-threads">benchmark</a>).</li>
-<li><strong>Practical functions supported by 16 subcommands</strong> (see subcommands and
+<li><strong>Practical functions supported by 18 subcommands</strong> (see subcommands and
   <a href="http://shenwei356.github.io/fakit/usage/">usage</a> )</li>
 <li><strong>Well documented</strong> (detailed <a href="http://shenwei356.github.io/fakit/usage/">usage</a>
   and <a href="http://shenwei356.github.io/fakit/benchmark/">benchmark</a> )</li>
@@ -450,17 +450,19 @@ rename it to <code>fakit.exe</code> (Windows) or <code>fakit</code> (other opera
 </li>
 </ol>
 <p>or simply copy it to <code>/usr/local/bin</code></p>
-<h2 id="subcommands-16-in-total">Subcommands (16 in total)</h2>
+<h2 id="subcommands">Subcommands</h2>
+<p>18 in total.</p>
 <p><strong>Sequence and subsequence</strong></p>
 <ul>
 <li><code>seq</code>        transform sequences (revserse, complement, extract ID...)</li>
 <li><code>subseq</code>     get subsequences by region/gtf/bed, including flanking sequences</li>
 <li><code>sliding</code>    sliding sequences, circle genome supported</li>
 <li><code>stat</code>       simple statistics of FASTA files</li>
+<li><code>faidx</code>      create FASTA index file</li>
 </ul>
 <p><strong>Format conversion</strong></p>
 <ul>
-<li><code>fx2tab</code>     covert FASTA/Q to tabular format (and length/GC content/GC skew) to filter and sort</li>
+<li><code>fx2tab</code>     covert FASTA/Q to tabular format (and length/GC content/GC skew)</li>
 <li><code>tab2fx</code>     covert tabular format to FASTA/Q format</li>
 <li><code>fq2fa</code>      covert FASTQ to FASTA</li>
 </ul>
@@ -479,6 +481,7 @@ rename it to <code>fakit.exe</code> (Windows) or <code>fakit</code> (other opera
 <p><strong>Edit</strong></p>
 <ul>
 <li><code>replace</code>    replace name/sequence/by regular expression</li>
+<li><code>rename</code>     rename duplicated IDs</li>
 </ul>
 <p><strong>Ordering</strong></p>
 <ul>
@@ -503,7 +506,7 @@ rename it to <code>fakit.exe</code> (Windows) or <code>fakit</code> (other opera
 <h3 id="reading-fastaq">Reading FASTA/Q</h3>
 <p>fakit use author's bioinformatics packages <a href="https://github.com/shenwei356/bio">bio</a>
 for FASTA/Q parsing, which <strong>asynchronously parse FASTA/Q records and buffer them
-in chunks</strong>. The parser return one chunk of records for each call.</p>
+in chunks</strong>. The parser returns one chunk of records for each call.</p>
 <p><strong>Asynchronous parsing</strong> saves much time because these's no waiting interval for
 parsed records being handled.
 The strategy of <strong>records chunks</strong> reduces data exchange in parallelly handling
@@ -511,19 +514,28 @@ of sequences, which could also improve performance.</p>
 <p>Since using of buffers and chunks, the memory occupation will be higher than
 cases of reading sequence one by one.
 The default value of chunk size (configurable by global flag <code>-c</code> or <code>--chunk-size</code>)
-is 1000, which is suitable for manipulating "small" sequences, e.g. FASTQ.
-But for big genomes like human genome, smaller chunk size is prefered, e.g. 1.
-And the buffer size is configurable by  global flag <code>-b</code> or <code>--buffer-size</code>
-(default value is the number of CPUs), therefore, you may set with smaller
-value to reduce memory usage.</p>
+is 1, which is suitable for most of cases.
+But for manipulating short sequences, e.g. FASTQ or FASTA of short sequences,
+you could set higher value, e.g. 1000.
+For big genomes like human genome, smaller chunk size is prefered, e.g. 1.
+And the buffer size is configurable by global flag <code>-b</code> or <code>--buffer-size</code>
+(default value is 1). You may set with higher
+value for short sequences to imporve performance.</p>
 <p><strong><em>In summary, set smaller value for <code>-c</code> and <code>-b</code> when handling big FASTA file
 like human genomes.</em></strong></p>
+<h3 id="fasta-index">FASTA index</h3>
+<p>For commands, including <code>subseq</code>, <code>split</code>, <code>sort</code> and <code>shuffle</code>,
+when input files are FASTA files, FASTA index would be optional used for
+rapid acccess of sequences and reducing memory occupation.</p>
+<p>ATTENTION: the .fai file created by fakit is a little different from .fai file
+created by samtools. fakit uses full sequence head instead of just ID as key.
+So please delete .fai file created by samtools.</p>
 <h3 id="parallelization-of-cpu-intensive-jobs">Parallelization of CPU intensive jobs</h3>
 <p>Most of the manipulations of FASTA/Q files are I/O intensive, to improve the
 performance, asynchronous parsing strategy is used.</p>
-<p>For CPU intensive jobs like <code>grep</code> with regular expressions, <code>locate</code> with
-sequence motifs, and <code>subseq</code> by GTF/BED files. The processes are parallelized
-with MapReduce model by multiple goroutine in golang, similar to but much
+<p>For CPU intensive jobs like <code>grep</code> with regular expressions and <code>locate</code> with
+sequence motifs. The processes are parallelized
+with "Map-Reduce" model by multiple goroutines in golang which are similar to but much
 lighter weight than threads. The concurrency number is configurable with global
 flag <code>-j</code> or <code>--threads</code>.</p>
 <p>Most of the time you can just use the default value. i.e. the number of CPUs
@@ -531,15 +543,21 @@ of your computer.</p>
 <h3 id="memory-occupation">Memory occupation</h3>
 <p>Most of the subcommands do not read whole FASTA/Q records in to memory,
 including <code>stat</code>, <code>fq2fa</code>, <code>fx2tab</code>, <code>tab2fx</code>, <code>grep</code>, <code>locate</code>, <code>replace</code>,
- <code>seq</code>, <code>sliding</code>, <code>subseq</code>. The just temporarily buffer chunks of records.</p>
+ <code>seq</code>, <code>sliding</code>, <code>subseq</code>. They just temporarily buffer chunks of records.</p>
+<p>Note that when using <code>subseq --gtf | --bed</code>, if the GTF/BED files are too
+big, the memory usage will increase.
+You could use <code>--chr</code> to specify chromesomes and <code>--feature</code> to limit features.</p>
 <p>Some subcommands need to store sequences or heads in memory, but there are
 strategy to reduce memory occupation, including <code>rmdup</code> and <code>common</code>.
 When comparing with sequences, MD5 digest could be used to replace sequence by
 flag <code>-m</code> (<code>--md5</code>).</p>
 <p>Some subcommands could either read all records or read the files twice by flag
-<code>-2</code> (<code>--two-pass</code>), including <code>sample</code> and <code>split</code>.</p>
-<p>Two subcommands must read all records in memory right now, <code>shuffle</code> and <code>sort</code>.
-But I'll improve this later.</p>
+<code>-2</code> (<code>--two-pass</code>), including <code>sample</code>, <code>split</code>, <code>shuffle</code> and <code>sort</code>.
+They use FASTA index for rapid acccess of sequences and reducing memory occupation.</p>
+<h3 id="reproducibility">Reproducibility</h3>
+<p>Subcommands <code>sample</code> and <code>shuffle</code> use random function, random seed could be
+given by flag <code>-s</code> (<code>--rand-seed</code>). This makes sure that sampling result could be
+reproduced in different environments with same random seed.</p>
 <h2 id="usage-examples">Usage &amp;&amp; Examples</h2>
 <p><a href="http://shenwei356.github.io/fakit/usage/">Usage and examples</a></p>
 <p><a href="http://shenwei356.github.io/fakit/tutorial/">Tutorial</a></p>
@@ -607,5 +625,5 @@ propose new functions or ask for help.</p>
 
 <!--
 MkDocs version : 0.15.3
-Build Date UTC : 2016-04-21 07:22:59.297214
+Build Date UTC : 2016-04-24 15:14:00.018138
 -->

@@ -152,14 +152,12 @@
   in <a href="https://github.com/shenwei356/fakit/releases">release</a> page.</p>
 <h2 id="current-version">Current Version</h2>
 <ul>
-<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.7">fakit v0.1.7</a><ul>
-<li><strong><em>add support for (multi-line) FASTQ format</em></strong></li>
-<li>update document, add technical details</li>
-<li>rename subcommands <code>fa2tab</code> and <code>tab2fa</code> to <code>fx2tab</code> and <code>tab2fx</code></li>
-<li>add subcommand <code>fq2fa</code></li>
-<li>add column "seq_format" to <code>stat</code></li>
-<li>add global flag <code>-b</code> (<code>--bufer-size</code>)</li>
-<li>little change of flag in <code>subseq</code> and some other commands</li>
+<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.8">fakit v0.1.8</a><ul>
+<li>add subcommand <code>rename</code> to rename duplicated IDs</li>
+<li>add subcommand <code>faidx</code> to create FASTA index file</li>
+<li><strong><em>utilize faidx to improve performance of <code>subseq</code></em></strong></li>
+<li><em><code>shuffle</code>, <code>sort</code> and split support two-pass mode (by flag <code>-2</code>) with faidx to reduce memory usage.</em></li>
+<li>document update</li>
 </ul>
 </li>
 </ul>
@@ -185,6 +183,16 @@ echo export PATH=\$PATH:/PATH/OF/FASTCOV &gt;&gt; ~/.bashrc
 </ol>
 <h2 id="previous-versions">Previous Versions</h2>
 <ul>
+<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.7">fakit v0.1.7</a><ul>
+<li><strong><em>add support for (multi-line) FASTQ format</em></strong></li>
+<li>update document, add technical details</li>
+<li>rename subcommands <code>fa2tab</code> and <code>tab2fa</code> to <code>fx2tab</code> and <code>tab2fx</code></li>
+<li>add subcommand <code>fq2fa</code></li>
+<li>add column "seq_format" to <code>stat</code></li>
+<li>add global flag <code>-b</code> (<code>--bufer-size</code>)</li>
+<li>little change of flag in <code>subseq</code> and some other commands</li>
+</ul>
+</li>
 <li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.6">fakit v0.1.6</a><ul>
 <li>add subcommand <code>replace</code></li>
 </ul>
