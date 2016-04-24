@@ -24,11 +24,13 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"regexp"
 	"runtime"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/brentp/xopen"
@@ -230,13 +232,26 @@ func fileNotExists(file string) bool {
 	return os.IsNotExist(err)
 }
 
-func getFaidx(file string) *fai.Faidx {
+func copySeqs(file, newFile string) {
+	fh, err := xopen.Ropen(file)
+	checkError(err)
+	defer fh.Close()
+
+	outfh, err := xopen.Wopen(newFile)
+	checkError(err)
+	defer outfh.Close()
+
+	_, err = io.Copy(outfh, fh)
+	checkError(err)
+}
+
+func getFaidx(file string, idRegexp string) *fai.Faidx {
 	var idx fai.Index
 	var err error
 	fileFai := file + ".fai"
 	if fileNotExists(fileFai) {
 		log.Infof("create FASTA index for %s", file)
-		idx, err = fai.Create(file)
+		idx, err = fai.CreateWithIDRegexp(file, idRegexp)
 		checkError(err)
 	} else {
 		idx, err = fai.Read(fileFai)
@@ -247,9 +262,22 @@ func getFaidx(file string) *fai.Faidx {
 	return faidx
 }
 
-func getSeqIDsFromFaidxFile(file string) ([]string, error) {
-	ids := []string{}
+func subseqByFaix(faidx *fai.Faidx, chrs string, r fai.Record, start, end int) []byte {
+	start, end, ok := seq.SubLocation(r.Length, start, end)
+	if !ok {
+		return []byte("")
+	}
+	subseq, _ := faidx.SubSeq(chrs, start, end)
+	return subseq
+}
 
+func getSeqIDAndLengthFromFaidxFile(file string) ([]string, []int, error) {
+	ids := []string{}
+	lengths := []int{}
+	type idAndLength struct {
+		id     string
+		length int
+	}
 	fn := func(line string) (interface{}, bool, error) {
 		if len(line) == 0 {
 			return nil, false, nil
@@ -258,22 +286,30 @@ func getSeqIDsFromFaidxFile(file string) ([]string, error) {
 		if len(items) != 5 {
 			return nil, false, nil
 		}
-		return items[0], true, nil
+
+		length, err := strconv.Atoi(items[1])
+		if err != nil {
+			return nil, false, fmt.Errorf("seq length should be integer: %s", items[1])
+		}
+		return idAndLength{id: items[0], length: length}, true, nil
 	}
 	reader, err := breader.NewBufferedReader(file, runtime.NumCPU(), 100, fn)
 	if err != nil {
-		return ids, err
+		return ids, lengths, err
 	}
+	var info idAndLength
 	for chunk := range reader.Ch {
 		if chunk.Err != nil {
-			return ids, err
+			return ids, lengths, err
 		}
 		for _, data := range chunk.Data {
-			ids = append(ids, data.(string))
+			info = data.(idAndLength)
+			ids = append(ids, info.id)
+			lengths = append(lengths, info.length)
 		}
 	}
 
-	return ids, nil
+	return ids, lengths, nil
 }
 
 var reRegion = regexp.MustCompile(`\-?\d+:\-?\d+`)

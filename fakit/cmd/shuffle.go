@@ -38,14 +38,19 @@ var shuffleCmd = &cobra.Command{
 	Use:   "shuffle",
 	Short: "shuffle sequences",
 	Long: `shuffle sequences.
-In default, all records will be readed into memory.
+
+By default, all records will be readed into memory.
 For FASTA format, use flag -2 (--two-pass) to reduce memory usage. FASTQ not
 supported.
 
-Firstly,  fakit reads the sequence IDs. if the file is not plain FASTA file,
+Firstly, fakit reads the sequence IDs. If the file is not plain FASTA file,
 fakit will write the sequences to tempory files, and create FASTA index.
 
 Secondly, fakit shuffles sequence IDs and extract sequences by FASTA index.
+
+ATTENTION: the .fai file created by fakit is a little different from .fai file
+created by samtools. Fakit use full sequence head instead of just ID as key.
+So please delete .fai file created by samtools.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -65,10 +70,14 @@ Secondly, fakit shuffles sequence IDs and extract sequences by FASTA index.
 		seed := getFlagInt64(cmd, "rand-seed")
 		twoPass := getFlagBool(cmd, "two-pass")
 		keepTemp := getFlagBool(cmd, "keep-temp")
+		if keepTemp && !twoPass {
+			checkError(fmt.Errorf("flag -k (--keep-temp) must be used with flag -2 (--two-pass)"))
+		}
+
+		index2name := make(map[int]string)
 
 		if !twoPass { // read all records into memory
 			sequences := make(map[string]*fastx.Record)
-			index2name := make(map[int]string)
 
 			if !quiet {
 				log.Infof("read sequences ...")
@@ -122,7 +131,6 @@ Secondly, fakit shuffles sequence IDs and extract sequences by FASTA index.
 
 		file := files[0]
 
-		index2name := make(map[int]string)
 		var alphabet2 *seq.Alphabet
 
 		newFile := file
@@ -132,46 +140,34 @@ Secondly, fakit shuffles sequence IDs and extract sequences by FASTA index.
 				log.Infof("read and write sequences to tempory file: %s ...", newFile)
 			}
 
-			outfh, err := xopen.Wopen(newFile)
-			checkError(err)
+			copySeqs(file, newFile)
 
-			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+			var isFastq bool
+			var err error
+			alphabet2, isFastq, err = fastx.GuessAlphabet(newFile)
 			checkError(err)
-			i := 0
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
-				if fastxReader.IsFastq {
-					checkError(os.Remove(newFile))
-					checkError(fmt.Errorf("Sorry, two-pass mode does not support FASTQ format"))
-				}
-				for _, record := range chunk.Data {
-					alphabet2 = record.Seq.Alphabet
-					index2name[i] = string(record.ID)
-					outfh.WriteString(record.Format(lineWidth))
-					i++
-				}
+			if isFastq {
+				checkError(os.Remove(newFile))
+				checkError(fmt.Errorf("Sorry, two-pass mode does not support FASTQ format"))
 			}
-
-			outfh.Close() // have to do this, do not use defer! or sequence will not all be written
 		}
 
 		if !quiet {
 			log.Infof("create and read FASTA index ...")
 		}
-		faidx := getFaidx(newFile)
+		faidx := getFaidx(newFile, `^(.+)$`)
 
-		if isPlainFile(file) {
-			if !quiet {
-				log.Infof("read sequence IDs from FASTA index ...")
-			}
-			ids, err := getSeqIDsFromFaidxFile(file + ".fai")
-			checkError(err)
-			for i, id := range ids {
-				index2name[i] = id
-			}
+		if !quiet {
+			log.Infof("read sequence IDs from FASTA index ...")
+		}
+		ids, _, err := getSeqIDAndLengthFromFaidxFile(newFile + ".fai")
+		checkError(err)
+		for i, id := range ids {
+			index2name[i] = id
 		}
 
 		if !quiet {
+			log.Infof("%d sequences loaded", len(ids))
 			log.Infof("shuffle ...")
 		}
 		rand.Seed(seed)
@@ -193,7 +189,7 @@ Secondly, fakit shuffles sequence IDs and extract sequences by FASTA index.
 			chr = index2name[i]
 			r, ok := faidx.Index[chr]
 			if !ok {
-				log.Warningf(`sequence (%s) not found in file: %s`, chr, newFile)
+				checkError(fmt.Errorf(`sequence (%s) not found in file: %s`, chr, newFile))
 				continue
 			}
 
@@ -215,6 +211,6 @@ Secondly, fakit shuffles sequence IDs and extract sequences by FASTA index.
 func init() {
 	RootCmd.AddCommand(shuffleCmd)
 	shuffleCmd.Flags().Int64P("rand-seed", "s", 23, "rand seed for shuffle")
-	shuffleCmd.Flags().BoolP("two-pass", "2", false, "2-pass mode read files twice to lower memory usage. (only for FASTA format)")
+	shuffleCmd.Flags().BoolP("two-pass", "2", false, "two-pass mode read files twice to lower memory usage. (only for FASTA format)")
 	shuffleCmd.Flags().BoolP("keep-temp", "k", false, "keep tempory FASTA and .fai file when using 2-pass mode")
 }

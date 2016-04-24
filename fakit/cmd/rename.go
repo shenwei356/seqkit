@@ -27,7 +27,6 @@ import (
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
-	"github.com/shenwei356/util/byteutil"
 	"github.com/spf13/cobra"
 )
 
@@ -51,6 +50,7 @@ var renameCmd = &cobra.Command{
 		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileList(args)
+		byName := getFlagBool(cmd, "by-name")
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
@@ -59,6 +59,7 @@ var renameCmd = &cobra.Command{
 		for _, file := range files {
 			numbers := make(map[string]int)
 			var newID string
+			var k string
 
 			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
 			checkError(err)
@@ -66,20 +67,21 @@ var renameCmd = &cobra.Command{
 				checkError(chunk.Err)
 
 				for _, record := range chunk.Data {
-					if _, ok := numbers[string(record.ID)]; ok {
-						numbers[string(record.ID)]++
-						newID = fmt.Sprintf("%s_%d", record.ID, numbers[string(record.ID)])
+					if byName {
+						k = string(record.Name)
 					} else {
-						numbers[string(record.ID)] = 1
+						k = string(record.ID)
 					}
 
-					if len(record.Seq.Qual) > 0 {
-						outfh.WriteString(fmt.Sprintf("@%s %s\n%s\n+\n%s\n", newID, record.Name,
-							byteutil.WrapByteSlice(record.Seq.Seq, lineWidth),
-							byteutil.WrapByteSlice(record.Seq.Qual, lineWidth)))
+					if _, ok := numbers[k]; ok {
+						numbers[k]++
+						newID = fmt.Sprintf("%s_%d", record.ID, numbers[k])
+						record.Name = []byte(fmt.Sprintf("%s %s", newID, record.Name))
+					} else {
+						numbers[k] = 1
 					}
-					outfh.WriteString(fmt.Sprintf(">%s %s\n%s\n", newID, record.Name,
-						byteutil.WrapByteSlice(record.Seq.Seq, lineWidth)))
+
+					outfh.WriteString(record.Format(lineWidth))
 				}
 			}
 		}
@@ -88,4 +90,6 @@ var renameCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(renameCmd)
+
+	renameCmd.Flags().BoolP("by-name", "n", false, "check duplicated by full name instead of just id")
 }

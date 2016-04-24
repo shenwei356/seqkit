@@ -10,6 +10,8 @@
     - add subcommand `rename` to rename duplicated IDs
     - add subcommand `faidx` to create FASTA index file
     - ***utilize faidx to improve performance of `subseq`***
+    - *`shuffle`, `sort` and split support two-pass mode (by flag `-2`) with faidx to reduce memory usage.*
+    - document update
 
 ## Installation
 

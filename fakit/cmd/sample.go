@@ -89,7 +89,7 @@ var sampleCmd = &cobra.Command{
 
 			if twoPass {
 				if xopen.IsStdin() {
-					checkError(fmt.Errorf("2-pass mode (-2) will failed when reading from stdin. please disable flag: -2"))
+					checkError(fmt.Errorf("two-pass mode (-2) will failed when reading from stdin. please disable flag: -2"))
 				}
 				// first pass, get seq number
 				if !quiet {
@@ -102,7 +102,7 @@ var sampleCmd = &cobra.Command{
 					log.Infof("seq number: %d", len(names))
 				}
 
-				proportion = float64(number) / float64(len(names))
+				proportion = float64(number) / float64(len(names)) * 1.1
 
 				// second pass
 				if !quiet {

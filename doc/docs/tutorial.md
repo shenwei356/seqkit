@@ -1,6 +1,142 @@
 # Tutorial
 
+## Some manipulations on big genomes
+
+A script [memusg](https://gist.github.com/netj/526585) is
+used to check the peek memory usage. Usage: `memusg command`.
+
+1. Human genome
+
+        $  fakit stat hsa.fa
+        file     seq_format   seq_type   num_seqs   min_len        avg_len       max_len
+        hsa.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
+
+1. Sorting by sequence length
+
+        $ time fakit sort --by-length --reverse --two-pass hsa.fa > hsa.sorted.fa
+        [INFO] create and read FASTA index ...
+        [INFO] read sequence IDs and lengths from FASTA index ...
+        [INFO] 194 sequences loaded
+        [INFO] sorting ...
+        [INFO] output ...
+
+        real    0m26.002s
+        user    0m34.735s
+        sys     0m2.686s
+
+    The peak meomory usage is about 4.45G (2.7G before run)
+
+    Detail:
+
+        $ fakit fx2tab --length hsa.sorted.fa --name --only-id | cut -f 1,4 | more
+        1       248956422
+        2       242193529
+        3       198295559
+        4       190214555
+        5       181538259
+        6       170805979
+        7       159345973
+        X       156040895
+        8       145138636
+        9       138394717
+        11      135086622
+        10      133797422
+        12      133275309
+        13      114364328
+        14      107043718
+        15      101991189
+        16      90338345
+        17      83257441
+        18      80373285
+        20      64444167
+        19      58617616
+        Y       57227415
+        22      50818468
+        21      46709983
+        KI270728.1      1872759
+        KI270727.1      448248
+        ...
+
+        real    0m10.697s
+        user    0m11.153s
+        sys     0m0.917s
+
+1. Shuffling sequences
+
+        $ time fakit shuffle hsa.fa --two-pass > hsa.shuffled.fa
+        [INFO] create and read FASTA index ...
+        [INFO] read sequence IDs from FASTA index ...
+        [INFO] 194 sequences loaded
+        [INFO] shuffle ...
+        [INFO] output ...
+
+        real    0m28.331s
+        user    0m35.320s
+        sys     0m3.309s
+
+    The peak meomory usage is about 4.45G (2.7G before run)
+
+1. Spliting into files with single sequence
+
+        $ time fakit split --by-id hsa.fa --two-pass
+        [INFO] split by ID. idRegexp: ^([^\s]+)\s?
+        [INFO] create and read FASTA index ...
+        [INFO] read sequence IDs from FASTA index ...
+        [INFO] 194 sequences loaded
+        [INFO] write 1 sequences to file: hsa.id_KI270743.1.fa
+        [INFO] write 1 sequences to file: hsa.id_KI270706.1.fa
+        [INFO] write 1 sequences to file: hsa.id_KI270717.1.fa
+        [INFO] write 1 sequences to file: hsa.id_KI270718.1.fa
+        [INFO] write 1 sequences to file: hsa.id_KI270468.1.fa
+        ...
+
+        real    0m25.233s
+        user    0m34.189s
+        sys     0m3.002s
+
+1. Geting subsequence of some chromesomes
+
+        $ fakit subseq -r 1:10 --chr X --chr Y  hsa.fa
+        >X_1-10 X dna_sm:chromosome chromosome:GRCh38:X:1:156040895:1 REF
+        nnnnnnnnnn
+        >Y_1-10 Y dna_sm:chromosome chromosome:GRCh38:Y:2781480:56887902:1 REF
+        NNNNNNNNNN
+
+1. Geting CDS sequence of chr 1 by GTF files
+
+        $ time fakit subseq --gtf Homo_sapiens.GRCh38.84.gtf.gz --chr X --feature cds  hsa.fa > chrX.gtf.cds.fa
+        [INFO] read GTF file ...
+        [INFO] 22420 GTF features loaded
+
+        real    0m8.881s
+        user    0m20.124s
+        sys     0m0.682s
+
+
 ## Remove contaminated reads
+
+1. Mapping with reads on some potential contaminate genomes, and get the reads IDs list.
+
+        $ wc -l contaminate.list
+        244 contaminate.list
+
+        $ head -n 2 contaminate.list
+        HWI-D00523:240:HF3WGBCXX:1:1101:2574:2226
+        HWI-D00523:240:HF3WGBCXX:1:1101:12616:2205
+
+1. Remove contaminated reads
+
+        $ fakit grep -f contaminate.list -v reads_1.fq.gz -o reads_1.clean.fq.gz
+        $ fakit grep -f contaminate.list -v reads_2.fq.gz -o reads_2.clean.fq.gz
+
+        $ fakit stat *.fq.gz
+        file                  seq_format   seq_type   num_seqs   min_len   avg_len   max_len
+        reads_1.clean.fq.gz   FASTQ        DNA           2,256       226       227       229
+        reads_1.fq.gz         FASTQ        DNA           2,500       226       227       229
+        reads_2.clean.fq.gz   FASTQ        DNA           2,256       223       224       225
+        reads_2.fq.gz         FASTQ        DNA           2,500       223       224       225
+
+
 
 ## Handling of aligned sequences
 
@@ -22,7 +158,7 @@
 
 1. Convert FASTA format to tabular format.
 
-        $ fakit fa2tab seqs.msa.fa
+        $ fakit fx2tab seqs.msa.fa
         seq1    ACAACGTCTACTTACGTTGCAT----CGTCATGCTGCATTACGTAGTCTGATGATG
         seq2    ---------------ACACCGTCTACTTTCATGCTGCATTACGTAGTCTGATGATG
         seq3    ACAACGTCTACTTACGTTGCATCGTCATGCTGCACTGATGATG-------------
@@ -30,7 +166,7 @@
 
     or
 
-        $ fakit fa2tab seqs.msa.fa | cut -f 2
+        $ fakit fx2tab seqs.msa.fa | cut -f 2
         ACAACGTCTACTTACGTTGCAT----CGTCATGCTGCATTACGTAGTCTGATGATG
         ---------------ACACCGTCTACTTTCATGCTGCATTACGTAGTCTGATGATG
         ACAACGTCTACTTACGTTGCATCGTCATGCTGCACTGATGATG-------------
@@ -122,7 +258,7 @@ And the `dre-miR-430c` has the most multicopies in *Danio rerio*.
     So we could split hairpins by the first letters by defining custom
     sequence ID parsing regular expression `^([\w]+)\-`.
 
-    In default, `fakit` takes the first non-space letters as sequence ID.
+    By default, `fakit` takes the first non-space letters as sequence ID.
     For example,
 
     |   FASTA head                                                  |     ID                                            |
@@ -140,25 +276,32 @@ And the `dre-miR-430c` has the most multicopies in *Danio rerio*.
 1. Split sequences by species.
 A custom ID parsing regular expression is used, `^([\w]+)\-`.
 
-        $ fakit split hairpin.fa.gz -i --id-regexp "^([\w]+)\-"
+        $ fakit split hairpin.fa.gz -i --id-regexp "^([\w]+)\-" --two-pass
+
+    ***To reduce memory usage when spliting big file, we should alwasy use flag `--two-pass`***
 
 2. Species with most miRNA hairpins. Third column is the sequences number.
 
-        $ fakit stat hairpin.id_*.gz | sort -k3,3nr
-        hairpin.id_hsa.fa.gz           RNA       1,881         41       81.9        180
-        hairpin.id_mmu.fa.gz           RNA       1,193         39       83.4        147
-        hairpin.id_bta.fa.gz           RNA         808         53       80.1        149
-        hairpin.id_gga.fa.gz           RNA         740         48       91.5        169
-        hairpin.id_eca.fa.gz           RNA         715         52      104.6        145
+        $ fakit stat hairpin.id_*.gz | csvtk space2tab | csvtk -t sort -k num_seqs:nr | csvtk -t pretty| more
+        file                     seq_format   seq_type   num_seqs   min_len   avg_len   max_len
+        hairpin.id_hsa.fa.gz     FASTA        RNA        1,881      41        81.9      180
+        hairpin.id_mmu.fa.gz     FASTA        RNA        1,193      39        83.4      147
+        hairpin.id_bta.fa.gz     FASTA        RNA        808        53        80.1      149
+        hairpin.id_gga.fa.gz     FASTA        RNA        740        48        91.5      169
+        hairpin.id_eca.fa.gz     FASTA        RNA        715        52        104.6     145
+        hairpin.id_mtr.fa.gz     FASTA        RNA        672        54        165.3     910
+
+    Here, a CSV/TSV tool [csvtk](https://github.com/shenwei356/csvtk)
+    is used to sort and view the result.
 
 For human miRNA hairpins
 
 1. Length distribution.
- `fakit fa2tab` could show extra information like sequence length, GC content.
+ `fakit fx2tab` could show extra information like sequence length, GC content.
  A distribution ploting script is used, (
  [plot_distribution.py](https://github.com/shenwei356/bio_scripts/blob/master/plot/plot_distribution.py) )
 
-        $ fakit fa2tab hairpin.id_hsa.fa.gz -l | cut -f 3  | plot_distribution.py -o hairpin.id_hsa.fa.gz.lendist.png
+        $ fakit fx2tab hairpin.id_hsa.fa.gz -l | cut -f 3  | plot_distribution.py -o hairpin.id_hsa.fa.gz.lendist.png
 
     ![hairpin.id_hsa.fa.gz.lendist.png](/files/hairpin/hairpin.id_hsa.fa.gz.lendist.png)
 

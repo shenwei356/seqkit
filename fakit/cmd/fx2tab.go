@@ -33,7 +33,7 @@ import (
 // fx2tabCmd represents the fx2tab command
 var fx2tabCmd = &cobra.Command{
 	Use:   "fx2tab",
-	Short: "covert FASTA/Q to tabular format (with length/GC content/GC skew) to filter and sort",
+	Short: "covert FASTA/Q to tabular format (with length/GC content/GC skew)",
 	Long: `covert FASTA/Q to tabular format, and provide various information,
 like sequence length, GC content/GC skew.
 
@@ -57,7 +57,7 @@ like sequence length, GC content/GC skew.
 		printGCSkew := getFlagBool(cmd, "gc-skew")
 		baseContents := getFlagStringSlice(cmd, "base-content")
 		onlyName := getFlagBool(cmd, "name")
-		printTitle := getFlagBool(cmd, "title")
+		printTitle := getFlagBool(cmd, "header-line")
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
@@ -139,5 +139,5 @@ func init() {
 	fx2tabCmd.Flags().StringSliceP("base-content", "B", []string{}, "print base content. (case ignored, multiple values supported) e.g. -b AT -b N")
 	fx2tabCmd.Flags().BoolP("only-id", "i", false, "print ID instead of full head")
 	fx2tabCmd.Flags().BoolP("name", "n", false, "only print names (no sequences and qualities)")
-	fx2tabCmd.Flags().BoolP("title", "T", false, "print title line")
+	fx2tabCmd.Flags().BoolP("header-line", "H", false, "print header line")
 }

@@ -96,7 +96,9 @@ You can also add the directory of the executable file to environment variable
   or simply copy it to `/usr/local/bin`
 
 
-## Subcommands (18 in total)
+## Subcommands
+
+18 in total.
 
 **Sequence and subsequence**
 
@@ -108,7 +110,7 @@ You can also add the directory of the executable file to environment variable
 
 **Format conversion**
 
-- `fx2tab`     covert FASTA/Q to tabular format (and length/GC content/GC skew) to filter and sort
+- `fx2tab`     covert FASTA/Q to tabular format (and length/GC content/GC skew)
 - `tab2fx`     covert tabular format to FASTA/Q format
 - `fq2fa`      covert FASTQ to FASTA
 
@@ -157,7 +159,7 @@ You can also add the directory of the executable file to environment variable
 
 fakit use author's bioinformatics packages [bio](https://github.com/shenwei356/bio)
 for FASTA/Q parsing, which **asynchronously parse FASTA/Q records and buffer them
-in chunks**. The parser return one chunk of records for each call.
+in chunks**. The parser returns one chunk of records for each call.
 
 **Asynchronous parsing** saves much time because these's no waiting interval for
 parsed records being handled.
@@ -167,12 +169,12 @@ of sequences, which could also improve performance.
 Since using of buffers and chunks, the memory occupation will be higher than
 cases of reading sequence one by one.
 The default value of chunk size (configurable by global flag `-c` or `--chunk-size`)
-is 1, which is suitable for most of cases. 
+is 1, which is suitable for most of cases.
 But for manipulating short sequences, e.g. FASTQ or FASTA of short sequences,
 you could set higher value, e.g. 1000.
 For big genomes like human genome, smaller chunk size is prefered, e.g. 1.
-And the buffer size is configurable by  global flag `-b` or `--buffer-size`
-(default value is 1), therefore, you may set with higher
+And the buffer size is configurable by global flag `-b` or `--buffer-size`
+(default value is 1). You may set with higher
 value for short sequences to imporve performance.
 
 ***In summary, set smaller value for `-c` and `-b` when handling big FASTA file
@@ -180,9 +182,13 @@ like human genomes.***
 
 ### FASTA index
 
-For some commands, e.g. `subseq`, `split`, `sort` and `shuffle`,
-when input files are plain FASTA files, FASTA index file .fai will be created for
+For commands, including `subseq`, `split`, `sort` and `shuffle`,
+when input files are FASTA files, FASTA index would be optional used for
 rapid acccess of sequences and reducing memory occupation.
+
+ATTENTION: the .fai file created by fakit is a little different from .fai file
+created by samtools. fakit uses full sequence head instead of just ID as key.
+So please delete .fai file created by samtools.
 
 ### Parallelization of CPU intensive jobs
 
@@ -191,7 +197,7 @@ performance, asynchronous parsing strategy is used.
 
 For CPU intensive jobs like `grep` with regular expressions and `locate` with
 sequence motifs. The processes are parallelized
-with MapReduce model by multiple goroutine in golang, similar to but much
+with "Map-Reduce" model by multiple goroutines in golang which are similar to but much
 lighter weight than threads. The concurrency number is configurable with global
 flag `-j` or `--threads`.
 
@@ -203,9 +209,9 @@ of your computer.
 Most of the subcommands do not read whole FASTA/Q records in to memory,
 including `stat`, `fq2fa`, `fx2tab`, `tab2fx`, `grep`, `locate`, `replace`,
  `seq`, `sliding`, `subseq`. They just temporarily buffer chunks of records.
- 
+
 Note that when using `subseq --gtf | --bed`, if the GTF/BED files are too
-big, the memory usage will increase. 
+big, the memory usage will increase.
 You could use `--chr` to specify chromesomes and `--feature` to limit features.
 
 Some subcommands need to store sequences or heads in memory, but there are
@@ -214,15 +220,13 @@ When comparing with sequences, MD5 digest could be used to replace sequence by
 flag `-m` (`--md5`).
 
 Some subcommands could either read all records or read the files twice by flag
-`-2` (`--two-pass`), including `sample` and `split`.
-
-Two subcommands must read all records in memory right now, `shuffle` and `sort`.
-But I'll improve this later.
+`-2` (`--two-pass`), including `sample`, `split`, `shuffle` and `sort`.
+They use FASTA index for rapid acccess of sequences and reducing memory occupation.
 
 ### Reproducibility
 
 Subcommands `sample` and `shuffle` use random function, random seed could be
-given by flag `-s` (`--rand-seed`). This make sure that sample result could be
+given by flag `-s` (`--rand-seed`). This makes sure that sampling result could be
 reproduced in different environments with same random seed.
 
 ## Usage && Examples
