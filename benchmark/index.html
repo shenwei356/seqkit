@@ -149,11 +149,11 @@
         
             <li><a href="#test-2-extract-sequencs-by-id-list">Test 2. Extract sequencs by ID list</a></li>
         
-            <li><a href="#test-3-sampling">Test 3. Sampling</a></li>
+            <li><a href="#test-3-sampling-by-number">Test 3. Sampling by number</a></li>
         
-            <li><a href="#test-4-remove-duplicated-sequences">Test 4. Remove duplicated sequences</a></li>
+            <li><a href="#test-4-removing-duplicates-by-seq-content">Test 4. Removing duplicates by seq content</a></li>
         
-            <li><a href="#test-5-extract-subsequencs-by-bed-file">Test 5. Extract subsequencs by BED file</a></li>
+            <li><a href="#test-5-subsequence-with-bed-file">Test 5. Subsequence with BED file</a></li>
         
             <li><a href="#result">Result</a></li>
         
@@ -166,19 +166,22 @@
 <h2 id="softwares">Softwares</h2>
 <ol>
 <li><a href="https://github.com/shenwei356/fakit">fakit</a>. (Go).
-   Version <a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.5.1">v0.1.5.1</a>.</li>
+   Version <a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.9">v0.1.9</a>.</li>
 <li><a href="https://github.com/jimhester/fasta_utilities">fasta_utilities</a>. (Perl).
    Version <a href="https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579">3dcc0bc</a>.
    Lots of dependencies to install_.</li>
 <li><a href="http://hannonlab.cshl.edu/fastx_toolkit/">fastx_toolkit</a>. (Perl).
    Version <a href="http://hannonlab.cshl.edu/fastx_toolkit/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2">0.0.13</a>.
    Can't handle multi-line FASTA files_.</li>
-<li><a href="https://github.com/mdshw5/pyfaidx">pyfaidx</a>. (Python).
-   Version <a href="https://pypi.python.org/packages/source/p/pyfaidx/pyfaidx-0.4.7.1.tar.gz#md5=f33604a3550c2fa115ac7d33b952127d">0.4.7.1</a>.</li>
 <li><a href="http://seqmagick.readthedocs.org/en/latest/index.html">seqmagick</a>. (Python).
    Version 0.6.1</li>
 <li><a href="https://github.com/lh3/seqtk">seqtk</a>. (C).
    Version <a href="https://github.com/lh3/seqtk/commit/4feb6e81444ab6bc44139dd3a125068f81ae4ad8">1.0-r82-dirty</a>.</li>
+</ol>
+<p>Not used:</p>
+<ol>
+<li><a href="https://github.com/mdshw5/pyfaidx">pyfaidx</a>. (Python).
+   Version <a href="https://pypi.python.org/packages/source/p/pyfaidx/pyfaidx-0.4.7.1.tar.gz#md5=f33604a3550c2fa115ac7d33b952127d">0.4.7.1</a>. <em>not used, because it exhausted my memory (10G) when computing reverse-complement on a 5GB fasta file of 250 bp.</em></li>
 </ol>
 <h2 id="features">Features</h2>
 <table>
@@ -395,20 +398,9 @@
 </tbody>
 </table>
 <h2 id="datasets">Datasets</h2>
-<h3 id="dataset_a-large-number-of-short-sequences">dataset_A - large number of short sequences</h3>
-<p>dataset_A came from <a href="http://www.arb-silva.de/">SILVA rRNA database</a>.</p>
-<ul>
-<li><a href="http://www.arb-silva.de/fileadmin/silva_databases/current/Exports/SILVA_123_SSURef_tax_silva.fasta.gz"><code>SILVA_123_SSURef_tax_silva.fasta.gz</code></a></li>
-</ul>
-<p>Only sampled subsets (~ 10%) are used:</p>
-<pre><code>fakit sample SILVA_123_SSURef_tax_silva.fasta.gz -p 0.1 -o dataset_A.fa.gz
-</code></pre>
-
-<p>Some tools do not support RNA sequences,  and are not able to directly read .gz file,  so the file are uncompressed, and converted to DNA by</p>
-<pre><code>fakit seq --rna2dna dataset_A.fa.gz &gt; dataset_A.fa
-</code></pre>
-
-<h3 id="dataset_b-small-number-of-large-sequences">dataset_B - small number of large sequences</h3>
+<h3 id="dataset_afa-large-number-of-short-sequences">dataset_A.fa - large number of short sequences</h3>
+<p>to be updated.</p>
+<h3 id="dataset_bfa-small-number-of-large-sequences">dataset_B.fa - small number of large sequences</h3>
 <p>Human genome from <a href="http://uswest.ensembl.org/info/data/ftp/index.html">ensembl</a></p>
 <ul>
 <li>Genome DNA:  <a href="ftp://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz"><code>Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz</code></a></li>
@@ -417,43 +409,14 @@
 </code></pre>
 </li>
 </ul>
-<p>Only subsets of serveral chromosomes (chr18,19,20,21,22,Y) were used:</p>
-<pre><code>fakit grep Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz -c 1 -p 18 -p 19 -p 20 -p 21 -p 22 -p Y  -o dataset_B.fa
-</code></pre>
-
-<p>Datasets summary:</p>
-<pre><code>$ fakit stat *.fa
-file            seq_type    num_seqs       min_len       avg_len       max_len
-dataset_A.fa         DNA     175,364           900       1,419.6         3,725
-dataset_B.fa         DNA           6    46,709,983    59,698,489    80,373,285
-</code></pre>
-
-<h3 id="chr1">Chr1</h3>
-<p>DNA and gtf/bed data of Chr1 were used for testing of extracting subsequence:</p>
-<ul>
-<li>
-<p><code>chr1.fa.gz</code></p>
-<pre><code>fakit grep -p 1 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz -o chr1.fa.gz
-</code></pre>
-</li>
-<li>
-<p><code>chr1.gtf.gz</code></p>
-<pre><code>zcat Homo_sapiens.GRCh38.84.gtf.gz | grep -w '^1' | gzip -c &gt; chr1.gtf.gz
-</code></pre>
-</li>
-<li>
-<p><code>chr1.bed.gz</code></p>
-<pre><code>zcat Homo_sapiens.GRCh38.84.bed.gz | grep -w '^1' | gzip -c &gt; chr1.bed.gz
-</code></pre>
-</li>
-</ul>
+<p>to be updated.</p>
 <h2 id="platform">Platform</h2>
 <p>PC:</p>
 <ul>
 <li>CPU: Intel Core i5-3320M @ 2.60GHz, two cores/4 threads</li>
 <li>RAM: DDR3 1600MHz, 12GB</li>
 <li>SSD: SAMSUNG 850 EVO 250G, SATA-3</li>
-<li>OS: Fedora 23 (Scientific KDE spin),  Kernal: 4.4.3-300.fc23.x86_64</li>
+<li>OS: Fedora 23 (Scientific KDE spin),  Kernal: 4.4.7-300.fc23.x86_64</li>
 </ul>
 <p>Softwares:</p>
 <ul>
@@ -462,136 +425,18 @@ dataset_B.fa         DNA           6    46,709,983    59,698,489    80,373,285
 </ul>
 <h2 id="automatic-benchmark-and-plotting-scripts">Automatic benchmark and plotting scripts</h2>
 <p>Scripts are available at:  <a href="https://github.com/shenwei356/fakit/tree/master/benchmark">https://github.com/shenwei356/fakit/tree/master/benchmark</a></p>
-<p>All tests were repeated 4 times.</p>
+<p>One round test takes ~70 min, so only all tests were only repeated 1 times.</p>
 <h2 id="test-1-reverse-complement">Test 1. Reverse Complement</h2>
-<h3 id="commands">Commands</h3>
-<p><code>revcom_biogo</code> (<a href="https://github.com/shenwei356/fakit/blob/master/benchmark/revcom_biogo.go">source</a>,
- <a href="https://github.com/shenwei356/fakit/raw/master/benchmark/revcom_biogo">binary</a> ),
- a tool written in Golang using <a href="https://github.com/biogo/biogo">biogo</a> package,
- is also used for comparison of FASTA file parsing performance.</p>
-<pre><code>echo == fakit
-for f in dataset_{A,B}.fa; do echo data: $f; time fakit seq -r -p $f &gt; $f.fakit.rc; done
-
-echo == fasta_utilities
-for f in dataset_{A,B}.fa; do echo data: $f; time reverse_complement.pl $f &gt; .$f.fautil.rc; done
-
-echo == pyfaidx
-for f in dataset_{A,B}.fa; do echo data: $f; time faidx -c -r $f &gt; $f.pyfaidx.rc; done
-
-echo == seqmagick
-for f in dataset_{A,B}.fa; do echo data: $f; time seqmagick convert --reverse-complement $f - &gt; $f.seqmagick.rc; done
-
-echo == seqtk
-for f in dataset_{A,B}.fa; do echo data: $f; time seqtk seq -r $f &gt; $f.seqtk.rc; done
-
-echo == biogo
-for f in dataset_{A,B}.fa; do echo data: $f; time ./revcom_biogo $f &gt; $f.biogo.rc; done
-</code></pre>
-
 <h2 id="test-2-extract-sequencs-by-id-list">Test 2. Extract sequencs by ID list</h2>
-<h3 id="id-lists">ID lists</h3>
-<p>ID lists come from sampling 80% of the corresponding dataset and shuffling.</p>
-<pre><code>$ fakit sample -p 0.8 dataset_A.fa | fakit shuffle | fakit seq -n -i &gt; ids_A.txt
-$ wc -l ids_A.txt
-140261 ids_A.txt
-$ head -n 2 ids_A.txt
-GQ103704.1.1352
-FR853054.1.1478
-
-$ fakit sample -p 0.8 dataset_B.fa | fakit shuffle | fakit seq -n -i  &gt; ids_B.txt
-$ wc -l ids_B.txt
-4 ids_B.txt
-$ cat ids_B.txt
-Y
-18
-22
-21
-</code></pre>
-
-<h3 id="commands_1">Commands</h3>
-<pre><code>echo == fakit
-for g in A B; do echo data: dataset_$g.fa; time fakit grep -f ids_$g.txt dataset_$g.fa &gt; ids_$g.txt.fakit.fa; done
-
-echo == fasta_utilities
-for g in A B; do echo data: dataset_$g.fa; time in_list.pl -files ids_$g.txt dataset_$g.fa &gt; ids_$g.txt.fautil.fa; done
-
-echo == seqmagick
-for g in A B; do echo data: dataset_$g.fa; time seqmagick convert --include-from-file ids_$g.txt dataset_$g.fa - &gt; ids_$g.txt.seqmagic.fa; done
-
-echo == seqtk
-for g in A B; do echo data: dataset_$g.fa; time seqtk subseq  dataset_$g.fa ids_$g.txt &gt; ids_$g.txt.seqtk.fa; done
-</code></pre>
-
-<h2 id="test-3-sampling">Test 3. Sampling</h2>
-<h3 id="commands_2">Commands</h3>
-<p>Sample by number</p>
-<pre><code>n=1000
-n2=4
-
-echo == fakit
-for f in dataset_{A}.fa; do echo data: $f; time fakit sample -n $n  $f &gt; $f.sample.fakit.fa; done
-for f in dataset_{B}.fa; do echo data: $f; time fakit sample -n $n2 $f &gt; $f.sample.fakit.fa; done
-
-echo == seqmagick
-for f in dataset_{A}.fa; do echo data: $f; time seqmagick convert --sample $n  $f - &gt; $f.sample.seqmagick.fa; done
-for f in dataset_{B}.fa; do echo data: $f; time seqmagick convert --sample $n2 $f - &gt; $f.sample.seqmagick.fa; done
-
-echo == seqtk
-for f in dataset_{A}.fa; do echo data: $f; time seqtk sample $f $n  &gt; $f.sample.seqtk.fa; done
-for f in dataset_{B}.fa; do echo data: $f; time seqtk sample $f $n2 &gt; $f.sample.seqtk.fa; done
-</code></pre>
-
-<h2 id="test-4-remove-duplicated-sequences">Test 4. Remove duplicated sequences</h2>
-<h3 id="dataset">Dataset</h3>
-<p>10% or 20% sequences were randomly extract sequences from dataset_A.fa
-or dataset_B.fa and merge dback and then shuffled.</p>
-<pre><code>$ cat &lt;(fakit sample -p 0.1 dataset_A.fa) dataset_A.fa | fakit shuffle &gt; dataset_A_dup.fasta
-$ cat &lt;(fakit sample -p 0.2 dataset_B.fa) dataset_B.fa | fakit shuffle &gt; dataset_B_dup.fasta
-</code></pre>
-
-<p>Numbers:</p>
-<pre><code>dataset_A_dup.fasta: 175364 + 17411 = 192775
-dataset_B_dup.fasta: 6 + 2 = 8
-</code></pre>
-
-<p>Unique seqs:</p>
-<pre><code>$ fakit fa2tab dataset_A_dup.fasta  | cut -f 2 | sort | uniq | wc -l
-161864
-$ fakit fa2tab dataset_B_dup.fasta  | cut -f 2 | sort | uniq | wc -l
-6
-</code></pre>
-
-<h3 id="commands_3">Commands</h3>
-<p>By sequence</p>
-<pre><code>echo == fakit
-for f in dataset_{A,B}_dup.fasta; do echo data: $f; time fakit rmdup -s -m $f &gt; $f.rmdup.fakit.fa; done
-
-echo == seqmagick
-for f in dataset_{A,B}_dup.fasta; do echo data: $f; time seqmagick convert --deduplicate-sequences $f - &gt; $f.rmdup.seqmagick.fa; done
-</code></pre>
-
-<h2 id="test-5-extract-subsequencs-by-bed-file">Test 5. Extract subsequencs by BED file</h2>
-<h3 id="commands_4">Commands</h3>
-<pre><code>echo ==  fakit
-echo data: chr1.fa.gz; time fakit subseq -c 1 chr1.fa.gz --bed chr1.bed.gz &gt; chr1.bed.gz.fakit.fa
-
-echo ==  seqtk
-echo data: chr1.fa.gz; time seqtk subseq chr1.fa.gz chr1.bed.gz &gt; chr1.bed.gz.seqtk.fa
-</code></pre>
-
-<p>TODO: bedtools</p>
+<h2 id="test-3-sampling-by-number">Test 3. Sampling by number</h2>
+<h2 id="test-4-removing-duplicates-by-seq-content">Test 4. Removing duplicates by seq content</h2>
+<h2 id="test-5-subsequence-with-bed-file">Test 5. Subsequence with BED file</h2>
 <h2 id="result">Result</h2>
-<p>All tests were repeated 4 times.</p>
-<h3 id="performance-comparison-with-other-tools">Performance comparison with other tools</h3>
-<p>Missing data indicates that the tool does not have the function.</p>
-<p>Result also shows that <strong>the self-implemented FASTA parsing module has better performance than
-the <a href="https://github.com/biogo/biogo">biogo</a></strong>, a bioinformatics library for Go.</p>
-<p>For the revese complementary sequence test,
-the <code>fasta_utilities</code>, <code>seqmagick</code> and <code>seqtk</code> do not validate the bases/residues, which save some times.</p>
-<p>Fakit used all CPUs (4 for my computer) by default.</p>
-<p><img alt="benchmark_colorful.png" src="../benchmark/benchmark_colorful.png" /></p>
-<h3 id="speedup-with-multi-threads">Speedup with multi-threads</h3>
-<p><img alt="benchmark_colorful.png" src="../benchmark/fakit_multi_threads/benchmark_colorful.png" /></p>
+<p><img alt="benchmark-reverse-complement.png" src="../benchmark/benchmark-reverse-complement.png" /></p>
+<p><img alt="benchmark-reverse-complement.png" src="../benchmark/benchmark-searching-by-id-list.png" /></p>
+<p><img alt="benchmark-reverse-complement.png" src="../benchmark/benchmark-sampling-by-number.png" /></p>
+<p><img alt="benchmark-reverse-complement.png" src="../benchmark/benchmark-removing-duplicates-by-seq-content.png" /></p>
+<p><img alt="benchmark-reverse-complement.png" src="../benchmark/benchmark-subsequence-with-bed-file.png" /></p>
 <div id="disqus_thread"></div>
 
 <script>

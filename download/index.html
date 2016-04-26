@@ -152,12 +152,10 @@
   in <a href="https://github.com/shenwei356/fakit/releases">release</a> page.</p>
 <h2 id="current-version">Current Version</h2>
 <ul>
-<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.8">fakit v0.1.8</a><ul>
-<li>add subcommand <code>rename</code> to rename duplicated IDs</li>
-<li>add subcommand <code>faidx</code> to create FASTA index file</li>
-<li><strong><em>utilize faidx to improve performance of <code>subseq</code></em></strong></li>
-<li><em><code>shuffle</code>, <code>sort</code> and split support two-pass mode (by flag <code>-2</code>) with faidx to reduce memory usage.</em></li>
-<li>document update</li>
+<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.9">fakit v0.1.9</a><ul>
+<li>using custom FASTA index file extension: <code>.fakit.fai</code></li>
+<li>reducing memory usage of <code>sample --number --two-pass</code></li>
+<li><strong><em>change default CPU number to 2 for multi-cpus computer, and 1 for single-CPU computer</em></strong></li>
 </ul>
 </li>
 </ul>
@@ -183,6 +181,14 @@ echo export PATH=\$PATH:/PATH/OF/FASTCOV &gt;&gt; ~/.bashrc
 </ol>
 <h2 id="previous-versions">Previous Versions</h2>
 <ul>
+<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.8">fakit v0.1.8</a><ul>
+<li>add subcommand <code>rename</code> to rename duplicated IDs</li>
+<li>add subcommand <code>faidx</code> to create FASTA index file</li>
+<li><strong><em>utilize faidx to improve performance of <code>subseq</code></em></strong></li>
+<li><em><code>shuffle</code>, <code>sort</code> and split support two-pass mode (by flag <code>-2</code>) with faidx to reduce memory usage.</em></li>
+<li>document update</li>
+</ul>
+</li>
 <li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.1.7">fakit v0.1.7</a><ul>
 <li><strong><em>add support for (multi-line) FASTQ format</em></strong></li>
 <li>update document, add technical details</li>
