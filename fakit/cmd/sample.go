@@ -93,20 +93,21 @@ var sampleCmd = &cobra.Command{
 				}
 				// first pass, get seq number
 				if !quiet {
-					log.Info("first pass: get seq number")
+					log.Info("first pass: estimating seq number")
 				}
-				names, err := fastx.GetSeqNames(file)
+				// EstimateSeqNumber is faster than GetSeqNumber, and using less memory
+				seqNum, err := fastx.EstimateSeqNumber(file)
 				checkError(err)
 
 				if !quiet {
-					log.Infof("seq number: %d", len(names))
+					log.Infof("seq number: %d", seqNum)
 				}
 
-				proportion = float64(number) / float64(len(names)) * 1.1
+				proportion = float64(number) / float64(seqNum) * 1.1
 
 				// second pass
 				if !quiet {
-					log.Info("second pass: read and sample")
+					log.Info("second pass: reading and sampling")
 				}
 				fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
 				checkError(err)

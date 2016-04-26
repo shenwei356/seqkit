@@ -49,6 +49,9 @@ var seqCmd = &cobra.Command{
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = true
+		seq.ValidateWholeSeq = false
+		seq.ValidSeqLengthThreshold = config.ValidateSeqLength
+		seq.ValidSeqThreads = config.Threads
 		runtime.GOMAXPROCS(config.Threads)
 
 		reverse := getFlagBool(cmd, "reverse")
@@ -132,10 +135,10 @@ var seqCmd = &cobra.Command{
 					if printSeq {
 						sequence = record.Seq
 						if reverse {
-							sequence = sequence.Reverse()
+							sequence = sequence.ReverseInplace()
 						}
 						if complement {
-							sequence = sequence.Complement()
+							sequence = sequence.ComplementInplace()
 						}
 						if removeGaps {
 							sequence = sequence.RemoveGaps(gapLetters)
@@ -188,10 +191,10 @@ var seqCmd = &cobra.Command{
 					if printQual {
 						sequence = record.Seq
 						if reverse {
-							sequence = sequence.Reverse()
+							sequence = sequence.ReverseInplace()
 						}
 						if complement {
-							sequence = sequence.Complement()
+							sequence = sequence.ComplementInplace()
 						}
 						if removeGaps {
 							sequence = sequence.RemoveGaps(gapLetters)

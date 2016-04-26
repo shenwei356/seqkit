@@ -1,19 +1,19 @@
 #!/bin/sh
 
-echo  Test: Subseq
+echo  Test: Subsequence with BED file
 
 echo warm-up
-zcat chr1.fa.gz chr1.bed.gz > /dev/null
+cat dataset_B.fa chr19.bed.gz > /dev/null
 
 echo ==  fakit
-echo data: chr1.fa.gz; time fakit subseq -c 1 chr1.fa.gz --bed chr1.bed.gz > chr1.bed.gz.fakit.fa
+echo data: dataset_B.fa;
+if [[ ! -f dataset_B.fa.fakit.fai ]]; then fakit faidx dataset_B.fa --id-regexp "^(.+)$" -o dataset_B.fa.fakit.fai; fi;
+memusg -t -H fakit subseq dataset_B.fa --bed chr19.bed.gz > chr19.bed.gz.fakit.fa;
+# fakit stat chr19.bed.gz.fakit.fa;
+/bin/rm chr19.bed.gz.fakit.fa;
 
 echo ==  seqtk
-echo data: chr1.fa.gz; time seqtk subseq chr1.fa.gz chr1.bed.gz > chr1.bed.gz.seqtk.fa
-
-
-
-echo ==  result summary
-fakit stat chr1.bed.gz.*.fa
-
-rm chr1.bed.gz.*.fa
+echo data: dataset_B.fa;
+memusg -t -H seqtk subseq dataset_B.fa chr19.bed.gz > chr19.bed.gz.seqtk.fa
+# fakit stat chr19.bed.gz.seqtk.fa;
+/bin/rm chr19.bed.gz.seqtk.fa;

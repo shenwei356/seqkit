@@ -2,8 +2,8 @@
 
 ## Some manipulations on big genomes
 
-A script [memusg](https://gist.github.com/netj/526585) is
-used to check the peek memory usage. Usage: `memusg command`.
+A script [memusg](https://github.com/shenwei356/memusg) is
+used to check the peek memory usage of fakit. Usage: `memusg [-t] command`.
 
 1. Human genome
 
@@ -13,18 +13,15 @@ used to check the peek memory usage. Usage: `memusg command`.
 
 1. Sorting by sequence length
 
-        $ time fakit sort --by-length --reverse --two-pass hsa.fa > hsa.sorted.fa
+        $ memusg -t fakit sort --by-length --reverse --two-pass hsa.fa > hsa.sorted.fa
         [INFO] create and read FASTA index ...
         [INFO] read sequence IDs and lengths from FASTA index ...
         [INFO] 194 sequences loaded
         [INFO] sorting ...
         [INFO] output ...
 
-        real    0m26.002s
-        user    0m34.735s
-        sys     0m2.686s
-
-    The peak meomory usage is about 4.45G (2.7G before run)
+        elapsed time: 25.533s
+        peak rss: 4.62 GB
 
     Detail:
 
@@ -63,22 +60,21 @@ used to check the peek memory usage. Usage: `memusg command`.
 
 1. Shuffling sequences
 
-        $ time fakit shuffle hsa.fa --two-pass > hsa.shuffled.fa
+        $ memusg -t fakit shuffle hsa.fa --two-pass > hsa.shuffled.fa
         [INFO] create and read FASTA index ...
+        [INFO] create FASTA index for hsa.fa
         [INFO] read sequence IDs from FASTA index ...
         [INFO] 194 sequences loaded
         [INFO] shuffle ...
         [INFO] output ...
 
-        real    0m28.331s
-        user    0m35.320s
-        sys     0m3.309s
+        elapsed time: 37.248s
+        peak rss: 5.25 GB
 
-    The peak meomory usage is about 4.45G (2.7G before run)
 
 1. Spliting into files with single sequence
 
-        $ time fakit split --by-id hsa.fa --two-pass
+        $ memusg -t fakit split --by-id hsa.fa --two-pass
         [INFO] split by ID. idRegexp: ^([^\s]+)\s?
         [INFO] create and read FASTA index ...
         [INFO] read sequence IDs from FASTA index ...
@@ -90,27 +86,29 @@ used to check the peek memory usage. Usage: `memusg command`.
         [INFO] write 1 sequences to file: hsa.id_KI270468.1.fa
         ...
 
-        real    0m25.233s
-        user    0m34.189s
-        sys     0m3.002s
+        elapsed time: 24.183s
+        peak rss: 4.79 GB
 
 1. Geting subsequence of some chromesomes
 
-        $ fakit subseq -r 1:10 --chr X --chr Y  hsa.fa
+        $ memusg -t fakit subseq -r 1:10 --chr X --chr Y  hsa.fa
         >X_1-10 X dna_sm:chromosome chromosome:GRCh38:X:1:156040895:1 REF
         nnnnnnnnnn
         >Y_1-10 Y dna_sm:chromosome chromosome:GRCh38:Y:2781480:56887902:1 REF
         NNNNNNNNNN
 
+        elapsed time: 1.627s
+        peak rss: 770.88 MB
+
+
 1. Geting CDS sequence of chr 1 by GTF files
 
-        $ time fakit subseq --gtf Homo_sapiens.GRCh38.84.gtf.gz --chr X --feature cds  hsa.fa > chrX.gtf.cds.fa
+        $ memusg -t fakit subseq --gtf Homo_sapiens.GRCh38.84.gtf.gz --chr X --feature cds  hsa.fa > chrX.gtf.cds.fa
         [INFO] read GTF file ...
         [INFO] 22420 GTF features loaded
 
-        real    0m8.881s
-        user    0m20.124s
-        sys     0m0.682s
+        elapsed time: 8.967s
+        peak rss: 1.29 GB
 
 
 ## Remove contaminated reads

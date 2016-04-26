@@ -252,7 +252,7 @@ So please delete .fai file created by samtools.
 				checkError(fmt.Errorf("fail to compile regexp: %s", idRegexp))
 			}
 
-			ids, lengths, err := getSeqIDAndLengthFromFaidxFile(newFile + ".fai")
+			ids, lengths, err := getSeqIDAndLengthFromFaidxFile(newFile + ".fakit.fai")
 			checkError(err)
 			var name string
 			for i, head := range ids {
@@ -383,7 +383,7 @@ So please delete .fai file created by samtools.
 
 		if !isPlainFile(file) && !keepTemp {
 			checkError(os.Remove(newFile))
-			checkError(os.Remove(newFile + ".fai"))
+			checkError(os.Remove(newFile + ".fakit.fai"))
 		}
 	},
 }

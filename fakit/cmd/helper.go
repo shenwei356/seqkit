@@ -154,12 +154,20 @@ func getAlphabet(cmd *cobra.Command, flag string) *seq.Alphabet {
 	}
 }
 
-func getFlagalphabetGuessSeqLength(cmd *cobra.Command, flag string) int {
-	alphabetGuessSeqLength := getFlagInt(cmd, flag)
-	if alphabetGuessSeqLength < 10000 {
+func getFlagAlphabetGuessSeqLength(cmd *cobra.Command, flag string) int {
+	alphabetGuessSeqLength := getFlagNonNegativeInt(cmd, flag)
+	if alphabetGuessSeqLength > 0 && alphabetGuessSeqLength < 10000 {
 		checkError(fmt.Errorf("value of flag --%s too small, should >= 10000", flag))
 	}
 	return alphabetGuessSeqLength
+}
+
+func getFlagValidateSeqLength(cmd *cobra.Command, flag string) int {
+	validateSeqLength := getFlagNonNegativeInt(cmd, flag)
+	if validateSeqLength > 0 && validateSeqLength < 10000 {
+		checkError(fmt.Errorf("value of flag --%s too small, should >= 10000", flag))
+	}
+	return validateSeqLength
 }
 
 // Config is the global falgs
@@ -174,20 +182,22 @@ type Config struct {
 	OutFile                string
 	Quiet                  bool
 	AlphabetGuessSeqLength int
+	ValidateSeqLength      int
 }
 
 func getConfigs(cmd *cobra.Command) Config {
 	return Config{
 		Alphabet:   getAlphabet(cmd, "seq-type"),
 		ChunkSize:  getFlagPositiveInt(cmd, "chunk-size"),
-		BufferSize: getFlagPositiveInt(cmd, "buffer-size"),
+		BufferSize: getFlagNonNegativeInt(cmd, "buffer-size"),
 		Threads:    getFlagPositiveInt(cmd, "threads"),
 		LineWidth:  getFlagNonNegativeInt(cmd, "line-width"),
 		IDRegexp:   getIDRegexp(cmd, "id-regexp"),
 		IDNCBI:     getFlagBool(cmd, "id-ncbi"),
 		OutFile:    getFlagString(cmd, "out-file"),
 		Quiet:      getFlagBool(cmd, "quiet"),
-		AlphabetGuessSeqLength: getFlagalphabetGuessSeqLength(cmd, "alphabet-guess-seq-length"),
+		AlphabetGuessSeqLength: getFlagAlphabetGuessSeqLength(cmd, "alphabet-guess-seq-length"),
+		ValidateSeqLength:      getFlagValidateSeqLength(cmd, "validate-seq-length"),
 	}
 
 }
@@ -248,10 +258,10 @@ func copySeqs(file, newFile string) {
 func getFaidx(file string, idRegexp string) *fai.Faidx {
 	var idx fai.Index
 	var err error
-	fileFai := file + ".fai"
+	fileFai := file + ".fakit.fai"
 	if fileNotExists(fileFai) {
 		log.Infof("create FASTA index for %s", file)
-		idx, err = fai.CreateWithIDRegexp(file, idRegexp)
+		idx, err = fai.CreateWithIDRegexp(file, fileFai, idRegexp)
 		checkError(err)
 	} else {
 		idx, err = fai.Read(fileFai)

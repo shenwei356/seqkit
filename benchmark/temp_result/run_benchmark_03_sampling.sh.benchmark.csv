@@ -1,7 +1,0 @@
-test	dataset	app	time_mean	time_stdev
-Sample	dataset_A.fa	fakit	1.55	0.01
-Sample	dataset_A.fa	seqmagick	5.71	0.02
-Sample	dataset_A.fa	seqtk	0.35	0.01
-Sample	dataset_B.fa	fakit	1.94	0.03
-Sample	dataset_B.fa	seqmagick	7.63	0.34
-Sample	dataset_B.fa	seqtk	0.71	0.01

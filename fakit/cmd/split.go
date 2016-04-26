@@ -167,7 +167,7 @@ Examples:
 			if !quiet {
 				log.Infof("read sequence IDs from FASTA index ...")
 			}
-			IDs, _, err := getSeqIDAndLengthFromFaidxFile(newFile + ".fai")
+			IDs, _, err := getSeqIDAndLengthFromFaidxFile(newFile + ".fakit.fai")
 			checkError(err)
 			if !quiet {
 				log.Infof("%d sequences loaded", len(IDs))
@@ -220,7 +220,7 @@ Examples:
 
 			if !isPlainFile(file) && !keepTemp {
 				checkError(os.Remove(newFile))
-				checkError(os.Remove(newFile + ".fai"))
+				checkError(os.Remove(newFile + ".fakit.fai"))
 			}
 			return
 		}
@@ -300,7 +300,7 @@ Examples:
 			if !quiet {
 				log.Infof("read sequence IDs from FASTA index ...")
 			}
-			IDs, _, err := getSeqIDAndLengthFromFaidxFile(newFile + ".fai")
+			IDs, _, err := getSeqIDAndLengthFromFaidxFile(newFile + ".fakit.fai")
 			checkError(err)
 			if !quiet {
 				log.Infof("%d sequences loaded", len(IDs))
@@ -365,7 +365,7 @@ Examples:
 
 			if !isPlainFile(file) && !keepTemp {
 				checkError(os.Remove(newFile))
-				checkError(os.Remove(newFile + ".fai"))
+				checkError(os.Remove(newFile + ".fakit.fai"))
 			}
 			return
 		}
@@ -434,7 +434,7 @@ Examples:
 			if !quiet {
 				log.Infof("read sequence IDs from FASTA index ...")
 			}
-			IDs, _, err := getSeqIDAndLengthFromFaidxFile(newFile + ".fai")
+			IDs, _, err := getSeqIDAndLengthFromFaidxFile(newFile + ".fakit.fai")
 			checkError(err)
 			if !quiet {
 				log.Infof("%d sequences loaded", len(IDs))
@@ -492,7 +492,7 @@ Examples:
 
 			if !isPlainFile(file) && !keepTemp {
 				checkError(os.Remove(newFile))
-				checkError(os.Remove(newFile + ".fai"))
+				checkError(os.Remove(newFile + ".fakit.fai"))
 			}
 			return
 		}

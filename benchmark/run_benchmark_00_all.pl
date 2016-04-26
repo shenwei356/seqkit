@@ -22,7 +22,7 @@ perl $0 -n 5 run_benchmark_04_remove_duplicated_seqs_by_name.sh
 
 USAGE
 
-my $N = 4;    # run $N times
+my $N = 3;    # run $N times
 
 GetOptions( 'n=i' => \$N, )
   or die $usage;
@@ -32,13 +32,14 @@ my @tests = @ARGV;
 
 my $resultfile = "$0.benchmark.csv";
 open my $fh_result, ">", $resultfile or die "failed to write file: $resultfile\n";
-my $title_line = "test\tdataset\tapp\ttime_mean\ttime_stdev\n";
+my $title_line = "test\tdataset\tapp\ttime_mean\ttime_stdev\tmem_mean\tmem_stdev\n";
 print $fh_result $title_line;
 
 for my $test (@tests) {
     print STDERR "Test: $test\n";
 
     my $stat = {};    # dataset->app->round
+    my $stat_mem = {};
     my $t = ""; # test name
     # run $N times
     for my $n ( 1 .. $N ) {
@@ -53,7 +54,7 @@ for my $test (@tests) {
         die "failed to run:$cmd\n" if $fail;
 
         # stat
-        my ( $app, $dataset, $time );
+        my ( $app, $dataset, $time, $mem );
         open my $fh, "<", $outfile or die "failed to read file: $outfile\n";
         for my $line (<$fh>) {
             if ( $t eq "" and $line =~ /Test: (.+)/ ) {
@@ -65,13 +66,21 @@ for my $test (@tests) {
             if ( $line =~ /data: (.+)/ ) {
                 $dataset = $1;
             }
-            if ( $line =~ /real\t(\d+)m([\d\.]+)s/ ) {
-                $time = $1 * 60 + $2;
+            if ( $line =~ /time: (.+)/ ) {
+                $time = $1;
 
                 if ( not exists $$stat{$dataset}{$app} ) {
                     $$stat{$dataset}{$app} = [];
                 }
                 push @{ $$stat{$dataset}{$app} }, $time;
+            }
+            if ( $line =~ /rss: (\d+)/ ) {
+                $mem = $1;
+
+                if ( not exists $$stat_mem{$dataset}{$app} ) {
+                    $$stat_mem{$dataset}{$app} = [];
+                }
+                push @{ $$stat_mem{$dataset}{$app} }, $mem;
             }
         }
         close($fh);
@@ -88,10 +97,12 @@ for my $test (@tests) {
         my $st = $$stat{$dataset};
         for my $app ( sort keys %$st ) {
             my $times = $$st{$app};
+            my $mems = $$stat_mem{$dataset}{$app};
             my ( $time_mean, $time_stdev ) = mean_and_stdev($times);
+            my ( $mem_mean, $mem_stdev ) = mean_and_stdev($mems);
 
-            my $data_line = sprintf "%s\t%s\t%s\t%.2f\t%.2f\n", $t, $dataset, $app, $time_mean,
-              $time_stdev;
+            my $data_line = sprintf "%s\t%s\t%s\t%.2f\t%.2f\t%d\t%d\n",
+                        $t, $dataset, $app, $time_mean, $time_stdev,$mem_mean, $mem_stdev;
 
             printf $data_line;
             printf $fh $data_line;

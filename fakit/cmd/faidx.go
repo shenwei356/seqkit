@@ -51,7 +51,14 @@ var faidxCmd = &cobra.Command{
 				checkError(fmt.Errorf("gzipped file not supported"))
 			}
 
-			_, err := fai.CreateWithIDRegexp(file, config.IDRegexp)
+			var outFile string
+			if config.OutFile == "-" {
+				outFile = file + ".fa"
+			} else {
+				outFile = config.OutFile
+			}
+
+			_, err := fai.CreateWithIDRegexp(file, outFile, config.IDRegexp)
 			checkError(err)
 		}
 	},

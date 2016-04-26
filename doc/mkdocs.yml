@@ -1,4 +1,4 @@
-site_name: fakit - FASTA kit
+site_name: fakit - FASTA/Q kit
 pages:
 - Home: index.md
 - Download: download.md

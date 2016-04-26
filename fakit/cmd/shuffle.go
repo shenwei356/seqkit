@@ -135,7 +135,7 @@ So please delete .fai file created by samtools.
 
 		newFile := file
 		if !isPlainFile(file) {
-			newFile = file + ".fa"
+			newFile = file + ".fakit.fa"
 			if !quiet {
 				log.Infof("read and write sequences to tempory file: %s ...", newFile)
 			}
@@ -160,7 +160,7 @@ So please delete .fai file created by samtools.
 		if !quiet {
 			log.Infof("read sequence IDs from FASTA index ...")
 		}
-		ids, _, err := getSeqIDAndLengthFromFaidxFile(newFile + ".fai")
+		ids, _, err := getSeqIDAndLengthFromFaidxFile(newFile + ".fakit.fai")
 		checkError(err)
 		for i, id := range ids {
 			index2name[i] = id
@@ -202,7 +202,7 @@ So please delete .fai file created by samtools.
 
 		if !isPlainFile(file) && !keepTemp {
 			checkError(os.Remove(newFile))
-			checkError(os.Remove(newFile + ".fai"))
+			checkError(os.Remove(newFile + ".fakit.fai"))
 		}
 
 	},

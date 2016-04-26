@@ -1,33 +1,31 @@
-test	dataset	app	time_mean	time_stdev
-Revcom	dataset_A.fa	biogo	12.40	0.15
-Revcom	dataset_A.fa	fakit	4.82	0.08
-Revcom	dataset_A.fa	fasta_utilities	4.54	0.10
-Revcom	dataset_A.fa	pyfaidx	27.53	0.13
-Revcom	dataset_A.fa	seqmagick	14.40	0.22
-Revcom	dataset_A.fa	seqtk	0.97	0.05
-Revcom	dataset_B.fa	biogo	10.75	0.09
-Revcom	dataset_B.fa	fakit	6.07	0.05
-Revcom	dataset_B.fa	fasta_utilities	3.22	0.09
-Revcom	dataset_B.fa	pyfaidx	19.10	0.10
-Revcom	dataset_B.fa	seqmagick	10.77	0.20
-Revcom	dataset_B.fa	seqtk	1.15	0.04
-Search	dataset_A.fa	fakit	3.72	0.01
-Search	dataset_A.fa	fasta_utilities	4.41	0.07
-Search	dataset_A.fa	seqmagick	9.92	0.14
-Search	dataset_A.fa	seqtk	2.72	0.15
-Search	dataset_B.fa	fakit	2.05	0.02
-Search	dataset_B.fa	fasta_utilities	1.88	0.03
-Search	dataset_B.fa	seqmagick	7.50	0.20
-Search	dataset_B.fa	seqtk	2.86	0.12
-Sample	dataset_A.fa	fakit	1.55	0.01
-Sample	dataset_A.fa	seqmagick	5.71	0.02
-Sample	dataset_A.fa	seqtk	0.35	0.01
-Sample	dataset_B.fa	fakit	1.94	0.03
-Sample	dataset_B.fa	seqmagick	7.63	0.34
-Sample	dataset_B.fa	seqtk	0.71	0.01
-Rmdup	dataset_A_dup.fasta	fakit	3.49	0.01
-Rmdup	dataset_A_dup.fasta	seqmagick	14.77	0.10
-Rmdup	dataset_B_dup.fasta	fakit	3.64	0.04
-Rmdup	dataset_B_dup.fasta	seqmagick	13.17	0.39
-Subseq	chr1.fa.gz	fakit	14.60	0.21
-Subseq	chr1.fa.gz	seqtk	9.69	0.58
+test	dataset	app	time_mean	time_stdev	mem_mean	mem_stdev
+Reverse complement	dataset_A.fa	biogo	260.59	0.00	6572	0
+Reverse complement	dataset_A.fa	fakit	137.02	0.00	12444	0
+Reverse complement	dataset_A.fa	fasta_utilities	239.22	0.00	32440	0
+Reverse complement	dataset_A.fa	seqmagick	634.98	0.00	21868	0
+Reverse complement	dataset_A.fa	seqtk	18.64	0.00	1104	0
+Reverse complement	dataset_B.fa	biogo	105.87	0.00	1368496	0
+Reverse complement	dataset_B.fa	fakit	35.75	0.00	2378044	0
+Reverse complement	dataset_B.fa	fasta_utilities	33.71	0.00	1256268	0
+Reverse complement	dataset_B.fa	seqmagick	72.12	0.00	1378868	0
+Reverse complement	dataset_B.fa	seqtk	21.51	0.00	244796	0
+Searching by ID list	dataset_A.fa	fakit	193.88	0.00	941036	0
+Searching by ID list	dataset_A.fa	fasta_utilities	205.95	0.00	812568	0
+Searching by ID list	dataset_A.fa	seqmagick	327.17	0.00	522016	0
+Searching by ID list	dataset_A.fa	seqtk	27.03	0.00	704260	0
+Searching by ID list	dataset_B.fa	fakit	18.96	0.00	2306012	0
+Searching by ID list	dataset_B.fa	fasta_utilities	18.31	0.00	1256364	0
+Searching by ID list	dataset_B.fa	seqmagick	60.20	0.00	966600	0
+Searching by ID list	dataset_B.fa	seqtk	17.11	0.00	244816	0
+Sampling by number	dataset_A.fa	fakit	103.30	0.00	11976	0
+Sampling by number	dataset_A.fa	seqmagick	241.78	0.00	49948	0
+Sampling by number	dataset_A.fa	seqtk	5.64	0.00	5288	0
+Sampling by number	dataset_B.fa	fakit	36.48	0.00	2195608	0
+Sampling by number	dataset_B.fa	seqmagick	46.36	0.00	2879368	0
+Sampling by number	dataset_B.fa	seqtk	8.31	0.00	2817668	0
+Removing duplicates by seq content	dataset_A.fa	fakit	266.80	0.00	3141624	0
+Removing duplicates by seq content	dataset_A.fa	seqmagick	744.29	0.00	4678728	0
+Removing duplicates by seq content	dataset_B.fa	fakit	25.68	0.00	2183264	0
+Removing duplicates by seq content	dataset_B.fa	seqmagick	111.51	0.00	1123708	0
+Subsequence with BED file	dataset_B.fa	fakit	11.678	0.00	1913684	0
+Subsequence with BED file	dataset_B.fa	seqtk	11.18	0.00	246112	0

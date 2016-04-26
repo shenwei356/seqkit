@@ -6,12 +6,10 @@
 
 ## Current Version
 
-- [fakit v0.1.8](https://github.com/shenwei356/fakit/releases/tag/v0.1.8)
-    - add subcommand `rename` to rename duplicated IDs
-    - add subcommand `faidx` to create FASTA index file
-    - ***utilize faidx to improve performance of `subseq`***
-    - *`shuffle`, `sort` and split support two-pass mode (by flag `-2`) with faidx to reduce memory usage.*
-    - document update
+- [fakit v0.1.9](https://github.com/shenwei356/fakit/releases/tag/v0.1.9)
+    - using custom FASTA index file extension: `.fakit.fai`
+    - reducing memory usage of `sample --number --two-pass`
+    - ***change default CPU number to 2 for multi-cpus computer, and 1 for single-CPU computer***
 
 ## Installation
 
@@ -35,6 +33,12 @@ You can also add the directory of the executable file to environment variable
 
 ## Previous Versions
 
+- [fakit v0.1.8](https://github.com/shenwei356/fakit/releases/tag/v0.1.8)
+    - add subcommand `rename` to rename duplicated IDs
+    - add subcommand `faidx` to create FASTA index file
+    - ***utilize faidx to improve performance of `subseq`***
+    - *`shuffle`, `sort` and split support two-pass mode (by flag `-2`) with faidx to reduce memory usage.*
+    - document update
 - [fakit v0.1.7](https://github.com/shenwei356/fakit/releases/tag/v0.1.7)
     - ***add support for (multi-line) FASTQ format***
     - update document, add technical details

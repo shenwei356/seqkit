@@ -1,9 +1,0 @@
-test	dataset	app	time_mean	time_stdev
-Sample	dataset_A.fa	1	1.79	0.02
-Sample	dataset_A.fa	2	1.60	0.04
-Sample	dataset_A.fa	3	1.51	0.04
-Sample	dataset_A.fa	4	1.49	0.02
-Sample	dataset_B.fa	1	1.95	0.04
-Sample	dataset_B.fa	2	1.89	0.04
-Sample	dataset_B.fa	3	1.96	0.02
-Sample	dataset_B.fa	4	1.99	0.03

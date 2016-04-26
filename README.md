@@ -12,7 +12,7 @@ format. And the name was remained after adding seamless support for FASTQ fromat
 ## Introduction
 
 FASTA and FASTQ are basic formats for storing nucleotide and protein sequences.
-The manipulation of FASTA/Q file includes converting, clipping, searching,
+The manipulations of FASTA/Q file includes converting, clipping, searching,
 filtering, deduplication, splitting, shuffling, sampling and so on.
 Existed tools only implemented parts of the functions,
 and some of them are only available for specific operating systems.
@@ -30,8 +30,8 @@ from either standard stream or files, therefore, it could be easily used in pipe
   see [download](http://shenwei356.github.io/fakit/download/))
 - **Light weight and out-of-the-box, no dependencies, no compilation, no configuration**
   (see [download](http://shenwei356.github.io/fakit/download/))
-- **Fast** (see [benchmark](/#performance-comparison-with-other-tools)),
-  **multiple-CPUs supported** (see [benchmark](/#speedup-with-multi-threads)).
+- **Fast** (see [benchmark](/#benchmark)),
+  **multiple-CPUs supported**.
 - **Practical functions supported by 18 subcommands** (see subcommands and
   [usage](http://shenwei356.github.io/fakit/usage/) )
 - **Well documented** (detailed [usage](http://shenwei356.github.io/fakit/usage/)
@@ -140,16 +140,17 @@ You can also add the directory of the executable file to environment variable
 **Global Flags**
 
 ```
-      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which fakit guesses the sequence type (default 10000)
-  -b, --buffer-size int                 buffer size of chunks (default value is the CPUs number of your computer) (default 4)
-  -c, --chunk-size int                  chunk size (attention: unit is FASTA records not lines) (default 1000)
+      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which fakit guesses the sequence type (0 for whole seq) (default 10000)
+  -b, --buffer-size int                 buffer size of chunks (0 for no buffer) (default 1)
+  -c, --chunk-size int                  chunk size (attention: unit is FASTA records not lines) (default 1)
       --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
       --id-regexp string                regular expression for parsing ID (default "^([^\\s]+)\\s?")
   -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
   -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
       --quiet                           be quiet and do not show extra information
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
-  -j, --threads int                     number of CPUs. (default value is the CPUs number of your computer) (default 4)
+  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
+      --validate-seq-length int         length of sequence prefix of based on which fakit validates the alphabets (0 for whole seq) (default 10000)
 
 ```
 
@@ -157,7 +158,7 @@ You can also add the directory of the executable file to environment variable
 
 ### Reading FASTA/Q
 
-fakit use author's bioinformatics packages [bio](https://github.com/shenwei356/bio)
+fakit uses author's bioinformatics packages [bio](https://github.com/shenwei356/bio)
 for FASTA/Q parsing, which **asynchronously parse FASTA/Q records and buffer them
 in chunks**. The parser returns one chunk of records for each call.
 
@@ -177,38 +178,43 @@ And the buffer size is configurable by global flag `-b` or `--buffer-size`
 (default value is 1). You may set with higher
 value for short sequences to imporve performance.
 
-***In summary, set smaller value for `-c` and `-b` when handling big FASTA file
-like human genomes.***
+***In summary, set smaller value for `-c` (`--chunk-size`) and
+ `-b` (`--buffer-size`) when handling big FASTA file like human genomes.***
 
 ### FASTA index
 
-For commands, including `subseq`, `split`, `sort` and `shuffle`,
-when input files are FASTA files, FASTA index would be optional used for
+For some commands, including `subseq`, `split`, `sort` and `shuffle`,
+when input files are (plain or gzipped) FASTA files,
+FASTA index would be optional used for
 rapid acccess of sequences and reducing memory occupation.
 
-ATTENTION: the .fai file created by fakit is a little different from .fai file
+ATTENTION: the `.fakit.fai` file created by fakit is a little different from .fai file
 created by samtools. fakit uses full sequence head instead of just ID as key.
-So please delete .fai file created by samtools.
 
 ### Parallelization of CPU intensive jobs
 
 Most of the manipulations of FASTA/Q files are I/O intensive, to improve the
 performance, asynchronous parsing strategy is used.
 
+The validation of sequences bases and complement process of sequences
+are parallelized for large sequences.
+
 For CPU intensive jobs like `grep` with regular expressions and `locate` with
 sequence motifs. The processes are parallelized
 with "Map-Reduce" model by multiple goroutines in golang which are similar to but much
 lighter weight than threads. The concurrency number is configurable with global
-flag `-j` or `--threads`.
-
-Most of the time you can just use the default value. i.e. the number of CPUs
-of your computer.
+flag `-j` or `--threads` (default value: 1 for single-CPU PC, 2 for others).
 
 ### Memory occupation
 
 Most of the subcommands do not read whole FASTA/Q records in to memory,
 including `stat`, `fq2fa`, `fx2tab`, `tab2fx`, `grep`, `locate`, `replace`,
  `seq`, `sliding`, `subseq`. They just temporarily buffer chunks of records.
+
+However when handling big sequences, e.g. human genome, the memory is high
+(2-3 GB) even the buffer size is 1.
+This is due to the limitation of Go programming language, it may be solved
+in the future.
 
 Note that when using `subseq --gtf | --bed`, if the GTF/BED files are too
 big, the memory usage will increase.
@@ -237,25 +243,18 @@ reproduced in different environments with same random seed.
 
 ## Benchmark
 
-Details: [http://shenwei356.github.io/fakit/benchmark/](http://shenwei356.github.io/fakit/benchmark/)
+More details: [http://shenwei356.github.io/fakit/benchmark/](http://shenwei356.github.io/fakit/benchmark/)
 
-All tests were repeated 4 times.
+![benchmark-reverse-complement.png](benchmark/benchmark-reverse-complement.png)
 
-### Performance comparison with other tools
+![benchmark-reverse-complement.png](benchmark/benchmark-searching-by-id-list.png)
 
-Missing data indicates that the tool does not have the function.
+![benchmark-reverse-complement.png](benchmark/benchmark-sampling-by-number.png)
 
-Result also shows that **the self-implemented FASTA parsing module has better performance than
-the [biogo](https://github.com/biogo/biogo)**, a bioinformatics library for Go.
+![benchmark-reverse-complement.png](benchmark/benchmark-removing-duplicates-by-seq-content.png)
 
-For the revese complementary sequence test,
-the `fasta_utilities`, `seqmagick` and `seqtk` do not validate the bases/residues, which save some times.
+![benchmark-reverse-complement.png](benchmark/benchmark-subsequence-with-bed-file.png)
 
-![benchmark_colorful.png](benchmark/benchmark_colorful.png)
-
-### Acceleration with multi-CPUs
-
-![benchmark_colorful.png](benchmark/fakit_multi_threads/benchmark_colorful.png)
 
 ## Contact
 

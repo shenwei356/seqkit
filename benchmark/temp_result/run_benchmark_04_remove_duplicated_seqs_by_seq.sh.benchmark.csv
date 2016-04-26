@@ -1,5 +1,0 @@
-test	dataset	app	time_mean	time_stdev
-Rmdup	dataset_A_dup.fasta	fakit	3.49	0.01
-Rmdup	dataset_A_dup.fasta	seqmagick	14.77	0.10
-Rmdup	dataset_B_dup.fasta	fakit	3.64	0.04
-Rmdup	dataset_B_dup.fasta	seqmagick	13.17	0.39
