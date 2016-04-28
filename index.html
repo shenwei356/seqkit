@@ -434,7 +434,7 @@ from either standard stream or files, therefore, it could be easily used in pipe
  executable binary files <strong>for most popular operating system</strong> are freely available
   in <a href="https://github.com/shenwei356/fakit/releases">release</a> page.</p>
 <p>Just <a href="https://github.com/shenwei356/fakit/releases">download</a> gzip-compressed
-executable file of your operating system, and uncompress it with <code>gzip -d *.gz</code> command,
+executable file of your operating system, and uncompress it with <code>tar -zxvf *.tar.gz</code> command,
 rename it to <code>fakit.exe</code> (Windows) or <code>fakit</code> (other operating systems) for convenience.</p>
 <p>You may need to add executable permision by <code>chmod a+x fakit</code>.</p>
 <p>You can also add the directory of the executable file to environment variable
@@ -445,11 +445,12 @@ rename it to <code>fakit.exe</code> (Windows) or <code>fakit</code> (other opera
 </li>
 <li>
 <p>For Linux, type:</p>
-<p>chmod a+x /PATH/OF/FASTCOV/fakit
-  echo export PATH=\$PATH:/PATH/OF/FASTCOV &gt;&gt; ~/.bashrc</p>
+<pre><code>chmod a+x /PATH/OF/FASTCOV/fakit
+echo export PATH=\$PATH:/PATH/OF/FASTCOV &gt;&gt; ~/.bashrc
+</code></pre>
+<p>or simply copy it to <code>/usr/local/bin</code></p>
 </li>
 </ol>
-<p>or simply copy it to <code>/usr/local/bin</code></p>
 <h2 id="subcommands">Subcommands</h2>
 <p>18 in total.</p>
 <p><strong>Sequence and subsequence</strong></p>
@@ -649,5 +650,5 @@ propose new functions or ask for help.</p>
 
 <!--
 MkDocs version : 0.15.3
-Build Date UTC : 2016-04-28 04:56:42.590919
+Build Date UTC : 2016-04-28 05:01:27.800339
 -->
