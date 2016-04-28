@@ -595,6 +595,12 @@ reproduced in different environments with same random seed.</p>
 <p><a href="http://shenwei356.github.io/fakit/tutorial/">Tutorial</a></p>
 <h2 id="benchmark">Benchmark</h2>
 <p>More details: <a href="http://shenwei356.github.io/fakit/benchmark/">http://shenwei356.github.io/fakit/benchmark/</a></p>
+<p>Datasets:</p>
+<pre><code>$ fakit stat *.fa
+file           seq_format   seq_type   num_seqs   min_len        avg_len       max_len
+dataset_A.fa   FASTA        DNA          67,748        56       41,442.5     5,976,145                  
+dataset_B.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
+</code></pre>
 <p><img alt="benchmark-5tests.csv.png" src="./benchmark/benchmark.5tests.csv.png" /></p>
 <p>Performance of other functions in fakit:</p>
 <p><img alt="benchmark-fakit.csv.png" src="./benchmark/benchmark.fakit.csv.png" /></p>
@@ -650,5 +656,5 @@ propose new functions or ask for help.</p>
 
 <!--
 MkDocs version : 0.15.3
-Build Date UTC : 2016-04-28 05:01:27.800339
+Build Date UTC : 2016-04-28 15:40:35.408534
 -->
