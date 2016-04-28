@@ -176,26 +176,67 @@
 
 <h1 id="usage-and-examples">Usage and Examples</h1>
 <h2 id="technical-details-and-guides-for-use">Technical details and guides for use</h2>
-<h3 id="reading-fastaq">Reading FASTA/Q</h3>
+<h3 id="fastaq-format-parsing">FASTA/Q format parsing</h3>
 <p>fakit uses author's bioinformatics packages <a href="https://github.com/shenwei356/bio">bio</a>
-for FASTA/Q parsing, which <strong>asynchronously parse FASTA/Q records and buffer them
-in chunks</strong>. The parser returns one chunk of records for each call.</p>
-<p><strong>Asynchronous parsing</strong> saves much time because these's no waiting interval for
+for FASTA/Q parsing, which <strong><em>asynchronously parse FASTA/Q records and buffer them
+in chunks</em></strong>. The parser returns one chunk of records for each call.</p>
+<p>Asynchronous parsing saves much time because these's no waiting interval for
 parsed records being handled.
-The strategy of <strong>records chunks</strong> reduces data exchange in parallelly handling
+The strategy of records chunks reduces data exchange in parallelly handling
 of sequences, which could also improve performance.</p>
 <p>Since using of buffers and chunks, the memory occupation will be higher than
 cases of reading sequence one by one.
 The default value of chunk size (configurable by global flag <code>-c</code> or <code>--chunk-size</code>)
 is 1, which is suitable for most of cases.
 But for manipulating short sequences, e.g. FASTQ or FASTA of short sequences,
-you could set higher value, e.g. 1000.
+you could set higher value, e.g. 100.
 For big genomes like human genome, smaller chunk size is prefered, e.g. 1.
 And the buffer size is configurable by global flag <code>-b</code> or <code>--buffer-size</code>
 (default value is 1). You may set with higher
 value for short sequences to imporve performance.</p>
-<p><strong><em>In summary, set smaller value for <code>-c</code> (<code>--chunk-size</code>) and
- <code>-b</code> (<code>--buffer-size</code>) when handling big FASTA file like human genomes.</em></strong></p>
+<h3 id="sequence-formats-and-types">Sequence formats and types</h3>
+<p>fakit seamlessly support FASTA and FASTQ format.
+All subcommands except for <code>faidx</code> can handle both formats.
+And only when some commands (<code>subseq</code>, <code>split</code>, <code>sort</code> and <code>shuffle</code>)
+which utilise FASTA index to improve perfrmance for large files in two pass mode
+(by flag <code>--two-pass</code>), only FASTA format is supported.</p>
+<p>Sequence format is automatically detected by the first character of the file
+or STDIN.</p>
+<p>Sequence type (DNA/RNA/Protein) is automatically detected by leading subsequences
+of the first sequences in file or STDIN. The length of the leading subsequences
+is configurable by global flag <code>--alphabet-guess-seq-length</code> with default value
+of 10000. If length of the sequences is less than that, whole sequences will
+be checked.</p>
+<h3 id="sequence-id">Sequence ID</h3>
+<p>By default, most softwares, including <code>fakit</code>, takes the first non-space
+letters as sequence ID. For example,</p>
+<table>
+<thead>
+<tr>
+<th align="left">FASTA head</th>
+<th align="left">ID</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">&gt;123456 gene name</td>
+<td align="left">123456</td>
+</tr>
+<tr>
+<td align="left">&gt;longname</td>
+<td align="left">longname</td>
+</tr>
+<tr>
+<td align="left">&gt;gi&#124;110645304&#124;ref&#124;NC_002516.2&#124; Pseudomona</td>
+<td align="left">gi&#124;110645304&#124;ref&#124;NC_002516.2&#124;</td>
+</tr>
+</tbody>
+</table>
+<p>But for some sequences from NCBI,
+e.g. <code>&gt;gi|110645304|ref|NC_002516.2| Pseudomona</code>, the ID is <code>NC_002516.2</code>.
+In this case, we could set sequence ID parsing regular expression by global flag
+<code>--id-regexp "\|([^\|]+)\| "</code> or just use flag <code>--id-ncbi</code>. If you want
+the <code>gi</code> number, then use <code>--id-regexp "^gi\|([^\|]+)\|"</code>.</p>
 <h3 id="fasta-index">FASTA index</h3>
 <p>For some commands, including <code>subseq</code>, <code>split</code>, <code>sort</code> and <code>shuffle</code>,
 when input files are (plain or gzipped) FASTA files,
@@ -239,7 +280,7 @@ reproduced in different environments with same random seed.</p>
 <p>Usage</p>
 <pre><code>fakit -- a cross-platform and efficient suit for FASTA/Q file manipulation
 
-Version: 0.1.9
+Version: 0.2.0
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -280,7 +321,6 @@ Flags:
       --quiet                           be quiet and do not show extra information
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default &quot;auto&quot;)
   -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
-      --validate-seq-length int         length of sequence prefix of based on which fakit validates the alphabets (0 for whole seq) (default 10000)
 
 Use &quot;fakit [command] --help&quot; for more information about a command.
 
@@ -330,18 +370,20 @@ Usage:
   fakit seq [flags]
 
 Flags:
-  -p, --complement          complement sequence (blank for Protein sequence)
-      --dna2rna             DNA to RNA
-  -G, --gap-letter string   gap letters (default &quot;- &quot;)
-  -l, --lower-case          print sequences in lower case
-  -n, --name                only print names
-  -i, --only-id             print ID instead of full head
-  -q, --qual                only print qualities
-  -g, --remove-gaps         remove gaps
-  -r, --reverse             reverse sequence)
-      --rna2dna             RNA to DNA
-  -s, --seq                 only print sequences
-  -u, --upper-case          print sequences in upper case
+  -p, --complement                complement sequence (blank for Protein sequence)
+      --dna2rna                   DNA to RNA
+  -G, --gap-letter string         gap letters (default &quot;- &quot;)
+  -l, --lower-case                print sequences in lower case
+  -n, --name                      only print names
+  -i, --only-id                   print ID instead of full head
+  -q, --qual                      only print qualities
+  -g, --remove-gaps               remove gaps
+  -r, --reverse                   reverse sequence)
+      --rna2dna                   RNA to DNA
+  -s, --seq                       only print sequences
+  -u, --upper-case                print sequences in upper case
+  -v, --validate-seq              validate bases according to the alphabet
+  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
 
 </code></pre>
 

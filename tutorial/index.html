@@ -157,9 +157,41 @@ used to check the peek memory usage of fakit. Usage: <code>memusg [-t] command</
 <ol>
 <li>
 <p>Human genome</p>
-<pre><code>$  fakit stat hsa.fa
+<pre><code>$ fakit stat hsa.fa
 file     seq_format   seq_type   num_seqs   min_len        avg_len       max_len
 hsa.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
+</code></pre>
+</li>
+<li>
+<p>Build FASTA index (<strong><em>optional</em></strong>, when using flag <code>-2</code> (<code>--two-pass</code>),
+   some commands will automaticlly build it).
+   For some commands, including <code>subseq</code>, <code>split</code>, <code>sort</code> and <code>shuffle</code>,
+   when input files are (plain or gzipped) FASTA files or stdin,
+   FASTA index would be optional used for
+   rapid acccess of sequences and reducing memory occupation.
+   <strong><em>ATTENTION</em></strong>: the <code>.fakit.fai</code> file created by fakit is a little different from .fai file
+   created by samtools. fakit uses full sequence head instead of just ID as key.</p>
+<pre><code>$ memusg -t fakit faidx --id-regexp "^(.+)$"  hsa.fa -o hsa.fa.fakit.fai
+
+elapsed time: 10.011s
+peak rss: 177.21 MB
+</code></pre>
+<p>Create common .fai file:</p>
+<pre><code>$ memusg -t fakit faidx hsa.fa -o hsa.fa.fai2
+
+elapsed time: 10.454s
+peak rss: 172.82 MB
+</code></pre>
+<p>Performance of samtools:</p>
+<pre><code>$ memusg -t samtools faidx hsa.fa
+
+elapsed time: 9.574s
+peak rss: 1.45 MB
+</code></pre>
+<p>Exactly same content:</p>
+<pre><code>$ md5sum hsa.fa.fai*
+21e0c25b4d817d1c19ee8107191b9b31  hsa.fa.fai
+21e0c25b4d817d1c19ee8107191b9b31  hsa.fa.fai2
 </code></pre>
 </li>
 <li>
@@ -171,8 +203,8 @@ hsa.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
 [INFO] sorting ...
 [INFO] output ...
 
-elapsed time: 25.533s
-peak rss: 4.62 GB
+elapsed time: 5.021s
+peak rss: 2.93 GB
 </code></pre>
 <p>Detail:</p>
 <pre><code>$ fakit fx2tab --length hsa.sorted.fa --name --only-id | cut -f 1,4 | more
@@ -213,14 +245,13 @@ sys     0m0.917s
 <p>Shuffling sequences</p>
 <pre><code>$ memusg -t fakit shuffle hsa.fa --two-pass &gt; hsa.shuffled.fa
 [INFO] create and read FASTA index ...
-[INFO] create FASTA index for hsa.fa
 [INFO] read sequence IDs from FASTA index ...
 [INFO] 194 sequences loaded
 [INFO] shuffle ...
 [INFO] output ...
 
-elapsed time: 37.248s
-peak rss: 5.25 GB
+elapsed time: 4.738s
+peak rss: 2.78 GB
 </code></pre>
 </li>
 <li>
@@ -237,8 +268,8 @@ peak rss: 5.25 GB
 [INFO] write 1 sequences to file: hsa.id_KI270468.1.fa
 ...
 
-elapsed time: 24.183s
-peak rss: 4.79 GB
+elapsed time: 19.324s
+peak rss: 3.91 GB
 </code></pre>
 </li>
 <li>
