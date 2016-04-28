@@ -258,6 +258,13 @@ reproduced in different environments with same random seed.
 
 More details: [http://shenwei356.github.io/fakit/benchmark/](http://shenwei356.github.io/fakit/benchmark/)
 
+Datasets:
+
+    $ fakit stat *.fa
+    file           seq_format   seq_type   num_seqs   min_len        avg_len       max_len
+    dataset_A.fa   FASTA        DNA          67,748        56       41,442.5     5,976,145                  
+    dataset_B.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
+
 ![benchmark-5tests.csv.png](benchmark/benchmark.5tests.csv.png)
 
 Performance of other functions in fakit:
