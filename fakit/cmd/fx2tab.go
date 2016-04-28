@@ -99,12 +99,17 @@ like sequence length, GC content/GC skew.
 					if onlyName {
 						outfh.WriteString(fmt.Sprintf("%s\t%s\t%s", name, "", ""))
 					} else {
-						outfh.WriteString(fmt.Sprintf("%s\t%s\t%s", name,
-							record.Seq.Seq, record.Seq.Qual))
+						//outfh.WriteString(fmt.Sprintf("%s\t%s\t%s", name,
+						//	record.Seq.Seq, record.Seq.Qual))
+						outfh.WriteString(fmt.Sprintf("%s\t", name))
+						outfh.Write(record.Seq.Seq)
+						outfh.WriteString("\t")
+						outfh.Write(record.Seq.Qual)
+
 					}
 
 					if printLength {
-						outfh.WriteString(fmt.Sprintf("\t%d", record.Seq.Length()))
+						outfh.WriteString(fmt.Sprintf("\t%d", len(record.Seq.Seq)))
 					}
 					if printGC || printGCSkew {
 						g = record.Seq.BaseContent("G")

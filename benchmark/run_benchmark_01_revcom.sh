@@ -22,7 +22,7 @@ for f in dataset_{A,B}.fa; do
     /bin/rm $f.fautil.rc;
 done
 
-# out of memory
+# too high memory usage and too slow
 # echo == pyfaidx
 # for f in dataset_{A,B}.fa; do
 #     echo data: $f;

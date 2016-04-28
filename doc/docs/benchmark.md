@@ -4,7 +4,7 @@
 ## Softwares
 
 1. [fakit](https://github.com/shenwei356/fakit). (Go).
-   Version [v0.1.9](https://github.com/shenwei356/fakit/releases/tag/v0.1.9).
+   Version [v0.2.0](https://github.com/shenwei356/fakit/releases/tag/v0.2.0).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    Lots of dependencies to install_.
@@ -15,11 +15,16 @@
    Version 0.6.1
 1. [seqtk](https://github.com/lh3/seqtk). (C).
    Version [1.0-r82-dirty](https://github.com/lh3/seqtk/commit/4feb6e81444ab6bc44139dd3a125068f81ae4ad8).
+1. [biogo]
+
 
 Not used:
 
 1. [pyfaidx](https://github.com/mdshw5/pyfaidx). (Python).
    Version [0.4.7.1](https://pypi.python.org/packages/source/p/pyfaidx/pyfaidx-0.4.7.1.tar.gz#md5=f33604a3550c2fa115ac7d33b952127d). *Not used, because it exhausted my memory (10G) when computing reverse-complement on a 5GB fasta file of 250 bp.*
+
+A Python script [memusg](https://github.com/shenwei356/memusg) was used
+to compute running time and peak memory usage of a process.
 
 ## Features
 
@@ -52,19 +57,48 @@ Rename head      | Yes      | Yes             | --            | --      | Yes   
 
 ### dataset_A.fa - large number of short sequences
 
-to be updated.
+Dataset A is reference genomes DNA sequences of gastrointestinal tract from
+[NIH Human Microbiome Project](http://hmpdacc.org/):
+[`Gastrointestinal_tract.nuc.fsa`](http://downloads.hmpdacc.org/data/reference_genomes/body_sites/Gastrointestinal_tract.nuc.fsa) (FASTA format, ~2.7G).
 
 ### dataset_B.fa - small number of large sequences
 
-Human genome from [ensembl](http://uswest.ensembl.org/info/data/ftp/index.html)
+Dataset B is Human genome from [ensembl](http://uswest.ensembl.org/info/data/ftp/index.html).
 
-- Genome DNA:  [`Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz`](ftp://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz)
-- GTF:  [`Homo_sapiens.GRCh38.84.gtf.gz`](ftp://ftp.ensembl.org/pub/release-84/gtf/homo_sapiens/Homo_sapiens.GRCh38.84.gtf.gz)
-- BED: `Homo_sapiens.GRCh38.84.bed.gz` was converted from `Homo_sapiens.GRCh38.84.gtf.gz` by  [`gtf2bed`](http://bedops.readthedocs.org/en/latest/content/reference/file-management/conversion/gtf2bed.html?highlight=gtf2bed)  with command
+- Genome DNA:  [`Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz`](ftp://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz) (Gzipped FASTA file, ~900M)
+- GTF file:  [`Homo_sapiens.GRCh38.84.gtf.gz`](ftp://ftp.ensembl.org/pub/release-84/gtf/homo_sapiens/Homo_sapiens.GRCh38.84.gtf.gz) (~44M)
+- BED file: `Homo_sapiens.GRCh38.84.bed.gz` was converted from `Homo_sapiens.GRCh38.84.gtf.gz` by  [`gtf2bed`](http://bedops.readthedocs.org/en/latest/content/reference/file-management/conversion/gtf2bed.html?highlight=gtf2bed)  with command
 
-        zcat Homo_sapiens.GRCh38.84.gtf.gz | gtf2bed --do-not-sort | gzip -c > Homo_sapiens.GRCh38.84.bed.gz
+        $ zcat Homo_sapiens.GRCh38.84.gtf.gz | gtf2bed --do-not-sort | gzip -c > Homo_sapiens.GRCh38.84.bed.gz
 
-to be updated.
+Summary
+
+    $ fakit stat *.fa
+    file           seq_format   seq_type   num_seqs   min_len        avg_len       max_len
+    dataset_A.fa   FASTA        DNA          67,748        56       41,442.5     5,976,145                  
+    dataset_B.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
+
+### Sequence ID list
+
+Parts of sequences IDs was sampled and shuffled from original data.
+There were used in test of extracting sequences by ID list.
+
+Commands:
+
+    $ fakit sample -p 0.3 dataset_A.fa | fakit seq --name --only-id | shuf > ids_A.txt
+    $ fakit sample -p 0.3 dataset_B.fa | fakit seq --name --only-id | shuf > ids_B.txt
+
+Numbers:
+
+    $ wc -l ids_*
+    20138 ids_A.txt
+       58 ids_B.txt
+
+### BED file
+
+Only BED data of chromosome 19 was used in test of subsequence with BED file:
+
+    $ zcat Homo_sapiens.GRCh38.84.bed.gz | grep -E "^19" | gzip -c > chr19.bed.gz
 
 
 ## Platform
@@ -81,35 +115,52 @@ Softwares:
 - Perl: perl 5, version 22, subversion 1 (v5.22.1) built for x86_64-linux-thread-multi
 - Python: Python 2.7.10 (default, Sep  8 2015, 17:20:17) [GCC 5.1.1 20150618 (Red Hat 5.1.1-4)] on linux2
 
+## Tests
 
-## Automatic benchmark and plotting scripts
+Automatic benchmark and plotting scripts are available at:  [https://github.com/shenwei356/fakit/tree/master/benchmark](https://github.com/shenwei356/fakit/tree/master/benchmark).
 
-Scripts are available at:  [https://github.com/shenwei356/fakit/tree/master/benchmark](https://github.com/shenwei356/fakit/tree/master/benchmark)
+All tests were repeated 3 times ( ~20 min for one time),
+and average time and peak memory ware used for plotting.
 
-One round test takes ~70 min, so only all tests were only repeated 1 times.
+All data were readed once before tests began to minimize the influence of page cache.
 
-## Test 1. Reverse Complement
+### Test 1. Reverse Complement
 
-## Test 2. Extract sequencs by ID list
+Output sequences of all Softwares were not wrapped to fixed length.
 
-## Test 3. Sampling by number
+`revcom_biogo` ([source](https://github.com/shenwei356/fakit/blob/master/benchmark/revcom_biogo.go),
+ [binary](https://github.com/shenwei356/fakit/raw/master/benchmark/revcom_biogo) ),
+ a tool written in Golang using [biogo](https://github.com/biogo/biogo) package,
+ was also used for comparison of FASTA file parsing performance.
 
-## Test 4. Removing duplicates by seq content
+[Commands](https://github.com/shenwei356/fakit/blob/master/benchmark/run_benchmark_01_revcom.sh)
 
-## Test 5. Subsequence with BED file
+### Test 2. Extracting sequencs by ID list
 
-## Result
+[Commands](https://github.com/shenwei356/fakit/blob/master/benchmark/run_benchmark_02_exctact_by_id_list.sh)
 
-![benchmark-reverse-complement.png](benchmark/benchmark-reverse-complement.png)
+### Test 3. Sampling by number
 
-![benchmark-reverse-complement.png](benchmark/benchmark-searching-by-id-list.png)
+Note that different softwares have different sampling strategies,
+the peak memory may depends on size of sampled sequences.
 
-![benchmark-reverse-complement.png](benchmark/benchmark-sampling-by-number.png)
+[Commands](https://github.com/shenwei356/fakit/blob/master/benchmark/run_benchmark_03_sampling.sh)
 
-![benchmark-reverse-complement.png](benchmark/benchmark-removing-duplicates-by-seq-content.png)
+### Test 4. Removing duplicates by sequence content
 
-![benchmark-reverse-complement.png](benchmark/benchmark-subsequence-with-bed-file.png)
+[Commands](https://github.com/shenwei356/fakit/blob/master/benchmark/run_benchmark_04_remove_duplicated_seqs_by_seq.sh)
 
+### Test 5. Subsequence with BED file
+
+[Commands](https://github.com/shenwei356/fakit/blob/master/benchmark/run_benchmark_05_subseq_with_bed.sh)
+
+## Results
+
+![benchmark-5tests.csv.png](benchmark/benchmark.5tests.csv.png)
+
+Performance of other functions in fakit:
+
+![benchmark-fakit.csv.png](benchmark/benchmark.fakit.csv.png)
 
 <div id="disqus_thread"></div>
 <script>

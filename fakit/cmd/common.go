@@ -160,7 +160,7 @@ var commonCmd = &cobra.Command{
 			for _, record := range chunk.Data {
 				name := string(record.Name)
 				if _, ok := namesOK[name]; ok && namesOK[name] > 0 {
-					outfh.WriteString(record.Format(lineWidth))
+					record.FormatToWriter(outfh, lineWidth)
 					namesOK[name] = 0
 				}
 			}

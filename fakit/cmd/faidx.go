@@ -53,7 +53,7 @@ var faidxCmd = &cobra.Command{
 
 			var outFile string
 			if config.OutFile == "-" {
-				outFile = file + ".fa"
+				outFile = file + ".fai"
 			} else {
 				outFile = config.OutFile
 			}

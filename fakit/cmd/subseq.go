@@ -195,8 +195,7 @@ Examples:
 
 		for _, file := range files {
 			// plain fasta, using Faidx
-			if isPlainFile(file) {
-
+			if !isStdin(file) && isPlainFile(file) {
 				// check seq format, ignoring fastq
 				alphabet2, isFastq, err := fastx.GuessAlphabet(file)
 				checkError(err)
@@ -232,8 +231,10 @@ Examples:
 
 								s, e, _ := seq.SubLocation(r.Length, start, end)
 								subseq := subseqByFaix(faidx, chr2, r, start, end)
-								outfh.WriteString(fmt.Sprintf(">%s_%d-%d %s\n%s\n",
-									chr, s, e, chr2, byteutil.WrapByteSlice(subseq, lineWidth)))
+								outfh.WriteString(fmt.Sprintf(">%s_%d-%d %s\n",
+									chr, s, e, chr2))
+								outfh.Write(byteutil.WrapByteSlice(subseq, lineWidth))
+								outfh.WriteString("\n")
 							}
 							continue
 						} else {
@@ -336,8 +337,8 @@ Examples:
 type type2gtfFeatures map[string][]gtf.Feature
 
 func subseqByRegion(outfh *xopen.Writer, record *fastx.Record, lineWidth int, start, end int) {
-	record.Seq = record.Seq.SubSeq(start, end)
-	outfh.WriteString(record.Format(lineWidth))
+	record.Seq = record.Seq.SubSeqInplace(start, end)
+	record.FormatToWriter(outfh, lineWidth)
 }
 
 func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
@@ -373,10 +374,10 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 						e = feature.Start - 1
 					}
 				} else {
-					s = feature.Start - downStream // seq.SubSeq will check it
+					s = feature.Start - downStream // seq.SubSeqInplace will check it
 					e = feature.End + upStream
 				}
-				subseq = record.Seq.SubSeq(s, e).RevCom()
+				subseq = record.Seq.SubSeqInplace(s, e).RevComInplace()
 			} else {
 				if onlyFlank {
 					if upStream > 0 {
@@ -390,7 +391,7 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 					s = feature.Start - upStream
 					e = feature.End + downStream
 				}
-				subseq = record.Seq.SubSeq(s, e)
+				subseq = record.Seq.SubSeqInplace(s, e)
 			}
 
 			if feature.Strand == nil {
@@ -423,7 +424,7 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 			outname = fmt.Sprintf("%s_%d-%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, geneID)
 			newRecord, err := fastx.NewRecord(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq)
 			checkError(err)
-			outfh.WriteString(newRecord.Format(lineWidth))
+			outfh.Write(newRecord.Format(lineWidth))
 		}
 	}
 }
@@ -449,10 +450,10 @@ func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 					e = feature.Start - 1
 				}
 			} else {
-				s = feature.Start - downStream // seq.SubSeq will check it
+				s = feature.Start - downStream // seq.SubSeqInplace will check it
 				e = feature.End + upStream
 			}
-			subseq = record.Seq.SubSeq(s, e).RevCom()
+			subseq = record.Seq.SubSeqInplace(s, e).RevComInplace()
 		} else {
 			if onlyFlank {
 				if upStream > 0 {
@@ -466,7 +467,7 @@ func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 				s = feature.Start - upStream
 				e = feature.End + downStream
 			}
-			subseq = record.Seq.SubSeq(s, e)
+			subseq = record.Seq.SubSeqInplace(s, e)
 		}
 
 		if feature.Strand == nil {
@@ -496,7 +497,7 @@ func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 		outname = fmt.Sprintf("%s_%d-%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, geneID)
 		newRecord, err := fastx.NewRecord(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq)
 		checkError(err)
-		outfh.WriteString(newRecord.Format(lineWidth))
+		outfh.Write(newRecord.Format(lineWidth))
 	}
 }
 

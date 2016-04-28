@@ -48,10 +48,6 @@ var seqCmd = &cobra.Command{
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
-		seq.ValidateSeq = true
-		seq.ValidateWholeSeq = false
-		seq.ValidSeqLengthThreshold = config.ValidateSeqLength
-		seq.ValidSeqThreads = config.Threads
 		runtime.GOMAXPROCS(config.Threads)
 
 		reverse := getFlagBool(cmd, "reverse")
@@ -66,6 +62,18 @@ var seqCmd = &cobra.Command{
 		upperCase := getFlagBool(cmd, "upper-case")
 		dna2rna := getFlagBool(cmd, "dna2rna")
 		rna2dna := getFlagBool(cmd, "rna2dna")
+		validateSeq := getFlagBool(cmd, "validate-seq")
+		validateSeqLength := getFlagValidateSeqLength(cmd, "validate-seq-length")
+
+		seq.ValidateSeq = validateSeq
+		seq.ValidateWholeSeq = false
+		seq.ValidSeqLengthThreshold = validateSeqLength
+		seq.ValidSeqThreads = config.Threads
+
+		if !(alphabet == nil || alphabet == seq.Unlimit) {
+			log.Info("when flag -t (--seq-type) given, flag -v (--validate-seq) is automatically switched on")
+			seq.ValidateSeq = true
+		}
 
 		if lowerCase && upperCase {
 			checkError(fmt.Errorf("could not give both flags -l (--lower-case) and -u (--upper-case)"))
@@ -123,12 +131,17 @@ var seqCmd = &cobra.Command{
 
 						if printSeq {
 							if isFastq {
-								outfh.WriteString(fmt.Sprintf("@%s\n", head))
+								outfh.WriteString("@")
+								outfh.Write(head)
+								outfh.WriteString("\n")
 							} else {
-								outfh.WriteString(fmt.Sprintf(">%s\n", head))
+								outfh.WriteString(">")
+								outfh.Write(head)
+								outfh.WriteString("\n")
 							}
 						} else {
-							outfh.WriteString(fmt.Sprintf("%s\n", head))
+							outfh.Write(head)
+							outfh.WriteString("\n")
 						}
 					}
 
@@ -184,25 +197,28 @@ var seqCmd = &cobra.Command{
 						} else if upperCase {
 							sequence.Seq = bytes.ToUpper(sequence.Seq)
 						}
-
-						outfh.WriteString(fmt.Sprintf("%s\n", byteutil.WrapByteSlice(sequence.Seq, lineWidth)))
+						outfh.Write(byteutil.WrapByteSlice(sequence.Seq, lineWidth))
+						outfh.WriteString("\n")
 					}
 
 					if printQual {
 						sequence = record.Seq
 						if reverse {
-							sequence = sequence.ReverseInplace()
+							sequence = sequence.Reverse()
 						}
 						if complement {
-							sequence = sequence.ComplementInplace()
+							sequence = sequence.Complement()
 						}
 						if removeGaps {
 							sequence = sequence.RemoveGaps(gapLetters)
 						}
 						if onlyQual {
-							outfh.WriteString(fmt.Sprintf("%s\n", byteutil.WrapByteSlice(sequence.Qual, lineWidth)))
+							outfh.Write(byteutil.WrapByteSlice(sequence.Qual, lineWidth))
+							outfh.WriteString("\n")
 						} else {
-							outfh.WriteString(fmt.Sprintf("+\n%s\n", byteutil.WrapByteSlice(sequence.Qual, lineWidth)))
+							outfh.WriteString("+\n")
+							outfh.Write(byteutil.WrapByteSlice(sequence.Qual, lineWidth))
+							outfh.WriteString("\n")
 						}
 					}
 				}
@@ -228,4 +244,7 @@ func init() {
 	seqCmd.Flags().BoolP("upper-case", "u", false, "print sequences in upper case")
 	seqCmd.Flags().BoolP("dna2rna", "", false, "DNA to RNA")
 	seqCmd.Flags().BoolP("rna2dna", "", false, "RNA to DNA")
+	seqCmd.Flags().BoolP("validate-seq", "v", false, "validate bases according to the alphabet")
+	seqCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
+
 }

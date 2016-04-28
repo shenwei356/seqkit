@@ -62,7 +62,7 @@ var fq2faCmd = &cobra.Command{
 
 				for _, record := range chunk.Data {
 					record.Seq.Qual = []byte{}
-					outfh.WriteString(record.Format(lineWidth))
+					record.FormatToWriter(outfh, lineWidth)
 				}
 			}
 		}

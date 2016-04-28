@@ -153,14 +153,15 @@ var grepCmd = &cobra.Command{
 
 					if chunk.ID == id {
 						for _, record := range chunk.Data {
-							outfh.WriteString(record.Format(lineWidth))
+							record.FormatToWriter(outfh, lineWidth)
+
 						}
 						id++
 					} else { // check bufferd result
 						for true {
 							if chunk, ok := chunks[id]; ok {
 								for _, record := range chunk.Data {
-									outfh.WriteString(record.Format(lineWidth))
+									record.FormatToWriter(outfh, lineWidth)
 								}
 								id++
 								delete(chunks, chunk.ID)
@@ -177,7 +178,7 @@ var grepCmd = &cobra.Command{
 					for _, id := range sortedIDs {
 						chunk := chunks[id]
 						for _, record := range chunk.Data {
-							outfh.WriteString(record.Format(lineWidth))
+							record.FormatToWriter(outfh, lineWidth)
 						}
 					}
 				}

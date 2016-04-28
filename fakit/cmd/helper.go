@@ -55,7 +55,7 @@ func getFileList(args []string) []string {
 		files = append(files, "-")
 	} else {
 		for _, file := range files {
-			if file == "-" {
+			if isStdin(file) {
 				continue
 			}
 			if _, err := os.Stat(file); os.IsNotExist(err) {
@@ -156,16 +156,16 @@ func getAlphabet(cmd *cobra.Command, flag string) *seq.Alphabet {
 
 func getFlagAlphabetGuessSeqLength(cmd *cobra.Command, flag string) int {
 	alphabetGuessSeqLength := getFlagNonNegativeInt(cmd, flag)
-	if alphabetGuessSeqLength > 0 && alphabetGuessSeqLength < 10000 {
-		checkError(fmt.Errorf("value of flag --%s too small, should >= 10000", flag))
+	if alphabetGuessSeqLength > 0 && alphabetGuessSeqLength < 1000 {
+		checkError(fmt.Errorf("value of flag --%s too small, should >= 1000", flag))
 	}
 	return alphabetGuessSeqLength
 }
 
 func getFlagValidateSeqLength(cmd *cobra.Command, flag string) int {
 	validateSeqLength := getFlagNonNegativeInt(cmd, flag)
-	if validateSeqLength > 0 && validateSeqLength < 10000 {
-		checkError(fmt.Errorf("value of flag --%s too small, should >= 10000", flag))
+	if validateSeqLength > 0 && validateSeqLength < 1000 {
+		checkError(fmt.Errorf("value of flag --%s too small, should >= 1000", flag))
 	}
 	return validateSeqLength
 }
@@ -197,7 +197,6 @@ func getConfigs(cmd *cobra.Command) Config {
 		OutFile:    getFlagString(cmd, "out-file"),
 		Quiet:      getFlagBool(cmd, "quiet"),
 		AlphabetGuessSeqLength: getFlagAlphabetGuessSeqLength(cmd, "alphabet-guess-seq-length"),
-		ValidateSeqLength:      getFlagValidateSeqLength(cmd, "validate-seq-length"),
 	}
 
 }
@@ -281,6 +280,15 @@ func subseqByFaix(faidx *fai.Faidx, chrs string, r fai.Record, start, end int) [
 	return subseq
 }
 
+func subseqByFaixNotCleaned(faidx *fai.Faidx, chrs string, r fai.Record, start, end int) []byte {
+	start, end, ok := seq.SubLocation(r.Length, start, end)
+	if !ok {
+		return []byte("")
+	}
+	subseq, _ := faidx.SubSeqNotCleaned(chrs, start, end)
+	return subseq
+}
+
 func getSeqIDAndLengthFromFaidxFile(file string) ([]string, []int, error) {
 	ids := []string{}
 	lengths := []int{}
@@ -350,8 +358,12 @@ func writeSeqs(records []*fastx.Record, file string, lineWidth int, quiet bool, 
 	defer outfh.Close()
 
 	for _, record := range records {
-		outfh.WriteString(record.Format(lineWidth))
+		record.FormatToWriter(outfh, lineWidth)
 	}
 
 	return nil
+}
+
+func isStdin(file string) bool {
+	return file == "-"
 }

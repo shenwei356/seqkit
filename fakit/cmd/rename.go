@@ -81,7 +81,7 @@ var renameCmd = &cobra.Command{
 						numbers[k] = 1
 					}
 
-					outfh.WriteString(record.Format(lineWidth))
+					record.FormatToWriter(outfh, lineWidth)
 				}
 			}
 		}

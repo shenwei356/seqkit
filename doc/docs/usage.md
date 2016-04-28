@@ -2,15 +2,15 @@
 
 ## Technical details and guides for use
 
-### Reading FASTA/Q
+### FASTA/Q format parsing
 
 fakit uses author's bioinformatics packages [bio](https://github.com/shenwei356/bio)
-for FASTA/Q parsing, which **asynchronously parse FASTA/Q records and buffer them
-in chunks**. The parser returns one chunk of records for each call.
+for FASTA/Q parsing, which ***asynchronously parse FASTA/Q records and buffer them
+in chunks***. The parser returns one chunk of records for each call.
 
-**Asynchronous parsing** saves much time because these's no waiting interval for
+Asynchronous parsing saves much time because these's no waiting interval for
 parsed records being handled.
-The strategy of **records chunks** reduces data exchange in parallelly handling
+The strategy of records chunks reduces data exchange in parallelly handling
 of sequences, which could also improve performance.
 
 Since using of buffers and chunks, the memory occupation will be higher than
@@ -18,14 +18,45 @@ cases of reading sequence one by one.
 The default value of chunk size (configurable by global flag `-c` or `--chunk-size`)
 is 1, which is suitable for most of cases.
 But for manipulating short sequences, e.g. FASTQ or FASTA of short sequences,
-you could set higher value, e.g. 1000.
+you could set higher value, e.g. 100.
 For big genomes like human genome, smaller chunk size is prefered, e.g. 1.
 And the buffer size is configurable by global flag `-b` or `--buffer-size`
 (default value is 1). You may set with higher
 value for short sequences to imporve performance.
 
-***In summary, set smaller value for `-c` (`--chunk-size`) and
- `-b` (`--buffer-size`) when handling big FASTA file like human genomes.***
+### Sequence formats and types
+
+fakit seamlessly support FASTA and FASTQ format.
+All subcommands except for `faidx` can handle both formats.
+And only when some commands (`subseq`, `split`, `sort` and `shuffle`)
+which utilise FASTA index to improve perfrmance for large files in two pass mode
+(by flag `--two-pass`), only FASTA format is supported.
+
+Sequence format is automatically detected by the first character of the file
+or STDIN.
+
+Sequence type (DNA/RNA/Protein) is automatically detected by leading subsequences
+of the first sequences in file or STDIN. The length of the leading subsequences
+is configurable by global flag `--alphabet-guess-seq-length` with default value
+of 10000. If length of the sequences is less than that, whole sequences will
+be checked.
+
+### Sequence ID
+
+By default, most softwares, including `fakit`, takes the first non-space
+letters as sequence ID. For example,
+
+|   FASTA head                                                  |     ID                                            |
+|:--------------------------------------------------------------|:--------------------------------------------------|
+| >123456 gene name                                             | 123456                                            |
+| >longname                                                     | longname                                          |
+| >gi&#124;110645304&#124;ref&#124;NC_002516.2&#124; Pseudomona | gi&#124;110645304&#124;ref&#124;NC_002516.2&#124; |
+
+But for some sequences from NCBI,
+e.g. `>gi|110645304|ref|NC_002516.2| Pseudomona`, the ID is `NC_002516.2`.
+In this case, we could set sequence ID parsing regular expression by global flag
+`--id-regexp "\|([^\|]+)\| "` or just use flag `--id-ncbi`. If you want
+the `gi` number, then use `--id-regexp "^gi\|([^\|]+)\|"`.
 
 ### FASTA index
 
@@ -88,7 +119,7 @@ Usage
 ```
 fakit -- a cross-platform and efficient suit for FASTA/Q file manipulation
 
-Version: 0.1.9
+Version: 0.2.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -129,7 +160,6 @@ Flags:
       --quiet                           be quiet and do not show extra information
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
   -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
-      --validate-seq-length int         length of sequence prefix of based on which fakit validates the alphabets (0 for whole seq) (default 10000)
 
 Use "fakit [command] --help" for more information about a command.
 
@@ -180,18 +210,20 @@ Usage:
   fakit seq [flags]
 
 Flags:
-  -p, --complement          complement sequence (blank for Protein sequence)
-      --dna2rna             DNA to RNA
-  -G, --gap-letter string   gap letters (default "- ")
-  -l, --lower-case          print sequences in lower case
-  -n, --name                only print names
-  -i, --only-id             print ID instead of full head
-  -q, --qual                only print qualities
-  -g, --remove-gaps         remove gaps
-  -r, --reverse             reverse sequence)
-      --rna2dna             RNA to DNA
-  -s, --seq                 only print sequences
-  -u, --upper-case          print sequences in upper case
+  -p, --complement                complement sequence (blank for Protein sequence)
+      --dna2rna                   DNA to RNA
+  -G, --gap-letter string         gap letters (default "- ")
+  -l, --lower-case                print sequences in lower case
+  -n, --name                      only print names
+  -i, --only-id                   print ID instead of full head
+  -q, --qual                      only print qualities
+  -g, --remove-gaps               remove gaps
+  -r, --reverse                   reverse sequence)
+      --rna2dna                   RNA to DNA
+  -s, --seq                       only print sequences
+  -u, --upper-case                print sequences in upper case
+  -v, --validate-seq              validate bases according to the alphabet
+  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
 
 ```
 

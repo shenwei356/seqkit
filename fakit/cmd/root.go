@@ -35,7 +35,7 @@ var RootCmd = &cobra.Command{
 	Short: "a cross-platform and efficient suit for FASTA/Q file manipulation",
 	Long: `fakit -- a cross-platform and efficient suit for FASTA/Q file manipulation
 
-Version: 0.1.9
+Version: 0.2.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -69,5 +69,4 @@ func init() {
 	RootCmd.PersistentFlags().StringP("out-file", "o", "-", `out file ("-" for stdout, suffix .gz for gzipped out)`)
 	RootCmd.PersistentFlags().BoolP("quiet", "", false, "be quiet and do not show extra information")
 	RootCmd.PersistentFlags().IntP("alphabet-guess-seq-length", "", 10000, "length of sequence prefix of the first FASTA record based on which fakit guesses the sequence type (0 for whole seq)")
-	RootCmd.PersistentFlags().IntP("validate-seq-length", "", 10000, "length of sequence prefix of based on which fakit validates the alphabets (0 for whole seq)")
 }

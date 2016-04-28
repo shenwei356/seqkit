@@ -116,13 +116,13 @@ var rmdupCmd = &cobra.Command{
 						counter[subject]++
 						removed++
 						if len(dupFile) > 0 {
-							outfhDup.WriteString(record.Format(lineWidth))
+							outfhDup.Write(record.Format(lineWidth))
 						}
 						if len(numFile) > 0 {
 							names[subject] = append(names[subject], string(record.ID))
 						}
 					} else { // new one
-						outfh.WriteString(record.Format(lineWidth))
+						record.FormatToWriter(outfh, lineWidth)
 						counter[subject]++
 
 						if len(numFile) > 0 {
@@ -151,7 +151,7 @@ var rmdupCmd = &cobra.Command{
 		}
 
 		if !quiet {
-			log.Info("%d duplicated records removed", removed)
+			log.Infof("%d duplicated records removed", removed)
 		}
 	},
 }

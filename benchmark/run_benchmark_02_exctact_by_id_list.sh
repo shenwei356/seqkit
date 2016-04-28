@@ -4,6 +4,7 @@ echo Test: Searching by ID list
 
 echo warm-up
 for f in dataset_{A,B}.fa; do echo data: $f; cat $f > /dev/null; done
+for g in A B; do echo data: ids_$g.txt; cat ids_$g.txt > /dev/null; done
 
 echo == fakit
 for g in A B; do

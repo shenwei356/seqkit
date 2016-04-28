@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo Test: Removing duplicates by seq content
+echo Test: Removing duplicates by seq
 
 echo warm-up
 for f in dataset_{A,B}.fa; do echo data: $f; cat $f > /dev/null; done

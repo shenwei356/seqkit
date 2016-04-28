@@ -10,27 +10,29 @@ Usage:
 
 1. Run all tests:
 
-perl $0 run_*.sh
+perl $0 run_benchmark*.sh --outfile benchmark.5test.csv
 
 2. Run one test:
 
-perl $0 run_benchmark_04_remove_duplicated_seqs_by_name.sh
+perl $0 run_benchmark_04_remove_duplicated_seqs_by_name.sh -o benchmark.rmdup.csv
 
 3. Custom repeate times:
 
-perl $0 -n 5 run_benchmark_04_remove_duplicated_seqs_by_name.sh
+perl $0 -n 3 run_benchmark_04_remove_duplicated_seqs_by_name.sh -o benchmark.rmdup.csv
 
 USAGE
 
 my $N = 3;    # run $N times
 
-GetOptions( 'n=i' => \$N, )
+my $resultfile = "$0.benchmark.csv";
+my $help = 0;
+
+GetOptions( "n=i" => \$N, 'outfile|o=s' => \$resultfile, "help|h" => \$help, )
   or die $usage;
-die $usage if scalar @ARGV == 0;
+die $usage if scalar @ARGV == 0 or $help;
 
 my @tests = @ARGV;
 
-my $resultfile = "$0.benchmark.csv";
 open my $fh_result, ">", $resultfile or die "failed to write file: $resultfile\n";
 my $title_line = "test\tdataset\tapp\ttime_mean\ttime_stdev\tmem_mean\tmem_stdev\n";
 print $fh_result $title_line;

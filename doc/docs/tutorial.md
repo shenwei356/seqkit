@@ -7,9 +7,44 @@ used to check the peek memory usage of fakit. Usage: `memusg [-t] command`.
 
 1. Human genome
 
-        $  fakit stat hsa.fa
+        $ fakit stat hsa.fa
         file     seq_format   seq_type   num_seqs   min_len        avg_len       max_len
         hsa.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
+
+1. Build FASTA index (***optional***, when using flag `-2` (`--two-pass`),
+   some commands will automaticlly build it).
+   For some commands, including `subseq`, `split`, `sort` and `shuffle`,
+   when input files are (plain or gzipped) FASTA files or stdin,
+   FASTA index would be optional used for
+   rapid acccess of sequences and reducing memory occupation.
+   ***ATTENTION***: the `.fakit.fai` file created by fakit is a little different from .fai file
+   created by samtools. fakit uses full sequence head instead of just ID as key.
+
+        $ memusg -t fakit faidx --id-regexp "^(.+)$"  hsa.fa -o hsa.fa.fakit.fai
+
+        elapsed time: 10.011s
+        peak rss: 177.21 MB
+
+    Create common .fai file:
+
+        $ memusg -t fakit faidx hsa.fa -o hsa.fa.fai2
+
+        elapsed time: 10.454s
+        peak rss: 172.82 MB
+
+
+    Performance of samtools:
+
+        $ memusg -t samtools faidx hsa.fa
+
+        elapsed time: 9.574s
+        peak rss: 1.45 MB
+
+    Exactly same content:
+
+        $ md5sum hsa.fa.fai*
+        21e0c25b4d817d1c19ee8107191b9b31  hsa.fa.fai
+        21e0c25b4d817d1c19ee8107191b9b31  hsa.fa.fai2
 
 1. Sorting by sequence length
 
@@ -20,8 +55,8 @@ used to check the peek memory usage of fakit. Usage: `memusg [-t] command`.
         [INFO] sorting ...
         [INFO] output ...
 
-        elapsed time: 25.533s
-        peak rss: 4.62 GB
+        elapsed time: 5.021s
+        peak rss: 2.93 GB
 
     Detail:
 
@@ -62,14 +97,13 @@ used to check the peek memory usage of fakit. Usage: `memusg [-t] command`.
 
         $ memusg -t fakit shuffle hsa.fa --two-pass > hsa.shuffled.fa
         [INFO] create and read FASTA index ...
-        [INFO] create FASTA index for hsa.fa
         [INFO] read sequence IDs from FASTA index ...
         [INFO] 194 sequences loaded
         [INFO] shuffle ...
         [INFO] output ...
 
-        elapsed time: 37.248s
-        peak rss: 5.25 GB
+        elapsed time: 4.738s
+        peak rss: 2.78 GB
 
 
 1. Spliting into files with single sequence
@@ -86,8 +120,8 @@ used to check the peek memory usage of fakit. Usage: `memusg [-t] command`.
         [INFO] write 1 sequences to file: hsa.id_KI270468.1.fa
         ...
 
-        elapsed time: 24.183s
-        peak rss: 4.79 GB
+        elapsed time: 19.324s
+        peak rss: 3.91 GB
 
 1. Geting subsequence of some chromesomes
 

@@ -56,10 +56,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		bufferSize := config.BufferSize
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
-		seq.ValidateSeq = true
-		seq.ValidateWholeSeq = false
-		seq.ValidSeqLengthThreshold = config.ValidateSeqLength
-		seq.ValidSeqThreads = config.Threads
+		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
 		pattern := getFlagStringSlice(cmd, "pattern")

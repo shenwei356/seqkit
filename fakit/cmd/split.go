@@ -97,12 +97,12 @@ Examples:
 
 		file := files[0]
 		var fileName, fileExt string
-		if file == "-" {
+		if isStdin(file) {
 			fileName, fileExt = "stdin", ".fastx"
 		} else {
 			fileName, fileExt = filepathTrimExtension(file)
 		}
-
+		renameFileExt := true
 		var outfile string
 
 		if size > 0 {
@@ -120,6 +120,14 @@ Examples:
 				for chunk := range fastxReader.Ch {
 					checkError(chunk.Err)
 					for _, record := range chunk.Data {
+						if renameFileExt {
+							if len(record.Seq.Qual) > 0 {
+								fileExt = ".fastq"
+							} else {
+								fileExt = ".fasta"
+							}
+							renameFileExt = false
+						}
 						records = append(records, record)
 						if len(records) == size {
 							outfile = fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt)
@@ -141,8 +149,12 @@ Examples:
 
 			newFile := file
 
-			if !isPlainFile(file) {
-				newFile = file + ".fa"
+			if isStdin(file) || !isPlainFile(file) {
+				if isStdin(file) {
+					newFile = "stdin" + ".fastx"
+				} else {
+					newFile = file + ".fastx"
+				}
 				if !quiet {
 					log.Infof("read and write sequences to tempory file: %s ...", newFile)
 				}
@@ -153,11 +165,20 @@ Examples:
 				var err error
 				alphabet2, isFastq, err = fastx.GuessAlphabet(newFile)
 				checkError(err)
+				if renameFileExt {
+					if isFastq {
+						fileExt = ".fastq"
+					} else {
+						fileExt = ".fasta"
+					}
+					renameFileExt = false
+				}
 				if isFastq {
 					checkError(os.Remove(newFile))
 					checkError(fmt.Errorf("Sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
+			fileExt = ".fasta"
 
 			if !quiet {
 				log.Infof("create and read FASTA index ...")
@@ -194,7 +215,7 @@ Examples:
 					record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), sequence)
 					checkError(err)
 
-					outfh.WriteString(record.Format(lineWidth))
+					record.FormatToWriter(outfh, lineWidth)
 				}
 				j++
 				if j == size {
@@ -218,7 +239,7 @@ Examples:
 				outfh.Close()
 			}
 
-			if !isPlainFile(file) && !keepTemp {
+			if (isStdin(file) || !isPlainFile(file)) && !keepTemp {
 				checkError(os.Remove(newFile))
 				checkError(os.Remove(newFile + ".fakit.fai"))
 			}
@@ -255,6 +276,14 @@ Examples:
 				}
 
 				for _, record := range allRecords {
+					if renameFileExt {
+						if len(record.Seq.Qual) > 0 {
+							fileExt = ".fastq"
+						} else {
+							fileExt = ".fasta"
+						}
+						renameFileExt = false
+					}
 					records = append(records, record)
 					if len(records) == size {
 						outfile = fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt)
@@ -274,8 +303,12 @@ Examples:
 
 			newFile := file
 
-			if !isPlainFile(file) {
-				newFile = file + ".fa"
+			if isStdin(file) || !isPlainFile(file) {
+				if isStdin(file) {
+					newFile = "stdin" + ".fastx"
+				} else {
+					newFile = file + ".fastx"
+				}
 				if !quiet {
 					log.Infof("read and write sequences to tempory file: %s ...", newFile)
 				}
@@ -286,11 +319,20 @@ Examples:
 				var err error
 				alphabet2, isFastq, err = fastx.GuessAlphabet(newFile)
 				checkError(err)
+				if renameFileExt {
+					if isFastq {
+						fileExt = ".fastq"
+					} else {
+						fileExt = ".fasta"
+					}
+					renameFileExt = false
+				}
 				if isFastq {
 					checkError(os.Remove(newFile))
 					checkError(fmt.Errorf("Sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
+			fileExt = ".fasta"
 
 			if !quiet {
 				log.Infof("create and read FASTA index ...")
@@ -339,7 +381,7 @@ Examples:
 					record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), sequence)
 					checkError(err)
 
-					outfh.WriteString(record.Format(lineWidth))
+					record.FormatToWriter(outfh, lineWidth)
 				}
 				j++
 				if j == size {
@@ -363,7 +405,7 @@ Examples:
 				outfh.Close()
 			}
 
-			if !isPlainFile(file) && !keepTemp {
+			if (isStdin(file) || !isPlainFile(file)) && !keepTemp {
 				checkError(os.Remove(newFile))
 				checkError(os.Remove(newFile + ".fakit.fai"))
 			}
@@ -389,6 +431,14 @@ Examples:
 
 				var id string
 				for _, record := range allRecords {
+					if renameFileExt {
+						if len(record.Seq.Qual) > 0 {
+							fileExt = ".fastq"
+						} else {
+							fileExt = ".fasta"
+						}
+						renameFileExt = false
+					}
 					id = string(record.ID)
 					if _, ok := recordsByID[id]; !ok {
 						recordsByID[id] = []*fastx.Record{}
@@ -408,8 +458,12 @@ Examples:
 
 			newFile := file
 
-			if !isPlainFile(file) {
-				newFile = file + ".fa"
+			if isStdin(file) || !isPlainFile(file) {
+				if isStdin(file) {
+					newFile = "stdin" + ".fastx"
+				} else {
+					newFile = file + ".fastx"
+				}
 				if !quiet {
 					log.Infof("read and write sequences to tempory file: %s ...", newFile)
 				}
@@ -420,11 +474,20 @@ Examples:
 				var err error
 				alphabet2, isFastq, err = fastx.GuessAlphabet(newFile)
 				checkError(err)
+				if renameFileExt {
+					if isFastq {
+						fileExt = ".fastq"
+					} else {
+						fileExt = ".fasta"
+					}
+					renameFileExt = false
+				}
 				if isFastq {
 					checkError(os.Remove(newFile))
 					checkError(fmt.Errorf("Sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
+			fileExt = ".fasta"
 
 			if !quiet {
 				log.Infof("create and read FASTA index ...")
@@ -478,7 +541,7 @@ Examples:
 						record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), sequence)
 						checkError(err)
 
-						outfh.WriteString(record.Format(lineWidth))
+						record.FormatToWriter(outfh, lineWidth)
 					}
 				}
 
@@ -490,7 +553,7 @@ Examples:
 				}
 			}
 
-			if !isPlainFile(file) && !keepTemp {
+			if (isStdin(file) || !isPlainFile(file)) && !keepTemp {
 				checkError(os.Remove(newFile))
 				checkError(os.Remove(newFile + ".fakit.fai"))
 			}
@@ -533,6 +596,14 @@ Examples:
 				var s, e int
 				var ok bool
 				for _, record := range allRecords {
+					if renameFileExt {
+						if len(record.Seq.Qual) > 0 {
+							fileExt = ".fastq"
+						} else {
+							fileExt = ".fasta"
+						}
+						renameFileExt = false
+					}
 					s, e, ok = seq.SubLocation(len(record.Seq.Seq), start, end)
 					if !ok {
 						checkError(fmt.Errorf("region (%s) not match sequence (%s) with length of %d", region, record.Name, len(record.Seq.Seq)))
@@ -560,8 +631,12 @@ Examples:
 
 			newFile := file
 
-			if !isPlainFile(file) {
-				newFile = file + ".fa"
+			if isStdin(file) || !isPlainFile(file) {
+				if isStdin(file) {
+					newFile = "stdin" + ".fastx"
+				} else {
+					newFile = file + ".fastx"
+				}
 				if !quiet {
 					log.Infof("read and write sequences to tempory file: %s ...", newFile)
 				}
@@ -571,12 +646,21 @@ Examples:
 				var isFastq bool
 				var err error
 				alphabet2, isFastq, err = fastx.GuessAlphabet(newFile)
+				if renameFileExt {
+					if isFastq {
+						fileExt = ".fastq"
+					} else {
+						fileExt = ".fasta"
+					}
+					renameFileExt = false
+				}
 				checkError(err)
 				if isFastq {
 					checkError(os.Remove(newFile))
 					checkError(fmt.Errorf("Sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
+			fileExt = ".fasta"
 
 			if !quiet {
 				log.Infof("read sequence IDs and sequence region from FASTA file ...")
@@ -634,7 +718,7 @@ Examples:
 						record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), sequence)
 						checkError(err)
 
-						outfh.WriteString(record.Format(lineWidth))
+						record.FormatToWriter(outfh, lineWidth)
 					}
 				}
 

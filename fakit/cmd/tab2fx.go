@@ -93,13 +93,15 @@ var tab2faCmd = &cobra.Command{
 				for _, data := range chunk.Data {
 					items := data.(Slice)
 					if len(items) == 3 && len(items[2]) > 0 {
-						outfh.WriteString(fmt.Sprintf("@%s\n%s\n+\n%s\n",
-							items[0],
-							byteutil.WrapByteSlice([]byte(items[1]), lineWidth),
-							byteutil.WrapByteSlice([]byte(items[2]), lineWidth)))
+						outfh.WriteString(fmt.Sprintf("@%s\n", items[0]))
+						outfh.Write(byteutil.WrapByteSlice([]byte(items[1]), lineWidth))
+						outfh.WriteString("+\n")
+						outfh.Write(byteutil.WrapByteSlice([]byte(items[2]), lineWidth))
+						outfh.WriteString("\n")
 					} else {
-						outfh.WriteString(fmt.Sprintf(">%s\n%s\n", items[0],
-							byteutil.WrapByteSlice([]byte(items[1]), lineWidth)))
+						outfh.WriteString(fmt.Sprintf(">%s\n", items[0]))
+						outfh.Write(byteutil.WrapByteSlice([]byte(items[1]), lineWidth))
+						outfh.WriteString("\n")
 					}
 				}
 			}

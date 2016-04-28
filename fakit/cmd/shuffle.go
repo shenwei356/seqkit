@@ -119,7 +119,7 @@ So please delete .fai file created by samtools.
 			var record *fastx.Record
 			for _, i := range indices {
 				record = sequences[index2name[i]]
-				outfh.WriteString(record.Format(lineWidth))
+				record.FormatToWriter(outfh, lineWidth)
 			}
 			return
 		}
@@ -131,11 +131,13 @@ So please delete .fai file created by samtools.
 
 		file := files[0]
 
-		var alphabet2 *seq.Alphabet
-
 		newFile := file
-		if !isPlainFile(file) {
-			newFile = file + ".fakit.fa"
+		if isStdin(file) || !isPlainFile(file) {
+			if isStdin(file) {
+				newFile = "stdin" + ".fastx"
+			} else {
+				newFile = file + ".fastx"
+			}
 			if !quiet {
 				log.Infof("read and write sequences to tempory file: %s ...", newFile)
 			}
@@ -144,7 +146,7 @@ So please delete .fai file created by samtools.
 
 			var isFastq bool
 			var err error
-			alphabet2, isFastq, err = fastx.GuessAlphabet(newFile)
+			_, isFastq, err = fastx.GuessAlphabet(newFile)
 			checkError(err)
 			if isFastq {
 				checkError(os.Remove(newFile))
@@ -193,14 +195,13 @@ So please delete .fai file created by samtools.
 				continue
 			}
 
-			sequence := subseqByFaix(faidx, chr, r, 1, -1)
-			record, err := fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), sequence)
-			checkError(err)
-
-			outfh.WriteString(record.Format(lineWidth))
+			sequence := subseqByFaixNotCleaned(faidx, chr, r, 1, -1)
+			outfh.Write([]byte(fmt.Sprintf(">%s\n", chr)))
+			outfh.Write(sequence)
+			outfh.WriteString("\n")
 		}
 
-		if !isPlainFile(file) && !keepTemp {
+		if (isStdin(file) || !isPlainFile(file)) && !keepTemp {
 			checkError(os.Remove(newFile))
 			checkError(os.Remove(newFile + ".fakit.fai"))
 		}

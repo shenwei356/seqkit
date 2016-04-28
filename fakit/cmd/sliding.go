@@ -94,9 +94,11 @@ var slidingCmd = &cobra.Command{
 						if e > originalLen {
 							e = e - originalLen
 						}
-						outfh.WriteString(fmt.Sprintf(">%s_sliding:%d-%d\n%s\n",
-							record.ID, i+1, e,
-							byteutil.WrapByteSlice(sequence[i:i+window], lineWidth)))
+						outfh.WriteString(fmt.Sprintf(">%s_sliding:%d-%d\n",
+							record.ID, i+1, e))
+						outfh.Write(byteutil.WrapByteSlice(sequence[i:i+window], lineWidth))
+						outfh.WriteString("\n")
+
 					}
 				}
 			}

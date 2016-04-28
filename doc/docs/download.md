@@ -6,18 +6,23 @@
 
 ## Current Version
 
-- [fakit v0.1.9](https://github.com/shenwei356/fakit/releases/tag/v0.1.9)
-    - using custom FASTA index file extension: `.fakit.fai`
-    - reducing memory usage of `sample --number --two-pass`
-    - ***change default CPU number to 2 for multi-cpus computer, and 1 for single-CPU computer***
+- [fakit v0.2.0](https://github.com/shenwei356/fakit/releases/tag/v0.2.0)
+    - ***reduce memory usage of writing output***
+    - fix bug of `subseq`, `shuffle`, `sort` when reading from stdin
+    - reduce memory usage of `faidx`
+    - make validating sequences an optional option in `seq` command, it saves some time.
 
 ## Installation
 
-Just [download](https://github.com/shenwei356/fakit/releases) executable file
- of your operating system and rename it to `fakit.exe` (Windows) or
- `fakit` (other operating systems) for convenience,
- and then run it in command-line interface, no dependencies,
- no complicated compilation process.
+`fakit` is implemented in [Golang](https://golang.org/) programming language,
+ executable binary files **for most popular operating system** are freely available
+  in [release](https://github.com/shenwei356/fakit/releases) page.
+
+Just [download](https://github.com/shenwei356/fakit/releases) gzip-compressed
+executable file of your operating system, and uncompress it with `tar -zxvf *.tar.gz` command,
+rename it to `fakit.exe` (Windows) or `fakit` (other operating systems) for convenience.
+
+You may need to add executable permision by `chmod a+x fakit`.
 
 You can also add the directory of the executable file to environment variable
 `PATH`, so you can run `fakit` anywhere.
@@ -33,6 +38,10 @@ You can also add the directory of the executable file to environment variable
 
 ## Previous Versions
 
+- [fakit v0.1.9](https://github.com/shenwei356/fakit/releases/tag/v0.1.9)
+    - using custom FASTA index file extension: `.fakit.fai`
+    - reducing memory usage of `sample --number --two-pass`
+    - ***change default CPU number to 2 for multi-cpus computer, and 1 for single-CPU computer***
 - [fakit v0.1.8](https://github.com/shenwei356/fakit/releases/tag/v0.1.8)
     - add subcommand `rename` to rename duplicated IDs
     - add subcommand `faidx` to create FASTA index file

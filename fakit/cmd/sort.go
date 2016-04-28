@@ -196,12 +196,12 @@ So please delete .fai file created by samtools.
 			if byName || byID || bySeq {
 				for _, kv := range name2sequence {
 					record = sequences[kv.Key]
-					outfh.WriteString(record.Format(lineWidth))
+					record.FormatToWriter(outfh, lineWidth)
 				}
 			} else if byLength {
 				for _, kv := range name2length {
 					record = sequences[kv.Key]
-					outfh.WriteString(record.Format(lineWidth))
+					record.FormatToWriter(outfh, lineWidth)
 				}
 			}
 
@@ -218,8 +218,12 @@ So please delete .fai file created by samtools.
 		var alphabet2 *seq.Alphabet
 
 		newFile := file
-		if !isPlainFile(file) {
-			newFile = file + ".fa"
+		if isStdin(file) || !isPlainFile(file) {
+			if isStdin(file) {
+				newFile = "stdin" + ".fastx"
+			} else {
+				newFile = file + ".fastx"
+			}
 			if !quiet {
 				log.Infof("read and write sequences to tempory file: %s ...", newFile)
 			}
@@ -347,7 +351,7 @@ So please delete .fai file created by samtools.
 		checkError(err)
 		defer outfh.Close()
 
-		var record *fastx.Record
+		// var record *fastx.Record
 		var chr string
 		if byName || byID || bySeq {
 			for _, kv := range name2sequence {
@@ -358,11 +362,10 @@ So please delete .fai file created by samtools.
 					continue
 				}
 
-				sequence := subseqByFaix(faidx, chr, r, 1, -1)
-				record, err = fastx.NewRecord(alphabet2, []byte(kv.Key), []byte(chr), sequence)
-				checkError(err)
-
-				outfh.WriteString(record.Format(lineWidth))
+				sequence := subseqByFaixNotCleaned(faidx, chr, r, 1, -1)
+				outfh.Write([]byte(fmt.Sprintf(">%s\n", chr)))
+				outfh.Write(sequence)
+				outfh.WriteString("\n")
 			}
 		} else if byLength {
 			for _, kv := range name2length {
@@ -373,15 +376,14 @@ So please delete .fai file created by samtools.
 					continue
 				}
 
-				sequence := subseqByFaix(faidx, chr, r, 1, -1)
-				record, err = fastx.NewRecord(alphabet2, []byte(kv.Key), []byte(chr), sequence)
-				checkError(err)
-
-				outfh.WriteString(record.Format(lineWidth))
+				sequence := subseqByFaixNotCleaned(faidx, chr, r, 1, -1)
+				outfh.Write([]byte(fmt.Sprintf(">%s\n", chr)))
+				outfh.Write(sequence)
+				outfh.WriteString("\n")
 			}
 		}
 
-		if !isPlainFile(file) && !keepTemp {
+		if (isStdin(file) || !isPlainFile(file)) && !keepTemp {
 			checkError(os.Remove(newFile))
 			checkError(os.Remove(newFile + ".fakit.fai"))
 		}

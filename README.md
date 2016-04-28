@@ -6,8 +6,8 @@ Source code: [https://github.com/shenwei356/fakit](https://github.com/shenwei356
 
 ## About the name
 
-Origionally, `fakit` (abbreviation of `FASTA kit`) was designed to handle FASTA
-format. And the name was remained after adding seamless support for FASTQ fromat.
+Originally, `fakit` (abbreviation of `FASTA kit`) was designed to handle FASTA
+format. And the name was remained after adding ***seamless support for FASTA/Q fromat***.
 
 ## Introduction
 
@@ -78,7 +78,7 @@ Rename head      | Yes      | Yes             | --            | --      | Yes   
   in [release](https://github.com/shenwei356/fakit/releases) page.
 
 Just [download](https://github.com/shenwei356/fakit/releases) gzip-compressed
-executable file of your operating system, and uncompress it with `gzip -d *.gz` command,
+executable file of your operating system, and uncompress it with `tar -zxvf *.tar.gz` command,
 rename it to `fakit.exe` (Windows) or `fakit` (other operating systems) for convenience.
 
 You may need to add executable permision by `chmod a+x fakit`.
@@ -90,10 +90,10 @@ You can also add the directory of the executable file to environment variable
 
 2. For Linux, type:
 
-      chmod a+x /PATH/OF/FASTCOV/fakit
-      echo export PATH=\$PATH:/PATH/OF/FASTCOV >> ~/.bashrc
+        chmod a+x /PATH/OF/FASTCOV/fakit
+        echo export PATH=\$PATH:/PATH/OF/FASTCOV >> ~/.bashrc
 
-  or simply copy it to `/usr/local/bin`
+    or simply copy it to `/usr/local/bin`
 
 
 ## Subcommands
@@ -136,35 +136,17 @@ You can also add the directory of the executable file to environment variable
 - `shuffle`    shuffle sequences
 - `sort`       sort sequences by id/name/sequence
 
-
-**Global Flags**
-
-```
-      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which fakit guesses the sequence type (0 for whole seq) (default 10000)
-  -b, --buffer-size int                 buffer size of chunks (0 for no buffer) (default 1)
-  -c, --chunk-size int                  chunk size (attention: unit is FASTA records not lines) (default 1)
-      --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
-      --id-regexp string                regular expression for parsing ID (default "^([^\\s]+)\\s?")
-  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
-  -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
-      --quiet                           be quiet and do not show extra information
-  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
-  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
-      --validate-seq-length int         length of sequence prefix of based on which fakit validates the alphabets (0 for whole seq) (default 10000)
-
-```
-
 ## Technical details and guides for use
 
-### Reading FASTA/Q
+### FASTA/Q format parsing
 
 fakit uses author's bioinformatics packages [bio](https://github.com/shenwei356/bio)
-for FASTA/Q parsing, which **asynchronously parse FASTA/Q records and buffer them
-in chunks**. The parser returns one chunk of records for each call.
+for FASTA/Q parsing, which ***asynchronously parse FASTA/Q records and buffer them
+in chunks***. The parser returns one chunk of records for each call.
 
-**Asynchronous parsing** saves much time because these's no waiting interval for
+Asynchronous parsing saves much time because these's no waiting interval for
 parsed records being handled.
-The strategy of **records chunks** reduces data exchange in parallelly handling
+The strategy of records chunks reduces data exchange in parallelly handling
 of sequences, which could also improve performance.
 
 Since using of buffers and chunks, the memory occupation will be higher than
@@ -172,14 +154,45 @@ cases of reading sequence one by one.
 The default value of chunk size (configurable by global flag `-c` or `--chunk-size`)
 is 1, which is suitable for most of cases.
 But for manipulating short sequences, e.g. FASTQ or FASTA of short sequences,
-you could set higher value, e.g. 1000.
+you could set higher value, e.g. 100.
 For big genomes like human genome, smaller chunk size is prefered, e.g. 1.
 And the buffer size is configurable by global flag `-b` or `--buffer-size`
 (default value is 1). You may set with higher
 value for short sequences to imporve performance.
 
-***In summary, set smaller value for `-c` (`--chunk-size`) and
- `-b` (`--buffer-size`) when handling big FASTA file like human genomes.***
+### Sequence formats and types
+
+fakit seamlessly support FASTA and FASTQ format.
+All subcommands except for `faidx` can handle both formats.
+And only when some commands (`subseq`, `split`, `sort` and `shuffle`)
+which utilise FASTA index to improve perfrmance for large files in two pass mode
+(by flag `--two-pass`), only FASTA format is supported.
+
+Sequence format is automatically detected by the first character of the file
+or STDIN.
+
+Sequence type (DNA/RNA/Protein) is automatically detected by leading subsequences
+of the first sequences in file or STDIN. The length of the leading subsequences
+is configurable by global flag `--alphabet-guess-seq-length` with default value
+of 10000. If length of the sequences is less than that, whole sequences will
+be checked.
+
+### Sequence ID
+
+By default, most softwares, including `fakit`, takes the first non-space
+letters as sequence ID. For example,
+
+|   FASTA head                                                  |     ID                                            |
+|:--------------------------------------------------------------|:--------------------------------------------------|
+| >123456 gene name                                             | 123456                                            |
+| >longname                                                     | longname                                          |
+| >gi&#124;110645304&#124;ref&#124;NC_002516.2&#124; Pseudomona | gi&#124;110645304&#124;ref&#124;NC_002516.2&#124; |
+
+But for some sequences from NCBI,
+e.g. `>gi|110645304|ref|NC_002516.2| Pseudomona`, the ID is `NC_002516.2`.
+In this case, we could set sequence ID parsing regular expression by global flag
+`--id-regexp "\|([^\|]+)\| "` or just use flag `--id-ncbi`. If you want
+the `gi` number, then use `--id-regexp "^gi\|([^\|]+)\|"`.
 
 ### FASTA index
 
@@ -245,16 +258,11 @@ reproduced in different environments with same random seed.
 
 More details: [http://shenwei356.github.io/fakit/benchmark/](http://shenwei356.github.io/fakit/benchmark/)
 
-![benchmark-reverse-complement.png](benchmark/benchmark-reverse-complement.png)
+![benchmark-5tests.csv.png](benchmark/benchmark.5tests.csv.png)
 
-![benchmark-reverse-complement.png](benchmark/benchmark-searching-by-id-list.png)
+Performance of other functions in fakit:
 
-![benchmark-reverse-complement.png](benchmark/benchmark-sampling-by-number.png)
-
-![benchmark-reverse-complement.png](benchmark/benchmark-removing-duplicates-by-seq-content.png)
-
-![benchmark-reverse-complement.png](benchmark/benchmark-subsequence-with-bed-file.png)
-
+![benchmark-fakit.csv.png](benchmark/benchmark.fakit.csv.png)
 
 ## Contact
 

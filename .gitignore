@@ -27,3 +27,4 @@ doc/site/*
 *.Rhistory
 fakit/fakit*
 TODO.md
+benchmark/.Rhistory

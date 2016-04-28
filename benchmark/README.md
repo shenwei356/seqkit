@@ -2,7 +2,7 @@
 
 Datasets and results are described at [http://shenwei356.github.io/fakit/benchmark](http://shenwei356.github.io/fakit/benchmark)
 
-**The benchmark needs be performed in Linux-like operating systems.**
+***The benchmark needs be performed in Linux-like operating systems.***
 
 ## Install softwares
 
@@ -24,7 +24,10 @@ Softwares
 Not used:
 
 1. [pyfaidx](https://github.com/mdshw5/pyfaidx). (Python).
-   Version [0.4.7.1](https://pypi.python.org/packages/source/p/pyfaidx/pyfaidx-0.4.7.1.tar.gz#md5=f33604a3550c2fa115ac7d33b952127d). *Not used, because it 
+   Version [0.4.7.1](https://pypi.python.org/packages/source/p/pyfaidx/pyfaidx-0.4.7.1.tar.gz#md5=f33604a3550c2fa115ac7d33b952127d). *Not used, because it
+
+A Python script [memusg](https://github.com/shenwei356/memusg) was used
+   to computate running time and peak memory usage of a process.
 
 **Attention**: the `fasta_utilities` uses Perl module `Term-ProgressBar`
 which makes it failed to run when using benchmark script `run_benchmark_00_all.pl`.
@@ -44,34 +47,47 @@ The edited code is
 
 ## Data preparation
 
-[http://blog.shenwei.me/fakit/benchmark/#datasets](http://blog.shenwei.me/fakit/benchmark/#datasets)
+[http://shenwei356.github.io/fakit/benchmark/#datasets](http://shenwei356.github.io/fakit/benchmark/#datasets)
 
 ## Run tests
 
+A Perl scripts
+[`run.pl`](https://github.com/shenwei356/fakit/blob/master/benchmark/run_benchmark_00_all.pl)
+is used to automatically running tests and generate data for plotting.
+
 ```
+$ perl run.pl -h
 Usage:
 
 1. Run all tests:
 
-perl run_benchmark_00_all.pl run_*.sh
+perl run.pl run_benchmark*.sh --outfile benchmark.5test.csv
 
 2. Run one test:
 
-perl run_benchmark_00_all.pl run_benchmark_04_remove_duplicated_seqs_by_name.sh
+perl run.pl run_benchmark_04_remove_duplicated_seqs_by_name.sh -o benchmark.rmdup.csv
 
-3. Custom repeating times:
+3. Custom repeate times:
 
-perl run_benchmark_00_all.pl -n 5 run_benchmark_04_remove_duplicated_seqs_by_name.sh
+perl run.pl -n 3 run_benchmark_04_remove_duplicated_seqs_by_name.sh -o benchmark.rmdup.csv
 ```
+
+To compare performance between different softwares, run:
+
+    ./run.pl run_benchmark*.sh -n 3 -o benchmark.5tests.csv
+
+To test performance of other functions in fakit, run:
+
+    ./run.pl run_test*.sh -n 1 -o benchmark.fakit.csv
 
 ## Plot result
 
-Before this, you need to run
-
-    perl run_benchmark_00_all.pl run_*.sh
-
 R libraries `dplyr`, `ggplot2`, `scales`, `ggthemes`, `ggrepel` are needed.
 
-Run:
+Plot for result of the five tests:
 
-    ./plot.R
+    ./plot2.R -i benchmark.5tests.csv
+
+Plot for result of the stest of other functions in fakit:
+
+    ./plot2.R -i benchmark.fakit.csv --width 5 --height 3
