@@ -1,0 +1,62 @@
+Test: Reverse complement
+Output sequences of all apps are not wrapped to fixed length.
+warm-up
+data: dataset_A.fa
+data: dataset_B.fa
+== fakit
+data: dataset_A.fa
+
+elapsed time: 29.123
+peak rss: 44892
+
+data: dataset_B.fa
+
+elapsed time: 24.628
+peak rss: 1687780
+
+== fasta_utilities
+data: dataset_A.fa
+Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94.
+
+elapsed time: 16.996
+peak rss: 57092
+
+data: dataset_B.fa
+Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94.
+
+elapsed time: 25.254
+peak rss: 1256424
+
+== seqmagick
+data: dataset_A.fa
+
+elapsed time: 57.511
+peak rss: 49884
+
+data: dataset_B.fa
+
+elapsed time: 62.871
+peak rss: 1476928
+
+== seqtk
+data: dataset_A.fa
+
+elapsed time: 10.752
+peak rss: 7616
+
+data: dataset_B.fa
+
+elapsed time: 11.340
+peak rss: 244944
+
+== biogo
+data: dataset_A.fa
+
+elapsed time: 102.572
+peak rss: 36036
+
+data: dataset_B.fa
+
+elapsed time: 95.609
+peak rss: 1390856
+

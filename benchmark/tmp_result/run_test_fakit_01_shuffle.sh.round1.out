@@ -1,0 +1,30 @@
+Test: Shuffling
+warm-up
+data: dataset_A.fa
+data: dataset_B.fa
+recreate FASTA index file
+== fakit
+data: dataset_A.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for dataset_A.fa
+[fai warning] ignoring duplicate sequence "CP007063 Fusobacterium nucleatum subsp. animalis 7_1 plasmid, complete sequence. [Fusobacterium nucleatum subsp. animalis 7_1]" at byte offset 982881655
+[fai warning] ignoring duplicate sequence "CP007062 Fusobacterium nucleatum subsp. animalis 7_1, complete genome. [Fusobacterium nucleatum subsp. animalis 7_1]" at byte offset 982888188
+[INFO][0m read sequence IDs from FASTA index ...
+[INFO][0m 67746 sequences loaded
+[INFO][0m shuffle ...
+[INFO][0m output ...
+
+elapsed time: 17.702
+peak rss: 2843664
+
+data: dataset_B.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for dataset_B.fa
+[INFO][0m read sequence IDs from FASTA index ...
+[INFO][0m 194 sequences loaded
+[INFO][0m shuffle ...
+[INFO][0m output ...
+
+elapsed time: 14.437
+peak rss: 3127368
+

@@ -12,7 +12,7 @@ format. And the name was remained after adding ***seamless support for FASTA/Q f
 ## Introduction
 
 FASTA and FASTQ are basic formats for storing nucleotide and protein sequences.
-The manipulations of FASTA/Q file includes converting, clipping, searching,
+The manipulations of FASTA/Q file include converting, clipping, searching,
 filtering, deduplication, splitting, shuffling, sampling and so on.
 Existed tools only implemented parts of the functions,
 and some of them are only available for specific operating systems.
@@ -22,7 +22,8 @@ running environment also make them less friendly to common users.
 fakit is a cross-platform, efficient, and practical FASTA/Q manipulations tool
 that is friendly for researchers to complete wide ranges of FASTA file processing.
 The suite supports plain or gzip-compressed input and output
-from either standard stream or files, therefore, it could be easily used in pipelines.
+from either standard stream or files,
+therefore, it could be easily used in command-line pipe.
 
 ## Features
 
@@ -224,10 +225,10 @@ Most of the subcommands do not read whole FASTA/Q records in to memory,
 including `stat`, `fq2fa`, `fx2tab`, `tab2fx`, `grep`, `locate`, `replace`,
  `seq`, `sliding`, `subseq`. They just temporarily buffer chunks of records.
 
-However when handling big sequences, e.g. human genome, the memory is high
+However when handling big sequences, e.g. Human genome, the memory is high
 (2-3 GB) even the buffer size is 1.
-This is due to the limitation of Go programming language, it may be solved
-in the future.
+This is due to the limitation of garbage collection mechanism in
+ Go programming language, it may be solved in the future.
 
 Note that when using `subseq --gtf | --bed`, if the GTF/BED files are too
 big, the memory usage will increase.

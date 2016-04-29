@@ -9,22 +9,18 @@ Datasets and results are described at [http://shenwei356.github.io/fakit/benchma
 Softwares
 
 1. [fakit](https://github.com/shenwei356/fakit). (Go).
-   Version [v0.1.9](https://github.com/shenwei356/fakit/releases/tag/v0.1.9).
+   Version [v0.2.1](https://github.com/shenwei356/fakit/releases/tag/v0.2.1).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    Lots of dependencies to install_.
 1. [fastx_toolkit](http://hannonlab.cshl.edu/fastx_toolkit/). (Perl).
    Version [0.0.13](http://hannonlab.cshl.edu/fastx_toolkit/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2).
    Can't handle multi-line FASTA files_.
-1. [seqmagick](http://seqmagick.readthedocs.org/en/latest/index.html). (Python).
+1. [seqmagick](http://seqmagick.readthedocs.io/en/latest/index.html#installation). (Python).
    Version 0.6.1
 1. [seqtk](https://github.com/lh3/seqtk). (C).
-   Version [1.0-r82-dirty](https://github.com/lh3/seqtk/commit/4feb6e81444ab6bc44139dd3a125068f81ae4ad8).
+   Version [1.1-r92-dirty](https://github.com/lh3/seqtk/tree/fb85aad4ce1fc7b3d4543623418a1ae88fe1cea6).
 
-Not used:
-
-1. [pyfaidx](https://github.com/mdshw5/pyfaidx). (Python).
-   Version [0.4.7.1](https://pypi.python.org/packages/source/p/pyfaidx/pyfaidx-0.4.7.1.tar.gz#md5=f33604a3550c2fa115ac7d33b952127d). *Not used, because it
 
 A Python script [memusg](https://github.com/shenwei356/memusg) was used
    to computate running time and peak memory usage of a process.
@@ -45,9 +41,21 @@ The edited code is
       if $config{bar_width} < 1;
     }
 
+## Clone this repository
+
+    git clone https://github.com/shenwei356/fakit
+    cd fakit/benchmark
+
 ## Data preparation
 
 [http://shenwei356.github.io/fakit/benchmark/#datasets](http://shenwei356.github.io/fakit/benchmark/#datasets)
+
+Or download all test data [fakit-benchmark-data.tar.gz](http://bioinf.shenwei.me/fakit-benchmark-data.tar.gz)
+ (1.7G) and uncompress it, and then move them into directory `fakit/benchmark`
+
+    wget ***
+    tar -zxvf fakit-benchmark-data.tar.gz
+    mv fakit-benchmark-data/* fakit/benchmark
 
 ## Run tests
 
@@ -76,6 +84,8 @@ To compare performance between different softwares, run:
 
     ./run.pl run_benchmark*.sh -n 3 -o benchmark.5tests.csv
 
+It costed ~50min for me.
+
 To test performance of other functions in fakit, run:
 
     ./run.pl run_test*.sh -n 1 -o benchmark.fakit.csv
@@ -86,8 +96,8 @@ R libraries `dplyr`, `ggplot2`, `scales`, `ggthemes`, `ggrepel` are needed.
 
 Plot for result of the five tests:
 
-    ./plot2.R -i benchmark.5tests.csv
+    ./plot.R -i benchmark.5tests.csv
 
-Plot for result of the stest of other functions in fakit:
+Plot for result of the tests of other functions in fakit:
 
-    ./plot2.R -i benchmark.fakit.csv --width 5 --height 3
+    ./plot.R -i benchmark.fakit.csv --width 5 --height 3

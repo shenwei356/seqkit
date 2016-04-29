@@ -159,7 +159,7 @@ Examples:
 				gtfFeaturesMap[chr][feat] = append(gtfFeaturesMap[chr][feat], feature)
 			}
 			if !quiet {
-				log.Info("%d GTF features loaded", len(features))
+				log.Infof("%d GTF features loaded", len(features))
 			}
 		} else if bedFile != "" {
 			if !quiet {
@@ -189,7 +189,7 @@ Examples:
 				bedFeatureMap[chr] = append(bedFeatureMap[chr], feature)
 			}
 			if !quiet {
-				log.Info("%d BED features loaded", len(features))
+				log.Infof("%d BED features loaded", len(features))
 			}
 		}
 

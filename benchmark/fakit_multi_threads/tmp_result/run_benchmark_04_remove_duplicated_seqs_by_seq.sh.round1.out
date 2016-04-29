@@ -1,0 +1,56 @@
+Test: Removing duplicates by seq content
+warm-up
+data: dataset_A.fa
+data: dataset_B.fa
+== 1
+data: dataset_A.fa
+[INFO][0m 12351 duplicated records removed
+
+elapsed time: 21.932
+peak rss: 65416
+
+data: dataset_B.fa
+[INFO][0m 0 duplicated records removed
+
+elapsed time: 20.157
+peak rss: 1703012
+
+== 2
+data: dataset_A.fa
+[INFO][0m 12351 duplicated records removed
+
+elapsed time: 19.455
+peak rss: 59204
+
+data: dataset_B.fa
+[INFO][0m 0 duplicated records removed
+
+elapsed time: 16.216
+peak rss: 1780832
+
+== 3
+data: dataset_A.fa
+[INFO][0m 12351 duplicated records removed
+
+elapsed time: 20.118
+peak rss: 59924
+
+data: dataset_B.fa
+[INFO][0m 0 duplicated records removed
+
+elapsed time: 18.641
+peak rss: 2011904
+
+== 4
+data: dataset_A.fa
+[INFO][0m 12351 duplicated records removed
+
+elapsed time: 19.343
+peak rss: 59940
+
+data: dataset_B.fa
+[INFO][0m 0 duplicated records removed
+
+elapsed time: 16.326
+peak rss: 2150284
+

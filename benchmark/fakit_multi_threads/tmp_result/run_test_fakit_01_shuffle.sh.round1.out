@@ -1,0 +1,108 @@
+Test: Shuffling
+warm-up
+data: dataset_A.fa
+data: dataset_B.fa
+== 1
+recreate FASTA index file
+data: dataset_A.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for dataset_A.fa
+[fai warning] ignoring duplicate sequence "CP007063 Fusobacterium nucleatum subsp. animalis 7_1 plasmid, complete sequence. [Fusobacterium nucleatum subsp. animalis 7_1]" at byte offset 982881655
+[fai warning] ignoring duplicate sequence "CP007062 Fusobacterium nucleatum subsp. animalis 7_1, complete genome. [Fusobacterium nucleatum subsp. animalis 7_1]" at byte offset 982888188
+[INFO][0m read sequence IDs from FASTA index ...
+[INFO][0m 67746 sequences loaded
+[INFO][0m shuffle ...
+[INFO][0m output ...
+
+elapsed time: 17.471
+peak rss: 2804292
+
+data: dataset_B.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for dataset_B.fa
+[INFO][0m read sequence IDs from FASTA index ...
+[INFO][0m 194 sequences loaded
+[INFO][0m shuffle ...
+[INFO][0m output ...
+
+elapsed time: 13.777
+peak rss: 3246272
+
+== 2
+recreate FASTA index file
+data: dataset_A.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for dataset_A.fa
+[fai warning] ignoring duplicate sequence "CP007063 Fusobacterium nucleatum subsp. animalis 7_1 plasmid, complete sequence. [Fusobacterium nucleatum subsp. animalis 7_1]" at byte offset 982881655
+[fai warning] ignoring duplicate sequence "CP007062 Fusobacterium nucleatum subsp. animalis 7_1, complete genome. [Fusobacterium nucleatum subsp. animalis 7_1]" at byte offset 982888188
+[INFO][0m read sequence IDs from FASTA index ...
+[INFO][0m 67746 sequences loaded
+[INFO][0m shuffle ...
+[INFO][0m output ...
+
+elapsed time: 16.922
+peak rss: 2853488
+
+data: dataset_B.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for dataset_B.fa
+[INFO][0m read sequence IDs from FASTA index ...
+[INFO][0m 194 sequences loaded
+[INFO][0m shuffle ...
+[INFO][0m output ...
+
+elapsed time: 13.608
+peak rss: 3266400
+
+== 3
+recreate FASTA index file
+data: dataset_A.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for dataset_A.fa
+[fai warning] ignoring duplicate sequence "CP007063 Fusobacterium nucleatum subsp. animalis 7_1 plasmid, complete sequence. [Fusobacterium nucleatum subsp. animalis 7_1]" at byte offset 982881655
+[fai warning] ignoring duplicate sequence "CP007062 Fusobacterium nucleatum subsp. animalis 7_1, complete genome. [Fusobacterium nucleatum subsp. animalis 7_1]" at byte offset 982888188
+[INFO][0m read sequence IDs from FASTA index ...
+[INFO][0m 67746 sequences loaded
+[INFO][0m shuffle ...
+[INFO][0m output ...
+
+elapsed time: 16.875
+peak rss: 2840376
+
+data: dataset_B.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for dataset_B.fa
+[INFO][0m read sequence IDs from FASTA index ...
+[INFO][0m 194 sequences loaded
+[INFO][0m shuffle ...
+[INFO][0m output ...
+
+elapsed time: 16.508
+peak rss: 3278048
+
+== 4
+recreate FASTA index file
+data: dataset_A.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for dataset_A.fa
+[fai warning] ignoring duplicate sequence "CP007063 Fusobacterium nucleatum subsp. animalis 7_1 plasmid, complete sequence. [Fusobacterium nucleatum subsp. animalis 7_1]" at byte offset 982881655
+[fai warning] ignoring duplicate sequence "CP007062 Fusobacterium nucleatum subsp. animalis 7_1, complete genome. [Fusobacterium nucleatum subsp. animalis 7_1]" at byte offset 982888188
+[INFO][0m read sequence IDs from FASTA index ...
+[INFO][0m 67746 sequences loaded
+[INFO][0m shuffle ...
+[INFO][0m output ...
+
+elapsed time: 17.669
+peak rss: 2814828
+
+data: dataset_B.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for dataset_B.fa
+[INFO][0m read sequence IDs from FASTA index ...
+[INFO][0m 194 sequences loaded
+[INFO][0m shuffle ...
+[INFO][0m output ...
+
+elapsed time: 13.744
+peak rss: 3232840
+

@@ -1,0 +1,28 @@
+Test: Removing duplicates by seq
+warm-up
+data: dataset_A.fa
+data: dataset_B.fa
+== fakit
+data: dataset_A.fa
+[INFO][0m 12351 duplicated records removed
+
+elapsed time: 18.949
+peak rss: 60444
+
+data: dataset_B.fa
+[INFO][0m 0 duplicated records removed
+
+elapsed time: 17.317
+peak rss: 1745716
+
+== seqmagick
+data: dataset_A.fa
+
+elapsed time: 79.250
+peak rss: 61016
+
+data: dataset_B.fa
+
+elapsed time: 90.240
+peak rss: 1123820
+

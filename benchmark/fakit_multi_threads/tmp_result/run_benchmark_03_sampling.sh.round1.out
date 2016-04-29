@@ -1,0 +1,88 @@
+Test: Sampling by number
+warm-up
+data: dataset_A.fa
+data: dataset_B.fa
+== 1
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m first pass: estimating seq number
+[INFO][0m seq number: 67748
+[INFO][0m second pass: reading and sampling
+[INFO][0m %d sequences outputed 10000
+
+elapsed time: 33.230
+peak rss: 47588
+
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m first pass: estimating seq number
+[INFO][0m seq number: 194
+[INFO][0m second pass: reading and sampling
+[INFO][0m %d sequences outputed 19
+
+elapsed time: 36.808
+peak rss: 1869772
+
+== 2
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m first pass: estimating seq number
+[INFO][0m seq number: 67748
+[INFO][0m second pass: reading and sampling
+[INFO][0m %d sequences outputed 10000
+
+elapsed time: 28.746
+peak rss: 44032
+
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m first pass: estimating seq number
+[INFO][0m seq number: 194
+[INFO][0m second pass: reading and sampling
+[INFO][0m %d sequences outputed 19
+
+elapsed time: 31.512
+peak rss: 1558392
+
+== 3
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m first pass: estimating seq number
+[INFO][0m seq number: 67748
+[INFO][0m second pass: reading and sampling
+[INFO][0m %d sequences outputed 10000
+
+elapsed time: 29.751
+peak rss: 42520
+
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m first pass: estimating seq number
+[INFO][0m seq number: 194
+[INFO][0m second pass: reading and sampling
+[INFO][0m %d sequences outputed 19
+
+elapsed time: 32.991
+peak rss: 1536872
+
+== 4
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m first pass: estimating seq number
+[INFO][0m seq number: 67748
+[INFO][0m second pass: reading and sampling
+[INFO][0m %d sequences outputed 10000
+
+elapsed time: 30.270
+peak rss: 47688
+
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m first pass: estimating seq number
+[INFO][0m seq number: 194
+[INFO][0m second pass: reading and sampling
+[INFO][0m %d sequences outputed 19
+
+elapsed time: 31.828
+peak rss: 1604788
+

@@ -1,0 +1,47 @@
+Test: Sampling by number
+warm-up
+data: dataset_A.fa
+data: dataset_B.fa
+== fakit
+data: dataset_A.fa
+[INFO][0m sample by number
+[INFO][0m first pass: estimating seq number
+[INFO][0m seq number: 67748
+[INFO][0m second pass: reading and sampling
+[INFO][0m %d sequences outputed 10000
+
+elapsed time: 28.829
+peak rss: 44632
+
+data: dataset_B.fa
+[INFO][0m sample by number
+[INFO][0m first pass: estimating seq number
+[INFO][0m seq number: 194
+[INFO][0m second pass: reading and sampling
+[INFO][0m %d sequences outputed 19
+
+elapsed time: 31.334
+peak rss: 1558036
+
+== seqmagick
+data: dataset_A.fa
+
+elapsed time: 42.377
+peak rss: 540640
+
+data: dataset_B.fa
+
+elapsed time: 45.154
+peak rss: 2940288
+
+== seqtk
+data: dataset_A.fa
+
+elapsed time: 4.358
+peak rss: 1083280
+
+data: dataset_B.fa
+
+elapsed time: 4.904
+peak rss: 2817700
+

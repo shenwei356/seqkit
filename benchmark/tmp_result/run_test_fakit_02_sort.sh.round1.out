@@ -1,0 +1,30 @@
+Test: Sorting by length
+warm-up
+data: dataset_A.fa
+data: dataset_B.fa
+delete old FASTA index file
+== fakit
+data: dataset_A.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for dataset_A.fa
+[fai warning] ignoring duplicate sequence "CP007063 Fusobacterium nucleatum subsp. animalis 7_1 plasmid, complete sequence. [Fusobacterium nucleatum subsp. animalis 7_1]" at byte offset 982881655
+[fai warning] ignoring duplicate sequence "CP007062 Fusobacterium nucleatum subsp. animalis 7_1, complete genome. [Fusobacterium nucleatum subsp. animalis 7_1]" at byte offset 982888188
+[INFO][0m read sequence IDs and lengths from FASTA index ...
+[INFO][0m 67746 sequences loaded
+[INFO][0m sorting ...
+[INFO][0m output ...
+
+elapsed time: 18.775
+peak rss: 2888056
+
+data: dataset_B.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for dataset_B.fa
+[INFO][0m read sequence IDs and lengths from FASTA index ...
+[INFO][0m 194 sequences loaded
+[INFO][0m sorting ...
+[INFO][0m output ...
+
+elapsed time: 14.233
+peak rss: 3254916
+

@@ -1,0 +1,5 @@
+test	dataset	app	time_mean	time_stdev	mem_mean	mem_stdev
+Shuffling	dataset_A.fa	fakit	17.70	0.00	2843664	0
+Shuffling	dataset_B.fa	fakit	14.44	0.00	3127368	0
+Sorting by length	dataset_A.fa	fakit	18.77	0.00	2888056	0
+Sorting by length	dataset_B.fa	fakit	14.23	0.00	3254916	0

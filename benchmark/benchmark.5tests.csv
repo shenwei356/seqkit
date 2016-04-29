@@ -1,0 +1,31 @@
+test	dataset	app	time_mean	time_stdev	mem_mean	mem_stdev
+Reverse complement	dataset_A.fa	biogo	100.78	1.33	35836	1226
+Reverse complement	dataset_A.fa	fakit	30.53	1.03	47684	1994
+Reverse complement	dataset_A.fa	fasta_utilities	18.87	1.36	58298	859
+Reverse complement	dataset_A.fa	seqmagick	59.68	1.56	49754	1493
+Reverse complement	dataset_A.fa	seqtk	10.06	0.53	7629	18
+Reverse complement	dataset_B.fa	biogo	93.65	2.18	1315030	53727
+Reverse complement	dataset_B.fa	fakit	26.36	1.29	1793784	75222
+Reverse complement	dataset_B.fa	fasta_utilities	27.79	3.25	1256350	92
+Reverse complement	dataset_B.fa	seqmagick	65.42	1.91	1422250	73040
+Reverse complement	dataset_B.fa	seqtk	12.25	0.95	244870	57
+Searching by ID list	dataset_A.fa	fakit	12.23	0.21	53065	2711
+Searching by ID list	dataset_A.fa	fasta_utilities	9.96	0.01	54824	3379
+Searching by ID list	dataset_A.fa	seqmagick	46.22	0.19	42166	932
+Searching by ID list	dataset_A.fa	seqtk	11.72	0.44	9954	60
+Searching by ID list	dataset_B.fa	fakit	12.02	0.06	1695814	1128
+Searching by ID list	dataset_B.fa	fasta_utilities	12.60	0.07	1256420	67
+Searching by ID list	dataset_B.fa	seqmagick	53.86	1.12	973556	36867
+Searching by ID list	dataset_B.fa	seqtk	14.22	0.27	244886	64
+Sampling by number	dataset_A.fa	fakit	28.30	0.39	44261	3344
+Sampling by number	dataset_A.fa	seqmagick	40.88	1.07	541172	912
+Sampling by number	dataset_A.fa	seqtk	4.25	0.09	1081468	1295
+Sampling by number	dataset_B.fa	fakit	31.31	0.66	1558248	149
+Sampling by number	dataset_B.fa	seqmagick	42.20	2.10	3036372	108690
+Sampling by number	dataset_B.fa	seqtk	4.99	0.11	2817700	3
+Removing duplicates by seq	dataset_A.fa	fakit	19.86	0.82	61324	2426
+Removing duplicates by seq	dataset_A.fa	seqmagick	79.47	1.87	60590	576
+Removing duplicates by seq	dataset_B.fa	fakit	16.50	0.78	1927258	133969
+Removing duplicates by seq	dataset_B.fa	seqmagick	90.29	0.67	1123858	28
+Subsequence with BED file	dataset_B.fa	fakit	9.70	0.23	2081481	163038
+Subsequence with BED file	dataset_B.fa	seqtk	6.72	0.06	246277	33
