@@ -69,6 +69,7 @@ var seqCmd = &cobra.Command{
 		seq.ValidateWholeSeq = false
 		seq.ValidSeqLengthThreshold = validateSeqLength
 		seq.ValidSeqThreads = config.Threads
+		seq.ComplementThreads = config.Threads
 
 		if !(alphabet == nil || alphabet == seq.Unlimit) {
 			log.Info("when flag -t (--seq-type) given, flag -v (--validate-seq) is automatically switched on")
@@ -151,6 +152,9 @@ var seqCmd = &cobra.Command{
 							sequence = sequence.ReverseInplace()
 						}
 						if complement {
+							if !config.Quiet && record.Seq.Alphabet == seq.Protein || record.Seq.Alphabet == seq.Unlimit {
+								log.Warning("Complement does no take effect on protein/unlimit sequence")
+							}
 							sequence = sequence.ComplementInplace()
 						}
 						if removeGaps {

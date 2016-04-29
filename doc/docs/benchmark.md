@@ -4,19 +4,17 @@
 ## Softwares
 
 1. [fakit](https://github.com/shenwei356/fakit). (Go).
-   Version [v0.2.0](https://github.com/shenwei356/fakit/releases/tag/v0.2.0).
+   Version [v0.2.1](https://github.com/shenwei356/fakit/releases/tag/v0.2.1).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
-   Lots of dependencies to install_.
+   Lots of dependencies to install.
 1. [fastx_toolkit](http://hannonlab.cshl.edu/fastx_toolkit/). (Perl).
    Version [0.0.13](http://hannonlab.cshl.edu/fastx_toolkit/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2).
-   Can't handle multi-line FASTA files_.
-1. [seqmagick](http://seqmagick.readthedocs.org/en/latest/index.html). (Python).
+   Can't handle multi-line FASTA files.
+1. [seqmagick](http://seqmagick.readthedocs.io/en/latest/index.html#installation). (Python).
    Version 0.6.1
 1. [seqtk](https://github.com/lh3/seqtk). (C).
-   Version [1.0-r82-dirty](https://github.com/lh3/seqtk/commit/4feb6e81444ab6bc44139dd3a125068f81ae4ad8).
-1. [biogo]
-
+   Version [1.1-r92-dirty](https://github.com/lh3/seqtk/tree/fb85aad4ce1fc7b3d4543623418a1ae88fe1cea6).
 
 Not used:
 
@@ -54,6 +52,8 @@ Size select      | Indirect | Yes             | --            | Yes     | Yes   
 Rename head      | Yes      | Yes             | --            | --      | Yes       | Yes
 
 ## Datasets
+
+All test data is available here: [fakit-benchmark-data.tar.gz](http://bioinf.shenwei.me/fakit-benchmark-data.tar.gz)  (1.7G)
 
 ### dataset_A.fa - large number of short sequences
 
@@ -129,7 +129,7 @@ All data were readed once before tests began to minimize the influence of page c
 Output sequences of all Softwares were not wrapped to fixed length.
 
 `revcom_biogo` ([source](https://github.com/shenwei356/fakit/blob/master/benchmark/revcom_biogo.go),
- [binary](https://github.com/shenwei356/fakit/raw/master/benchmark/revcom_biogo) ),
+ [binary](https://github.com/shenwei356/fakit/blob/master/benchmark/revcom_biogo?raw=true) ),
  a tool written in Golang using [biogo](https://github.com/biogo/biogo) package,
  was also used for comparison of FASTA file parsing performance.
 
@@ -161,6 +161,16 @@ the peak memory may depends on size of sampled sequences.
 Performance of other functions in fakit:
 
 ![benchmark-fakit.csv.png](benchmark/benchmark.fakit.csv.png)
+
+### Test of multiple threads:
+
+From the results, 2 threads/CPU is enough, so the default threads of fakit is 2.
+
+![benchmark-5tests.csv.png](benchmark/fakit_multi_threads/benchmark.5tests.csv.png)
+
+
+![benchmark-fakit.csv.png](benchmark/fakit_multi_threads/benchmark.fakit.csv.png)
+
 
 <div id="disqus_thread"></div>
 <script>

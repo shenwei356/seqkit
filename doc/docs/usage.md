@@ -88,10 +88,10 @@ Most of the subcommands do not read whole FASTA/Q records in to memory,
 including `stat`, `fq2fa`, `fx2tab`, `tab2fx`, `grep`, `locate`, `replace`,
  `seq`, `sliding`, `subseq`. They just temporarily buffer chunks of records.
 
-However when handling big sequences, e.g. human genome, the memory is high
-(2-3 GB) even the buffer size is 1.
-This is due to the limitation of Go programming language, it may be solved
-in the future.
+ However when handling big sequences, e.g. Human genome, the memory is high
+ (2-3 GB) even the buffer size is 1.
+ This is due to the limitation of garbage collection mechanism in
+  Go programming language, it may be solved in the future.
 
 Note that when using `subseq --gtf | --bed`, if the GTF/BED files are too
 big, the memory usage will increase.
@@ -119,7 +119,7 @@ Usage
 ```
 fakit -- a cross-platform and efficient suit for FASTA/Q file manipulation
 
-Version: 0.2.0
+Version: 0.2.1
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -279,7 +279,9 @@ Examples
       But this only take effect on subcommands `seq` and `locate`.
 
             $ echo -e ">seq\nabcdefghijklmnpqrstvwyz" | fakit seq -t dna
+            [INFO] when flag -t (--seq-type) given, flag -v (--validate-seq) is automatically switched on
             [ERRO] error when parsing seq: seq (invalid DNAredundant letter: e)
+
 
 1. Only print names
 
@@ -313,7 +315,7 @@ Examples
 
 1. Convert multi-line FASTQ to 4-line FASTQ
 
-        $ fakit seq read_1.fq.gz -w 0
+        $ fakit seq reads_1.fq.gz -w 0
 
 1. Reverse comlement sequence
 
@@ -594,7 +596,7 @@ Examples
 1. Print sequence length, GC content, and only print names (no sequences),
 we could also print title line by flag `-T`.
 
-        $ fakit fx2tab hairpin.fa.gz -l -g -n -i -T | head -n 4 | csvtk -t -C '&' pretty
+        $ fakit fx2tab hairpin.fa.gz -l -g -n -i -H | head -n 4 | csvtk -t -C '&' pretty
         #name       seq   qual   length   GC
         cel-let-7                99       43.43
         cel-lin-4                94       54.26
@@ -632,7 +634,7 @@ After converting FASTA to tabular format with `fakit fx2tab`,
 it could be handled with CSV/TSV tools,
  e.g. [csvtk](https://github.com/shenwei356/csvtkt), a cross-platform, efficient and practical CSV/TSV toolkit
 
-- `csvtk grep` could be used to filter sequences (similar with `fakit extract`)
+- `csvtk grep` could be used to filter sequences (similar with `fakit grep`)
 - `csvtk inter`
 computates intersection of multiple files. It could achieve similar function
 as `fakit common -n` along with shell.
@@ -1094,7 +1096,8 @@ Examples
         [INFO] shuffle ...
         [INFO] output ...
 
-1. ***For big genome, you'd better use plain FASTA file***
+1. ***For big genome, you'd better use two-pass mode*** so fakit could use
+   FASTA index to reduce memory usage
 
         $ time fakit shuffle -2 hsa.fa > shuffle.fa
         [INFO] create and read FASTA index ...

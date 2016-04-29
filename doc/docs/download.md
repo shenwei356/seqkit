@@ -6,11 +6,11 @@
 
 ## Current Version
 
-- [fakit v0.2.0](https://github.com/shenwei356/fakit/releases/tag/v0.2.0)
-    - ***reduce memory usage of writing output***
-    - fix bug of `subseq`, `shuffle`, `sort` when reading from stdin
-    - reduce memory usage of `faidx`
-    - make validating sequences an optional option in `seq` command, it saves some time.
+- [fakit v0.2.1](https://github.com/shenwei356/fakit/releases/tag/v0.2.1)
+    - improve performance of outputing.
+    - fix bug of `fakit seq -g` for FASTA fromat
+    - some other minor fix of code and docs
+    - update benchmark results
 
 ## Installation
 
@@ -38,6 +38,11 @@ You can also add the directory of the executable file to environment variable
 
 ## Previous Versions
 
+- [fakit v0.2.0](https://github.com/shenwei356/fakit/releases/tag/v0.2.0)
+    - ***reduce memory usage of writing output***
+    - fix bug of `subseq`, `shuffle`, `sort` when reading from stdin
+    - reduce memory usage of `faidx`
+    - make validating sequences an optional option in `seq` command, it saves some time.
 - [fakit v0.1.9](https://github.com/shenwei356/fakit/releases/tag/v0.1.9)
     - using custom FASTA index file extension: `.fakit.fai`
     - reducing memory usage of `sample --number --two-pass`
