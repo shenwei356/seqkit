@@ -258,10 +258,10 @@ flag <code>-j</code> or <code>--threads</code> (default value: 1 for single-CPU 
 <p>Most of the subcommands do not read whole FASTA/Q records in to memory,
 including <code>stat</code>, <code>fq2fa</code>, <code>fx2tab</code>, <code>tab2fx</code>, <code>grep</code>, <code>locate</code>, <code>replace</code>,
  <code>seq</code>, <code>sliding</code>, <code>subseq</code>. They just temporarily buffer chunks of records.</p>
-<p>However when handling big sequences, e.g. human genome, the memory is high
-(2-3 GB) even the buffer size is 1.
-This is due to the limitation of Go programming language, it may be solved
-in the future.</p>
+<p>However when handling big sequences, e.g. Human genome, the memory is high
+ (2-3 GB) even the buffer size is 1.
+ This is due to the limitation of garbage collection mechanism in
+  Go programming language, it may be solved in the future.</p>
 <p>Note that when using <code>subseq --gtf | --bed</code>, if the GTF/BED files are too
 big, the memory usage will increase.
 You could use <code>--chr</code> to specify chromesomes and <code>--feature</code> to limit features.</p>
@@ -280,7 +280,7 @@ reproduced in different environments with same random seed.</p>
 <p>Usage</p>
 <pre><code>fakit -- a cross-platform and efficient suit for FASTA/Q file manipulation
 
-Version: 0.2.0
+Version: 0.2.1
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -445,6 +445,7 @@ file   seq_format   seq_type   num_seqs   min_len   avg_len   max_len
 <p>You can also set sequence type by flag <code>-t</code> (<code>--seq-type</code>).
   But this only take effect on subcommands <code>seq</code> and <code>locate</code>.</p>
 <pre><code>$ echo -e "&gt;seq\nabcdefghijklmnpqrstvwyz" | fakit seq -t dna
+[INFO] when flag -t (--seq-type) given, flag -v (--validate-seq) is automatically switched on
 [ERRO] error when parsing seq: seq (invalid DNAredundant letter: e)
 </code></pre>
 </li>
@@ -489,7 +490,7 @@ AAAGUGACCGUACCGAGCUGCAUACUUCCUUACAUGCCCAUACUAUAUCAUAAAUGGAUAUGGAAUGUAAAGAAGUAUGU
 </li>
 <li>
 <p>Convert multi-line FASTQ to 4-line FASTQ</p>
-<pre><code>$ fakit seq read_1.fq.gz -w 0
+<pre><code>$ fakit seq reads_1.fq.gz -w 0
 </code></pre>
 </li>
 <li>
@@ -759,7 +760,7 @@ cel-lin-4 MI0000002 Caenorhabditis elegans lin-4 stem-loop      AUGCUUCCGGCCUGUU
 <li>
 <p>Print sequence length, GC content, and only print names (no sequences),
 we could also print title line by flag <code>-T</code>.</p>
-<pre><code>$ fakit fx2tab hairpin.fa.gz -l -g -n -i -T | head -n 4 | csvtk -t -C '&amp;' pretty
+<pre><code>$ fakit fx2tab hairpin.fa.gz -l -g -n -i -H | head -n 4 | csvtk -t -C '&amp;' pretty
 #name       seq   qual   length   GC
 cel-let-7                99       43.43
 cel-lin-4                94       54.26
@@ -800,7 +801,7 @@ $ fakit fx2tab reads_1.fq.gz | head -n 1000 | fakit tab2fx
 it could be handled with CSV/TSV tools,
  e.g. <a href="https://github.com/shenwei356/csvtkt">csvtk</a>, a cross-platform, efficient and practical CSV/TSV toolkit</p>
 <ul>
-<li><code>csvtk grep</code> could be used to filter sequences (similar with <code>fakit extract</code>)</li>
+<li><code>csvtk grep</code> could be used to filter sequences (similar with <code>fakit grep</code>)</li>
 <li><code>csvtk inter</code>
 computates intersection of multiple files. It could achieve similar function
 as <code>fakit common -n</code> along with shell.</li>
@@ -1262,7 +1263,8 @@ Flags:
 </code></pre>
 </li>
 <li>
-<p><strong><em>For big genome, you'd better use plain FASTA file</em></strong></p>
+<p><strong><em>For big genome, you'd better use two-pass mode</em></strong> so fakit could use
+   FASTA index to reduce memory usage</p>
 <pre><code>$ time fakit shuffle -2 hsa.fa &gt; shuffle.fa
 [INFO] create and read FASTA index ...
 [INFO] create FASTA index for hsa.fa

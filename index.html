@@ -169,7 +169,7 @@
 format. And the name was remained after adding <strong><em>seamless support for FASTA/Q fromat</em></strong>.</p>
 <h2 id="introduction">Introduction</h2>
 <p>FASTA and FASTQ are basic formats for storing nucleotide and protein sequences.
-The manipulations of FASTA/Q file includes converting, clipping, searching,
+The manipulations of FASTA/Q file include converting, clipping, searching,
 filtering, deduplication, splitting, shuffling, sampling and so on.
 Existed tools only implemented parts of the functions,
 and some of them are only available for specific operating systems.
@@ -178,7 +178,8 @@ running environment also make them less friendly to common users.</p>
 <p>fakit is a cross-platform, efficient, and practical FASTA/Q manipulations tool
 that is friendly for researchers to complete wide ranges of FASTA file processing.
 The suite supports plain or gzip-compressed input and output
-from either standard stream or files, therefore, it could be easily used in pipelines.</p>
+from either standard stream or files,
+therefore, it could be easily used in command-line pipe.</p>
 <h2 id="features">Features</h2>
 <ul>
 <li><strong>Cross-platform</strong> (Linux/Windows/Mac OS X/OpenBSD/FreeBSD,
@@ -572,10 +573,10 @@ flag <code>-j</code> or <code>--threads</code> (default value: 1 for single-CPU 
 <p>Most of the subcommands do not read whole FASTA/Q records in to memory,
 including <code>stat</code>, <code>fq2fa</code>, <code>fx2tab</code>, <code>tab2fx</code>, <code>grep</code>, <code>locate</code>, <code>replace</code>,
  <code>seq</code>, <code>sliding</code>, <code>subseq</code>. They just temporarily buffer chunks of records.</p>
-<p>However when handling big sequences, e.g. human genome, the memory is high
+<p>However when handling big sequences, e.g. Human genome, the memory is high
 (2-3 GB) even the buffer size is 1.
-This is due to the limitation of Go programming language, it may be solved
-in the future.</p>
+This is due to the limitation of garbage collection mechanism in
+ Go programming language, it may be solved in the future.</p>
 <p>Note that when using <code>subseq --gtf | --bed</code>, if the GTF/BED files are too
 big, the memory usage will increase.
 You could use <code>--chr</code> to specify chromesomes and <code>--feature</code> to limit features.</p>
@@ -656,5 +657,5 @@ propose new functions or ask for help.</p>
 
 <!--
 MkDocs version : 0.15.3
-Build Date UTC : 2016-04-28 15:40:35.408534
+Build Date UTC : 2016-04-29 09:14:13.208379
 -->

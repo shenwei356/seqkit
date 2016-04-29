@@ -156,18 +156,17 @@
 <h2 id="softwares">Softwares</h2>
 <ol>
 <li><a href="https://github.com/shenwei356/fakit">fakit</a>. (Go).
-   Version <a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.0">v0.2.0</a>.</li>
+   Version <a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.1">v0.2.1</a>.</li>
 <li><a href="https://github.com/jimhester/fasta_utilities">fasta_utilities</a>. (Perl).
    Version <a href="https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579">3dcc0bc</a>.
-   Lots of dependencies to install_.</li>
+   Lots of dependencies to install.</li>
 <li><a href="http://hannonlab.cshl.edu/fastx_toolkit/">fastx_toolkit</a>. (Perl).
    Version <a href="http://hannonlab.cshl.edu/fastx_toolkit/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2">0.0.13</a>.
-   Can't handle multi-line FASTA files_.</li>
-<li><a href="http://seqmagick.readthedocs.org/en/latest/index.html">seqmagick</a>. (Python).
+   Can't handle multi-line FASTA files.</li>
+<li><a href="http://seqmagick.readthedocs.io/en/latest/index.html#installation">seqmagick</a>. (Python).
    Version 0.6.1</li>
 <li><a href="https://github.com/lh3/seqtk">seqtk</a>. (C).
-   Version <a href="https://github.com/lh3/seqtk/commit/4feb6e81444ab6bc44139dd3a125068f81ae4ad8">1.0-r82-dirty</a>.</li>
-<li>[biogo]</li>
+   Version <a href="https://github.com/lh3/seqtk/tree/fb85aad4ce1fc7b3d4543623418a1ae88fe1cea6">1.1-r92-dirty</a>.</li>
 </ol>
 <p>Not used:</p>
 <ol>
@@ -391,6 +390,7 @@ to compute running time and peak memory usage of a process.</p>
 </tbody>
 </table>
 <h2 id="datasets">Datasets</h2>
+<p>All test data is available here: <a href="http://bioinf.shenwei.me/fakit-benchmark-data.tar.gz">fakit-benchmark-data.tar.gz</a>  (1.7G)</p>
 <h3 id="dataset_afa-large-number-of-short-sequences">dataset_A.fa - large number of short sequences</h3>
 <p>Dataset A is reference genomes DNA sequences of gastrointestinal tract from
 <a href="http://hmpdacc.org/">NIH Human Microbiome Project</a>:
@@ -447,7 +447,7 @@ and average time and peak memory ware used for plotting.</p>
 <h3 id="test-1-reverse-complement">Test 1. Reverse Complement</h3>
 <p>Output sequences of all Softwares were not wrapped to fixed length.</p>
 <p><code>revcom_biogo</code> (<a href="https://github.com/shenwei356/fakit/blob/master/benchmark/revcom_biogo.go">source</a>,
- <a href="https://github.com/shenwei356/fakit/raw/master/benchmark/revcom_biogo">binary</a> ),
+ <a href="https://github.com/shenwei356/fakit/blob/master/benchmark/revcom_biogo?raw=true">binary</a> ),
  a tool written in Golang using <a href="https://github.com/biogo/biogo">biogo</a> package,
  was also used for comparison of FASTA file parsing performance.</p>
 <p><a href="https://github.com/shenwei356/fakit/blob/master/benchmark/run_benchmark_01_revcom.sh">Commands</a></p>
@@ -465,6 +465,10 @@ the peak memory may depends on size of sampled sequences.</p>
 <p><img alt="benchmark-5tests.csv.png" src="../benchmark/benchmark.5tests.csv.png" /></p>
 <p>Performance of other functions in fakit:</p>
 <p><img alt="benchmark-fakit.csv.png" src="../benchmark/benchmark.fakit.csv.png" /></p>
+<h3 id="test-of-multiple-threads">Test of multiple threads:</h3>
+<p>From the results, 2 threads/CPU is enough, so the default threads of fakit is 2.</p>
+<p><img alt="benchmark-5tests.csv.png" src="../benchmark/fakit_multi_threads/benchmark.5tests.csv.png" /></p>
+<p><img alt="benchmark-fakit.csv.png" src="../benchmark/fakit_multi_threads/benchmark.fakit.csv.png" /></p>
 <div id="disqus_thread"></div>
 
 <script>
