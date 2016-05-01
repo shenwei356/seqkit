@@ -14,8 +14,8 @@ data: dataset_A.fa
 [INFO][0m sorting ...
 [INFO][0m output ...
 
-elapsed time: 18.272
-peak rss: 2853268
+elapsed time: 22.549
+peak rss: 130596
 
 data: dataset_B.fa
 [INFO][0m create and read FASTA index ...
@@ -25,8 +25,8 @@ data: dataset_B.fa
 [INFO][0m sorting ...
 [INFO][0m output ...
 
-elapsed time: 14.721
-peak rss: 3155324
+elapsed time: 18.021
+peak rss: 768636
 
 == 2
 delete old FASTA index file
@@ -40,8 +40,8 @@ data: dataset_A.fa
 [INFO][0m sorting ...
 [INFO][0m output ...
 
-elapsed time: 21.878
-peak rss: 2856084
+elapsed time: 21.572
+peak rss: 130708
 
 data: dataset_B.fa
 [INFO][0m create and read FASTA index ...
@@ -51,8 +51,8 @@ data: dataset_B.fa
 [INFO][0m sorting ...
 [INFO][0m output ...
 
-elapsed time: 17.350
-peak rss: 3141520
+elapsed time: 16.756
+peak rss: 829404
 
 == 3
 delete old FASTA index file
@@ -66,8 +66,8 @@ data: dataset_A.fa
 [INFO][0m sorting ...
 [INFO][0m output ...
 
-elapsed time: 19.024
-peak rss: 2859320
+elapsed time: 21.072
+peak rss: 130332
 
 data: dataset_B.fa
 [INFO][0m create and read FASTA index ...
@@ -77,8 +77,8 @@ data: dataset_B.fa
 [INFO][0m sorting ...
 [INFO][0m output ...
 
-elapsed time: 14.431
-peak rss: 3202260
+elapsed time: 16.260
+peak rss: 806988
 
 == 4
 delete old FASTA index file
@@ -92,8 +92,8 @@ data: dataset_A.fa
 [INFO][0m sorting ...
 [INFO][0m output ...
 
-elapsed time: 19.274
-peak rss: 2880252
+elapsed time: 20.231
+peak rss: 135576
 
 data: dataset_B.fa
 [INFO][0m create and read FASTA index ...
@@ -103,6 +103,6 @@ data: dataset_B.fa
 [INFO][0m sorting ...
 [INFO][0m output ...
 
-elapsed time: 17.663
-peak rss: 3250852
+elapsed time: 17.008
+peak rss: 757764
 

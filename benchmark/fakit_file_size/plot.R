@@ -71,7 +71,7 @@ if (max_mem > 1024 * 1024) {
 p <-
   ggplot(df, aes(
     x = mem_mean2, y = time_mean,
-    color = app, shape = dataset, label = app
+    color = app, label = app
   )) +
   
   geom_point(size = 2) +
@@ -83,7 +83,7 @@ p <-
   ylim(0, max(df$time_mean)) +
   xlim(0, max(df$mem_mean2)) +
   
-  # ggtitle(paste("FASTA/Q Manipulation Performance\n", test1, sep = "")) +
+  ggtitle("Performance on different size of files") +
   ylab("Time (s)") +
   xlab(paste("Peak Memory (", unit, ")", sep = ""))
 
@@ -103,7 +103,7 @@ p <- p +
     ),
     
     legend.text = element_text(size = 14),
-    legend.position = c(0.85,0.25),
+    legend.position = "c(0.85,0.25)",
     legend.background = element_rect(fill = "transparent"),
     legend.key.size = unit(0.6, "cm"),
     legend.key = element_blank(),
@@ -115,7 +115,7 @@ p <- p +
       size = 14, family = "arial", face = "bold"
     ),
     plot.title = element_text(size = 15)
-  )
+  ) 
 
 ggsave(p, file = args$outfile, width = w, height = h, dpi=args$dpi)
 

@@ -1,0 +1,43 @@
+Test: Removing duplicates by seq content
+== 1
+data: 1.fa
+[INFO][0m 0 duplicated records removed
+
+elapsed time: 2.006
+peak rss: 1032112
+
+== 2
+data: 2.fa
+[INFO][0m 1 duplicated records removed
+
+elapsed time: 3.295
+peak rss: 1282864
+
+== 4
+data: 4.fa
+[INFO][0m 3 duplicated records removed
+
+elapsed time: 5.683
+peak rss: 1786604
+
+== 8
+data: 8.fa
+[INFO][0m 7 duplicated records removed
+
+elapsed time: 10.260
+peak rss: 1786348
+
+== 16
+data: 16.fa
+[INFO][0m 15 duplicated records removed
+
+elapsed time: 21.432
+peak rss: 1786084
+
+== 32
+data: 32.fa
+[INFO][0m 31 duplicated records removed
+
+elapsed time: 40.787
+peak rss: 1786456
+

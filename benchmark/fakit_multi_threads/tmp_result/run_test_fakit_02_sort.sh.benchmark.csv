@@ -1,9 +1,9 @@
 test	dataset	app	time_mean	time_stdev	mem_mean	mem_stdev
-Sorting by length	dataset_A.fa	1	18.27	0.00	2853268	0
-Sorting by length	dataset_A.fa	2	21.88	0.00	2856084	0
-Sorting by length	dataset_A.fa	3	19.02	0.00	2859320	0
-Sorting by length	dataset_A.fa	4	19.27	0.00	2880252	0
-Sorting by length	dataset_B.fa	1	14.72	0.00	3155324	0
-Sorting by length	dataset_B.fa	2	17.35	0.00	3141520	0
-Sorting by length	dataset_B.fa	3	14.43	0.00	3202260	0
-Sorting by length	dataset_B.fa	4	17.66	0.00	3250852	0
+Sorting by length	dataset_A.fa	1	22.55	0.00	130596	0
+Sorting by length	dataset_A.fa	2	21.57	0.00	130708	0
+Sorting by length	dataset_A.fa	3	21.07	0.00	130332	0
+Sorting by length	dataset_A.fa	4	20.23	0.00	135576	0
+Sorting by length	dataset_B.fa	1	18.02	0.00	768636	0
+Sorting by length	dataset_B.fa	2	16.76	0.00	829404	0
+Sorting by length	dataset_B.fa	3	16.26	0.00	806988	0
+Sorting by length	dataset_B.fa	4	17.01	0.00	757764	0

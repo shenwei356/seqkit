@@ -276,7 +276,8 @@ func subseqByFaix(faidx *fai.Faidx, chrs string, r fai.Record, start, end int) [
 	if !ok {
 		return []byte("")
 	}
-	subseq, _ := faidx.SubSeq(chrs, start, end)
+	subseq, err := faidx.SubSeq(chrs, start, end)
+	checkError(err)
 	return subseq
 }
 
@@ -285,7 +286,8 @@ func subseqByFaixNotCleaned(faidx *fai.Faidx, chrs string, r fai.Record, start, 
 	if !ok {
 		return []byte("")
 	}
-	subseq, _ := faidx.SubSeqNotCleaned(chrs, start, end)
+	subseq, err := faidx.SubSeqNotCleaned(chrs, start, end)
+	checkError(err)
 	return subseq
 }
 

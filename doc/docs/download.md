@@ -6,11 +6,8 @@
 
 ## Current Version
 
-- [fakit v0.2.1](https://github.com/shenwei356/fakit/releases/tag/v0.2.1)
-    - improve performance of outputing.
-    - fix bug of `fakit seq -g` for FASTA fromat
-    - some other minor fix of code and docs
-    - update benchmark results
+- [fakit v0.2.2](https://github.com/shenwei356/fakit/releases/tag/v0.2.2)
+    - reduce memory occupation of subcommands that use FASTA index
 
 ## Installation
 
@@ -31,13 +28,18 @@ You can also add the directory of the executable file to environment variable
 
 2. For Linux, type:
 
-        chmod a+x /PATH/OF/FASTCOV/fakit
-        echo export PATH=\$PATH:/PATH/OF/FASTCOV >> ~/.bashrc
+        chmod a+x /PATH/OF/FAKIT/fakit
+        echo export PATH=\$PATH:/PATH/OF/fakit >> ~/.bashrc
 
     or simply copy it to `/usr/local/bin`
 
 ## Previous Versions
 
+- [fakit v0.2.1](https://github.com/shenwei356/fakit/releases/tag/v0.2.1)
+    - improve performance of outputing.
+    - fix bug of `fakit seq -g` for FASTA fromat
+    - some other minor fix of code and docs
+    - update benchmark results
 - [fakit v0.2.0](https://github.com/shenwei356/fakit/releases/tag/v0.2.0)
     - ***reduce memory usage of writing output***
     - fix bug of `subseq`, `shuffle`, `sort` when reading from stdin

@@ -1,0 +1,37 @@
+Test: Reverse complement
+== 1
+data: 1.fa
+
+elapsed time: 2.604
+peak rss: 775772
+
+== 2
+data: 2.fa
+
+elapsed time: 4.986
+peak rss: 1029524
+
+== 4
+data: 4.fa
+
+elapsed time: 9.285
+peak rss: 1535448
+
+== 8
+data: 8.fa
+
+elapsed time: 18.551
+peak rss: 2039500
+
+== 16
+data: 16.fa
+
+elapsed time: 41.316
+peak rss: 2040348
+
+== 32
+data: 32.fa
+
+elapsed time: 82.434
+peak rss: 2207924
+

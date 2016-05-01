@@ -14,8 +14,8 @@ data: dataset_A.fa
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 17.702
-peak rss: 2843664
+elapsed time: 19.903
+peak rss: 93744
 
 data: dataset_B.fa
 [INFO][0m create and read FASTA index ...
@@ -25,6 +25,6 @@ data: dataset_B.fa
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 14.437
-peak rss: 3127368
+elapsed time: 17.340
+peak rss: 615716
 

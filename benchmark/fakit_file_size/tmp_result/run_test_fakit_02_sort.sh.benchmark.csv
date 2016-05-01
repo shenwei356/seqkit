@@ -1,0 +1,7 @@
+test	dataset	app	time_mean	time_stdev	mem_mean	mem_stdev
+Sorting by length	1.fa	1	1.30	0.15	431653	13741
+Sorting by length	16.fa	16	28.60	2.42	704033	37342
+Sorting by length	2.fa	2	2.55	0.20	668110	21799
+Sorting by length	32.fa	32	77.64	2.59	689464	25033
+Sorting by length	4.fa	4	4.94	0.52	679746	13107
+Sorting by length	8.fa	8	13.33	2.83	669818	15667

@@ -1,0 +1,79 @@
+Test: Sorting by length
+== 1
+delete old FASTA index file
+data: 1.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for 1.fa
+[INFO][0m read sequence IDs and lengths from FASTA index ...
+[INFO][0m 1 sequences loaded
+[INFO][0m sorting ...
+[INFO][0m output ...
+
+elapsed time: 1.501
+peak rss: 428980
+
+== 2
+delete old FASTA index file
+data: 2.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for 2.fa
+[INFO][0m read sequence IDs and lengths from FASTA index ...
+[INFO][0m 2 sequences loaded
+[INFO][0m sorting ...
+[INFO][0m output ...
+
+elapsed time: 2.648
+peak rss: 690628
+
+== 4
+delete old FASTA index file
+data: 4.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for 4.fa
+[INFO][0m read sequence IDs and lengths from FASTA index ...
+[INFO][0m 4 sequences loaded
+[INFO][0m sorting ...
+[INFO][0m output ...
+
+elapsed time: 5.307
+peak rss: 693752
+
+== 8
+delete old FASTA index file
+data: 8.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for 8.fa
+[INFO][0m read sequence IDs and lengths from FASTA index ...
+[INFO][0m 8 sequences loaded
+[INFO][0m sorting ...
+[INFO][0m output ...
+
+elapsed time: 15.114
+peak rss: 676804
+
+== 16
+delete old FASTA index file
+data: 16.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for 16.fa
+[INFO][0m read sequence IDs and lengths from FASTA index ...
+[INFO][0m 16 sequences loaded
+[INFO][0m sorting ...
+[INFO][0m output ...
+
+elapsed time: 27.078
+peak rss: 724380
+
+== 32
+delete old FASTA index file
+data: 32.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for 32.fa
+[INFO][0m read sequence IDs and lengths from FASTA index ...
+[INFO][0m 32 sequences loaded
+[INFO][0m sorting ...
+[INFO][0m output ...
+
+elapsed time: 79.093
+peak rss: 700928
+

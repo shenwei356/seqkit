@@ -35,8 +35,8 @@ import (
 // replaceCmd represents the replace command
 var replaceCmd = &cobra.Command{
 	Use:   "replace",
-	Short: "replace name/sequence/by regular expression",
-	Long: `replace name/sequence/by regular expression.
+	Short: "replace name/sequence by regular expression",
+	Long: `replace name/sequence by regular expression.
 
 Note that the replacement supports capture variables.
 e.g. $1 represents the text of the first submatch.

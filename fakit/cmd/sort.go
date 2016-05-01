@@ -31,6 +31,7 @@ import (
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seq"
+	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/util/stringutil"
 	"github.com/spf13/cobra"
@@ -69,6 +70,7 @@ So please delete .fai file created by samtools.
 		quiet := config.Quiet
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
+		fai.MapWholeFile = false
 		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileList(args)
@@ -245,6 +247,9 @@ So please delete .fai file created by samtools.
 		}
 
 		faidx := getFaidx(newFile, `^(.+)$`)
+		defer func() {
+			checkError(faidx.Close())
+		}()
 
 		if !bySeq { // if not by seq, just read faidx
 			if !quiet {

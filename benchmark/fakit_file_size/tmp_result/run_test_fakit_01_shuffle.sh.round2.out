@@ -1,0 +1,79 @@
+Test: Shuffling
+== 1
+recreate FASTA index file
+data: 1.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for 1.fa
+[INFO][0m read sequence IDs from FASTA index ...
+[INFO][0m 1 sequences loaded
+[INFO][0m shuffle ...
+[INFO][0m output ...
+
+elapsed time: 1.361
+peak rss: 415640
+
+== 2
+recreate FASTA index file
+data: 2.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for 2.fa
+[INFO][0m read sequence IDs from FASTA index ...
+[INFO][0m 2 sequences loaded
+[INFO][0m shuffle ...
+[INFO][0m output ...
+
+elapsed time: 2.516
+peak rss: 692092
+
+== 4
+recreate FASTA index file
+data: 4.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for 4.fa
+[INFO][0m read sequence IDs from FASTA index ...
+[INFO][0m 4 sequences loaded
+[INFO][0m shuffle ...
+[INFO][0m output ...
+
+elapsed time: 5.017
+peak rss: 740208
+
+== 8
+recreate FASTA index file
+data: 8.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for 8.fa
+[INFO][0m read sequence IDs from FASTA index ...
+[INFO][0m 8 sequences loaded
+[INFO][0m shuffle ...
+[INFO][0m output ...
+
+elapsed time: 16.725
+peak rss: 725632
+
+== 16
+recreate FASTA index file
+data: 16.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for 16.fa
+[INFO][0m read sequence IDs from FASTA index ...
+[INFO][0m 16 sequences loaded
+[INFO][0m shuffle ...
+[INFO][0m output ...
+
+elapsed time: 31.721
+peak rss: 709244
+
+== 32
+recreate FASTA index file
+data: 32.fa
+[INFO][0m create and read FASTA index ...
+[INFO][0m create FASTA index for 32.fa
+[INFO][0m read sequence IDs from FASTA index ...
+[INFO][0m 32 sequences loaded
+[INFO][0m shuffle ...
+[INFO][0m output ...
+
+elapsed time: 77.845
+peak rss: 682432
+

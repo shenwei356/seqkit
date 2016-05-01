@@ -75,7 +75,7 @@ Rename head      | Yes      | Yes             | --            | --      | Yes   
 # Installation
 
 `fakit` is implemented in [Golang](https://golang.org/) programming language,
- executable binary files **for most popular operating system** are freely available
+ executable binary files **for most popular operating systems** are freely available
   in [release](https://github.com/shenwei356/fakit/releases) page.
 
 Just [download](https://github.com/shenwei356/fakit/releases) gzip-compressed
@@ -91,8 +91,8 @@ You can also add the directory of the executable file to environment variable
 
 2. For Linux, type:
 
-        chmod a+x /PATH/OF/FASTCOV/fakit
-        echo export PATH=\$PATH:/PATH/OF/FASTCOV >> ~/.bashrc
+        chmod a+x /PATH/OF/FAKIT/fakit
+        echo export PATH=\$PATH:/PATH/OF/fakit >> ~/.bashrc
 
     or simply copy it to `/usr/local/bin`
 
@@ -129,7 +129,7 @@ You can also add the directory of the executable file to environment variable
 
 **Edit**
 
-- `replace`    replace name/sequence/by regular expression
+- `replace`    replace name/sequence by regular expression
 - `rename`     rename duplicated IDs
 
 **Ordering**

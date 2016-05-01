@@ -30,6 +30,7 @@ import (
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/featio/gtf"
 	"github.com/shenwei356/bio/seq"
+	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/util/byteutil"
 	"github.com/spf13/cobra"
@@ -61,6 +62,7 @@ Examples:
 		seq.ValidateSeq = false
 		fastx.Threads = config.Threads
 		gtf.Threads = config.Threads
+		fai.MapWholeFile = false
 		Threads = config.Threads
 		runtime.GOMAXPROCS(config.Threads)
 
@@ -295,6 +297,7 @@ Examples:
 						continue
 					}
 
+					checkError(faidx.Close())
 				}
 			}
 

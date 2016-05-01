@@ -14,8 +14,8 @@ data: dataset_A.fa
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 17.471
-peak rss: 2804292
+elapsed time: 20.735
+peak rss: 96580
 
 data: dataset_B.fa
 [INFO][0m create and read FASTA index ...
@@ -25,8 +25,8 @@ data: dataset_B.fa
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 13.777
-peak rss: 3246272
+elapsed time: 17.287
+peak rss: 698424
 
 == 2
 recreate FASTA index file
@@ -40,8 +40,8 @@ data: dataset_A.fa
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 16.922
-peak rss: 2853488
+elapsed time: 20.197
+peak rss: 95912
 
 data: dataset_B.fa
 [INFO][0m create and read FASTA index ...
@@ -51,8 +51,8 @@ data: dataset_B.fa
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 13.608
-peak rss: 3266400
+elapsed time: 17.235
+peak rss: 573016
 
 == 3
 recreate FASTA index file
@@ -66,8 +66,8 @@ data: dataset_A.fa
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 16.875
-peak rss: 2840376
+elapsed time: 22.426
+peak rss: 95736
 
 data: dataset_B.fa
 [INFO][0m create and read FASTA index ...
@@ -77,8 +77,8 @@ data: dataset_B.fa
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 16.508
-peak rss: 3278048
+elapsed time: 20.244
+peak rss: 583884
 
 == 4
 recreate FASTA index file
@@ -92,8 +92,8 @@ data: dataset_A.fa
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 17.669
-peak rss: 2814828
+elapsed time: 21.037
+peak rss: 96808
 
 data: dataset_B.fa
 [INFO][0m create and read FASTA index ...
@@ -103,6 +103,6 @@ data: dataset_B.fa
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 13.744
-peak rss: 3232840
+elapsed time: 15.858
+peak rss: 734460
 

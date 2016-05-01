@@ -14,8 +14,8 @@ data: dataset_A.fa
 [INFO][0m sorting ...
 [INFO][0m output ...
 
-elapsed time: 18.775
-peak rss: 2888056
+elapsed time: 20.548
+peak rss: 131832
 
 data: dataset_B.fa
 [INFO][0m create and read FASTA index ...
@@ -25,6 +25,6 @@ data: dataset_B.fa
 [INFO][0m sorting ...
 [INFO][0m output ...
 
-elapsed time: 14.233
-peak rss: 3254916
+elapsed time: 16.552
+peak rss: 810984
 
