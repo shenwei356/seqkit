@@ -152,11 +152,8 @@
   in <a href="https://github.com/shenwei356/fakit/releases">release</a> page.</p>
 <h2 id="current-version">Current Version</h2>
 <ul>
-<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.1">fakit v0.2.1</a><ul>
-<li>improve performance of outputing.</li>
-<li>fix bug of <code>fakit seq -g</code> for FASTA fromat</li>
-<li>some other minor fix of code and docs</li>
-<li>update benchmark results</li>
+<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.2">fakit v0.2.2</a><ul>
+<li>reduce memory occupation of subcommands that use FASTA index</li>
 </ul>
 </li>
 </ul>
@@ -176,14 +173,21 @@ rename it to <code>fakit.exe</code> (Windows) or <code>fakit</code> (other opera
 </li>
 <li>
 <p>For Linux, type:</p>
-<pre><code>chmod a+x /PATH/OF/FASTCOV/fakit
-echo export PATH=\$PATH:/PATH/OF/FASTCOV &gt;&gt; ~/.bashrc
+<pre><code>chmod a+x /PATH/OF/FAKIT/fakit
+echo export PATH=\$PATH:/PATH/OF/fakit &gt;&gt; ~/.bashrc
 </code></pre>
 <p>or simply copy it to <code>/usr/local/bin</code></p>
 </li>
 </ol>
 <h2 id="previous-versions">Previous Versions</h2>
 <ul>
+<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.1">fakit v0.2.1</a><ul>
+<li>improve performance of outputing.</li>
+<li>fix bug of <code>fakit seq -g</code> for FASTA fromat</li>
+<li>some other minor fix of code and docs</li>
+<li>update benchmark results</li>
+</ul>
+</li>
 <li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.0">fakit v0.2.0</a><ul>
 <li><strong><em>reduce memory usage of writing output</em></strong></li>
 <li>fix bug of <code>subseq</code>, <code>shuffle</code>, <code>sort</code> when reading from stdin</li>
