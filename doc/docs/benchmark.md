@@ -30,15 +30,17 @@ Features         | fakit    | fasta_utilities | fastx_toolkit | pyfaidx | seqmag
 :--------------- | :------: | :-------------: | :-----------: | :-----: | :-------: | :----
 Cross-platform   | Yes      | Partly          | Partly        | Yes     | Yes       | Yes
 Mutli-line FASTA | Yes      | Yes             | --            | Yes     | Yes       | Yes
+Read FASTQ       | Yes      | Yes             | Yes           | --      | Yes       | Yes
+Mutli-line FASTQ | Yes      | Yes             | --            | --      | Yes       | Yes
 Validate bases   | Yes      | --              | Yes           | Yes     | --        | --
 Recognize RNA    | Yes      | Yes             | --            | --      | Yes       | Yes
 Read STDIN       | Yes      | Yes             | Yes           | --      | Yes       | Yes
 Read gzip        | Yes      | Yes             | --            | --      | Yes       | Yes
 Write gzip       | Yes      | --              | --            | --      | Yes       | --
-Search by pattern| Yes      | Yes             | --            | --      | Yes       | Yes
+Search by motifs | Yes      | Yes             | --            | --      | Yes       | Yes
 Sample seqs      | Yes      | --              | --            | --      | Yes       | Yes
 Subseq           | Yes      | Yes             | --            | Yes     | Yes       | Yes
-Deduplicate seqs | Yes      | Partly          | --            | --      | Partly    | --
+Deduplicate seqs | Yes      | --              | --            | --      | Partly    | --
 Split seqs       | Yes      | Yes             | --            | Partly  | --        | --
 Split by seq     | Yes      | --              | Yes           | Yes     | --        | --
 Shuffle seqs     | Yes      | --              | --            | --      | --        | --
@@ -50,6 +52,7 @@ Transcribe       | Yes      | Yes             | Yes           | Yes     | Yes   
 Translate        | --       | Yes             | Yes           | Yes     | Yes       | --
 Size select      | Indirect | Yes             | --            | Yes     | Yes       | --
 Rename head      | Yes      | Yes             | --            | --      | Yes       | Yes
+
 
 ## Datasets
 
@@ -75,13 +78,13 @@ Summary
 
     $ fakit stat *.fa
     file           seq_format   seq_type   num_seqs   min_len        avg_len       max_len
-    dataset_A.fa   FASTA        DNA          67,748        56       41,442.5     5,976,145                  
+    dataset_A.fa   FASTA        DNA          67,748        56       41,442.5     5,976,145
     dataset_B.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
 
 ### Sequence ID list
 
 Parts of sequences IDs was sampled and shuffled from original data.
-There were used in test of extracting sequences by ID list.
+They were used in test of extracting sequences by ID list.
 
 Commands:
 
@@ -135,7 +138,7 @@ Output sequences of all Softwares were not wrapped to fixed length.
 
 [Commands](https://github.com/shenwei356/fakit/blob/master/benchmark/run_benchmark_01_revcom.sh)
 
-### Test 2. Extracting sequencs by ID list
+### Test 2. Extracting sequences by ID list
 
 [Commands](https://github.com/shenwei356/fakit/blob/master/benchmark/run_benchmark_02_exctact_by_id_list.sh)
 

@@ -71,19 +71,19 @@ if (max_mem > 1024 * 1024) {
 p <-
   ggplot(df, aes(
     x = mem_mean2, y = time_mean,
-    color = app, label = app
+    label = app
   )) +
   
   geom_point(size = 2) +
-  geom_hline(aes(yintercept = time_mean, color = app), size = 0.1, alpha = 0.4) +
-  geom_vline(aes(xintercept = mem_mean2, color = app), size = 0.1, alpha = 0.4) +
+  geom_hline(aes(yintercept = time_mean), size = 0.1, alpha = 0.4) +
+  geom_vline(aes(xintercept = mem_mean2), size = 0.1, alpha = 0.4) +
   geom_text_repel(size = 4) +
   scale_color_wsj() +
   facet_wrap( ~ test) +
   ylim(0, max(df$time_mean)) +
   xlim(0, max(df$mem_mean2)) +
   
-  ggtitle("Performance on different size of files") +
+  # ggtitle("Performance on different size of files") +
   ylab("Time (s)") +
   xlab(paste("Peak Memory (", unit, ")", sep = ""))
 

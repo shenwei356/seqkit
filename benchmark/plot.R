@@ -19,9 +19,21 @@ parser$add_argument("--width", type = "double",
 parser$add_argument("--height", type = "double",
                     default = 6,
                     help = "result file height")
+parser$add_argument("--lx", type = "double",
+                    default = 0.85,
+                    help = "x of legend position")
+parser$add_argument("--ly", type = "double",
+                    default = 0.25,
+                    help = "y of legend position")
 parser$add_argument("--dpi", type = "integer",
                     default = 300,
                     help = "DPI")
+parser$add_argument("--labcolor", type = "character",
+                    default = "Tools",
+                    help = "label of color")
+parser$add_argument("--labshape", type = "character",
+                    default = "Datasets",
+                    help = "label of shape")
 
 args <- parser$parse_args()
 
@@ -85,7 +97,8 @@ p <-
   
   # ggtitle(paste("FASTA/Q Manipulation Performance\n", test1, sep = "")) +
   ylab("Time (s)") +
-  xlab(paste("Peak Memory (", unit, ")", sep = ""))
+  xlab(paste("Peak Memory (", unit, ")", sep = "")) +
+  labs(color=args$labcolor, shape=args$labshape)
 
 p <- p +
   theme_bw() +
@@ -103,11 +116,10 @@ p <- p +
     ),
     
     legend.text = element_text(size = 14),
-    legend.position = c(0.85,0.25),
+    legend.position = c(args$lx,args$ly),
     legend.background = element_rect(fill = "transparent"),
     legend.key.size = unit(0.6, "cm"),
     legend.key = element_blank(),
-    legend.title = element_blank(),
     legend.text.align = 0,
     legend.box.just = "left",
     

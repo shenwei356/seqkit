@@ -57,7 +57,7 @@ Read STDIN       | Yes      | Yes             | Yes           | --      | Yes   
 Read gzip        | Yes      | Yes             | --            | --      | Yes       | Yes
 Write gzip       | Yes      | --              | --            | --      | Yes       | --
 Search by motifs | Yes      | Yes             | --            | --      | Yes       | Yes
-Sample seqs      | Yes      | Yes             | --            | --      | Yes       | Yes
+Sample seqs      | Yes      | --              | --            | --      | Yes       | Yes
 Subseq           | Yes      | Yes             | --            | Yes     | Yes       | Yes
 Deduplicate seqs | Yes      | --              | --            | --      | Partly    | --
 Split seqs       | Yes      | Yes             | --            | Partly  | --        | --
@@ -200,7 +200,7 @@ the `gi` number, then use `--id-regexp "^gi\|([^\|]+)\|"`.
 For some commands, including `subseq`, `split`, `sort` and `shuffle`,
 when input files are (plain or gzipped) FASTA files,
 FASTA index would be optional used for
-rapid acccess of sequences and reducing memory occupation.
+rapid access of sequences and reducing memory occupation.
 
 ATTENTION: the `.fakit.fai` file created by fakit is a little different from .fai file
 created by samtools. fakit uses full sequence head instead of just ID as key.

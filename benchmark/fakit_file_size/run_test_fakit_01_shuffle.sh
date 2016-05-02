@@ -3,7 +3,7 @@
 echo Test: Shuffling 
 
 for i in 1 2 4 8 16 32; do 
-    echo == $i
+    echo == ${i}X
     f=$i.fa
     echo recreate FASTA index file
     if [[ -f $f.fakit.fai ]]; then
