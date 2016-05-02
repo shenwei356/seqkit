@@ -208,6 +208,24 @@ to compute running time and peak memory usage of a process.</p>
 <td>Yes</td>
 </tr>
 <tr>
+<td align="left">Read FASTQ</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>--</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td align="left">Mutli-line FASTQ</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>--</td>
+<td>--</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
 <td align="left">Validate bases</td>
 <td>Yes</td>
 <td>--</td>
@@ -253,7 +271,7 @@ to compute running time and peak memory usage of a process.</p>
 <td>--</td>
 </tr>
 <tr>
-<td align="left">Search by pattern</td>
+<td align="left">Search by motifs</td>
 <td>Yes</td>
 <td>Yes</td>
 <td>--</td>
@@ -282,7 +300,7 @@ to compute running time and peak memory usage of a process.</p>
 <tr>
 <td align="left">Deduplicate seqs</td>
 <td>Yes</td>
-<td>Partly</td>
+<td>--</td>
 <td>--</td>
 <td>--</td>
 <td>Partly</td>
@@ -407,12 +425,12 @@ to compute running time and peak memory usage of a process.</p>
 <p>Summary</p>
 <pre><code>$ fakit stat *.fa
 file           seq_format   seq_type   num_seqs   min_len        avg_len       max_len
-dataset_A.fa   FASTA        DNA          67,748        56       41,442.5     5,976,145                  
+dataset_A.fa   FASTA        DNA          67,748        56       41,442.5     5,976,145
 dataset_B.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
 </code></pre>
 <h3 id="sequence-id-list">Sequence ID list</h3>
 <p>Parts of sequences IDs was sampled and shuffled from original data.
-There were used in test of extracting sequences by ID list.</p>
+They were used in test of extracting sequences by ID list.</p>
 <p>Commands:</p>
 <pre><code>$ fakit sample -p 0.3 dataset_A.fa | fakit seq --name --only-id | shuf &gt; ids_A.txt
 $ fakit sample -p 0.3 dataset_B.fa | fakit seq --name --only-id | shuf &gt; ids_B.txt
@@ -451,7 +469,7 @@ and average time and peak memory ware used for plotting.</p>
  a tool written in Golang using <a href="https://github.com/biogo/biogo">biogo</a> package,
  was also used for comparison of FASTA file parsing performance.</p>
 <p><a href="https://github.com/shenwei356/fakit/blob/master/benchmark/run_benchmark_01_revcom.sh">Commands</a></p>
-<h3 id="test-2-extracting-sequencs-by-id-list">Test 2. Extracting sequencs by ID list</h3>
+<h3 id="test-2-extracting-sequences-by-id-list">Test 2. Extracting sequences by ID list</h3>
 <p><a href="https://github.com/shenwei356/fakit/blob/master/benchmark/run_benchmark_02_exctact_by_id_list.sh">Commands</a></p>
 <h3 id="test-3-sampling-by-number">Test 3. Sampling by number</h3>
 <p>Note that different softwares have different sampling strategies,
