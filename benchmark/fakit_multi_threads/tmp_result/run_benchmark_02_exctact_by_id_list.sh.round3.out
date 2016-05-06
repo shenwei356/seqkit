@@ -1,0 +1,48 @@
+Test: B) Searching by ID list
+warm-up
+data: dataset_A.fa
+data: dataset_B.fa
+== 1
+data: dataset_A.fa
+
+elapsed time: 12.458
+peak rss: 50992
+
+data: dataset_B.fa
+
+elapsed time: 11.879
+peak rss: 1535096
+
+== 2
+data: dataset_A.fa
+
+elapsed time: 11.723
+peak rss: 46340
+
+data: dataset_B.fa
+
+elapsed time: 10.832
+peak rss: 1830136
+
+== 3
+data: dataset_A.fa
+
+elapsed time: 11.472
+peak rss: 48916
+
+data: dataset_B.fa
+
+elapsed time: 11.206
+peak rss: 1545240
+
+== 4
+data: dataset_A.fa
+
+elapsed time: 11.911
+peak rss: 47044
+
+data: dataset_B.fa
+
+elapsed time: 11.156
+peak rss: 1492996
+

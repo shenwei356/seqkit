@@ -1,9 +1,0 @@
-test	dataset	app	time_mean	time_stdev	mem_mean	mem_stdev
-Searching by ID list	dataset_A.fa	1	13.28	0.00	53604	0
-Searching by ID list	dataset_A.fa	2	13.01	0.00	52312	0
-Searching by ID list	dataset_A.fa	3	13.02	0.00	52572	0
-Searching by ID list	dataset_A.fa	4	13.41	0.00	56628	0
-Searching by ID list	dataset_B.fa	1	12.37	0.00	1665156	0
-Searching by ID list	dataset_B.fa	2	12.06	0.00	1585708	0
-Searching by ID list	dataset_B.fa	3	12.14	0.00	1912948	0
-Searching by ID list	dataset_B.fa	4	11.83	0.00	1912032	0

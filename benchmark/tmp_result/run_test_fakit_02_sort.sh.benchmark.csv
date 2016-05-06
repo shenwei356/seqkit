@@ -1,3 +1,0 @@
-test	dataset	app	time_mean	time_stdev	mem_mean	mem_stdev
-Sorting by length	dataset_A.fa	fakit	20.55	0.00	131832	0
-Sorting by length	dataset_B.fa	fakit	16.55	0.00	810984	0

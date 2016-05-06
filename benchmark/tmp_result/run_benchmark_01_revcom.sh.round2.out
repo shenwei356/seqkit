@@ -1,4 +1,4 @@
-Test: Reverse complement
+Test: A) Reverse complement
 Output sequences of all apps are not wrapped to fixed length.
 warm-up
 data: dataset_A.fa
@@ -6,57 +6,57 @@ data: dataset_B.fa
 == fakit
 data: dataset_A.fa
 
-elapsed time: 30.936
-peak rss: 49428
+elapsed time: 21.040
+peak rss: 38808
 
 data: dataset_B.fa
 
-elapsed time: 26.762
-peak rss: 1854528
+elapsed time: 18.850
+peak rss: 1379460
 
 == fasta_utilities
 data: dataset_A.fa
 Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94.
 
-elapsed time: 20.182
-peak rss: 58780
+elapsed time: 16.879
+peak rss: 56424
 
 data: dataset_B.fa
 Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94.
 
-elapsed time: 25.738
-peak rss: 1256408
+elapsed time: 24.127
+peak rss: 1256200
 
 == seqmagick
 data: dataset_A.fa
 
-elapsed time: 61.081
-peak rss: 47864
+elapsed time: 55.473
+peak rss: 49432
 
 data: dataset_B.fa
 
-elapsed time: 67.482
-peak rss: 1470808
+elapsed time: 61.842
+peak rss: 1405056
 
 == seqtk
 data: dataset_A.fa
 
-elapsed time: 9.963
-peak rss: 7656
+elapsed time: 8.777
+peak rss: 7660
 
 data: dataset_B.fa
 
-elapsed time: 11.837
-peak rss: 244864
+elapsed time: 9.555
+peak rss: 244896
 
 == biogo
 data: dataset_A.fa
 
-elapsed time: 99.380
-peak rss: 34244
+elapsed time: 103.211
+peak rss: 31412
 
 data: dataset_B.fa
 
-elapsed time: 90.608
-peak rss: 1281344
+elapsed time: 90.403
+peak rss: 1253184
 

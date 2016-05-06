@@ -1,7 +1,0 @@
-test	dataset	app	time_mean	time_stdev	mem_mean	mem_stdev
-Reverse complement	1.fa	1	2.99	0.34	859818	118797
-Reverse complement	16.fa	16	38.94	1.71	2040532	134
-Reverse complement	2.fa	2	4.86	0.09	1114461	117442
-Reverse complement	32.fa	32	78.97	2.82	2180024	104449
-Reverse complement	4.fa	4	9.01	0.29	1541604	102658
-Reverse complement	8.fa	8	18.40	0.11	1953130	120747

@@ -1,9 +1,0 @@
-test	dataset	app	time_mean	time_stdev	mem_mean	mem_stdev
-Reverse complement	dataset_A.fa	1	38.27	0.00	45544	0
-Reverse complement	dataset_A.fa	2	31.23	0.00	45876	0
-Reverse complement	dataset_A.fa	3	30.22	0.00	42036	0
-Reverse complement	dataset_A.fa	4	32.62	0.00	48744	0
-Reverse complement	dataset_B.fa	1	38.92	0.00	1925872	0
-Reverse complement	dataset_B.fa	2	25.62	0.00	1833360	0
-Reverse complement	dataset_B.fa	3	25.02	0.00	1813708	0
-Reverse complement	dataset_B.fa	4	24.99	0.00	1925272	0

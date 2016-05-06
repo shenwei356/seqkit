@@ -122,6 +122,7 @@ p <- p +
     legend.key = element_blank(),
     legend.text.align = 0,
     legend.box.just = "left",
+    strip.text.x = element_text(angle = 0, hjust = 0),
     
     text = element_text(
       size = 14, family = "arial", face = "bold"

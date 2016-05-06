@@ -1,31 +1,31 @@
 test	dataset	app	time_mean	time_stdev	mem_mean	mem_stdev
-Reverse complement	dataset_A.fa	biogo	100.78	1.33	35836	1226
-Reverse complement	dataset_A.fa	fakit	30.53	1.03	47684	1994
-Reverse complement	dataset_A.fa	fasta_utilities	18.87	1.36	58298	859
-Reverse complement	dataset_A.fa	seqmagick	59.68	1.56	49754	1493
-Reverse complement	dataset_A.fa	seqtk	10.06	0.53	7629	18
-Reverse complement	dataset_B.fa	biogo	93.65	2.18	1315030	53727
-Reverse complement	dataset_B.fa	fakit	26.36	1.29	1793784	75222
-Reverse complement	dataset_B.fa	fasta_utilities	27.79	3.25	1256350	92
-Reverse complement	dataset_B.fa	seqmagick	65.42	1.91	1422250	73040
-Reverse complement	dataset_B.fa	seqtk	12.25	0.95	244870	57
-Searching by ID list	dataset_A.fa	fakit	12.23	0.21	53065	2711
-Searching by ID list	dataset_A.fa	fasta_utilities	9.96	0.01	54824	3379
-Searching by ID list	dataset_A.fa	seqmagick	46.22	0.19	42166	932
-Searching by ID list	dataset_A.fa	seqtk	11.72	0.44	9954	60
-Searching by ID list	dataset_B.fa	fakit	12.02	0.06	1695814	1128
-Searching by ID list	dataset_B.fa	fasta_utilities	12.60	0.07	1256420	67
-Searching by ID list	dataset_B.fa	seqmagick	53.86	1.12	973556	36867
-Searching by ID list	dataset_B.fa	seqtk	14.22	0.27	244886	64
-Sampling by number	dataset_A.fa	fakit	28.30	0.39	44261	3344
-Sampling by number	dataset_A.fa	seqmagick	40.88	1.07	541172	912
-Sampling by number	dataset_A.fa	seqtk	4.25	0.09	1081468	1295
-Sampling by number	dataset_B.fa	fakit	31.31	0.66	1558248	149
-Sampling by number	dataset_B.fa	seqmagick	42.20	2.10	3036372	108690
-Sampling by number	dataset_B.fa	seqtk	4.99	0.11	2817700	3
-Removing duplicates by seq	dataset_A.fa	fakit	19.86	0.82	61324	2426
-Removing duplicates by seq	dataset_A.fa	seqmagick	79.47	1.87	60590	576
-Removing duplicates by seq	dataset_B.fa	fakit	16.50	0.78	1927258	133969
-Removing duplicates by seq	dataset_B.fa	seqmagick	90.29	0.67	1123858	28
-Subsequence with BED file	dataset_B.fa	fakit	9.70	0.23	2081481	163038
-Subsequence with BED file	dataset_B.fa	seqtk	6.72	0.06	246277	33
+A) Reverse complement	dataset_A.fa	biogo	102.91	1.76	32356	2674
+A) Reverse complement	dataset_A.fa	fakit	21.10	0.61	43128	3054
+A) Reverse complement	dataset_A.fa	fasta_utilities	17.21	0.35	59852	4089
+A) Reverse complement	dataset_A.fa	seqmagick	57.28	1.87	48792	1241
+A) Reverse complement	dataset_A.fa	seqtk	8.85	0.05	7630	20
+A) Reverse complement	dataset_B.fa	biogo	90.39	0.26	1342154	88022
+A) Reverse complement	dataset_B.fa	fakit	18.92	0.38	1480601	76849
+A) Reverse complement	dataset_B.fa	fasta_utilities	25.09	0.74	1256193	37
+A) Reverse complement	dataset_B.fa	seqmagick	62.35	0.42	1361974	47386
+A) Reverse complement	dataset_B.fa	seqtk	9.72	0.19	244866	26
+B) Searching by ID list	dataset_A.fa	fakit	11.33	0.05	44566	1766
+B) Searching by ID list	dataset_A.fa	fasta_utilities	9.77	0.10	52569	717
+B) Searching by ID list	dataset_A.fa	seqmagick	44.58	0.44	40814	1099
+B) Searching by ID list	dataset_A.fa	seqtk	11.13	0.10	9954	47
+B) Searching by ID list	dataset_B.fa	fakit	10.73	0.02	1473005	112928
+B) Searching by ID list	dataset_B.fa	fasta_utilities	12.63	0.06	1256278	74
+B) Searching by ID list	dataset_B.fa	seqmagick	51.41	0.37	1006766	30756
+B) Searching by ID list	dataset_B.fa	seqtk	13.61	0.22	244912	34
+C) Sampling by number	dataset_A.fa	fakit	27.90	0.08	43016	2382
+C) Sampling by number	dataset_A.fa	seqmagick	39.31	0.60	542800	12179
+C) Sampling by number	dataset_A.fa	seqtk	4.12	0.05	1082325	1304
+C) Sampling by number	dataset_B.fa	fakit	30.60	0.09	1481014	101322
+C) Sampling by number	dataset_B.fa	seqmagick	43.23	1.27	2897485	46296
+C) Sampling by number	dataset_B.fa	seqtk	4.98	0.04	2817761	35
+D) Removing duplicates by seq	dataset_A.fa	fakit	18.22	0.14	58070	728
+D) Removing duplicates by seq	dataset_A.fa	seqmagick	76.14	1.21	60376	545
+D) Removing duplicates by seq	dataset_B.fa	fakit	15.71	0.57	1593622	9573
+D) Removing duplicates by seq	dataset_B.fa	seqmagick	88.66	0.50	1123629	47
+E) Subsequence with BED file	dataset_B.fa	fakit	9.32	0.08	1881713	92274
+E) Subsequence with BED file	dataset_B.fa	seqtk	6.62	0.07	246238	39

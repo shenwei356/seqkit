@@ -1,4 +1,4 @@
-Test: Sampling by number
+Test: C) Sampling by number
 warm-up
 data: dataset_A.fa
 data: dataset_B.fa
@@ -10,8 +10,8 @@ data: dataset_A.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m %d sequences outputed 10000
 
-elapsed time: 28.191
-peak rss: 39992
+elapsed time: 27.789
+peak rss: 44796
 
 data: dataset_B.fa
 [INFO][0m sample by number
@@ -20,28 +20,28 @@ data: dataset_B.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m %d sequences outputed 19
 
-elapsed time: 32.102
-peak rss: 1558348
+elapsed time: 30.673
+peak rss: 1503996
 
 == seqmagick
 data: dataset_A.fa
 
-elapsed time: 40.352
-peak rss: 542456
+elapsed time: 38.565
+peak rss: 527784
 
 data: dataset_B.fa
 
-elapsed time: 40.483
-peak rss: 2980508
+elapsed time: 44.525
+peak rss: 2933360
 
 == seqtk
 data: dataset_A.fa
 
-elapsed time: 4.149
-peak rss: 1080800
+elapsed time: 4.084
+peak rss: 1082940
 
 data: dataset_B.fa
 
-elapsed time: 4.917
-peak rss: 2817696
+elapsed time: 4.985
+peak rss: 2817732
 

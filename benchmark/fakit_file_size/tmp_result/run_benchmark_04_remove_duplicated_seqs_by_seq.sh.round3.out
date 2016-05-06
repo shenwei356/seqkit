@@ -1,43 +1,43 @@
-Test: Removing duplicates by seq content
-== 1
-data: 1.fa
+Test: B) Removing duplicates by seq
+== 1X
+data: 1X.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 2.017
-peak rss: 781952
+elapsed time: 2.131
+peak rss: 1031872
 
-== 2
-data: 2.fa
+== 2X
+data: 2X.fa
 [INFO][0m 1 duplicated records removed
 
-elapsed time: 3.270
-peak rss: 1279748
+elapsed time: 3.090
+peak rss: 1283080
 
-== 4
-data: 4.fa
+== 4X
+data: 4X.fa
 [INFO][0m 3 duplicated records removed
 
-elapsed time: 5.973
-peak rss: 1786572
+elapsed time: 4.955
+peak rss: 1284624
 
-== 8
-data: 8.fa
+== 8X
+data: 8X.fa
 [INFO][0m 7 duplicated records removed
 
-elapsed time: 11.431
-peak rss: 1786904
+elapsed time: 9.279
+peak rss: 1472276
 
-== 16
-data: 16.fa
+== 16X
+data: 16X.fa
 [INFO][0m 15 duplicated records removed
 
-elapsed time: 20.729
-peak rss: 1786804
+elapsed time: 18.539
+peak rss: 1493816
 
-== 32
-data: 32.fa
+== 32X
+data: 32X.fa
 [INFO][0m 31 duplicated records removed
 
-elapsed time: 42.921
-peak rss: 2040396
+elapsed time: 36.527
+peak rss: 1539840
 

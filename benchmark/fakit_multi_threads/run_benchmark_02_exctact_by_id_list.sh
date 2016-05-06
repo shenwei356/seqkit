@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo Test: Searching by ID list
+echo Test: B\) Searching by ID list
 
 echo warm-up
 for f in dataset_{A,B}.fa; do echo data: $f; cat $f > /dev/null; done

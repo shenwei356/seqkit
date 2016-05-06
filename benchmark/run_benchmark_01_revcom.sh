@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo Test: Reverse complement
+echo Test: A\) Reverse complement
 echo Output sequences of all apps are not wrapped to fixed length.
 
 echo warm-up

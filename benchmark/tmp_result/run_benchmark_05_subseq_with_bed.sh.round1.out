@@ -1,16 +1,16 @@
-Test: Subsequence with BED file
+Test: E) Subsequence with BED file
 warm-up
 == fakit
 data: dataset_B.fa
 [INFO][0m read BED file ...
-[INFO][0m %d BED features loaded 162980
+[INFO][0m 162980 BED features loaded
 
-elapsed time: 9.773
-peak rss: 1855604
+elapsed time: 9.351
+peak rss: 1804020
 
 == seqtk
 data: dataset_B.fa
 
-elapsed time: 6.783
-peak rss: 246288
+elapsed time: 6.681
+peak rss: 246192
 

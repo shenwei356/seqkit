@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo Test: Sampling by number
+echo Test: C\) Sampling by number
 
 echo warm-up
 for f in dataset_{A,B}.fa; do echo data: $f; cat $f > /dev/null; done

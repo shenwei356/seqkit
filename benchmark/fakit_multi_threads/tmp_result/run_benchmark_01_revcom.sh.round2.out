@@ -1,0 +1,48 @@
+Test: A) Reverse complement
+warm-up
+data: dataset_A.fa
+data: dataset_B.fa
+== 1
+data: dataset_A.fa
+
+elapsed time: 23.794
+peak rss: 41288
+
+data: dataset_B.fa
+
+elapsed time: 24.197
+peak rss: 1308004
+
+== 2
+data: dataset_A.fa
+
+elapsed time: 21.376
+peak rss: 38476
+
+data: dataset_B.fa
+
+elapsed time: 20.776
+peak rss: 1295768
+
+== 3
+data: dataset_A.fa
+
+elapsed time: 19.977
+peak rss: 37384
+
+data: dataset_B.fa
+
+elapsed time: 17.828
+peak rss: 1756960
+
+== 4
+data: dataset_A.fa
+
+elapsed time: 20.469
+peak rss: 37908
+
+data: dataset_B.fa
+
+elapsed time: 17.439
+peak rss: 1376452
+

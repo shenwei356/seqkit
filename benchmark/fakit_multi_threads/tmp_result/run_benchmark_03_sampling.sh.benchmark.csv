@@ -1,9 +1,0 @@
-test	dataset	app	time_mean	time_stdev	mem_mean	mem_stdev
-Sampling by number	dataset_A.fa	1	33.23	0.00	47588	0
-Sampling by number	dataset_A.fa	2	28.75	0.00	44032	0
-Sampling by number	dataset_A.fa	3	29.75	0.00	42520	0
-Sampling by number	dataset_A.fa	4	30.27	0.00	47688	0
-Sampling by number	dataset_B.fa	1	36.81	0.00	1869772	0
-Sampling by number	dataset_B.fa	2	31.51	0.00	1558392	0
-Sampling by number	dataset_B.fa	3	32.99	0.00	1536872	0
-Sampling by number	dataset_B.fa	4	31.83	0.00	1604788	0

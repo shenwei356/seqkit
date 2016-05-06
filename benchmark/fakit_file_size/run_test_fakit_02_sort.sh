@@ -1,10 +1,10 @@
 #!/bin/sh
 
-echo Test: Sorting by length
+echo Test: D\) Sorting by length
 
 for i in 1 2 4 8 16 32; do 
     echo == ${i}X
-    f=$i.fa
+    f=${i}X.fa
     echo delete old FASTA index file
     if [[ -f $f.fakit.fai ]]; then
         /bin/rm $f.fakit.fai

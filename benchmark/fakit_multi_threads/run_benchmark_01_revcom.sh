@@ -1,7 +1,7 @@
 #!/bin/sh
 
 
-echo Test: Reverse complement
+echo Test: A\) Reverse complement
 
 echo warm-up
 for f in dataset_{A,B}.fa; do echo data: $f; cat $f > /dev/null; done

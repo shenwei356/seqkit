@@ -1,37 +1,37 @@
-Test: Reverse complement
-== 1
-data: 1.fa
+Test: A) Reverse complement
+== 1X
+data: 1X.fa
 
-elapsed time: 3.434
-peak rss: 775860
+elapsed time: 2.028
+peak rss: 776320
 
-== 2
-data: 2.fa
+== 2X
+data: 2X.fa
 
-elapsed time: 4.842
-peak rss: 1033324
+elapsed time: 4.178
+peak rss: 1028788
 
-== 4
-data: 4.fa
+== 4X
+data: 4X.fa
 
-elapsed time: 9.135
-peak rss: 1419064
+elapsed time: 6.869
+peak rss: 1029364
 
-== 8
-data: 8.fa
+== 8X
+data: 8X.fa
 
-elapsed time: 18.282
-peak rss: 1782372
+elapsed time: 18.182
+peak rss: 1494308
 
-== 16
-data: 16.fa
+== 16X
+data: 16X.fa
 
-elapsed time: 37.355
-peak rss: 2040668
+elapsed time: 40.207
+peak rss: 1495052
 
-== 32
-data: 32.fa
+== 32X
+data: 32X.fa
 
-elapsed time: 75.521
-peak rss: 2040452
+elapsed time: 73.960
+peak rss: 1495192
 

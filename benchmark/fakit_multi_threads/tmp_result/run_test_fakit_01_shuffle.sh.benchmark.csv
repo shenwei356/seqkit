@@ -1,9 +1,0 @@
-test	dataset	app	time_mean	time_stdev	mem_mean	mem_stdev
-Shuffling	dataset_A.fa	1	20.73	0.00	96580	0
-Shuffling	dataset_A.fa	2	20.20	0.00	95912	0
-Shuffling	dataset_A.fa	3	22.43	0.00	95736	0
-Shuffling	dataset_A.fa	4	21.04	0.00	96808	0
-Shuffling	dataset_B.fa	1	17.29	0.00	698424	0
-Shuffling	dataset_B.fa	2	17.23	0.00	573016	0
-Shuffling	dataset_B.fa	3	20.24	0.00	583884	0
-Shuffling	dataset_B.fa	4	15.86	0.00	734460	0

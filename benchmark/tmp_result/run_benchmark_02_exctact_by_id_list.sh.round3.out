@@ -1,4 +1,4 @@
-Test: Searching by ID list
+Test: B) Searching by ID list
 warm-up
 data: dataset_A.fa
 data: dataset_B.fa
@@ -7,48 +7,48 @@ data: ids_B.txt
 == fakit
 data: dataset_A.fa
 
-elapsed time: 12.226
-peak rss: 50612
+elapsed time: 11.395
+peak rss: 46568
 
 data: dataset_B.fa
 
-elapsed time: 11.988
-peak rss: 1696496
+elapsed time: 10.702
+peak rss: 1313964
 
 == fasta_utilities
 data: dataset_A.fa
 number in list 20138
 Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94, <LIST> line 20138.
 
-elapsed time: 9.955
-peak rss: 59544
+elapsed time: 9.908
+peak rss: 51664
 
 data: dataset_B.fa
 number in list 58
 Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94, <LIST> line 58.
 
-elapsed time: 12.634
-peak rss: 1256416
+elapsed time: 12.549
+peak rss: 1256220
 
 == seqmagick
 data: dataset_A.fa
 
-elapsed time: 46.055
-peak rss: 42428
+elapsed time: 45.061
+peak rss: 41756
 
 data: dataset_B.fa
 
-elapsed time: 52.822
-peak rss: 967868
+elapsed time: 51.208
+peak rss: 980628
 
 == seqtk
 data: dataset_A.fa
 
-elapsed time: 11.510
-peak rss: 10028
+elapsed time: 11.221
+peak rss: 10008
 
 data: dataset_B.fa
 
-elapsed time: 13.888
-peak rss: 244800
+elapsed time: 13.464
+peak rss: 244960
 

@@ -56,7 +56,7 @@ Recognize RNA    | Yes      | Yes             | --            | --      | Yes   
 Read STDIN       | Yes      | Yes             | Yes           | --      | Yes       | Yes
 Read gzip        | Yes      | Yes             | --            | --      | Yes       | Yes
 Write gzip       | Yes      | --              | --            | --      | Yes       | --
-Search by motifs | Yes      | Yes             | --            | --      | Yes       | Yes
+Search by motifs | Yes      | Yes             | --            | --      | Yes       | --
 Sample seqs      | Yes      | --              | --            | --      | Yes       | Yes
 Subseq           | Yes      | Yes             | --            | Yes     | Yes       | Yes
 Deduplicate seqs | Yes      | --              | --            | --      | Partly    | --
@@ -268,9 +268,6 @@ Datasets:
 
 ![benchmark-5tests.csv.png](benchmark/benchmark.5tests.csv.png)
 
-Performance of other functions in fakit:
-
-![benchmark-fakit.csv.png](benchmark/benchmark.fakit.csv.png)
 
 ## Contact
 

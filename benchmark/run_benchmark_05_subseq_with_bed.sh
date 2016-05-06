@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo  Test: Subsequence with BED file
+echo Test: E\) Subsequence with BED file
 
 echo warm-up
 cat dataset_B.fa chr19.bed.gz > /dev/null

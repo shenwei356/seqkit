@@ -1,7 +1,0 @@
-test	dataset	app	time_mean	time_stdev	mem_mean	mem_stdev
-Removing duplicates by seq content	1.fa	1	2.06	0.07	948813	117988
-Removing duplicates by seq content	16.fa	16	21.13	0.30	1786420	295
-Removing duplicates by seq content	2.fa	2	3.28	0.01	1281909	1531
-Removing duplicates by seq content	32.fa	32	41.84	0.87	1871253	119602
-Removing duplicates by seq content	4.fa	4	5.83	0.12	1787325	1042
-Removing duplicates by seq content	8.fa	8	10.95	0.50	1786450	336
