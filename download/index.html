@@ -152,8 +152,9 @@
   in <a href="https://github.com/shenwei356/fakit/releases">release</a> page.</p>
 <h2 id="current-version">Current Version</h2>
 <ul>
-<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.2">fakit v0.2.2</a><ul>
-<li>reduce memory occupation of subcommands that use FASTA index</li>
+<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.3">fakit v0.2.3</a><ul>
+<li>reduce memory occupation by avoid copy data when convert <code>string</code> to <code>[]byte</code></li>
+<li>speedup reverse-complement by avoid repeatly calling functions</li>
 </ul>
 </li>
 </ul>
@@ -181,6 +182,10 @@ echo export PATH=\$PATH:/PATH/OF/fakit &gt;&gt; ~/.bashrc
 </ol>
 <h2 id="previous-versions">Previous Versions</h2>
 <ul>
+<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.2">fakit v0.2.2</a><ul>
+<li>reduce memory occupation of subcommands that use FASTA index</li>
+</ul>
+</li>
 <li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.1">fakit v0.2.1</a><ul>
 <li>improve performance of outputing.</li>
 <li>fix bug of <code>fakit seq -g</code> for FASTA fromat</li>
