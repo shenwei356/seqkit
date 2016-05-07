@@ -96,6 +96,9 @@ You can also add the directory of the executable file to environment variable
 
     or simply copy it to `/usr/local/bin`
 
+For Go developer, just one command:
+
+    go get -u github.com/shenwei356/fakit/fakit
 
 ## Subcommands
 
