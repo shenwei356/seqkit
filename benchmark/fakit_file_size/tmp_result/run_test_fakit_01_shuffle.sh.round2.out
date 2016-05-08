@@ -9,128 +9,71 @@ data: 1X.fa
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 1.115
-peak rss: 404756
+elapsed time: 1.244
+peak rss: 388564
 
 == 2X
 recreate FASTA index file
 data: 2X.fa
 [INFO][0m create and read FASTA index ...
 [INFO][0m create FASTA index for 2X.fa
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 253105814
 [INFO][0m read sequence IDs from FASTA index ...
-[INFO][0m 1 sequences loaded
+[INFO][0m 2 sequences loaded
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 2.009
-peak rss: 381464
+elapsed time: 2.393
+peak rss: 664704
 
 == 4X
 recreate FASTA index file
 data: 4X.fa
 [INFO][0m create and read FASTA index ...
 [INFO][0m create FASTA index for 4X.fa
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 253105814
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 506211569
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 759317324
 [INFO][0m read sequence IDs from FASTA index ...
-[INFO][0m 1 sequences loaded
+[INFO][0m 4 sequences loaded
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 3.823
-peak rss: 495992
+elapsed time: 4.793
+peak rss: 705696
 
 == 8X
 recreate FASTA index file
 data: 8X.fa
 [INFO][0m create and read FASTA index ...
 [INFO][0m create FASTA index for 8X.fa
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 253105814
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 506211569
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 759317324
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 1012423079
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 1265528834
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 1518634589
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 1771740344
 [INFO][0m read sequence IDs from FASTA index ...
-[INFO][0m 1 sequences loaded
+[INFO][0m 8 sequences loaded
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 7.433
-peak rss: 483460
+elapsed time: 12.405
+peak rss: 629100
 
 == 16X
 recreate FASTA index file
 data: 16X.fa
 [INFO][0m create and read FASTA index ...
 [INFO][0m create FASTA index for 16X.fa
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 253105814
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 506211569
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 759317324
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 1012423079
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 1265528834
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 1518634589
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 1771740344
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 2024846099
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 2277951854
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 2531057609
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 2784163364
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 3037269119
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 3290374874
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 3543480629
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 3796586384
 [INFO][0m read sequence IDs from FASTA index ...
-[INFO][0m 1 sequences loaded
+[INFO][0m 16 sequences loaded
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 14.514
-peak rss: 432396
+elapsed time: 30.147
+peak rss: 713020
 
 == 32X
 recreate FASTA index file
 data: 32X.fa
 [INFO][0m create and read FASTA index ...
 [INFO][0m create FASTA index for 32X.fa
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 253105814
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 506211569
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 759317324
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 1012423079
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 1265528834
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 1518634589
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 1771740344
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 2024846099
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 2277951854
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 2531057609
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 2784163364
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 3037269119
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 3290374874
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 3543480629
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 3796586384
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 4049692139
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 4302797894
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 4555903649
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 4809009404
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 5062115159
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 5315220914
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 5568326669
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 5821432424
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 6074538179
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 6327643934
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 6580749689
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 6833855444
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 7086961199
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 7340066954
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 7593172709
-[fai warning] ignoring duplicate sequence "1 dna_sm:chromosome chromosome:GRCh38:1:1:248956422:1 REF" at byte offset 7846278464
 [INFO][0m read sequence IDs from FASTA index ...
-[INFO][0m 1 sequences loaded
+[INFO][0m 32 sequences loaded
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 29.380
-peak rss: 440108
+elapsed time: 71.592
+peak rss: 741228
 
