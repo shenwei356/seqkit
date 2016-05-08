@@ -6,24 +6,15 @@
 
 ## Current Version
 
-- [fakit v0.2.3](https://github.com/shenwei356/fakit/releases/tag/v0.2.3)
-    - reduce memory occupation by avoid copy data when convert `string` to `[]byte`
-    - speedup reverse-complement by avoid repeatly calling functions
-
+- [fakit v0.2.4](https://github.com/shenwei356/fakit/releases/tag/v0.2.4)
+    - add subcommand `head`
 
 ## Installation
 
-`fakit` is implemented in [Golang](https://golang.org/) programming language,
- executable binary files **for most popular operating system** are freely available
-  in [release](https://github.com/shenwei356/fakit/releases) page.
+Just [download](https://github.com/shenwei356/fakit/releases) compressed
+executable file of your operating system, and uncompress it with `tar -zxvf *.tar.gz` command.
 
-Just [download](https://github.com/shenwei356/fakit/releases) gzip-compressed
-executable file of your operating system, and uncompress it with `tar -zxvf *.tar.gz` command,
-rename it to `fakit.exe` (Windows) or `fakit` (other operating systems) for convenience.
-
-You may need to add executable permision by `chmod a+x fakit`.
-
-You can also add the directory of the executable file to environment variable
+You can add the directory of the executable file to environment variable
 `PATH`, so you can run `fakit` anywhere.
 
 1. For windows, the simplest way is copy it to `C:\WINDOWS\system32`.
@@ -41,6 +32,9 @@ For Go developer, just one command:
 
 ## Previous Versions
 
+- [fakit v0.2.3](https://github.com/shenwei356/fakit/releases/tag/v0.2.3)
+    - reduce memory occupation by avoid copy data when convert `string` to `[]byte`
+    - speedup reverse-complement by avoid repeatly calling functions
 - [fakit v0.2.2](https://github.com/shenwei356/fakit/releases/tag/v0.2.2)
     - reduce memory occupation of subcommands that use FASTA index
 - [fakit v0.2.1](https://github.com/shenwei356/fakit/releases/tag/v0.2.1)

@@ -119,7 +119,7 @@ Usage
 ```
 fakit -- a cross-platform and efficient suit for FASTA/Q file manipulation
 
-Version: 0.2.3
+Version: 0.2.4
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -134,7 +134,8 @@ Available Commands:
   faidx       create FASTA index file
   fq2fa       covert FASTQ to FASTA
   fx2tab      covert FASTA/Q to tabular format (with length/GC content/GC skew)
-  grep        search sequences by pattern(s) of name or sequence motifs
+  grep        search sequences by pattern(s) of name or sequence motifss
+  head        print first N FASTA/Q records
   locate      locate subsequences/motifs
   rename      rename duplicated IDs
   replace     replace name/sequence/by regular expression
@@ -960,6 +961,12 @@ Flags:
 
 Examples
 
+1. Sample by proportion
+
+        $ zcat hairpin.fa.gz | fakit sample -p 0.1 -o sample.fa.gz
+        [INFO] sample by proportion
+        [INFO] 2814 sequences outputed
+
 1. Sample by number
 
         $ zcat hairpin.fa.gz | fakit sample -n 1000 -o sample.fa.gz
@@ -968,11 +975,9 @@ Examples
 
     ***To reduce memory usage when spliting big file, we could use flag `--two-pass`***
 
-1. Sample by proportion
+    ***We can also use `fakit sample -p` followed with `fakit head -n`:***
 
-        $ zcat hairpin.fa.gz | fakit sample -p 0.1 -o sample.fa.gz
-        [INFO] sample by proportion
-        [INFO] 2814 sequences outputed
+        $ zcat hairpin.fa.gz | fakit sample -p 0.1 | fakit head -n 1000 -o sample.fa.gz
 
 1. Set rand seed to reproduce the result
 
@@ -984,6 +989,46 @@ Examples
 
 Note that when sampling on FASTQ files, make sure using same random seed by
 flag `-s` (`--rand-seed`)
+
+## head
+
+Usage
+
+```
+print first N FASTA/Q records
+
+Usage:
+  fakit head [flags]
+
+Flags:
+  -n, --number int   print first N FASTA/Q records (default 10)
+
+```
+
+Examples
+
+1. FASTA
+
+    $ fakit head -n 1 hairpin.fa.gz
+    >cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+    UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
+    UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
+
+1. FASTQ
+
+    $ fakit head -n 1 reads_1.fq.gz
+    @HWI-D00523:240:HF3WGBCXX:1:1101:2574:2226 1:N:0:CTGTAG
+    TGAGGAATATTGGTCAATGGGCGCGAGCCTGAACCAGCCAAGTAGCGTGAAGGATGACTG
+    CCCTACGGGTTGTAAACTTCTTTTATAAAGGAATAAAGTGAGGCACGTGTGCCTTTTTGT
+    ATGTACTTTATGAATAAGGATCGGCTAACTCCGTGCCAGCAGCCGCGGTAATACGGAGGA
+    TCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGTGCGCAGGCGGT
+    +
+    HIHIIIIIHIIHGHHIHHIIIIIIIIIIIIIIIHHIIIIIHHIHIIIIIGIHIIIIHHHH
+    HHGHIHIIIIIIIIIIIGHIIIIIGHIIIIHIIHIHHIIIIHIHHIIIIIIIGIIIIIII
+    HIIIIIGHIIIIHIIIH?DGHEEGHIIIIIIIIIIIHIIHIIIHHIIHIHHIHCHHIIHG
+    IHHHHHHH<GG?B@EHDE-BEHHHII5B@GHHF?CGEHHHDHIHIIH
+
+
 
 ## replace
 

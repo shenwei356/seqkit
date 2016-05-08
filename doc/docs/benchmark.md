@@ -4,7 +4,7 @@
 ## Softwares
 
 1. [fakit](https://github.com/shenwei356/fakit). (Go).
-   Version [v0.2.3](https://github.com/shenwei356/fakit/releases/tag/v0.2.3).
+   Version [v0.2.4](https://github.com/shenwei356/fakit/releases/tag/v0.2.4).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    Lots of dependencies to install.

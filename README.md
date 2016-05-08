@@ -1,4 +1,4 @@
-# fakit - a cross-platform and efficient suit for FASTA/Q file manipulation
+# fakit - a cross-platform and efficient toolkit for FASTA/Q file manipulation
 
 Documents  : [http://shenwei356.github.io/fakit](http://shenwei356.github.io/fakit)
 
@@ -21,7 +21,7 @@ running environment also make them less friendly to common users.
 
 fakit is a cross-platform, efficient, and practical FASTA/Q manipulations tool
 that is friendly for researchers to complete wide ranges of FASTA file processing.
-The suite supports plain or gzip-compressed input and output
+The toolkit supports plain or gzip-compressed input and output
 from either standard stream or files,
 therefore, it could be easily used in command-line pipe.
 
@@ -33,7 +33,7 @@ therefore, it could be easily used in command-line pipe.
   (see [download](http://shenwei356.github.io/fakit/download/))
 - **Fast** (see [benchmark](/#benchmark)),
   **multiple-CPUs supported**.
-- **Practical functions supported by 18 subcommands** (see subcommands and
+- **Practical functions supported by 19 subcommands** (see subcommands and
   [usage](http://shenwei356.github.io/fakit/usage/) )
 - **Well documented** (detailed [usage](http://shenwei356.github.io/fakit/usage/)
   and [benchmark](http://shenwei356.github.io/fakit/benchmark/) )
@@ -78,14 +78,12 @@ Rename head      | Yes      | Yes             | --            | --      | Yes   
  executable binary files **for most popular operating systems** are freely available
   in [release](https://github.com/shenwei356/fakit/releases) page.
 
-Just [download](https://github.com/shenwei356/fakit/releases) gzip-compressed
-executable file of your operating system, and uncompress it with `tar -zxvf *.tar.gz` command,
-rename it to `fakit.exe` (Windows) or `fakit` (other operating systems) for convenience.
+Just [download](https://github.com/shenwei356/fakit/releases) compressed
+executable file of your operating system, and uncompress it with `tar -zxvf *.tar.gz` command.
 
-You may need to add executable permision by `chmod a+x fakit`.
-
-You can also add the directory of the executable file to environment variable
+You can add the directory of the executable file to environment variable
 `PATH`, so you can run `fakit` anywhere.
+
 
 1. For windows, the simplest way is copy it to `C:\WINDOWS\system32`.
 
@@ -102,7 +100,7 @@ For Go developer, just one command:
 
 ## Subcommands
 
-18 in total.
+19 in total.
 
 **Sequence and subsequence**
 
@@ -129,6 +127,7 @@ For Go developer, just one command:
 - `common`     find common sequences of multiple files by id/name/sequence
 - `split`      split sequences into files by id/seq region/size/parts
 - `sample`     sample sequences by number or proportion
+- `head`       print first N FASTA/Q records
 
 **Edit**
 

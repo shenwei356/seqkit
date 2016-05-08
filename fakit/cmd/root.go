@@ -32,10 +32,10 @@ import (
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "fakit",
-	Short: "a cross-platform and efficient suit for FASTA/Q file manipulation",
-	Long: `fakit -- a cross-platform and efficient suit for FASTA/Q file manipulation
+	Short: "a cross-platform and efficient toolkit for FASTA/Q file manipulation",
+	Long: `fakit -- a cross-platform and efficient toolkit for FASTA/Q file manipulation
 
-Version: 0.2.3
+Version: 0.2.4
 
 Author: Wei Shen <shenwei356@gmail.com>
 
