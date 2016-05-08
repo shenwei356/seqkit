@@ -133,7 +133,7 @@
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
     
-        <li class="main active"><a href="#fakit-a-cross-platform-and-efficient-suit-for-fastaq-file-manipulation">fakit - a cross-platform and efficient suit for FASTA/Q file manipulation</a></li>
+        <li class="main active"><a href="#fakit-a-cross-platform-and-efficient-toolkit-for-fastaq-file-manipulation">fakit - a cross-platform and efficient toolkit for FASTA/Q file manipulation</a></li>
         
             <li><a href="#about-the-name">About the name</a></li>
         
@@ -161,7 +161,7 @@
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="fakit-a-cross-platform-and-efficient-suit-for-fastaq-file-manipulation">fakit - a cross-platform and efficient suit for FASTA/Q file manipulation</h1>
+<h1 id="fakit-a-cross-platform-and-efficient-toolkit-for-fastaq-file-manipulation">fakit - a cross-platform and efficient toolkit for FASTA/Q file manipulation</h1>
 <p>Documents  : <a href="http://shenwei356.github.io/fakit">http://shenwei356.github.io/fakit</a></p>
 <p>Source code: <a href="https://github.com/shenwei356/fakit">https://github.com/shenwei356/fakit</a></p>
 <h2 id="about-the-name">About the name</h2>
@@ -177,7 +177,7 @@ Furthermore, the complicated installation process of dependencies packages and
 running environment also make them less friendly to common users.</p>
 <p>fakit is a cross-platform, efficient, and practical FASTA/Q manipulations tool
 that is friendly for researchers to complete wide ranges of FASTA file processing.
-The suite supports plain or gzip-compressed input and output
+The toolkit supports plain or gzip-compressed input and output
 from either standard stream or files,
 therefore, it could be easily used in command-line pipe.</p>
 <h2 id="features">Features</h2>
@@ -188,7 +188,7 @@ therefore, it could be easily used in command-line pipe.</p>
   (see <a href="http://shenwei356.github.io/fakit/download/">download</a>)</li>
 <li><strong>Fast</strong> (see <a href="./#benchmark">benchmark</a>),
   <strong>multiple-CPUs supported</strong>.</li>
-<li><strong>Practical functions supported by 18 subcommands</strong> (see subcommands and
+<li><strong>Practical functions supported by 19 subcommands</strong> (see subcommands and
   <a href="http://shenwei356.github.io/fakit/usage/">usage</a> )</li>
 <li><strong>Well documented</strong> (detailed <a href="http://shenwei356.github.io/fakit/usage/">usage</a>
   and <a href="http://shenwei356.github.io/fakit/benchmark/">benchmark</a> )</li>
@@ -434,11 +434,9 @@ therefore, it could be easily used in command-line pipe.</p>
 <p><code>fakit</code> is implemented in <a href="https://golang.org/">Golang</a> programming language,
  executable binary files <strong>for most popular operating systems</strong> are freely available
   in <a href="https://github.com/shenwei356/fakit/releases">release</a> page.</p>
-<p>Just <a href="https://github.com/shenwei356/fakit/releases">download</a> gzip-compressed
-executable file of your operating system, and uncompress it with <code>tar -zxvf *.tar.gz</code> command,
-rename it to <code>fakit.exe</code> (Windows) or <code>fakit</code> (other operating systems) for convenience.</p>
-<p>You may need to add executable permision by <code>chmod a+x fakit</code>.</p>
-<p>You can also add the directory of the executable file to environment variable
+<p>Just <a href="https://github.com/shenwei356/fakit/releases">download</a> compressed
+executable file of your operating system, and uncompress it with <code>tar -zxvf *.tar.gz</code> command.</p>
+<p>You can add the directory of the executable file to environment variable
 <code>PATH</code>, so you can run <code>fakit</code> anywhere.</p>
 <ol>
 <li>
@@ -456,7 +454,7 @@ echo export PATH=\$PATH:/PATH/OF/fakit &gt;&gt; ~/.bashrc
 <pre><code>go get -u github.com/shenwei356/fakit/fakit
 </code></pre>
 <h2 id="subcommands">Subcommands</h2>
-<p>18 in total.</p>
+<p>19 in total.</p>
 <p><strong>Sequence and subsequence</strong></p>
 <ul>
 <li><code>seq</code>        transform sequences (revserse, complement, extract ID...)</li>
@@ -482,6 +480,7 @@ echo export PATH=\$PATH:/PATH/OF/fakit &gt;&gt; ~/.bashrc
 <li><code>common</code>     find common sequences of multiple files by id/name/sequence</li>
 <li><code>split</code>      split sequences into files by id/seq region/size/parts</li>
 <li><code>sample</code>     sample sequences by number or proportion</li>
+<li><code>head</code>       print first N FASTA/Q records</li>
 </ul>
 <p><strong>Edit</strong></p>
 <ul>
@@ -658,5 +657,5 @@ propose new functions or ask for help.</p>
 
 <!--
 MkDocs version : 0.15.3
-Build Date UTC : 2016-05-07 15:09:27.250967
+Build Date UTC : 2016-05-08 13:05:06.149874
 -->

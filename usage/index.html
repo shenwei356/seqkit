@@ -163,6 +163,8 @@
         
             <li><a href="#sample">sample</a></li>
         
+            <li><a href="#head">head</a></li>
+        
             <li><a href="#replace">replace</a></li>
         
             <li><a href="#shuffle">shuffle</a></li>
@@ -280,7 +282,7 @@ reproduced in different environments with same random seed.</p>
 <p>Usage</p>
 <pre><code>fakit -- a cross-platform and efficient suit for FASTA/Q file manipulation
 
-Version: 0.2.3
+Version: 0.2.4
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -295,7 +297,8 @@ Available Commands:
   faidx       create FASTA index file
   fq2fa       covert FASTQ to FASTA
   fx2tab      covert FASTA/Q to tabular format (with length/GC content/GC skew)
-  grep        search sequences by pattern(s) of name or sequence motifs
+  grep        search sequences by pattern(s) of name or sequence motifss
+  head        print first N FASTA/Q records
   locate      locate subsequences/motifs
   rename      rename duplicated IDs
   replace     replace name/sequence/by regular expression
@@ -1124,18 +1127,21 @@ Flags:
 <p>Examples</p>
 <ol>
 <li>
+<p>Sample by proportion</p>
+<pre><code>$ zcat hairpin.fa.gz | fakit sample -p 0.1 -o sample.fa.gz
+[INFO] sample by proportion
+[INFO] 2814 sequences outputed
+</code></pre>
+</li>
+<li>
 <p>Sample by number</p>
 <pre><code>$ zcat hairpin.fa.gz | fakit sample -n 1000 -o sample.fa.gz
 [INFO] sample by number
 [INFO] 949 sequences outputed
 </code></pre>
 <p><strong><em>To reduce memory usage when spliting big file, we could use flag <code>--two-pass</code></em></strong></p>
-</li>
-<li>
-<p>Sample by proportion</p>
-<pre><code>$ zcat hairpin.fa.gz | fakit sample -p 0.1 -o sample.fa.gz
-[INFO] sample by proportion
-[INFO] 2814 sequences outputed
+<p><strong><em>We can also use <code>fakit sample -p</code> followed with <code>fakit head -n</code>:</em></strong></p>
+<pre><code>$ zcat hairpin.fa.gz | fakit sample -p 0.1 | fakit head -n 1000 -o sample.fa.gz
 </code></pre>
 </li>
 <li>
@@ -1151,6 +1157,44 @@ Flags:
 </ol>
 <p>Note that when sampling on FASTQ files, make sure using same random seed by
 flag <code>-s</code> (<code>--rand-seed</code>)</p>
+<h2 id="head">head</h2>
+<p>Usage</p>
+<pre><code>print first N FASTA/Q records
+
+Usage:
+  fakit head [flags]
+
+Flags:
+  -n, --number int   print first N FASTA/Q records (default 10)
+
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>FASTA</p>
+<p>$ fakit head -n 1 hairpin.fa.gz</p>
+<blockquote>
+<p>cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
+UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA</p>
+</blockquote>
+</li>
+<li>
+<p>FASTQ</p>
+<p>$ fakit head -n 1 reads_1.fq.gz
+@HWI-D00523:240:HF3WGBCXX:1:1101:2574:2226 1:N:0:CTGTAG
+TGAGGAATATTGGTCAATGGGCGCGAGCCTGAACCAGCCAAGTAGCGTGAAGGATGACTG
+CCCTACGGGTTGTAAACTTCTTTTATAAAGGAATAAAGTGAGGCACGTGTGCCTTTTTGT
+ATGTACTTTATGAATAAGGATCGGCTAACTCCGTGCCAGCAGCCGCGGTAATACGGAGGA
+TCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGTGCGCAGGCGGT
++
+HIHIIIIIHIIHGHHIHHIIIIIIIIIIIIIIIHHIIIIIHHIHIIIIIGIHIIIIHHHH
+HHGHIHIIIIIIIIIIIGHIIIIIGHIIIIHIIHIHHIIIIHIHHIIIIIIIGIIIIIII
+HIIIIIGHIIIIHIIIH?DGHEEGHIIIIIIIIIIIHIIHIIIHHIIHIHHIHCHHIIHG
+IHHHHHHH&lt;GG?B@EHDE-BEHHHII5B@GHHF?CGEHHHDHIHIIH</p>
+</li>
+</ol>
 <h2 id="replace">replace</h2>
 <p>Usage</p>
 <pre><code>replace name/sequence/by regular expression.

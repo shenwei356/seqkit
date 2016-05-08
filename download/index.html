@@ -152,21 +152,15 @@
   in <a href="https://github.com/shenwei356/fakit/releases">release</a> page.</p>
 <h2 id="current-version">Current Version</h2>
 <ul>
-<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.3">fakit v0.2.3</a><ul>
-<li>reduce memory occupation by avoid copy data when convert <code>string</code> to <code>[]byte</code></li>
-<li>speedup reverse-complement by avoid repeatly calling functions</li>
+<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.4">fakit v0.2.4</a><ul>
+<li>add subcommand <code>head</code></li>
 </ul>
 </li>
 </ul>
 <h2 id="installation">Installation</h2>
-<p><code>fakit</code> is implemented in <a href="https://golang.org/">Golang</a> programming language,
- executable binary files <strong>for most popular operating system</strong> are freely available
-  in <a href="https://github.com/shenwei356/fakit/releases">release</a> page.</p>
-<p>Just <a href="https://github.com/shenwei356/fakit/releases">download</a> gzip-compressed
-executable file of your operating system, and uncompress it with <code>tar -zxvf *.tar.gz</code> command,
-rename it to <code>fakit.exe</code> (Windows) or <code>fakit</code> (other operating systems) for convenience.</p>
-<p>You may need to add executable permision by <code>chmod a+x fakit</code>.</p>
-<p>You can also add the directory of the executable file to environment variable
+<p>Just <a href="https://github.com/shenwei356/fakit/releases">download</a> compressed
+executable file of your operating system, and uncompress it with <code>tar -zxvf *.tar.gz</code> command.</p>
+<p>You can add the directory of the executable file to environment variable
 <code>PATH</code>, so you can run <code>fakit</code> anywhere.</p>
 <ol>
 <li>
@@ -185,6 +179,11 @@ echo export PATH=\$PATH:/PATH/OF/fakit &gt;&gt; ~/.bashrc
 </code></pre>
 <h2 id="previous-versions">Previous Versions</h2>
 <ul>
+<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.3">fakit v0.2.3</a><ul>
+<li>reduce memory occupation by avoid copy data when convert <code>string</code> to <code>[]byte</code></li>
+<li>speedup reverse-complement by avoid repeatly calling functions</li>
+</ul>
+</li>
 <li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.2">fakit v0.2.2</a><ul>
 <li>reduce memory occupation of subcommands that use FASTA index</li>
 </ul>
