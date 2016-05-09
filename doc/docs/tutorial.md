@@ -55,8 +55,8 @@ used to check the peek memory usage of fakit. Usage: `memusg [-t] command`.
         [INFO] sorting ...
         [INFO] output ...
 
-        elapsed time: 5.021s
-        peak rss: 2.93 GB
+        elapsed time: 4.892s
+        peak rss: 500.15 MB
 
     Detail:
 
@@ -102,8 +102,8 @@ used to check the peek memory usage of fakit. Usage: `memusg [-t] command`.
         [INFO] shuffle ...
         [INFO] output ...
 
-        elapsed time: 4.738s
-        peak rss: 2.78 GB
+        elapsed time: 6.632s
+        peak rss: 528.3 MB
 
 
 1. Spliting into files with single sequence
@@ -120,8 +120,8 @@ used to check the peek memory usage of fakit. Usage: `memusg [-t] command`.
         [INFO] write 1 sequences to file: hsa.id_KI270468.1.fa
         ...
 
-        elapsed time: 19.324s
-        peak rss: 3.91 GB
+        elapsed time: 18.807s
+        peak rss: 1.36 GB
 
 1. Geting subsequence of some chromesomes
 
@@ -131,8 +131,8 @@ used to check the peek memory usage of fakit. Usage: `memusg [-t] command`.
         >Y_1-10 Y dna_sm:chromosome chromosome:GRCh38:Y:2781480:56887902:1 REF
         NNNNNNNNNN
 
-        elapsed time: 1.627s
-        peak rss: 770.88 MB
+        elapsed time: 1.276s
+        peak rss: 640.92 MB
 
 
 1. Geting CDS sequence of chr 1 by GTF files
@@ -141,8 +141,8 @@ used to check the peek memory usage of fakit. Usage: `memusg [-t] command`.
         [INFO] read GTF file ...
         [INFO] 22420 GTF features loaded
 
-        elapsed time: 8.967s
-        peak rss: 1.29 GB
+        elapsed time: 8.643s
+        peak rss: 846.14 MB
 
 
 ## Remove contaminated reads
