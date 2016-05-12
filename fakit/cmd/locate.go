@@ -56,7 +56,11 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		bufferSize := config.BufferSize
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
-		seq.ValidateSeq = false
+		seq.ValidateSeq = true
+		seq.ValidateWholeSeq = false
+		seq.ValidSeqLengthThreshold = getFlagValidateSeqLength(cmd, "validate-seq-length")
+		seq.ValidSeqThreads = config.Threads
+		seq.ComplementThreads = config.Threads
 		runtime.GOMAXPROCS(config.Threads)
 
 		pattern := getFlagStringSlice(cmd, "pattern")
@@ -183,7 +187,6 @@ For example: "\w" will be wrongly converted to "\[AT]".
 						chunks[chunk.ID] = chunk
 					}
 				}
-
 				if len(chunks) > 0 {
 					sortedIDs := sortLocationChunkMapID(chunks)
 					for _, id := range sortedIDs {
@@ -295,4 +298,6 @@ func init() {
 	locateCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
 	locateCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	locateCmd.Flags().BoolP("only-positive-strand", "P", false, "only search at positive strand")
+	locateCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
+
 }
