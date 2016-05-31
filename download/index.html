@@ -152,8 +152,13 @@
   in <a href="https://github.com/shenwei356/fakit/releases">release</a> page.</p>
 <h2 id="current-version">Current Version</h2>
 <ul>
-<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.4">fakit v0.2.4</a><ul>
-<li>add subcommand <code>head</code></li>
+<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.4.1">fakit v0.2.4.1</a><ul>
+<li>fix several bugs from library <code>bio</code>, affected situations:<ul>
+<li>Locating patterns in sequences by pattern FASTA file: <code>fakit locate -f</code></li>
+<li>Reading FASTQ file with record of which the quality starts with <code>+</code></li>
+</ul>
+</li>
+<li>add command <code>version</code></li>
 </ul>
 </li>
 </ul>
@@ -179,6 +184,10 @@ echo export PATH=\$PATH:/PATH/OF/fakit &gt;&gt; ~/.bashrc
 </code></pre>
 <h2 id="previous-versions">Previous Versions</h2>
 <ul>
+<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.4">fakit v0.2.4</a><ul>
+<li>add subcommand <code>head</code></li>
+</ul>
+</li>
 <li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.3">fakit v0.2.3</a><ul>
 <li>reduce memory occupation by avoid copy data when convert <code>string</code> to <code>[]byte</code></li>
 <li>speedup reverse-complement by avoid repeatly calling functions</li>
