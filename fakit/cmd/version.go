@@ -50,7 +50,7 @@ var versionCmd = &cobra.Command{
 		} else {
 			version = items[len(items)-1]
 		}
-		fmt.Printf("Latest version: fakit %s\n", version)
+		fmt.Printf("Latest version: fakit %s at %s\n", version, resp.Request.URL.String())
 	},
 }
 
