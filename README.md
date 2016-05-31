@@ -106,7 +106,7 @@ For Go developer, just one command:
 
 - `seq`        transform sequences (revserse, complement, extract ID...)
 - `subseq`     get subsequences by region/gtf/bed, including flanking sequences
-- `sliding`    sliding sequences, circle genome supported
+- `sliding`    sliding sequences, circular genome supported
 - `stat`       simple statistics of FASTA files
 - `faidx`      create FASTA index file
 
@@ -138,6 +138,11 @@ For Go developer, just one command:
 
 - `shuffle`    shuffle sequences
 - `sort`       sort sequences by id/name/sequence
+
+**Misc**
+
+- `version`   print version information
+
 
 ## Technical details and guides for use
 

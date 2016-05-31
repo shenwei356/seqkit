@@ -80,7 +80,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		patterns := make(map[string][]byte)
 		var s string
 		if patternFile != "" {
-			records, err := fastx.GetSeqsMap(patternFile, nil, 1000, runtime.NumCPU(), "")
+			records, err := fastx.GetSeqsMap(patternFile, nil, 10, config.Threads, "")
 			checkError(err)
 			for name, record := range records {
 				patterns[name] = record.Seq.Seq

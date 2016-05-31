@@ -34,8 +34,8 @@ import (
 // slidingCmd represents the sliding command
 var slidingCmd = &cobra.Command{
 	Use:   "sliding",
-	Short: "sliding sequences, circle genome supported",
-	Long: `sliding sequences, circle genome supported
+	Short: "sliding sequences, circular genome supported",
+	Long: `sliding sequences, circular genome supported
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -52,7 +52,7 @@ var slidingCmd = &cobra.Command{
 
 		files := getFileList(args)
 
-		circle := getFlagBool(cmd, "circle-genome")
+		circular := getFlagBool(cmd, "circular-genome")
 		step := getFlagInt(cmd, "step")
 		window := getFlagInt(cmd, "window")
 		if step == 0 || window == 0 {
@@ -80,7 +80,7 @@ var slidingCmd = &cobra.Command{
 				for _, record := range chunk.Data {
 					originalLen = len(record.Seq.Seq)
 					sequence = record.Seq.Seq
-					if circle {
+					if circular {
 						sequence = append(sequence, sequence[0:window-1]...)
 					}
 
@@ -111,5 +111,5 @@ func init() {
 
 	slidingCmd.Flags().IntP("step", "s", 0, "step size")
 	slidingCmd.Flags().IntP("window", "W", 0, "window size")
-	slidingCmd.Flags().BoolP("circle-genome", "C", false, "circle genome")
+	slidingCmd.Flags().BoolP("circular-genome", "C", false, "circular genome")
 }

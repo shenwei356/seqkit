@@ -119,7 +119,7 @@ Usage
 ```
 fakit -- a cross-platform and efficient suit for FASTA/Q file manipulation
 
-Version: 0.2.4
+Version: 0.2.4.1
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -134,7 +134,7 @@ Available Commands:
   faidx       create FASTA index file
   fq2fa       covert FASTQ to FASTA
   fx2tab      covert FASTA/Q to tabular format (with length/GC content/GC skew)
-  grep        search sequences by pattern(s) of name or sequence motifss
+  grep        search sequences by pattern(s) of name or sequence motifs
   head        print first N FASTA/Q records
   locate      locate subsequences/motifs
   rename      rename duplicated IDs
@@ -143,12 +143,13 @@ Available Commands:
   sample      sample sequences by number or proportion
   seq         transform sequences (revserse, complement, extract ID...)
   shuffle     shuffle sequences
-  sliding     sliding sequences, circle genome supported
+  sliding     sliding sequences, circular genome supported
   sort        sort sequences by id/name/sequence/length
   split       split sequences into files by id/seq region/size/parts
   stat        simple statistics of FASTA files
   subseq      get subsequences by region/gtf/bed, including flanking sequences
   tab2fx      covert tabular format to FASTA/Q format
+  version     print version information
 
 Flags:
       --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which fakit guesses the sequence type (0 for whole seq) (default 10000)
@@ -463,13 +464,13 @@ Examples
 Usage
 
 ```
-sliding sequences, circle genome supported
+sliding sequences, circular genome supported
 
 Usage:
   fakit sliding [flags]
 
 Flags:
-  -C, --circle-genome   circle genome
+  -C, --circular-genome   circular genome
   -s, --step int        step size
   -W, --window int      window size
 
@@ -485,7 +486,7 @@ Examples
         >seq_sliding:4-9
         TacgtN
 
-2. Circle genome
+2. Circular genome
 
         $ echo -e ">seq\nACGTacgtNN" | fakit sliding -s 3 -W 6 -C
         >seq_sliding:1-6
