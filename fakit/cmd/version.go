@@ -22,6 +22,8 @@ package cmd
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -29,12 +31,26 @@ import (
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "print version information",
-	Long: `print version information
+	Short: "print version information and check for update",
+	Long: `print version information and check for update
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("fakit 0.2.4.1")
+		fmt.Println("fakit v0.2.4.1")
+		fmt.Println("\nChecking new version...")
+
+		resp, err := http.Get("https://github.com/shenwei356/fakit/releases/latest")
+		if err != nil {
+			checkError(fmt.Errorf("Network error"))
+		}
+		items := strings.Split(resp.Request.URL.String(), "/")
+		version := ""
+		if items[len(items)-1] == "" {
+			version = items[len(items)-2]
+		} else {
+			version = items[len(items)-1]
+		}
+		fmt.Printf("Latest version: fakit %s\n", version)
 	},
 }
 
