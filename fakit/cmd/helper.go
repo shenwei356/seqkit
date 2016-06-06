@@ -42,6 +42,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// VERSION of fakit
+var VERSION = "0.2.4.1"
+
 func checkError(err error) {
 	if err != nil {
 		log.Error(err)

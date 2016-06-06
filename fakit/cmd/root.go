@@ -33,16 +33,16 @@ import (
 var RootCmd = &cobra.Command{
 	Use:   "fakit",
 	Short: "a cross-platform and efficient toolkit for FASTA/Q file manipulation",
-	Long: `fakit -- a cross-platform and efficient toolkit for FASTA/Q file manipulation
+	Long: fmt.Sprintf(`fakit -- a cross-platform and efficient toolkit for FASTA/Q file manipulation
 
-Version: 0.2.4.1
+Version: %s
 
 Author: Wei Shen <shenwei356@gmail.com>
 
 Documents  : http://shenwei356.github.io/fakit
 Source code: https://github.com/shenwei356/fakit
 
-`,
+`, VERSION),
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.

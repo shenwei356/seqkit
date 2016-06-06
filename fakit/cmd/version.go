@@ -36,10 +36,11 @@ var versionCmd = &cobra.Command{
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("fakit v0.2.4.1")
+		app := "fakit"
+		fmt.Printf("%s v%s\n", app, VERSION)
 		fmt.Println("\nChecking new version...")
 
-		resp, err := http.Get("https://github.com/shenwei356/fakit/releases/latest")
+		resp, err := http.Get(fmt.Sprintf("https://github.com/shenwei356/%s/releases/latest", app))
 		if err != nil {
 			checkError(fmt.Errorf("Network error"))
 		}
@@ -50,7 +51,11 @@ var versionCmd = &cobra.Command{
 		} else {
 			version = items[len(items)-1]
 		}
-		fmt.Printf("Latest version: fakit %s at %s\n", version, resp.Request.URL.String())
+		if version == "v"+VERSION {
+			fmt.Printf("You are using the latest version of %s\n", app)
+		} else {
+			fmt.Printf("New version available: %s %s at %s\n", app, version, resp.Request.URL.String())
+		}
 	},
 }
 
