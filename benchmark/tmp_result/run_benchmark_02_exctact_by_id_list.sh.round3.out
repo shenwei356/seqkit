@@ -7,48 +7,48 @@ data: ids_B.txt
 == fakit
 data: dataset_A.fa
 
-elapsed time: 11.395
-peak rss: 46568
+elapsed time: 12.618
+peak rss: 55416
 
 data: dataset_B.fa
 
-elapsed time: 10.702
-peak rss: 1313964
+elapsed time: 12.422
+peak rss: 1729668
 
 == fasta_utilities
 data: dataset_A.fa
 number in list 20138
 Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94, <LIST> line 20138.
 
-elapsed time: 9.908
-peak rss: 51664
+elapsed time: 10.042
+peak rss: 54352
 
 data: dataset_B.fa
 number in list 58
 Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94, <LIST> line 58.
 
-elapsed time: 12.549
-peak rss: 1256220
+elapsed time: 12.654
+peak rss: 1256288
 
 == seqmagick
 data: dataset_A.fa
 
-elapsed time: 45.061
-peak rss: 41756
+elapsed time: 44.882
+peak rss: 39176
 
 data: dataset_B.fa
 
-elapsed time: 51.208
-peak rss: 980628
+elapsed time: 51.234
+peak rss: 1063396
 
 == seqtk
 data: dataset_A.fa
 
-elapsed time: 11.221
-peak rss: 10008
+elapsed time: 11.285
+peak rss: 9896
 
 data: dataset_B.fa
 
-elapsed time: 13.464
-peak rss: 244960
+elapsed time: 14.056
+peak rss: 244868
 

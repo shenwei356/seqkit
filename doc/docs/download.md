@@ -8,6 +8,7 @@
 
 - [fakit v0.2.5](https://github.com/shenwei356/fakit/releases/tag/v0.2.5)
     - fix a serious bug brought in `v0.2.3`, using unsafe method to convert `string` to `[]byte`
+    - add awk-like built-in variable of record number (`{NR}`) for `fakit replace`
 
 ## Installation
 

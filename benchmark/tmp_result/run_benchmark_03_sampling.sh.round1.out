@@ -10,8 +10,8 @@ data: dataset_A.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m %d sequences outputed 10000
 
-elapsed time: 27.789
-peak rss: 44796
+elapsed time: 29.217
+peak rss: 47792
 
 data: dataset_B.fa
 [INFO][0m sample by number
@@ -20,28 +20,28 @@ data: dataset_B.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m %d sequences outputed 19
 
-elapsed time: 30.673
-peak rss: 1503996
+elapsed time: 30.923
+peak rss: 1558032
 
 == seqmagick
 data: dataset_A.fa
 
-elapsed time: 38.565
-peak rss: 527784
+elapsed time: 39.762
+peak rss: 535696
 
 data: dataset_B.fa
 
-elapsed time: 44.525
-peak rss: 2933360
+elapsed time: 45.507
+peak rss: 2904516
 
 == seqtk
 data: dataset_A.fa
 
-elapsed time: 4.084
-peak rss: 1082940
+elapsed time: 4.237
+peak rss: 1079284
 
 data: dataset_B.fa
 
-elapsed time: 4.985
-peak rss: 2817732
+elapsed time: 5.011
+peak rss: 2817744
 

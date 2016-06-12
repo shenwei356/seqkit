@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"regexp"
 	"runtime"
+	"strconv"
 	"sync"
 
 	"github.com/brentp/xopen"
@@ -67,6 +68,11 @@ more on: http://shenwei356.github.io/fakit/usage/#replace
 
 		pattern := getFlagString(cmd, "pattern")
 		replacement := []byte(getFlagString(cmd, "replacement"))
+		var replaceeWithNR bool
+		if reNR.Match(replacement) {
+			replaceeWithNR = true
+		}
+
 		bySeq := getFlagBool(cmd, "by-seq")
 		// byName := getFlagBool(cmd, "by-name")
 		ignoreCase := getFlagBool(cmd, "ignore-case")
@@ -140,28 +146,35 @@ more on: http://shenwei356.github.io/fakit/usage/#replace
 
 			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
 			checkError(err)
+			nr := 1
 			for chunk := range fastxReader.Ch {
 				checkError(chunk.Err)
 				tokens <- 1
 				wg.Add(1)
 
-				go func(chunk fastx.RecordChunk) {
+				go func(chunk fastx.RecordChunk, nr int) {
 					defer func() {
 						wg.Done()
 						<-tokens
 					}()
 
 					var chunkData []*fastx.Record
-					for _, record := range chunk.Data {
+					var r []byte
+					for i, record := range chunk.Data {
 						if bySeq {
 							record.Seq.Seq = patternRegexp.ReplaceAll(record.Seq.Seq, replacement)
 						} else {
-							record.Name = patternRegexp.ReplaceAll(record.Name, replacement)
+							r = replacement
+							if replaceeWithNR {
+								r = reNR.ReplaceAll(replacement, []byte(strconv.Itoa(nr+i)))
+							}
+							record.Name = patternRegexp.ReplaceAll(record.Name, r)
 						}
 						chunkData = append(chunkData, record)
 					}
 					ch <- fastx.RecordChunk{ID: chunk.ID, Data: chunkData, Err: nil}
-				}(chunk)
+				}(chunk, nr)
+				nr += len(chunk.Data)
 			}
 			wg.Wait()
 			close(ch)
@@ -177,8 +190,10 @@ func init() {
 		"replacement. supporting capture variables. "+
 			" e.g. $1 represents the text of the first submatch. "+
 			"ATTENTION: use SINGLE quote NOT double quotes in *nix OS or "+
-			"use the \\ escape character.")
+			`use the \\ escape character. record number is also supported by "{NR}"`)
 	// replaceCmd.Flags().BoolP("by-name", "n", false, "replace full name instead of just id")
 	replaceCmd.Flags().BoolP("by-seq", "s", false, "replace seq")
 	replaceCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 }
+
+var reNR = regexp.MustCompile(`\{NR\}`)

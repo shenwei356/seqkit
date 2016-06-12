@@ -2,36 +2,36 @@ Test: A) Reverse complement
 == 1X
 data: 1X.fa
 
-elapsed time: 1.942
-peak rss: 775128
+elapsed time: 2.158
+peak rss: 775500
 
 == 2X
 data: 2X.fa
 
-elapsed time: 3.421
-peak rss: 1029436
+elapsed time: 4.033
+peak rss: 1280528
 
 == 4X
 data: 4X.fa
 
-elapsed time: 7.128
-peak rss: 1030432
+elapsed time: 7.067
+peak rss: 1782348
 
 == 8X
 data: 8X.fa
 
-elapsed time: 13.457
-peak rss: 1494176
+elapsed time: 17.558
+peak rss: 1535576
 
 == 16X
 data: 16X.fa
 
-elapsed time: 34.371
-peak rss: 1495336
+elapsed time: 34.178
+peak rss: 1535748
 
 == 32X
 data: 32X.fa
 
-elapsed time: 75.616
-peak rss: 1495044
+elapsed time: 67.378
+peak rss: 1786604
 

@@ -1060,7 +1060,7 @@ Flags:
   -s, --by-seq               replace seq
   -i, --ignore-case          ignore case
   -p, --pattern string       search regular expression
-  -r, --replacement string   replacement. supporting capture variables.  e.g. $1 represents the text of the first submatch. ATTENTION: use SINGLE quote NOT double quotes in *nix OS or use the \ escape character.
+  -r, --replacement string   replacement. supporting capture variables.  e.g. $1 represents the text of the first submatch. ATTENTION: use SINGLE quote NOT double quotes in *nix OS or use the \ escape character. record number is also supported by "{NR}"
 
 ```
 
@@ -1101,6 +1101,14 @@ Examples
         C       C
         G       G
         T       T
+        
+1. Rename with number of record
+
+        echo -e ">abc\nACTG\n>123\nATTT" |  fakit replace -p .+ -r "seq_{NR}" 
+        >seq_1
+        ACTG
+        >seq_2
+        ATTT
 
 
 ## shuffle

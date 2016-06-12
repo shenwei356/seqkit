@@ -10,8 +10,8 @@ data: dataset_A.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m %d sequences outputed 10000
 
-elapsed time: 32.544
-peak rss: 47528
+elapsed time: 34.224
+peak rss: 49112
 
 data: dataset_B.fa
 [INFO][0m sample by number
@@ -20,8 +20,8 @@ data: dataset_B.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m %d sequences outputed 19
 
-elapsed time: 35.011
-peak rss: 1533624
+elapsed time: 36.642
+peak rss: 1617164
 
 == 2
 data: dataset_A.fa
@@ -31,8 +31,8 @@ data: dataset_A.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m %d sequences outputed 10000
 
-elapsed time: 28.774
-peak rss: 42572
+elapsed time: 29.272
+peak rss: 47072
 
 data: dataset_B.fa
 [INFO][0m sample by number
@@ -41,8 +41,8 @@ data: dataset_B.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m %d sequences outputed 19
 
-elapsed time: 31.601
-peak rss: 1333372
+elapsed time: 31.655
+peak rss: 1558304
 
 == 3
 data: dataset_A.fa
@@ -52,8 +52,8 @@ data: dataset_A.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m %d sequences outputed 10000
 
-elapsed time: 28.511
-peak rss: 40756
+elapsed time: 33.032
+peak rss: 50220
 
 data: dataset_B.fa
 [INFO][0m sample by number
@@ -62,8 +62,8 @@ data: dataset_B.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m %d sequences outputed 19
 
-elapsed time: 31.322
-peak rss: 1493720
+elapsed time: 35.009
+peak rss: 1586964
 
 == 4
 data: dataset_A.fa
@@ -73,8 +73,8 @@ data: dataset_A.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m %d sequences outputed 10000
 
-elapsed time: 29.114
-peak rss: 43664
+elapsed time: 31.420
+peak rss: 53532
 
 data: dataset_B.fa
 [INFO][0m sample by number
@@ -83,6 +83,6 @@ data: dataset_B.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m %d sequences outputed 19
 
-elapsed time: 33.679
-peak rss: 1511352
+elapsed time: 35.383
+peak rss: 1613908
 

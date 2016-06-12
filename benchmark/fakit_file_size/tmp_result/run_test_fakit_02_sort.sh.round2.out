@@ -9,8 +9,8 @@ data: 1X.fa
 [INFO][0m sorting ...
 [INFO][0m output ...
 
-elapsed time: 1.249
-peak rss: 459324
+elapsed time: 1.356
+peak rss: 462680
 
 == 2X
 delete old FASTA index file
@@ -22,8 +22,8 @@ data: 2X.fa
 [INFO][0m sorting ...
 [INFO][0m output ...
 
-elapsed time: 2.378
-peak rss: 639760
+elapsed time: 2.639
+peak rss: 627008
 
 == 4X
 delete old FASTA index file
@@ -35,8 +35,8 @@ data: 4X.fa
 [INFO][0m sorting ...
 [INFO][0m output ...
 
-elapsed time: 4.649
-peak rss: 694076
+elapsed time: 5.268
+peak rss: 673364
 
 == 8X
 delete old FASTA index file
@@ -48,8 +48,8 @@ data: 8X.fa
 [INFO][0m sorting ...
 [INFO][0m output ...
 
-elapsed time: 13.983
-peak rss: 724820
+elapsed time: 15.650
+peak rss: 716216
 
 == 16X
 delete old FASTA index file
@@ -61,8 +61,8 @@ data: 16X.fa
 [INFO][0m sorting ...
 [INFO][0m output ...
 
-elapsed time: 27.392
-peak rss: 744004
+elapsed time: 33.425
+peak rss: 736220
 
 == 32X
 delete old FASTA index file
@@ -74,6 +74,6 @@ data: 32X.fa
 [INFO][0m sorting ...
 [INFO][0m output ...
 
-elapsed time: 74.389
-peak rss: 675264
+elapsed time: 75.105
+peak rss: 689972
 

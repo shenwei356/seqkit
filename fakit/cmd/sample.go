@@ -161,7 +161,7 @@ var sampleCmd = &cobra.Command{
 		}
 
 		if !quiet {
-			log.Info("%d sequences outputed", n)
+			log.Infof("%d sequences outputed", n)
 		}
 	},
 }
