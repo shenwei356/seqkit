@@ -6,11 +6,8 @@
 
 ## Current Version
 
-- [fakit v0.2.4.1](https://github.com/shenwei356/fakit/releases/tag/v0.2.4.1)
-    - fix several bugs from library `bio`, affected situations:
-        - Locating patterns in sequences by pattern FASTA file: `fakit locate -f`
-        - Reading FASTQ file with record of which the quality starts with `+`
-    - add command `version`
+- [fakit v0.2.5](https://github.com/shenwei356/fakit/releases/tag/v0.2.5)
+    - fix a serious bug brought in `v0.2.3`, using unsafe method to convert `string` to `[]byte`
 
 ## Installation
 
@@ -35,6 +32,11 @@ For Go developer, just one command:
 
 ## Previous Versions
 
+- [fakit v0.2.4.1](https://github.com/shenwei356/fakit/releases/tag/v0.2.4.1)
+    - fix several bugs from library `bio`, affected situations:
+        - Locating patterns in sequences by pattern FASTA file: `fakit locate -f`
+        - Reading FASTQ file with record of which the quality starts with `+`
+    - add command `version`
 - [fakit v0.2.4](https://github.com/shenwei356/fakit/releases/tag/v0.2.4)
     - add subcommand `head`
 - [fakit v0.2.3](https://github.com/shenwei356/fakit/releases/tag/v0.2.3)

@@ -240,7 +240,7 @@ from [The miRBase Sequence Database -- Release 21](ftp://mirbase.org/pub/mirbase
 
 1. First 10 bases
 
-        $ zcat hairpin.fa.gz | fakit subseq -r 1:10 | fakit sort -s | fakit seq -t rna -s | head -n 10
+        $ zcat hairpin.fa.gz | fakit subseq -r 1:10 | fakit sort -s | fakit seq -s | head -n 10
         AAAAAAAAAA
         AAAAAAAAAA
         AAAAAAAAAG

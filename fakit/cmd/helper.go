@@ -43,7 +43,7 @@ import (
 )
 
 // VERSION of fakit
-var VERSION = "0.2.4.1"
+var VERSION = "0.2.5"
 
 func checkError(err error) {
 	if err != nil {

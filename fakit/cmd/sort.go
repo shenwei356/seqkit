@@ -142,20 +142,21 @@ So please delete .fai file created by samtools.
 						if _, ok := id2name[name]; ok {
 							checkError(fmt.Errorf(`duplicated sequences found: %s. use "fakit rename" to rename duplicated IDs`, name))
 						}
-						id2name[name] = record.Name
+						id2name[name] = []byte(string(record.Name))
 
 						if ignoreCase {
 							name = strings.ToLower(name)
 						}
 
-						sequences[name] = record
+						record2 := record.Clone()
+						sequences[name] = record2
 						if byLength {
-							name2length = append(name2length, stringutil.StringCount{Key: name, Count: len(record.Seq.Seq)})
+							name2length = append(name2length, stringutil.StringCount{Key: name, Count: len(record2.Seq.Seq)})
 						} else if byID || byName || bySeq {
 							if ignoreCase {
-								name2sequence = append(name2sequence, stringutil.String2ByteSlice{Key: name, Value: bytes.ToLower(record.Seq.Seq)})
+								name2sequence = append(name2sequence, stringutil.String2ByteSlice{Key: name, Value: bytes.ToLower(record2.Seq.Seq)})
 							} else {
-								name2sequence = append(name2sequence, stringutil.String2ByteSlice{Key: name, Value: record.Seq.Seq})
+								name2sequence = append(name2sequence, stringutil.String2ByteSlice{Key: name, Value: record2.Seq.Seq})
 							}
 						}
 					}
@@ -305,7 +306,7 @@ So please delete .fai file created by samtools.
 					if _, ok := id2name[name]; ok {
 						checkError(fmt.Errorf(`duplicated sequences found: %s. use "fakit rename" to rename duplicated IDs`, name))
 					}
-					id2name[name] = record.Name
+					id2name[name] = []byte(string(record.Name))
 
 					if ignoreCase {
 						name = strings.ToLower(name)
@@ -317,7 +318,7 @@ So please delete .fai file created by samtools.
 						prefix = record.Seq.Seq[0:seqPrefixLength]
 					}
 					name2sequence = append(name2sequence,
-						stringutil.String2ByteSlice{Key: name, Value: prefix})
+						stringutil.String2ByteSlice{Key: name, Value: []byte(string(prefix))})
 					name2length = append(name2length,
 						stringutil.StringCount{Key: name, Count: len(record.Seq.Seq)})
 				}
@@ -370,7 +371,10 @@ So please delete .fai file created by samtools.
 				sequence := subseqByFaixNotCleaned(faidx, chr, r, 1, -1)
 				outfh.Write([]byte(fmt.Sprintf(">%s\n", chr)))
 				outfh.Write(sequence)
-				outfh.WriteString("\n")
+				if len(sequence) > 0 && sequence[len(sequence)-1] == '\n' {
+				} else {
+					outfh.WriteString("\n")
+				}
 			}
 		} else if byLength {
 			for _, kv := range name2length {
@@ -384,7 +388,10 @@ So please delete .fai file created by samtools.
 				sequence := subseqByFaixNotCleaned(faidx, chr, r, 1, -1)
 				outfh.Write([]byte(fmt.Sprintf(">%s\n", chr)))
 				outfh.Write(sequence)
-				outfh.WriteString("\n")
+				if len(sequence) > 0 && sequence[len(sequence)-1] == '\n' {
+				} else {
+					outfh.WriteString("\n")
+				}
 			}
 		}
 
