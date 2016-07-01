@@ -348,7 +348,7 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 	gtfFeaturesMap map[string]type2gtfFeatures, choosedFeatures []string,
 	onlyFlank bool, upStream int, downStream int) {
 
-	seqname := string(record.ID)
+	seqname := strings.ToLower(string(record.ID))
 
 	var strand, geneID, outname, flankInfo string
 	var s, e int
@@ -435,7 +435,7 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 	bedFeatureMap map[string][]BedFeature,
 	onlyFlank bool, upStream, downStream int) {
-	seqname := string(record.ID)
+	seqname := strings.ToLower(string(record.ID))
 
 	var strand, geneID, outname, flankInfo string
 	var s, e int

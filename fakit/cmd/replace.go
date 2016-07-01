@@ -190,7 +190,7 @@ func init() {
 		"replacement. supporting capture variables. "+
 			" e.g. $1 represents the text of the first submatch. "+
 			"ATTENTION: use SINGLE quote NOT double quotes in *nix OS or "+
-			`use the \\ escape character. record number is also supported by "{NR}"`)
+			`use the \ escape character. record number is also supported by "{NR}"`)
 	// replaceCmd.Flags().BoolP("by-name", "n", false, "replace full name instead of just id")
 	replaceCmd.Flags().BoolP("by-seq", "s", false, "replace seq")
 	replaceCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")

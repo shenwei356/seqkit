@@ -141,7 +141,7 @@ func init() {
 	fx2tabCmd.Flags().BoolP("length", "l", false, "print sequence length")
 	fx2tabCmd.Flags().BoolP("gc", "g", false, "print GC content")
 	fx2tabCmd.Flags().BoolP("gc-skew", "G", false, "print GC-Skew")
-	fx2tabCmd.Flags().StringSliceP("base-content", "B", []string{}, "print base content. (case ignored, multiple values supported) e.g. -b AT -b N")
+	fx2tabCmd.Flags().StringSliceP("base-content", "B", []string{}, "print base content. (case ignored, multiple values supported) e.g. -B AT -B N")
 	fx2tabCmd.Flags().BoolP("only-id", "i", false, "print ID instead of full head")
 	fx2tabCmd.Flags().BoolP("name", "n", false, "only print names (no sequences and qualities)")
 	fx2tabCmd.Flags().BoolP("header-line", "H", false, "print header line")

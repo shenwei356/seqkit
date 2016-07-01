@@ -119,7 +119,7 @@ Usage
 ```
 fakit -- a cross-platform and efficient suit for FASTA/Q file manipulation
 
-Version: 0.2.5
+Version: 0.2.5.1
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -562,7 +562,7 @@ Usage:
   fakit fx2tab [flags]
 
 Flags:
-  -B, --base-content value   print base content. (case ignored, multiple values supported) e.g. -b AT -b N (default [])
+  -B, --base-content value   print base content. (case ignored, multiple values supported) e.g. -B AT -B N (default [])
   -g, --gc                   print GC content
   -G, --gc-skew              print GC-Skew
   -H, --header-line          print header line
@@ -752,10 +752,10 @@ Examples
 
 1. Locate Motif.
 
-        $ zcat hairpin.fa.gz | fakit locate -i -p UUS
-        seqID   patternName     pattern strand  start   end     matched
-        bna-MIR396a     UUS     UUS     -       105     107     UUS
-        bna-MIR396a     UUS     UUS     -       89      91      UUS
+        $ zcat hairpin.fa.gz | fakit locate -i -d -p AUGGACUN
+        seqID         patternName   pattern    strand   start   end   matched
+        cel-mir-58a   AUGGACUN      AUGGACUN   +        81      88    AUGGACUG
+        ath-MIR163    AUGGACUN      AUGGACUN   -        122     129   AUGGACUC
 
     Notice that `fakit grep` only searches in positive strand, but `fakit loate` could recognize both strand
 
@@ -1101,10 +1101,10 @@ Examples
         C       C
         G       G
         T       T
-        
+
 1. Rename with number of record
 
-        echo -e ">abc\nACTG\n>123\nATTT" |  fakit replace -p .+ -r "seq_{NR}" 
+        echo -e ">abc\nACTG\n>123\nATTT" |  fakit replace -p .+ -r "seq_{NR}"
         >seq_1
         ACTG
         >seq_2
