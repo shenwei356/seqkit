@@ -312,7 +312,7 @@ Examples:
 						subseqByRegion(outfh, record, lineWidth, start, end)
 
 					} else if gtfFile != "" {
-						seqname := string(record.ID)
+						seqname := strings.ToLower(string(record.ID))
 						if _, ok := gtfFeaturesMap[seqname]; !ok {
 							continue
 						}
@@ -322,7 +322,7 @@ Examples:
 							onlyFlank, upStream, downStream)
 
 					} else if bedFile != "" {
-						seqname := string(record.ID)
+						seqname := strings.ToLower(string(record.ID))
 						if _, ok := bedFeatureMap[seqname]; !ok {
 							return
 						}
