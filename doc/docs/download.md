@@ -7,7 +7,9 @@
 ## Current Version
 
 - [fakit v0.2.5.1](https://github.com/shenwei356/fakit/releases/tag/v0.2.5.1)
-    - fix a bug of `fakit subseq`: chromesome name was not be converting to lower case when using `--gtf` or `--bed`
+    - fix bug of `fakit subseq`:
+        - chromesome name was not be converting to lower case when using `--gtf` or `--bed`
+        - Inplace subseq method leaded to wrong result
 
 ## Installation
 

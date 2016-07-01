@@ -340,7 +340,7 @@ Examples:
 type type2gtfFeatures map[string][]gtf.Feature
 
 func subseqByRegion(outfh *xopen.Writer, record *fastx.Record, lineWidth int, start, end int) {
-	record.Seq = record.Seq.SubSeqInplace(start, end)
+	record.Seq = record.Seq.SubSeq(start, end)
 	record.FormatToWriter(outfh, lineWidth)
 }
 
@@ -377,10 +377,10 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 						e = feature.Start - 1
 					}
 				} else {
-					s = feature.Start - downStream // seq.SubSeqInplace will check it
+					s = feature.Start - downStream // seq.SubSeq will check it
 					e = feature.End + upStream
 				}
-				subseq = record.Seq.SubSeqInplace(s, e).RevComInplace()
+				subseq = record.Seq.SubSeq(s, e).RevComInplace()
 			} else {
 				if onlyFlank {
 					if upStream > 0 {
@@ -394,7 +394,7 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 					s = feature.Start - upStream
 					e = feature.End + downStream
 				}
-				subseq = record.Seq.SubSeqInplace(s, e)
+				subseq = record.Seq.SubSeq(s, e)
 			}
 
 			if feature.Strand == nil {
@@ -453,10 +453,10 @@ func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 					e = feature.Start - 1
 				}
 			} else {
-				s = feature.Start - downStream // seq.SubSeqInplace will check it
+				s = feature.Start - downStream // seq.SubSeq will check it
 				e = feature.End + upStream
 			}
-			subseq = record.Seq.SubSeqInplace(s, e).RevComInplace()
+			subseq = record.Seq.SubSeq(s, e).RevComInplace()
 		} else {
 			if onlyFlank {
 				if upStream > 0 {
@@ -470,7 +470,7 @@ func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 				s = feature.Start - upStream
 				e = feature.End + downStream
 			}
-			subseq = record.Seq.SubSeqInplace(s, e)
+			subseq = record.Seq.SubSeq(s, e)
 		}
 
 		if feature.Strand == nil {
