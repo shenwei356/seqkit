@@ -6,10 +6,8 @@
 
 ## Current Version
 
-- [fakit v0.2.5.1](https://github.com/shenwei356/fakit/releases/tag/v0.2.5.1)
-    - fix bug of `fakit subseq`:
-        - chromesome name was not be converting to lower case when using `--gtf` or `--bed`
-        - Inplace subseq method leaded to wrong result
+- [fakit v0.2.6](https://github.com/shenwei356/fakit/releases/tag/v0.2.6)
+    - fix bug of `fakit subseq`: Inplace subseq method leaded to wrong result
 
 ## Installation
 
@@ -34,6 +32,8 @@ For Go developer, just one command:
 
 ## Previous Versions
 
+- [fakit v0.2.5.1](https://github.com/shenwei356/fakit/releases/tag/v0.2.5.1)
+    - fix a bug of `fakit subseq`: chromesome name was not be converting to lower case when using `--gtf` or `--bed`
 - [fakit v0.2.5](https://github.com/shenwei356/fakit/releases/tag/v0.2.5)
     - fix a serious bug brought in `v0.2.3`, using unsafe method to convert `string` to `[]byte`
     - add awk-like built-in variable of record number (`{NR}`) for `fakit replace`

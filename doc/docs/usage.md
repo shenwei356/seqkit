@@ -119,7 +119,7 @@ Usage
 ```
 fakit -- a cross-platform and efficient suit for FASTA/Q file manipulation
 
-Version: 0.2.5.1
+Version: 0.2.6
 
 Author: Wei Shen <shenwei356@gmail.com>
 

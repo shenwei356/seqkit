@@ -43,7 +43,7 @@ import (
 )
 
 // VERSION of fakit
-const VERSION = "0.2.5.1"
+const VERSION = "0.2.6"
 
 func checkError(err error) {
 	if err != nil {
