@@ -730,7 +730,7 @@ Usage:
   fakit fx2tab [flags]
 
 Flags:
-  -B, --base-content value   print base content. (case ignored, multiple values supported) e.g. -b AT -b N (default [])
+  -B, --base-content value   print base content. (case ignored, multiple values supported) e.g. -B AT -B N (default [])
   -g, --gc                   print GC content
   -G, --gc-skew              print GC-Skew
   -H, --header-line          print header line
@@ -922,10 +922,10 @@ cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:A
 </li>
 <li>
 <p>Locate Motif.</p>
-<pre><code>$ zcat hairpin.fa.gz | fakit locate -i -p UUS
-seqID   patternName     pattern strand  start   end     matched
-bna-MIR396a     UUS     UUS     -       105     107     UUS
-bna-MIR396a     UUS     UUS     -       89      91      UUS
+<pre><code>$ zcat hairpin.fa.gz | fakit locate -i -d -p AUGGACUN
+seqID         patternName   pattern    strand   start   end   matched
+cel-mir-58a   AUGGACUN      AUGGACUN   +        81      88    AUGGACUG
+ath-MIR163    AUGGACUN      AUGGACUN   -        122     129   AUGGACUC
 </code></pre>
 <p>Notice that <code>fakit grep</code> only searches in positive strand, but <code>fakit loate</code> could recognize both strand</p>
 </li>
@@ -1271,7 +1271,7 @@ T       T
 </li>
 <li>
 <p>Rename with number of record</p>
-<pre><code>echo -e "&gt;abc\nACTG\n&gt;123\nATTT" |  fakit replace -p .+ -r "seq_{NR}" 
+<pre><code>echo -e "&gt;abc\nACTG\n&gt;123\nATTT" |  fakit replace -p .+ -r "seq_{NR}"
 &gt;seq_1
 ACTG
 &gt;seq_2
