@@ -109,6 +109,8 @@ more on: http://shenwei356.github.io/fakit/usage/#replace
 					if chunk.ID == id {
 						for _, record := range chunk.Data {
 							record.FormatToWriter(outfh, lineWidth)
+
+							record.Recycle()
 						}
 						id++
 					} else { // check bufferd result
@@ -116,6 +118,8 @@ more on: http://shenwei356.github.io/fakit/usage/#replace
 							if chunk, ok := chunks[id]; ok {
 								for _, record := range chunk.Data {
 									record.FormatToWriter(outfh, lineWidth)
+
+									record.Recycle()
 								}
 								id++
 								delete(chunks, chunk.ID)
@@ -133,6 +137,8 @@ more on: http://shenwei356.github.io/fakit/usage/#replace
 						chunk := chunks[id]
 						for _, record := range chunk.Data {
 							record.FormatToWriter(outfh, lineWidth)
+
+							record.Recycle()
 						}
 					}
 				}

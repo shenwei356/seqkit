@@ -97,6 +97,8 @@ For example: "\w" will be wrongly converted to "\[AT]".
 				re, err := regexp.Compile(s)
 				checkError(err)
 				regexps[name] = re
+
+				record.Recycle()
 			}
 		} else {
 			for _, p := range pattern {
@@ -254,6 +256,8 @@ For example: "\w" will be wrongly converted to "\[AT]".
 								locations = append(locations, LocationInfo{record, pName, "-", tlocs})
 							}
 						}
+
+						record.Recycle()
 					}
 					ch <- LocationChunk{chunk.ID, locations}
 				}(chunk)

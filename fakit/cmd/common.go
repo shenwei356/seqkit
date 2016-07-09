@@ -127,6 +127,8 @@ var commonCmd = &cobra.Command{
 						names[subject] = make(map[string]string)
 					}
 					names[subject][file] = string(record.Name)
+
+					record.Recycle()
 				}
 			}
 		}

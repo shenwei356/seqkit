@@ -130,6 +130,8 @@ var rmdupCmd = &cobra.Command{
 							names[subject] = append(names[subject], string(record.ID))
 						}
 					}
+
+					record.Recycle()
 				}
 			}
 		}

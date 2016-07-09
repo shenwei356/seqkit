@@ -129,6 +129,8 @@ like sequence length, GC content/GC skew.
 						}
 					}
 					outfh.WriteString("\n")
+
+					record.Recycle()
 				}
 			}
 		}

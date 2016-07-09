@@ -87,6 +87,7 @@ var statCmd = &cobra.Command{
 					if l > lenMax {
 						lenMax = l
 					}
+					record.Recycle()
 				}
 			}
 			if fastxReader.Alphabet() == seq.DNAredundant {

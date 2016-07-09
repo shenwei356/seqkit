@@ -49,10 +49,6 @@ fakit will write the sequences to tempory files, and create FASTA index.
 
 Secondly, fakit shuffles sequence IDs and extract sequences by FASTA index.
 
-ATTENTION: the .fai file created by fakit is a little different from .fai file
-created by samtools. Fakit use full sequence head instead of just ID as key.
-So please delete .fai file created by samtools.
-
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)

@@ -201,8 +201,15 @@ var seqCmd = &cobra.Command{
 						} else if upperCase {
 							sequence.Seq = bytes.ToUpper(sequence.Seq)
 						}
-						outfh.Write(byteutil.WrapByteSlice(sequence.Seq, lineWidth))
+						// outfh.Write(byteutil.WrapByteSlice(sequence.Seq, lineWidth))
+						if bufferedByteSliceWrapper == nil {
+							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Seq), lineWidth)
+						}
+						text, b := bufferedByteSliceWrapper.Wrap(sequence.Seq, lineWidth)
+						outfh.Write(text)
 						outfh.WriteString("\n")
+						outfh.Flush()
+						bufferedByteSliceWrapper.Recycle(b)
 					}
 
 					if printQual {
@@ -216,15 +223,21 @@ var seqCmd = &cobra.Command{
 						if removeGaps {
 							sequence = sequence.RemoveGaps(gapLetters)
 						}
-						if onlyQual {
-							outfh.Write(byteutil.WrapByteSlice(sequence.Qual, lineWidth))
-							outfh.WriteString("\n")
-						} else {
+						if !onlyQual {
 							outfh.WriteString("+\n")
-							outfh.Write(byteutil.WrapByteSlice(sequence.Qual, lineWidth))
-							outfh.WriteString("\n")
 						}
+						// outfh.Write(byteutil.WrapByteSlice(sequence.Qual, lineWidth))
+						if bufferedByteSliceWrapper == nil {
+							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Qual), lineWidth)
+						}
+						txt, b := bufferedByteSliceWrapper.Wrap(sequence.Qual, lineWidth)
+						outfh.Write(txt)
+						outfh.WriteString("\n")
+						outfh.Flush()
+						bufferedByteSliceWrapper.Recycle(b)
 					}
+
+					record.Recycle()
 				}
 			}
 
