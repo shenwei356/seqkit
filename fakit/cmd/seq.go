@@ -24,6 +24,7 @@ import (
 	"bytes"
 	"fmt"
 	"runtime"
+	// "runtime/debug"
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seq"
@@ -215,10 +216,13 @@ var seqCmd = &cobra.Command{
 					if printQual {
 						sequence = record.Seq
 						if reverse {
-							sequence = sequence.Reverse()
+							sequence = sequence.ReverseInplace()
 						}
 						if complement {
-							sequence = sequence.Complement()
+							if !config.Quiet && record.Seq.Alphabet == seq.Protein || record.Seq.Alphabet == seq.Unlimit {
+								log.Warning("Complement does no take effect on protein/unlimit sequence")
+							}
+							sequence = sequence.ComplementInplace()
 						}
 						if removeGaps {
 							sequence = sequence.RemoveGaps(gapLetters)
@@ -238,6 +242,7 @@ var seqCmd = &cobra.Command{
 					}
 
 					record.Recycle()
+					// debug.FreeOSMemory()
 				}
 			}
 
