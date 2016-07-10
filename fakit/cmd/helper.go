@@ -374,7 +374,7 @@ func isStdin(file string) bool {
 	return file == "-"
 }
 
-var defaultBytesBufferSize = 10 << 20
+var defaultBytesBufferSize = 1 << 20
 
 var bufferedByteSliceWrapper *byteutil.BufferedByteSliceWrapper
 

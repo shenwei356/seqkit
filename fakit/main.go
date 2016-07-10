@@ -22,7 +22,7 @@ package main
 
 import (
 	"os"
-	"runtime/pprof"
+	// "runtime/pprof"
 
 	"github.com/op/go-logging"
 	"github.com/shenwei356/fakit/fakit/cmd"
@@ -41,14 +41,14 @@ func init() {
 
 func main() {
 	// go tool pprof /usr/local/bin/fakit pprof
-	f, _ := os.Create("pprof")
-	pprof.StartCPUProfile(f)
-	defer pprof.StopCPUProfile()
+	// f, _ := os.Create("pprof")
+	// pprof.StartCPUProfile(f)
+	// defer pprof.StopCPUProfile()
 
 	cmd.Execute()
 
 	// go tool pprof --alloc_space /usr/local/bin/fakit mprof
-	f2, _ := os.Create("mprof")
-	pprof.WriteHeapProfile(f2)
-	defer f2.Close()
+	// f2, _ := os.Create("mprof")
+	// pprof.WriteHeapProfile(f2)
+	// defer f2.Close()
 }

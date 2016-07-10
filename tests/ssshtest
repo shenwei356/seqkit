@@ -1,0 +1,510 @@
+#!/bin/bash
+
+############################################################
+#  Program: ssshtest
+#  Authors : Ryan M Layer ryan.layer@gmail.com
+#            Brent S Pedersen bpederse@gmail.com
+
+# (c) 2015 - Ryan Layer, Brent Pedersen
+############################################################
+
+PROGRAM_NAME=sshtest
+VERSION=0.1.5
+
+RED='\033[0;31m'
+BRED='\033[1;31m' # bold
+
+GREEN='\033[0;32m'
+BGREEN='\033[1;32m' # bold
+
+BLUE='\033[0;33m'
+BOLD='\033[0;1m'
+NC='\033[0m' # No Color
+
+PASS=" ${BGREEN}PASS${NC}"
+FAIL=" ${BRED}FAIL${NC}"
+
+COLS=`tput cols`
+
+STDOUT_FILE=${TMPDIR:-/tmp}/o.$$
+STDERR_FILE=${TMPDIR:-/tmp}/e.$$
+OUTVAL=
+ERRVAL=
+RETVAL=
+CMD=
+VERBOSE=
+
+TOTAL=0
+SUCCESSES=0
+FAILS=0
+
+FLAG=0
+
+STOP_ON_FAIL=0
+
+trap report EXIT
+
+TESTS_TO_RUN=($@)
+
+RUN_NAME=
+
+#{{{ Command line parsing
+usage()
+{
+    cat << EOF
+
+usage: $0 OPTIONS
+
+OPTIONS can be:
+    -h      Show this message
+    -v      Print success messages
+EOF
+}
+
+# Check options passed in.
+while getopts "h v" OPTION
+do
+    case $OPTION in
+        h)
+            usage
+            exit 1
+            ;;
+        v)
+            VERBOSE=1
+            ;;
+        ?)
+            usage
+            exit
+            ;;
+    esac
+done
+#}}}
+
+#{{{ exit codes
+EX_OK=0
+
+#The command was used incorrectly, e.g., with the wrong number of arguments, a
+#bad flag, a bad syntax in a parameter, or whatever.
+EX_USAGE=64
+
+#The input data was incorrect in some way.  This should only be used for user's
+#data and not system files.
+EX_DATAERR=65
+
+#An input file (not a system file) did not exist or was not readable.  This
+#could also include errors like ``No message'' to a mailer (if it cared to
+#catch it).
+EX_NOINPUT=66
+
+#The user specified did not exist.  This might be used for mail addresses or
+#remote logins.
+EX_NOUSER=67
+
+#The host specified did not exist.  This is used in mail addresses or network
+#requests.
+EX_NOHOST=68
+
+#A service is unavailable.  This can occur if a support program or file does
+#not exist.  This can also be used as a catchall message when something you
+#wanted to do doesn't work, but you don't know why.
+EX_UNAVAILABLE=69
+
+#An internal software error has been detected.  This should be limited to
+#non-operating system related errors as possible.
+EX_SOFTWARE=70
+
+#An operating system error has been detected.  This is intended to be used for
+#such things as ``cannot fork'', ``cannot create pipe'', or the like.  It
+#includes things like getuid returning a user that does not exist in the passwd
+#file.
+EX_OSERR=71
+
+#Some system file (e.g., /etc/passwd, /var/run/utmp, etc.) does not exist,
+#cannot be opened, or has some sort of error (e.g., syntax error).
+EX_OSFILE=72
+
+#A (user specified) output file cannot be created.
+EX_CANTCREAT=73
+
+#An error occurred while doing I/O on some file.
+EX_IOERR=74
+
+#Temporary failure, indicating something that is not really an error.  In
+#sendmail, this means that a mailer (e.g.) could not create a connection, and
+#the request should be reattempted later.
+EX_TEMPFAIL=75
+
+#The remote system returned something that was ``not possible'' during a
+#protocol exchange.
+EX_PROTOCOL=76
+
+#You did not have sufficient permission to perform the operation.  This is not
+#intended for file system problems, which should use EX_NOINPUT or
+#EX_CANTCREAT, but rather for higher level permissions.
+EX_NOPERM=77
+
+#Something was found in an unconfigured or misconfigured state.
+EX_CONFIG=78
+#}}}
+
+#{{{ function report {
+function report {
+    rm -f $STDOUT_FILE $STDERR_FILE
+
+    echo -e "\n$PROGRAM_NAME v$VERSION\n"
+
+    if [ "$STOP_ON_FAIL" -ne "0" ]
+    then
+        if [ "$FAILS" -ne "0" ]
+        then
+            printf "${BOLD}TESTING STOPPED ON FIRST FAIL${NC}\n\n"
+        fi
+    fi
+
+    printf "${NC}%-10s${NC}Tests\n" $TOTAL
+
+    if [ "$FAILS" -ne "0" ]
+    then
+        printf "${BRED}%-10s${NC}${BOLD}Failures${NC}\n" $FAILS
+        printf "${BGREEN}%-10s${NC}Successes\n" $SUCCESSES
+    else
+        printf "${BRED}%-10s${NC}Failures\n" $FAILS
+        printf "${BGREEN}%-10s${NC}${BOLD}Successes${NC}\n" $SUCCESSES
+    fi
+
+    exit $FAILS
+}
+#}}}
+
+#{{{ function run {
+function run {
+    RUN_NAME=$1
+    shift
+
+    FLAG=0
+    if [ "${#TESTS_TO_RUN[*]}" -eq 0 ]
+    then
+        FLAG=1
+	
+	else 
+	
+		for i in "${TESTS_TO_RUN[@]}"
+		do
+			if [ "$RUN_NAME" == "$i" ]
+			then
+				FLAG=1
+				break
+			fi
+		done
+    fi
+
+    if [ "$FLAG" -eq 0 ]
+    then
+        return
+    fi
+
+    CMD="$@"
+
+    START=$(date +%s);
+    O="$("$@" >$STDOUT_FILE 2>$STDERR_FILE)"
+    RETVAL=$?
+    END=$(date +%s);
+    TOTAL_TIME=$((END-START))
+
+    RUN_TIME="$TOTAL_TIME sec"
+
+
+    OUTVAL=`cat $STDOUT_FILE`
+    ERRVAL=`cat $STDERR_FILE`
+
+    #make it pretty
+    RUN_NAME=${BOLD}$RUN_NAME${NC}
+	ELINES=$(wc -l $STDERR_FILE | awk '{print $1 }' &)
+	OLINES=$(wc -l $STDOUT_FILE | awk '{print $1 }' &)
+	wait
+    echo -e "\n$RUN_NAME ran in $RUN_TIME with $ELINES/$OLINES lines to STDERR/OUT"
+}
+#}}}
+
+#{{{ function print_exit_code {
+function print_exit_code {
+    case $1 in
+        $EX_OK)
+            echo "EX_OK"
+            ;;
+        $EX_USAGE)
+            echo "EX_USAGE"
+            ;;
+        $EX_DATAERR)
+            echo "EX_DATAERR"
+            ;;
+        $EX_NOINPUT)
+            echo "EX_NOINPUT"
+            ;;
+        $EX_NOUSER)
+            echo "EX_NOUSER"
+            ;;
+        $EX_NOHOST)
+            echo "EX_NOHOST"
+            ;;
+        $EX_UNAVAILABLE)
+            echo "EX_UNAVAILABLE"
+            ;;
+        $EX_SOFTWARE)
+            echo "EX_SOFTWARE"
+            ;;
+        $EX_OSERR)
+            echo "EX_OSERR"
+            ;;
+        $EX_OSFILE)
+            echo "EX_OSFILE"
+            ;;
+        $EX_CANTCREAT)
+            echo "EX_CANTCREAT"
+            ;;
+        $EX_IOERR)
+            echo "EX_IOERR"
+            ;;
+        $EX_TEMPFAIL)
+            echo "EX_TEMPFAIL"
+            ;;
+        $EX_PROTOCOL)
+            echo "EX_PROTOCOL"
+            ;;
+        $EX_NOPERM)
+            echo "EX_NOPERM"
+            ;;
+        $EX_CONFIG)
+            echo "EX_CONFIG"
+            ;;
+        *)
+            echo "Unknown code: $1"
+    esac
+}
+#}}}
+
+#{{{function assert_exit_code {
+function assert_exit_code {
+    
+    if [ "$FLAG" -eq 0 ];then return; fi
+
+    LINE=$(caller | cut -d " " -f1)
+
+    TOTAL=$((TOTAL + 1))
+    E=$(print_exit_code $1)
+    O=$(print_exit_code $RETVAL)
+    if [ $RETVAL -ne $1 ]
+    then
+        FAILS=$((FAILS + 1))
+        echo -e "$FAIL EXIT CODE (LINE $LINE)"
+        echo -e "-->\texpected $E, observed $O"
+        if [ $STOP_ON_FAIL -ne "0" ];then exit; fi
+    else
+        SUCCESSES=$((SUCCESSES + 1))
+        echo -e "$PASS EXIT CODE (LINE $LINE)"
+        if [ $VERBOSE ] 
+        then
+            echo -e "-->\texpected $E, observed $O"
+        fi
+    fi
+}
+#}}}
+
+#{{{ function assert_no_stdout {
+function assert_no_stdout {
+
+    if [ "$FLAG" -eq 0 ];then return; fi
+
+    LINE=$(caller | cut -d " " -f1)
+
+    TOTAL=$((TOTAL + 1))
+    if [ -n "$OUTVAL" ]
+    then
+        FAILS=$((FAILS + 1))
+        echo -e "$FAIL NON-EMPTY STDOUT (LINE $LINE)"
+        echo -e "-->\t$OUTVAL"
+        if [ $STOP_ON_FAIL -ne "0" ];then exit; fi
+    else
+        SUCCESSES=$((SUCCESSES + 1))
+        echo -e "$PASS NON-EMPTY STDOUT (LINE $LINE)"
+    fi
+}
+#}}}
+
+#{{{ function assert_no_stderr {
+function assert_no_stderr {
+
+    if [ "$FLAG" -eq 0 ];then return; fi
+
+    LINE=$(caller | cut -d " " -f1)
+
+    TOTAL=$((TOTAL + 1))
+    if [ -n "$ERRVAL" ]
+    then
+        FAILS=$((FAILS + 1))
+        echo -e "$FAIL NON-EMPTY STDERR(LINE $LINE)"
+        echo -e "-->\t$ERRVAL"
+        if [ $STOP_ON_FAIL -ne "0" ];then exit; fi
+    else
+        SUCCESSES=$((SUCCESSES + 1))
+        echo -e "$PASS EMPTY STDERR(LINE $LINE)"
+    fi
+}
+#}}}
+
+#{{{function assert_stderr {
+function assert_stderr {
+
+    if [ "$FLAG" -eq 0 ];then return; fi
+
+    LINE=$(caller | cut -d " " -f1)
+
+    TOTAL=$((TOTAL + 1))
+    if [ -z "$ERRVAL" ]
+    then
+        FAILS=$((FAILS + 1))
+        echo -e "$FAIL EMPTY STDERR(LINE $LINE)"
+        if [ $STOP_ON_FAIL -ne "0" ];then exit; fi
+    else
+        SUCCESSES=$((SUCCESSES + 1))
+        echo -e "$PASS EMPTY STDERR(LINE $LINE)"
+        if [ $VERBOSE ] 
+        then
+            echo -e "-->\t$ERRVAL"
+        fi
+    fi
+}
+#}}}
+
+#{{{function assert_stdout {
+function assert_stdout {
+
+    if [ "$FLAG" -eq 0 ];then return; fi
+
+    LINE=$(caller | cut -d " " -f1)
+
+    TOTAL=$((TOTAL + 1))
+    if [ -z "$OUTVAL" ]
+    then
+        FAILS=$((FAILS + 1))
+        echo -e "$FAIL EMPTY STDOUT (LINE $LINE)"
+        if [ $STOP_ON_FAIL -ne "0" ];then exit; fi
+    else
+        SUCCESSES=$((SUCCESSES + 1))
+        echo -e "$PASS NON-EMPTY STDOUT (LINE $LINE)"
+        if [ $VERBOSE ] 
+        then
+            echo -e "-->\t$ERRVAL"
+        fi
+    fi
+}
+#}}}
+
+#{{{function assert_in_stderr {
+function assert_in_stderr {
+
+    if [ "$FLAG" -eq 0 ];then return; fi
+
+    LINE=$(caller | cut -d " " -f1)
+
+    TOTAL=$((TOTAL + 1))
+    if [ -z "$ERRVAL" ]
+    then
+        FAILS=$((FAILS + 1))
+        echo -e "$FAIL EMPTY STDERR (LINE $LINE)"
+        if [ $STOP_ON_FAIL -ne "0" ];then exit; fi
+    else
+        if [[ $ERRVAL == *"$1"* ]]
+        then
+            SUCCESSES=$((SUCCESSES + 1))
+            echo -e "$PASS STDERR CONTAINS \"$1\" (LINE $LINE)"
+            if [ $VERBOSE ] 
+            then
+                echo -e "-->\t$ERRVAL"
+            fi
+        else
+            FAILS=$((FAILS + 1))
+            echo -e "$FAIL STDERR DOES NOT CONTAIN \"$1\" (LINE $LINE)"
+            echo -e "-->\t$ERRVAL"
+            if [ $STOP_ON_FAIL -ne "0" ];then exit; fi
+        fi
+    fi
+}
+#}}}
+
+#{{{function assert_in_stdout {
+function assert_in_stdout {
+
+    if [ "$FLAG" -eq 0 ];then return; fi
+
+    LINE=$(caller | cut -d " " -f1)
+
+    TOTAL=$((TOTAL + 1))
+    if [ -z "$OUTVAL" ]
+    then
+        FAILS=$((FAILS + 1))
+        echo -e "$FAIL EMPTY STDOUT (LINE $LINE)"
+        if [ $STOP_ON_FAIL -ne "0" ];then exit; fi
+    else
+        if [[ $OUTVAL == *"$1"* ]]
+        then
+            SUCCESSES=$((SUCCESSES + 1))
+            echo -e "$PASS STDOUT CONTAINS \"$1\" (LINE $LINE)"
+            if [ $VERBOSE ] 
+            then
+                echo -e "-->\t$OUTVAL"
+            fi
+        else
+            FAILS=$((FAILS + 1))
+            echo -e "$FAIL STDOUT DOES NOT CONTAIN \"$1\" (LINE $LINE)"
+            echo -e "-->\t$OUTVAL"
+            if [ $STOP_ON_FAIL -ne "0" ];then exit; fi
+        fi
+    fi
+}
+#}}}
+
+#{{{ function assert_equal {
+function assert_equal {
+
+    if [ "$FLAG" -eq 0 ];then return; fi
+
+    LINE=$(caller | cut -d " " -f1)
+
+    TOTAL=$((TOTAL + 1))
+    if [ "$1" == "$2" ]
+    then
+        SUCCESSES=$((SUCCESSES + 1))
+        echo -e "$PASS \"$1\" == \"$2\" (LINE $LINE)"
+    else
+        FAILS=$((FAILS + 1))
+        echo -e "$FAIL \"$1\" != \"$2\" (LINE $LINE)"
+        if [ $STOP_ON_FAIL -ne "0" ];then exit; fi
+    fi
+}
+#}}}
+
+#{{{ function assert_true {
+function assert_true {
+
+    COMMAND=("$@")
+    RES=`${COMMAND[@]}`
+    echo $RES || "AAAAAAAAAAA"
+
+    if [ "$FLAG" -eq 0 ];then return; fi
+
+    LINE=$(caller | cut -d " " -f1)
+
+    TOTAL=$((TOTAL + 1))
+    if [ "${COMMAND[@]}" == true ]
+    then
+        SUCCESSES=$((SUCCESSES + 1))
+        echo -e "$PASS $* (LINE $LINE)"
+    else
+        FAILS=$((FAILS + 1))
+        echo -e "$FAIL $* (LINE $LINE)"
+        if [ $STOP_ON_FAIL -ne "0" ];then exit; fi
+    fi
+}
+#}}}
+
