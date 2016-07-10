@@ -100,8 +100,6 @@ var slidingCmd = &cobra.Command{
 						outfh.WriteString("\n")
 
 					}
-
-					record.Recycle()
 				}
 			}
 		}

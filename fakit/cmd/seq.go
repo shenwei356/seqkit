@@ -92,6 +92,8 @@ var seqCmd = &cobra.Command{
 		var printName, printSeq, printQual bool
 		var head []byte
 		var sequence *seq.Seq
+		var text []byte
+		var b *bytes.Buffer
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
 			checkError(err)
@@ -206,11 +208,12 @@ var seqCmd = &cobra.Command{
 						if bufferedByteSliceWrapper == nil {
 							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Seq), lineWidth)
 						}
-						text, b := bufferedByteSliceWrapper.Wrap(sequence.Seq, lineWidth)
+						text, b = bufferedByteSliceWrapper.Wrap(sequence.Seq, lineWidth)
 						outfh.Write(text)
-						outfh.WriteString("\n")
 						outfh.Flush()
 						bufferedByteSliceWrapper.Recycle(b)
+
+						outfh.WriteString("\n")
 					}
 
 					if printQual {
@@ -234,14 +237,14 @@ var seqCmd = &cobra.Command{
 						if bufferedByteSliceWrapper == nil {
 							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Qual), lineWidth)
 						}
-						txt, b := bufferedByteSliceWrapper.Wrap(sequence.Qual, lineWidth)
-						outfh.Write(txt)
-						outfh.WriteString("\n")
+						text, b = bufferedByteSliceWrapper.Wrap(sequence.Qual, lineWidth)
+						outfh.Write(text)
 						outfh.Flush()
 						bufferedByteSliceWrapper.Recycle(b)
+
+						outfh.WriteString("\n")
 					}
 
-					record.Recycle()
 					// debug.FreeOSMemory()
 				}
 			}

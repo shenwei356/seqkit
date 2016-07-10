@@ -128,7 +128,6 @@ var commonCmd = &cobra.Command{
 					}
 					names[subject][file] = string(record.Name)
 
-					record.Recycle()
 				}
 			}
 		}

@@ -131,7 +131,6 @@ var rmdupCmd = &cobra.Command{
 						}
 					}
 
-					record.Recycle()
 				}
 			}
 		}

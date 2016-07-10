@@ -260,7 +260,7 @@ Examples:
 							}
 
 							subseq := subseqByFaix(faidx, chr, r, 1, -1)
-							record, err := fastx.NewRecord(alphabet2, fastx.ParseHeadID(idRe, []byte(chr)), []byte(chr), subseq, nil)
+							record, err := fastx.NewRecord(alphabet2, fastx.ParseHeadID(idRe, []byte(chr)), []byte(chr), subseq)
 							checkError(err)
 
 							subseqByGTFFile(outfh, record, lineWidth,
@@ -286,7 +286,7 @@ Examples:
 							}
 
 							subseq := subseqByFaix(faidx, chr, r, 1, -1)
-							record, err := fastx.NewRecord(alphabet2, fastx.ParseHeadID(idRe, []byte(chr)), []byte(chr), subseq, nil)
+							record, err := fastx.NewRecord(alphabet2, fastx.ParseHeadID(idRe, []byte(chr)), []byte(chr), subseq)
 							checkError(err)
 
 							subSeqByBEDFile(outfh, record, lineWidth,
@@ -425,7 +425,7 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 				flankInfo = ""
 			}
 			outname = fmt.Sprintf("%s_%d-%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, geneID)
-			newRecord, err := fastx.NewRecord(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq, nil)
+			newRecord, err := fastx.NewRecord(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq)
 			checkError(err)
 			outfh.Write(newRecord.Format(lineWidth))
 		}
@@ -498,7 +498,7 @@ func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 			flankInfo = ""
 		}
 		outname = fmt.Sprintf("%s_%d-%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, geneID)
-		newRecord, err := fastx.NewRecord(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq, nil)
+		newRecord, err := fastx.NewRecord(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq)
 		checkError(err)
 		outfh.Write(newRecord.Format(lineWidth))
 	}

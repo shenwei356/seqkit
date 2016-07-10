@@ -67,8 +67,6 @@ var headCmd = &cobra.Command{
 					i++
 					record.FormatToWriter(outfh, lineWidth)
 
-					record.Recycle()
-
 					if number == i {
 						fastxReader.Cancel()
 						return

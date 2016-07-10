@@ -110,7 +110,6 @@ more on: http://shenwei356.github.io/fakit/usage/#replace
 						for _, record := range chunk.Data {
 							record.FormatToWriter(outfh, lineWidth)
 
-							record.Recycle()
 						}
 						id++
 					} else { // check bufferd result
@@ -119,7 +118,6 @@ more on: http://shenwei356.github.io/fakit/usage/#replace
 								for _, record := range chunk.Data {
 									record.FormatToWriter(outfh, lineWidth)
 
-									record.Recycle()
 								}
 								id++
 								delete(chunks, chunk.ID)
@@ -138,7 +136,6 @@ more on: http://shenwei356.github.io/fakit/usage/#replace
 						for _, record := range chunk.Data {
 							record.FormatToWriter(outfh, lineWidth)
 
-							record.Recycle()
 						}
 					}
 				}

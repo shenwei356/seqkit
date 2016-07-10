@@ -82,8 +82,6 @@ var renameCmd = &cobra.Command{
 					}
 
 					record.FormatToWriter(outfh, lineWidth)
-
-					record.Recycle()
 				}
 			}
 		}

@@ -21,6 +21,7 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"runtime"
 	"strings"
@@ -88,7 +89,8 @@ var tab2faCmd = &cobra.Command{
 		for _, file := range files {
 			reader, err := breader.NewBufferedReader(file, bufferSize, chunkSize, fn)
 			checkError(err)
-
+			var text []byte
+			var b *bytes.Buffer
 			for chunk := range reader.Ch {
 				for _, data := range chunk.Data {
 					items := data.(Slice)
@@ -99,31 +101,33 @@ var tab2faCmd = &cobra.Command{
 						if bufferedByteSliceWrapper == nil {
 							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(items[1]), lineWidth)
 						}
-						text, b := bufferedByteSliceWrapper.Wrap([]byte(items[1]), lineWidth)
+						text, b = bufferedByteSliceWrapper.Wrap([]byte(items[1]), lineWidth)
 						outfh.Write(text)
 						outfh.Flush()
 						bufferedByteSliceWrapper.Recycle(b)
 
-						outfh.WriteString("+\n")
+						outfh.WriteString("\n+\n")
 
 						// outfh.Write(byteutil.WrapByteSlice([]byte(items[2]), lineWidth))
 						text, b = bufferedByteSliceWrapper.Wrap([]byte(items[2]), lineWidth)
 						outfh.Write(text)
-						outfh.WriteString("\n")
 						outfh.Flush()
 						bufferedByteSliceWrapper.Recycle(b)
+
+						outfh.WriteString("\n")
 					} else {
 						outfh.WriteString(fmt.Sprintf(">%s\n", items[0]))
+
 						// outfh.Write(byteutil.WrapByteSlice([]byte(items[1]), lineWidth))
 						if bufferedByteSliceWrapper == nil {
 							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(items[1]), lineWidth)
 						}
-						text, b := bufferedByteSliceWrapper.Wrap([]byte(items[1]), lineWidth)
+						text, b = bufferedByteSliceWrapper.Wrap([]byte(items[1]), lineWidth)
 						outfh.Write(text)
-						outfh.WriteString("\n")
 						outfh.Flush()
 						bufferedByteSliceWrapper.Recycle(b)
 
+						outfh.WriteString("\n")
 					}
 				}
 			}

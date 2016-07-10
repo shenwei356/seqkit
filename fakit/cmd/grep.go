@@ -155,7 +155,6 @@ var grepCmd = &cobra.Command{
 						for _, record := range chunk.Data {
 							record.FormatToWriter(outfh, lineWidth)
 
-							record.Recycle()
 						}
 						id++
 					} else { // check bufferd result
@@ -164,7 +163,6 @@ var grepCmd = &cobra.Command{
 								for _, record := range chunk.Data {
 									record.FormatToWriter(outfh, lineWidth)
 
-									record.Recycle()
 								}
 								id++
 								delete(chunks, chunk.ID)
@@ -183,7 +181,6 @@ var grepCmd = &cobra.Command{
 						for _, record := range chunk.Data {
 							record.FormatToWriter(outfh, lineWidth)
 
-							record.Recycle()
 						}
 					}
 				}

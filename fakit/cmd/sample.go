@@ -123,8 +123,6 @@ var sampleCmd = &cobra.Command{
 								break LOOP
 							}
 						}
-
-						record.Recycle()
 					}
 				}
 			} else {
@@ -141,8 +139,6 @@ var sampleCmd = &cobra.Command{
 							break
 						}
 					}
-
-					record.Recycle()
 				}
 			}
 		} else {
@@ -160,8 +156,6 @@ var sampleCmd = &cobra.Command{
 						n++
 						record.FormatToWriter(outfh, lineWidth)
 					}
-
-					record.Recycle()
 				}
 			}
 		}
