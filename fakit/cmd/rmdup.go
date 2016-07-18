@@ -23,6 +23,7 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"runtime"
 	"sort"
 	"strings"
@@ -44,8 +45,6 @@ var rmdupCmd = &cobra.Command{
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
@@ -86,51 +85,55 @@ var rmdupCmd = &cobra.Command{
 		var subject string
 		removed := 0
 		for _, file := range files {
-			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
+			for {
+				record, err := fastxReader.Read()
+				if err != nil {
+					if err == io.EOF {
+						break
+					}
+					checkError(err)
+					break
+				}
 
-				for _, record := range chunk.Data {
-					if bySeq {
-						if ignoreCase {
-							if usingMD5 {
-								subject = MD5(bytes.ToLower(record.Seq.Seq))
-							} else {
-								subject = string(bytes.ToLower(record.Seq.Seq))
-							}
+				if bySeq {
+					if ignoreCase {
+						if usingMD5 {
+							subject = MD5(bytes.ToLower(record.Seq.Seq))
 						} else {
-							if usingMD5 {
-								subject = MD5(record.Seq.Seq)
-							} else {
-								subject = string(record.Seq.Seq)
-							}
+							subject = string(bytes.ToLower(record.Seq.Seq))
 						}
-					} else if byName {
-						subject = string(record.Name)
-					} else { // byID
-						subject = string(record.ID)
-					}
-
-					if _, ok := counter[subject]; ok { // duplicated
-						counter[subject]++
-						removed++
-						if len(dupFile) > 0 {
-							outfhDup.Write(record.Format(lineWidth))
-						}
-						if len(numFile) > 0 {
-							names[subject] = append(names[subject], string(record.ID))
-						}
-					} else { // new one
-						record.FormatToWriter(outfh, lineWidth)
-						counter[subject]++
-
-						if len(numFile) > 0 {
-							names[subject] = []string{}
-							names[subject] = append(names[subject], string(record.ID))
+					} else {
+						if usingMD5 {
+							subject = MD5(record.Seq.Seq)
+						} else {
+							subject = string(record.Seq.Seq)
 						}
 					}
+				} else if byName {
+					subject = string(record.Name)
+				} else { // byID
+					subject = string(record.ID)
+				}
 
+				if _, ok := counter[subject]; ok { // duplicated
+					counter[subject]++
+					removed++
+					if len(dupFile) > 0 {
+						outfhDup.Write(record.Format(lineWidth))
+					}
+					if len(numFile) > 0 {
+						names[subject] = append(names[subject], string(record.ID))
+					}
+				} else { // new one
+					record.FormatToWriter(outfh, lineWidth)
+					counter[subject]++
+
+					if len(numFile) > 0 {
+						names[subject] = []string{}
+						names[subject] = append(names[subject], string(record.ID))
+					}
 				}
 			}
 		}

@@ -21,6 +21,7 @@
 package cmd
 
 import (
+	"io"
 	"runtime"
 
 	"github.com/brentp/xopen"
@@ -40,10 +41,8 @@ var headCmd = &cobra.Command{
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
-		lineWidth := config.LineWidth
 		outFile := config.OutFile
+		lineWidth := config.LineWidth
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
@@ -58,19 +57,22 @@ var headCmd = &cobra.Command{
 
 		i := 0
 		for _, file := range files {
-			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
-
-				for _, record := range chunk.Data {
-					i++
-					record.FormatToWriter(outfh, lineWidth)
-
-					if number == i {
-						fastxReader.Cancel()
-						return
+			for {
+				record, err := fastxReader.Read()
+				if err != nil {
+					if err == io.EOF {
+						break
 					}
+					checkError(err)
+					break
+				}
+				i++
+				record.FormatToWriter(outfh, lineWidth)
+
+				if number == i {
+					return
 				}
 			}
 		}

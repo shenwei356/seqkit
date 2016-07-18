@@ -22,6 +22,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"math/rand"
 	"runtime"
 
@@ -46,8 +47,6 @@ var sampleCmd = &cobra.Command{
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
@@ -95,8 +94,7 @@ var sampleCmd = &cobra.Command{
 				if !quiet {
 					log.Info("first pass: estimating seq number")
 				}
-				// EstimateSeqNumber is faster than GetSeqNumber, and using less memory
-				seqNum, err := fastx.EstimateSeqNumber(file)
+				seqNum, err := fastx.GetSeqNumber(file)
 				checkError(err)
 
 				if !quiet {
@@ -109,24 +107,29 @@ var sampleCmd = &cobra.Command{
 				if !quiet {
 					log.Info("second pass: reading and sampling")
 				}
-				fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 			LOOP:
-				for chunk := range fastxReader.Ch {
-					checkError(chunk.Err)
+				for {
+					record, err := fastxReader.Read()
+					if err != nil {
+						if err == io.EOF {
+							break
+						}
+						checkError(err)
+						break
+					}
 
-					for _, record := range chunk.Data {
-						if rand.Float64() <= proportion {
-							n++
-							record.FormatToWriter(outfh, lineWidth)
-							if n == number {
-								break LOOP
-							}
+					if rand.Float64() <= proportion {
+						n++
+						record.FormatToWriter(outfh, lineWidth)
+						if n == number {
+							break LOOP
 						}
 					}
 				}
 			} else {
-				records, err := fastx.GetSeqs(file, alphabet, chunkSize, bufferSize, idRegexp)
+				records, err := fastx.GetSeqs(file, alphabet, config.Threads, 10, idRegexp)
 				checkError(err)
 
 				proportion = float64(number) / float64(len(records))
@@ -146,16 +149,21 @@ var sampleCmd = &cobra.Command{
 				log.Info("sample by proportion")
 			}
 
-			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
-
-				for _, record := range chunk.Data {
-					if rand.Float64() <= proportion {
-						n++
-						record.FormatToWriter(outfh, lineWidth)
+			for {
+				record, err := fastxReader.Read()
+				if err != nil {
+					if err == io.EOF {
+						break
 					}
+					checkError(err)
+					break
+				}
+
+				if rand.Float64() <= proportion {
+					n++
+					record.FormatToWriter(outfh, lineWidth)
 				}
 			}
 		}

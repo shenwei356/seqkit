@@ -22,10 +22,10 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"regexp"
 	"runtime"
 	"strconv"
-	"sync"
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seq"
@@ -58,8 +58,6 @@ more on: http://shenwei356.github.io/fakit/usage/#replace
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
@@ -94,94 +92,36 @@ more on: http://shenwei356.github.io/fakit/usage/#replace
 		checkError(err)
 		defer outfh.Close()
 
+		var r []byte
 		for _, file := range files {
 
-			ch := make(chan fastx.RecordChunk, config.Threads)
-			done := make(chan int)
-
-			// receiver
-			go func() {
-				var id uint64 = 0
-				chunks := make(map[uint64]fastx.RecordChunk)
-				for chunk := range ch {
-					checkError(chunk.Err)
-
-					if chunk.ID == id {
-						for _, record := range chunk.Data {
-							record.FormatToWriter(outfh, lineWidth)
-
-						}
-						id++
-					} else { // check bufferd result
-						for true {
-							if chunk, ok := chunks[id]; ok {
-								for _, record := range chunk.Data {
-									record.FormatToWriter(outfh, lineWidth)
-
-								}
-								id++
-								delete(chunks, chunk.ID)
-							} else {
-								break
-							}
-						}
-						chunks[chunk.ID] = chunk
-					}
-				}
-
-				if len(chunks) > 0 {
-					sortedIDs := sortRecordChunkMapID(chunks)
-					for _, id := range sortedIDs {
-						chunk := chunks[id]
-						for _, record := range chunk.Data {
-							record.FormatToWriter(outfh, lineWidth)
-
-						}
-					}
-				}
-
-				done <- 1
-			}()
-
-			// producer and worker
-			var wg sync.WaitGroup
-			tokens := make(chan int, config.Threads)
-
-			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 			nr := 1
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
-				tokens <- 1
-				wg.Add(1)
-
-				go func(chunk fastx.RecordChunk, nr int) {
-					defer func() {
-						wg.Done()
-						<-tokens
-					}()
-
-					var chunkData []*fastx.Record
-					var r []byte
-					for i, record := range chunk.Data {
-						if bySeq {
-							record.Seq.Seq = patternRegexp.ReplaceAll(record.Seq.Seq, replacement)
-						} else {
-							r = replacement
-							if replaceeWithNR {
-								r = reNR.ReplaceAll(replacement, []byte(strconv.Itoa(nr+i)))
-							}
-							record.Name = patternRegexp.ReplaceAll(record.Name, r)
-						}
-						chunkData = append(chunkData, record)
+			for {
+				record, err := fastxReader.Read()
+				if err != nil {
+					if err == io.EOF {
+						break
 					}
-					ch <- fastx.RecordChunk{ID: chunk.ID, Data: chunkData, Err: nil}
-				}(chunk, nr)
-				nr += len(chunk.Data)
+					checkError(err)
+					break
+				}
+
+				nr++
+				if bySeq {
+					record.Seq.Seq = patternRegexp.ReplaceAll(record.Seq.Seq, replacement)
+				} else {
+					r = replacement
+					if replaceeWithNR {
+						r = reNR.ReplaceAll(replacement, []byte(strconv.Itoa(nr)))
+					}
+					record.Name = patternRegexp.ReplaceAll(record.Name, r)
+				}
+
+				record.FormatToWriter(outfh, lineWidth)
 			}
-			wg.Wait()
-			close(ch)
-			<-done
+
 		}
 	},
 }
@@ -199,4 +139,4 @@ func init() {
 	replaceCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 }
 
-var reNR = regexp.MustCompile(`\{NR\}`)
+var reNR = regexp.MustCompile(`\{(NR|nr)\}`)

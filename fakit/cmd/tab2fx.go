@@ -42,8 +42,6 @@ var tab2faCmd = &cobra.Command{
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
@@ -87,7 +85,7 @@ var tab2faCmd = &cobra.Command{
 		}
 
 		for _, file := range files {
-			reader, err := breader.NewBufferedReader(file, bufferSize, chunkSize, fn)
+			reader, err := breader.NewBufferedReader(file, config.Threads, 10, fn)
 			checkError(err)
 			var text []byte
 			var b *bytes.Buffer

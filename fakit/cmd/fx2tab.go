@@ -22,6 +22,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"runtime"
 
 	"github.com/brentp/xopen"
@@ -42,8 +43,6 @@ like sequence length, GC content/GC skew.
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
@@ -85,51 +84,55 @@ like sequence length, GC content/GC skew.
 		var name []byte
 		var g, c float64
 		for _, file := range files {
-			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
-
-				for _, record := range chunk.Data {
-					if onlyID {
-						name = record.ID
-					} else {
-						name = record.Name
+			for {
+				record, err := fastxReader.Read()
+				if err != nil {
+					if err == io.EOF {
+						break
 					}
-					if onlyName {
-						outfh.WriteString(fmt.Sprintf("%s\t%s\t%s", name, "", ""))
-					} else {
-						//outfh.WriteString(fmt.Sprintf("%s\t%s\t%s", name,
-						//	record.Seq.Seq, record.Seq.Qual))
-						outfh.WriteString(fmt.Sprintf("%s\t", name))
-						outfh.Write(record.Seq.Seq)
-						outfh.WriteString("\t")
-						outfh.Write(record.Seq.Qual)
-
-					}
-
-					if printLength {
-						outfh.WriteString(fmt.Sprintf("\t%d", len(record.Seq.Seq)))
-					}
-					if printGC || printGCSkew {
-						g = record.Seq.BaseContent("G")
-						c = record.Seq.BaseContent("C")
-					}
-
-					if printGC {
-						outfh.WriteString(fmt.Sprintf("\t%.2f", (g+c)*100))
-					}
-					if printGCSkew {
-						outfh.WriteString(fmt.Sprintf("\t%.2f", (g-c)/(g+c)*100))
-					}
-
-					if len(baseContents) > 0 {
-						for _, bc := range baseContents {
-							outfh.WriteString(fmt.Sprintf("\t%.2f", record.Seq.BaseContent(bc)*100))
-						}
-					}
-					outfh.WriteString("\n")
+					checkError(err)
+					break
 				}
+				if onlyID {
+					name = record.ID
+				} else {
+					name = record.Name
+				}
+				if onlyName {
+					outfh.WriteString(fmt.Sprintf("%s\t%s\t%s", name, "", ""))
+				} else {
+					//outfh.WriteString(fmt.Sprintf("%s\t%s\t%s", name,
+					//	record.Seq.Seq, record.Seq.Qual))
+					outfh.WriteString(fmt.Sprintf("%s\t", name))
+					outfh.Write(record.Seq.Seq)
+					outfh.WriteString("\t")
+					outfh.Write(record.Seq.Qual)
+
+				}
+
+				if printLength {
+					outfh.WriteString(fmt.Sprintf("\t%d", len(record.Seq.Seq)))
+				}
+				if printGC || printGCSkew {
+					g = record.Seq.BaseContent("G")
+					c = record.Seq.BaseContent("C")
+				}
+
+				if printGC {
+					outfh.WriteString(fmt.Sprintf("\t%.2f", (g+c)*100))
+				}
+				if printGCSkew {
+					outfh.WriteString(fmt.Sprintf("\t%.2f", (g-c)/(g+c)*100))
+				}
+
+				if len(baseContents) > 0 {
+					for _, bc := range baseContents {
+						outfh.WriteString(fmt.Sprintf("\t%.2f", record.Seq.BaseContent(bc)*100))
+					}
+				}
+				outfh.WriteString("\n")
 			}
 		}
 	},

@@ -22,6 +22,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"runtime"
 
 	"github.com/brentp/xopen"
@@ -44,8 +45,6 @@ var statCmd = &cobra.Command{
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
@@ -62,31 +61,36 @@ var statCmd = &cobra.Command{
 		var seqFormat, t string
 		statInfos := []statInfo{}
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			seqFormat = ""
 			num, lenMin, lenMax, lenSum = 0, ^uint64(0), 0, 0
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
+			for {
+				record, err := fastxReader.Read()
+				if err != nil {
+					if err == io.EOF {
+						break
+					}
+					checkError(err)
+					break
+				}
 
-				num += uint64(len(chunk.Data))
-				for _, record := range chunk.Data {
-					if seqFormat == "" {
-						if len(record.Seq.Qual) > 0 {
-							seqFormat = "FASTQ"
-						} else {
-							seqFormat = "FASTA"
-						}
+				num++
+				if seqFormat == "" {
+					if len(record.Seq.Qual) > 0 {
+						seqFormat = "FASTQ"
+					} else {
+						seqFormat = "FASTA"
 					}
-					l = uint64(len(record.Seq.Seq))
-					lenSum += l
-					if l < lenMin {
-						lenMin = l
-					}
-					if l > lenMax {
-						lenMax = l
-					}
+				}
+				l = uint64(len(record.Seq.Seq))
+				lenSum += l
+				if l < lenMin {
+					lenMin = l
+				}
+				if l > lenMax {
+					lenMax = l
 				}
 			}
 			if fastxReader.Alphabet() == seq.DNAredundant {

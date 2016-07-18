@@ -21,6 +21,7 @@
 package cmd
 
 import (
+	"io"
 	"runtime"
 
 	"github.com/brentp/xopen"
@@ -40,8 +41,6 @@ var fq2faCmd = &cobra.Command{
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
@@ -55,15 +54,21 @@ var fq2faCmd = &cobra.Command{
 		defer outfh.Close()
 
 		for _, file := range files {
-			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
 
-				for _, record := range chunk.Data {
-					record.Seq.Qual = []byte{}
-					record.FormatToWriter(outfh, lineWidth)
+			for {
+				record, err := fastxReader.Read()
+				if err != nil {
+					if err == io.EOF {
+						break
+					}
+					checkError(err)
+					break
 				}
+
+				record.Seq.Qual = []byte{}
+				record.FormatToWriter(outfh, lineWidth)
 			}
 		}
 	},

@@ -22,6 +22,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"runtime"
 
 	"github.com/brentp/xopen"
@@ -41,8 +42,6 @@ var renameCmd = &cobra.Command{
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
@@ -61,28 +60,33 @@ var renameCmd = &cobra.Command{
 			var newID string
 			var k string
 
-			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
-
-				for _, record := range chunk.Data {
-					if byName {
-						k = string(record.Name)
-					} else {
-						k = string(record.ID)
+			for {
+				record, err := fastxReader.Read()
+				if err != nil {
+					if err == io.EOF {
+						break
 					}
-
-					if _, ok := numbers[k]; ok {
-						numbers[k]++
-						newID = fmt.Sprintf("%s_%d", record.ID, numbers[k])
-						record.Name = []byte(fmt.Sprintf("%s %s", newID, record.Name))
-					} else {
-						numbers[k] = 1
-					}
-
-					record.FormatToWriter(outfh, lineWidth)
+					checkError(err)
+					break
 				}
+
+				if byName {
+					k = string(record.Name)
+				} else {
+					k = string(record.ID)
+				}
+
+				if _, ok := numbers[k]; ok {
+					numbers[k]++
+					newID = fmt.Sprintf("%s_%d", record.ID, numbers[k])
+					record.Name = []byte(fmt.Sprintf("%s %s", newID, record.Name))
+				} else {
+					numbers[k] = 1
+				}
+
+				record.FormatToWriter(outfh, lineWidth)
 			}
 		}
 	},

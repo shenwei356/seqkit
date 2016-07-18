@@ -22,6 +22,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"runtime"
 
 	"github.com/brentp/xopen"
@@ -42,8 +43,6 @@ var slidingCmd = &cobra.Command{
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
@@ -72,34 +71,38 @@ var slidingCmd = &cobra.Command{
 		var sequence []byte
 		var originalLen, l, end, e int
 		for _, file := range files {
-			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
-
-				for _, record := range chunk.Data {
-					originalLen = len(record.Seq.Seq)
-					sequence = record.Seq.Seq
-					if circular {
-						sequence = append(sequence, sequence[0:window-1]...)
+			for {
+				record, err := fastxReader.Read()
+				if err != nil {
+					if err == io.EOF {
+						break
 					}
+					checkError(err)
+					break
+				}
 
-					l = len(sequence)
-					end = l - window
-					if end < 0 {
-						end = 0
-					}
-					for i := 0; i <= end; i += step {
-						e = i + window
-						if e > originalLen {
-							e = e - originalLen
-						}
-						outfh.WriteString(fmt.Sprintf(">%s_sliding:%d-%d\n",
-							record.ID, i+1, e))
-						outfh.Write(byteutil.WrapByteSlice(sequence[i:i+window], lineWidth))
-						outfh.WriteString("\n")
+				originalLen = len(record.Seq.Seq)
+				sequence = record.Seq.Seq
+				if circular {
+					sequence = append(sequence, sequence[0:window-1]...)
+				}
 
+				l = len(sequence)
+				end = l - window
+				if end < 0 {
+					end = 0
+				}
+				for i := 0; i <= end; i += step {
+					e = i + window
+					if e > originalLen {
+						e = e - originalLen
 					}
+					outfh.WriteString(fmt.Sprintf(">%s_sliding:%d-%d\n",
+						record.ID, i+1, e))
+					outfh.Write(byteutil.WrapByteSlice(sequence[i:i+window], lineWidth))
+					outfh.WriteString("\n")
 				}
 			}
 		}

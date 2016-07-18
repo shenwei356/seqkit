@@ -22,10 +22,10 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"regexp"
 	"runtime"
 	"strings"
-	"sync"
 
 	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seq"
@@ -45,8 +45,6 @@ var grepCmd = &cobra.Command{
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
@@ -139,124 +137,63 @@ var grepCmd = &cobra.Command{
 		checkError(err)
 		defer outfh.Close()
 
+		var subject []byte
+		var hit bool
 		for _, file := range files {
-
-			ch := make(chan fastx.RecordChunk, config.Threads)
-			done := make(chan int)
-
-			// receiver
-			go func() {
-				var id uint64 = 0
-				chunks := make(map[uint64]fastx.RecordChunk)
-				for chunk := range ch {
-					checkError(chunk.Err)
-
-					if chunk.ID == id {
-						for _, record := range chunk.Data {
-							record.FormatToWriter(outfh, lineWidth)
-
-						}
-						id++
-					} else { // check bufferd result
-						for true {
-							if chunk, ok := chunks[id]; ok {
-								for _, record := range chunk.Data {
-									record.FormatToWriter(outfh, lineWidth)
-
-								}
-								id++
-								delete(chunks, chunk.ID)
-							} else {
-								break
-							}
-						}
-						chunks[chunk.ID] = chunk
-					}
-				}
-
-				if len(chunks) > 0 {
-					sortedIDs := sortRecordChunkMapID(chunks)
-					for _, id := range sortedIDs {
-						chunk := chunks[id]
-						for _, record := range chunk.Data {
-							record.FormatToWriter(outfh, lineWidth)
-
-						}
-					}
-				}
-
-				done <- 1
-			}()
-
-			// producer and worker
-			var wg sync.WaitGroup
-			tokens := make(chan int, config.Threads)
-
-			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
-				tokens <- 1
-				wg.Add(1)
 
-				go func(chunk fastx.RecordChunk) {
-					defer func() {
-						wg.Done()
-						<-tokens
-					}()
-
-					var subject []byte
-					var hit bool
-					var chunkData []*fastx.Record
-					for _, record := range chunk.Data {
-
-						if byName {
-							subject = record.Name
-						} else if bySeq {
-							subject = record.Seq.Seq
-						} else {
-							subject = record.ID
-						}
-
-						hit = false
-						if degenerate || useRegexp {
-							for pattern, re := range patterns {
-								if re.Match(subject) {
-									hit = true
-									if deleteMatched {
-										delete(patterns, pattern)
-									}
-									break
-								}
-							}
-						} else {
-							k := string(subject)
-							if useRegexp {
-								k = strings.ToLower(k)
-							}
-							if _, ok := patterns[k]; ok {
-								hit = true
-							}
-						}
-
-						if invertMatch {
-							if hit {
-								continue
-							}
-						} else {
-							if !hit {
-								continue
-							}
-						}
-
-						chunkData = append(chunkData, record)
+			for {
+				record, err := fastxReader.Read()
+				if err != nil {
+					if err == io.EOF {
+						break
 					}
-					ch <- fastx.RecordChunk{ID: chunk.ID, Data: chunkData, Err: nil}
-				}(chunk)
+					checkError(err)
+					break
+				}
+
+				if byName {
+					subject = record.Name
+				} else if bySeq {
+					subject = record.Seq.Seq
+				} else {
+					subject = record.ID
+				}
+
+				hit = false
+				if degenerate || useRegexp {
+					for pattern, re := range patterns {
+						if re.Match(subject) {
+							hit = true
+							if deleteMatched {
+								delete(patterns, pattern)
+							}
+							break
+						}
+					}
+				} else {
+					k := string(subject)
+					if useRegexp {
+						k = strings.ToLower(k)
+					}
+					if _, ok := patterns[k]; ok {
+						hit = true
+					}
+				}
+
+				if invertMatch {
+					if hit {
+						continue
+					}
+				} else {
+					if !hit {
+						continue
+					}
+				}
+
+				record.FormatToWriter(outfh, lineWidth)
 			}
-			wg.Wait()
-			close(ch)
-			<-done
 		}
 	},
 }

@@ -22,6 +22,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"regexp"
 	"runtime"
 	"strconv"
@@ -53,8 +54,6 @@ Examples:
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
@@ -302,35 +301,41 @@ Examples:
 			}
 
 			// Parse all sequences
-			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
 
-				for _, record := range chunk.Data {
-					if region != "" {
-						subseqByRegion(outfh, record, lineWidth, start, end)
-
-					} else if gtfFile != "" {
-						seqname := strings.ToLower(string(record.ID))
-						if _, ok := gtfFeaturesMap[seqname]; !ok {
-							continue
-						}
-
-						subseqByGTFFile(outfh, record, lineWidth,
-							gtfFeaturesMap, choosedFeatures,
-							onlyFlank, upStream, downStream)
-
-					} else if bedFile != "" {
-						seqname := strings.ToLower(string(record.ID))
-						if _, ok := bedFeatureMap[seqname]; !ok {
-							return
-						}
-
-						subSeqByBEDFile(outfh, record, lineWidth,
-							bedFeatureMap,
-							onlyFlank, upStream, downStream)
+			for {
+				record, err := fastxReader.Read()
+				if err != nil {
+					if err == io.EOF {
+						break
 					}
+					checkError(err)
+					break
+				}
+
+				if region != "" {
+					subseqByRegion(outfh, record, lineWidth, start, end)
+
+				} else if gtfFile != "" {
+					seqname := strings.ToLower(string(record.ID))
+					if _, ok := gtfFeaturesMap[seqname]; !ok {
+						continue
+					}
+
+					subseqByGTFFile(outfh, record, lineWidth,
+						gtfFeaturesMap, choosedFeatures,
+						onlyFlank, upStream, downStream)
+
+				} else if bedFile != "" {
+					seqname := strings.ToLower(string(record.ID))
+					if _, ok := bedFeatureMap[seqname]; !ok {
+						return
+					}
+
+					subSeqByBEDFile(outfh, record, lineWidth,
+						bedFeatureMap,
+						onlyFlank, upStream, downStream)
 				}
 			}
 		}

@@ -22,6 +22,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"regexp"
 	"runtime"
@@ -55,8 +56,6 @@ Examples:
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
@@ -116,27 +115,32 @@ Examples:
 				i := 1
 				records := []*fastx.Record{}
 
-				fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
+				for {
+					record, err := fastxReader.Read()
+					if err != nil {
+						if err == io.EOF {
+							break
+						}
+						checkError(err)
+						break
+					}
 
-				for chunk := range fastxReader.Ch {
-					checkError(chunk.Err)
-					for _, record := range chunk.Data {
-						if renameFileExt {
-							if len(record.Seq.Qual) > 0 {
-								fileExt = ".fastq"
-							} else {
-								fileExt = ".fasta"
-							}
-							renameFileExt = false
+					if renameFileExt {
+						if len(record.Seq.Qual) > 0 {
+							fileExt = ".fastq"
+						} else {
+							fileExt = ".fasta"
 						}
-						records = append(records, record)
-						if len(records) == size {
-							outfile = fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt)
-							writeSeqs(records, outfile, lineWidth, quiet, dryRun)
-							i++
-							records = []*fastx.Record{}
-						}
+						renameFileExt = false
+					}
+					records = append(records, record)
+					if len(records) == size {
+						outfile = fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt)
+						writeSeqs(records, outfile, lineWidth, quiet, dryRun)
+						i++
+						records = []*fastx.Record{}
 					}
 				}
 				if len(records) > 0 {
@@ -262,7 +266,7 @@ Examples:
 				if !quiet {
 					log.Info("read sequences ...")
 				}
-				allRecords, err := fastx.GetSeqs(file, alphabet, bufferSize, chunkSize, idRegexp)
+				allRecords, err := fastx.GetSeqs(file, alphabet, config.Threads, 10, idRegexp)
 				checkError(err)
 				if !quiet {
 					log.Infof("read %d sequences", len(allRecords))
@@ -429,7 +433,7 @@ Examples:
 				if !quiet {
 					log.Info("read sequences ...")
 				}
-				allRecords, err := fastx.GetSeqs(file, alphabet, bufferSize, chunkSize, idRegexp)
+				allRecords, err := fastx.GetSeqs(file, alphabet, config.Threads, 10, idRegexp)
 				checkError(err)
 				if !quiet {
 					log.Infof("read %d sequences", len(allRecords))
@@ -595,7 +599,7 @@ Examples:
 				if !quiet {
 					log.Info("read sequences ...")
 				}
-				allRecords, err := fastx.GetSeqs(file, alphabet, bufferSize, chunkSize, idRegexp)
+				allRecords, err := fastx.GetSeqs(file, alphabet, config.Threads, 10, idRegexp)
 				checkError(err)
 				if !quiet {
 					log.Infof("read %d sequences", len(allRecords))
@@ -678,30 +682,36 @@ Examples:
 			}
 			region2name := make(map[string][]string)
 
-			fastxReader, err := fastx.NewReader(alphabet2, newFile, bufferSize, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet2, newFile, idRegexp)
 			checkError(err)
 			var name string
 			var subseq string
 			var s, e int
 			var ok bool
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
-				for _, record := range chunk.Data {
-					s, e, ok = seq.SubLocation(len(record.Seq.Seq), start, end)
-					if !ok {
-						checkError(fmt.Errorf("region (%s) not match sequence (%s) with length of %d", region, record.Name, len(record.Seq.Seq)))
+			for {
+				record, err := fastxReader.Read()
+				if err != nil {
+					if err == io.EOF {
+						break
 					}
-					if usingMD5 {
-						subseq = string(MD5(record.Seq.SubSeq(s, e).Seq))
-					} else {
-						subseq = string(record.Seq.SubSeq(s, e).Seq)
-					}
-					name = string(record.Name)
-					if _, ok := region2name[subseq]; !ok {
-						region2name[subseq] = []string{}
-					}
-					region2name[subseq] = append(region2name[subseq], name)
+					checkError(err)
+					break
 				}
+
+				s, e, ok = seq.SubLocation(len(record.Seq.Seq), start, end)
+				if !ok {
+					checkError(fmt.Errorf("region (%s) not match sequence (%s) with length of %d", region, record.Name, len(record.Seq.Seq)))
+				}
+				if usingMD5 {
+					subseq = string(MD5(record.Seq.SubSeq(s, e).Seq))
+				} else {
+					subseq = string(record.Seq.SubSeq(s, e).Seq)
+				}
+				name = string(record.Name)
+				if _, ok := region2name[subseq]; !ok {
+					region2name[subseq] = []string{}
+				}
+				region2name[subseq] = append(region2name[subseq], name)
 			}
 
 			if !quiet {

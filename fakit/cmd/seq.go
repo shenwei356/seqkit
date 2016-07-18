@@ -23,6 +23,7 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"runtime"
 	// "runtime/debug"
 
@@ -44,8 +45,6 @@ var seqCmd = &cobra.Command{
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
@@ -95,157 +94,160 @@ var seqCmd = &cobra.Command{
 		var text []byte
 		var b *bytes.Buffer
 		for _, file := range files {
-			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			once := true
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
+			for {
+				record, err := fastxReader.Read()
+				if err != nil {
+					if err == io.EOF {
+						break
+					}
+					checkError(err)
+					break
+				}
 
-				for _, record := range chunk.Data {
-					if checkSeqType {
-						if len(record.Seq.Qual) > 0 {
-							isFastq = true
-						}
-						checkSeqType = false
+				if checkSeqType {
+					if len(record.Seq.Qual) > 0 {
+						isFastq = true
 					}
-					printQual = false
-					if isFastq {
-						printQual = true
-					}
+					checkSeqType = false
+				}
+				printQual = false
+				if isFastq {
+					printQual = true
+				}
+				printName, printSeq = true, true
+				if onlyName && onlySeq {
 					printName, printSeq = true, true
-					if onlyName && onlySeq {
-						printName, printSeq = true, true
-					} else if onlyName {
-						printName, printSeq, printQual = true, false, false
-					} else if onlySeq {
-						printName, printSeq, printQual = false, true, false
-					} else if onlyQual {
-						if !isFastq {
-							checkError(fmt.Errorf("FASTA format has no quality. So do not just use flag -q (--qual)"))
-						}
-						printName, printSeq, printQual = false, false, true
+				} else if onlyName {
+					printName, printSeq, printQual = true, false, false
+				} else if onlySeq {
+					printName, printSeq, printQual = false, true, false
+				} else if onlyQual {
+					if !isFastq {
+						checkError(fmt.Errorf("FASTA format has no quality. So do not just use flag -q (--qual)"))
 					}
-					if printName {
-						if onlyID {
-							head = record.ID
-						} else {
-							head = record.Name
-						}
-
-						if printSeq {
-							if isFastq {
-								outfh.WriteString("@")
-								outfh.Write(head)
-								outfh.WriteString("\n")
-							} else {
-								outfh.WriteString(">")
-								outfh.Write(head)
-								outfh.WriteString("\n")
-							}
-						} else {
-							outfh.Write(head)
-							outfh.WriteString("\n")
-						}
+					printName, printSeq, printQual = false, false, true
+				}
+				if printName {
+					if onlyID {
+						head = record.ID
+					} else {
+						head = record.Name
 					}
 
 					if printSeq {
-						sequence = record.Seq
-						if reverse {
-							sequence = sequence.ReverseInplace()
+						if isFastq {
+							outfh.WriteString("@")
+							outfh.Write(head)
+							outfh.WriteString("\n")
+						} else {
+							outfh.WriteString(">")
+							outfh.Write(head)
+							outfh.WriteString("\n")
 						}
-						if complement {
-							if !config.Quiet && record.Seq.Alphabet == seq.Protein || record.Seq.Alphabet == seq.Unlimit {
-								log.Warning("Complement does no take effect on protein/unlimit sequence")
-							}
-							sequence = sequence.ComplementInplace()
-						}
-						if removeGaps {
-							sequence = sequence.RemoveGaps(gapLetters)
-						}
-						if dna2rna {
-							ab := fastxReader.Alphabet()
-							if ab == seq.RNA || ab == seq.RNAredundant {
-								if once {
-									log.Warningf("it's already RNA, no need to convert")
-									once = false
-								}
-							} else {
-								for i, b := range sequence.Seq {
-									switch b {
-									case 't':
-										sequence.Seq[i] = 'u'
-									case 'T':
-										sequence.Seq[i] = 'U'
-									}
-								}
-							}
-						}
-						if rna2dna {
-							ab := fastxReader.Alphabet()
-							if ab == seq.DNA || ab == seq.DNAredundant {
-								if once {
-									log.Warningf("it's already DNA, no need to convert")
-									once = false
-								}
-							} else {
-								for i, b := range sequence.Seq {
-									switch b {
-									case 'u':
-										sequence.Seq[i] = 't'
-									case 'U':
-										sequence.Seq[i] = 'T'
-									}
-								}
-							}
-						}
-						if lowerCase {
-							sequence.Seq = bytes.ToLower(sequence.Seq)
-						} else if upperCase {
-							sequence.Seq = bytes.ToUpper(sequence.Seq)
-						}
-						// outfh.Write(byteutil.WrapByteSlice(sequence.Seq, lineWidth))
-						if bufferedByteSliceWrapper == nil {
-							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Seq), lineWidth)
-						}
-						text, b = bufferedByteSliceWrapper.Wrap(sequence.Seq, lineWidth)
-						outfh.Write(text)
-						outfh.Flush()
-						bufferedByteSliceWrapper.Recycle(b)
-
+					} else {
+						outfh.Write(head)
 						outfh.WriteString("\n")
 					}
+				}
 
-					if printQual {
-						sequence = record.Seq
-						if reverse {
-							sequence = sequence.ReverseInplace()
-						}
-						if complement {
-							if !config.Quiet && record.Seq.Alphabet == seq.Protein || record.Seq.Alphabet == seq.Unlimit {
-								log.Warning("Complement does no take effect on protein/unlimit sequence")
-							}
-							sequence = sequence.ComplementInplace()
-						}
-						if removeGaps {
-							sequence = sequence.RemoveGaps(gapLetters)
-						}
-						if !onlyQual {
-							outfh.WriteString("+\n")
-						}
-						// outfh.Write(byteutil.WrapByteSlice(sequence.Qual, lineWidth))
-						if bufferedByteSliceWrapper == nil {
-							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Qual), lineWidth)
-						}
-						text, b = bufferedByteSliceWrapper.Wrap(sequence.Qual, lineWidth)
-						outfh.Write(text)
-						outfh.Flush()
-						bufferedByteSliceWrapper.Recycle(b)
-
-						outfh.WriteString("\n")
+				if printSeq {
+					sequence = record.Seq
+					if reverse {
+						sequence = sequence.ReverseInplace()
 					}
+					if complement {
+						if !config.Quiet && record.Seq.Alphabet == seq.Protein || record.Seq.Alphabet == seq.Unlimit {
+							log.Warning("Complement does no take effect on protein/unlimit sequence")
+						}
+						sequence = sequence.ComplementInplace()
+					}
+					if removeGaps {
+						sequence = sequence.RemoveGaps(gapLetters)
+					}
+					if dna2rna {
+						ab := fastxReader.Alphabet()
+						if ab == seq.RNA || ab == seq.RNAredundant {
+							if once {
+								log.Warningf("it's already RNA, no need to convert")
+								once = false
+							}
+						} else {
+							for i, b := range sequence.Seq {
+								switch b {
+								case 't':
+									sequence.Seq[i] = 'u'
+								case 'T':
+									sequence.Seq[i] = 'U'
+								}
+							}
+						}
+					}
+					if rna2dna {
+						ab := fastxReader.Alphabet()
+						if ab == seq.DNA || ab == seq.DNAredundant {
+							if once {
+								log.Warningf("it's already DNA, no need to convert")
+								once = false
+							}
+						} else {
+							for i, b := range sequence.Seq {
+								switch b {
+								case 'u':
+									sequence.Seq[i] = 't'
+								case 'U':
+									sequence.Seq[i] = 'T'
+								}
+							}
+						}
+					}
+					if lowerCase {
+						sequence.Seq = bytes.ToLower(sequence.Seq)
+					} else if upperCase {
+						sequence.Seq = bytes.ToUpper(sequence.Seq)
+					}
+					// outfh.Write(byteutil.WrapByteSlice(sequence.Seq, lineWidth))
+					if bufferedByteSliceWrapper == nil {
+						bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Seq), lineWidth)
+					}
+					text, b = bufferedByteSliceWrapper.Wrap(sequence.Seq, lineWidth)
+					outfh.Write(text)
+					outfh.Flush()
+					bufferedByteSliceWrapper.Recycle(b)
 
-					// debug.FreeOSMemory()
+					outfh.WriteString("\n")
+				}
+
+				if printQual {
+					sequence = record.Seq
+					if reverse {
+						sequence = sequence.ReverseInplace()
+					}
+					if complement {
+						if !config.Quiet && record.Seq.Alphabet == seq.Protein || record.Seq.Alphabet == seq.Unlimit {
+							log.Warning("Complement does no take effect on protein/unlimit sequence")
+						}
+						sequence = sequence.ComplementInplace()
+					}
+					if removeGaps {
+						sequence = sequence.RemoveGaps(gapLetters)
+					}
+					if !onlyQual {
+						outfh.WriteString("+\n")
+					}
+					// outfh.Write(byteutil.WrapByteSlice(sequence.Qual, lineWidth))
+					if bufferedByteSliceWrapper == nil {
+						bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Qual), lineWidth)
+					}
+					text, b = bufferedByteSliceWrapper.Wrap(sequence.Qual, lineWidth)
+					outfh.Write(text)
+					outfh.Flush()
+					bufferedByteSliceWrapper.Recycle(b)
+
+					outfh.WriteString("\n")
 				}
 			}
 

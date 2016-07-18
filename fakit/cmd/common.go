@@ -24,6 +24,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"runtime"
 	"strings"
 
@@ -47,8 +48,6 @@ var commonCmd = &cobra.Command{
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
@@ -82,53 +81,57 @@ var commonCmd = &cobra.Command{
 		var subject string
 		for _, file := range files {
 			if !quiet {
-				log.Info("read file: %s", file)
+				log.Infof("read file: %s", file)
 			}
-			fastxReader, err = fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
-
-				for _, record := range chunk.Data {
-					if bySeq {
-						if ignoreCase {
-							if usingMD5 {
-								subject = MD5(bytes.ToLower(record.Seq.Seq))
-							} else {
-								subject = string(bytes.ToLower(record.Seq.Seq))
-							}
-						} else {
-							if usingMD5 {
-								subject = MD5(record.Seq.Seq)
-							} else {
-								subject = string(record.Seq.Seq)
-							}
-						}
-					} else if byName {
-						if ignoreCase {
-							subject = strings.ToLower(string(record.Name))
-						} else {
-							subject = string(record.Name)
-						}
-					} else { // byID
-						if ignoreCase {
-							subject = strings.ToLower(string(record.ID))
-						} else {
-							subject = string(record.ID)
-						}
+			for {
+				record, err := fastxReader.Read()
+				if err != nil {
+					if err == io.EOF {
+						break
 					}
-
-					if _, ok := counter[subject]; !ok {
-						counter[subject] = make(map[string]int)
-					}
-					counter[subject][file] = counter[subject][file] + 1
-
-					if _, ok := names[subject]; !ok {
-						names[subject] = make(map[string]string)
-					}
-					names[subject][file] = string(record.Name)
-
+					checkError(err)
+					break
 				}
+
+				if bySeq {
+					if ignoreCase {
+						if usingMD5 {
+							subject = MD5(bytes.ToLower(record.Seq.Seq))
+						} else {
+							subject = string(bytes.ToLower(record.Seq.Seq))
+						}
+					} else {
+						if usingMD5 {
+							subject = MD5(record.Seq.Seq)
+						} else {
+							subject = string(record.Seq.Seq)
+						}
+					}
+				} else if byName {
+					if ignoreCase {
+						subject = strings.ToLower(string(record.Name))
+					} else {
+						subject = string(record.Name)
+					}
+				} else { // byID
+					if ignoreCase {
+						subject = strings.ToLower(string(record.ID))
+					} else {
+						subject = string(record.ID)
+					}
+				}
+
+				if _, ok := counter[subject]; !ok {
+					counter[subject] = make(map[string]int)
+				}
+				counter[subject][file] = counter[subject][file] + 1
+
+				if _, ok := names[subject]; !ok {
+					names[subject] = make(map[string]string)
+				}
+				names[subject][file] = string(record.Name)
 			}
 		}
 
@@ -148,22 +151,34 @@ var commonCmd = &cobra.Command{
 			n++
 		}
 		if !quiet {
-			log.Info("%d common seqs found", n)
-			log.Info("extract common seqs from first file: %s", firstFile)
+			log.Infof("%d common seqs found", n)
+		}
+
+		if n == 0 {
+			return
+		}
+
+		if !quiet {
+			log.Infof("extract common seqs from first file: %s", firstFile)
 		}
 
 		// extract
-		fastxReader, err = fastx.NewReader(alphabet, firstFile, bufferSize, chunkSize, idRegexp)
+		fastxReader, err = fastx.NewReader(alphabet, firstFile, idRegexp)
 		checkError(err)
-		for chunk := range fastxReader.Ch {
-			checkError(chunk.Err)
-
-			for _, record := range chunk.Data {
-				name := string(record.Name)
-				if _, ok := namesOK[name]; ok && namesOK[name] > 0 {
-					record.FormatToWriter(outfh, lineWidth)
-					namesOK[name] = 0
+		for {
+			record, err := fastxReader.Read()
+			if err != nil {
+				if err == io.EOF {
+					break
 				}
+				checkError(err)
+				break
+			}
+
+			name := string(record.Name)
+			if _, ok := namesOK[name]; ok && namesOK[name] > 0 {
+				record.FormatToWriter(outfh, lineWidth)
+				namesOK[name] = 0
 			}
 		}
 	},

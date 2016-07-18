@@ -23,6 +23,7 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"regexp"
 	"runtime"
@@ -59,8 +60,6 @@ and extract sequences by FASTA index.
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
@@ -123,37 +122,42 @@ and extract sequences by FASTA index.
 			}
 			var name string
 			for _, file := range files {
-				fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
-				for chunk := range fastxReader.Ch {
-					checkError(chunk.Err)
-
-					for _, record := range chunk.Data {
-						if byName {
-							name = string(record.Name)
-						} else if byID || bySeq || byLength {
-							name = string(record.ID)
+				for {
+					record, err := fastxReader.Read()
+					if err != nil {
+						if err == io.EOF {
+							break
 						}
+						checkError(err)
+						break
+					}
 
-						if _, ok := id2name[name]; ok {
-							checkError(fmt.Errorf(`duplicated sequences found: %s. use "fakit rename" to rename duplicated IDs`, name))
-						}
-						id2name[name] = []byte(string(record.Name))
+					if byName {
+						name = string(record.Name)
+					} else if byID || bySeq || byLength {
+						name = string(record.ID)
+					}
 
+					if _, ok := id2name[name]; ok {
+						checkError(fmt.Errorf(`duplicated sequences found: %s. use "fakit rename" to rename duplicated IDs`, name))
+					}
+					id2name[name] = []byte(string(record.Name))
+
+					if ignoreCase {
+						name = strings.ToLower(name)
+					}
+
+					record2 := record.Clone()
+					sequences[name] = record2
+					if byLength {
+						name2length = append(name2length, stringutil.StringCount{Key: name, Count: len(record2.Seq.Seq)})
+					} else if byID || byName || bySeq {
 						if ignoreCase {
-							name = strings.ToLower(name)
-						}
-
-						record2 := record.Clone()
-						sequences[name] = record2
-						if byLength {
-							name2length = append(name2length, stringutil.StringCount{Key: name, Count: len(record2.Seq.Seq)})
-						} else if byID || byName || bySeq {
-							if ignoreCase {
-								name2sequence = append(name2sequence, stringutil.String2ByteSlice{Key: name, Value: bytes.ToLower(record2.Seq.Seq)})
-							} else {
-								name2sequence = append(name2sequence, stringutil.String2ByteSlice{Key: name, Value: record2.Seq.Seq})
-							}
+							name2sequence = append(name2sequence, stringutil.String2ByteSlice{Key: name, Value: bytes.ToLower(record2.Seq.Seq)})
+						} else {
+							name2sequence = append(name2sequence, stringutil.String2ByteSlice{Key: name, Value: record2.Seq.Seq})
 						}
 					}
 				}
@@ -286,38 +290,44 @@ and extract sequences by FASTA index.
 			if !quiet {
 				log.Infof("read sequence IDs and sequence prefix from FASTA file ...")
 			}
-			fastxReader, err := fastx.NewReader(alphabet2, newFile, bufferSize, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet2, newFile, idRegexp)
 			checkError(err)
 			var name string
 			var prefix []byte
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
-				for _, record := range chunk.Data {
-					if byName {
-						name = string(record.Name)
-					} else if byID || bySeq || byLength {
-						name = string(record.ID)
+			for {
+				record, err := fastxReader.Read()
+				if err != nil {
+					if err == io.EOF {
+						break
 					}
-
-					if _, ok := id2name[name]; ok {
-						checkError(fmt.Errorf(`duplicated sequences found: %s. use "fakit rename" to rename duplicated IDs`, name))
-					}
-					id2name[name] = []byte(string(record.Name))
-
-					if ignoreCase {
-						name = strings.ToLower(name)
-					}
-
-					if seqPrefixLength == 0 || len(record.Seq.Seq) <= seqPrefixLength {
-						prefix = record.Seq.Seq
-					} else {
-						prefix = record.Seq.Seq[0:seqPrefixLength]
-					}
-					name2sequence = append(name2sequence,
-						stringutil.String2ByteSlice{Key: name, Value: []byte(string(prefix))})
-					name2length = append(name2length,
-						stringutil.StringCount{Key: name, Count: len(record.Seq.Seq)})
+					checkError(err)
+					break
 				}
+
+				if byName {
+					name = string(record.Name)
+				} else if byID || bySeq || byLength {
+					name = string(record.ID)
+				}
+
+				if _, ok := id2name[name]; ok {
+					checkError(fmt.Errorf(`duplicated sequences found: %s. use "fakit rename" to rename duplicated IDs`, name))
+				}
+				id2name[name] = []byte(string(record.Name))
+
+				if ignoreCase {
+					name = strings.ToLower(name)
+				}
+
+				if seqPrefixLength == 0 || len(record.Seq.Seq) <= seqPrefixLength {
+					prefix = record.Seq.Seq
+				} else {
+					prefix = record.Seq.Seq[0:seqPrefixLength]
+				}
+				name2sequence = append(name2sequence,
+					stringutil.String2ByteSlice{Key: name, Value: []byte(string(prefix))})
+				name2length = append(name2length,
+					stringutil.StringCount{Key: name, Count: len(record.Seq.Seq)})
 			}
 		}
 

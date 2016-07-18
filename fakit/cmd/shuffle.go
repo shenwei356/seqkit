@@ -22,6 +22,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"math/rand"
 	"os"
 	"runtime"
@@ -54,8 +55,6 @@ Secondly, fakit shuffles sequence IDs and extract sequences by FASTA index.
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
@@ -82,16 +81,21 @@ Secondly, fakit shuffles sequence IDs and extract sequences by FASTA index.
 			}
 			i := 0
 			for _, file := range files {
-				fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
-				for chunk := range fastxReader.Ch {
-					checkError(chunk.Err)
-
-					for _, record := range chunk.Data {
-						sequences[string(record.Name)] = record
-						index2name[i] = string(record.Name)
-						i++
+				for {
+					record, err := fastxReader.Read()
+					if err != nil {
+						if err == io.EOF {
+							break
+						}
+						checkError(err)
+						break
 					}
+
+					sequences[string(record.Name)] = record
+					index2name[i] = string(record.Name)
+					i++
 				}
 			}
 

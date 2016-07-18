@@ -22,13 +22,11 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"regexp"
 	"runtime"
-	"sort"
-	"sync"
 
 	"github.com/brentp/xopen"
-	"github.com/cznic/sortutil"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/spf13/cobra"
@@ -52,8 +50,6 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		chunkSize := config.ChunkSize
-		bufferSize := config.BufferSize
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = true
@@ -80,7 +76,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		patterns := make(map[string][]byte)
 		var s string
 		if patternFile != "" {
-			records, err := fastx.GetSeqsMap(patternFile, nil, 10, config.Threads, "")
+			records, err := fastx.GetSeqsMap(patternFile, nil, config.Threads, 10, "")
 			checkError(err)
 			for name, record := range records {
 				patterns[name] = record.Seq.Seq
@@ -129,166 +125,59 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		outfh.WriteString("seqID\tpatternName\tpattern\tstrand\tstart\tend\tmatched\n")
 		for _, file := range files {
 
-			ch := make(chan LocationChunk, config.Threads)
-			done := make(chan int)
-
-			// receiver
-			go func() {
-				var id uint64 = 0
-				chunks := make(map[uint64]LocationChunk)
-				for chunk := range ch {
-					if chunk.ID == id {
-						for _, locationInfo := range chunk.Data {
-							var s []byte
-							for _, loc := range locationInfo.Locations {
-								if locationInfo.Strand == "+" {
-									s = locationInfo.Record.Seq.Seq[loc[0]:loc[1]]
-								} else {
-									s = locationInfo.Record.Seq.SubSeq(loc[0]+1, loc[1]).RevCom().Seq
-								}
-								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-									locationInfo.Record.ID,
-									locationInfo.PatternName,
-									patterns[locationInfo.PatternName],
-									locationInfo.Strand,
-									loc[0]+1,
-									loc[1],
-									s))
-							}
-						}
-						id++
-					} else { // check bufferd result
-						for true {
-							if chunk, ok := chunks[id]; ok {
-								for _, locationInfo := range chunk.Data {
-									var s []byte
-									for _, loc := range locationInfo.Locations {
-										if locationInfo.Strand == "+" {
-											s = locationInfo.Record.Seq.Seq[loc[0]:loc[1]]
-										} else {
-											s = locationInfo.Record.Seq.SubSeq(loc[0]+1, loc[1]).RevCom().Seq
-										}
-										outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-											locationInfo.Record.ID,
-											locationInfo.PatternName,
-											patterns[locationInfo.PatternName],
-											locationInfo.Strand,
-											loc[0]+1,
-											loc[1],
-											s))
-									}
-								}
-								id++
-								delete(chunks, chunk.ID)
-							} else {
-								break
-							}
-						}
-						chunks[chunk.ID] = chunk
-					}
-				}
-				if len(chunks) > 0 {
-					sortedIDs := sortLocationChunkMapID(chunks)
-					for _, id := range sortedIDs {
-						chunk := chunks[id]
-						for _, locationInfo := range chunk.Data {
-							var s []byte
-							for _, loc := range locationInfo.Locations {
-								if locationInfo.Strand == "+" {
-									s = locationInfo.Record.Seq.Seq[loc[0]:loc[1]]
-								} else {
-									s = locationInfo.Record.Seq.SubSeq(loc[0]+1, loc[1]).RevCom().Seq
-								}
-								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-									locationInfo.Record.ID,
-									locationInfo.PatternName,
-									patterns[locationInfo.PatternName],
-									locationInfo.Strand,
-									loc[0]+1,
-									loc[1],
-									s))
-							}
-						}
-					}
-				}
-
-				done <- 1
-			}()
-
-			// producer and worker
-			var wg sync.WaitGroup
-			tokens := make(chan int, config.Threads)
-
-			fastxReader, err := fastx.NewReader(alphabet, file, bufferSize, chunkSize, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
-			for chunk := range fastxReader.Ch {
-				checkError(chunk.Err)
-				tokens <- 1
-				wg.Add(1)
-
-				go func(chunk fastx.RecordChunk) {
-					defer func() {
-						wg.Done()
-						<-tokens
-					}()
-
-					var locations []LocationInfo
-					for _, record := range chunk.Data {
-						for pName, re := range regexps {
-							found := re.FindAllSubmatchIndex(record.Seq.Seq, -1)
-							if len(found) > 0 {
-								locations = append(locations, LocationInfo{record, pName, "+", found})
-							}
-
-							if onlyPositiveStrand {
-								continue
-							}
-							seqRP := record.Seq.RevCom()
-							found = re.FindAllSubmatchIndex(seqRP.Seq, -1)
-							if len(found) > 0 {
-								l := len(seqRP.Seq)
-								tlocs := make([][]int, len(found))
-								for i, loc := range found {
-									tlocs[i] = []int{l - loc[1], l - loc[0]}
-								}
-								locations = append(locations, LocationInfo{record, pName, "-", tlocs})
-							}
-						}
-
+			for {
+				record, err := fastxReader.Read()
+				if err != nil {
+					if err == io.EOF {
+						break
 					}
-					ch <- LocationChunk{chunk.ID, locations}
-				}(chunk)
+					checkError(err)
+					break
+				}
+
+				for pName, re := range regexps {
+					found := re.FindAllSubmatchIndex(record.Seq.Seq, -1)
+					if len(found) > 0 {
+						for _, loc := range found {
+							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+								record.ID,
+								pName,
+								patterns[pName],
+								"+",
+								loc[0]+1,
+								loc[1],
+								record.Seq.Seq[loc[0]:loc[1]]))
+						}
+					}
+
+					if onlyPositiveStrand {
+						continue
+					}
+					seqRP := record.Seq.RevCom()
+					found = re.FindAllSubmatchIndex(seqRP.Seq, -1)
+					if len(found) > 0 {
+						l := len(seqRP.Seq)
+						tlocs := make([][]int, len(found))
+						for i, loc := range found {
+							tlocs[i] = []int{l - loc[1], l - loc[0]}
+						}
+						for _, loc := range tlocs {
+							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+								record.ID,
+								pName,
+								patterns[pName],
+								"-",
+								loc[0]+1,
+								loc[1],
+								record.Seq.SubSeq(loc[0]+1, loc[1]).RevCom().Seq))
+						}
+					}
+				}
 			}
-			wg.Wait()
-			close(ch)
-			<-done
 		}
 	},
-}
-
-// LocationChunk is LocationChunk
-type LocationChunk struct {
-	ID   uint64
-	Data []LocationInfo
-}
-
-// LocationInfo is LocationInfo
-type LocationInfo struct {
-	Record      *fastx.Record
-	PatternName string
-	Strand      string
-	Locations   [][]int
-}
-
-func sortLocationChunkMapID(chunks map[uint64]LocationChunk) sortutil.Uint64Slice {
-	ids := make(sortutil.Uint64Slice, len(chunks))
-	i := 0
-	for id := range chunks {
-		ids[i] = id
-		i++
-	}
-	sort.Sort(ids)
-	return ids
 }
 
 func init() {
