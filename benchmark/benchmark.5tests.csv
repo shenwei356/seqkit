@@ -1,31 +1,31 @@
 test	dataset	app	time_mean	time_stdev	mem_mean	mem_stdev
-A) Reverse complement	dataset_A.fa	biogo	104.04	3.64	35409	853
-A) Reverse complement	dataset_A.fa	fakit	22.04	0.66	44290	658
-A) Reverse complement	dataset_A.fa	fasta_utilities	17.96	0.61	55464	2242
-A) Reverse complement	dataset_A.fa	seqmagick	59.18	0.98	49640	1511
-A) Reverse complement	dataset_A.fa	seqtk	9.56	0.29	7482	70
-A) Reverse complement	dataset_B.fa	biogo	91.01	0.67	1416565	75445
-A) Reverse complement	dataset_B.fa	fakit	20.99	1.82	1723793	58853
-A) Reverse complement	dataset_B.fa	fasta_utilities	26.11	0.46	1256297	16
-A) Reverse complement	dataset_B.fa	seqmagick	64.82	2.73	1379244	88633
-A) Reverse complement	dataset_B.fa	seqtk	10.06	0.34	244754	30
-B) Searching by ID list	dataset_A.fa	fakit	12.42	0.15	53728	1558
-B) Searching by ID list	dataset_A.fa	fasta_utilities	10.04	0.02	52538	1282
-B) Searching by ID list	dataset_A.fa	seqmagick	44.80	0.53	40381	895
-B) Searching by ID list	dataset_A.fa	seqtk	11.40	0.13	9905	54
-B) Searching by ID list	dataset_B.fa	fakit	12.20	0.16	1706621	16296
-B) Searching by ID list	dataset_B.fa	fasta_utilities	12.53	0.09	1256317	62
-B) Searching by ID list	dataset_B.fa	seqmagick	50.78	0.73	1031548	23957
-B) Searching by ID list	dataset_B.fa	seqtk	13.83	0.16	244834	44
-C) Sampling by number	dataset_A.fa	fakit	28.94	0.21	45756	3844
-C) Sampling by number	dataset_A.fa	seqmagick	39.92	0.23	546005	7308
-C) Sampling by number	dataset_A.fa	seqtk	4.18	0.05	1081562	1828
-C) Sampling by number	dataset_B.fa	fakit	31.19	0.19	1558144	89
-C) Sampling by number	dataset_B.fa	seqmagick	44.14	1.32	2924562	35398
-C) Sampling by number	dataset_B.fa	seqtk	4.92	0.06	2817705	28
-D) Removing duplicates by seq	dataset_A.fa	fakit	19.72	0.32	59244	2209
-D) Removing duplicates by seq	dataset_A.fa	seqmagick	73.98	0.32	60865	65
-D) Removing duplicates by seq	dataset_B.fa	fakit	15.68	0.55	1748017	46890
-D) Removing duplicates by seq	dataset_B.fa	seqmagick	84.58	0.59	1123853	80
-E) Subsequence with BED file	dataset_B.fa	fakit	20.20	0.96	1856492	71810
-E) Subsequence with BED file	dataset_B.fa	seqtk	6.66	0.05	246230	16
+A) Reverse complement	dataset_A.fa	biogo	97.95	1.70	33689	3094
+A) Reverse complement	dataset_A.fa	fakit	17.98	1.14	47722	635
+A) Reverse complement	dataset_A.fa	fasta_utilities	19.25	1.51	55300	3623
+A) Reverse complement	dataset_A.fa	seqmagick	65.50	1.93	49106	2207
+A) Reverse complement	dataset_A.fa	seqtk	9.71	0.31	7536	58
+A) Reverse complement	dataset_B.fa	biogo	99.25	1.03	1438622	184280
+A) Reverse complement	dataset_B.fa	fakit	15.85	0.28	786606	60
+A) Reverse complement	dataset_B.fa	fasta_utilities	26.62	1.23	1255724	26
+A) Reverse complement	dataset_B.fa	seqmagick	70.82	2.06	1342192	104111
+A) Reverse complement	dataset_B.fa	seqtk	11.07	0.91	244845	47
+B) Searching by ID list	dataset_A.fa	fakit	5.00	0.05	55121	1648
+B) Searching by ID list	dataset_A.fa	fasta_utilities	10.09	0.02	53132	946
+B) Searching by ID list	dataset_A.fa	seqmagick	49.64	0.52	40738	411
+B) Searching by ID list	dataset_A.fa	seqtk	10.97	0.07	9968	25
+B) Searching by ID list	dataset_B.fa	fakit	6.18	0.24	1043133	513
+B) Searching by ID list	dataset_B.fa	fasta_utilities	12.93	0.09	1255773	61
+B) Searching by ID list	dataset_B.fa	seqmagick	56.92	1.29	1028182	15595
+B) Searching by ID list	dataset_B.fa	seqtk	13.35	0.14	244825	57
+C) Sampling by number	dataset_A.fa	fakit	7.94	0.31	57929	81
+C) Sampling by number	dataset_A.fa	seqmagick	45.70	2.25	543724	9559
+C) Sampling by number	dataset_A.fa	seqtk	4.59	0.15	1080150	1025
+C) Sampling by number	dataset_B.fa	fakit	9.40	0.64	1156188	56002
+C) Sampling by number	dataset_B.fa	seqmagick	53.18	2.03	2937108	55581
+C) Sampling by number	dataset_B.fa	seqtk	5.49	0.33	2817689	36
+D) Removing duplicates by seq	dataset_A.fa	fakit	14.78	0.53	58253	143
+D) Removing duplicates by seq	dataset_A.fa	seqmagick	94.09	4.06	61112	40
+D) Removing duplicates by seq	dataset_B.fa	fakit	17.86	1.27	1043238	58
+D) Removing duplicates by seq	dataset_B.fa	seqmagick	109.00	3.21	1124136	51
+E) Subsequence with BED file	dataset_B.fa	fakit	11.71	0.37	1814394	115628
+E) Subsequence with BED file	dataset_B.fa	seqtk	7.54	0.30	246262	7

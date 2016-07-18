@@ -8,20 +8,20 @@ data: dataset_A.fa
 [INFO][0m first pass: estimating seq number
 [INFO][0m seq number: 67748
 [INFO][0m second pass: reading and sampling
-[INFO][0m %d sequences outputed 10000
+[INFO][0m 10000 sequences outputed
 
-elapsed time: 34.224
-peak rss: 49112
+elapsed time: 7.352
+peak rss: 59544
 
 data: dataset_B.fa
 [INFO][0m sample by number
 [INFO][0m first pass: estimating seq number
 [INFO][0m seq number: 194
 [INFO][0m second pass: reading and sampling
-[INFO][0m %d sequences outputed 19
+[INFO][0m 19 sequences outputed
 
-elapsed time: 36.642
-peak rss: 1617164
+elapsed time: 8.962
+peak rss: 1215572
 
 == 2
 data: dataset_A.fa
@@ -29,20 +29,20 @@ data: dataset_A.fa
 [INFO][0m first pass: estimating seq number
 [INFO][0m seq number: 67748
 [INFO][0m second pass: reading and sampling
-[INFO][0m %d sequences outputed 10000
+[INFO][0m 10000 sequences outputed
 
-elapsed time: 29.272
-peak rss: 47072
+elapsed time: 7.368
+peak rss: 58080
 
 data: dataset_B.fa
 [INFO][0m sample by number
 [INFO][0m first pass: estimating seq number
 [INFO][0m seq number: 194
 [INFO][0m second pass: reading and sampling
-[INFO][0m %d sequences outputed 19
+[INFO][0m 19 sequences outputed
 
-elapsed time: 31.655
-peak rss: 1558304
+elapsed time: 8.940
+peak rss: 1076492
 
 == 3
 data: dataset_A.fa
@@ -50,20 +50,20 @@ data: dataset_A.fa
 [INFO][0m first pass: estimating seq number
 [INFO][0m seq number: 67748
 [INFO][0m second pass: reading and sampling
-[INFO][0m %d sequences outputed 10000
+[INFO][0m 10000 sequences outputed
 
-elapsed time: 33.032
-peak rss: 50220
+elapsed time: 7.452
+peak rss: 65384
 
 data: dataset_B.fa
 [INFO][0m sample by number
 [INFO][0m first pass: estimating seq number
 [INFO][0m seq number: 194
 [INFO][0m second pass: reading and sampling
-[INFO][0m %d sequences outputed 19
+[INFO][0m 19 sequences outputed
 
-elapsed time: 35.009
-peak rss: 1586964
+elapsed time: 8.873
+peak rss: 1078552
 
 == 4
 data: dataset_A.fa
@@ -71,18 +71,18 @@ data: dataset_A.fa
 [INFO][0m first pass: estimating seq number
 [INFO][0m seq number: 67748
 [INFO][0m second pass: reading and sampling
-[INFO][0m %d sequences outputed 10000
+[INFO][0m 10000 sequences outputed
 
-elapsed time: 31.420
-peak rss: 53532
+elapsed time: 7.462
+peak rss: 65296
 
 data: dataset_B.fa
 [INFO][0m sample by number
 [INFO][0m first pass: estimating seq number
 [INFO][0m seq number: 194
 [INFO][0m second pass: reading and sampling
-[INFO][0m %d sequences outputed 19
+[INFO][0m 19 sequences outputed
 
-elapsed time: 35.383
-peak rss: 1613908
+elapsed time: 8.915
+peak rss: 1194236
 

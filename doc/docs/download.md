@@ -28,7 +28,7 @@
     - [fakit_openbsd_386.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_openbsd_386.tar.gz)
     - [fakit_openbsd_amd64.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_openbsd_amd64.tar.gz)
 
-#### Mirror site for these who have trouble in visiting AWS
+#### Mirror site for Chinese user
 
 - **Linux**
     - [fakit_linux_386.tar.gz](http://bioinf.shenwei.me/data/fakit_linux_386.tar.gz)

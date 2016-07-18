@@ -117,9 +117,9 @@ reproduced in different environments with same random seed.
 Usage
 
 ```
-fakit -- a cross-platform and efficient suit for FASTA/Q file manipulation
+fakit -- a cross-platform and efficient toolkit for FASTA/Q file manipulation
 
-Version: 0.2.6
+Version: 0.2.7
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -138,7 +138,7 @@ Available Commands:
   head        print first N FASTA/Q records
   locate      locate subsequences/motifs
   rename      rename duplicated IDs
-  replace     replace name/sequence/by regular expression
+  replace     replace name/sequence by regular expression
   rmdup       remove duplicated sequences by id/name/sequence
   sample      sample sequences by number or proportion
   seq         transform sequences (revserse, complement, extract ID...)
@@ -153,8 +153,6 @@ Available Commands:
 
 Flags:
       --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which fakit guesses the sequence type (0 for whole seq) (default 10000)
-  -b, --buffer-size int                 buffer size of chunks (0 for no buffer) (default 1)
-  -c, --chunk-size int                  chunk size (attention: unit is FASTA records not lines) (default 1)
       --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
       --id-regexp string                regular expression for parsing ID (default "^([^\\s]+)\\s?")
   -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)

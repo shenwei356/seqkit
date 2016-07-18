@@ -1,10 +1,11 @@
 # fakit - a cross-platform and efficient toolkit for FASTA/Q file manipulation
 
-[![GoDoc](https://godoc.org/github.com/shenwei356/fakit?status.svg)](https://godoc.org/github.com/shenwei356/fakit)
 
 Documents: [http://shenwei356.github.io/fakit](http://shenwei356.github.io/fakit)
 
 Source code: [https://github.com/shenwei356/fakit](https://github.com/shenwei356/fakit)
+
+Latest version: [![Latest Version](https://img.shields.io/github/release/shenwei356/fakit.svg?style=flat)](https://github.com/shenwei356/fakit/releases)
 
 ## About the name
 

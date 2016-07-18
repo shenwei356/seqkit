@@ -5,44 +5,44 @@ data: dataset_B.fa
 == 1
 data: dataset_A.fa
 
-elapsed time: 13.520
-peak rss: 53520
+elapsed time: 5.995
+peak rss: 61108
 
 data: dataset_B.fa
 
-elapsed time: 12.803
-peak rss: 1693180
+elapsed time: 6.101
+peak rss: 1043564
 
 == 2
 data: dataset_A.fa
 
-elapsed time: 12.229
-peak rss: 50788
+elapsed time: 5.170
+peak rss: 57144
 
 data: dataset_B.fa
 
-elapsed time: 11.559
-peak rss: 1696184
+elapsed time: 6.361
+peak rss: 1043168
 
 == 3
 data: dataset_A.fa
 
-elapsed time: 12.521
-peak rss: 51456
+elapsed time: 5.171
+peak rss: 53400
 
 data: dataset_B.fa
 
-elapsed time: 11.713
-peak rss: 1912320
+elapsed time: 5.619
+peak rss: 1043392
 
 == 4
 data: dataset_A.fa
 
-elapsed time: 12.643
-peak rss: 58164
+elapsed time: 4.932
+peak rss: 47100
 
 data: dataset_B.fa
 
-elapsed time: 11.617
-peak rss: 1668092
+elapsed time: 5.611
+peak rss: 1043500
 

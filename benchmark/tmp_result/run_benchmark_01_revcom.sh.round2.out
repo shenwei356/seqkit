@@ -6,57 +6,57 @@ data: dataset_B.fa
 == fakit
 data: dataset_A.fa
 
-elapsed time: 21.245
-peak rss: 44988
+elapsed time: 17.307
+peak rss: 46832
 
 data: dataset_B.fa
 
-elapsed time: 18.752
-peak rss: 1807024
+elapsed time: 15.846
+peak rss: 786528
 
 == fasta_utilities
 data: dataset_A.fa
 Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94.
 
-elapsed time: 17.868
-peak rss: 57056
+elapsed time: 18.390
+peak rss: 59096
 
 data: dataset_B.fa
 Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94.
 
-elapsed time: 25.464
-peak rss: 1256288
+elapsed time: 25.374
+peak rss: 1255716
 
 == seqmagick
 data: dataset_A.fa
 
-elapsed time: 60.269
-peak rss: 51004
+elapsed time: 64.025
+peak rss: 50488
 
 data: dataset_B.fa
 
-elapsed time: 64.839
-peak rss: 1455924
+elapsed time: 68.641
+peak rss: 1488712
 
 == seqtk
 data: dataset_A.fa
 
-elapsed time: 9.549
-peak rss: 7576
+elapsed time: 9.941
+peak rss: 7516
 
 data: dataset_B.fa
 
-elapsed time: 10.040
-peak rss: 244796
+elapsed time: 10.434
+peak rss: 244912
 
 == biogo
 data: dataset_A.fa
 
-elapsed time: 108.127
-peak rss: 35136
+elapsed time: 96.746
+peak rss: 30380
 
 data: dataset_B.fa
 
-elapsed time: 90.408
-peak rss: 1354388
+elapsed time: 100.173
+peak rss: 1179428
 
