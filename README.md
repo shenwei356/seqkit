@@ -260,6 +260,11 @@ fakit version: v0.2.7
 ![benchmark-5tests.csv.png](benchmark/benchmark.5tests.csv.png)
 
 
+## Citation
+
+**W Shen**, S Le, Y Li\*, F Hu\*. fakit: a cross-platform and efficient toolkit for FASTA/Q file manipulation.
+***PLOS ONE***. revised.
+
 ## Contact
 
 Email me for any problem when using fakit. shenwei356(at)gmail.com
