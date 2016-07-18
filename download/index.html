@@ -152,6 +152,7 @@
   in <a href="https://github.com/shenwei356/fakit/releases">release</a> page.</p>
 <h2 id="latest-version">Latest Version</h2>
 <p><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.7">fakit v0.2.7</a></p>
+<h4 id="links">Links</h4>
 <ul>
 <li><strong>Linux</strong><ul>
 <li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_linux_386.tar.gz">fakit_linux_386.tar.gz</a></li>
@@ -181,7 +182,7 @@
 </ul>
 </li>
 </ul>
-<h4 id="mirror-sites-for-china">Mirror sites for China:</h4>
+<h4 id="mirror-site-for-chinese-user">Mirror site for Chinese user</h4>
 <ul>
 <li><strong>Linux</strong><ul>
 <li><a href="http://bioinf.shenwei.me/data/fakit_linux_386.tar.gz">fakit_linux_386.tar.gz</a></li>
@@ -235,9 +236,9 @@ echo export PATH=\$PATH:/PATH/OF/fakit &gt;&gt; ~/.bashrc
 <ul>
 <li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.7">fakit v0.2.7</a><ul>
 <li><strong><em>reduce memory usage</em></strong> by optimize the outputing of sequences.
-  detail: using <a href="https://godoc.org/github.com/shenwei356/util/byteutil#BufferedByteSliceWrapper"><code>BufferedByteSliceWrapper</code></a> to resuse <code>bytes.Buffer</code>.</li>
+  detail: using <a href="https://godoc.org/github.com/shenwei356/util/byteutil#BufferedByteSliceWrapper"><code>BufferedByteSliceWrapper</code></a> to resuse bytes.Buffer.</li>
 <li><strong><em>reduce memory usage and improve speed</em></strong> by using custom buffered
-  reading mechanism, instead of using standard library <code>bufio</code>,
+ reading mechanism, instead of using standard library <code>bufio</code>,
   which is slow for large genome sequence.</li>
 <li>discard strategy of "buffer" and "chunk" of FASTA/Q records,
   just parse records one by one.</li>
@@ -245,7 +246,7 @@ echo export PATH=\$PATH:/PATH/OF/fakit &gt;&gt; ~/.bashrc
 <li>add function testing scripts</li>
 </ul>
 </li>
-<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.7">fakit v0.2.7</a><ul>
+<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.6">fakit v0.2.6</a><ul>
 <li>fix bug of <code>fakit subseq</code>: Inplace subseq method leaded to wrong result</li>
 </ul>
 </li>

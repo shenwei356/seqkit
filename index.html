@@ -152,8 +152,6 @@
         
             <li><a href="#benchmark">Benchmark</a></li>
         
-            <li><a href="#citation">Citation</a></li>
-        
             <li><a href="#contact">Contact</a></li>
         
             <li><a href="#license">License</a></li>
@@ -164,9 +162,9 @@
                 <div class="col-md-9" role="main">
 
 <h1 id="fakit-a-cross-platform-and-efficient-toolkit-for-fastaq-file-manipulation">fakit - a cross-platform and efficient toolkit for FASTA/Q file manipulation</h1>
-<p><a href="https://github.com/shenwei356/fakit/releases"><img alt="Latest Stable Version" src="https://img.shields.io/github/release/shenwei356/fakit.svg?style=flat" /></a></p>
-<p>Documents  : <a href="http://shenwei356.github.io/fakit">http://shenwei356.github.io/fakit</a></p>
+<p>Documents: <a href="http://shenwei356.github.io/fakit">http://shenwei356.github.io/fakit</a></p>
 <p>Source code: <a href="https://github.com/shenwei356/fakit">https://github.com/shenwei356/fakit</a></p>
+<p>Latest version: <a href="https://github.com/shenwei356/fakit/releases"><img alt="Latest Version" src="https://img.shields.io/github/release/shenwei356/fakit.svg?style=flat" /></a></p>
 <h2 id="about-the-name">About the name</h2>
 <p>Originally, <code>fakit</code> (abbreviation of <code>FASTA kit</code>) was designed to handle FASTA
 format. And the name was remained after adding <strong><em>seamless support for FASTA/Q fromat</em></strong>.</p>
@@ -434,6 +432,7 @@ therefore, it could be easily used in command-line pipe.</p>
 </tbody>
 </table>
 <h1 id="installation">Installation</h1>
+<p><a href="http://shenwei356.github.io/fakit/downlaod">Download Page</a></p>
 <p><code>fakit</code> is implemented in <a href="https://golang.org/">Golang</a> programming language,
  executable binary files <strong>for most popular operating systems</strong> are freely available
   in <a href="https://github.com/shenwei356/fakit/releases">release</a> page.</p>
@@ -502,9 +501,9 @@ echo export PATH=\$PATH:/PATH/OF/fakit &gt;&gt; ~/.bashrc
 <h2 id="technical-details-and-guides-for-use">Technical details and guides for use</h2>
 <h3 id="fastaq-format-parsing">FASTA/Q format parsing</h3>
 <p>fakit uses author's lightweight and high-performance bioinformatics packages
- <a href="https://github.com/shenwei356/bio">bio</a> for FASTA/Q parsing，
-which has very close performance (<em>0.89X</em>) compared to the famous C lib
-<a href="https://github.com/attractivechaos/klib/blob/master/kseq.h"><code>kseq.h</code></a>.</p>
+<a href="https://github.com/shenwei356/bio">bio</a> for FASTA/Q parsing，
+ which has very close performance (<strong><em>0.89X</em></strong>) compared to the
+  famous C lib <a href="https://github.com/attractivechaos/klib/blob/master/kseq.h">kseq.h</a>.</p>
 <h3 id="sequence-formats-and-types">Sequence formats and types</h3>
 <p>fakit seamlessly support FASTA and FASTQ format.
 All subcommands except for <code>faidx</code> can handle both formats.
@@ -555,22 +554,17 @@ rapid access of sequences and reducing memory occupation.</p>
 <p>ATTENTION: the <code>.fakit.fai</code> file created by fakit is a little different from .fai file
 created by samtools. fakit uses full sequence head instead of just ID as key.</p>
 <h3 id="parallelization-of-cpu-intensive-jobs">Parallelization of CPU intensive jobs</h3>
-<p>The validation of sequences bases and computing complement sequence sequences
+<p>The validation of sequences bases and complement process of sequences
 are parallelized for large sequences.</p>
-<p>Parsing of line-based files, including BED/GFF file and ID list file are
-also parallelized.</p>
-<p>The processes are parallelized
-with "Map-Reduce" model by multiple goroutines in golang which are similar to but much
+<p>Parsing of line-based files, including BED/GFF file and ID list file are also parallelized.</p>
+<p>The Parallelization is implemented by multiple goroutines in golang
+ which are similar to but much
 lighter weight than threads. The concurrency number is configurable with global
 flag <code>-j</code> or <code>--threads</code> (default value: 1 for single-CPU PC, 2 for others).</p>
 <h3 id="memory-occupation">Memory occupation</h3>
 <p>Most of the subcommands do not read whole FASTA/Q records in to memory,
 including <code>stat</code>, <code>fq2fa</code>, <code>fx2tab</code>, <code>tab2fx</code>, <code>grep</code>, <code>locate</code>, <code>replace</code>,
  <code>seq</code>, <code>sliding</code>, <code>subseq</code>.</p>
-<p>However when handling big sequences, e.g. Human genome, the memory is high
-(2-3 GB) even the buffer size is 1.
-This is due to the limitation of garbage collection mechanism in
- Go programming language, it may be solved in the future.</p>
 <p>Note that when using <code>subseq --gtf | --bed</code>, if the GTF/BED files are too
 big, the memory usage will increase.
 You could use <code>--chr</code> to specify chromesomes and <code>--feature</code> to limit features.</p>
@@ -598,9 +592,6 @@ dataset_B.fa   FASTA        DNA             194       970   15,978,096.5   248,9
 </code></pre>
 <p>fakit version: v0.2.7</p>
 <p><img alt="benchmark-5tests.csv.png" src="./benchmark/benchmark.5tests.csv.png" /></p>
-<h2 id="citation">Citation</h2>
-<p><strong>W Shen</strong>, S Le, Y Li*, F Hu*. fakit: a cross-platform and efficient toolkit for FASTA/Q file manipulation. <em>PLOS ONE</em>.
- revised.</p>
 <h2 id="contact">Contact</h2>
 <p>Email me for any problem when using fakit. shenwei356(at)gmail.com</p>
 <p><a href="https://github.com/shenwei356/fakit/issues">Create an issue</a> to report bugs,
@@ -653,5 +644,5 @@ propose new functions or ask for help.</p>
 
 <!--
 MkDocs version : 0.15.3
-Build Date UTC : 2016-07-18 04:08:13.647159
+Build Date UTC : 2016-07-18 07:37:49.095354
 -->
