@@ -9,7 +9,7 @@ Datasets and results are described at [http://shenwei356.github.io/fakit/benchma
 Softwares
 
 1. [fakit](https://github.com/shenwei356/fakit). (Go).
-   Version [v0.2.5](https://github.com/shenwei356/fakit/releases/tag/v0.2.5).
+   Version [v0.2.7](https://github.com/shenwei356/fakit/releases/tag/v0.2.7).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    Lots of dependencies to install_.

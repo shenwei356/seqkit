@@ -4,7 +4,7 @@
 ## Softwares
 
 1. [fakit](https://github.com/shenwei356/fakit). (Go).
-   Version [v0.2.5](https://github.com/shenwei356/fakit/releases/tag/v0.2.5).
+   Version [v0.2.7](https://github.com/shenwei356/fakit/releases/tag/v0.2.7).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    Lots of dependencies to install.
@@ -111,12 +111,12 @@ PC:
 - CPU: Intel Core i5-3320M @ 2.60GHz, two cores/4 threads
 - RAM: DDR3 1600MHz, 12GB
 - SSD: SAMSUNG 850 EVO 250G, SATA-3
-- OS: Fedora 23 (Scientific KDE spin),  Kernal: 4.5.6-200.fc23.x86_64
+- OS: Fedora 24 (Scientific KDE spin),  Kernal: 4.6.3-200.fc24.x86_64
 
 Softwares:
 
-- Perl: perl 5, version 22, subversion 1 (v5.22.1) built for x86_64-linux-thread-multi
-- Python: Python 2.7.10 (default, Sep  8 2015, 17:20:17) [GCC 5.1.1 20150618 (Red Hat 5.1.1-4)] on linux2
+- Perl: perl 5, version 22, subversion 1 (v5.22.2) built for x86_64-linux-thread-multi
+- Python: Python 2.7.11 (default, Jul 10 2016, 20:58:20) [GCC 6.1.1 20160621 (Red Hat 6.1.1-3)] on linux2
 
 ## Tests
 
@@ -159,7 +159,7 @@ the peak memory may depends on size of sampled sequences.
 
 ## Results
 
-fakit version: v0.2.5
+fakit version: v0.2.7
 
 ![benchmark-5tests.csv.png](benchmark/benchmark.5tests.csv.png)
 

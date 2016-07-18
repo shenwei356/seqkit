@@ -1,5 +1,7 @@
 # fakit - a cross-platform and efficient toolkit for FASTA/Q file manipulation
 
+[![GoDoc](https://godoc.org/github.com/shenwei356/fakit?status.svg)](https://godoc.org/github.com/shenwei356/fakit)
+
 Documents: [http://shenwei356.github.io/fakit](http://shenwei356.github.io/fakit)
 
 Source code: [https://github.com/shenwei356/fakit](https://github.com/shenwei356/fakit)
@@ -33,7 +35,7 @@ therefore, it could be easily used in command-line pipe.
   (see [download](http://shenwei356.github.io/fakit/download/))
 - **Fast** (see [benchmark](/#benchmark)),
   **multiple-CPUs supported**.
-- **Practical functions supported by 19 subcommands** (see subcommands and
+- **Practical functions supported by 20 subcommands** (see subcommands and
   [usage](http://shenwei356.github.io/fakit/usage/) )
 - **Well documented** (detailed [usage](http://shenwei356.github.io/fakit/usage/)
   and [benchmark](http://shenwei356.github.io/fakit/benchmark/) )
@@ -74,6 +76,8 @@ Rename head      | Yes      | Yes             | --            | --      | Yes   
 
 # Installation
 
+[Download Page](http://shenwei356.github.io/fakit/downlaod)
+
 `fakit` is implemented in [Golang](https://golang.org/) programming language,
  executable binary files **for most popular operating systems** are freely available
   in [release](https://github.com/shenwei356/fakit/releases) page.
@@ -100,7 +104,7 @@ For Go developer, just one command:
 
 ## Subcommands
 
-19 in total.
+20 in total.
 
 **Sequence and subsequence**
 
@@ -148,25 +152,10 @@ For Go developer, just one command:
 
 ### FASTA/Q format parsing
 
-fakit uses author's bioinformatics packages [bio](https://github.com/shenwei356/bio)
-for FASTA/Q parsing, which ***asynchronously parse FASTA/Q records and buffer them
-in chunks***. The parser returns one chunk of records for each call.
-
-Asynchronous parsing saves much time because these's no waiting interval for
-parsed records being handled.
-The strategy of records chunks reduces data exchange in parallelly handling
-of sequences, which could also improve performance.
-
-Since using of buffers and chunks, the memory occupation will be higher than
-cases of reading sequence one by one.
-The default value of chunk size (configurable by global flag `-c` or `--chunk-size`)
-is 1, which is suitable for most of cases.
-But for manipulating short sequences, e.g. FASTQ or FASTA of short sequences,
-you could set higher value, e.g. 100.
-For big genomes like human genome, smaller chunk size is prefered, e.g. 1.
-And the buffer size is configurable by global flag `-b` or `--buffer-size`
-(default value is 1). You may set with higher
-value for short sequences to imporve performance.
+fakit uses author's lightweight and high-performance bioinformatics packages
+[bio](https://github.com/shenwei356/bio) for FASTA/Q parsing，
+ which has very close performance (***0.89X***) compared to the
+  famous C lib [kseq.h](https://github.com/attractivechaos/klib/blob/master/kseq.h).
 
 ### Sequence formats and types
 
@@ -176,8 +165,7 @@ And only when some commands (`subseq`, `split`, `sort` and `shuffle`)
 which utilise FASTA index to improve perfrmance for large files in two pass mode
 (by flag `--two-pass`), only FASTA format is supported.
 
-Sequence format is automatically detected by the first character of the file
-or STDIN.
+Sequence format is automatically detected.
 
 Sequence type (DNA/RNA/Protein) is automatically detected by leading subsequences
 of the first sequences in file or STDIN. The length of the leading subsequences
@@ -214,15 +202,13 @@ created by samtools. fakit uses full sequence head instead of just ID as key.
 
 ### Parallelization of CPU intensive jobs
 
-Most of the manipulations of FASTA/Q files are I/O intensive, to improve the
-performance, asynchronous parsing strategy is used.
-
 The validation of sequences bases and complement process of sequences
 are parallelized for large sequences.
 
-For CPU intensive jobs like `grep` with regular expressions and `locate` with
-sequence motifs. The processes are parallelized
-with "Map-Reduce" model by multiple goroutines in golang which are similar to but much
+Parsing of line-based files, including BED/GFF file and ID list file are also parallelized.
+
+The Parallelization is implemented by multiple goroutines in golang
+ which are similar to but much
 lighter weight than threads. The concurrency number is configurable with global
 flag `-j` or `--threads` (default value: 1 for single-CPU PC, 2 for others).
 
@@ -230,12 +216,7 @@ flag `-j` or `--threads` (default value: 1 for single-CPU PC, 2 for others).
 
 Most of the subcommands do not read whole FASTA/Q records in to memory,
 including `stat`, `fq2fa`, `fx2tab`, `tab2fx`, `grep`, `locate`, `replace`,
- `seq`, `sliding`, `subseq`. They just temporarily buffer chunks of records.
-
-However when handling big sequences, e.g. Human genome, the memory is high
-(2-3 GB) even the buffer size is 1.
-This is due to the limitation of garbage collection mechanism in
- Go programming language, it may be solved in the future.
+ `seq`, `sliding`, `subseq`.
 
 Note that when using `subseq --gtf | --bed`, if the GTF/BED files are too
 big, the memory usage will increase.
@@ -272,8 +253,8 @@ Datasets:
     file           seq_format   seq_type   num_seqs   min_len        avg_len       max_len
     dataset_A.fa   FASTA        DNA          67,748        56       41,442.5     5,976,145                  
     dataset_B.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
-    
-fakit version: v0.2.5
+
+fakit version: v0.2.7
 
 ![benchmark-5tests.csv.png](benchmark/benchmark.5tests.csv.png)
 

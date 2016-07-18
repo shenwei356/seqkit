@@ -4,12 +4,49 @@
  executable binary files **for most popular operating system** are freely available
   in [release](https://github.com/shenwei356/fakit/releases) page.
 
-## Current Version
+## Latest Version
 
-- [fakit v0.2.7](https://github.com/shenwei356/fakit/releases/tag/v0.2.7)
-    - reduce memory usage by optimize the outputing of sequences. 
-      detail: using [`BufferedByteSliceWrapper`](https://godoc.org/github.com/shenwei356/util/byteutil#BufferedByteSliceWrapper) to resuse bytes.Buffer.
-    - add function testing scripts
+[fakit v0.2.7](https://github.com/shenwei356/fakit/releases/tag/v0.2.7)
+
+#### Links
+
+- **Linux**
+    - [fakit_linux_386.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_linux_386.tar.gz)
+    - [fakit_linux_amd64.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_linux_amd64.tar.gz)
+    - [fakit_linux_arm.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_linux_arm.tar.gz)
+- **Mac OS X**
+    - [fakit_darwin_386.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_darwin_386.tar.gz)
+    - [fakit_darwin_amd64.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_darwin_amd64.tar.gz)
+- **Windows**
+    - [fakit_windows_386.exe.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_windows_386.exe.tar.gz)
+    - [fakit_windows_amd64.exe.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_windows_amd64.exe.tar.gz)
+- **FreeBSD**
+    - [fakit_freebsd_386.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_freebsd_386.tar.gz)
+    - [fakit_freebsd_amd64.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_freebsd_amd64.tar.gz)
+    - [fakit_freebsd_arm.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_freebsd_arm.tar.gz)
+- **OpenBSD**
+    - [fakit_openbsd_386.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_openbsd_386.tar.gz)
+    - [fakit_openbsd_amd64.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_openbsd_amd64.tar.gz)
+
+#### Mirror site for these who have trouble in visiting AWS
+
+- **Linux**
+    - [fakit_linux_386.tar.gz](http://bioinf.shenwei.me/data/fakit_linux_386.tar.gz)
+    - [fakit_linux_amd64.tar.gz](http://bioinf.shenwei.me/data/fakit_linux_amd64.tar.gz)
+    - [fakit_linux_arm.tar.gz](http://bioinf.shenwei.me/data/fakit_linux_arm.tar.gz)
+- **Mac OS X**
+    - [fakit_darwin_386.tar.gz](http://bioinf.shenwei.me/data/fakit_darwin_386.tar.gz)
+    - [fakit_darwin_amd64.tar.gz](http://bioinf.shenwei.me/data/fakit_darwin_amd64.tar.gz)
+- **Windows**
+    - [fakit_windows_386.exe.tar.gz](http://bioinf.shenwei.me/data/fakit_windows_386.exe.tar.gz)
+    - [fakit_windows_amd64.exe.tar.gz](http://bioinf.shenwei.me/data/fakit_windows_amd64.exe.tar.gz)
+- **FreeBSD**
+    - [fakit_freebsd_386.tar.gz](http://bioinf.shenwei.me/data/fakit_freebsd_386.tar.gz)
+    - [fakit_freebsd_amd64.tar.gz](http://bioinf.shenwei.me/data/fakit_freebsd_amd64.tar.gz)
+    - [fakit_freebsd_arm.tar.gz](http://bioinf.shenwei.me/data/fakit_freebsd_arm.tar.gz)
+- **OpenBSD**
+    - [fakit_openbsd_386.tar.gz](http://bioinf.shenwei.me/data/fakit_openbsd_386.tar.gz)
+    - [fakit_openbsd_amd64.tar.gz](http://bioinf.shenwei.me/data/fakit_openbsd_amd64.tar.gz)
 
 ## Installation
 
@@ -32,8 +69,18 @@ For Go developer, just one command:
 
     go get -u github.com/shenwei356/fakit/fakit
 
-## Previous Versions
+## Release History
 
+- [fakit v0.2.7](https://github.com/shenwei356/fakit/releases/tag/v0.2.7)
+    - ***reduce memory usage*** by optimize the outputing of sequences.
+      detail: using [`BufferedByteSliceWrapper`](https://godoc.org/github.com/shenwei356/util/byteutil#BufferedByteSliceWrapper) to resuse bytes.Buffer.
+    - ***reduce memory usage and improve speed*** by using custom buffered
+     reading mechanism, instead of using standard library `bufio`,
+      which is slow for large genome sequence.
+    - discard strategy of "buffer" and "chunk" of FASTA/Q records,
+      just parse records one by one.
+    - delete global flags `-c (--chunk-size)` and `-b (--buffer-size)`.
+    - add function testing scripts
 - [fakit v0.2.6](https://github.com/shenwei356/fakit/releases/tag/v0.2.6)
     - fix bug of `fakit subseq`: Inplace subseq method leaded to wrong result
 - [fakit v0.2.5.1](https://github.com/shenwei356/fakit/releases/tag/v0.2.5.1)
