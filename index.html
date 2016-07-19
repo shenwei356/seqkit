@@ -504,8 +504,9 @@ echo export PATH=\$PATH:/PATH/OF/fakit &gt;&gt; ~/.bashrc
 <h3 id="fastaq-format-parsing">FASTA/Q format parsing</h3>
 <p>fakit uses author's lightweight and high-performance bioinformatics packages
 <a href="https://github.com/shenwei356/bio">bio</a> for FASTA/Q parsing，
- which has very close performance (<strong><em>0.89X</em></strong>) compared to the
-  famous C lib <a href="https://github.com/attractivechaos/klib/blob/master/kseq.h">kseq.h</a>.</p>
+which has <a href="https://github.com/shenwei356/bio#compare-to-kseqh-klib">high performance</a>
+close to the
+famous C lib <a href="https://github.com/attractivechaos/klib/blob/master/kseq.h">kseq.h</a>.</p>
 <h3 id="sequence-formats-and-types">Sequence formats and types</h3>
 <p>fakit seamlessly support FASTA and FASTQ format.
 All subcommands except for <code>faidx</code> can handle both formats.
@@ -592,7 +593,7 @@ file           seq_format   seq_type   num_seqs   min_len        avg_len       m
 dataset_A.fa   FASTA        DNA          67,748        56       41,442.5     5,976,145                  
 dataset_B.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
 </code></pre>
-<p>fakit version: v0.2.7</p>
+<p>fakit version: v0.2.8</p>
 <p><img alt="benchmark-5tests.csv.png" src="./benchmark/benchmark.5tests.csv.png" /></p>
 <h2 id="citation">Citation</h2>
 <p><strong>W Shen</strong>, S Le, Y Li*, F Hu*. fakit: a cross-platform and efficient toolkit for FASTA/Q file manipulation.
@@ -649,5 +650,5 @@ propose new functions or ask for help.</p>
 
 <!--
 MkDocs version : 0.15.3
-Build Date UTC : 2016-07-18 07:42:54.818244
+Build Date UTC : 2016-07-19 09:16:04.695215
 -->

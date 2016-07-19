@@ -151,34 +151,34 @@
  executable binary files <strong>for most popular operating system</strong> are freely available
   in <a href="https://github.com/shenwei356/fakit/releases">release</a> page.</p>
 <h2 id="latest-version">Latest Version</h2>
-<p><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.7">fakit v0.2.7</a></p>
+<p><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.8">fakit v0.2.8</a></p>
 <h4 id="links">Links</h4>
 <ul>
 <li><strong>Linux</strong><ul>
-<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_linux_386.tar.gz">fakit_linux_386.tar.gz</a></li>
-<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_linux_amd64.tar.gz">fakit_linux_amd64.tar.gz</a></li>
-<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_linux_arm.tar.gz">fakit_linux_arm.tar.gz</a></li>
+<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_linux_386.tar.gz">fakit_linux_386.tar.gz</a></li>
+<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_linux_amd64.tar.gz">fakit_linux_amd64.tar.gz</a></li>
+<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_linux_arm.tar.gz">fakit_linux_arm.tar.gz</a></li>
 </ul>
 </li>
 <li><strong>Mac OS X</strong><ul>
-<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_darwin_386.tar.gz">fakit_darwin_386.tar.gz</a></li>
-<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_darwin_amd64.tar.gz">fakit_darwin_amd64.tar.gz</a></li>
+<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_darwin_386.tar.gz">fakit_darwin_386.tar.gz</a></li>
+<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_darwin_amd64.tar.gz">fakit_darwin_amd64.tar.gz</a></li>
 </ul>
 </li>
 <li><strong>Windows</strong><ul>
-<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_windows_386.exe.tar.gz">fakit_windows_386.exe.tar.gz</a></li>
-<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_windows_amd64.exe.tar.gz">fakit_windows_amd64.exe.tar.gz</a></li>
+<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_windows_386.exe.tar.gz">fakit_windows_386.exe.tar.gz</a></li>
+<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_windows_amd64.exe.tar.gz">fakit_windows_amd64.exe.tar.gz</a></li>
 </ul>
 </li>
 <li><strong>FreeBSD</strong><ul>
-<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_freebsd_386.tar.gz">fakit_freebsd_386.tar.gz</a></li>
-<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_freebsd_amd64.tar.gz">fakit_freebsd_amd64.tar.gz</a></li>
-<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_freebsd_arm.tar.gz">fakit_freebsd_arm.tar.gz</a></li>
+<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_freebsd_386.tar.gz">fakit_freebsd_386.tar.gz</a></li>
+<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_freebsd_amd64.tar.gz">fakit_freebsd_amd64.tar.gz</a></li>
+<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_freebsd_arm.tar.gz">fakit_freebsd_arm.tar.gz</a></li>
 </ul>
 </li>
 <li><strong>OpenBSD</strong><ul>
-<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_openbsd_386.tar.gz">fakit_openbsd_386.tar.gz</a></li>
-<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_openbsd_amd64.tar.gz">fakit_openbsd_amd64.tar.gz</a></li>
+<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_openbsd_386.tar.gz">fakit_openbsd_386.tar.gz</a></li>
+<li><a href="https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_openbsd_amd64.tar.gz">fakit_openbsd_amd64.tar.gz</a></li>
 </ul>
 </li>
 </ul>
@@ -234,6 +234,13 @@ echo export PATH=\$PATH:/PATH/OF/fakit &gt;&gt; ~/.bashrc
 </code></pre>
 <h2 id="release-history">Release History</h2>
 <ul>
+<li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.8">fakit v0.2.8</a><ul>
+<li>improve speed of parsing sequence ID, not using regular expression for default <code>--id-regexp</code></li>
+<li>improve speed of record outputing for small-size sequences</li>
+<li>fix minor bug: <code>fakit seq</code> for blank record</li>
+<li>update benchmark result</li>
+</ul>
+</li>
 <li><a href="https://github.com/shenwei356/fakit/releases/tag/v0.2.7">fakit v0.2.7</a><ul>
 <li><strong><em>reduce memory usage</em></strong> by optimize the outputing of sequences.
   detail: using <a href="https://godoc.org/github.com/shenwei356/util/byteutil#BufferedByteSliceWrapper"><code>BufferedByteSliceWrapper</code></a> to resuse bytes.Buffer.</li>
