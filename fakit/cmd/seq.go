@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"io"
 	"runtime"
+	"syscall"
 	// "runtime/debug"
 
 	"github.com/brentp/xopen"
@@ -209,14 +210,18 @@ var seqCmd = &cobra.Command{
 					} else if upperCase {
 						sequence.Seq = bytes.ToUpper(sequence.Seq)
 					}
-					// outfh.Write(byteutil.WrapByteSlice(sequence.Seq, lineWidth))
-					if bufferedByteSliceWrapper == nil {
-						bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Seq), lineWidth)
+
+					if len(sequence.Seq) <= pageSize {
+						outfh.Write(byteutil.WrapByteSlice(sequence.Seq, lineWidth))
+					} else {
+						if bufferedByteSliceWrapper == nil {
+							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Seq), lineWidth)
+						}
+						text, b = bufferedByteSliceWrapper.Wrap(sequence.Seq, lineWidth)
+						outfh.Write(text)
+						outfh.Flush()
+						bufferedByteSliceWrapper.Recycle(b)
 					}
-					text, b = bufferedByteSliceWrapper.Wrap(sequence.Seq, lineWidth)
-					outfh.Write(text)
-					outfh.Flush()
-					bufferedByteSliceWrapper.Recycle(b)
 
 					outfh.WriteString("\n")
 				}
@@ -238,14 +243,18 @@ var seqCmd = &cobra.Command{
 					if !onlyQual {
 						outfh.WriteString("+\n")
 					}
-					// outfh.Write(byteutil.WrapByteSlice(sequence.Qual, lineWidth))
-					if bufferedByteSliceWrapper == nil {
-						bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Qual), lineWidth)
+
+					if len(sequence.Qual) <= pageSize {
+						outfh.Write(byteutil.WrapByteSlice(sequence.Qual, lineWidth))
+					} else {
+						if bufferedByteSliceWrapper == nil {
+							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Qual), lineWidth)
+						}
+						text, b = bufferedByteSliceWrapper.Wrap(sequence.Qual, lineWidth)
+						outfh.Write(text)
+						outfh.Flush()
+						bufferedByteSliceWrapper.Recycle(b)
 					}
-					text, b = bufferedByteSliceWrapper.Wrap(sequence.Qual, lineWidth)
-					outfh.Write(text)
-					outfh.Flush()
-					bufferedByteSliceWrapper.Recycle(b)
 
 					outfh.WriteString("\n")
 				}
@@ -255,6 +264,8 @@ var seqCmd = &cobra.Command{
 		}
 	},
 }
+
+var pageSize = syscall.Getpagesize()
 
 func init() {
 	RootCmd.AddCommand(seqCmd)

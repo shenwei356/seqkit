@@ -5,12 +5,12 @@ data: dataset_B.fa
 [INFO][0m read BED file ...
 [INFO][0m 162980 BED features loaded
 
-elapsed time: 11.269
-peak rss: 1813208
+elapsed time: 8.740
+peak rss: 1698864
 
 == seqtk
 data: dataset_B.fa
 
-elapsed time: 7.346
-peak rss: 246268
+elapsed time: 6.498
+peak rss: 246244
 

@@ -155,8 +155,9 @@ For Go developer, just one command:
 
 fakit uses author's lightweight and high-performance bioinformatics packages
 [bio](https://github.com/shenwei356/bio) for FASTA/Q parsing，
- which has very close performance (***0.89X***) compared to the
-  famous C lib [kseq.h](https://github.com/attractivechaos/klib/blob/master/kseq.h).
+which has [high performance](https://github.com/shenwei356/bio#compare-to-kseqh-klib)
+close to the
+famous C lib [kseq.h](https://github.com/attractivechaos/klib/blob/master/kseq.h).
 
 ### Sequence formats and types
 
@@ -255,7 +256,7 @@ Datasets:
     dataset_A.fa   FASTA        DNA          67,748        56       41,442.5     5,976,145                  
     dataset_B.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
 
-fakit version: v0.2.7
+fakit version: v0.2.8
 
 ![benchmark-5tests.csv.png](benchmark/benchmark.5tests.csv.png)
 

@@ -19,7 +19,7 @@ for i in $(seq 1 $NCPUs); do
 
     for f in dataset_{A,B}.fa; do
         echo data: $f;
-        memusg -t -H fakit sort -l -2 $f > $f.fakit.sort;
+        memusg -t -H fakit sort -l -2 $f -w 0 > $f.fakit.sort;
         # fakit stat $f.fakit.rc;
         /bin/rm $f.fakit.sort;
     done

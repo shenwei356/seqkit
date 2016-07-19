@@ -6,23 +6,23 @@ data: dataset_B.fa
 data: dataset_A.fa
 [INFO][0m 12351 duplicated records removed
 
-elapsed time: 14.257
-peak rss: 58264
+elapsed time: 11.098
+peak rss: 47840
 
 data: dataset_B.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 19.641
-peak rss: 1043316
+elapsed time: 11.806
+peak rss: 787012
 
 == seqmagick
 data: dataset_A.fa
 
-elapsed time: 99.239
-peak rss: 61132
+elapsed time: 52.080
+peak rss: 53568
 
 data: dataset_B.fa
 
-elapsed time: 113.163
-peak rss: 1124148
+elapsed time: 63.285
+peak rss: 1036472
 

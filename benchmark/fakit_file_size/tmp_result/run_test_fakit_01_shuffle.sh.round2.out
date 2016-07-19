@@ -9,8 +9,8 @@ data: 1X.fa
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 1.359
-peak rss: 407636
+elapsed time: 1.278
+peak rss: 423612
 
 == 2X
 recreate FASTA index file
@@ -22,8 +22,8 @@ data: 2X.fa
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 2.519
-peak rss: 658032
+elapsed time: 2.498
+peak rss: 679880
 
 == 4X
 recreate FASTA index file
@@ -35,8 +35,8 @@ data: 4X.fa
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 4.890
-peak rss: 621124
+elapsed time: 4.699
+peak rss: 676808
 
 == 8X
 recreate FASTA index file
@@ -48,8 +48,8 @@ data: 8X.fa
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 12.842
-peak rss: 699080
+elapsed time: 15.880
+peak rss: 681952
 
 == 16X
 recreate FASTA index file
@@ -61,8 +61,8 @@ data: 16X.fa
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 30.251
-peak rss: 746412
+elapsed time: 28.841
+peak rss: 730568
 
 == 32X
 recreate FASTA index file
@@ -74,6 +74,6 @@ data: 32X.fa
 [INFO][0m shuffle ...
 [INFO][0m output ...
 
-elapsed time: 72.638
-peak rss: 700500
+elapsed time: 71.830
+peak rss: 753552
 

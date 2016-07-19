@@ -1,25 +1,25 @@
 test	dataset	app	time_mean	time_stdev	mem_mean	mem_stdev
-A) Reverse complement	16X.fa	16X	21.56	1.00	786656	8
-A) Reverse complement	1X.fa	1X	1.94	0.02	786597	48
-A) Reverse complement	2X.fa	2X	3.61	0.01	786921	199
-A) Reverse complement	32X.fa	32X	35.76	0.71	786480	116
-A) Reverse complement	4X.fa	4X	6.69	0.07	798377	16460
-A) Reverse complement	8X.fa	8X	17.59	1.82	786778	169
-B) Removing duplicates by seq	16X.fa	16X	13.31	0.02	1042258	168
-B) Removing duplicates by seq	1X.fa	1X	1.97	0.07	1043560	60
-B) Removing duplicates by seq	2X.fa	2X	3.10	0.10	1043228	534
-B) Removing duplicates by seq	32X.fa	32X	19.25	0.17	1042224	263
-B) Removing duplicates by seq	4X.fa	4X	5.40	0.08	1042549	702
-B) Removing duplicates by seq	8X.fa	8X	9.78	0.05	1041974	185
-C) Shuffling	16X.fa	16X	18.59	4.15	741046	13324
-C) Shuffling	1X.fa	1X	1.32	0.05	444397	42193
-C) Shuffling	2X.fa	2X	2.50	0.01	679380	48740
-C) Shuffling	32X.fa	32X	29.13	2.57	736582	26718
-C) Shuffling	4X.fa	4X	4.90	0.01	682502	31766
-C) Shuffling	8X.fa	8X	10.97	0.56	707813	27062
-D) Sorting by length	16X.fa	16X	17.09	0.79	883880	45533
-D) Sorting by length	1X.fa	1X	1.29	0.06	427796	11337
-D) Sorting by length	2X.fa	2X	2.52	0.11	668088	37178
-D) Sorting by length	32X.fa	32X	26.92	1.86	729848	5186
-D) Sorting by length	4X.fa	4X	4.91	0.11	699170	3528
-D) Sorting by length	8X.fa	8X	12.40	0.83	721802	15542
+A) Reverse complement	16X.fa	16X	33.25	0.83	787197	58
+A) Reverse complement	1X.fa	1X	2.04	0.19	787002	117
+A) Reverse complement	2X.fa	2X	3.50	0.16	787258	174
+A) Reverse complement	32X.fa	32X	76.47	0.87	787190	129
+A) Reverse complement	4X.fa	4X	6.66	0.27	787098	45
+A) Reverse complement	8X.fa	8X	17.93	1.48	787165	154
+B) Removing duplicates by seq	16X.fa	16X	18.98	0.37	787157	53
+B) Removing duplicates by seq	1X.fa	1X	1.61	0.06	787005	205
+B) Removing duplicates by seq	2X.fa	2X	2.70	0.01	787001	141
+B) Removing duplicates by seq	32X.fa	32X	36.97	0.40	787080	31
+B) Removing duplicates by seq	4X.fa	4X	4.94	0.01	787022	154
+B) Removing duplicates by seq	8X.fa	8X	9.58	0.03	787001	170
+C) Shuffling	16X.fa	16X	30.24	1.00	732556	7178
+C) Shuffling	1X.fa	1X	1.26	0.02	421340	3760
+C) Shuffling	2X.fa	2X	2.45	0.04	680765	17787
+C) Shuffling	32X.fa	32X	72.14	1.84	752757	15301
+C) Shuffling	4X.fa	4X	4.78	0.07	703188	22546
+C) Shuffling	8X.fa	8X	14.14	2.27	704417	25537
+D) Sorting by length	16X.fa	16X	30.41	0.74	731480	4325
+D) Sorting by length	1X.fa	1X	1.27	0.02	429737	9031
+D) Sorting by length	2X.fa	2X	2.44	0.04	691550	16172
+D) Sorting by length	32X.fa	32X	71.99	0.30	725169	7176
+D) Sorting by length	4X.fa	4X	4.78	0.01	720520	17900
+D) Sorting by length	8X.fa	8X	14.97	1.51	731208	16575

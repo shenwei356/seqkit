@@ -4,25 +4,11 @@
 
 ### FASTA/Q format parsing
 
-fakit uses author's bioinformatics packages [bio](https://github.com/shenwei356/bio)
-for FASTA/Q parsing, which ***asynchronously parse FASTA/Q records and buffer them
-in chunks***. The parser returns one chunk of records for each call.
-
-Asynchronous parsing saves much time because these's no waiting interval for
-parsed records being handled.
-The strategy of records chunks reduces data exchange in parallelly handling
-of sequences, which could also improve performance.
-
-Since using of buffers and chunks, the memory occupation will be higher than
-cases of reading sequence one by one.
-The default value of chunk size (configurable by global flag `-c` or `--chunk-size`)
-is 1, which is suitable for most of cases.
-But for manipulating short sequences, e.g. FASTQ or FASTA of short sequences,
-you could set higher value, e.g. 100.
-For big genomes like human genome, smaller chunk size is prefered, e.g. 1.
-And the buffer size is configurable by global flag `-b` or `--buffer-size`
-(default value is 1). You may set with higher
-value for short sequences to imporve performance.
+fakit uses author's lightweight and high-performance bioinformatics packages
+[bio](https://github.com/shenwei356/bio) for FASTA/Q parsing，
+which has [high performance](https://github.com/shenwei356/bio#compare-to-kseqh-klib)
+close to the
+famous C lib [kseq.h](https://github.com/attractivechaos/klib/blob/master/kseq.h).
 
 ### Sequence formats and types
 
@@ -32,8 +18,7 @@ And only when some commands (`subseq`, `split`, `sort` and `shuffle`)
 which utilise FASTA index to improve perfrmance for large files in two pass mode
 (by flag `--two-pass`), only FASTA format is supported.
 
-Sequence format is automatically detected by the first character of the file
-or STDIN.
+Sequence format is automatically detected.
 
 Sequence type (DNA/RNA/Protein) is automatically detected by leading subsequences
 of the first sequences in file or STDIN. The length of the leading subsequences
@@ -63,22 +48,20 @@ the `gi` number, then use `--id-regexp "^gi\|([^\|]+)\|"`.
 For some commands, including `subseq`, `split`, `sort` and `shuffle`,
 when input files are (plain or gzipped) FASTA files,
 FASTA index would be optional used for
-rapid acccess of sequences and reducing memory occupation.
+rapid access of sequences and reducing memory occupation.
 
 ATTENTION: the `.fakit.fai` file created by fakit is a little different from .fai file
 created by samtools. fakit uses full sequence head instead of just ID as key.
 
 ### Parallelization of CPU intensive jobs
 
-Most of the manipulations of FASTA/Q files are I/O intensive, to improve the
-performance, asynchronous parsing strategy is used.
-
 The validation of sequences bases and complement process of sequences
 are parallelized for large sequences.
 
-For CPU intensive jobs like `grep` with regular expressions and `locate` with
-sequence motifs. The processes are parallelized
-with "Map-Reduce" model by multiple goroutines in golang which are similar to but much
+Parsing of line-based files, including BED/GFF file and ID list file are also parallelized.
+
+The Parallelization is implemented by multiple goroutines in golang
+ which are similar to but much
 lighter weight than threads. The concurrency number is configurable with global
 flag `-j` or `--threads` (default value: 1 for single-CPU PC, 2 for others).
 
@@ -86,12 +69,7 @@ flag `-j` or `--threads` (default value: 1 for single-CPU PC, 2 for others).
 
 Most of the subcommands do not read whole FASTA/Q records in to memory,
 including `stat`, `fq2fa`, `fx2tab`, `tab2fx`, `grep`, `locate`, `replace`,
- `seq`, `sliding`, `subseq`. They just temporarily buffer chunks of records.
-
- However when handling big sequences, e.g. Human genome, the memory is high
- (2-3 GB) even the buffer size is 1.
- This is due to the limitation of garbage collection mechanism in
-  Go programming language, it may be solved in the future.
+ `seq`, `sliding`, `subseq`.
 
 Note that when using `subseq --gtf | --bed`, if the GTF/BED files are too
 big, the memory usage will increase.
@@ -119,7 +97,7 @@ Usage
 ```
 fakit -- a cross-platform and efficient toolkit for FASTA/Q file manipulation
 
-Version: 0.2.7
+Version: 0.2.8
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -1009,24 +987,24 @@ Examples
 
 1. FASTA
 
-    $ fakit head -n 1 hairpin.fa.gz
-    >cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
-    UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
-    UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
+        $ fakit head -n 1 hairpin.fa.gz
+        >cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+        UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
+        UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 
 1. FASTQ
 
-    $ fakit head -n 1 reads_1.fq.gz
-    @HWI-D00523:240:HF3WGBCXX:1:1101:2574:2226 1:N:0:CTGTAG
-    TGAGGAATATTGGTCAATGGGCGCGAGCCTGAACCAGCCAAGTAGCGTGAAGGATGACTG
-    CCCTACGGGTTGTAAACTTCTTTTATAAAGGAATAAAGTGAGGCACGTGTGCCTTTTTGT
-    ATGTACTTTATGAATAAGGATCGGCTAACTCCGTGCCAGCAGCCGCGGTAATACGGAGGA
-    TCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGTGCGCAGGCGGT
-    +
-    HIHIIIIIHIIHGHHIHHIIIIIIIIIIIIIIIHHIIIIIHHIHIIIIIGIHIIIIHHHH
-    HHGHIHIIIIIIIIIIIGHIIIIIGHIIIIHIIHIHHIIIIHIHHIIIIIIIGIIIIIII
-    HIIIIIGHIIIIHIIIH?DGHEEGHIIIIIIIIIIIHIIHIIIHHIIHIHHIHCHHIIHG
-    IHHHHHHH<GG?B@EHDE-BEHHHII5B@GHHF?CGEHHHDHIHIIH
+        $ fakit head -n 1 reads_1.fq.gz
+        @HWI-D00523:240:HF3WGBCXX:1:1101:2574:2226 1:N:0:CTGTAG
+        TGAGGAATATTGGTCAATGGGCGCGAGCCTGAACCAGCCAAGTAGCGTGAAGGATGACTG
+        CCCTACGGGTTGTAAACTTCTTTTATAAAGGAATAAAGTGAGGCACGTGTGCCTTTTTGT
+        ATGTACTTTATGAATAAGGATCGGCTAACTCCGTGCCAGCAGCCGCGGTAATACGGAGGA
+        TCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGTGCGCAGGCGGT
+        +
+        HIHIIIIIHIIHGHHIHHIIIIIIIIIIIIIIIHHIIIIIHHIHIIIIIGIHIIIIHHHH
+        HHGHIHIIIIIIIIIIIGHIIIIIGHIIIIHIIHIHHIIIIHIHHIIIIIIIGIIIIIII
+        HIIIIIGHIIIIHIIIH?DGHEEGHIIIIIIIIIIIHIIHIIIHHIIHIHHIHCHHIIHG
+        IHHHHHHH<GG?B@EHDE-BEHHHII5B@GHHF?CGEHHHDHIHIIH
 
 
 

@@ -19,7 +19,7 @@ for i in $(seq 1 $NCPUs); do
 
     for f in dataset_{A,B}.fa; do
         echo data: $f;
-        memusg -t -H fakit shuffle -2 $f > $f.fakit.shuffle;
+        memusg -t -H fakit shuffle -2 $f -w 0 > $f.fakit.shuffle;
         # fakit stat $f.fakit.rc;
         /bin/rm $f.fakit.shuffle;
     done

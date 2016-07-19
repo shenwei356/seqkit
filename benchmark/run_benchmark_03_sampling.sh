@@ -11,27 +11,27 @@ n2=20
 echo == fakit
 for f in dataset_A.fa; do
     echo data: $f;
-    memusg -t -H fakit sample -2 -n $n  $f > $f.sample.fakit.fa;
+    memusg -t -H fakit sample -2 -n $n $f -w 0 > $f.sample.fakit.fa;
     # fakit stat $f.sample.fakit.fa;
     /bin/rm $f.sample.fakit.fa;
 done
 
 for f in dataset_B.fa; do
     echo data: $f;
-    memusg -t -H fakit sample -2 -n $n2 $f > $f.sample.fakit.fa;
+    memusg -t -H fakit sample -2 -n $n2 $f -w 0 > $f.sample.fakit.fa;
     # fakit stat $f.sample.fakit.fa;
     /bin/rm $f.sample.fakit.fa;
 done
 
 echo == seqmagick
 for f in dataset_A.fa; do
-    echo data: $f; memusg -t -H seqmagick convert --sample $n  $f - > $f.sample.seqmagick.fa;
+    echo data: $f; memusg -t -H seqmagick convert --line-wrap 0 --sample $n  $f - > $f.sample.seqmagick.fa;
     # fakit stat $f.sample.seqmagick.fa;
     /bin/rm $f.sample.seqmagick.fa;
 done
 
 for f in dataset_B.fa; do
-    echo data: $f; memusg -t -H seqmagick convert --sample $n2 $f - > $f.sample.seqmagick.fa;
+    echo data: $f; memusg -t -H seqmagick convert --line-wrap 0 --sample $n2 $f - > $f.sample.seqmagick.fa;
     # fakit stat $f.sample.seqmagick.fa;
     /bin/rm $f.sample.seqmagick.fa;
 done

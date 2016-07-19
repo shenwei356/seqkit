@@ -6,27 +6,27 @@
 
 ## Latest Version
 
-[fakit v0.2.7](https://github.com/shenwei356/fakit/releases/tag/v0.2.7)
+[fakit v0.2.8](https://github.com/shenwei356/fakit/releases/tag/v0.2.8)
 
 #### Links
 
 - **Linux**
-    - [fakit_linux_386.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_linux_386.tar.gz)
-    - [fakit_linux_amd64.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_linux_amd64.tar.gz)
-    - [fakit_linux_arm.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_linux_arm.tar.gz)
+    - [fakit_linux_386.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_linux_386.tar.gz)
+    - [fakit_linux_amd64.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_linux_amd64.tar.gz)
+    - [fakit_linux_arm.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_linux_arm.tar.gz)
 - **Mac OS X**
-    - [fakit_darwin_386.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_darwin_386.tar.gz)
-    - [fakit_darwin_amd64.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_darwin_amd64.tar.gz)
+    - [fakit_darwin_386.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_darwin_386.tar.gz)
+    - [fakit_darwin_amd64.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_darwin_amd64.tar.gz)
 - **Windows**
-    - [fakit_windows_386.exe.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_windows_386.exe.tar.gz)
-    - [fakit_windows_amd64.exe.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_windows_amd64.exe.tar.gz)
+    - [fakit_windows_386.exe.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_windows_386.exe.tar.gz)
+    - [fakit_windows_amd64.exe.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_windows_amd64.exe.tar.gz)
 - **FreeBSD**
-    - [fakit_freebsd_386.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_freebsd_386.tar.gz)
-    - [fakit_freebsd_amd64.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_freebsd_amd64.tar.gz)
-    - [fakit_freebsd_arm.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_freebsd_arm.tar.gz)
+    - [fakit_freebsd_386.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_freebsd_386.tar.gz)
+    - [fakit_freebsd_amd64.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_freebsd_amd64.tar.gz)
+    - [fakit_freebsd_arm.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_freebsd_arm.tar.gz)
 - **OpenBSD**
-    - [fakit_openbsd_386.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_openbsd_386.tar.gz)
-    - [fakit_openbsd_amd64.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.7/fakit_openbsd_amd64.tar.gz)
+    - [fakit_openbsd_386.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_openbsd_386.tar.gz)
+    - [fakit_openbsd_amd64.tar.gz](https://github.com/shenwei356/fakit/releases/download/v0.2.8/fakit_openbsd_amd64.tar.gz)
 
 #### Mirror site for Chinese user
 
@@ -71,6 +71,11 @@ For Go developer, just one command:
 
 ## Release History
 
+- [fakit v0.2.8](https://github.com/shenwei356/fakit/releases/tag/v0.2.8)
+    - improve speed of parsing sequence ID, not using regular expression for default `--id-regexp`
+    - improve speed of record outputing for small-size sequences
+    - fix minor bug: `fakit seq` for blank record
+    - update benchmark result
 - [fakit v0.2.7](https://github.com/shenwei356/fakit/releases/tag/v0.2.7)
     - ***reduce memory usage*** by optimize the outputing of sequences.
       detail: using [`BufferedByteSliceWrapper`](https://godoc.org/github.com/shenwei356/util/byteutil#BufferedByteSliceWrapper) to resuse bytes.Buffer.

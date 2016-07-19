@@ -9,7 +9,7 @@ for g in A B; do echo data: ids_$g.txt; cat ids_$g.txt > /dev/null; done
 echo == fakit
 for g in A B; do
     echo data: dataset_$g.fa;
-    memusg -t -H fakit grep -f ids_$g.txt dataset_$g.fa > ids_$g.txt.fakit.fa;
+    memusg -t -H fakit grep -f ids_$g.txt dataset_$g.fa -w 0 > ids_$g.txt.fakit.fa;
     # fakit stat ids_$g.txt.fakit.fa;
     /bin/rm ids_$g.txt.fakit.fa
 done

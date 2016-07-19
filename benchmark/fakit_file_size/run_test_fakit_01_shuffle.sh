@@ -12,7 +12,7 @@ for i in 1 2 4 8 16 32; do
     fi;
     
     echo data: $f;
-    memusg -t -H fakit shuffle -2 $f > $f.fakit.shuffle;
+    memusg -t -H fakit shuffle -2 $f -w 0 > $f.fakit.shuffle;
     # fakit stat $f.fakit.rc;
     /bin/rm $f.fakit.shuffle;
 
