@@ -1,6 +1,6 @@
 # Benchmark
 
-Datasets and results are described at [http://shenwei356.github.io/faskit/benchmark](http://shenwei356.github.io/faskit/benchmark)
+Datasets and results are described at [http://shenwei356.github.io/seqkit/benchmark](http://shenwei356.github.io/seqkit/benchmark)
 
 ***The benchmark needs be performed in Linux-like operating systems.***
 
@@ -8,8 +8,8 @@ Datasets and results are described at [http://shenwei356.github.io/faskit/benchm
 
 Softwares
 
-1. [faskit](https://github.com/shenwei356/faskit). (Go).
-   Version [v0.2.8](https://github.com/shenwei356/faskit/releases/tag/v0.2.8).
+1. [seqkit](https://github.com/shenwei356/seqkit). (Go).
+   Version [v0.2.8](https://github.com/shenwei356/seqkit/releases/tag/v0.2.8).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    Lots of dependencies to install_.
@@ -43,24 +43,24 @@ The edited code is
 
 ## Clone this repository
 
-    git clone https://github.com/shenwei356/faskit
-    cd faskit/benchmark
+    git clone https://github.com/shenwei356/seqkit
+    cd seqkit/benchmark
 
 ## Data preparation
 
-[http://shenwei356.github.io/faskit/benchmark/#datasets](http://shenwei356.github.io/faskit/benchmark/#datasets)
+[http://shenwei356.github.io/seqkit/benchmark/#datasets](http://shenwei356.github.io/seqkit/benchmark/#datasets)
 
-Or download all test data [faskit-benchmark-data.tar.gz](http://bioinf.shenwei.me/data/faskit-benchmark-data.tar.gz)
- (1.7G) and uncompress it, and then move them into directory `faskit/benchmark`
+Or download all test data [seqkit-benchmark-data.tar.gz](http://bioinf.shenwei.me/data/seqkit-benchmark-data.tar.gz)
+ (1.7G) and uncompress it, and then move them into directory `seqkit/benchmark`
 
     wget ***
-    tar -zxvf faskit-benchmark-data.tar.gz
-    mv faskit-benchmark-data/* faskit/benchmark
+    tar -zxvf seqkit-benchmark-data.tar.gz
+    mv seqkit-benchmark-data/* seqkit/benchmark
 
 ## Run tests
 
 A Perl scripts
-[`run.pl`](https://github.com/shenwei356/faskit/blob/master/benchmark/run_benchmark_00_all.pl)
+[`run.pl`](https://github.com/shenwei356/seqkit/blob/master/benchmark/run_benchmark_00_all.pl)
 is used to automatically running tests and generate data for plotting.
 
 ```
@@ -86,9 +86,9 @@ To compare performance between different softwares, run:
 
 It costed ~50min for me.
 
-To test performance of other functions in faskit, run:
+To test performance of other functions in seqkit, run:
 
-    ./run.pl run_test*.sh -n 1 -o benchmark.faskit.csv
+    ./run.pl run_test*.sh -n 1 -o benchmark.seqkit.csv
 
 ## Plot result
 
@@ -98,6 +98,6 @@ Plot for result of the five tests:
 
     ./plot.R -i benchmark.5tests.csv
 
-Plot for result of the tests of other functions in faskit:
+Plot for result of the tests of other functions in seqkit:
 
-    ./plot.R -i benchmark.faskit.csv --width 5 --height 3
+    ./plot.R -i benchmark.seqkit.csv --width 5 --height 3

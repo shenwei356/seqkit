@@ -25,7 +25,7 @@ _testmain.go
 *.directory
 doc/site/*
 *.Rhistory
-faskit/faskit*
+seqkit/seqkit*
 TODO.md
 benchmark/.Rhistory
-faskit/binaries*
+seqkit/binaries*

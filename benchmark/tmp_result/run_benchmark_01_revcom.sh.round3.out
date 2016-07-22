@@ -3,7 +3,7 @@ Output sequences of all apps are not wrapped to fixed length.
 warm-up
 data: dataset_A.fa
 data: dataset_B.fa
-== faskit
+== seqkit
 data: dataset_A.fa
 
 elapsed time: 18.091

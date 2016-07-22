@@ -3,11 +3,11 @@
 ## Some manipulations on big genomes
 
 A script [memusg](https://github.com/shenwei356/memusg) is
-used to check the peek memory usage of faskit. Usage: `memusg [-t] command`.
+used to check the peek memory usage of seqkit. Usage: `memusg [-t] command`.
 
 1. Human genome
 
-        $ faskit stat hsa.fa
+        $ seqkit stat hsa.fa
         file     seq_format   seq_type   num_seqs   min_len        avg_len       max_len
         hsa.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
 
@@ -17,17 +17,17 @@ used to check the peek memory usage of faskit. Usage: `memusg [-t] command`.
    when input files are (plain or gzipped) FASTA files or stdin,
    FASTA index would be optional used for
    rapid acccess of sequences and reducing memory occupation.
-   ***ATTENTION***: the `.faskit.fai` file created by faskit is a little different from .fai file
-   created by samtools. faskit uses full sequence head instead of just ID as key.
+   ***ATTENTION***: the `.seqkit.fai` file created by seqkit is a little different from .fai file
+   created by samtools. seqkit uses full sequence head instead of just ID as key.
 
-        $ memusg -t faskit faidx --id-regexp "^(.+)$"  hsa.fa -o hsa.fa.faskit.fai
+        $ memusg -t seqkit faidx --id-regexp "^(.+)$"  hsa.fa -o hsa.fa.seqkit.fai
 
         elapsed time: 10.011s
         peak rss: 177.21 MB
 
     Create common .fai file:
 
-        $ memusg -t faskit faidx hsa.fa -o hsa.fa.fai2
+        $ memusg -t seqkit faidx hsa.fa -o hsa.fa.fai2
 
         elapsed time: 10.454s
         peak rss: 172.82 MB
@@ -48,7 +48,7 @@ used to check the peek memory usage of faskit. Usage: `memusg [-t] command`.
 
 1. Sorting by sequence length
 
-        $ memusg -t faskit sort --by-length --reverse --two-pass hsa.fa > hsa.sorted.fa
+        $ memusg -t seqkit sort --by-length --reverse --two-pass hsa.fa > hsa.sorted.fa
         [INFO] create and read FASTA index ...
         [INFO] read sequence IDs and lengths from FASTA index ...
         [INFO] 194 sequences loaded
@@ -60,7 +60,7 @@ used to check the peek memory usage of faskit. Usage: `memusg [-t] command`.
 
     Detail:
 
-        $ faskit fx2tab --length hsa.sorted.fa --name --only-id | cut -f 1,4 | more
+        $ seqkit fx2tab --length hsa.sorted.fa --name --only-id | cut -f 1,4 | more
         1       248956422
         2       242193529
         3       198295559
@@ -95,7 +95,7 @@ used to check the peek memory usage of faskit. Usage: `memusg [-t] command`.
 
 1. Shuffling sequences
 
-        $ memusg -t faskit shuffle hsa.fa --two-pass > hsa.shuffled.fa
+        $ memusg -t seqkit shuffle hsa.fa --two-pass > hsa.shuffled.fa
         [INFO] create and read FASTA index ...
         [INFO] read sequence IDs from FASTA index ...
         [INFO] 194 sequences loaded
@@ -108,7 +108,7 @@ used to check the peek memory usage of faskit. Usage: `memusg [-t] command`.
 
 1. Spliting into files with single sequence
 
-        $ memusg -t faskit split --by-id hsa.fa --two-pass
+        $ memusg -t seqkit split --by-id hsa.fa --two-pass
         [INFO] split by ID. idRegexp: ^([^\s]+)\s?
         [INFO] create and read FASTA index ...
         [INFO] read sequence IDs from FASTA index ...
@@ -125,7 +125,7 @@ used to check the peek memory usage of faskit. Usage: `memusg [-t] command`.
 
 1. Geting subsequence of some chromesomes
 
-        $ memusg -t faskit subseq -r 1:10 --chr X --chr Y  hsa.fa
+        $ memusg -t seqkit subseq -r 1:10 --chr X --chr Y  hsa.fa
         >X_1-10 X dna_sm:chromosome chromosome:GRCh38:X:1:156040895:1 REF
         nnnnnnnnnn
         >Y_1-10 Y dna_sm:chromosome chromosome:GRCh38:Y:2781480:56887902:1 REF
@@ -137,7 +137,7 @@ used to check the peek memory usage of faskit. Usage: `memusg [-t] command`.
 
 1. Geting CDS sequence of chr 1 by GTF files
 
-        $ memusg -t faskit subseq --gtf Homo_sapiens.GRCh38.84.gtf.gz --chr X --feature cds  hsa.fa > chrX.gtf.cds.fa
+        $ memusg -t seqkit subseq --gtf Homo_sapiens.GRCh38.84.gtf.gz --chr X --feature cds  hsa.fa > chrX.gtf.cds.fa
         [INFO] read GTF file ...
         [INFO] 22420 GTF features loaded
 
@@ -158,10 +158,10 @@ used to check the peek memory usage of faskit. Usage: `memusg [-t] command`.
 
 1. Remove contaminated reads
 
-        $ faskit grep -f contaminate.list -v reads_1.fq.gz -o reads_1.clean.fq.gz
-        $ faskit grep -f contaminate.list -v reads_2.fq.gz -o reads_2.clean.fq.gz
+        $ seqkit grep -f contaminate.list -v reads_1.fq.gz -o reads_1.clean.fq.gz
+        $ seqkit grep -f contaminate.list -v reads_2.fq.gz -o reads_2.clean.fq.gz
 
-        $ faskit stat *.fq.gz
+        $ seqkit stat *.fq.gz
         file                  seq_format   seq_type   num_seqs   min_len   avg_len   max_len
         reads_1.clean.fq.gz   FASTQ        DNA           2,256       226       227       229
         reads_1.fq.gz         FASTQ        DNA           2,500       226       227       229
@@ -190,7 +190,7 @@ used to check the peek memory usage of faskit. Usage: `memusg [-t] command`.
 
 1. Convert FASTA format to tabular format.
 
-        $ faskit fx2tab seqs.msa.fa
+        $ seqkit fx2tab seqs.msa.fa
         seq1    ACAACGTCTACTTACGTTGCAT----CGTCATGCTGCATTACGTAGTCTGATGATG
         seq2    ---------------ACACCGTCTACTTTCATGCTGCATTACGTAGTCTGATGATG
         seq3    ACAACGTCTACTTACGTTGCATCGTCATGCTGCACTGATGATG-------------
@@ -198,7 +198,7 @@ used to check the peek memory usage of faskit. Usage: `memusg [-t] command`.
 
     or
 
-        $ faskit fx2tab seqs.msa.fa | cut -f 2
+        $ seqkit fx2tab seqs.msa.fa | cut -f 2
         ACAACGTCTACTTACGTTGCAT----CGTCATGCTGCATTACGTAGTCTGATGATG
         ---------------ACACCGTCTACTTTCATGCTGCATTACGTAGTCTGATGATG
         ACAACGTCTACTTACGTTGCATCGTCATGCTGCACTGATGATG-------------
@@ -210,7 +210,7 @@ used to check the peek memory usage of faskit. Usage: `memusg [-t] command`.
 
 1. Remove gaps
 
-        $ faskit seq seqs.msa.fa -g
+        $ seqkit seq seqs.msa.fa -g
         >seq1
         ACAACGTCTACTTACGTTGCATCGTCATGCTGCATTACGTAGTCTGATGATG
         >seq2
@@ -234,13 +234,13 @@ from [The miRBase Sequence Database -- Release 21](ftp://mirbase.org/pub/mirbase
 
 1. Sequence number
 
-        $ faskit stat hairpin.fa.gz
+        $ seqkit stat hairpin.fa.gz
         file             seq_type    num_seqs    min_len    avg_len    max_len
         hairpin.fa.gz         RNA      28,645         39        103      2,354
 
 1. First 10 bases
 
-        $ zcat hairpin.fa.gz | faskit subseq -r 1:10 | faskit sort -s | faskit seq -s | head -n 10
+        $ zcat hairpin.fa.gz | seqkit subseq -r 1:10 | seqkit sort -s | seqkit seq -s | head -n 10
         AAAAAAAAAA
         AAAAAAAAAA
         AAAAAAAAAG
@@ -258,13 +258,13 @@ from [The miRBase Sequence Database -- Release 21](ftp://mirbase.org/pub/mirbase
 ### Repeated hairpin sequences
 
 We may want to check how may identical hairpins among different species there are.
-`faskit rmdup` could remove duplicated sequences by sequence content,
+`seqkit rmdup` could remove duplicated sequences by sequence content,
 and save the replicates to another file (here is `duplicated.fa.gz`),
 as well as replicating details (`duplicated.detail.txt`,
 1th column is the repeated number,
 2nd column contains sequence IDs seperated by comma).
 
-    $ faskit rmdup -s -i hairpin.fa.gz -o clean.fa.gz -d duplicated.fa.gz -D duplicated.detail.txt
+    $ seqkit rmdup -s -i hairpin.fa.gz -o clean.fa.gz -d duplicated.fa.gz -D duplicated.detail.txt
 
     $ head -n 5 duplicated.detail.txt
     18      dre-mir-430c-1, dre-mir-430c-2, dre-mir-430c-3, dre-mir-430c-4, dre-mir-430c-5, dre-mir-430c-6, dre-mir-430c-7, dre-mir-430c-8, dre-mir-430c-9, dre-mir-430c-10, dre-mir-430c-11, dre-mir-430c-12, dre-mir-430c-13, dre-mir-430c-14, dre-mir-430c-15, dre-mir-430c-16, dre-mir-430c-17, dre-mir-430c-18
@@ -281,7 +281,7 @@ And the `dre-miR-430c` has the most multicopies in *Danio rerio*.
 
 1. Before spliting by species, let's take a look at the sequence names.
 
-        $ faskit seq hairpin.fa.gz -n | head -n 3
+        $ seqkit seq hairpin.fa.gz -n | head -n 3
         cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
         cel-lin-4 MI0000002 Caenorhabditis elegans lin-4 stem-loop
         cel-mir-1 MI0000003 Caenorhabditis elegans miR-1 stem-loop
@@ -290,7 +290,7 @@ And the `dre-miR-430c` has the most multicopies in *Danio rerio*.
     So we could split hairpins by the first letters by defining custom
     sequence ID parsing regular expression `^([\w]+)\-`.
 
-    By default, `faskit` takes the first non-space letters as sequence ID.
+    By default, `seqkit` takes the first non-space letters as sequence ID.
     For example,
 
     |   FASTA head                                                  |     ID                                            |
@@ -308,13 +308,13 @@ And the `dre-miR-430c` has the most multicopies in *Danio rerio*.
 1. Split sequences by species.
 A custom ID parsing regular expression is used, `^([\w]+)\-`.
 
-        $ faskit split hairpin.fa.gz -i --id-regexp "^([\w]+)\-" --two-pass
+        $ seqkit split hairpin.fa.gz -i --id-regexp "^([\w]+)\-" --two-pass
 
     ***To reduce memory usage when spliting big file, we should alwasy use flag `--two-pass`***
 
 2. Species with most miRNA hairpins. Third column is the sequences number.
 
-        $ faskit stat hairpin.id_*.gz | csvtk space2tab | csvtk -t sort -k num_seqs:nr | csvtk -t pretty| more
+        $ seqkit stat hairpin.id_*.gz | csvtk space2tab | csvtk -t sort -k num_seqs:nr | csvtk -t pretty| more
         file                     seq_format   seq_type   num_seqs   min_len   avg_len   max_len
         hairpin.id_hsa.fa.gz     FASTA        RNA        1,881      41        81.9      180
         hairpin.id_mmu.fa.gz     FASTA        RNA        1,193      39        83.4      147
@@ -329,11 +329,11 @@ A custom ID parsing regular expression is used, `^([\w]+)\-`.
 For human miRNA hairpins
 
 1. Length distribution.
- `faskit fx2tab` could show extra information like sequence length, GC content.
+ `seqkit fx2tab` could show extra information like sequence length, GC content.
  A distribution ploting script is used, (
  [plot_distribution.py](https://github.com/shenwei356/bio_scripts/blob/master/plot/plot_distribution.py) )
 
-        $ faskit fx2tab hairpin.id_hsa.fa.gz -l | cut -f 3  | plot_distribution.py -o hairpin.id_hsa.fa.gz.lendist.png
+        $ seqkit fx2tab hairpin.id_hsa.fa.gz -l | cut -f 3  | plot_distribution.py -o hairpin.id_hsa.fa.gz.lendist.png
 
     ![hairpin.id_hsa.fa.gz.lendist.png](/files/hairpin/hairpin.id_hsa.fa.gz.lendist.png)
 
@@ -366,15 +366,15 @@ Motifs
   By the way, do not be scared by the long flag `--circle-genome`, `--step`
   and so on. They have short ones, `-c`, `-s`
 
-        $ faskit sliding --id-ncbi --circle-genome --step 20000 --window 200000 PAO1.fasta -o PAO1.fasta.sliding.fa
+        $ seqkit sliding --id-ncbi --circle-genome --step 20000 --window 200000 PAO1.fasta -o PAO1.fasta.sliding.fa
 
-        $ faskit stat PAO1.fasta.sliding.fa
+        $ seqkit stat PAO1.fasta.sliding.fa
         file                     seq_type    num_seqs    min_len    avg_len    max_len
         PAO1.fasta.sliding.fa         DNA         314    200,000    200,000    200,000
 
 1. Locating motifs
 
-        $ faskit locate --id-ncbi --ignore-case --degenerate --pattern-file motifs.fa  PAO1.fasta.sliding.fa -o  PAO1.fasta.sliding.fa.motifs.tsv
+        $ seqkit locate --id-ncbi --ignore-case --degenerate --pattern-file motifs.fa  PAO1.fasta.sliding.fa -o  PAO1.fasta.sliding.fa.motifs.tsv
 
 1. Ploting distribution ([plot_motif_distribution.R](/files/PAO1/plot_motif_distribution.R))
 
@@ -393,9 +393,9 @@ Motifs
 
 1. Get all CDS sequences
 
-        $ faskit subseq --id-ncbi --gtf PAO1.gtf --feature cds PAO1.fasta -o PAO1.cds.fasta
+        $ seqkit subseq --id-ncbi --gtf PAO1.gtf --feature cds PAO1.fasta -o PAO1.cds.fasta
 
-        $ faskit stat *.fasta
+        $ seqkit stat *.fasta
         file              seq_type    num_seqs      min_len      avg_len      max_len
         PAO1.cds.fasta         DNA       5,572           72      1,003.8       16,884
         PAO1.fasta             DNA           1    6,264,404    6,264,404    6,264,404
@@ -403,7 +403,7 @@ Motifs
 
 1. Get duplicated sequences
 
-        $ faskit rmdup --by-seq --ignore-case PAO1.cds.fasta -o PAO1.cds.uniq.fasta --dup-seqs-file PAO1.cds.dup.fasta --dup-num-file PAO1.cds.dup.text
+        $ seqkit rmdup --by-seq --ignore-case PAO1.cds.fasta -o PAO1.cds.uniq.fasta --dup-seqs-file PAO1.cds.dup.fasta --dup-num-file PAO1.cds.dup.text
 
         $ cat PAO1.cds.dup.text
         6       NC_002516.2_500104:501120:-, NC_002516.2_2556948:2557964:+, NC_002516.2_3043750:3044766:-, NC_002516.2_3842274:3843290:-, NC_002516.2_4473623:4474639:+, NC_002516.2_5382796:5383812:-
@@ -415,11 +415,11 @@ Motifs
 
 1. Get CDS and 1000 bp upstream sequence
 
-        $ faskit subseq --id-ncbi --gtf PAO1.gtf --feature cds PAO1.fasta --up-stream 1000
+        $ seqkit subseq --id-ncbi --gtf PAO1.gtf --feature cds PAO1.fasta --up-stream 1000
 
 1. Get 1000 bp upstream sequence of CDS, *NOT* including CDS.
 
-        $ faskit subseq --id-ncbi --gtf PAO1.gtf --feature cds PAO1.fasta --up-stream 1000 --only-flank
+        $ seqkit subseq --id-ncbi --gtf PAO1.gtf --feature cds PAO1.fasta --up-stream 1000 --only-flank
 
 <div id="disqus_thread"></div>
 <script>

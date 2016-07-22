@@ -1,15 +1,15 @@
-# faskit - a cross-platform and efficient toolkit for FASTA/Q file manipulation
+# seqkit - a cross-platform and efficient toolkit for FASTA/Q file manipulation
 
 
-Documents: [http://shenwei356.github.io/faskit](http://shenwei356.github.io/faskit)
+Documents: [http://shenwei356.github.io/seqkit](http://shenwei356.github.io/seqkit)
 
-Source code: [https://github.com/shenwei356/faskit](https://github.com/shenwei356/faskit)
+Source code: [https://github.com/shenwei356/seqkit](https://github.com/shenwei356/seqkit)
 
-Latest version: [![Latest Version](https://img.shields.io/github/release/shenwei356/faskit.svg?style=flat)](https://github.com/shenwei356/faskit/releases)
+Latest version: [![Latest Version](https://img.shields.io/github/release/shenwei356/seqkit.svg?style=flat)](https://github.com/shenwei356/seqkit/releases)
 
 ## About the name
 
-Originally, `faskit` (abbreviation of `FASTA kit`) was designed to handle FASTA
+Originally, `seqkit` (abbreviation of `FASTA kit`) was designed to handle FASTA
 format. And the name was remained after adding ***seamless support for FASTA/Q fromat***.
 
 ## Introduction
@@ -22,7 +22,7 @@ and some of them are only available for specific operating systems.
 Furthermore, the complicated installation process of dependencies packages and
 running environment also make them less friendly to common users.
 
-faskit is a cross-platform, efficient, and practical FASTA/Q manipulations tool
+seqkit is a cross-platform, efficient, and practical FASTA/Q manipulations tool
 that is friendly for researchers to complete wide ranges of FASTA file processing.
 The toolkit supports plain or gzip-compressed input and output
 from either standard stream or files,
@@ -31,15 +31,15 @@ therefore, it could be easily used in command-line pipe.
 ## Features
 
 - **Cross-platform** (Linux/Windows/Mac OS X/OpenBSD/FreeBSD,
-  see [download](http://shenwei356.github.io/faskit/download/))
+  see [download](http://shenwei356.github.io/seqkit/download/))
 - **Light weight and out-of-the-box, no dependencies, no compilation, no configuration**
-  (see [download](http://shenwei356.github.io/faskit/download/))
+  (see [download](http://shenwei356.github.io/seqkit/download/))
 - **Fast** (see [benchmark](/#benchmark)),
   **multiple-CPUs supported**.
 - **Practical functions supported by 20 subcommands** (see subcommands and
-  [usage](http://shenwei356.github.io/faskit/usage/) )
-- **Well documented** (detailed [usage](http://shenwei356.github.io/faskit/usage/)
-  and [benchmark](http://shenwei356.github.io/faskit/benchmark/) )
+  [usage](http://shenwei356.github.io/seqkit/usage/) )
+- **Well documented** (detailed [usage](http://shenwei356.github.io/seqkit/usage/)
+  and [benchmark](http://shenwei356.github.io/seqkit/benchmark/) )
 - **Seamlessly parses both FASTA and FASTQ formats**
 - **Support STDIN and gziped input/output file, easy being used in pipe**
 - **Support custom sequence ID regular expression** (especially useful for quering with ID list)
@@ -48,7 +48,7 @@ therefore, it could be easily used in command-line pipe.
 
 **Features comparison**
 
-Features         | faskit   | fasta_utilities | fastx_toolkit | pyfaidx | seqmagick | seqtk
+Features         | seqkit   | fasta_utilities | fastx_toolkit | pyfaidx | seqmagick | seqtk
 :--------------- | :------: | :-------------: | :-----------: | :-----: | :-------: | :----
 Cross-platform   | Yes      | Partly          | Partly        | Yes     | Yes       | Yes
 Mutli-line FASTA | Yes      | Yes             | --            | Yes     | Yes       | Yes
@@ -77,31 +77,31 @@ Rename head      | Yes      | Yes             | --            | --      | Yes   
 
 # Installation
 
-[Download Page](http://shenwei356.github.io/faskit/downlaod)
+[Download Page](http://shenwei356.github.io/seqkit/downlaod)
 
-`faskit` is implemented in [Golang](https://golang.org/) programming language,
+`seqkit` is implemented in [Golang](https://golang.org/) programming language,
  executable binary files **for most popular operating systems** are freely available
-  in [release](https://github.com/shenwei356/faskit/releases) page.
+  in [release](https://github.com/shenwei356/seqkit/releases) page.
 
-Just [download](https://github.com/shenwei356/faskit/releases) compressed
+Just [download](https://github.com/shenwei356/seqkit/releases) compressed
 executable file of your operating system, and uncompress it with `tar -zxvf *.tar.gz` command.
 
 You can add the directory of the executable file to environment variable
-`PATH`, so you can run `faskit` anywhere.
+`PATH`, so you can run `seqkit` anywhere.
 
 
 1. For windows, the simplest way is copy it to `C:\WINDOWS\system32`.
 
 2. For Linux, type:
 
-        chmod a+x /PATH/OF/FAKIT/faskit
-        echo export PATH=\$PATH:/PATH/OF/faskit >> ~/.bashrc
+        chmod a+x /PATH/OF/FAKIT/seqkit
+        echo export PATH=\$PATH:/PATH/OF/seqkit >> ~/.bashrc
 
     or simply copy it to `/usr/local/bin`
 
 For Go developer, just one command:
 
-    go get -u github.com/shenwei356/faskit/faskit
+    go get -u github.com/shenwei356/seqkit/seqkit
 
 ## Subcommands
 
@@ -153,7 +153,7 @@ For Go developer, just one command:
 
 ### FASTA/Q format parsing
 
-faskit uses author's lightweight and high-performance bioinformatics packages
+seqkit uses author's lightweight and high-performance bioinformatics packages
 [bio](https://github.com/shenwei356/bio) for FASTA/Q parsing，
 which has [high performance](https://github.com/shenwei356/bio#compare-to-kseqh-klib)
 close to the
@@ -161,7 +161,7 @@ famous C lib [kseq.h](https://github.com/attractivechaos/klib/blob/master/kseq.h
 
 ### Sequence formats and types
 
-faskit seamlessly support FASTA and FASTQ format.
+seqkit seamlessly support FASTA and FASTQ format.
 All subcommands except for `faidx` can handle both formats.
 And only when some commands (`subseq`, `split`, `sort` and `shuffle`)
 which utilise FASTA index to improve perfrmance for large files in two pass mode
@@ -177,7 +177,7 @@ be checked.
 
 ### Sequence ID
 
-By default, most softwares, including `faskit`, takes the first non-space
+By default, most softwares, including `seqkit`, takes the first non-space
 letters as sequence ID. For example,
 
 |   FASTA head                                                  |     ID                                            |
@@ -199,8 +199,8 @@ when input files are (plain or gzipped) FASTA files,
 FASTA index would be optional used for
 rapid access of sequences and reducing memory occupation.
 
-ATTENTION: the `.faskit.fai` file created by faskit is a little different from .fai file
-created by samtools. faskit uses full sequence head instead of just ID as key.
+ATTENTION: the `.seqkit.fai` file created by seqkit is a little different from .fai file
+created by samtools. seqkit uses full sequence head instead of just ID as key.
 
 ### Parallelization of CPU intensive jobs
 
@@ -241,38 +241,38 @@ reproduced in different environments with same random seed.
 
 ## Usage && Examples
 
-[Usage and examples](http://shenwei356.github.io/faskit/usage/)
+[Usage and examples](http://shenwei356.github.io/seqkit/usage/)
 
-[Tutorial](http://shenwei356.github.io/faskit/tutorial/)
+[Tutorial](http://shenwei356.github.io/seqkit/tutorial/)
 
 ## Benchmark
 
-More details: [http://shenwei356.github.io/faskit/benchmark/](http://shenwei356.github.io/faskit/benchmark/)
+More details: [http://shenwei356.github.io/seqkit/benchmark/](http://shenwei356.github.io/seqkit/benchmark/)
 
 Datasets:
 
-    $ faskit stat *.fa
+    $ seqkit stat *.fa
     file           seq_format   seq_type   num_seqs   min_len        avg_len       max_len
     dataset_A.fa   FASTA        DNA          67,748        56       41,442.5     5,976,145                  
     dataset_B.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
 
-faskit version: v0.2.8
+seqkit version: v0.2.8
 
 ![benchmark-5tests.csv.png](benchmark/benchmark.5tests.csv.png)
 
 
 ## Citation
 
-**W Shen**, S Le, Y Li\*, F Hu\*. faskit: a cross-platform and efficient toolkit for FASTA/Q file manipulation.
+**W Shen**, S Le, Y Li\*, F Hu\*. seqkit: a cross-platform and efficient toolkit for FASTA/Q file manipulation.
 ***PLOS ONE***. revised.
 
 ## Contact
 
-Email me for any problem when using faskit. shenwei356(at)gmail.com
+Email me for any problem when using seqkit. shenwei356(at)gmail.com
 
-[Create an issue](https://github.com/shenwei356/faskit/issues) to report bugs,
+[Create an issue](https://github.com/shenwei356/seqkit/issues) to report bugs,
 propose new functions or ask for help.
 
 ## License
 
-[MIT License](https://github.com/shenwei356/faskit/blob/master/LICENSE)
+[MIT License](https://github.com/shenwei356/seqkit/blob/master/LICENSE)

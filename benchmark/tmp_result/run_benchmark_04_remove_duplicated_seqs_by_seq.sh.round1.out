@@ -2,7 +2,7 @@ Test: D) Removing duplicates by seq
 warm-up
 data: dataset_A.fa
 data: dataset_B.fa
-== faskit
+== seqkit
 data: dataset_A.fa
 [INFO][0m 12351 duplicated records removed
 

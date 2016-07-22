@@ -1,6 +1,6 @@
 Test: E) Subsequence with BED file
 warm-up
-== faskit
+== seqkit
 data: dataset_B.fa
 [INFO][0m read BED file ...
 [INFO][0m 162980 BED features loaded

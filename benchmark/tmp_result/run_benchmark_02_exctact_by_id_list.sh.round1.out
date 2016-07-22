@@ -4,7 +4,7 @@ data: dataset_A.fa
 data: dataset_B.fa
 data: ids_A.txt
 data: ids_B.txt
-== faskit
+== seqkit
 data: dataset_A.fa
 
 elapsed time: 4.141
