@@ -180,29 +180,29 @@
 <h2 id="technical-details-and-guides-for-use">Technical details and guides for use</h2>
 <h3 id="fastaq-format-parsing">FASTA/Q format parsing</h3>
 <p>seqkit uses author's lightweight and high-performance bioinformatics packages
-<a href="https://github.com/shenwei356/bio">bio</a> for FASTA/Q parsing，
+<a href="https://github.com/shenwei356/bio">bio</a> for FASTA/Q parsing,
 which has <a href="https://github.com/shenwei356/bio#compare-to-kseqh-klib">high performance</a>
 close to the
 famous C lib <a href="https://github.com/attractivechaos/klib/blob/master/kseq.h">kseq.h</a>.</p>
 <h3 id="sequence-formats-and-types">Sequence formats and types</h3>
-<p>seqkit seamlessly support FASTA and FASTQ format.
+<p>seqkit seamlessly support FASTA and FASTQ format. 
+Sequence format is automatically detected.
 All subcommands except for <code>faidx</code> can handle both formats.
 And only when some commands (<code>subseq</code>, <code>split</code>, <code>sort</code> and <code>shuffle</code>)
 which utilise FASTA index to improve perfrmance for large files in two pass mode
 (by flag <code>--two-pass</code>), only FASTA format is supported.</p>
-<p>Sequence format is automatically detected.</p>
 <p>Sequence type (DNA/RNA/Protein) is automatically detected by leading subsequences
 of the first sequences in file or STDIN. The length of the leading subsequences
 is configurable by global flag <code>--alphabet-guess-seq-length</code> with default value
 of 10000. If length of the sequences is less than that, whole sequences will
 be checked.</p>
 <h3 id="sequence-id">Sequence ID</h3>
-<p>By default, most softwares, including <code>seqkit</code>, takes the first non-space
-letters as sequence ID. For example,</p>
+<p>By default, most softwares, including <code>seqkit</code>, take the leading non-space
+letters as sequence identifier (ID). For example,</p>
 <table>
 <thead>
 <tr>
-<th align="left">FASTA head</th>
+<th align="left">FASTA header</th>
 <th align="left">ID</th>
 </tr>
 </thead>
@@ -231,8 +231,8 @@ the <code>gi</code> number, then use <code>--id-regexp "^gi\|([^\|]+)\|"</code>.
 when input files are (plain or gzipped) FASTA files,
 FASTA index would be optional used for
 rapid access of sequences and reducing memory occupation.</p>
-<p>ATTENTION: the <code>.seqkit.fai</code> file created by seqkit is a little different from .fai file
-created by samtools. seqkit uses full sequence head instead of just ID as key.</p>
+<p>ATTENTION: the <code>.seqkit.fai</code> file created by seqkit is a little different from <code>.fai</code> file
+created by <code>samtools</code>. seqkit uses full sequence head instead of just ID as key.</p>
 <h3 id="parallelization-of-cpu-intensive-jobs">Parallelization of CPU intensive jobs</h3>
 <p>The validation of sequences bases and complement process of sequences
 are parallelized for large sequences.</p>

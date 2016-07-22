@@ -135,14 +135,11 @@
     
         <li class="main active"><a href="#seqkit-a-cross-platform-and-efficient-toolkit-for-fastaq-file-manipulation">seqkit - a cross-platform and efficient toolkit for FASTA/Q file manipulation</a></li>
         
-            <li><a href="#about-the-name">About the name</a></li>
-        
             <li><a href="#introduction">Introduction</a></li>
         
             <li><a href="#features">Features</a></li>
         
-    
-        <li class="main "><a href="#installation">Installation</a></li>
+            <li><a href="#installation">Installation</a></li>
         
             <li><a href="#subcommands">Subcommands</a></li>
         
@@ -167,9 +164,6 @@
 <p>Documents: <a href="http://shenwei356.github.io/seqkit">http://shenwei356.github.io/seqkit</a></p>
 <p>Source code: <a href="https://github.com/shenwei356/seqkit">https://github.com/shenwei356/seqkit</a></p>
 <p>Latest version: <a href="https://github.com/shenwei356/seqkit/releases"><img alt="Latest Version" src="https://img.shields.io/github/release/shenwei356/seqkit.svg?style=flat" /></a></p>
-<h2 id="about-the-name">About the name</h2>
-<p>Originally, <code>seqkit</code> (abbreviation of <code>FASTA kit</code>) was designed to handle FASTA
-format. And the name was remained after adding <strong><em>seamless support for FASTA/Q fromat</em></strong>.</p>
 <h2 id="introduction">Introduction</h2>
 <p>FASTA and FASTQ are basic formats for storing nucleotide and protein sequences.
 The manipulations of FASTA/Q file include converting, clipping, searching,
@@ -189,7 +183,7 @@ therefore, it could be easily used in command-line pipe.</p>
   see <a href="http://shenwei356.github.io/seqkit/download/">download</a>)</li>
 <li><strong>Light weight and out-of-the-box, no dependencies, no compilation, no configuration</strong>
   (see <a href="http://shenwei356.github.io/seqkit/download/">download</a>)</li>
-<li><strong>Fast</strong> (see <a href="./#benchmark">benchmark</a>),
+<li><strong>Very Fast</strong> (see <a href="./#benchmark">benchmark</a>),
   <strong>multiple-CPUs supported</strong>.</li>
 <li><strong>Practical functions supported by 20 subcommands</strong> (see subcommands and
   <a href="http://shenwei356.github.io/seqkit/usage/">usage</a> )</li>
@@ -197,244 +191,271 @@ therefore, it could be easily used in command-line pipe.</p>
   and <a href="http://shenwei356.github.io/seqkit/benchmark/">benchmark</a> )</li>
 <li><strong>Seamlessly parses both FASTA and FASTQ formats</strong></li>
 <li><strong>Support STDIN and gziped input/output file, easy being used in pipe</strong></li>
-<li><strong>Support custom sequence ID regular expression</strong> (especially useful for quering with ID list)</li>
+<li><strong>Support custom sequence ID regular expression</strong> (especially useful for searching with ID list)</li>
 <li>Reproducible results (configurable rand seed in <code>sample</code> and <code>shuffle</code>)</li>
 <li>Well organized source code, friendly to use and easy to extend.</li>
 </ul>
-<p><strong>Features comparison</strong></p>
+<h3 id="features-comparison">Features comparison</h3>
 <table>
 <thead>
 <tr>
+<th align="left">Categories</th>
 <th align="left">Features</th>
-<th>seqkit</th>
-<th>fasta_utilities</th>
-<th>fastx_toolkit</th>
-<th>pyfaidx</th>
-<th>seqmagick</th>
-<th>seqtk</th>
+<th align="center">seqkit</th>
+<th align="center">fasta_utilities</th>
+<th align="center">fastx_toolkit</th>
+<th align="center">pyfaidx</th>
+<th align="center">seqmagick</th>
+<th align="center">seqtk</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td align="left"><strong>Formats supports</strong></td>
+<td align="left">Multi-line FASTA</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">FASTQ</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Multi-line  FASTQ</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Validating sequences</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Supporting RNA</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="left"><strong>Functions</strong></td>
+<td align="left">Searching by motifs</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Sampling</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Extracting sub-sequence</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Removing duplicates</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Partly</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Splitting</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Partly</td>
+<td align="center">--</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Splitting by seq</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Shuffling</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Sorting</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Locating motifs</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Common sequences</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Cleaning bases</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Transcription</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Translation</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Filtering by size</td>
+<td align="center">Indirect</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Renaming header</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="left"><strong>Other features</strong></td>
 <td align="left">Cross-platform</td>
-<td>Yes</td>
-<td>Partly</td>
-<td>Partly</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
+<td align="center">Yes</td>
+<td align="center">Partly</td>
+<td align="center">Partly</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
 </tr>
 <tr>
-<td align="left">Mutli-line FASTA</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
+<td align="left"></td>
+<td align="left">Reading STDIN</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
 </tr>
 <tr>
-<td align="left">Read FASTQ</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
+<td align="left"></td>
+<td align="left">Reading gzipped file</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
 </tr>
 <tr>
-<td align="left">Mutli-line FASTQ</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td align="left">Validate bases</td>
-<td>Yes</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Recognize RNA</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td align="left">Read STDIN</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td align="left">Read gzip</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td align="left">Write gzip</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>Yes</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Search by motifs</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>Yes</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Sample seqs</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td align="left">Subseq</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td align="left">Deduplicate seqs</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>Partly</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Split seqs</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>Partly</td>
-<td>--</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Split by seq</td>
-<td>Yes</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Shuffle seqs</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Sort seqs</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>Yes</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Locate motifs</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Common seqs</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Clean bases</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Transcribe</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td align="left">Translate</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Size select</td>
-<td>Indirect</td>
-<td>Yes</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Rename head</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
+<td align="left"></td>
+<td align="left">Writing gzip file</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
 </tr>
 </tbody>
 </table>
-<h1 id="installation">Installation</h1>
-<p><a href="http://shenwei356.github.io/seqkit/downlaod">Download Page</a></p>
+<p><strong>Note 1</strong>: See <a href="http://127.0.0.1:8000/benchmark/#softwares">version information</a> of the softwares.</p>
+<p><strong>Note 2</strong>: See <a href="http://shenwei356.github.io/seqkit/usage/">usage</a> for detailed options of seqkit. </p>
+<h2 id="installation">Installation</h2>
+<p>Go to <a href="http://shenwei356.github.io/seqkit/downlaod">Download Page</a> for more download options and changelogs.</p>
 <p><code>seqkit</code> is implemented in <a href="https://golang.org/">Golang</a> programming language,
  executable binary files <strong>for most popular operating systems</strong> are freely available
   in <a href="https://github.com/shenwei356/seqkit/releases">release</a> page.</p>
@@ -458,7 +479,7 @@ echo export PATH=\$PATH:/PATH/OF/seqkit &gt;&gt; ~/.bashrc
 <pre><code>go get -u github.com/shenwei356/seqkit/seqkit
 </code></pre>
 <h2 id="subcommands">Subcommands</h2>
-<p>20 in total.</p>
+<p>20 subcommands in total.</p>
 <p><strong>Sequence and subsequence</strong></p>
 <ul>
 <li><code>seq</code>        transform sequences (revserse, complement, extract ID...)</li>
@@ -498,34 +519,34 @@ echo export PATH=\$PATH:/PATH/OF/seqkit &gt;&gt; ~/.bashrc
 </ul>
 <p><strong>Misc</strong></p>
 <ul>
-<li><code>version</code>   print version information</li>
+<li><code>version</code>   print version information and check for update</li>
 </ul>
 <h2 id="technical-details-and-guides-for-use">Technical details and guides for use</h2>
 <h3 id="fastaq-format-parsing">FASTA/Q format parsing</h3>
 <p>seqkit uses author's lightweight and high-performance bioinformatics packages
-<a href="https://github.com/shenwei356/bio">bio</a> for FASTA/Q parsing，
+<a href="https://github.com/shenwei356/bio">bio</a> for FASTA/Q parsing,
 which has <a href="https://github.com/shenwei356/bio#compare-to-kseqh-klib">high performance</a>
 close to the
 famous C lib <a href="https://github.com/attractivechaos/klib/blob/master/kseq.h">kseq.h</a>.</p>
 <h3 id="sequence-formats-and-types">Sequence formats and types</h3>
-<p>seqkit seamlessly support FASTA and FASTQ format.
+<p>seqkit seamlessly support FASTA and FASTQ format. 
+Sequence format is automatically detected.
 All subcommands except for <code>faidx</code> can handle both formats.
 And only when some commands (<code>subseq</code>, <code>split</code>, <code>sort</code> and <code>shuffle</code>)
 which utilise FASTA index to improve perfrmance for large files in two pass mode
 (by flag <code>--two-pass</code>), only FASTA format is supported.</p>
-<p>Sequence format is automatically detected.</p>
 <p>Sequence type (DNA/RNA/Protein) is automatically detected by leading subsequences
 of the first sequences in file or STDIN. The length of the leading subsequences
 is configurable by global flag <code>--alphabet-guess-seq-length</code> with default value
 of 10000. If length of the sequences is less than that, whole sequences will
 be checked.</p>
 <h3 id="sequence-id">Sequence ID</h3>
-<p>By default, most softwares, including <code>seqkit</code>, takes the first non-space
-letters as sequence ID. For example,</p>
+<p>By default, most softwares, including <code>seqkit</code>, take the leading non-space
+letters as sequence identifier (ID). For example,</p>
 <table>
 <thead>
 <tr>
-<th align="left">FASTA head</th>
+<th align="left">FASTA header</th>
 <th align="left">ID</th>
 </tr>
 </thead>
@@ -554,8 +575,8 @@ the <code>gi</code> number, then use <code>--id-regexp "^gi\|([^\|]+)\|"</code>.
 when input files are (plain or gzipped) FASTA files,
 FASTA index would be optional used for
 rapid access of sequences and reducing memory occupation.</p>
-<p>ATTENTION: the <code>.seqkit.fai</code> file created by seqkit is a little different from .fai file
-created by samtools. seqkit uses full sequence head instead of just ID as key.</p>
+<p>ATTENTION: the <code>.seqkit.fai</code> file created by seqkit is a little different from <code>.fai</code> file
+created by <code>samtools</code>. seqkit uses full sequence head instead of just ID as key.</p>
 <h3 id="parallelization-of-cpu-intensive-jobs">Parallelization of CPU intensive jobs</h3>
 <p>The validation of sequences bases and complement process of sequences
 are parallelized for large sequences.</p>
@@ -650,5 +671,5 @@ propose new functions or ask for help.</p>
 
 <!--
 MkDocs version : 0.15.3
-Build Date UTC : 2016-07-22 08:06:18.652125
+Build Date UTC : 2016-07-22 14:33:54.655979
 -->

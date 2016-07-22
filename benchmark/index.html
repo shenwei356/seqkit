@@ -179,234 +179,260 @@ to compute running time and peak memory usage of a process.</p>
 <table>
 <thead>
 <tr>
+<th align="left">Categories</th>
 <th align="left">Features</th>
-<th>seqkit</th>
-<th>fasta_utilities</th>
-<th>fastx_toolkit</th>
-<th>pyfaidx</th>
-<th>seqmagick</th>
-<th>seqtk</th>
+<th align="center">seqkit</th>
+<th align="center">fasta_utilities</th>
+<th align="center">fastx_toolkit</th>
+<th align="center">pyfaidx</th>
+<th align="center">seqmagick</th>
+<th align="center">seqtk</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td align="left"><strong>Formats supports</strong></td>
+<td align="left">Multi-line FASTA</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">FASTQ</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Multi-line  FASTQ</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Validating sequences</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Supporting RNA</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="left"><strong>Functions</strong></td>
+<td align="left">Searching by motifs</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Sampling</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Extracting sub-sequence</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Removing duplicates</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Partly</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Splitting</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Partly</td>
+<td align="center">--</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Splitting by seq</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Shuffling</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Sorting</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Locating motifs</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Common sequences</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Cleaning bases</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Transcription</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Translation</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Filtering by size</td>
+<td align="center">Indirect</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">Renaming header</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="left"><strong>Other features</strong></td>
 <td align="left">Cross-platform</td>
-<td>Yes</td>
-<td>Partly</td>
-<td>Partly</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
+<td align="center">Yes</td>
+<td align="center">Partly</td>
+<td align="center">Partly</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
 </tr>
 <tr>
-<td align="left">Mutli-line FASTA</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
+<td align="left"></td>
+<td align="left">Reading STDIN</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
 </tr>
 <tr>
-<td align="left">Read FASTQ</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
+<td align="left"></td>
+<td align="left">Reading gzipped file</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
 </tr>
 <tr>
-<td align="left">Mutli-line FASTQ</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td align="left">Validate bases</td>
-<td>Yes</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Recognize RNA</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td align="left">Read STDIN</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td align="left">Read gzip</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td align="left">Write gzip</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>Yes</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Search by motifs</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>Yes</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Sample seqs</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td align="left">Subseq</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td align="left">Deduplicate seqs</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>Partly</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Split seqs</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>Partly</td>
-<td>--</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Split by seq</td>
-<td>Yes</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Shuffle seqs</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Sort seqs</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>Yes</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Locate motifs</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Common seqs</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Clean bases</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Transcribe</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td align="left">Translate</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Size select</td>
-<td>Indirect</td>
-<td>Yes</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-</tr>
-<tr>
-<td align="left">Rename head</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>--</td>
-<td>--</td>
-<td>Yes</td>
-<td>Yes</td>
+<td align="left"></td>
+<td align="left">Writing gzip file</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">--</td>
+<td align="center">Yes</td>
+<td align="center">--</td>
 </tr>
 </tbody>
 </table>
+<p><strong>Note 2</strong>: See <a href="http://shenwei356.github.io/seqkit/usage/">usage</a> for detailed options of seqkit. </p>
 <h2 id="datasets">Datasets</h2>
 <p>All test data is available here: <a href="http://bioinf.shenwei.me/seqkit-benchmark-data.tar.gz">seqkit-benchmark-data.tar.gz</a>  (1.7G)</p>
 <h3 id="dataset_afa-large-number-of-short-sequences">dataset_A.fa - large number of short sequences</h3>
@@ -462,8 +488,8 @@ $ seqkit sample -p 0.3 dataset_B.fa | seqkit seq --name --only-id | shuf &gt; id
 <p>All tests were repeated 3 times ( ~20 min for one time),
 and average time and peak memory ware used for plotting.</p>
 <p>All data were readed once before tests began to minimize the influence of page cache.</p>
+<p>Output sequences of all softwares were not wrapped to fixed length.</p>
 <h3 id="test-1-reverse-complement">Test 1. Reverse Complement</h3>
-<p>Output sequences of all Softwares were not wrapped to fixed length.</p>
 <p><code>revcom_biogo</code> (<a href="https://github.com/shenwei356/seqkit/blob/master/benchmark/revcom_biogo.go">source</a>,
  <a href="https://github.com/shenwei356/seqkit/blob/master/benchmark/revcom_biogo?raw=true">binary</a> ),
  a tool written in Golang using <a href="https://github.com/biogo/biogo">biogo</a> package,
