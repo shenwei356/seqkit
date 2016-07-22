@@ -31,22 +31,22 @@
 #### Mirror site for Chinese user
 
 - **Linux**
-    - [seqkit_linux_386.tar.gz](http://app.shenwei.me/data/seqkit_linux_386.tar.gz)
-    - [seqkit_linux_amd64.tar.gz](http://app.shenwei.me/data/seqkit_linux_amd64.tar.gz)
-    - [seqkit_linux_arm.tar.gz](http://app.shenwei.me/data/seqkit_linux_arm.tar.gz)
+    - [seqkit_linux_386.tar.gz](http://app.shenwei.me/data/seqkit/seqkit_linux_386.tar.gz)
+    - [seqkit_linux_amd64.tar.gz](http://app.shenwei.me/data/seqkit/seqkit_linux_amd64.tar.gz)
+    - [seqkit_linux_arm.tar.gz](http://app.shenwei.me/data/seqkit/seqkit_linux_arm.tar.gz)
 - **Mac OS X**
-    - [seqkit_darwin_386.tar.gz](http://app.shenwei.me/data/seqkit_darwin_386.tar.gz)
-    - [seqkit_darwin_amd64.tar.gz](http://app.shenwei.me/data/seqkit_darwin_amd64.tar.gz)
+    - [seqkit_darwin_386.tar.gz](http://app.shenwei.me/data/seqkit/seqkit_darwin_386.tar.gz)
+    - [seqkit_darwin_amd64.tar.gz](http://app.shenwei.me/data/seqkit/seqkit_darwin_amd64.tar.gz)
 - **Windows**
-    - [seqkit_windows_386.exe.tar.gz](http://app.shenwei.me/data/seqkit_windows_386.exe.tar.gz)
-    - [seqkit_windows_amd64.exe.tar.gz](http://app.shenwei.me/data/seqkit_windows_amd64.exe.tar.gz)
+    - [seqkit_windows_386.exe.tar.gz](http://app.shenwei.me/data/seqkit/seqkit_windows_386.exe.tar.gz)
+    - [seqkit_windows_amd64.exe.tar.gz](http://app.shenwei.me/data/seqkit/seqkit_windows_amd64.exe.tar.gz)
 - **FreeBSD**
-    - [seqkit_freebsd_386.tar.gz](http://app.shenwei.me/data/seqkit_freebsd_386.tar.gz)
-    - [seqkit_freebsd_amd64.tar.gz](http://app.shenwei.me/data/seqkit_freebsd_amd64.tar.gz)
-    - [seqkit_freebsd_arm.tar.gz](http://app.shenwei.me/data/seqkit_freebsd_arm.tar.gz)
+    - [seqkit_freebsd_386.tar.gz](http://app.shenwei.me/data/seqkit/seqkit_freebsd_386.tar.gz)
+    - [seqkit_freebsd_amd64.tar.gz](http://app.shenwei.me/data/seqkit/seqkit_freebsd_amd64.tar.gz)
+    - [seqkit_freebsd_arm.tar.gz](http://app.shenwei.me/data/seqkit/seqkit_freebsd_arm.tar.gz)
 - **OpenBSD**
-    - [seqkit_openbsd_386.tar.gz](http://app.shenwei.me/data/seqkit_openbsd_386.tar.gz)
-    - [seqkit_openbsd_amd64.tar.gz](http://app.shenwei.me/data/seqkit_openbsd_amd64.tar.gz)
+    - [seqkit_openbsd_386.tar.gz](http://app.shenwei.me/data/seqkit/seqkit_openbsd_386.tar.gz)
+    - [seqkit_openbsd_amd64.tar.gz](http://app.shenwei.me/data/seqkit/seqkit_openbsd_amd64.tar.gz)
 
 ## Installation
 

@@ -50,7 +50,7 @@ The edited code is
 
 [http://shenwei356.github.io/seqkit/benchmark/#datasets](http://shenwei356.github.io/seqkit/benchmark/#datasets)
 
-Or download all test data [seqkit-benchmark-data.tar.gz](http://bioinf.shenwei.me/data/seqkit-benchmark-data.tar.gz)
+Or download all test data [seqkit-benchmark-data.tar.gz](http://app.shenwei.me/data/seqkit/seqkit-benchmark-data.tar.gz)
  (1.7G) and uncompress it, and then move them into directory `seqkit/benchmark`
 
     wget ***
