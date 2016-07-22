@@ -9,7 +9,7 @@
         
         <link rel="shortcut icon" href="../img/favicon.ico">
 
-	<title>Benchmark - faskit - FASTA/Q kit</title>
+	<title>Benchmark - seqkit - FASTA/Q kit</title>
 
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
@@ -29,7 +29,7 @@
             m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
             })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-            ga('create', 'UA-28948626-3', 'blog.shenwei.me/faskit');
+            ga('create', 'UA-28948626-3', 'blog.shenwei.me/seqkit');
             ga('send', 'pageview');
         </script>
         
@@ -53,7 +53,7 @@
             
 
             <!-- Main title -->
-            <a class="navbar-brand" href="..">faskit - FASTA/Q kit</a>
+            <a class="navbar-brand" href="..">seqkit - FASTA/Q kit</a>
         </div>
 
         <!-- Expanded navigation -->
@@ -115,7 +115,7 @@
                 
                 
                     <li>
-                        <a href="https://github.com/shenwei356/faskit">
+                        <a href="https://github.com/shenwei356/seqkit">
                             
                                 <i class="fa fa-github"></i>
                             
@@ -155,8 +155,8 @@
 <h1 id="benchmark">Benchmark</h1>
 <h2 id="softwares">Softwares</h2>
 <ol>
-<li><a href="https://github.com/shenwei356/faskit">faskit</a>. (Go).
-   Version <a href="https://github.com/shenwei356/faskit/releases/tag/v0.2.8">v0.2.8</a>.</li>
+<li><a href="https://github.com/shenwei356/seqkit">seqkit</a>. (Go).
+   Version <a href="https://github.com/shenwei356/seqkit/releases/tag/v0.2.8">v0.2.8</a>.</li>
 <li><a href="https://github.com/jimhester/fasta_utilities">fasta_utilities</a>. (Perl).
    Version <a href="https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579">3dcc0bc</a>.
    Lots of dependencies to install.</li>
@@ -180,7 +180,7 @@ to compute running time and peak memory usage of a process.</p>
 <thead>
 <tr>
 <th align="left">Features</th>
-<th>faskit</th>
+<th>seqkit</th>
 <th>fasta_utilities</th>
 <th>fastx_toolkit</th>
 <th>pyfaidx</th>
@@ -408,7 +408,7 @@ to compute running time and peak memory usage of a process.</p>
 </tbody>
 </table>
 <h2 id="datasets">Datasets</h2>
-<p>All test data is available here: <a href="http://bioinf.shenwei.me/faskit-benchmark-data.tar.gz">faskit-benchmark-data.tar.gz</a>  (1.7G)</p>
+<p>All test data is available here: <a href="http://bioinf.shenwei.me/seqkit-benchmark-data.tar.gz">seqkit-benchmark-data.tar.gz</a>  (1.7G)</p>
 <h3 id="dataset_afa-large-number-of-short-sequences">dataset_A.fa - large number of short sequences</h3>
 <p>Dataset A is reference genomes DNA sequences of gastrointestinal tract from
 <a href="http://hmpdacc.org/">NIH Human Microbiome Project</a>:
@@ -423,7 +423,7 @@ to compute running time and peak memory usage of a process.</p>
 </li>
 </ul>
 <p>Summary</p>
-<pre><code>$ faskit stat *.fa
+<pre><code>$ seqkit stat *.fa
 file           seq_format   seq_type   num_seqs   min_len        avg_len       max_len
 dataset_A.fa   FASTA        DNA          67,748        56       41,442.5     5,976,145
 dataset_B.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
@@ -432,8 +432,8 @@ dataset_B.fa   FASTA        DNA             194       970   15,978,096.5   248,9
 <p>Parts of sequences IDs was sampled and shuffled from original data.
 They were used in test of extracting sequences by ID list.</p>
 <p>Commands:</p>
-<pre><code>$ faskit sample -p 0.3 dataset_A.fa | faskit seq --name --only-id | shuf &gt; ids_A.txt
-$ faskit sample -p 0.3 dataset_B.fa | faskit seq --name --only-id | shuf &gt; ids_B.txt
+<pre><code>$ seqkit sample -p 0.3 dataset_A.fa | seqkit seq --name --only-id | shuf &gt; ids_A.txt
+$ seqkit sample -p 0.3 dataset_B.fa | seqkit seq --name --only-id | shuf &gt; ids_B.txt
 </code></pre>
 <p>Numbers:</p>
 <pre><code>$ wc -l ids_*
@@ -458,36 +458,36 @@ $ faskit sample -p 0.3 dataset_B.fa | faskit seq --name --only-id | shuf &gt; id
 <li>Python: Python 2.7.11 (default, Jul 10 2016, 20:58:20) [GCC 6.1.1 20160621 (Red Hat 6.1.1-3)] on linux2</li>
 </ul>
 <h2 id="tests">Tests</h2>
-<p>Automatic benchmark and plotting scripts are available at:  <a href="https://github.com/shenwei356/faskit/tree/master/benchmark">https://github.com/shenwei356/faskit/tree/master/benchmark</a>.</p>
+<p>Automatic benchmark and plotting scripts are available at:  <a href="https://github.com/shenwei356/seqkit/tree/master/benchmark">https://github.com/shenwei356/seqkit/tree/master/benchmark</a>.</p>
 <p>All tests were repeated 3 times ( ~20 min for one time),
 and average time and peak memory ware used for plotting.</p>
 <p>All data were readed once before tests began to minimize the influence of page cache.</p>
 <h3 id="test-1-reverse-complement">Test 1. Reverse Complement</h3>
 <p>Output sequences of all Softwares were not wrapped to fixed length.</p>
-<p><code>revcom_biogo</code> (<a href="https://github.com/shenwei356/faskit/blob/master/benchmark/revcom_biogo.go">source</a>,
- <a href="https://github.com/shenwei356/faskit/blob/master/benchmark/revcom_biogo?raw=true">binary</a> ),
+<p><code>revcom_biogo</code> (<a href="https://github.com/shenwei356/seqkit/blob/master/benchmark/revcom_biogo.go">source</a>,
+ <a href="https://github.com/shenwei356/seqkit/blob/master/benchmark/revcom_biogo?raw=true">binary</a> ),
  a tool written in Golang using <a href="https://github.com/biogo/biogo">biogo</a> package,
  was also used for comparison of FASTA file parsing performance.</p>
-<p><a href="https://github.com/shenwei356/faskit/blob/master/benchmark/run_benchmark_01_revcom.sh">Commands</a></p>
+<p><a href="https://github.com/shenwei356/seqkit/blob/master/benchmark/run_benchmark_01_revcom.sh">Commands</a></p>
 <h3 id="test-2-extracting-sequences-by-id-list">Test 2. Extracting sequences by ID list</h3>
-<p><a href="https://github.com/shenwei356/faskit/blob/master/benchmark/run_benchmark_02_exctact_by_id_list.sh">Commands</a></p>
+<p><a href="https://github.com/shenwei356/seqkit/blob/master/benchmark/run_benchmark_02_exctact_by_id_list.sh">Commands</a></p>
 <h3 id="test-3-sampling-by-number">Test 3. Sampling by number</h3>
 <p>Note that different softwares have different sampling strategies,
 the peak memory may depends on size of sampled sequences.</p>
-<p><a href="https://github.com/shenwei356/faskit/blob/master/benchmark/run_benchmark_03_sampling.sh">Commands</a></p>
+<p><a href="https://github.com/shenwei356/seqkit/blob/master/benchmark/run_benchmark_03_sampling.sh">Commands</a></p>
 <h3 id="test-4-removing-duplicates-by-sequence-content">Test 4. Removing duplicates by sequence content</h3>
-<p><a href="https://github.com/shenwei356/faskit/blob/master/benchmark/run_benchmark_04_remove_duplicated_seqs_by_seq.sh">Commands</a></p>
+<p><a href="https://github.com/shenwei356/seqkit/blob/master/benchmark/run_benchmark_04_remove_duplicated_seqs_by_seq.sh">Commands</a></p>
 <h3 id="test-5-subsequence-with-bed-file">Test 5. Subsequence with BED file</h3>
-<p><a href="https://github.com/shenwei356/faskit/blob/master/benchmark/run_benchmark_05_subseq_with_bed.sh">Commands</a></p>
+<p><a href="https://github.com/shenwei356/seqkit/blob/master/benchmark/run_benchmark_05_subseq_with_bed.sh">Commands</a></p>
 <h2 id="results">Results</h2>
-<p>faskit version: v0.2.8</p>
+<p>seqkit version: v0.2.8</p>
 <p><img alt="benchmark-5tests.csv.png" src="../benchmark/benchmark.5tests.csv.png" /></p>
 <h3 id="test-of-multiple-threads">Test of multiple threads:</h3>
-<p>From the results, 2 threads/CPU is enough, so the default threads of faskit is 2.</p>
-<p><img alt="benchmark-5tests.csv.png" src="../benchmark/faskit_multi_threads/benchmark.5tests.csv.png" /></p>
+<p>From the results, 2 threads/CPU is enough, so the default threads of seqkit is 2.</p>
+<p><img alt="benchmark-5tests.csv.png" src="../benchmark/seqkit_multi_threads/benchmark.5tests.csv.png" /></p>
 <h3 id="tests-on-different-file-sizes">Tests on different file sizes</h3>
 <p>Files are generated by replicating Human genome chr1 for N times.</p>
-<p><img alt="benchmark.faskit.files_size.csv.png" src="../benchmark/faskit_file_size/benchmark.faskit.files_size.csv.png" /></p>
+<p><img alt="benchmark.seqkit.files_size.csv.png" src="../benchmark/seqkit_file_size/benchmark.seqkit.files_size.csv.png" /></p>
 <div id="disqus_thread"></div>
 
 <script>
