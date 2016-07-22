@@ -4,12 +4,12 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="fakit - Practical FASTA kit">
+        <meta name="description" content="faskit - Practical FASTA kit">
         <meta name="author" content="shenwei356">
         
         <link rel="shortcut icon" href="./img/favicon.ico">
 
-	<title>fakit - FASTA/Q kit</title>
+	<title>faskit - FASTA/Q kit</title>
 
         <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="./css/font-awesome-4.5.0.css" rel="stylesheet">
@@ -29,7 +29,7 @@
             m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
             })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-            ga('create', 'UA-28948626-3', 'blog.shenwei.me/fakit');
+            ga('create', 'UA-28948626-3', 'blog.shenwei.me/faskit');
             ga('send', 'pageview');
         </script>
         
@@ -53,7 +53,7 @@
             
 
             <!-- Main title -->
-            <a class="navbar-brand" href=".">fakit - FASTA/Q kit</a>
+            <a class="navbar-brand" href=".">faskit - FASTA/Q kit</a>
         </div>
 
         <!-- Expanded navigation -->
@@ -115,7 +115,7 @@
                 
                 
                     <li>
-                        <a href="https://github.com/shenwei356/fakit">
+                        <a href="https://github.com/shenwei356/faskit">
                             
                                 <i class="fa fa-github"></i>
                             
@@ -133,7 +133,7 @@
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
     
-        <li class="main active"><a href="#fakit-a-cross-platform-and-efficient-toolkit-for-fastaq-file-manipulation">fakit - a cross-platform and efficient toolkit for FASTA/Q file manipulation</a></li>
+        <li class="main active"><a href="#faskit-a-cross-platform-and-efficient-toolkit-for-fastaq-file-manipulation">faskit - a cross-platform and efficient toolkit for FASTA/Q file manipulation</a></li>
         
             <li><a href="#about-the-name">About the name</a></li>
         
@@ -163,12 +163,12 @@
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="fakit-a-cross-platform-and-efficient-toolkit-for-fastaq-file-manipulation">fakit - a cross-platform and efficient toolkit for FASTA/Q file manipulation</h1>
-<p>Documents: <a href="http://shenwei356.github.io/fakit">http://shenwei356.github.io/fakit</a></p>
-<p>Source code: <a href="https://github.com/shenwei356/fakit">https://github.com/shenwei356/fakit</a></p>
-<p>Latest version: <a href="https://github.com/shenwei356/fakit/releases"><img alt="Latest Version" src="https://img.shields.io/github/release/shenwei356/fakit.svg?style=flat" /></a></p>
+<h1 id="faskit-a-cross-platform-and-efficient-toolkit-for-fastaq-file-manipulation">faskit - a cross-platform and efficient toolkit for FASTA/Q file manipulation</h1>
+<p>Documents: <a href="http://shenwei356.github.io/faskit">http://shenwei356.github.io/faskit</a></p>
+<p>Source code: <a href="https://github.com/shenwei356/faskit">https://github.com/shenwei356/faskit</a></p>
+<p>Latest version: <a href="https://github.com/shenwei356/faskit/releases"><img alt="Latest Version" src="https://img.shields.io/github/release/shenwei356/faskit.svg?style=flat" /></a></p>
 <h2 id="about-the-name">About the name</h2>
-<p>Originally, <code>fakit</code> (abbreviation of <code>FASTA kit</code>) was designed to handle FASTA
+<p>Originally, <code>faskit</code> (abbreviation of <code>FASTA kit</code>) was designed to handle FASTA
 format. And the name was remained after adding <strong><em>seamless support for FASTA/Q fromat</em></strong>.</p>
 <h2 id="introduction">Introduction</h2>
 <p>FASTA and FASTQ are basic formats for storing nucleotide and protein sequences.
@@ -178,7 +178,7 @@ Existed tools only implemented parts of the functions,
 and some of them are only available for specific operating systems.
 Furthermore, the complicated installation process of dependencies packages and
 running environment also make them less friendly to common users.</p>
-<p>fakit is a cross-platform, efficient, and practical FASTA/Q manipulations tool
+<p>faskit is a cross-platform, efficient, and practical FASTA/Q manipulations tool
 that is friendly for researchers to complete wide ranges of FASTA file processing.
 The toolkit supports plain or gzip-compressed input and output
 from either standard stream or files,
@@ -186,15 +186,15 @@ therefore, it could be easily used in command-line pipe.</p>
 <h2 id="features">Features</h2>
 <ul>
 <li><strong>Cross-platform</strong> (Linux/Windows/Mac OS X/OpenBSD/FreeBSD,
-  see <a href="http://shenwei356.github.io/fakit/download/">download</a>)</li>
+  see <a href="http://shenwei356.github.io/faskit/download/">download</a>)</li>
 <li><strong>Light weight and out-of-the-box, no dependencies, no compilation, no configuration</strong>
-  (see <a href="http://shenwei356.github.io/fakit/download/">download</a>)</li>
+  (see <a href="http://shenwei356.github.io/faskit/download/">download</a>)</li>
 <li><strong>Fast</strong> (see <a href="./#benchmark">benchmark</a>),
   <strong>multiple-CPUs supported</strong>.</li>
 <li><strong>Practical functions supported by 20 subcommands</strong> (see subcommands and
-  <a href="http://shenwei356.github.io/fakit/usage/">usage</a> )</li>
-<li><strong>Well documented</strong> (detailed <a href="http://shenwei356.github.io/fakit/usage/">usage</a>
-  and <a href="http://shenwei356.github.io/fakit/benchmark/">benchmark</a> )</li>
+  <a href="http://shenwei356.github.io/faskit/usage/">usage</a> )</li>
+<li><strong>Well documented</strong> (detailed <a href="http://shenwei356.github.io/faskit/usage/">usage</a>
+  and <a href="http://shenwei356.github.io/faskit/benchmark/">benchmark</a> )</li>
 <li><strong>Seamlessly parses both FASTA and FASTQ formats</strong></li>
 <li><strong>Support STDIN and gziped input/output file, easy being used in pipe</strong></li>
 <li><strong>Support custom sequence ID regular expression</strong> (especially useful for quering with ID list)</li>
@@ -206,7 +206,7 @@ therefore, it could be easily used in command-line pipe.</p>
 <thead>
 <tr>
 <th align="left">Features</th>
-<th>fakit</th>
+<th>faskit</th>
 <th>fasta_utilities</th>
 <th>fastx_toolkit</th>
 <th>pyfaidx</th>
@@ -434,28 +434,28 @@ therefore, it could be easily used in command-line pipe.</p>
 </tbody>
 </table>
 <h1 id="installation">Installation</h1>
-<p><a href="http://shenwei356.github.io/fakit/downlaod">Download Page</a></p>
-<p><code>fakit</code> is implemented in <a href="https://golang.org/">Golang</a> programming language,
+<p><a href="http://shenwei356.github.io/faskit/downlaod">Download Page</a></p>
+<p><code>faskit</code> is implemented in <a href="https://golang.org/">Golang</a> programming language,
  executable binary files <strong>for most popular operating systems</strong> are freely available
-  in <a href="https://github.com/shenwei356/fakit/releases">release</a> page.</p>
-<p>Just <a href="https://github.com/shenwei356/fakit/releases">download</a> compressed
+  in <a href="https://github.com/shenwei356/faskit/releases">release</a> page.</p>
+<p>Just <a href="https://github.com/shenwei356/faskit/releases">download</a> compressed
 executable file of your operating system, and uncompress it with <code>tar -zxvf *.tar.gz</code> command.</p>
 <p>You can add the directory of the executable file to environment variable
-<code>PATH</code>, so you can run <code>fakit</code> anywhere.</p>
+<code>PATH</code>, so you can run <code>faskit</code> anywhere.</p>
 <ol>
 <li>
 <p>For windows, the simplest way is copy it to <code>C:\WINDOWS\system32</code>.</p>
 </li>
 <li>
 <p>For Linux, type:</p>
-<pre><code>chmod a+x /PATH/OF/FAKIT/fakit
-echo export PATH=\$PATH:/PATH/OF/fakit &gt;&gt; ~/.bashrc
+<pre><code>chmod a+x /PATH/OF/FAKIT/faskit
+echo export PATH=\$PATH:/PATH/OF/faskit &gt;&gt; ~/.bashrc
 </code></pre>
 <p>or simply copy it to <code>/usr/local/bin</code></p>
 </li>
 </ol>
 <p>For Go developer, just one command:</p>
-<pre><code>go get -u github.com/shenwei356/fakit/fakit
+<pre><code>go get -u github.com/shenwei356/faskit/faskit
 </code></pre>
 <h2 id="subcommands">Subcommands</h2>
 <p>20 in total.</p>
@@ -502,13 +502,13 @@ echo export PATH=\$PATH:/PATH/OF/fakit &gt;&gt; ~/.bashrc
 </ul>
 <h2 id="technical-details-and-guides-for-use">Technical details and guides for use</h2>
 <h3 id="fastaq-format-parsing">FASTA/Q format parsing</h3>
-<p>fakit uses author's lightweight and high-performance bioinformatics packages
+<p>faskit uses author's lightweight and high-performance bioinformatics packages
 <a href="https://github.com/shenwei356/bio">bio</a> for FASTA/Q parsing，
 which has <a href="https://github.com/shenwei356/bio#compare-to-kseqh-klib">high performance</a>
 close to the
 famous C lib <a href="https://github.com/attractivechaos/klib/blob/master/kseq.h">kseq.h</a>.</p>
 <h3 id="sequence-formats-and-types">Sequence formats and types</h3>
-<p>fakit seamlessly support FASTA and FASTQ format.
+<p>faskit seamlessly support FASTA and FASTQ format.
 All subcommands except for <code>faidx</code> can handle both formats.
 And only when some commands (<code>subseq</code>, <code>split</code>, <code>sort</code> and <code>shuffle</code>)
 which utilise FASTA index to improve perfrmance for large files in two pass mode
@@ -520,7 +520,7 @@ is configurable by global flag <code>--alphabet-guess-seq-length</code> with def
 of 10000. If length of the sequences is less than that, whole sequences will
 be checked.</p>
 <h3 id="sequence-id">Sequence ID</h3>
-<p>By default, most softwares, including <code>fakit</code>, takes the first non-space
+<p>By default, most softwares, including <code>faskit</code>, takes the first non-space
 letters as sequence ID. For example,</p>
 <table>
 <thead>
@@ -554,8 +554,8 @@ the <code>gi</code> number, then use <code>--id-regexp "^gi\|([^\|]+)\|"</code>.
 when input files are (plain or gzipped) FASTA files,
 FASTA index would be optional used for
 rapid access of sequences and reducing memory occupation.</p>
-<p>ATTENTION: the <code>.fakit.fai</code> file created by fakit is a little different from .fai file
-created by samtools. fakit uses full sequence head instead of just ID as key.</p>
+<p>ATTENTION: the <code>.faskit.fai</code> file created by faskit is a little different from .fai file
+created by samtools. faskit uses full sequence head instead of just ID as key.</p>
 <h3 id="parallelization-of-cpu-intensive-jobs">Parallelization of CPU intensive jobs</h3>
 <p>The validation of sequences bases and complement process of sequences
 are parallelized for large sequences.</p>
@@ -583,27 +583,27 @@ They use FASTA index for rapid acccess of sequences and reducing memory occupati
 given by flag <code>-s</code> (<code>--rand-seed</code>). This makes sure that sampling result could be
 reproduced in different environments with same random seed.</p>
 <h2 id="usage-examples">Usage &amp;&amp; Examples</h2>
-<p><a href="http://shenwei356.github.io/fakit/usage/">Usage and examples</a></p>
-<p><a href="http://shenwei356.github.io/fakit/tutorial/">Tutorial</a></p>
+<p><a href="http://shenwei356.github.io/faskit/usage/">Usage and examples</a></p>
+<p><a href="http://shenwei356.github.io/faskit/tutorial/">Tutorial</a></p>
 <h2 id="benchmark">Benchmark</h2>
-<p>More details: <a href="http://shenwei356.github.io/fakit/benchmark/">http://shenwei356.github.io/fakit/benchmark/</a></p>
+<p>More details: <a href="http://shenwei356.github.io/faskit/benchmark/">http://shenwei356.github.io/faskit/benchmark/</a></p>
 <p>Datasets:</p>
-<pre><code>$ fakit stat *.fa
+<pre><code>$ faskit stat *.fa
 file           seq_format   seq_type   num_seqs   min_len        avg_len       max_len
 dataset_A.fa   FASTA        DNA          67,748        56       41,442.5     5,976,145                  
 dataset_B.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
 </code></pre>
-<p>fakit version: v0.2.8</p>
+<p>faskit version: v0.2.8</p>
 <p><img alt="benchmark-5tests.csv.png" src="./benchmark/benchmark.5tests.csv.png" /></p>
 <h2 id="citation">Citation</h2>
-<p><strong>W Shen</strong>, S Le, Y Li*, F Hu*. fakit: a cross-platform and efficient toolkit for FASTA/Q file manipulation.
+<p><strong>W Shen</strong>, S Le, Y Li*, F Hu*. faskit: a cross-platform and efficient toolkit for FASTA/Q file manipulation.
 <strong><em>PLOS ONE</em></strong>. revised.</p>
 <h2 id="contact">Contact</h2>
-<p>Email me for any problem when using fakit. shenwei356(at)gmail.com</p>
-<p><a href="https://github.com/shenwei356/fakit/issues">Create an issue</a> to report bugs,
+<p>Email me for any problem when using faskit. shenwei356(at)gmail.com</p>
+<p><a href="https://github.com/shenwei356/faskit/issues">Create an issue</a> to report bugs,
 propose new functions or ask for help.</p>
 <h2 id="license">License</h2>
-<p><a href="https://github.com/shenwei356/fakit/blob/master/LICENSE">MIT License</a></p></div>
+<p><a href="https://github.com/shenwei356/faskit/blob/master/LICENSE">MIT License</a></p></div>
             
         </div>
 
@@ -650,5 +650,5 @@ propose new functions or ask for help.</p>
 
 <!--
 MkDocs version : 0.15.3
-Build Date UTC : 2016-07-20 13:23:07.554862
+Build Date UTC : 2016-07-22 04:59:12.971809
 -->
