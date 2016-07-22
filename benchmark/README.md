@@ -1,6 +1,6 @@
 # Benchmark
 
-Datasets and results are described at [http://shenwei356.github.io/fakit/benchmark](http://shenwei356.github.io/fakit/benchmark)
+Datasets and results are described at [http://shenwei356.github.io/faskit/benchmark](http://shenwei356.github.io/faskit/benchmark)
 
 ***The benchmark needs be performed in Linux-like operating systems.***
 
@@ -8,8 +8,8 @@ Datasets and results are described at [http://shenwei356.github.io/fakit/benchma
 
 Softwares
 
-1. [fakit](https://github.com/shenwei356/fakit). (Go).
-   Version [v0.2.8](https://github.com/shenwei356/fakit/releases/tag/v0.2.8).
+1. [faskit](https://github.com/shenwei356/faskit). (Go).
+   Version [v0.2.8](https://github.com/shenwei356/faskit/releases/tag/v0.2.8).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    Lots of dependencies to install_.
@@ -43,24 +43,24 @@ The edited code is
 
 ## Clone this repository
 
-    git clone https://github.com/shenwei356/fakit
-    cd fakit/benchmark
+    git clone https://github.com/shenwei356/faskit
+    cd faskit/benchmark
 
 ## Data preparation
 
-[http://shenwei356.github.io/fakit/benchmark/#datasets](http://shenwei356.github.io/fakit/benchmark/#datasets)
+[http://shenwei356.github.io/faskit/benchmark/#datasets](http://shenwei356.github.io/faskit/benchmark/#datasets)
 
-Or download all test data [fakit-benchmark-data.tar.gz](http://bioinf.shenwei.me/data/fakit-benchmark-data.tar.gz)
- (1.7G) and uncompress it, and then move them into directory `fakit/benchmark`
+Or download all test data [faskit-benchmark-data.tar.gz](http://bioinf.shenwei.me/data/faskit-benchmark-data.tar.gz)
+ (1.7G) and uncompress it, and then move them into directory `faskit/benchmark`
 
     wget ***
-    tar -zxvf fakit-benchmark-data.tar.gz
-    mv fakit-benchmark-data/* fakit/benchmark
+    tar -zxvf faskit-benchmark-data.tar.gz
+    mv faskit-benchmark-data/* faskit/benchmark
 
 ## Run tests
 
 A Perl scripts
-[`run.pl`](https://github.com/shenwei356/fakit/blob/master/benchmark/run_benchmark_00_all.pl)
+[`run.pl`](https://github.com/shenwei356/faskit/blob/master/benchmark/run_benchmark_00_all.pl)
 is used to automatically running tests and generate data for plotting.
 
 ```
@@ -86,9 +86,9 @@ To compare performance between different softwares, run:
 
 It costed ~50min for me.
 
-To test performance of other functions in fakit, run:
+To test performance of other functions in faskit, run:
 
-    ./run.pl run_test*.sh -n 1 -o benchmark.fakit.csv
+    ./run.pl run_test*.sh -n 1 -o benchmark.faskit.csv
 
 ## Plot result
 
@@ -98,6 +98,6 @@ Plot for result of the five tests:
 
     ./plot.R -i benchmark.5tests.csv
 
-Plot for result of the tests of other functions in fakit:
+Plot for result of the tests of other functions in faskit:
 
-    ./plot.R -i benchmark.fakit.csv --width 5 --height 3
+    ./plot.R -i benchmark.faskit.csv --width 5 --height 3

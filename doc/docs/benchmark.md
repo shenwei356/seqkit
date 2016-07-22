@@ -3,8 +3,8 @@
 
 ## Softwares
 
-1. [fakit](https://github.com/shenwei356/fakit). (Go).
-   Version [v0.2.8](https://github.com/shenwei356/fakit/releases/tag/v0.2.8).
+1. [faskit](https://github.com/shenwei356/faskit). (Go).
+   Version [v0.2.8](https://github.com/shenwei356/faskit/releases/tag/v0.2.8).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    Lots of dependencies to install.
@@ -26,7 +26,7 @@ to compute running time and peak memory usage of a process.
 
 ## Features
 
-Features         | fakit    | fasta_utilities | fastx_toolkit | pyfaidx | seqmagick | seqtk
+Features         | faskit    | fasta_utilities | fastx_toolkit | pyfaidx | seqmagick | seqtk
 :--------------- | :------: | :-------------: | :-----------: | :-----: | :-------: | :----
 Cross-platform   | Yes      | Partly          | Partly        | Yes     | Yes       | Yes
 Mutli-line FASTA | Yes      | Yes             | --            | Yes     | Yes       | Yes
@@ -56,7 +56,7 @@ Rename head      | Yes      | Yes             | --            | --      | Yes   
 
 ## Datasets
 
-All test data is available here: [fakit-benchmark-data.tar.gz](http://bioinf.shenwei.me/fakit-benchmark-data.tar.gz)  (1.7G)
+All test data is available here: [faskit-benchmark-data.tar.gz](http://bioinf.shenwei.me/faskit-benchmark-data.tar.gz)  (1.7G)
 
 ### dataset_A.fa - large number of short sequences
 
@@ -76,7 +76,7 @@ Dataset B is Human genome from [ensembl](http://uswest.ensembl.org/info/data/ftp
 
 Summary
 
-    $ fakit stat *.fa
+    $ faskit stat *.fa
     file           seq_format   seq_type   num_seqs   min_len        avg_len       max_len
     dataset_A.fa   FASTA        DNA          67,748        56       41,442.5     5,976,145
     dataset_B.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
@@ -88,8 +88,8 @@ They were used in test of extracting sequences by ID list.
 
 Commands:
 
-    $ fakit sample -p 0.3 dataset_A.fa | fakit seq --name --only-id | shuf > ids_A.txt
-    $ fakit sample -p 0.3 dataset_B.fa | fakit seq --name --only-id | shuf > ids_B.txt
+    $ faskit sample -p 0.3 dataset_A.fa | faskit seq --name --only-id | shuf > ids_A.txt
+    $ faskit sample -p 0.3 dataset_B.fa | faskit seq --name --only-id | shuf > ids_B.txt
 
 Numbers:
 
@@ -120,7 +120,7 @@ Softwares:
 
 ## Tests
 
-Automatic benchmark and plotting scripts are available at:  [https://github.com/shenwei356/fakit/tree/master/benchmark](https://github.com/shenwei356/fakit/tree/master/benchmark).
+Automatic benchmark and plotting scripts are available at:  [https://github.com/shenwei356/faskit/tree/master/benchmark](https://github.com/shenwei356/faskit/tree/master/benchmark).
 
 All tests were repeated 3 times ( ~20 min for one time),
 and average time and peak memory ware used for plotting.
@@ -131,49 +131,49 @@ All data were readed once before tests began to minimize the influence of page c
 
 Output sequences of all Softwares were not wrapped to fixed length.
 
-`revcom_biogo` ([source](https://github.com/shenwei356/fakit/blob/master/benchmark/revcom_biogo.go),
- [binary](https://github.com/shenwei356/fakit/blob/master/benchmark/revcom_biogo?raw=true) ),
+`revcom_biogo` ([source](https://github.com/shenwei356/faskit/blob/master/benchmark/revcom_biogo.go),
+ [binary](https://github.com/shenwei356/faskit/blob/master/benchmark/revcom_biogo?raw=true) ),
  a tool written in Golang using [biogo](https://github.com/biogo/biogo) package,
  was also used for comparison of FASTA file parsing performance.
 
-[Commands](https://github.com/shenwei356/fakit/blob/master/benchmark/run_benchmark_01_revcom.sh)
+[Commands](https://github.com/shenwei356/faskit/blob/master/benchmark/run_benchmark_01_revcom.sh)
 
 ### Test 2. Extracting sequences by ID list
 
-[Commands](https://github.com/shenwei356/fakit/blob/master/benchmark/run_benchmark_02_exctact_by_id_list.sh)
+[Commands](https://github.com/shenwei356/faskit/blob/master/benchmark/run_benchmark_02_exctact_by_id_list.sh)
 
 ### Test 3. Sampling by number
 
 Note that different softwares have different sampling strategies,
 the peak memory may depends on size of sampled sequences.
 
-[Commands](https://github.com/shenwei356/fakit/blob/master/benchmark/run_benchmark_03_sampling.sh)
+[Commands](https://github.com/shenwei356/faskit/blob/master/benchmark/run_benchmark_03_sampling.sh)
 
 ### Test 4. Removing duplicates by sequence content
 
-[Commands](https://github.com/shenwei356/fakit/blob/master/benchmark/run_benchmark_04_remove_duplicated_seqs_by_seq.sh)
+[Commands](https://github.com/shenwei356/faskit/blob/master/benchmark/run_benchmark_04_remove_duplicated_seqs_by_seq.sh)
 
 ### Test 5. Subsequence with BED file
 
-[Commands](https://github.com/shenwei356/fakit/blob/master/benchmark/run_benchmark_05_subseq_with_bed.sh)
+[Commands](https://github.com/shenwei356/faskit/blob/master/benchmark/run_benchmark_05_subseq_with_bed.sh)
 
 ## Results
 
-fakit version: v0.2.8
+faskit version: v0.2.8
 
 ![benchmark-5tests.csv.png](benchmark/benchmark.5tests.csv.png)
 
 ### Test of multiple threads:
 
-From the results, 2 threads/CPU is enough, so the default threads of fakit is 2.
+From the results, 2 threads/CPU is enough, so the default threads of faskit is 2.
 
-![benchmark-5tests.csv.png](benchmark/fakit_multi_threads/benchmark.5tests.csv.png)
+![benchmark-5tests.csv.png](benchmark/faskit_multi_threads/benchmark.5tests.csv.png)
 
 ### Tests on different file sizes
 
 Files are generated by replicating Human genome chr1 for N times.
 
-![benchmark.fakit.files_size.csv.png](benchmark/fakit_file_size/benchmark.fakit.files_size.csv.png)
+![benchmark.faskit.files_size.csv.png](benchmark/faskit_file_size/benchmark.faskit.files_size.csv.png)
 
 <div id="disqus_thread"></div>
 <script>

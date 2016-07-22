@@ -1,4 +1,4 @@
-site_name: fakit - FASTA/Q kit
+site_name: faskit - FASTA/Q kit
 pages:
 - Home: index.md
 - Download: download.md
@@ -7,7 +7,7 @@ pages:
 - Benchmark: benchmark.md
 theme: mkdocs
 
-repo_url: https://github.com/shenwei356/fakit
-site_description: fakit - Practical FASTA kit
+repo_url: https://github.com/shenwei356/faskit
+site_description: faskit - Practical FASTA kit
 site_author: shenwei356
-google_analytics: ['UA-28948626-3', 'blog.shenwei.me/fakit']
+google_analytics: ['UA-28948626-3', 'blog.shenwei.me/faskit']

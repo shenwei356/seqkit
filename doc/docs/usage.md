@@ -4,7 +4,7 @@
 
 ### FASTA/Q format parsing
 
-fakit uses author's lightweight and high-performance bioinformatics packages
+faskit uses author's lightweight and high-performance bioinformatics packages
 [bio](https://github.com/shenwei356/bio) for FASTA/Q parsing，
 which has [high performance](https://github.com/shenwei356/bio#compare-to-kseqh-klib)
 close to the
@@ -12,7 +12,7 @@ famous C lib [kseq.h](https://github.com/attractivechaos/klib/blob/master/kseq.h
 
 ### Sequence formats and types
 
-fakit seamlessly support FASTA and FASTQ format.
+faskit seamlessly support FASTA and FASTQ format.
 All subcommands except for `faidx` can handle both formats.
 And only when some commands (`subseq`, `split`, `sort` and `shuffle`)
 which utilise FASTA index to improve perfrmance for large files in two pass mode
@@ -28,7 +28,7 @@ be checked.
 
 ### Sequence ID
 
-By default, most softwares, including `fakit`, takes the first non-space
+By default, most softwares, including `faskit`, takes the first non-space
 letters as sequence ID. For example,
 
 |   FASTA head                                                  |     ID                                            |
@@ -50,8 +50,8 @@ when input files are (plain or gzipped) FASTA files,
 FASTA index would be optional used for
 rapid access of sequences and reducing memory occupation.
 
-ATTENTION: the `.fakit.fai` file created by fakit is a little different from .fai file
-created by samtools. fakit uses full sequence head instead of just ID as key.
+ATTENTION: the `.faskit.fai` file created by faskit is a little different from .fai file
+created by samtools. faskit uses full sequence head instead of just ID as key.
 
 ### Parallelization of CPU intensive jobs
 
@@ -90,22 +90,22 @@ Subcommands `sample` and `shuffle` use random function, random seed could be
 given by flag `-s` (`--rand-seed`). This makes sure that sampling result could be
 reproduced in different environments with same random seed.
 
-## fakit
+## faskit
 
 Usage
 
 ```
-fakit -- a cross-platform and efficient toolkit for FASTA/Q file manipulation
+faskit -- a cross-platform and efficient toolkit for FASTA/Q file manipulation
 
 Version: 0.2.8
 
 Author: Wei Shen <shenwei356@gmail.com>
 
-Documents  : http://shenwei356.github.io/fakit
-Source code: https://github.com/shenwei356/fakit
+Documents  : http://shenwei356.github.io/faskit
+Source code: https://github.com/shenwei356/faskit
 
 Usage:
-  fakit [command]
+  faskit [command]
 
 Available Commands:
   common      find common sequences of multiple files by id/name/sequence
@@ -130,7 +130,7 @@ Available Commands:
   version     print version information and check for update
 
 Flags:
-      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which fakit guesses the sequence type (0 for whole seq) (default 10000)
+      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which faskit guesses the sequence type (0 for whole seq) (default 10000)
       --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
       --id-regexp string                regular expression for parsing ID (default "^([^\\s]+)\\s?")
   -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
@@ -139,7 +139,7 @@ Flags:
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
   -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
 
-Use "fakit [command] --help" for more information about a command.
+Use "faskit [command] --help" for more information about a command.
 
 ```
 
@@ -152,7 +152,7 @@ Datasets from [The miRBase Sequence Database -- Release 21](ftp://mirbase.org/pu
 - [`miRNA.diff.gz`](ftp://mirbase.org/pub/mirbase/21/miRNA.diff.gz)
 
 Human genome from [ensembl](http://uswest.ensembl.org/info/data/ftp/index.html)
-(For `fakit subseq`)
+(For `faskit subseq`)
 
 - [`Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz`](ftp://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz)
 - [`Homo_sapiens.GRCh38.84.gtf.gz`](ftp://ftp.ensembl.org/pub/release-84/gtf/homo_sapiens/Homo_sapiens.GRCh38.84.gtf.gz)
@@ -166,7 +166,7 @@ Only DNA and gtf/bed data of Chr1 were used:
 
 - `chr1.fa.gz`
 
-            fakit grep -p 1 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz -o chr1.fa.gz
+            faskit grep -p 1 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz -o chr1.fa.gz
 
 - `chr1.gtf.gz`
 
@@ -185,7 +185,7 @@ Usage
 transform sequences (revserse, complement, extract ID...)
 
 Usage:
-  fakit seq [flags]
+  faskit seq [flags]
 
 Flags:
   -p, --complement                complement sequence (blank for Protein sequence)
@@ -211,12 +211,12 @@ Examples
 
     - From file:
 
-            $ fakit seq hairpin.fa.gz
+            $ faskit seq hairpin.fa.gz
             >cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
             UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
             UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 
-            $ fakit seq read_1.fq.gz
+            $ faskit seq read_1.fq.gz
             @HWI-D00523:240:HF3WGBCXX:1:1101:2574:2226 1:N:0:CTGTAG
             TGAGGAATATTGGTCAATGGGCGCGAGCCTGAACCAGCCAAGTAGCGTGAAGGATGACTG
             CCCTACGGGTTGTAAACTTCTTTTATAAAGGAATAAAGTGAGGCACGTGTGCCTTTTTGT
@@ -230,33 +230,33 @@ Examples
 
     - From stdin:
 
-            zcat hairpin.fa.gz | fakit seq
+            zcat hairpin.fa.gz | faskit seq
 
 
 1. Sequence types
 
-    - By default, `fakit seq` automatically detect the sequence type
+    - By default, `faskit seq` automatically detect the sequence type
 
-            $ echo -e ">seq\nacgtryswkmbdhvACGTRYSWKMBDHV" | fakit stat
+            $ echo -e ">seq\nacgtryswkmbdhvACGTRYSWKMBDHV" | faskit stat
             file   seq_format   seq_type   num_seqs   min_len   avg_len   max_len
             -      FASTA        DNA               1        28        28        28
 
-            $ echo -e ">seq\nACGUN ACGUN" | fakit stat
+            $ echo -e ">seq\nACGUN ACGUN" | faskit stat
             file   seq_format   seq_type   num_seqs   min_len   avg_len   max_len
             -      FASTA        RNA               1        11        11        11
 
-            $ echo -e ">seq\nabcdefghijklmnpqrstvwyz" | fakit stat
+            $ echo -e ">seq\nabcdefghijklmnpqrstvwyz" | faskit stat
             file   seq_format   seq_type   num_seqs   min_len   avg_len   max_len
             -      FASTA        Protein           1        23        23        23
 
-            $ echo -e "@read\nACTGCN\n+\n@IICCG" | fakit stat
+            $ echo -e "@read\nACTGCN\n+\n@IICCG" | faskit stat
             file   seq_format   seq_type   num_seqs   min_len   avg_len   max_len
             -      FASTQ        DNA               1         6         6         6
 
     - You can also set sequence type by flag `-t` (`--seq-type`).
       But this only take effect on subcommands `seq` and `locate`.
 
-            $ echo -e ">seq\nabcdefghijklmnpqrstvwyz" | fakit seq -t dna
+            $ echo -e ">seq\nabcdefghijklmnpqrstvwyz" | faskit seq -t dna
             [INFO] when flag -t (--seq-type) given, flag -v (--validate-seq) is automatically switched on
             [ERRO] error when parsing seq: seq (invalid DNAredundant letter: e)
 
@@ -265,52 +265,52 @@ Examples
 
     - Full name:
 
-            $ fakit seq hairpin.fa.gz -n
+            $ faskit seq hairpin.fa.gz -n
             cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
             cel-lin-4 MI0000002 Caenorhabditis elegans lin-4 stem-loop
             cel-mir-1 MI0000003 Caenorhabditis elegans miR-1 stem-loop
 
     - Only ID:
 
-            $ fakit seq hairpin.fa.gz -n -i
+            $ faskit seq hairpin.fa.gz -n -i
             cel-let-7
             cel-lin-4
             cel-mir-1
 
     - Custom ID region by regular expression (this could be applied to all subcommands):
 
-            $ fakit seq hairpin.fa.gz -n -i --id-regexp "^[^\s]+\s([^\s]+)\s"
+            $ faskit seq hairpin.fa.gz -n -i --id-regexp "^[^\s]+\s([^\s]+)\s"
             MI0000001
             MI0000002
             MI0000003
 
 1. Only print seq (global flag `-w` defines the output line width, 0 for no wrap)
 
-        $ fakit seq hairpin.fa.gz -s -w 0
+        $ faskit seq hairpin.fa.gz -s -w 0
         UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAACUAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
         AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGAGUGUACUAUUGAUGCUUCACACCUGGGCUCUCCGGGUACCAGGACGGUUUGAGCAGAU
         AAAGUGACCGUACCGAGCUGCAUACUUCCUUACAUGCCCAUACUAUAUCAUAAAUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAGU
 
 1. Convert multi-line FASTQ to 4-line FASTQ
 
-        $ fakit seq reads_1.fq.gz -w 0
+        $ faskit seq reads_1.fq.gz -w 0
 
 1. Reverse comlement sequence
 
-        $ fakit seq hairpin.fa.gz -r -p
+        $ faskit seq hairpin.fa.gz -r -p
         >cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
         UCGAAGAGUUCUGUCUCCGGUAAGGUAGAAAAUUGCAUAGUUCACCGGUGGUAAUAUUCC
         AAACUAUACAACCUACUACCUCACCGGAUCCACAGUGUA
 
 1. Remove gaps and to lower/upper case
 
-        $ echo -e ">seq\nACGT-ACTGC-ACC" | fakit seq -g -u
+        $ echo -e ">seq\nACGT-ACTGC-ACC" | faskit seq -g -u
         >seq
         ACGTACTGCACC
 
 1. RNA to DNA
 
-        $ echo -e ">seq\nUCAUAUGCUUGUCUCAAAGAUUA" | fakit seq --rna2dna
+        $ echo -e ">seq\nUCAUAUGCUUGUCUCAAAGAUUA" | faskit seq --rna2dna
         >seq
         TCATATGCTTGTCTCAAAGATTA
 
@@ -322,7 +322,7 @@ Usage
 ```
 get subsequences by region/gtf/bed, including flanking sequences.
 
-Recommendation: use plain FASTA file, so fakit could utilize FASTA index.
+Recommendation: use plain FASTA file, so faskit could utilize FASTA index.
 
 The definition of region is 1-based and with some custom design.
 
@@ -340,7 +340,7 @@ negative index    0-9-8-7-6-5-4-3-2-1
           1:-1    A C G T N a c g t n
 
 Usage:
-  fakit subseq [flags]
+  faskit subseq [flags]
 
 Flags:
       --bed string        by BED file
@@ -349,26 +349,26 @@ Flags:
       --feature value     select limited feature types (multiple value supported, case ignored, only works with GTF) (default [])
       --gtf string        by GTF (version 2.2) file
   -f, --only-flank        only return up/down stream sequence
-  -r, --region string     by region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases, 13:-1 for cutting first 12 bases. type "fakit subseq -h" for more examples
+  -r, --region string     by region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases, 13:-1 for cutting first 12 bases. type "faskit subseq -h" for more examples
   -u, --up-stream int     up stream length
 
 ```
 
 Examples
 
-***Recommendation: use plain FASTA file, so fakit could utilize FASTA index.***
+***Recommendation: use plain FASTA file, so faskit could utilize FASTA index.***
 
 1. First 12 bases
 
-        $ zcat hairpin.fa.gz | fakit subseq -r 1:12
+        $ zcat hairpin.fa.gz | faskit subseq -r 1:12
 
 1. Last 12 bases
 
-        $ zcat hairpin.fa.gz | fakit subseq -r -12:-1
+        $ zcat hairpin.fa.gz | faskit subseq -r -12:-1
 
 1. Subsequences without first and last 12 bases
 
-        $ zcat hairpin.fa.gz | fakit subseq -r 13:-13
+        $ zcat hairpin.fa.gz | faskit subseq -r 13:-13
 
 1. Get subsequence by GTF file
 
@@ -378,9 +378,9 @@ Examples
         $ cat t.gtf
         seq     test    CDS     5       8       .       .       .       gene_id "A"; transcript_id "";
         seq     test    CDS     5       8       .       -       .       gene_id "B"; transcript_id "";
-        $ fakit
+        $ faskit
 
-        $ fakit subseq --gtf t.gtf t.fa
+        $ faskit subseq --gtf t.gtf t.fa
         >seq_5:8:. A
         ACTG
         >seq_5:8:- B
@@ -393,15 +393,15 @@ Examples
 
     We could specify chromesomes and features.
 
-        $ fakit subseq --gtf Homo_sapiens.GRCh38.84.gtf.gz --chr 1 --feature cds  hsa.fa > chr1.gtf.cds.fa
+        $ faskit subseq --gtf Homo_sapiens.GRCh38.84.gtf.gz --chr 1 --feature cds  hsa.fa > chr1.gtf.cds.fa
 
-        $ fakit stat chr1.gtf.cds.fa
+        $ faskit stat chr1.gtf.cds.fa
         file              seq_format   seq_type   num_seqs   min_len   avg_len   max_len
         chr1.gtf.cds.fa   FASTA        DNA          65,012         1     151.4    12,045
 
 1. Get CDS and 3bp up-stream sequences
 
-        $ fakit subseq --gtf t.gtf t.fa -u 3
+        $ faskit subseq --gtf t.gtf t.fa -u 3
         >seq_5:8:._us:3 A
         ctgACTG
         >seq_5:8:-_us:3 B
@@ -409,7 +409,7 @@ Examples
 
 1. Get 3bp up-stream sequences of CDS, not including CDS
 
-        $ fakit subseq --gtf t.gtf t.fa -u 3 -f
+        $ faskit subseq --gtf t.gtf t.fa -u 3 -f
         >seq_5:8:._usf:3 A
         ctg
         >seq_5:8:-_usf:3 B
@@ -420,16 +420,16 @@ Examples
     ***AVOID loading all data from Homo_sapiens.GRCh38.84.gtf.gz,
     the uncompressed data are so big and may exhaust your RAM.***
 
-        $  fakit subseq --bed Homo_sapiens.GRCh38.84.bed.gz --chr 1 hsa.fa >  chr1.bed.gz.fa
+        $  faskit subseq --bed Homo_sapiens.GRCh38.84.bed.gz --chr 1 hsa.fa >  chr1.bed.gz.fa
 
     We may need to remove duplicated sequences
 
-        $ fakit subseq --bed Homo_sapiens.GRCh38.84.bed.gz --chr 1 hsa.fa | fakit rmdup > chr1.bed.rmdup.fa
+        $ faskit subseq --bed Homo_sapiens.GRCh38.84.bed.gz --chr 1 hsa.fa | faskit rmdup > chr1.bed.rmdup.fa
         [INFO] 141060 duplicated records removed
 
     Summary:
 
-        $ fakit stat chr1.gz.*.gz
+        $ faskit stat chr1.gz.*.gz
         file               seq_format   seq_type   num_seqs   min_len   avg_len     max_len
         chr1.gz.fa         FASTA        DNA         231,974         1   3,089.5   1,551,957
         chr1.gz.rmdup.fa   FASTA        DNA          90,914         1   6,455.8   1,551,957
@@ -443,7 +443,7 @@ Usage
 sliding sequences, circular genome supported
 
 Usage:
-  fakit sliding [flags]
+  faskit sliding [flags]
 
 Flags:
   -C, --circular-genome   circular genome
@@ -456,7 +456,7 @@ Examples
 
 1. General use
 
-        $ echo -e ">seq\nACGTacgtNN" | fakit sliding -s 3 -W 6
+        $ echo -e ">seq\nACGTacgtNN" | faskit sliding -s 3 -W 6
         >seq_sliding:1-6
         ACGTac
         >seq_sliding:4-9
@@ -464,7 +464,7 @@ Examples
 
 2. Circular genome
 
-        $ echo -e ">seq\nACGTacgtNN" | fakit sliding -s 3 -W 6 -C
+        $ echo -e ">seq\nACGTacgtNN" | faskit sliding -s 3 -W 6 -C
         >seq_sliding:1-6
         ACGTac
         >seq_sliding:4-9
@@ -476,7 +476,7 @@ Examples
 
 3. Generate GC content for ploting
 
-        $ zcat hairpin.fa.gz | fakit fx2tab | head -n 1 | fakit tab2fx | fakit sliding -s 5 -W 30 | fakit fx2tab -n -g
+        $ zcat hairpin.fa.gz | faskit fx2tab | head -n 1 | faskit tab2fx | faskit sliding -s 5 -W 30 | faskit fx2tab -n -g
         cel-let-7_sliding:1-30          50.00
         cel-let-7_sliding:6-35          46.67
         cel-let-7_sliding:11-40         43.33
@@ -493,7 +493,7 @@ Usage
 simple statistics of FASTA files
 
 Usage:
-  fakit stat [flags]
+  faskit stat [flags]
 
 ```
 
@@ -501,7 +501,7 @@ Eexamples
 
 1. General use
 
-        $ fakit stat *.f{a,q}.gz
+        $ faskit stat *.f{a,q}.gz
         file            seq_format   seq_type   num_seqs   min_len   avg_len   max_len
         clean.fa.gz     FASTA        RNA          26,419        39     104.2     2,354
         hairpin.fa.gz   FASTA        RNA          28,645        39       103     2,354
@@ -517,13 +517,13 @@ Usage
 covert FASTQ to FASTA
 
 Usage:
-  fakit fq2fa [flags]
+  faskit fq2fa [flags]
 
 ```
 
 Examples
 
-    fakit fq2fa reads_1.fq.gz -o reads1_.fa.gz
+    faskit fq2fa reads_1.fq.gz -o reads1_.fa.gz
 
 
 ## fx2tab & tab2fx
@@ -535,7 +535,7 @@ covert FASTA/Q to tabular format, and provide various information,
 like sequence length, GC content/GC skew.
 
 Usage:
-  fakit fx2tab [flags]
+  faskit fx2tab [flags]
 
 Flags:
   -B, --base-content value   print base content. (case ignored, multiple values supported) e.g. -B AT -B N (default [])
@@ -554,7 +554,7 @@ Usage (tab2fx)
 covert tabular format (first two/three columns) to FASTA/Q format
 
 Usage:
-  fakit tab2fx [flags]
+  faskit tab2fx [flags]
 
 Flags:
   -p, --comment-line-prefix value   comment line prefix (default [#,//])
@@ -566,7 +566,7 @@ Examples
 
 1. Default output
 
-        $ fakit fx2tab hairpin.fa.gz | head -n 2
+        $ faskit fx2tab hairpin.fa.gz | head -n 2
         cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop      UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAACUAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
         cel-lin-4 MI0000002 Caenorhabditis elegans lin-4 stem-loop      AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGAGUGUACUAUUGAUGCUUCACACCUGGGCUCUCCGGGUACCAGGACGGUUUGAGCAGAU
 
@@ -574,7 +574,7 @@ Examples
 1. Print sequence length, GC content, and only print names (no sequences),
 we could also print title line by flag `-T`.
 
-        $ fakit fx2tab hairpin.fa.gz -l -g -n -i -H | head -n 4 | csvtk -t -C '&' pretty
+        $ faskit fx2tab hairpin.fa.gz -l -g -n -i -H | head -n 4 | csvtk -t -C '&' pretty
         #name       seq   qual   length   GC
         cel-let-7                99       43.43
         cel-lin-4                94       54.26
@@ -582,13 +582,13 @@ we could also print title line by flag `-T`.
 
 1. Use fx2tab and tab2fx in pipe
 
-        $ zcat hairpin.fa.gz | fakit fx2tab | fakit tab2fx
+        $ zcat hairpin.fa.gz | faskit fx2tab | faskit tab2fx
 
-        $ zcat reads_1.fq.gz | fakit fx2tab | fakit tab2fx
+        $ zcat reads_1.fq.gz | faskit fx2tab | faskit tab2fx
 
-1. Sort sequences by length (use `fakit sort -l`)
+1. Sort sequences by length (use `faskit sort -l`)
 
-        $ zcat hairpin.fa.gz | fakit fx2tab -l | sort -t"`echo -e '\t'`" -n -k4,4 | fakit tab2fx
+        $ zcat hairpin.fa.gz | faskit fx2tab -l | sort -t"`echo -e '\t'`" -n -k4,4 | faskit tab2fx
         >cin-mir-4129 MI0015684 Ciona intestinalis miR-4129 stem-loop
         UUCGUUAUUGGAAGACCUUAGUCCGUUAAUAAAGGCAUC
         >mmu-mir-7228 MI0023723 Mus musculus miR-7228 stem-loop
@@ -596,26 +596,26 @@ we could also print title line by flag `-T`.
         >cin-mir-4103 MI0015657 Ciona intestinalis miR-4103 stem-loop
         ACCACGGGUCUGUGACGUAGCAGCGCUGCGGGUCCGCUGU
 
-        $ fakit sort -l hairpin.fa.gz
+        $ faskit sort -l hairpin.fa.gz
 
     Sorting or filtering by GC (or other base by -flag `-B`) content could also achieved in similar way.
 
 1. Get first 1000 sequences
 
-        $ fakit fx2tab hairpin.fa.gz | head -n 1000 | fakit tab2fx
+        $ faskit fx2tab hairpin.fa.gz | head -n 1000 | faskit tab2fx
 
-        $ fakit fx2tab reads_1.fq.gz | head -n 1000 | fakit tab2fx
+        $ faskit fx2tab reads_1.fq.gz | head -n 1000 | faskit tab2fx
 
 **Extension**
 
-After converting FASTA to tabular format with `fakit fx2tab`,
+After converting FASTA to tabular format with `faskit fx2tab`,
 it could be handled with CSV/TSV tools,
  e.g. [csvtk](https://github.com/shenwei356/csvtkt), a cross-platform, efficient and practical CSV/TSV toolkit
 
-- `csvtk grep` could be used to filter sequences (similar with `fakit grep`)
+- `csvtk grep` could be used to filter sequences (similar with `faskit grep`)
 - `csvtk inter`
 computates intersection of multiple files. It could achieve similar function
-as `fakit common -n` along with shell.
+as `faskit common -n` along with shell.
 - `csvtk join` joins multiple CSV/TSV files by multiple IDs.
 - [csv_melt](https://github.com/shenwei356/datakit/blob/master/csv_melt)
 provides melt function, could be used in preparation of data for ploting.
@@ -629,7 +629,7 @@ Usage
 search sequences by pattern(s) of name or sequence motifs
 
 Usage:
-  fakit grep [flags]
+  faskit grep [flags]
 
 Flags:
   -n, --by-name               match by full name instead of just id
@@ -648,7 +648,7 @@ Examples
 
 1. Extract human hairpins (i.e. sequences with name starting with `hsa`)
 
-        $ zcat hairpin.fa.gz | fakit grep -r -p ^hsa
+        $ zcat hairpin.fa.gz | faskit grep -r -p ^hsa
         >hsa-let-7a-1 MI0000060 Homo sapiens let-7a-1 stem-loop
         UGGGAUGAGGUAGUAGGUUGUAUAGUUUUAGGGUCACACCCACCACUGGGAGAUAACUAU
         ACAAUCUACUGUCUUUCCUA
@@ -658,7 +658,7 @@ Examples
 
 1. Remove human and mice hairpins.
 
-        $ zcat hairpin.fa.gz | fakit grep -r -p ^hsa -p ^mmu -v
+        $ zcat hairpin.fa.gz | faskit grep -r -p ^hsa -p ^mmu -v
 
 1. Extract new entries by information from miRNA.diff.gz
 
@@ -673,19 +673,19 @@ Examples
 
     2. Extract by ID list file
 
-            $ zcat hairpin.fa.gz | fakit grep -f list > new.fa
+            $ zcat hairpin.fa.gz | faskit grep -f list > new.fa
 
 1. Extract sequences starting with AGGCG
 
-        $ zcat hairpin.fa.gz | fakit grep -s -r -i -p ^aggcg
+        $ zcat hairpin.fa.gz | faskit grep -s -r -i -p ^aggcg
 
 1. Extract sequences with TTSAA (AgsI digest site) in SEQUENCE. Base S stands for C or G.
 
-        $ zcat hairpin.fa.gz | fakit grep -s -d -i -p TTSAA
+        $ zcat hairpin.fa.gz | faskit grep -s -d -i -p TTSAA
 
     It's equal to but simpler than:
 
-        $ zcat hairpin.fa.gz | fakit grep -s -r -i -p TT[CG]AA
+        $ zcat hairpin.fa.gz | faskit grep -s -r -i -p TT[CG]AA
 
 
 ## locate
@@ -704,7 +704,7 @@ When flag -d given, regular expression may be wrong.
 For example: "\w" will be wrongly converted to "\[AT]".
 
 Usage:
-  fakit locate [flags]
+  faskit locate [flags]
 
 Flags:
   -d, --degenerate                pattern/motif contains degenerate base
@@ -720,7 +720,7 @@ Examples
 
 1. Locate ORFs.
 
-        $ zcat hairpin.fa.gz | fakit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)"
+        $ zcat hairpin.fa.gz | faskit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)"
         seqID   patternName     pattern strand  start   end     matched
         cel-lin-4       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        +  136      AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGA
         cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        +  54       95      AUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAG
@@ -728,12 +728,12 @@ Examples
 
 1. Locate Motif.
 
-        $ zcat hairpin.fa.gz | fakit locate -i -d -p AUGGACUN
+        $ zcat hairpin.fa.gz | faskit locate -i -d -p AUGGACUN
         seqID         patternName   pattern    strand   start   end   matched
         cel-mir-58a   AUGGACUN      AUGGACUN   +        81      88    AUGGACUG
         ath-MIR163    AUGGACUN      AUGGACUN   -        122     129   AUGGACUC
 
-    Notice that `fakit grep` only searches in positive strand, but `fakit loate` could recognize both strand
+    Notice that `faskit grep` only searches in positive strand, but `faskit loate` could recognize both strand
 
 
 ## rmdup
@@ -744,7 +744,7 @@ Usage
 remove duplicated sequences by id/name/sequence
 
 Usage:
-  fakit rmdup [flags]
+  faskit rmdup [flags]
 
 Flags:
     -n, --by-name                by full name instead of just id
@@ -762,15 +762,15 @@ Similar to `common`.
 
 1. General use
 
-        $ zcat hairpin.fa.gz | fakit rmdup -s -o clean.fa.gz
+        $ zcat hairpin.fa.gz | faskit rmdup -s -o clean.fa.gz
         [INFO] 2226 duplicated records removed
 
-        $ zcat reads_1.fq.gz | fakit rmdup -s -o clean.fa.gz
+        $ zcat reads_1.fq.gz | faskit rmdup -s -o clean.fa.gz
         [INFO] 1086 duplicated records removed
 
 1. Save duplicated sequences to file
 
-        $ zcat hairpin.fa.gz | fakit rmdup -s -i -m -o clean.fa.gz -d duplicated.fa.gz -D duplicated.detail.txt
+        $ zcat hairpin.fa.gz | faskit rmdup -s -i -m -o clean.fa.gz -d duplicated.fa.gz -D duplicated.detail.txt
 
         $ cat duplicated.detail.txt   # here is not the entire list
         3	hsa-mir-424, mml-mir-424, ppy-mir-424
@@ -786,7 +786,7 @@ Usage
 find common sequences of multiple files by id/name/sequence
 
 Usage:
-  fakit common [flags]
+  faskit common [flags]
 
 Flags:
     -n, --by-name       match by full name instead of just id
@@ -800,19 +800,19 @@ Examples
 
 1. By ID (default)
 
-        fakit common file*.fa -o common.fasta
+        faskit common file*.fa -o common.fasta
 
 1. By full name
 
-        fakit common file*.fa -n -o common.fasta
+        faskit common file*.fa -n -o common.fasta
 
 1. By sequence
 
-        fakit common file*.fa -s -i -o common.fasta
+        faskit common file*.fa -s -i -o common.fasta
 
 1. By sequence (***for large sequences***)
 
-        fakit common file*.fa -s -i -o common.fasta --md5
+        faskit common file*.fa -s -i -o common.fasta --md5
 
 
 ## split
@@ -839,12 +839,12 @@ negative index    0-9-8-7-6-5-4-3-2-1
           1:-1    A C G T N a c g t n
 
 Usage:
-  fakit split [flags]
+  faskit split [flags]
 
 Flags:
   -i, --by-id              split squences according to sequence ID
   -p, --by-part int        split squences into N parts
-  -r, --by-region string   split squences according to subsequence of given region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type "fakit split -h" for more examples
+  -r, --by-region string   split squences according to subsequence of given region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type "faskit split -h" for more examples
   -s, --by-size int        split squences into multi parts with N sequences
   -d, --dry-run            dry run, just print message and no files will be created.
   -k, --keep-temp          keep tempory FASTA and .fai file when using 2-pass mode
@@ -857,7 +857,7 @@ Examples
 
 1. Split sequences into parts with at most 10000 sequences
 
-        $ fakit split hairpin.fa.gz -s 10000
+        $ faskit split hairpin.fa.gz -s 10000
         [INFO] split into 10000 seqs per file
         [INFO] write 10000 sequences to file: hairpin.fa.part_001.gz
         [INFO] write 10000 sequences to file: hairpin.fa.part_002.gz
@@ -865,7 +865,7 @@ Examples
 
 1. Split sequences into 4 parts
 
-        $ fakit split hairpin.fa.gz -p 4
+        $ faskit split hairpin.fa.gz -p 4
         [INFO] split into 4 parts
         [INFO] read sequences ...
         [INFO] read 28645 sequences
@@ -877,7 +877,7 @@ Examples
 
     ***To reduce memory usage when spliting big file, we should alwasy use flag `--two-pass`***
 
-        $ fakit split hairpin.fa.gz -p 4 -2
+        $ faskit split hairpin.fa.gz -p 4 -2
         [INFO] split into 4 parts
         [INFO] read and write sequences to tempory file: hairpin.fa.gz.fa ...
         [INFO] create and read FASTA index ...
@@ -890,7 +890,7 @@ Examples
 
 1. Split sequences by species. i.e. by custom IDs (first three letters)
 
-        $ fakit split hairpin.fa.gz -i --id-regexp "^([\w]+)\-" -2
+        $ faskit split hairpin.fa.gz -i --id-regexp "^([\w]+)\-" -2
         [INFO] split by ID. idRegexp: ^([\w]+)\-
         [INFO] read and write sequences to tempory file: hairpin.fa.gz.fa ...
         [INFO] create and read FASTA index ...
@@ -905,7 +905,7 @@ Examples
 
 1. Split sequences by sequence region (for example, sequence barcode)
 
-        $ fakit split hairpin.fa.gz -r 1:3 -2
+        $ faskit split hairpin.fa.gz -r 1:3 -2
         [INFO] split by region: 1:3
         [INFO] read and write sequences to tempory file: hairpin.fa.gz.fa ...
         [INFO] read sequence IDs and sequence region from FASTA file ...
@@ -927,7 +927,7 @@ Usage
 sample sequences by number or proportion.
 
 Usage:
-  fakit sample [flags]
+  faskit sample [flags]
 
 Flags:
   -n, --number int         sample by number (result may not exactly match)
@@ -941,29 +941,29 @@ Examples
 
 1. Sample by proportion
 
-        $ zcat hairpin.fa.gz | fakit sample -p 0.1 -o sample.fa.gz
+        $ zcat hairpin.fa.gz | faskit sample -p 0.1 -o sample.fa.gz
         [INFO] sample by proportion
         [INFO] 2814 sequences outputed
 
 1. Sample by number
 
-        $ zcat hairpin.fa.gz | fakit sample -n 1000 -o sample.fa.gz
+        $ zcat hairpin.fa.gz | faskit sample -n 1000 -o sample.fa.gz
         [INFO] sample by number
         [INFO] 949 sequences outputed
 
     ***To reduce memory usage when spliting big file, we could use flag `--two-pass`***
 
-    ***We can also use `fakit sample -p` followed with `fakit head -n`:***
+    ***We can also use `faskit sample -p` followed with `faskit head -n`:***
 
-        $ zcat hairpin.fa.gz | fakit sample -p 0.1 | fakit head -n 1000 -o sample.fa.gz
+        $ zcat hairpin.fa.gz | faskit sample -p 0.1 | faskit head -n 1000 -o sample.fa.gz
 
 1. Set rand seed to reproduce the result
 
-        $ zcat hairpin.fa.gz | fakit sample -p 0.1 -s 11
+        $ zcat hairpin.fa.gz | faskit sample -p 0.1 -s 11
 
 1. Most of the time, we could shuffle after sampling
 
-        $ zcat hairpin.fa.gz | fakit sample -p 0.1 | fakit shuffle -o sample.fa.gz
+        $ zcat hairpin.fa.gz | faskit sample -p 0.1 | faskit shuffle -o sample.fa.gz
 
 Note that when sampling on FASTQ files, make sure using same random seed by
 flag `-s` (`--rand-seed`)
@@ -976,7 +976,7 @@ Usage
 print first N FASTA/Q records
 
 Usage:
-  fakit head [flags]
+  faskit head [flags]
 
 Flags:
   -n, --number int   print first N FASTA/Q records (default 10)
@@ -987,14 +987,14 @@ Examples
 
 1. FASTA
 
-        $ fakit head -n 1 hairpin.fa.gz
+        $ faskit head -n 1 hairpin.fa.gz
         >cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
         UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
         UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 
 1. FASTQ
 
-        $ fakit head -n 1 reads_1.fq.gz
+        $ faskit head -n 1 reads_1.fq.gz
         @HWI-D00523:240:HF3WGBCXX:1:1101:2574:2226 1:N:0:CTGTAG
         TGAGGAATATTGGTCAATGGGCGCGAGCCTGAACCAGCCAAGTAGCGTGAAGGATGACTG
         CCCTACGGGTTGTAAACTTCTTTTATAAAGGAATAAAGTGAGGCACGTGTGCCTTTTTGT
@@ -1021,16 +1021,16 @@ ATTENTION: use SINGLE quote NOT double quotes in *nix OS.
 
 Examples: Adding space to all bases.
 
-    fakit replace -p "(.)" -r '$1 ' -s
+    faskit replace -p "(.)" -r '$1 ' -s
 
 Or use the \ escape character.
 
-    fakit replace -p "(.)" -r "\$1 " -s
+    faskit replace -p "(.)" -r "\$1 " -s
 
-more on: http://shenwei356.github.io/fakit/usage/#replace
+more on: http://shenwei356.github.io/faskit/usage/#replace
 
 Usage:
-  fakit replace [flags]
+  faskit replace [flags]
 
 Flags:
   -s, --by-seq               replace seq
@@ -1044,31 +1044,31 @@ Examples
 
 1. Remove descriptions
 
-        $ echo -e ">seq1 abc-123\nACGT-ACGT" | fakit replace -p " .+"
+        $ echo -e ">seq1 abc-123\nACGT-ACGT" | faskit replace -p " .+"
         >seq1
         ACGT-ACGT
 
 1. Replace "-" with "="
 
-        $ echo -e ">seq1 abc-123\nACGT-ACGT" | fakit replace -p "\-" -r '='
+        $ echo -e ">seq1 abc-123\nACGT-ACGT" | faskit replace -p "\-" -r '='
         >seq1 abc=123
         ACGT-ACGT
 
 1. Remove gaps in sequences.
 
-        $ echo -e ">seq1 abc-123\nACGT-ACGT" | fakit replace -p " |-" -s
+        $ echo -e ">seq1 abc-123\nACGT-ACGT" | faskit replace -p " |-" -s
         >seq1 abc-123
         ACGTACGT
 
 1. Add space to every base. **ATTENTION: use SINGLE quote NOT double quotes in *nix OS**
 
-        $ echo -e ">seq1 abc-123\nACGT-ACGT" | fakit replace -p "(.)" -r '$1 ' -s
+        $ echo -e ">seq1 abc-123\nACGT-ACGT" | faskit replace -p "(.)" -r '$1 ' -s
         >seq1 abc-123
         A C G T - A C G T
 
 1. Transpose sequence with [csvtk](https://github.com/shenwei356/csvtk)
 
-        $ echo -e ">seq1\nACTGACGT\n>seq2\nactgccgt" | fakit replace -p "(.)" -r     "\$1 " -s | fakit seq -s -u | csvtk space2tab | csvtk -t transpose
+        $ echo -e ">seq1\nACTGACGT\n>seq2\nactgccgt" | faskit replace -p "(.)" -r     "\$1 " -s | faskit seq -s -u | csvtk space2tab | csvtk -t transpose
         A       A
         C       C
         T       T
@@ -1080,7 +1080,7 @@ Examples
 
 1. Rename with number of record
 
-        echo -e ">abc\nACTG\n>123\nATTT" |  fakit replace -p .+ -r "seq_{NR}"
+        echo -e ">abc\nACTG\n>123\nATTT" |  faskit replace -p .+ -r "seq_{NR}"
         >seq_1
         ACTG
         >seq_2
@@ -1098,13 +1098,13 @@ By default, all records will be readed into memory.
 For FASTA format, use flag -2 (--two-pass) to reduce memory usage. FASTQ not
 supported.
 
-Firstly, fakit reads the sequence IDs. If the file is not plain FASTA file,
-fakit will write the sequences to tempory files, and create FASTA index.
+Firstly, faskit reads the sequence IDs. If the file is not plain FASTA file,
+faskit will write the sequences to tempory files, and create FASTA index.
 
-Secondly, fakit shuffles sequence IDs and extract sequences by FASTA index.
+Secondly, faskit shuffles sequence IDs and extract sequences by FASTA index.
 
 Usage:
-  fakit shuffle [flags]
+  faskit shuffle [flags]
 
 Flags:
   -k, --keep-temp       keep tempory FASTA and .fai file when using 2-pass mode
@@ -1117,16 +1117,16 @@ Examples
 
 1. General use.
 
-        $ fakit shuffle hairpin.fa.gz > shuffled.fa
+        $ faskit shuffle hairpin.fa.gz > shuffled.fa
         [INFO] read sequences ...
         [INFO] 28645 sequences loaded
         [INFO] shuffle ...
         [INFO] output ...
 
-1. ***For big genome, you'd better use two-pass mode*** so fakit could use
+1. ***For big genome, you'd better use two-pass mode*** so faskit could use
    FASTA index to reduce memory usage
 
-        $ time fakit shuffle -2 hsa.fa > shuffle.fa
+        $ time faskit shuffle -2 hsa.fa > shuffle.fa
         [INFO] create and read FASTA index ...
         [INFO] create FASTA index for hsa.fa
         [INFO] read sequence IDs from FASTA index ...
@@ -1152,15 +1152,15 @@ By default, all records will be readed into memory.
 For FASTA format, use flag -2 (--two-pass) to reduce memory usage. FASTQ not
 supported.
 
-Firstly, fakit reads the sequence head and length information.
+Firstly, faskit reads the sequence head and length information.
 If the file is not plain FASTA file,
-fakit will write the sequences to tempory files, and create FASTA index.
+faskit will write the sequences to tempory files, and create FASTA index.
 
-Secondly, fakit sort sequence by head and length information
+Secondly, faskit sort sequence by head and length information
 and extract sequences by FASTA index.
 
 Usage:
-  fakit sort [flags]
+  faskit sort [flags]
 
 Flags:
   -l, --by-length               by sequence length
@@ -1169,7 +1169,7 @@ Flags:
   -i, --ignore-case             ignore case
   -k, --keep-temp               keep tempory FASTA and .fai file when using 2-pass mode
   -r, --reverse                 reverse the result
-  -L, --seq-prefix-length int   length of sequence prefix on which fakit sorts by sequences (0 for whole sequence) (default 10000)
+  -L, --seq-prefix-length int   length of sequence prefix on which faskit sorts by sequences (0 for whole sequence) (default 10000)
   -2, --two-pass                two-pass mode read files twice to lower memory usage. (only for FASTA format)
 
 ```
@@ -1180,7 +1180,7 @@ Examples
 
 1. sort by ID
 
-        $ echo -e ">seq1\nACGTNcccc\n>SEQ2\nacgtnAAAA" | fakit sort --quiet
+        $ echo -e ">seq1\nACGTNcccc\n>SEQ2\nacgtnAAAA" | faskit sort --quiet
         >SEQ2
         acgtnAAAA
         >seq1
@@ -1188,7 +1188,7 @@ Examples
 
 1. sort by ID, ignoring case.
 
-        $ echo -e ">seq1\nACGTNcccc\n>SEQ2\nacgtnAAAA" | fakit sort --quiet -i
+        $ echo -e ">seq1\nACGTNcccc\n>SEQ2\nacgtnAAAA" | faskit sort --quiet -i
         >seq1
         ACGTNcccc
         >SEQ2
@@ -1196,7 +1196,7 @@ Examples
 
 1. sort by seq, ignoring case.
 
-        $ echo -e ">seq1\nACGTNcccc\n>SEQ2\nacgtnAAAA" | fakit sort --quiet -s -i
+        $ echo -e ">seq1\nACGTNcccc\n>SEQ2\nacgtnAAAA" | faskit sort --quiet -s -i
         >SEQ2
         acgtnAAAA
         >seq1
@@ -1204,7 +1204,7 @@ Examples
 
 1. sort by sequence length
 
-        $ echo -e ">seq1\nACGTNcccc\n>SEQ2\nacgtnAAAAnnn\n>seq3\nacgt" | fakit sort --quiet -l
+        $ echo -e ">seq1\nACGTNcccc\n>SEQ2\nacgtnAAAAnnn\n>seq3\nacgt" | faskit sort --quiet -l
         >seq3
         acgt
         >seq1
