@@ -1,0 +1,25 @@
+Categories	Features	seqkit	fasta_utilities	fastx_toolkit	pyfaidx	seqmagick	seqtk
+**Formats supports**	Multi-line FASTA	Yes	Yes	--	Yes	Yes	Yes
+ 	FASTQ	Yes	Yes	Yes	--	Yes	Yes
+ 	Multi-line  FASTQ	Yes	Yes	--	--	Yes	Yes
+ 	Validating sequences	Yes	--	Yes	Yes	--	--
+ 	Supporting RNA	Yes	Yes	--	--	Yes	Yes
+**Functions**	Searching by motifs	Yes	Yes	--	--	Yes	--
+ 	Sampling	Yes	--	--	--	Yes	Yes
+ 	Extracting sub-sequence	Yes	Yes	--	Yes	Yes	Yes
+ 	Removing duplicates	Yes	--	--	--	Partly	--
+ 	Splitting	Yes	Yes	--	Partly	--	--
+ 	Splitting by seq	Yes	--	Yes	Yes	--	--
+ 	Shuffling	Yes	--	--	--	--	--
+ 	Sorting	Yes	Yes	--	--	Yes	--
+ 	Locating motifs	Yes	--	--	--	--	--
+ 	Common sequences	Yes	--	--	--	--	--
+ 	Cleaning bases	Yes	Yes	Yes	Yes	--	--
+ 	Transcription	Yes	Yes	Yes	Yes	Yes	Yes
+ 	Translation	--	Yes	Yes	Yes	Yes	--
+ 	Filtering by size	Indirect	Yes	--	Yes	Yes	--
+ 	Renaming header	Yes	Yes	--	--	Yes	Yes 
+**Other features**	Cross-platform	Yes	Partly	Partly	Yes	Yes	Yes
+ 	Reading STDIN	Yes	Yes	Yes	--	Yes	Yes
+ 	Reading gzipped file	Yes	Yes	--	--	Yes	Yes
+ 	Writing gzip file	Yes	--	--	--	Yes	--

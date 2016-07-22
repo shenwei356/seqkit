@@ -7,10 +7,6 @@ Source code: [https://github.com/shenwei356/seqkit](https://github.com/shenwei35
 
 Latest version: [![Latest Version](https://img.shields.io/github/release/shenwei356/seqkit.svg?style=flat)](https://github.com/shenwei356/seqkit/releases)
 
-## About the name
-
-Originally, `seqkit` (abbreviation of `FASTA kit`) was designed to handle FASTA
-format. And the name was remained after adding ***seamless support for FASTA/Q fromat***.
 
 ## Introduction
 
@@ -34,7 +30,7 @@ therefore, it could be easily used in command-line pipe.
   see [download](http://shenwei356.github.io/seqkit/download/))
 - **Light weight and out-of-the-box, no dependencies, no compilation, no configuration**
   (see [download](http://shenwei356.github.io/seqkit/download/))
-- **Fast** (see [benchmark](/#benchmark)),
+- **Very Fast** (see [benchmark](/#benchmark)),
   **multiple-CPUs supported**.
 - **Practical functions supported by 20 subcommands** (see subcommands and
   [usage](http://shenwei356.github.io/seqkit/usage/) )
@@ -42,42 +38,46 @@ therefore, it could be easily used in command-line pipe.
   and [benchmark](http://shenwei356.github.io/seqkit/benchmark/) )
 - **Seamlessly parses both FASTA and FASTQ formats**
 - **Support STDIN and gziped input/output file, easy being used in pipe**
-- **Support custom sequence ID regular expression** (especially useful for quering with ID list)
+- **Support custom sequence ID regular expression** (especially useful for searching with ID list)
 - Reproducible results (configurable rand seed in `sample` and `shuffle`)
 - Well organized source code, friendly to use and easy to extend.
 
-**Features comparison**
+### Features comparison
 
-Features         | seqkit   | fasta_utilities | fastx_toolkit | pyfaidx | seqmagick | seqtk
-:--------------- | :------: | :-------------: | :-----------: | :-----: | :-------: | :----
-Cross-platform   | Yes      | Partly          | Partly        | Yes     | Yes       | Yes
-Mutli-line FASTA | Yes      | Yes             | --            | Yes     | Yes       | Yes
-Read FASTQ       | Yes      | Yes             | Yes           | --      | Yes       | Yes
-Mutli-line FASTQ | Yes      | Yes             | --            | --      | Yes       | Yes
-Validate bases   | Yes      | --              | Yes           | Yes     | --        | --
-Recognize RNA    | Yes      | Yes             | --            | --      | Yes       | Yes
-Read STDIN       | Yes      | Yes             | Yes           | --      | Yes       | Yes
-Read gzip        | Yes      | Yes             | --            | --      | Yes       | Yes
-Write gzip       | Yes      | --              | --            | --      | Yes       | --
-Search by motifs | Yes      | Yes             | --            | --      | Yes       | --
-Sample seqs      | Yes      | --              | --            | --      | Yes       | Yes
-Subseq           | Yes      | Yes             | --            | Yes     | Yes       | Yes
-Deduplicate seqs | Yes      | --              | --            | --      | Partly    | --
-Split seqs       | Yes      | Yes             | --            | Partly  | --        | --
-Split by seq     | Yes      | --              | Yes           | Yes     | --        | --
-Shuffle seqs     | Yes      | --              | --            | --      | --        | --
-Sort seqs        | Yes      | Yes             | --            | --      | Yes       | --
-Locate motifs    | Yes      | --              | --            | --      | --        | --
-Common seqs      | Yes      | --              | --            | --      | --        | --
-Clean bases      | Yes      | Yes             | Yes           | Yes     | --        | --
-Transcribe       | Yes      | Yes             | Yes           | Yes     | Yes       | Yes
-Translate        | --       | Yes             | Yes           | Yes     | Yes       | --
-Size select      | Indirect | Yes             | --            | Yes     | Yes       | --
-Rename head      | Yes      | Yes             | --            | --      | Yes       | Yes
+Categories          |Features               |seqkit  |fasta_utilities|fastx_toolkit|pyfaidx|seqmagick|seqtk
+:-------------------|:----------------------|:------:|:-------------:|:-----------:|:-----:|:-------:|:---:
+**Formats supports**|Multi-line FASTA       |Yes     |Yes            |--           |Yes    |Yes      |Yes
+                    |FASTQ                  |Yes     |Yes            |Yes          |--     |Yes      |Yes
+                    |Multi-line  FASTQ      |Yes     |Yes            |--           |--     |Yes      |Yes
+                    |Validating sequences   |Yes     |--             |Yes          |Yes    |--       |--
+                    |Supporting RNA         |Yes     |Yes            |--           |--     |Yes      |Yes
+**Functions**       |Searching by motifs    |Yes     |Yes            |--           |--     |Yes      |--
+                    |Sampling               |Yes     |--             |--           |--     |Yes      |Yes
+                    |Extracting sub-sequence|Yes     |Yes            |--           |Yes    |Yes      |Yes
+                    |Removing duplicates    |Yes     |--             |--           |--     |Partly   |--
+                    |Splitting              |Yes     |Yes            |--           |Partly |--       |--
+                    |Splitting by seq       |Yes     |--             |Yes          |Yes    |--       |--
+                    |Shuffling              |Yes     |--             |--           |--     |--       |--
+                    |Sorting                |Yes     |Yes            |--           |--     |Yes      |--
+                    |Locating motifs        |Yes     |--             |--           |--     |--       |--
+                    |Common sequences       |Yes     |--             |--           |--     |--       |--
+                    |Cleaning bases         |Yes     |Yes            |Yes          |Yes    |--       |--
+                    |Transcription          |Yes     |Yes            |Yes          |Yes    |Yes      |Yes
+                    |Translation            |--      |Yes            |Yes          |Yes    |Yes      |--
+                    |Filtering by size      |Indirect|Yes            |--           |Yes    |Yes      |--
+                    |Renaming header        |Yes     |Yes            |--           |--     |Yes      |Yes 
+**Other features**  |Cross-platform         |Yes     |Partly         |Partly       |Yes    |Yes      |Yes
+                    |Reading STDIN          |Yes     |Yes            |Yes          |--     |Yes      |Yes
+                    |Reading gzipped file   |Yes     |Yes            |--           |--     |Yes      |Yes
+                    |Writing gzip file      |Yes     |--             |--           |--     |Yes      |--
 
-# Installation
+**Note 1**: See [version information](http://127.0.0.1:8000/benchmark/#softwares) of the softwares.
 
-[Download Page](http://shenwei356.github.io/seqkit/downlaod)
+**Note 2**: See [usage](http://shenwei356.github.io/seqkit/usage/) for detailed options of seqkit. 
+
+## Installation
+
+Go to [Download Page](http://shenwei356.github.io/seqkit/downlaod) for more download options and changelogs.
 
 `seqkit` is implemented in [Golang](https://golang.org/) programming language,
  executable binary files **for most popular operating systems** are freely available
@@ -105,7 +105,7 @@ For Go developer, just one command:
 
 ## Subcommands
 
-20 in total.
+20 subcommands in total.
 
 **Sequence and subsequence**
 
@@ -146,7 +146,7 @@ For Go developer, just one command:
 
 **Misc**
 
-- `version`   print version information
+- `version`   print version information and check for update
 
 
 ## Technical details and guides for use
@@ -154,20 +154,20 @@ For Go developer, just one command:
 ### FASTA/Q format parsing
 
 seqkit uses author's lightweight and high-performance bioinformatics packages
-[bio](https://github.com/shenwei356/bio) for FASTA/Q parsing，
+[bio](https://github.com/shenwei356/bio) for FASTA/Q parsing,
 which has [high performance](https://github.com/shenwei356/bio#compare-to-kseqh-klib)
 close to the
 famous C lib [kseq.h](https://github.com/attractivechaos/klib/blob/master/kseq.h).
 
 ### Sequence formats and types
 
-seqkit seamlessly support FASTA and FASTQ format.
+seqkit seamlessly support FASTA and FASTQ format. 
+Sequence format is automatically detected.
 All subcommands except for `faidx` can handle both formats.
 And only when some commands (`subseq`, `split`, `sort` and `shuffle`)
 which utilise FASTA index to improve perfrmance for large files in two pass mode
 (by flag `--two-pass`), only FASTA format is supported.
 
-Sequence format is automatically detected.
 
 Sequence type (DNA/RNA/Protein) is automatically detected by leading subsequences
 of the first sequences in file or STDIN. The length of the leading subsequences
@@ -177,10 +177,10 @@ be checked.
 
 ### Sequence ID
 
-By default, most softwares, including `seqkit`, takes the first non-space
-letters as sequence ID. For example,
+By default, most softwares, including `seqkit`, take the leading non-space
+letters as sequence identifier (ID). For example,
 
-|   FASTA head                                                  |     ID                                            |
+|   FASTA header                                                  |     ID                                            |
 |:--------------------------------------------------------------|:--------------------------------------------------|
 | >123456 gene name                                             | 123456                                            |
 | >longname                                                     | longname                                          |
@@ -199,8 +199,8 @@ when input files are (plain or gzipped) FASTA files,
 FASTA index would be optional used for
 rapid access of sequences and reducing memory occupation.
 
-ATTENTION: the `.seqkit.fai` file created by seqkit is a little different from .fai file
-created by samtools. seqkit uses full sequence head instead of just ID as key.
+ATTENTION: the `.seqkit.fai` file created by seqkit is a little different from `.fai` file
+created by `samtools`. seqkit uses full sequence head instead of just ID as key.
 
 ### Parallelization of CPU intensive jobs
 

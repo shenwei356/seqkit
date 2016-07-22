@@ -26,33 +26,34 @@ to compute running time and peak memory usage of a process.
 
 ## Features
 
-Features         | seqkit    | fasta_utilities | fastx_toolkit | pyfaidx | seqmagick | seqtk
-:--------------- | :------: | :-------------: | :-----------: | :-----: | :-------: | :----
-Cross-platform   | Yes      | Partly          | Partly        | Yes     | Yes       | Yes
-Mutli-line FASTA | Yes      | Yes             | --            | Yes     | Yes       | Yes
-Read FASTQ       | Yes      | Yes             | Yes           | --      | Yes       | Yes
-Mutli-line FASTQ | Yes      | Yes             | --            | --      | Yes       | Yes
-Validate bases   | Yes      | --              | Yes           | Yes     | --        | --
-Recognize RNA    | Yes      | Yes             | --            | --      | Yes       | Yes
-Read STDIN       | Yes      | Yes             | Yes           | --      | Yes       | Yes
-Read gzip        | Yes      | Yes             | --            | --      | Yes       | Yes
-Write gzip       | Yes      | --              | --            | --      | Yes       | --
-Search by motifs | Yes      | Yes             | --            | --      | Yes       | --
-Sample seqs      | Yes      | --              | --            | --      | Yes       | Yes
-Subseq           | Yes      | Yes             | --            | Yes     | Yes       | Yes
-Deduplicate seqs | Yes      | --              | --            | --      | Partly    | --
-Split seqs       | Yes      | Yes             | --            | Partly  | --        | --
-Split by seq     | Yes      | --              | Yes           | Yes     | --        | --
-Shuffle seqs     | Yes      | --              | --            | --      | --        | --
-Sort seqs        | Yes      | Yes             | --            | --      | Yes       | --
-Locate motifs    | Yes      | --              | --            | --      | --        | --
-Common seqs      | Yes      | --              | --            | --      | --        | --
-Clean bases      | Yes      | Yes             | Yes           | Yes     | --        | --
-Transcribe       | Yes      | Yes             | Yes           | Yes     | Yes       | Yes
-Translate        | --       | Yes             | Yes           | Yes     | Yes       | --
-Size select      | Indirect | Yes             | --            | Yes     | Yes       | --
-Rename head      | Yes      | Yes             | --            | --      | Yes       | Yes
+Categories          |Features               |seqkit  |fasta_utilities|fastx_toolkit|pyfaidx|seqmagick|seqtk
+:-------------------|:----------------------|:------:|:-------------:|:-----------:|:-----:|:-------:|:---:
+**Formats supports**|Multi-line FASTA       |Yes     |Yes            |--           |Yes    |Yes      |Yes
+                    |FASTQ                  |Yes     |Yes            |Yes          |--     |Yes      |Yes
+                    |Multi-line  FASTQ      |Yes     |Yes            |--           |--     |Yes      |Yes
+                    |Validating sequences   |Yes     |--             |Yes          |Yes    |--       |--
+                    |Supporting RNA         |Yes     |Yes            |--           |--     |Yes      |Yes
+**Functions**       |Searching by motifs    |Yes     |Yes            |--           |--     |Yes      |--
+                    |Sampling               |Yes     |--             |--           |--     |Yes      |Yes
+                    |Extracting sub-sequence|Yes     |Yes            |--           |Yes    |Yes      |Yes
+                    |Removing duplicates    |Yes     |--             |--           |--     |Partly   |--
+                    |Splitting              |Yes     |Yes            |--           |Partly |--       |--
+                    |Splitting by seq       |Yes     |--             |Yes          |Yes    |--       |--
+                    |Shuffling              |Yes     |--             |--           |--     |--       |--
+                    |Sorting                |Yes     |Yes            |--           |--     |Yes      |--
+                    |Locating motifs        |Yes     |--             |--           |--     |--       |--
+                    |Common sequences       |Yes     |--             |--           |--     |--       |--
+                    |Cleaning bases         |Yes     |Yes            |Yes          |Yes    |--       |--
+                    |Transcription          |Yes     |Yes            |Yes          |Yes    |Yes      |Yes
+                    |Translation            |--      |Yes            |Yes          |Yes    |Yes      |--
+                    |Filtering by size      |Indirect|Yes            |--           |Yes    |Yes      |--
+                    |Renaming header        |Yes     |Yes            |--           |--     |Yes      |Yes 
+**Other features**  |Cross-platform         |Yes     |Partly         |Partly       |Yes    |Yes      |Yes
+                    |Reading STDIN          |Yes     |Yes            |Yes          |--     |Yes      |Yes
+                    |Reading gzipped file   |Yes     |Yes            |--           |--     |Yes      |Yes
+                    |Writing gzip file      |Yes     |--             |--           |--     |Yes      |--
 
+**Note 2**: See [usage](http://shenwei356.github.io/seqkit/usage/) for detailed options of seqkit. 
 
 ## Datasets
 
@@ -127,9 +128,9 @@ and average time and peak memory ware used for plotting.
 
 All data were readed once before tests began to minimize the influence of page cache.
 
-### Test 1. Reverse Complement
+Output sequences of all softwares were not wrapped to fixed length.
 
-Output sequences of all Softwares were not wrapped to fixed length.
+### Test 1. Reverse Complement
 
 `revcom_biogo` ([source](https://github.com/shenwei356/seqkit/blob/master/benchmark/revcom_biogo.go),
  [binary](https://github.com/shenwei356/seqkit/blob/master/benchmark/revcom_biogo?raw=true) ),

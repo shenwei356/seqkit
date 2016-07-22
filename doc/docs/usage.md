@@ -5,20 +5,20 @@
 ### FASTA/Q format parsing
 
 seqkit uses author's lightweight and high-performance bioinformatics packages
-[bio](https://github.com/shenwei356/bio) for FASTA/Q parsing，
+[bio](https://github.com/shenwei356/bio) for FASTA/Q parsing,
 which has [high performance](https://github.com/shenwei356/bio#compare-to-kseqh-klib)
 close to the
 famous C lib [kseq.h](https://github.com/attractivechaos/klib/blob/master/kseq.h).
 
 ### Sequence formats and types
 
-seqkit seamlessly support FASTA and FASTQ format.
+seqkit seamlessly support FASTA and FASTQ format. 
+Sequence format is automatically detected.
 All subcommands except for `faidx` can handle both formats.
 And only when some commands (`subseq`, `split`, `sort` and `shuffle`)
 which utilise FASTA index to improve perfrmance for large files in two pass mode
 (by flag `--two-pass`), only FASTA format is supported.
 
-Sequence format is automatically detected.
 
 Sequence type (DNA/RNA/Protein) is automatically detected by leading subsequences
 of the first sequences in file or STDIN. The length of the leading subsequences
@@ -28,10 +28,10 @@ be checked.
 
 ### Sequence ID
 
-By default, most softwares, including `seqkit`, takes the first non-space
-letters as sequence ID. For example,
+By default, most softwares, including `seqkit`, take the leading non-space
+letters as sequence identifier (ID). For example,
 
-|   FASTA head                                                  |     ID                                            |
+|   FASTA header                                                  |     ID                                            |
 |:--------------------------------------------------------------|:--------------------------------------------------|
 | >123456 gene name                                             | 123456                                            |
 | >longname                                                     | longname                                          |
@@ -50,8 +50,8 @@ when input files are (plain or gzipped) FASTA files,
 FASTA index would be optional used for
 rapid access of sequences and reducing memory occupation.
 
-ATTENTION: the `.seqkit.fai` file created by seqkit is a little different from .fai file
-created by samtools. seqkit uses full sequence head instead of just ID as key.
+ATTENTION: the `.seqkit.fai` file created by seqkit is a little different from `.fai` file
+created by `samtools`. seqkit uses full sequence head instead of just ID as key.
 
 ### Parallelization of CPU intensive jobs
 

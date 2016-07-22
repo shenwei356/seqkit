@@ -1,14 +1,14 @@
 # Download
 
 `seqkit` is implemented in [Golang](https://golang.org/) programming language,
- executable binary files **for most popular operating system** are freely available
+ executable binary files **for most popular operating systems** are freely available
   in [release](https://github.com/shenwei356/seqkit/releases) page.
 
 ## Latest Version
 
 [seqkit v0.2.8](https://github.com/shenwei356/seqkit/releases/tag/v0.2.8)
 
-#### Links
+### Links
 
 - **Linux**
     - [seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.8/seqkit_linux_386.tar.gz)
@@ -28,7 +28,7 @@
     - [seqkit_openbsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.8/seqkit_openbsd_386.tar.gz)
     - [seqkit_openbsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.8/seqkit_openbsd_amd64.tar.gz)
 
-#### Mirror site for Chinese user
+### Mirror site for Chinese user
 
 - **Linux**
     - [seqkit_linux_386.tar.gz](http://app.shenwei.me/data/seqkit/seqkit_linux_386.tar.gz)
