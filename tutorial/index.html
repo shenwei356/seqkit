@@ -9,7 +9,7 @@
         
         <link rel="shortcut icon" href="../img/favicon.ico">
 
-	<title>Tutorial - seqkit - FASTA/Q kit</title>
+	<title>Tutorial - SeqKit - FASTA/Q kit</title>
 
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
@@ -53,7 +53,7 @@
             
 
             <!-- Main title -->
-            <a class="navbar-brand" href="..">seqkit - FASTA/Q kit</a>
+            <a class="navbar-brand" href="..">SeqKit - FASTA/Q kit</a>
         </div>
 
         <!-- Expanded navigation -->
@@ -169,8 +169,8 @@ hsa.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
    when input files are (plain or gzipped) FASTA files or stdin,
    FASTA index would be optional used for
    rapid acccess of sequences and reducing memory occupation.
-   <strong><em>ATTENTION</em></strong>: the <code>.seqkit.fai</code> file created by seqkit is a little different from .fai file
-   created by samtools. seqkit uses full sequence head instead of just ID as key.</p>
+   <strong><em>ATTENTION</em></strong>: the <code>.seqkit.fai</code> file created by SeqKit is a little different from .fai file
+   created by samtools. SeqKit uses full sequence head instead of just ID as key.</p>
 <pre><code>$ memusg -t seqkit faidx --id-regexp "^(.+)$"  hsa.fa -o hsa.fa.seqkit.fai
 
 elapsed time: 10.011s
