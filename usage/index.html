@@ -1012,13 +1012,16 @@ Usage:
   seqkit split [flags]
 
 Flags:
+Flags:
   -i, --by-id              split squences according to sequence ID
   -p, --by-part int        split squences into N parts
   -r, --by-region string   split squences according to subsequence of given region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type &quot;seqkit split -h&quot; for more examples
   -s, --by-size int        split squences into multi parts with N sequences
   -d, --dry-run            dry run, just print message and no files will be created.
+  -f, --force              overwrite output directory
   -k, --keep-temp          keep tempory FASTA and .fai file when using 2-pass mode
   -m, --md5                use MD5 instead of region sequence in output file when using flag -r (--by-region)
+  -O, --out-dir string     output directory (default value is infile.split)
   -2, --two-pass           two-pass mode read files twice to lower memory usage. (only for FASTA format)
 
 </code></pre>
