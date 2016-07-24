@@ -28,7 +28,7 @@ to compute running time and peak memory usage of a process.
 
 Categories          |Features               |seqkit  |fasta_utilities|fastx_toolkit|pyfaidx|seqmagick|seqtk
 :-------------------|:----------------------|:------:|:-------------:|:-----------:|:-----:|:-------:|:---:
-**Formats supports**|Multi-line FASTA       |Yes     |Yes            |--           |Yes    |Yes      |Yes
+**Formats support** |Multi-line FASTA       |Yes     |Yes            |--           |Yes    |Yes      |Yes
                     |FASTQ                  |Yes     |Yes            |Yes          |--     |Yes      |Yes
                     |Multi-line  FASTQ      |Yes     |Yes            |--           |--     |Yes      |Yes
                     |Validating sequences   |Yes     |--             |Yes          |Yes    |--       |--
@@ -47,13 +47,13 @@ Categories          |Features               |seqkit  |fasta_utilities|fastx_tool
                     |Transcription          |Yes     |Yes            |Yes          |Yes    |Yes      |Yes
                     |Translation            |--      |Yes            |Yes          |Yes    |Yes      |--
                     |Filtering by size      |Indirect|Yes            |--           |Yes    |Yes      |--
-                    |Renaming header        |Yes     |Yes            |--           |--     |Yes      |Yes 
+                    |Renaming header        |Yes     |Yes            |--           |--     |Yes      |Yes
 **Other features**  |Cross-platform         |Yes     |Partly         |Partly       |Yes    |Yes      |Yes
                     |Reading STDIN          |Yes     |Yes            |Yes          |--     |Yes      |Yes
                     |Reading gzipped file   |Yes     |Yes            |--           |--     |Yes      |Yes
                     |Writing gzip file      |Yes     |--             |--           |--     |Yes      |--
 
-**Note 2**: See [usage](http://shenwei356.github.io/seqkit/usage/) for detailed options of seqkit. 
+**Note 2**: See [usage](http://shenwei356.github.io/seqkit/usage/) for detailed options of seqkit.
 
 ## Datasets
 

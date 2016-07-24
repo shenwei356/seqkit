@@ -17,8 +17,8 @@ used to check the peek memory usage of seqkit. Usage: `memusg [-t] command`.
    when input files are (plain or gzipped) FASTA files or stdin,
    FASTA index would be optional used for
    rapid acccess of sequences and reducing memory occupation.
-   ***ATTENTION***: the `.seqkit.fai` file created by seqkit is a little different from .fai file
-   created by samtools. seqkit uses full sequence head instead of just ID as key.
+   ***ATTENTION***: the `.seqkit.fai` file created by SeqKit is a little different from .fai file
+   created by samtools. SeqKit uses full sequence head instead of just ID as key.
 
         $ memusg -t seqkit faidx --id-regexp "^(.+)$"  hsa.fa -o hsa.fa.seqkit.fai
 

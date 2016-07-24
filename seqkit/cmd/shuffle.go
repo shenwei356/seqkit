@@ -93,7 +93,7 @@ Secondly, seqkit shuffles sequence IDs and extract sequences by FASTA index.
 						break
 					}
 
-					sequences[string(record.Name)] = record
+					sequences[string(record.Name)] = record.Clone()
 					index2name[i] = string(record.Name)
 					i++
 				}

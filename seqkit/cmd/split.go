@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strconv"
@@ -33,6 +34,7 @@ import (
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/util/pathutil"
 	"github.com/spf13/cobra"
 )
 
@@ -57,7 +59,6 @@ Examples:
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
 		lineWidth := config.LineWidth
-		outFile := config.OutFile
 		quiet := config.Quiet
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
@@ -65,6 +66,10 @@ Examples:
 		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileList(args)
+
+		if len(files) > 1 {
+			checkError(fmt.Errorf("no more than one file should be given"))
+		}
 
 		size := getFlagInt(cmd, "by-size")
 		if size < 0 {
@@ -88,23 +93,43 @@ Examples:
 		}
 		dryRun := getFlagBool(cmd, "dry-run")
 
-		outfh, err := xopen.Wopen(outFile)
-		checkError(err)
-		defer outfh.Close()
-
-		if len(files) > 1 {
-			checkError(fmt.Errorf("no more than one file should be given"))
-		}
+		outdir := getFlagString(cmd, "out-dir")
+		force := getFlagBool(cmd, "force")
 
 		file := files[0]
 		var fileName, fileExt string
 		if isStdin(file) {
 			fileName, fileExt = "stdin", ".fastx"
+			outdir = "stdin.split"
 		} else {
 			fileName, fileExt = filepathTrimExtension(file)
+			outdir = filepath.Clean(outdir) + ".split"
 		}
 		renameFileExt := true
 		var outfile string
+
+		if outdir == "" {
+			outdir = file
+		}
+
+		existed, err := pathutil.DirExists(outdir)
+		checkError(err)
+		if existed {
+			empty, err := pathutil.IsEmpty(outdir)
+			checkError(err)
+			if !empty {
+				if force {
+					checkError(os.RemoveAll(outdir))
+				} else {
+					checkError(fmt.Errorf("outdir not empty: %s, use -f (--force) to overwrite", outdir))
+				}
+			} else {
+				checkError(os.RemoveAll(outdir))
+			}
+		}
+		checkError(os.MkdirAll(outdir, 0777))
+
+		var outfh *xopen.Writer
 
 		if size > 0 {
 			if !twoPass {
@@ -135,16 +160,16 @@ Examples:
 						}
 						renameFileExt = false
 					}
-					records = append(records, record)
+					records = append(records, record.Clone())
 					if len(records) == size {
-						outfile = fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt)
+						outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt))
 						writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 						i++
 						records = []*fastx.Record{}
 					}
 				}
 				if len(records) > 0 {
-					outfile = fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt)
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt))
 					writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 				}
 
@@ -205,7 +230,7 @@ Examples:
 
 			n := 1
 			if len(IDs) > 0 {
-				outfile = fmt.Sprintf("%s.part_%03d%s", fileName, n, fileExt)
+				outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", fileName, n, fileExt))
 				if !dryRun {
 					outfh, err = xopen.Wopen(outfile)
 					checkError(err)
@@ -232,7 +257,7 @@ Examples:
 						log.Infof("write %d sequences to file: %s\n", j, outfile)
 					}
 					n++
-					outfile = fmt.Sprintf("%s.part_%03d%s", fileName, n, fileExt)
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", fileName, n, fileExt))
 					if !dryRun {
 						outfh.Close()
 						outfh, err = xopen.Wopen(outfile)
@@ -295,14 +320,14 @@ Examples:
 					}
 					records = append(records, record)
 					if len(records) == size {
-						outfile = fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt)
+						outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt))
 						writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 						i++
 						records = []*fastx.Record{}
 					}
 				}
 				if len(records) > 0 {
-					outfile = fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt)
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt))
 					writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 				}
 				return
@@ -374,7 +399,7 @@ Examples:
 
 			n := 1
 			if len(IDs) > 0 {
-				outfile = fmt.Sprintf("%s.part_%03d%s", fileName, n, fileExt)
+				outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", fileName, n, fileExt))
 				if !dryRun {
 					outfh, err = xopen.Wopen(outfile)
 					checkError(err)
@@ -401,7 +426,7 @@ Examples:
 						log.Infof("write %d sequences to file: %s\n", j, outfile)
 					}
 					n++
-					outfile = fmt.Sprintf("%s.part_%03d%s", fileName, n, fileExt)
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", fileName, n, fileExt))
 					if !dryRun {
 						outfh.Close()
 						outfh, err = xopen.Wopen(outfile)
@@ -460,7 +485,7 @@ Examples:
 
 				var outfile string
 				for id, records := range recordsByID {
-					outfile = fmt.Sprintf("%s.id_%s%s", fileName, id, fileExt)
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s", fileName, id, fileExt))
 					writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 				}
 				return
@@ -538,7 +563,7 @@ Examples:
 			var record *fastx.Record
 			for id, ids := range idsMap {
 
-				outfile = fmt.Sprintf("%s.id_%s%s", fileName, id, fileExt)
+				outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s", fileName, id, fileExt))
 				if !dryRun {
 					outfh, err = xopen.Wopen(outfile)
 					checkError(err)
@@ -636,7 +661,7 @@ Examples:
 
 				var outfile string
 				for subseq, records := range recordsBySeqs {
-					outfile = fmt.Sprintf("%s.region_%d:%d_%s%s", fileName, start, end, subseq, fileExt)
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s.region_%d:%d_%s%s", fileName, start, end, subseq, fileExt))
 					writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 				}
 				return
@@ -725,7 +750,7 @@ Examples:
 			var outfile string
 			var record *fastx.Record
 			for subseq, chrs := range region2name {
-				outfile = fmt.Sprintf("%s.region_%d:%d_%s%s", fileName, start, end, subseq, fileExt)
+				outfile = filepath.Join(outdir, fmt.Sprintf("%s.region_%d:%d_%s%s", fileName, start, end, subseq, fileExt))
 				if !dryRun {
 					outfh, err = xopen.Wopen(outfile)
 					checkError(err)
@@ -772,4 +797,6 @@ func init() {
 	splitCmd.Flags().BoolP("two-pass", "2", false, "two-pass mode read files twice to lower memory usage. (only for FASTA format)")
 	splitCmd.Flags().BoolP("dry-run", "d", false, "dry run, just print message and no files will be created.")
 	splitCmd.Flags().BoolP("keep-temp", "k", false, "keep tempory FASTA and .fai file when using 2-pass mode")
+	splitCmd.Flags().StringP("out-dir", "O", "", "output directory (default value is infile.split)")
+	splitCmd.Flags().BoolP("force", "f", false, "overwrite output directory")
 }

@@ -1,4 +1,4 @@
-site_name: seqkit - FASTA/Q kit
+site_name: SeqKit - FASTA/Q kit
 pages:
 - Home: index.md
 - Download: download.md
@@ -8,6 +8,6 @@ pages:
 theme: mkdocs
 
 repo_url: https://github.com/shenwei356/seqkit
-site_description: seqkit - a cross-platform and efficient toolkit for FASTA/Q file manipulation
+site_description: SeqKit - a cross-platform and efficient toolkit for FASTA/Q file manipulation
 site_author: Wei Shen
 google_analytics: ['UA-28948626-9', 'bioinf.shenwei.me/seqkit']

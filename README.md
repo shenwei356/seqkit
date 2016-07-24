@@ -1,4 +1,4 @@
-# seqkit - a cross-platform and efficient toolkit for FASTA/Q file manipulation
+# SeqKit - a cross-platform and efficient toolkit for FASTA/Q file manipulation
 
 
 Documents: [http://shenwei356.github.io/seqkit](http://shenwei356.github.io/seqkit)
@@ -18,7 +18,7 @@ and some of them are only available for specific operating systems.
 Furthermore, the complicated installation process of dependencies packages and
 running environment also make them less friendly to common users.
 
-seqkit is a cross-platform, efficient, and practical FASTA/Q manipulations tool
+SeqKit is a cross-platform, efficient, and practical FASTA/Q manipulations tool
 that is friendly for researchers to complete wide ranges of FASTA file processing.
 The toolkit supports plain or gzip-compressed input and output
 from either standard stream or files,
@@ -46,7 +46,7 @@ therefore, it could be easily used in command-line pipe.
 
 Categories          |Features               |seqkit  |fasta_utilities|fastx_toolkit|pyfaidx|seqmagick|seqtk
 :-------------------|:----------------------|:------:|:-------------:|:-----------:|:-----:|:-------:|:---:
-**Formats supports**|Multi-line FASTA       |Yes     |Yes            |--           |Yes    |Yes      |Yes
+**Formats support** |Multi-line FASTA       |Yes     |Yes            |--           |Yes    |Yes      |Yes
                     |FASTQ                  |Yes     |Yes            |Yes          |--     |Yes      |Yes
                     |Multi-line  FASTQ      |Yes     |Yes            |--           |--     |Yes      |Yes
                     |Validating sequences   |Yes     |--             |Yes          |Yes    |--       |--
@@ -65,7 +65,7 @@ Categories          |Features               |seqkit  |fasta_utilities|fastx_tool
                     |Transcription          |Yes     |Yes            |Yes          |Yes    |Yes      |Yes
                     |Translation            |--      |Yes            |Yes          |Yes    |Yes      |--
                     |Filtering by size      |Indirect|Yes            |--           |Yes    |Yes      |--
-                    |Renaming header        |Yes     |Yes            |--           |--     |Yes      |Yes 
+                    |Renaming header        |Yes     |Yes            |--           |--     |Yes      |Yes
 **Other features**  |Cross-platform         |Yes     |Partly         |Partly       |Yes    |Yes      |Yes
                     |Reading STDIN          |Yes     |Yes            |Yes          |--     |Yes      |Yes
                     |Reading gzipped file   |Yes     |Yes            |--           |--     |Yes      |Yes
@@ -73,7 +73,7 @@ Categories          |Features               |seqkit  |fasta_utilities|fastx_tool
 
 **Note 1**: See [version information](http://127.0.0.1:8000/benchmark/#softwares) of the softwares.
 
-**Note 2**: See [usage](http://shenwei356.github.io/seqkit/usage/) for detailed options of seqkit. 
+**Note 2**: See [usage](http://shenwei356.github.io/seqkit/usage/) for detailed options of seqkit.
 
 ## Installation
 
@@ -84,20 +84,22 @@ Go to [Download Page](http://shenwei356.github.io/seqkit/downlaod) for more down
   in [release](https://github.com/shenwei356/seqkit/releases) page.
 
 Just [download](https://github.com/shenwei356/seqkit/releases) compressed
-executable file of your operating system, and uncompress it with `tar -zxvf *.tar.gz` command.
+executable file of your operating system,
+and uncompress it with `tar -zxvf *.tar.gz` command or other tools.
+And then:
 
-You can add the directory of the executable file to environment variable
-`PATH`, so you can run `seqkit` anywhere.
+1. **For Linux-like systems**
+    1. If you have root privilege simply copy it to `/usr/local/bin`:
+
+            sudo cp seqkit /usr/local/bin/
+
+    1. Or add the directory of the executable file to environment variable
+    `PATH`:
+
+            echo export PATH=\$PATH:/PATH/OF/seqkit >> ~/.bashrc
 
 
-1. For windows, the simplest way is copy it to `C:\WINDOWS\system32`.
-
-2. For Linux, type:
-
-        chmod a+x /PATH/OF/FAKIT/seqkit
-        echo export PATH=\$PATH:/PATH/OF/seqkit >> ~/.bashrc
-
-    or simply copy it to `/usr/local/bin`
+1. **For windows**, just copy `seqkit.exe` to `C:\WINDOWS\system32`.
 
 For Go developer, just one command:
 
@@ -153,7 +155,7 @@ For Go developer, just one command:
 
 ### FASTA/Q format parsing
 
-seqkit uses author's lightweight and high-performance bioinformatics packages
+SeqKit uses author's lightweight and high-performance bioinformatics packages
 [bio](https://github.com/shenwei356/bio) for FASTA/Q parsing,
 which has [high performance](https://github.com/shenwei356/bio#compare-to-kseqh-klib)
 close to the
@@ -161,7 +163,7 @@ famous C lib [kseq.h](https://github.com/attractivechaos/klib/blob/master/kseq.h
 
 ### Sequence formats and types
 
-seqkit seamlessly support FASTA and FASTQ format. 
+SeqKit seamlessly support FASTA and FASTQ format.
 Sequence format is automatically detected.
 All subcommands except for `faidx` can handle both formats.
 And only when some commands (`subseq`, `split`, `sort` and `shuffle`)
@@ -199,8 +201,8 @@ when input files are (plain or gzipped) FASTA files,
 FASTA index would be optional used for
 rapid access of sequences and reducing memory occupation.
 
-ATTENTION: the `.seqkit.fai` file created by seqkit is a little different from `.fai` file
-created by `samtools`. seqkit uses full sequence head instead of just ID as key.
+ATTENTION: the `.seqkit.fai` file created by SeqKit is a little different from `.fai` file
+created by `samtools`. SeqKit uses full sequence head instead of just ID as key.
 
 ### Parallelization of CPU intensive jobs
 
@@ -256,7 +258,7 @@ Datasets:
     dataset_A.fa   FASTA        DNA          67,748        56       41,442.5     5,976,145                  
     dataset_B.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
 
-seqkit version: v0.2.8
+SeqKit version: v0.2.8
 
 ![benchmark-5tests.csv.png](benchmark/benchmark.5tests.csv.png)
 

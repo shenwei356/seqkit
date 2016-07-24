@@ -4,7 +4,7 @@
 
 ### FASTA/Q format parsing
 
-seqkit uses author's lightweight and high-performance bioinformatics packages
+SeqKit uses author's lightweight and high-performance bioinformatics packages
 [bio](https://github.com/shenwei356/bio) for FASTA/Q parsing,
 which has [high performance](https://github.com/shenwei356/bio#compare-to-kseqh-klib)
 close to the
@@ -12,7 +12,7 @@ famous C lib [kseq.h](https://github.com/attractivechaos/klib/blob/master/kseq.h
 
 ### Sequence formats and types
 
-seqkit seamlessly support FASTA and FASTQ format. 
+SeqKit seamlessly support FASTA and FASTQ format.
 Sequence format is automatically detected.
 All subcommands except for `faidx` can handle both formats.
 And only when some commands (`subseq`, `split`, `sort` and `shuffle`)
@@ -50,8 +50,8 @@ when input files are (plain or gzipped) FASTA files,
 FASTA index would be optional used for
 rapid access of sequences and reducing memory occupation.
 
-ATTENTION: the `.seqkit.fai` file created by seqkit is a little different from `.fai` file
-created by `samtools`. seqkit uses full sequence head instead of just ID as key.
+ATTENTION: the `.seqkit.fai` file created by SeqKit is a little different from `.fai` file
+created by `samtools`. SeqKit uses full sequence head instead of just ID as key.
 
 ### Parallelization of CPU intensive jobs
 
@@ -842,13 +842,16 @@ Usage:
   seqkit split [flags]
 
 Flags:
+Flags:
   -i, --by-id              split squences according to sequence ID
   -p, --by-part int        split squences into N parts
   -r, --by-region string   split squences according to subsequence of given region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type "seqkit split -h" for more examples
   -s, --by-size int        split squences into multi parts with N sequences
   -d, --dry-run            dry run, just print message and no files will be created.
+  -f, --force              overwrite output directory
   -k, --keep-temp          keep tempory FASTA and .fai file when using 2-pass mode
   -m, --md5                use MD5 instead of region sequence in output file when using flag -r (--by-region)
+  -O, --out-dir string     output directory (default value is infile.split)
   -2, --two-pass           two-pass mode read files twice to lower memory usage. (only for FASTA format)
 
 ```

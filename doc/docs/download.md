@@ -1,32 +1,32 @@
 # Download
 
-`seqkit` is implemented in [Golang](https://golang.org/) programming language,
+SeqKit is implemented in [Golang](https://golang.org/) programming language,
  executable binary files **for most popular operating systems** are freely available
   in [release](https://github.com/shenwei356/seqkit/releases) page.
 
 ## Latest Version
 
-[seqkit v0.2.8](https://github.com/shenwei356/seqkit/releases/tag/v0.2.8)
+[SeqKit v0.2.9](https://github.com/shenwei356/seqkit/releases/tag/v0.2.9)
 
 ### Links
 
 - **Linux**
-    - [seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.8/seqkit_linux_386.tar.gz)
-    - [seqkit_linux_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.8/seqkit_linux_amd64.tar.gz)
-    - [seqkit_linux_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.8/seqkit_linux_arm.tar.gz)
+    - [seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_linux_386.tar.gz)
+    - [seqkit_linux_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_linux_amd64.tar.gz)
+    - [seqkit_linux_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_linux_arm.tar.gz)
 - **Mac OS X**
-    - [seqkit_darwin_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.8/seqkit_darwin_386.tar.gz)
-    - [seqkit_darwin_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.8/seqkit_darwin_amd64.tar.gz)
+    - [seqkit_darwin_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_darwin_386.tar.gz)
+    - [seqkit_darwin_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_darwin_amd64.tar.gz)
 - **Windows**
-    - [seqkit_windows_386.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.8/seqkit_windows_386.exe.tar.gz)
-    - [seqkit_windows_amd64.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.8/seqkit_windows_amd64.exe.tar.gz)
+    - [seqkit_windows_386.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_windows_386.exe.tar.gz)
+    - [seqkit_windows_amd64.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_windows_amd64.exe.tar.gz)
 - **FreeBSD**
-    - [seqkit_freebsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.8/seqkit_freebsd_386.tar.gz)
-    - [seqkit_freebsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.8/seqkit_freebsd_amd64.tar.gz)
-    - [seqkit_freebsd_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.8/seqkit_freebsd_arm.tar.gz)
+    - [seqkit_freebsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_freebsd_386.tar.gz)
+    - [seqkit_freebsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_freebsd_amd64.tar.gz)
+    - [seqkit_freebsd_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_freebsd_arm.tar.gz)
 - **OpenBSD**
-    - [seqkit_openbsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.8/seqkit_openbsd_386.tar.gz)
-    - [seqkit_openbsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.8/seqkit_openbsd_amd64.tar.gz)
+    - [seqkit_openbsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_openbsd_386.tar.gz)
+    - [seqkit_openbsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_openbsd_amd64.tar.gz)
 
 ### Mirror site for Chinese user
 
@@ -51,19 +51,22 @@
 ## Installation
 
 Just [download](https://github.com/shenwei356/seqkit/releases) compressed
-executable file of your operating system, and uncompress it with `tar -zxvf *.tar.gz` command.
+executable file of your operating system,
+and uncompress it with `tar -zxvf *.tar.gz` command or other tools.
+And then:
 
-You can add the directory of the executable file to environment variable
-`PATH`, so you can run `seqkit` anywhere.
+1. **For Linux-like systems**
+    1. If you have root privilege simply copy it to `/usr/local/bin`:
 
-1. For windows, the simplest way is copy it to `C:\WINDOWS\system32`.
+            sudo cp seqkit /usr/local/bin/
 
-2. For Linux, type:
+    1. Or add the directory of the executable file to environment variable
+    `PATH`:
 
-        chmod a+x /PATH/OF/FAKIT/seqkit
-        echo export PATH=\$PATH:/PATH/OF/seqkit >> ~/.bashrc
+            echo export PATH=\$PATH:/PATH/OF/seqkit >> ~/.bashrc
 
-    or simply copy it to `/usr/local/bin`
+
+1. **For windows**, just copy `seqkit.exe` to `C:\WINDOWS\system32`.
 
 For Go developer, just one command:
 
@@ -71,6 +74,10 @@ For Go developer, just one command:
 
 ## Release History
 
+- [seqkit v0.2.9](https://github.com/shenwei356/seqkit/releases/tag/v0.2.9)
+    - fix minor bug of `seqkit split` and `seqkit shuffle`,
+      header name error due to improper use of pointer
+    - add option `-O (--out-dir)` to `seqkit split`
 - [seqkit v0.2.8](https://github.com/shenwei356/seqkit/releases/tag/v0.2.8)
     - improve speed of parsing sequence ID, not using regular expression for default `--id-regexp`
     - improve speed of record outputing for small-size sequences

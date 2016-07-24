@@ -21,6 +21,7 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"runtime"
@@ -70,6 +71,8 @@ var slidingCmd = &cobra.Command{
 
 		var sequence []byte
 		var originalLen, l, end, e int
+		var text []byte
+		var b *bytes.Buffer
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -101,7 +104,20 @@ var slidingCmd = &cobra.Command{
 					}
 					outfh.WriteString(fmt.Sprintf(">%s_sliding:%d-%d\n",
 						record.ID, i+1, e))
-					outfh.Write(byteutil.WrapByteSlice(sequence[i:i+window], lineWidth))
+
+					// outfh.Write(byteutil.WrapByteSlice(sequence[i:i+window], lineWidth))
+					if window <= pageSize {
+						outfh.Write(byteutil.WrapByteSlice(sequence[i:i+window], lineWidth))
+					} else {
+						if bufferedByteSliceWrapper == nil {
+							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, window, lineWidth)
+						}
+						text, b = bufferedByteSliceWrapper.Wrap(sequence[i:i+window], lineWidth)
+						outfh.Write(text)
+						outfh.Flush()
+						bufferedByteSliceWrapper.Recycle(b)
+					}
+
 					outfh.WriteString("\n")
 				}
 			}
