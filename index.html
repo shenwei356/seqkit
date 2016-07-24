@@ -460,19 +460,28 @@ therefore, it could be easily used in command-line pipe.</p>
  executable binary files <strong>for most popular operating systems</strong> are freely available
   in <a href="https://github.com/shenwei356/seqkit/releases">release</a> page.</p>
 <p>Just <a href="https://github.com/shenwei356/seqkit/releases">download</a> compressed
-executable file of your operating system, and uncompress it with <code>tar -zxvf *.tar.gz</code> command.</p>
-<p>You can add the directory of the executable file to environment variable
-<code>PATH</code>, so you can run <code>seqkit</code> anywhere.</p>
+executable file of your operating system,
+and uncompress it with <code>tar -zxvf *.tar.gz</code> command or other tools.
+And then:</p>
 <ol>
 <li>
-<p>For windows, the simplest way is copy it to <code>C:\WINDOWS\system32</code>.</p>
+<p><strong>For Linux-like systems</strong></p>
+<ol>
+<li>
+<p>If you have root privilege simply copy it to <code>/usr/local/bin</code>:</p>
+<pre><code>sudo cp seqkit /usr/local/bin/
+</code></pre>
 </li>
 <li>
-<p>For Linux, type:</p>
-<pre><code>chmod a+x /PATH/OF/FAKIT/seqkit
-echo export PATH=\$PATH:/PATH/OF/seqkit &gt;&gt; ~/.bashrc
+<p>Or add the directory of the executable file to environment variable
+<code>PATH</code>:</p>
+<pre><code>echo export PATH=\$PATH:/PATH/OF/seqkit &gt;&gt; ~/.bashrc
 </code></pre>
-<p>or simply copy it to <code>/usr/local/bin</code></p>
+</li>
+</ol>
+</li>
+<li>
+<p><strong>For windows</strong>, just copy <code>seqkit.exe</code> to <code>C:\WINDOWS\system32</code>.</p>
 </li>
 </ol>
 <p>For Go developer, just one command:</p>
@@ -671,5 +680,5 @@ propose new functions or ask for help.</p>
 
 <!--
 MkDocs version : 0.15.3
-Build Date UTC : 2016-07-23 11:34:15.668505
+Build Date UTC : 2016-07-24 04:44:39.363574
 -->
