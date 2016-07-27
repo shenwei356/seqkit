@@ -27,7 +27,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/brentp/xopen"
+	"github.com/shenwei356/xopen"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/breader"

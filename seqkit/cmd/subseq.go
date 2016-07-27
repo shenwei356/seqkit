@@ -28,12 +28,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/featio/gtf"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/util/byteutil"
+	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
 
@@ -111,6 +111,11 @@ Examples:
 		checkError(err)
 		defer outfh.Close()
 
+		idRe, err := regexp.Compile(idRegexp)
+		if err != nil {
+			checkError(fmt.Errorf("fail to compile regexp: %s", idRegexp))
+		}
+
 		var start, end int
 
 		var gtfFeaturesMap map[string]type2gtfFeatures
@@ -141,9 +146,9 @@ Examples:
 			var features []gtf.Feature
 			var err error
 			if len(chrs) > 0 || len(choosedFeatures) > 0 {
-				features, err = gtf.ReadFilteredFeatures(gtfFile, chrs, choosedFeatures)
+				features, err = gtf.ReadFilteredFeatures(gtfFile, chrs, choosedFeatures, []string{"gene_id"})
 			} else {
-				features, err = gtf.ReadFeatures(gtfFile)
+				features, err = gtf.ReadFilteredFeatures(gtfFile, []string{}, []string{}, []string{"gene_id"})
 			}
 			checkError(err)
 
@@ -202,11 +207,6 @@ Examples:
 				checkError(err)
 
 				id2name := make(map[string][]byte)
-
-				idRe, err := regexp.Compile(idRegexp)
-				if err != nil {
-					checkError(fmt.Errorf("fail to compile regexp: %s", idRegexp))
-				}
 
 				if !isFastq { // ok, it's fasta!
 					// faidx, err := fai.New(file)

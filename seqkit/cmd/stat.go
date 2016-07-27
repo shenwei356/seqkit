@@ -25,7 +25,7 @@ import (
 	"io"
 	"runtime"
 
-	"github.com/brentp/xopen"
+	"github.com/shenwei356/xopen"
 	"github.com/dustin/go-humanize"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
@@ -101,21 +101,23 @@ var statCmd = &cobra.Command{
 				t = fmt.Sprintf("%s", fastxReader.Alphabet())
 			}
 
-			statInfos = append(statInfos, statInfo{file, seqFormat, t, int64(num), int64(lenMin),
+			statInfos = append(statInfos, statInfo{file, seqFormat, t,
+				int64(num), int64(lenSum), int64(lenMin),
 				math.Round(float64(lenSum)/float64(num), 1), int64(lenMax)})
 		}
 
 		// format output
 		tbl, err := prettytable.NewTable([]prettytable.Column{
 			{Header: "file"},
-			{Header: "seq_format"},
-			{Header: "seq_type"},
+			{Header: "format"},
+			{Header: "type"},
 			{Header: "num_seqs", AlignRight: true},
+			{Header: "sum_len", AlignRight: true},
 			{Header: "min_len", AlignRight: true},
 			{Header: "avg_len", AlignRight: true},
 			{Header: "max_len", AlignRight: true}}...)
 		checkError(err)
-		tbl.Separator = "   "
+		tbl.Separator = "  "
 
 		for _, info := range statInfos {
 			tbl.AddRow(
@@ -123,6 +125,7 @@ var statCmd = &cobra.Command{
 				info.format,
 				info.t,
 				humanize.Comma(info.num),
+				humanize.Comma(info.lenSum),
 				humanize.Comma(info.lenMin),
 				humanize.Commaf(info.lenAvg),
 				humanize.Comma(info.lenMax))
@@ -136,6 +139,7 @@ type statInfo struct {
 	format string
 	t      string
 	num    int64
+	lenSum int64
 	lenMin int64
 	lenAvg float64
 	lenMax int64

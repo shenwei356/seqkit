@@ -4,7 +4,7 @@
 ## Softwares
 
 1. [seqkit](https://github.com/shenwei356/seqkit). (Go).
-   Version [v0.2.8](https://github.com/shenwei356/seqkit/releases/tag/v0.2.8).
+   Version [v0.3.0](https://github.com/shenwei356/seqkit/releases/tag/v0.3.0).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    Lots of dependencies to install.
@@ -78,9 +78,9 @@ Dataset B is Human genome from [ensembl](http://uswest.ensembl.org/info/data/ftp
 Summary
 
     $ seqkit stat *.fa
-    file           seq_format   seq_type   num_seqs   min_len        avg_len       max_len
-    dataset_A.fa   FASTA        DNA          67,748        56       41,442.5     5,976,145
-    dataset_B.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
+    file          format  type  num_seqs        sum_len  min_len       avg_len      max_len
+    dataset_A.fa  FASTA   DNA     67,748  2,807,643,808       56      41,442.5    5,976,145                  
+    dataset_B.fa  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422  
 
 ### Sequence ID list
 
@@ -134,7 +134,9 @@ Output sequences of all softwares were not wrapped to fixed length.
 
 `revcom_biogo` ([source](https://github.com/shenwei356/seqkit/blob/master/benchmark/revcom_biogo.go),
  [binary](https://github.com/shenwei356/seqkit/blob/master/benchmark/revcom_biogo?raw=true) ),
- a tool written in Golang using [biogo](https://github.com/biogo/biogo) package,
+ a tool written in Golang using [biogo](https://github.com/biogo/biogo)
+ (Version [7ebd71b](https://github.com/biogo/biogo/commit/7ebd71bd9afc52cdab7a7128467ae1a936b68958))
+ package,
  was also used for comparison of FASTA file parsing performance.
 
 [Commands](https://github.com/shenwei356/seqkit/blob/master/benchmark/run_benchmark_01_revcom.sh)
@@ -160,7 +162,7 @@ the peak memory may depends on size of sampled sequences.
 
 ## Results
 
-seqkit version: v0.2.8
+seqkit version: v0.3.0
 
 ![benchmark-5tests.csv.png](benchmark/benchmark.5tests.csv.png)
 

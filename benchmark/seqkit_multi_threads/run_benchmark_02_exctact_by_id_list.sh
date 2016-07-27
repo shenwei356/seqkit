@@ -3,7 +3,7 @@
 echo Test: B\) Searching by ID list
 
 echo warm-up
-for f in dataset_{A,B}.fa; do echo data: $f; cat $f > /dev/null; done
+for f in dataset_{A,B}.fa; do echo data: $f; cat $f > t; /bin/rm t; done
 
 NCPUs=$(grep -c processor /proc/cpuinfo)
 for i in $(seq 1 $NCPUs); do 

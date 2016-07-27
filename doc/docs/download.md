@@ -6,27 +6,27 @@ SeqKit is implemented in [Golang](https://golang.org/) programming language,
 
 ## Latest Version
 
-[SeqKit v0.2.9](https://github.com/shenwei356/seqkit/releases/tag/v0.2.9)
+[SeqKit v0.3.0](https://github.com/shenwei356/seqkit/releases/tag/v0.3.0)
 
 ### Links
 
 - **Linux**
-    - [seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_linux_386.tar.gz)
-    - [seqkit_linux_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_linux_amd64.tar.gz)
-    - [seqkit_linux_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_linux_arm.tar.gz)
+    - [seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_linux_386.tar.gz)
+    - [seqkit_linux_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_linux_amd64.tar.gz)
+    - [seqkit_linux_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_linux_arm.tar.gz)
 - **Mac OS X**
-    - [seqkit_darwin_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_darwin_386.tar.gz)
-    - [seqkit_darwin_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_darwin_amd64.tar.gz)
+    - [seqkit_darwin_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_darwin_386.tar.gz)
+    - [seqkit_darwin_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_darwin_amd64.tar.gz)
 - **Windows**
-    - [seqkit_windows_386.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_windows_386.exe.tar.gz)
-    - [seqkit_windows_amd64.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_windows_amd64.exe.tar.gz)
+    - [seqkit_windows_386.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_windows_386.exe.tar.gz)
+    - [seqkit_windows_amd64.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_windows_amd64.exe.tar.gz)
 - **FreeBSD**
-    - [seqkit_freebsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_freebsd_386.tar.gz)
-    - [seqkit_freebsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_freebsd_amd64.tar.gz)
-    - [seqkit_freebsd_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_freebsd_arm.tar.gz)
+    - [seqkit_freebsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_freebsd_386.tar.gz)
+    - [seqkit_freebsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_freebsd_amd64.tar.gz)
+    - [seqkit_freebsd_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_freebsd_arm.tar.gz)
 - **OpenBSD**
-    - [seqkit_openbsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_openbsd_386.tar.gz)
-    - [seqkit_openbsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.2.9/seqkit_openbsd_amd64.tar.gz)
+    - [seqkit_openbsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_openbsd_386.tar.gz)
+    - [seqkit_openbsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_openbsd_amd64.tar.gz)
 
 ### Mirror site for Chinese user
 
@@ -74,6 +74,17 @@ For Go developer, just one command:
 
 ## Release History
 
+
+- [SeqKit v0.3.0](https://github.com/shenwei356/seqkit/releases/tag/v0.3.0)
+    - use fork of github.com/brentp/xopen, using `zcat` for speedup of .gz file
+      reading on \*nix systems.
+    - improve speed of parsing sequence ID when creating FASTA index
+    - reduce memory usage of `seqkit subseq --gtf`
+    - fix bug of `seqkit subseq` when using flag `--id-ncbi`
+    - fix bug of `seqkit split`, outdir error
+    - fix bug of `seqkit seq -p`, last base is wrongly failed to convert when
+      sequence length is odd.
+    - add "sum_len" result for output of `seqkit stat`
 - [seqkit v0.2.9](https://github.com/shenwei356/seqkit/releases/tag/v0.2.9)
     - fix minor bug of `seqkit split` and `seqkit shuffle`,
       header name error due to improper use of pointer

@@ -30,11 +30,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/util/pathutil"
+	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
 
@@ -97,37 +97,40 @@ Examples:
 		force := getFlagBool(cmd, "force")
 
 		file := files[0]
+		isstdin := isStdin(file)
+
 		var fileName, fileExt string
-		if isStdin(file) {
+		if isstdin {
 			fileName, fileExt = "stdin", ".fastx"
 			outdir = "stdin.split"
 		} else {
 			fileName, fileExt = filepathTrimExtension(file)
-			outdir = filepath.Clean(outdir) + ".split"
+			if outdir == "" {
+				outdir = file + ".split"
+			}
 		}
+
 		renameFileExt := true
 		var outfile string
 
-		if outdir == "" {
-			outdir = file
-		}
-
-		existed, err := pathutil.DirExists(outdir)
-		checkError(err)
-		if existed {
-			empty, err := pathutil.IsEmpty(outdir)
+		if !dryRun {
+			existed, err := pathutil.DirExists(outdir)
 			checkError(err)
-			if !empty {
-				if force {
-					checkError(os.RemoveAll(outdir))
+			if existed {
+				empty, err := pathutil.IsEmpty(outdir)
+				checkError(err)
+				if !empty {
+					if force {
+						checkError(os.RemoveAll(outdir))
+					} else {
+						checkError(fmt.Errorf("outdir not empty: %s, use -f (--force) to overwrite", outdir))
+					}
 				} else {
-					checkError(fmt.Errorf("outdir not empty: %s, use -f (--force) to overwrite", outdir))
+					checkError(os.RemoveAll(outdir))
 				}
-			} else {
-				checkError(os.RemoveAll(outdir))
 			}
+			checkError(os.MkdirAll(outdir, 0777))
 		}
-		checkError(os.MkdirAll(outdir, 0777))
 
 		var outfh *xopen.Writer
 
@@ -152,7 +155,7 @@ Examples:
 						break
 					}
 
-					if renameFileExt {
+					if renameFileExt && isstdin {
 						if len(record.Seq.Qual) > 0 {
 							fileExt = ".fastq"
 						} else {
@@ -180,8 +183,8 @@ Examples:
 
 			newFile := file
 
-			if isStdin(file) || !isPlainFile(file) {
-				if isStdin(file) {
+			if isstdin || !isPlainFile(file) {
+				if isstdin {
 					newFile = "stdin" + ".fastx"
 				} else {
 					newFile = file + ".fastx"
@@ -196,7 +199,7 @@ Examples:
 				var err error
 				alphabet2, isFastq, err = fastx.GuessAlphabet(newFile)
 				checkError(err)
-				if renameFileExt {
+				if renameFileExt && isstdin {
 					if isFastq {
 						fileExt = ".fastq"
 					} else {
@@ -273,7 +276,7 @@ Examples:
 				outfh.Close()
 			}
 
-			if (isStdin(file) || !isPlainFile(file)) && !keepTemp {
+			if (isstdin || !isPlainFile(file)) && !keepTemp {
 				checkError(os.Remove(newFile))
 				checkError(os.Remove(newFile + ".seqkit.fai"))
 			}
@@ -310,7 +313,7 @@ Examples:
 				}
 
 				for _, record := range allRecords {
-					if renameFileExt {
+					if renameFileExt && isstdin {
 						if len(record.Seq.Qual) > 0 {
 							fileExt = ".fastq"
 						} else {
@@ -337,8 +340,8 @@ Examples:
 
 			newFile := file
 
-			if isStdin(file) || !isPlainFile(file) {
-				if isStdin(file) {
+			if isstdin || !isPlainFile(file) {
+				if isstdin {
 					newFile = "stdin" + ".fastx"
 				} else {
 					newFile = file + ".fastx"
@@ -353,7 +356,7 @@ Examples:
 				var err error
 				alphabet2, isFastq, err = fastx.GuessAlphabet(newFile)
 				checkError(err)
-				if renameFileExt {
+				if renameFileExt && isstdin {
 					if isFastq {
 						fileExt = ".fastq"
 					} else {
@@ -442,7 +445,7 @@ Examples:
 				outfh.Close()
 			}
 
-			if (isStdin(file) || !isPlainFile(file)) && !keepTemp {
+			if (isstdin || !isPlainFile(file)) && !keepTemp {
 				checkError(os.Remove(newFile))
 				checkError(os.Remove(newFile + ".seqkit.fai"))
 			}
@@ -468,7 +471,7 @@ Examples:
 
 				var id string
 				for _, record := range allRecords {
-					if renameFileExt {
+					if renameFileExt && isstdin {
 						if len(record.Seq.Qual) > 0 {
 							fileExt = ".fastq"
 						} else {
@@ -495,8 +498,8 @@ Examples:
 
 			newFile := file
 
-			if isStdin(file) || !isPlainFile(file) {
-				if isStdin(file) {
+			if isstdin || !isPlainFile(file) {
+				if isstdin {
 					newFile = "stdin" + ".fastx"
 				} else {
 					newFile = file + ".fastx"
@@ -511,7 +514,7 @@ Examples:
 				var err error
 				alphabet2, isFastq, err = fastx.GuessAlphabet(newFile)
 				checkError(err)
-				if renameFileExt {
+				if renameFileExt && isstdin {
 					if isFastq {
 						fileExt = ".fastq"
 					} else {
@@ -593,7 +596,7 @@ Examples:
 				}
 			}
 
-			if (isStdin(file) || !isPlainFile(file)) && !keepTemp {
+			if (isstdin || !isPlainFile(file)) && !keepTemp {
 				checkError(os.Remove(newFile))
 				checkError(os.Remove(newFile + ".seqkit.fai"))
 			}
@@ -636,7 +639,7 @@ Examples:
 				var s, e int
 				var ok bool
 				for _, record := range allRecords {
-					if renameFileExt {
+					if renameFileExt && isstdin {
 						if len(record.Seq.Qual) > 0 {
 							fileExt = ".fastq"
 						} else {
@@ -671,8 +674,8 @@ Examples:
 
 			newFile := file
 
-			if isStdin(file) || !isPlainFile(file) {
-				if isStdin(file) {
+			if isstdin || !isPlainFile(file) {
+				if isstdin {
 					newFile = "stdin" + ".fastx"
 				} else {
 					newFile = file + ".fastx"
@@ -686,7 +689,7 @@ Examples:
 				var isFastq bool
 				var err error
 				alphabet2, isFastq, err = fastx.GuessAlphabet(newFile)
-				if renameFileExt {
+				if renameFileExt && isstdin {
 					if isFastq {
 						fileExt = ".fastq"
 					} else {

@@ -3,7 +3,7 @@
 echo Test: E\) Subsequence with BED file
 
 echo warm-up
-cat dataset_B.fa chr19.bed.gz > /dev/null
+cat dataset_B.fa chr19.bed.gz > t; /bin/rm t;
 
 
 NCPUs=$(grep -c processor /proc/cpuinfo)

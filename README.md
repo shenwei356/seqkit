@@ -83,7 +83,7 @@ Go to [Download Page](http://shenwei356.github.io/seqkit/downlaod) for more down
  executable binary files **for most popular operating systems** are freely available
   in [release](https://github.com/shenwei356/seqkit/releases) page.
 
-Just [download](https://github.com/shenwei356/seqkit/releases) compressed
+Just [download](https://github.com/shenwei356/csvtk/releases) compressed
 executable file of your operating system,
 and uncompress it with `tar -zxvf *.tar.gz` command or other tools.
 And then:
@@ -91,19 +91,19 @@ And then:
 1. **For Linux-like systems**
     1. If you have root privilege simply copy it to `/usr/local/bin`:
 
-            sudo cp seqkit /usr/local/bin/
+            sudo cp csvtk /usr/local/bin/
 
     1. Or add the directory of the executable file to environment variable
     `PATH`:
 
-            echo export PATH=\$PATH:/PATH/OF/seqkit >> ~/.bashrc
+            echo export PATH=\$PATH:/PATH/OF/csvtk >> ~/.bashrc
 
 
-1. **For windows**, just copy `seqkit.exe` to `C:\WINDOWS\system32`.
+1. **For windows**, just copy `csvtk.exe` to `C:\WINDOWS\system32`.
 
 For Go developer, just one command:
 
-    go get -u github.com/shenwei356/seqkit/seqkit
+    go get -u github.com/shenwei356/csvtk/csvtk
 
 ## Subcommands
 
@@ -254,11 +254,11 @@ More details: [http://shenwei356.github.io/seqkit/benchmark/](http://shenwei356.
 Datasets:
 
     $ seqkit stat *.fa
-    file           seq_format   seq_type   num_seqs   min_len        avg_len       max_len
-    dataset_A.fa   FASTA        DNA          67,748        56       41,442.5     5,976,145                  
-    dataset_B.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
+    file          format  type  num_seqs        sum_len  min_len       avg_len      max_len
+    dataset_A.fa  FASTA   DNA     67,748  2,807,643,808       56      41,442.5    5,976,145                  
+    dataset_B.fa  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422  
 
-SeqKit version: v0.2.8
+SeqKit version: v0.3.0
 
 ![benchmark-5tests.csv.png](benchmark/benchmark.5tests.csv.png)
 

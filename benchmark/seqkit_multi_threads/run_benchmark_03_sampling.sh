@@ -3,7 +3,7 @@
 echo Test: C\) Sampling by number
 
 echo warm-up
-for f in dataset_{A,B}.fa; do echo data: $f; cat $f > /dev/null; done
+for f in dataset_{A,B}.fa; do echo data: $f; cat $f > t; /bin/rm t; done
 
 n=10000
 n2=20

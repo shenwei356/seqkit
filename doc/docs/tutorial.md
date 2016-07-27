@@ -8,8 +8,8 @@ used to check the peek memory usage of seqkit. Usage: `memusg [-t] command`.
 1. Human genome
 
         $ seqkit stat hsa.fa
-        file     seq_format   seq_type   num_seqs   min_len        avg_len       max_len
-        hsa.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
+        file    format  type  num_seqs        sum_len  min_len       avg_len      max_len
+        hsa.fa  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422
 
 1. Build FASTA index (***optional***, when using flag `-2` (`--two-pass`),
    some commands will automaticlly build it).
@@ -235,8 +235,8 @@ from [The miRBase Sequence Database -- Release 21](ftp://mirbase.org/pub/mirbase
 1. Sequence number
 
         $ seqkit stat hairpin.fa.gz
-        file             seq_type    num_seqs    min_len    avg_len    max_len
-        hairpin.fa.gz         RNA      28,645         39        103      2,354
+        file           format  type  num_seqs    sum_len  min_len  avg_len  max_len
+        hairpin.fa.gz  FASTA   RNA     28,645  2,949,871       39      103    2,354
 
 1. First 10 bases
 
@@ -310,18 +310,19 @@ A custom ID parsing regular expression is used, `^([\w]+)\-`.
 
         $ seqkit split hairpin.fa.gz -i --id-regexp "^([\w]+)\-" --two-pass
 
-    ***To reduce memory usage when spliting big file, we should alwasy use flag `--two-pass`***
+    ***To reduce memory usage when splitting big file, we should always use flag `--two-pass`***
 
 2. Species with most miRNA hairpins. Third column is the sequences number.
 
-        $ seqkit stat hairpin.id_*.gz | csvtk space2tab | csvtk -t sort -k num_seqs:nr | csvtk -t pretty| more
-        file                     seq_format   seq_type   num_seqs   min_len   avg_len   max_len
-        hairpin.id_hsa.fa.gz     FASTA        RNA        1,881      41        81.9      180
-        hairpin.id_mmu.fa.gz     FASTA        RNA        1,193      39        83.4      147
-        hairpin.id_bta.fa.gz     FASTA        RNA        808        53        80.1      149
-        hairpin.id_gga.fa.gz     FASTA        RNA        740        48        91.5      169
-        hairpin.id_eca.fa.gz     FASTA        RNA        715        52        104.6     145
-        hairpin.id_mtr.fa.gz     FASTA        RNA        672        54        165.3     910
+        $ cd hairpin.fa.gz.split/;
+        $ seqkit stat hairpin.id_* | csvtk space2tab | csvtk -t sort -k num_seqs:nr | csvtk -t pretty| more
+        file                     format   type   num_seqs   sum_len   min_len   avg_len   max_len
+        hairpin.id_hsa.fasta     FASTA    RNA    1,881      154,242   82        82        82
+        hairpin.id_mmu.fasta     FASTA    RNA    1,193      107,370   90        90        90
+        hairpin.id_bta.fasta     FASTA    RNA    808        61,408    76        76        76
+        hairpin.id_gga.fasta     FASTA    RNA    740        42,180    57        57        57
+        hairpin.id_eca.fasta     FASTA    RNA    715        89,375    125       125       125
+        hairpin.id_mtr.fasta     FASTA    RNA    672        231,840   345       345       345
 
     Here, a CSV/TSV tool [csvtk](https://github.com/shenwei356/csvtk)
     is used to sort and view the result.
@@ -366,11 +367,11 @@ Motifs
   By the way, do not be scared by the long flag `--circle-genome`, `--step`
   and so on. They have short ones, `-c`, `-s`
 
-        $ seqkit sliding --id-ncbi --circle-genome --step 20000 --window 200000 PAO1.fasta -o PAO1.fasta.sliding.fa
+        $ seqkit sliding --id-ncbi --circular-genome --step 20000 --window 200000 PAO1.fasta -o PAO1.fasta.sliding.fa
 
         $ seqkit stat PAO1.fasta.sliding.fa
-        file                     seq_type    num_seqs    min_len    avg_len    max_len
-        PAO1.fasta.sliding.fa         DNA         314    200,000    200,000    200,000
+        file                   format  type  num_seqs     sum_len  min_len  avg_len  max_len
+        PAO1.fasta.sliding.fa  FASTA   DNA        314  62,800,000  200,000  200,000  200,000
 
 1. Locating motifs
 
@@ -396,10 +397,9 @@ Motifs
         $ seqkit subseq --id-ncbi --gtf PAO1.gtf --feature cds PAO1.fasta -o PAO1.cds.fasta
 
         $ seqkit stat *.fasta
-        file              seq_type    num_seqs      min_len      avg_len      max_len
-        PAO1.cds.fasta         DNA       5,572           72      1,003.8       16,884
-        PAO1.fasta             DNA           1    6,264,404    6,264,404    6,264,404
-
+        file            format  type  num_seqs    sum_len    min_len    avg_len    max_len
+        PAO1.cds.fasta  FASTA   DNA      5,572  5,593,306         72    1,003.8     16,884
+        PAO1.fasta      FASTA   DNA          1  6,264,404  6,264,404  6,264,404  6,264,404
 
 1. Get duplicated sequences
 

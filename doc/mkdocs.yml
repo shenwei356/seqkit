@@ -5,6 +5,7 @@ pages:
 - Usage: usage.md
 - Tutorial: tutorial.md
 - Benchmark: benchmark.md
+- YanLi Lab: yanlilab.md
 theme: mkdocs
 
 repo_url: https://github.com/shenwei356/seqkit

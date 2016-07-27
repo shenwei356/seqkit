@@ -3,7 +3,7 @@
 echo Test: Sorting by length
 
 echo warm-up
-for f in dataset_{A,B}.fa; do echo data: $f; cat $f > /dev/null; done
+for f in dataset_{A,B}.fa; do echo data: $f; cat $f > t; /bin/rm t; done
 
 echo delete old FASTA index file
 for f in dataset_{A,B}.fa; do

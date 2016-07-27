@@ -33,18 +33,18 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/brentp/xopen"
 	"github.com/cznic/sortutil"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/breader"
 	"github.com/shenwei356/util/byteutil"
+	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
 
 // VERSION of seqkit
-const VERSION = "0.2.9"
+const VERSION = "0.3.0"
 
 func checkError(err error) {
 	if err != nil {

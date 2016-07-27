@@ -28,10 +28,10 @@ import (
 	"syscall"
 	// "runtime/debug"
 
-	"github.com/brentp/xopen"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/util/byteutil"
+	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
 
