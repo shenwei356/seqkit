@@ -6,23 +6,35 @@ data: dataset_B.fa
 data: dataset_A.fa
 [INFO][0m 12351 duplicated records removed
 
-elapsed time: 11.154
-peak rss: 47620
+elapsed time: 12.488
+peak rss: 47360
 
+file                          format  type  num_seqs        sum_len  min_len   avg_len    max_len
+dataset_A.fa.rmdup.seqkit.fa  FASTA   DNA     55,397  2,589,746,144       56  46,748.9  5,976,145
+0a65481fa3446f622bd83b1d57677395  dataset_A.fa.rmdup.seqkit.fa
 data: dataset_B.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 11.980
-peak rss: 787084
+elapsed time: 12.428
+peak rss: 786796
 
+file                          format  type  num_seqs        sum_len  min_len       avg_len      max_len
+dataset_B.fa.rmdup.seqkit.fa  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422
+af9e765363ffe03aaaaa0a23509f7b32  dataset_B.fa.rmdup.seqkit.fa
 == seqmagick
 data: dataset_A.fa
 
-elapsed time: 53.108
-peak rss: 56000
+elapsed time: 50.304
+peak rss: 54132
 
+file                             format  type  num_seqs        sum_len  min_len   avg_len    max_len
+dataset_A.fa.rmdup.seqmagick.fa  FASTA   DNA     55,397  2,589,746,144       56  46,748.9  5,976,145
+0a65481fa3446f622bd83b1d57677395  dataset_A.fa.rmdup.seqmagick.fa
 data: dataset_B.fa
 
-elapsed time: 63.198
-peak rss: 1036444
+elapsed time: 60.065
+peak rss: 1036476
 
+file                             format  type  num_seqs        sum_len  min_len       avg_len      max_len
+dataset_B.fa.rmdup.seqmagick.fa  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422
+af9e765363ffe03aaaaa0a23509f7b32  dataset_B.fa.rmdup.seqmagick.fa

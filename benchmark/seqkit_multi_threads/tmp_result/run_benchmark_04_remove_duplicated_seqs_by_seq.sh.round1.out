@@ -6,51 +6,51 @@ data: dataset_B.fa
 data: dataset_A.fa
 [INFO][0m 12351 duplicated records removed
 
-elapsed time: 10.694
-peak rss: 44540
+elapsed time: 10.702
+peak rss: 49156
 
 data: dataset_B.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 11.789
-peak rss: 787348
+elapsed time: 12.057
+peak rss: 786932
 
 == 2
 data: dataset_A.fa
 [INFO][0m 12351 duplicated records removed
 
-elapsed time: 11.077
-peak rss: 47880
+elapsed time: 10.746
+peak rss: 47476
 
 data: dataset_B.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 11.788
-peak rss: 787416
+elapsed time: 11.624
+peak rss: 786896
 
 == 3
 data: dataset_A.fa
 [INFO][0m 12351 duplicated records removed
 
-elapsed time: 10.959
-peak rss: 47968
+elapsed time: 10.690
+peak rss: 47064
 
 data: dataset_B.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 12.362
-peak rss: 787428
+elapsed time: 12.152
+peak rss: 786936
 
 == 4
 data: dataset_A.fa
 [INFO][0m 12351 duplicated records removed
 
-elapsed time: 10.765
+elapsed time: 11.405
 peak rss: 47200
 
 data: dataset_B.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 11.969
-peak rss: 786852
+elapsed time: 11.561
+peak rss: 786492
 

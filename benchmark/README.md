@@ -9,7 +9,7 @@ Datasets and results are described at [http://shenwei356.github.io/seqkit/benchm
 Softwares
 
 1. [seqkit](https://github.com/shenwei356/seqkit). (Go).
-   Version [v0.2.8](https://github.com/shenwei356/seqkit/releases/tag/v0.2.8).
+   Version [v0.3.0](https://github.com/shenwei356/seqkit/releases/tag/v0.3.0).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    Lots of dependencies to install_.

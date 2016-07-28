@@ -10,9 +10,12 @@ data: dataset_A.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 10000 sequences outputed
 
-elapsed time: 6.925
-peak rss: 47000
+elapsed time: 6.840
+peak rss: 47840
 
+file                           format  type  num_seqs      sum_len  min_len   avg_len    max_len
+dataset_A.fa.sample.seqkit.fa  FASTA   DNA     10,000  390,296,238       88  39,029.6  4,876,800
+bcc9774e1c856ffaa521441104f0057c  dataset_A.fa.sample.seqkit.fa
 data: dataset_B.fa
 [INFO][0m sample by number
 [INFO][0m first pass: estimating seq number
@@ -20,28 +23,43 @@ data: dataset_B.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 19 sequences outputed
 
-elapsed time: 8.747
-peak rss: 1057904
+elapsed time: 8.310
+peak rss: 1057644
 
+file                           format  type  num_seqs      sum_len  min_len       avg_len      max_len
+dataset_B.fa.sample.seqkit.fa  FASTA   DNA         19  309,154,398    1,428  16,271,284.1  248,956,422
+664126516577d1d71e3288b55c16a737  dataset_B.fa.sample.seqkit.fa
 == seqmagick
 data: dataset_A.fa
 
-elapsed time: 39.956
-peak rss: 553300
+elapsed time: 36.489
+peak rss: 531320
 
+file                              format  type  num_seqs      sum_len  min_len   avg_len    max_len
+dataset_A.fa.sample.seqmagick.fa  FASTA   DNA     10,000  380,944,347       85  38,094.4  4,286,292
+e1d38bc9ce0b7faad6e28dbaab0fbe36  dataset_A.fa.sample.seqmagick.fa
 data: dataset_B.fa
 
-elapsed time: 44.853
-peak rss: 2931560
+elapsed time: 41.609
+peak rss: 2864212
 
+file                              format  type  num_seqs      sum_len  min_len       avg_len      max_len
+dataset_B.fa.sample.seqmagick.fa  FASTA   DNA         20  482,976,986      971  24,148,849.3  198,295,559
+a62c1b5a97ad9c8df714ab6c12e69c37  dataset_B.fa.sample.seqmagick.fa
 == seqtk
 data: dataset_A.fa
 
-elapsed time: 4.242
-peak rss: 1080396
+elapsed time: 4.214
+peak rss: 1082904
 
+file                          format  type  num_seqs      sum_len  min_len   avg_len    max_len
+dataset_A.fa.sample.seqtk.fa  FASTA   DNA     10,000  422,307,789       56  42,230.8  4,876,800
+20cbb564e61ac5e9c70da19aafc3dfe2  dataset_A.fa.sample.seqtk.fa
 data: dataset_B.fa
 
-elapsed time: 5.040
-peak rss: 2817648
+elapsed time: 4.865
+peak rss: 2817744
 
+file                          format  type  num_seqs      sum_len  min_len       avg_len      max_len
+dataset_B.fa.sample.seqtk.fa  FASTA   DNA         20  204,856,115      990  10,242,805.8  145,138,636
+5ca08cd9790479aae76adc950ef41309  dataset_B.fa.sample.seqtk.fa

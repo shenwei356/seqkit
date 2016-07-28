@@ -31,6 +31,7 @@ func main() {
 
 		} else {
 			t := s.(*linear.Seq)
+			t.RevComp()
 
 			fmt.Printf(">%s %s\n%v\n", t.Name(), t.Description(), t.Seq)
 		}
