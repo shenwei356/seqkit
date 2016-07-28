@@ -414,20 +414,20 @@ IHHHHHHH&lt;GG?B@EHDE-BEHHHII5B@GHHF?CGEHHHDHIHIIH
 <li>
 <p>By default, <code>seqkit seq</code> automatically detect the sequence type</p>
 <pre><code>$ echo -e "&gt;seq\nacgtryswkmbdhvACGTRYSWKMBDHV" | seqkit stat
-file   seq_format   seq_type   num_seqs   min_len   avg_len   max_len
--      FASTA        DNA               1        28        28        28
+file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+-     FASTA   DNA          1       28       28       28       28
 
 $ echo -e "&gt;seq\nACGUN ACGUN" | seqkit stat
-file   seq_format   seq_type   num_seqs   min_len   avg_len   max_len
--      FASTA        RNA               1        11        11        11
+file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+-     FASTA   RNA          1       11       11       11       11
 
 $ echo -e "&gt;seq\nabcdefghijklmnpqrstvwyz" | seqkit stat
-file   seq_format   seq_type   num_seqs   min_len   avg_len   max_len
--      FASTA        Protein           1        23        23        23
+file  format  type     num_seqs  sum_len  min_len  avg_len  max_len
+-     FASTA   Protein         1       23       23       23       23
 
 $ echo -e "@read\nACTGCN\n+\n@IICCG" | seqkit stat
-file   seq_format   seq_type   num_seqs   min_len   avg_len   max_len
--      FASTQ        DNA               1         6         6         6
+file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+-     FASTQ   DNA          1        6        6        6        6
 </code></pre>
 </li>
 <li>
@@ -582,8 +582,8 @@ the uncompressed data are so big and may exhaust your RAM.</em></strong></p>
 <pre><code>$ seqkit subseq --gtf Homo_sapiens.GRCh38.84.gtf.gz --chr 1 --feature cds  hsa.fa &gt; chr1.gtf.cds.fa
 
 $ seqkit stat chr1.gtf.cds.fa
-file              seq_format   seq_type   num_seqs   min_len   avg_len   max_len
-chr1.gtf.cds.fa   FASTA        DNA          65,012         1     151.4    12,045
+file             format  type  num_seqs    sum_len  min_len  avg_len  max_len
+chr1.gtf.cds.fa  FASTA   DNA     65,012  9,842,274        1    151.4   12,045
 </code></pre>
 </li>
 <li>
@@ -685,12 +685,11 @@ Usage:
 <p>Eexamples</p>
 <ol>
 <li>General use<pre><code>$ seqkit stat *.f{a,q}.gz
-file            seq_format   seq_type   num_seqs   min_len   avg_len   max_len
-clean.fa.gz     FASTA        RNA          26,419        39     104.2     2,354
-hairpin.fa.gz   FASTA        RNA          28,645        39       103     2,354
-mature.fa.gz    FASTA        RNA          35,828        15      21.8        34
-reads_1.fq.gz   FASTQ        DNA           2,500       226       227       229
-reads_2.fq.gz   FASTQ        DNA           2,500       223       224       225
+file           format  type  num_seqs    sum_len  min_len  avg_len  max_len
+hairpin.fa.gz  FASTA   RNA     28,645  2,949,871       39      103    2,354
+mature.fa.gz   FASTA   RNA     35,828    781,222       15     21.8       34
+reads_1.fq.gz  FASTQ   DNA      2,500    567,516      226      227      229
+reads_2.fq.gz  FASTQ   DNA      2,500    560,002      223      224      225
 </code></pre>
 </li>
 </ol>

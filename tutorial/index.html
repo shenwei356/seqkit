@@ -164,8 +164,8 @@ used to check the peek memory usage of seqkit. Usage: <code>memusg [-t] command<
 <li>
 <p>Human genome</p>
 <pre><code>$ seqkit stat hsa.fa
-file     seq_format   seq_type   num_seqs   min_len        avg_len       max_len
-hsa.fa   FASTA        DNA             194       970   15,978,096.5   248,956,422
+file    format  type  num_seqs        sum_len  min_len       avg_len      max_len
+hsa.fa  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422
 </code></pre>
 </li>
 <li>
@@ -388,8 +388,8 @@ from <a href="ftp://mirbase.org/pub/mirbase/21/">The miRBase Sequence Database -
 <li>
 <p>Sequence number</p>
 <pre><code>$ seqkit stat hairpin.fa.gz
-file             seq_type    num_seqs    min_len    avg_len    max_len
-hairpin.fa.gz         RNA      28,645         39        103      2,354
+file           format  type  num_seqs    sum_len  min_len  avg_len  max_len
+hairpin.fa.gz  FASTA   RNA     28,645  2,949,871       39      103    2,354
 </code></pre>
 </li>
 <li>
@@ -475,18 +475,19 @@ the <code>gi</code> number, then use <code>--id-regexp "^gi\|([^\|]+)\|"</code>.
 A custom ID parsing regular expression is used, <code>^([\w]+)\-</code>.</p>
 <pre><code>$ seqkit split hairpin.fa.gz -i --id-regexp "^([\w]+)\-" --two-pass
 </code></pre>
-<p><strong><em>To reduce memory usage when spliting big file, we should alwasy use flag <code>--two-pass</code></em></strong></p>
+<p><strong><em>To reduce memory usage when splitting big file, we should always use flag <code>--two-pass</code></em></strong></p>
 </li>
 <li>
 <p>Species with most miRNA hairpins. Third column is the sequences number.</p>
-<pre><code>$ seqkit stat hairpin.id_*.gz | csvtk space2tab | csvtk -t sort -k num_seqs:nr | csvtk -t pretty| more
-file                     seq_format   seq_type   num_seqs   min_len   avg_len   max_len
-hairpin.id_hsa.fa.gz     FASTA        RNA        1,881      41        81.9      180
-hairpin.id_mmu.fa.gz     FASTA        RNA        1,193      39        83.4      147
-hairpin.id_bta.fa.gz     FASTA        RNA        808        53        80.1      149
-hairpin.id_gga.fa.gz     FASTA        RNA        740        48        91.5      169
-hairpin.id_eca.fa.gz     FASTA        RNA        715        52        104.6     145
-hairpin.id_mtr.fa.gz     FASTA        RNA        672        54        165.3     910
+<pre><code>$ cd hairpin.fa.gz.split/;
+$ seqkit stat hairpin.id_* | csvtk space2tab | csvtk -t sort -k num_seqs:nr | csvtk -t pretty| more
+file                     format   type   num_seqs   sum_len   min_len   avg_len   max_len
+hairpin.id_hsa.fasta     FASTA    RNA    1,881      154,242   82        82        82
+hairpin.id_mmu.fasta     FASTA    RNA    1,193      107,370   90        90        90
+hairpin.id_bta.fasta     FASTA    RNA    808        61,408    76        76        76
+hairpin.id_gga.fasta     FASTA    RNA    740        42,180    57        57        57
+hairpin.id_eca.fasta     FASTA    RNA    715        89,375    125       125       125
+hairpin.id_mtr.fasta     FASTA    RNA    672        231,840   345       345       345
 </code></pre>
 <p>Here, a CSV/TSV tool <a href="https://github.com/shenwei356/csvtk">csvtk</a>
 is used to sort and view the result.</p>
@@ -528,11 +529,11 @@ GGWGKTCG
 <p>Sliding. Remember flag <code>--id-ncbi</code>, do you?
   By the way, do not be scared by the long flag <code>--circle-genome</code>, <code>--step</code>
   and so on. They have short ones, <code>-c</code>, <code>-s</code></p>
-<pre><code>$ seqkit sliding --id-ncbi --circle-genome --step 20000 --window 200000 PAO1.fasta -o PAO1.fasta.sliding.fa
+<pre><code>$ seqkit sliding --id-ncbi --circular-genome --step 20000 --window 200000 PAO1.fasta -o PAO1.fasta.sliding.fa
 
 $ seqkit stat PAO1.fasta.sliding.fa
-file                     seq_type    num_seqs    min_len    avg_len    max_len
-PAO1.fasta.sliding.fa         DNA         314    200,000    200,000    200,000
+file                   format  type  num_seqs     sum_len  min_len  avg_len  max_len
+PAO1.fasta.sliding.fa  FASTA   DNA        314  62,800,000  200,000  200,000  200,000
 </code></pre>
 </li>
 <li>
@@ -559,9 +560,9 @@ $ ./plot_motif_distribution.R
 <pre><code>$ seqkit subseq --id-ncbi --gtf PAO1.gtf --feature cds PAO1.fasta -o PAO1.cds.fasta
 
 $ seqkit stat *.fasta
-file              seq_type    num_seqs      min_len      avg_len      max_len
-PAO1.cds.fasta         DNA       5,572           72      1,003.8       16,884
-PAO1.fasta             DNA           1    6,264,404    6,264,404    6,264,404
+file            format  type  num_seqs    sum_len    min_len    avg_len    max_len
+PAO1.cds.fasta  FASTA   DNA      5,572  5,593,306         72    1,003.8     16,884
+PAO1.fasta      FASTA   DNA          1  6,264,404  6,264,404  6,264,404  6,264,404
 </code></pre>
 </li>
 <li>
