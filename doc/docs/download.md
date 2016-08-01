@@ -8,7 +8,11 @@ SeqKit is implemented in [Golang](https://golang.org/) programming language,
 
 [SeqKit v0.3.0](https://github.com/shenwei356/seqkit/releases/tag/v0.3.0)
 
+
+***64-bit versions are highly recommended.***
+
 ### Links
+
 
 - **Linux**
     - [seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_linux_386.tar.gz)

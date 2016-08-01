@@ -89,7 +89,7 @@ p <-
   geom_point(size = 2) +
   geom_hline(aes(yintercept = time_mean, color = app), size = 0.1, alpha = 0.4) +
   geom_vline(aes(xintercept = mem_mean2, color = app), size = 0.1, alpha = 0.4) +
-  geom_text_repel(size = 4) +
+  geom_text_repel(size = 4, max.iter=200000) +
   scale_color_wsj() +
   facet_wrap( ~ test) +
   ylim(0, max(df$time_mean)) +
@@ -130,7 +130,11 @@ p <- p +
     plot.title = element_text(size = 15)
   )
 
-ggsave(p, file = args$outfile, width = w, height = h, dpi=args$dpi)
+if (grepl("tiff?$", args$outfile, perl=TRUE, ignore.case=TRUE)) {
+  ggsave(p, file = args$outfile, width = w, height = h, dpi=args$dpi, compress="lzw")
+} else {
+  ggsave(p, file = args$outfile, width = w, height = h, dpi=args$dpi)
+}
 
 #   p <- p + scale_color_manual(values = rep("black", length(df$app)))
 #
