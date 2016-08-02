@@ -4,7 +4,7 @@
 ## Softwares
 
 1. [seqkit](https://github.com/shenwei356/seqkit). (Go).
-   Version [v0.3.0](https://github.com/shenwei356/seqkit/releases/tag/v0.3.0).
+   Version [v0.3.1](https://github.com/shenwei356/seqkit/releases/tag/v0.3.1).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    Lots of dependencies to install.
@@ -162,7 +162,7 @@ the peak memory may depends on size of sampled sequences.
 
 ## Results
 
-seqkit version: v0.3.0
+seqkit version: v0.3.1
 
 ![benchmark-5tests.csv.png](benchmark/benchmark.5tests.csv.png)
 

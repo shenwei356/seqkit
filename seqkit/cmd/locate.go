@@ -26,9 +26,9 @@ import (
 	"regexp"
 	"runtime"
 
-	"github.com/shenwei356/xopen"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
 
@@ -123,6 +123,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		defer outfh.Close()
 
 		outfh.WriteString("seqID\tpatternName\tpattern\tstrand\tstart\tend\tmatched\n")
+		var seqRP *seq.Seq
 		for _, file := range files {
 
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
@@ -137,6 +138,9 @@ For example: "\w" will be wrongly converted to "\[AT]".
 					break
 				}
 
+				if !onlyPositiveStrand {
+					seqRP = record.Seq.RevCom()
+				}
 				for pName, re := range regexps {
 					found := re.FindAllSubmatchIndex(record.Seq.Seq, -1)
 					if len(found) > 0 {
@@ -155,7 +159,6 @@ For example: "\w" will be wrongly converted to "\[AT]".
 					if onlyPositiveStrand {
 						continue
 					}
-					seqRP := record.Seq.RevCom()
 					found = re.FindAllSubmatchIndex(seqRP.Seq, -1)
 					if len(found) > 0 {
 						l := len(seqRP.Seq)

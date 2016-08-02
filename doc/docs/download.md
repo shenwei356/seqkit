@@ -6,7 +6,7 @@ SeqKit is implemented in [Golang](https://golang.org/) programming language,
 
 ## Latest Version
 
-[SeqKit v0.3.0](https://github.com/shenwei356/seqkit/releases/tag/v0.3.0)
+[SeqKit v0.3.1](https://github.com/shenwei356/seqkit/releases/tag/v0.3.1)
 
 
 ***64-bit versions are highly recommended.***
@@ -15,22 +15,22 @@ SeqKit is implemented in [Golang](https://golang.org/) programming language,
 
 
 - **Linux**
-    - [seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_linux_386.tar.gz)
-    - [seqkit_linux_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_linux_amd64.tar.gz)
-    - [seqkit_linux_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_linux_arm.tar.gz)
+    - [seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.1/seqkit_linux_386.tar.gz)
+    - [seqkit_linux_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.1/seqkit_linux_amd64.tar.gz)
+    - [seqkit_linux_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.1/seqkit_linux_arm.tar.gz)
 - **Mac OS X**
-    - [seqkit_darwin_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_darwin_386.tar.gz)
-    - [seqkit_darwin_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_darwin_amd64.tar.gz)
+    - [seqkit_darwin_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.1/seqkit_darwin_386.tar.gz)
+    - [seqkit_darwin_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.1/seqkit_darwin_amd64.tar.gz)
 - **Windows**
-    - [seqkit_windows_386.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_windows_386.exe.tar.gz)
-    - [seqkit_windows_amd64.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_windows_amd64.exe.tar.gz)
+    - [seqkit_windows_386.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.1/seqkit_windows_386.exe.tar.gz)
+    - [seqkit_windows_amd64.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.1/seqkit_windows_amd64.exe.tar.gz)
 - **FreeBSD**
-    - [seqkit_freebsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_freebsd_386.tar.gz)
-    - [seqkit_freebsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_freebsd_amd64.tar.gz)
-    - [seqkit_freebsd_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_freebsd_arm.tar.gz)
+    - [seqkit_freebsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.1/seqkit_freebsd_386.tar.gz)
+    - [seqkit_freebsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.1/seqkit_freebsd_amd64.tar.gz)
+    - [seqkit_freebsd_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.1/seqkit_freebsd_arm.tar.gz)
 - **OpenBSD**
-    - [seqkit_openbsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_openbsd_386.tar.gz)
-    - [seqkit_openbsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.0/seqkit_openbsd_amd64.tar.gz)
+    - [seqkit_openbsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.1/seqkit_openbsd_386.tar.gz)
+    - [seqkit_openbsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.1/seqkit_openbsd_amd64.tar.gz)
 
 ### Mirror site for Chinese user
 
@@ -78,7 +78,8 @@ For Go developer, just one command:
 
 ## Release History
 
-
+- [SeqKit v0.3.1](https://github.com/shenwei356/seqkit/releases/tag/v0.3.1)
+    - improve speed of `seqkit locate`
 - [SeqKit v0.3.0](https://github.com/shenwei356/seqkit/releases/tag/v0.3.0)
     - use fork of github.com/brentp/xopen, using `zcat` for speedup of .gz file
       reading on \*nix systems.

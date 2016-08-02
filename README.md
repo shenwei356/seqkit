@@ -258,7 +258,7 @@ Datasets:
     dataset_A.fa  FASTA   DNA     67,748  2,807,643,808       56      41,442.5    5,976,145                  
     dataset_B.fa  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422  
 
-SeqKit version: v0.3.0
+SeqKit version: v0.3.1
 
 ![benchmark-5tests.csv.png](benchmark/benchmark.5tests.csv.png)
 

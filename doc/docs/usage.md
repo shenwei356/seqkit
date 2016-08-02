@@ -97,7 +97,7 @@ Usage
 ```
 seqkit -- a cross-platform and efficient toolkit for FASTA/Q file manipulation
 
-Version: 0.2.8
+Version: 0.3.1
 
 Author: Wei Shen <shenwei356@gmail.com>
 
