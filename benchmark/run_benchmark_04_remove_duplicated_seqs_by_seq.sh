@@ -1,27 +1,31 @@
 #!/bin/sh
 
 echo Test: D\) Removing duplicates by seq
-
-echo warm-up
-for f in dataset_{A,B}.fa; do echo data: $f; cat $f > t; /bin/rm t; done
+echo Output sequences of all apps are not wrapped to fixed length.
 
 
-echo == seqkit
+function check() {
+    seqkit stat $1
+    md5sum $1
+    /bin/rm $1
+}
+
+
 for f in dataset_{A,B}.fa; do
-    echo data: $f;
-    memusg -t -H seqkit rmdup -s -m $f -w 0 > $f.rmdup.seqkit.fa;
+    echo read file once with cat
+    cat $f > /dev/null
     
-    seqkit stat $f.rmdup.seqkit.fa;
-    md5sum $f.rmdup.seqkit.fa;
-    /bin/rm $f.rmdup.seqkit.fa;
-done
-
-echo == seqmagick
-for f in dataset_{A,B}.fa; do
-    echo data: $f;
-    memusg -t -H seqmagick convert --line-wrap 0 --deduplicate-sequences $f - > $f.rmdup.seqmagick.fa;
     
-    seqkit stat $f.rmdup.seqmagick.fa;
-    md5sum $f.rmdup.seqmagick.fa;
-    /bin/rm $f.rmdup.seqmagick.fa;
+    echo == seqkit
+    echo data: $f
+    out=$f.rmdup.seqkit.fa
+    memusg -t -H seqkit rmdup -s -m $f -w 0 > $out
+    check $out
+    
+    
+    echo == seqmagick
+    echo data: $f
+    out=$f.rmdup.seqmagick.fa
+    memusg -t -H seqmagick convert --line-wrap 0 --deduplicate-sequences $f - > $out 
+    check $out
 done

@@ -2,18 +2,19 @@
 
 
 echo Test: A\) Reverse complement
+echo Output sequences of all apps are not wrapped to fixed length.
 
-echo warm-up
-for f in dataset_{A,B}.fa; do echo data: $f; cat $f > t; /bin/rm t; done
 
 NCPUs=$(grep -c processor /proc/cpuinfo)
 for i in $(seq 1 $NCPUs); do 
     echo == $i
     for f in dataset_{A,B}.fa; do
-        echo data: $f;
-        memusg -t -H seqkit seq -r -p $f -w 0 -j $i > $f.seqkit.rc;
-        # seqkit stat $f.seqkit.rc;
-        /bin/rm $f.seqkit.rc;
+        echo read file once with cat
+        cat $f > /dev/null
+        
+        echo data: $f
+        memusg -t -H seqkit seq -r -p $f -w 0 -j $i > $f.seqkit.rc
+        /bin/rm $f.seqkit.rc
     done
 done
 

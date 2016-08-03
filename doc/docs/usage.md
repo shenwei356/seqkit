@@ -6,9 +6,11 @@
 
 SeqKit uses author's lightweight and high-performance bioinformatics packages
 [bio](https://github.com/shenwei356/bio) for FASTA/Q parsing,
-which has [high performance](https://github.com/shenwei356/bio#compare-to-kseqh-klib)
+which has [high performance](https://github.com/shenwei356/bio#fastaq-parsing)
 close to the
-famous C lib [kseq.h](https://github.com/attractivechaos/klib/blob/master/kseq.h).
+famous C lib [klib](https://github.com/attractivechaos/klib/) ([kseq.h](https://github.com/attractivechaos/klib/blob/master/kseq.h)).
+
+![](https://github.com/shenwei356/bio/raw/master/benchmark/benchmark.tsv.png)
 
 ### Sequence formats and types
 

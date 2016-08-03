@@ -1,91 +1,95 @@
 Test: A) Reverse complement
 Output sequences of all apps are not wrapped to fixed length.
-warm-up
-data: dataset_A.fa
-data: dataset_B.fa
+read file once with cat
 == seqkit
 data: dataset_A.fa
 
-elapsed time: 17.347
-peak rss: 45456
+elapsed time: 16.471
+peak rss: 45024
 
 file                    format  type  num_seqs        sum_len  min_len   avg_len    max_len
 dataset_A.fa.seqkit.rc  FASTA   DNA     67,748  2,807,643,808       56  41,442.5  5,976,145
 a4594bc869003be6244f5619efe371eb  dataset_A.fa.seqkit.rc
+== fasta_utilities
+data: dataset_A.fa
+Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94.
+
+elapsed time: 18.412
+peak rss: 52112
+
+file                    format  type  num_seqs        sum_len  min_len   avg_len    max_len
+dataset_A.fa.fautil.rc  FASTA   DNA     67,748  2,807,643,808       56  41,442.5  5,976,145
+8514f074a5aa73bcbc3fce0dce5baea9  dataset_A.fa.fautil.rc
+== seqmagick
+data: dataset_A.fa
+
+elapsed time: 58.044
+peak rss: 52776
+
+file                       format  type  num_seqs        sum_len  min_len   avg_len    max_len
+dataset_A.fa.seqmagick.rc  FASTA   DNA     67,748  2,807,643,808       56  41,442.5  5,976,145
+a4594bc869003be6244f5619efe371eb  dataset_A.fa.seqmagick.rc
+== seqtk
+data: dataset_A.fa
+
+elapsed time: 8.972
+peak rss: 7568
+
+file                   format  type  num_seqs        sum_len  min_len   avg_len    max_len
+dataset_A.fa.seqtk.rc  FASTA   DNA     67,748  2,807,643,808       56  41,442.5  5,976,145
+a4594bc869003be6244f5619efe371eb  dataset_A.fa.seqtk.rc
+== biogo
+data: dataset_A.fa
+
+elapsed time: 102.704
+peak rss: 32896
+
+file                   format  type  num_seqs        sum_len  min_len   avg_len    max_len
+dataset_A.fa.biogo.rc  FASTA   DNA     67,748  2,807,643,808       56  41,442.5  5,976,145
+44e3cd785fd18f46949190990b1082f0  dataset_A.fa.biogo.rc
+read file once with cat
+== seqkit
 data: dataset_B.fa
 
-elapsed time: 18.738
-peak rss: 786900
+elapsed time: 16.219
+peak rss: 786720
 
 file                    format  type  num_seqs        sum_len  min_len       avg_len      max_len
 dataset_B.fa.seqkit.rc  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422
 25d0ae8f0b88796778f8e236eec07b5e  dataset_B.fa.seqkit.rc
 == fasta_utilities
-data: dataset_A.fa
-Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94.
-
-elapsed time: 17.451
-peak rss: 52040
-
-file                    format  type  num_seqs        sum_len  min_len   avg_len    max_len
-dataset_A.fa.fautil.rc  FASTA   DNA     67,748  2,807,643,808       56  41,442.5  5,976,145
-8514f074a5aa73bcbc3fce0dce5baea9  dataset_A.fa.fautil.rc
 data: dataset_B.fa
 Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94.
 
-elapsed time: 24.806
-peak rss: 1255756
+elapsed time: 24.227
+peak rss: 1255580
 
 file                    format  type  num_seqs        sum_len  min_len       avg_len      max_len
 dataset_B.fa.fautil.rc  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422
 25d0ae8f0b88796778f8e236eec07b5e  dataset_B.fa.fautil.rc
 == seqmagick
-data: dataset_A.fa
-
-elapsed time: 58.181
-peak rss: 51160
-
-file                       format  type  num_seqs        sum_len  min_len   avg_len    max_len
-dataset_A.fa.seqmagick.rc  FASTA   DNA     67,748  2,807,643,808       56  41,442.5  5,976,145
-a4594bc869003be6244f5619efe371eb  dataset_A.fa.seqmagick.rc
 data: dataset_B.fa
 
-elapsed time: 63.868
-peak rss: 1311484
+elapsed time: 64.769
+peak rss: 1380848
 
 file                       format  type  num_seqs        sum_len  min_len       avg_len      max_len
 dataset_B.fa.seqmagick.rc  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422
 25d0ae8f0b88796778f8e236eec07b5e  dataset_B.fa.seqmagick.rc
 == seqtk
-data: dataset_A.fa
-
-elapsed time: 8.932
-peak rss: 7524
-
-file                   format  type  num_seqs        sum_len  min_len   avg_len    max_len
-dataset_A.fa.seqtk.rc  FASTA   DNA     67,748  2,807,643,808       56  41,442.5  5,976,145
-a4594bc869003be6244f5619efe371eb  dataset_A.fa.seqtk.rc
 data: dataset_B.fa
 
-elapsed time: 9.951
-peak rss: 244784
+elapsed time: 9.621
+peak rss: 244768
 
 file                   format  type  num_seqs        sum_len  min_len       avg_len      max_len
 dataset_B.fa.seqtk.rc  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422
 25d0ae8f0b88796778f8e236eec07b5e  dataset_B.fa.seqtk.rc
 == biogo
-data: dataset_A.fa
-
-elapsed time: 99.940
-peak rss: 31364
-
-file                   format  type  num_seqs        sum_len  min_len   avg_len    max_len
-dataset_A.fa.biogo.rc  FASTA   DNA     67,748  2,807,643,808       56  41,442.5  5,976,145
-44e3cd785fd18f46949190990b1082f0  dataset_A.fa.biogo.rc
 data: dataset_B.fa
 
-elapsed time: 96.454
-peak rss: 1552076
+elapsed time: 96.946
+peak rss: 1335648
 
 file                   format  type  num_seqs        sum_len  min_len       avg_len      max_len
 dataset_B.fa.biogo.rc  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422

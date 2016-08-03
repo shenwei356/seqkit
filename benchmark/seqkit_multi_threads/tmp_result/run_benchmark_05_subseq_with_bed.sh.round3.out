@@ -1,34 +1,36 @@
 Test: E) Subsequence with BED file
-warm-up
+Output sequences of all apps are not wrapped to fixed length.
+read file once with cat
+run_benchmark_05_subseq_with_bed.sh: line 9: zat: command not found
 == 1
 data: dataset_B.fa
 [INFO][0m read BED file ...
 [INFO][0m 162980 BED features loaded
 
-elapsed time: 14.667
-peak rss: 1578104
+elapsed time: 14.672
+peak rss: 1814196
 
 == 2
 data: dataset_B.fa
 [INFO][0m read BED file ...
 [INFO][0m 162980 BED features loaded
 
-elapsed time: 9.030
-peak rss: 1853364
+elapsed time: 9.221
+peak rss: 2003308
 
 == 3
 data: dataset_B.fa
 [INFO][0m read BED file ...
 [INFO][0m 162980 BED features loaded
 
-elapsed time: 8.286
-peak rss: 1884616
+elapsed time: 8.370
+peak rss: 1707644
 
 == 4
 data: dataset_B.fa
 [INFO][0m read BED file ...
 [INFO][0m 162980 BED features loaded
 
-elapsed time: 8.489
-peak rss: 1973816
+elapsed time: 8.333
+peak rss: 1865552
 

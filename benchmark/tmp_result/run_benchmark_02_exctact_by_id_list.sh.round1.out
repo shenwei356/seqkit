@@ -1,77 +1,79 @@
 Test: B) Searching by ID list
-warm-up
-data: dataset_A.fa
-data: dataset_B.fa
-data: ids_A.txt
-data: ids_B.txt
+Output sequences of all apps are not wrapped to fixed length.
+read file once with cat
 == seqkit
 data: dataset_A.fa
 
-elapsed time: 4.100
-peak rss: 40996
+elapsed time: 4.072
+peak rss: 40568
 
 file                 format  type  num_seqs      sum_len  min_len   avg_len    max_len
 ids_A.txt.seqkit.fa  FASTA   DNA     20,139  799,917,174       56  39,719.8  4,876,800
 02b9b978f9ccbc79be64295fd5115e09  ids_A.txt.seqkit.fa
-data: dataset_B.fa
-
-elapsed time: 4.780
-peak rss: 786792
-
-file                 format  type  num_seqs        sum_len  min_len       avg_len      max_len
-ids_B.txt.seqkit.fa  FASTA   DNA         58  1,014,365,529      971  17,489,060.8  248,956,422
-f694c89b74d133009be0f4f9961de3ef  ids_B.txt.seqkit.fa
 == fasta_utilities
 data: dataset_A.fa
 number in list 20138
 Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94, <LIST> line 20138.
 
-elapsed time: 9.729
-peak rss: 51788
+elapsed time: 9.795
+peak rss: 51780
 
 file                 format  type  num_seqs      sum_len  min_len   avg_len    max_len
 ids_A.txt.fautil.fa  FASTA   DNA     20,139  799,917,174       56  39,719.8  4,876,800
 02b9b978f9ccbc79be64295fd5115e09  ids_A.txt.fautil.fa
+== seqmagick
+data: dataset_A.fa
+
+elapsed time: 38.324
+peak rss: 41960
+
+file                   format  type  num_seqs      sum_len  min_len   avg_len    max_len
+ids_A.txt.seqmagic.fa  FASTA   DNA     20,139  799,917,174       56  39,719.8  4,876,800
+02b9b978f9ccbc79be64295fd5115e09  ids_A.txt.seqmagic.fa
+== seqtk
+data: dataset_A.fa
+
+elapsed time: 11.063
+peak rss: 9924
+
+file                format  type  num_seqs      sum_len  min_len   avg_len    max_len
+ids_A.txt.seqtk.fa  FASTA   DNA     20,139  799,917,174       56  39,719.8  4,876,800
+02b9b978f9ccbc79be64295fd5115e09  ids_A.txt.seqtk.fa
+read file once with cat
+== seqkit
+data: dataset_B.fa
+
+elapsed time: 4.720
+peak rss: 786564
+
+file                 format  type  num_seqs        sum_len  min_len       avg_len      max_len
+ids_B.txt.seqkit.fa  FASTA   DNA         58  1,014,365,529      971  17,489,060.8  248,956,422
+f694c89b74d133009be0f4f9961de3ef  ids_B.txt.seqkit.fa
+== fasta_utilities
 data: dataset_B.fa
 number in list 58
 Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94, <LIST> line 58.
 
-elapsed time: 12.617
-peak rss: 1255620
+elapsed time: 12.435
+peak rss: 1255524
 
 file                 format  type  num_seqs        sum_len  min_len       avg_len      max_len
 ids_B.txt.fautil.fa  FASTA   DNA         58  1,014,365,529      971  17,489,060.8  248,956,422
 f694c89b74d133009be0f4f9961de3ef  ids_B.txt.fautil.fa
 == seqmagick
-data: dataset_A.fa
-
-elapsed time: 38.017
-peak rss: 36320
-
-file                   format  type  num_seqs      sum_len  min_len   avg_len    max_len
-ids_A.txt.seqmagic.fa  FASTA   DNA     20,139  799,917,174       56  39,719.8  4,876,800
-02b9b978f9ccbc79be64295fd5115e09  ids_A.txt.seqmagic.fa
 data: dataset_B.fa
 
-elapsed time: 43.272
-peak rss: 979168
+elapsed time: 43.726
+peak rss: 977872
 
 file                   format  type  num_seqs        sum_len  min_len       avg_len      max_len
 ids_B.txt.seqmagic.fa  FASTA   DNA         58  1,014,365,529      971  17,489,060.8  248,956,422
 f694c89b74d133009be0f4f9961de3ef  ids_B.txt.seqmagic.fa
 == seqtk
-data: dataset_A.fa
-
-elapsed time: 10.915
-peak rss: 9988
-
-file                format  type  num_seqs      sum_len  min_len   avg_len    max_len
-ids_A.txt.seqtk.fa  FASTA   DNA     20,139  799,917,174       56  39,719.8  4,876,800
-02b9b978f9ccbc79be64295fd5115e09  ids_A.txt.seqtk.fa
 data: dataset_B.fa
 
-elapsed time: 13.169
-peak rss: 244888
+elapsed time: 13.504
+peak rss: 244856
 
 file                format  type  num_seqs        sum_len  min_len       avg_len      max_len
 ids_B.txt.seqtk.fa  FASTA   DNA         58  1,014,365,529      971  17,489,060.8  248,956,422

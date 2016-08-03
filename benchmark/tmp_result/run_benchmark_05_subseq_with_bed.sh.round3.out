@@ -1,12 +1,13 @@
 Test: E) Subsequence with BED file
-warm-up
+Output sequences of all apps are not wrapped to fixed length.
+read file once with cat
 == seqkit
 data: dataset_B.fa
 [INFO][0m read BED file ...
 [INFO][0m 162980 BED features loaded
 
-elapsed time: 8.823
-peak rss: 1824568
+elapsed time: 8.944
+peak rss: 1653340
 
 file                    format  type  num_seqs      sum_len  min_len  avg_len  max_len
 chr19.bed.gz.seqkit.fa  FASTA   DNA    162,980  244,087,173        1  1,497.7  486,463
@@ -14,8 +15,8 @@ chr19.bed.gz.seqkit.fa  FASTA   DNA    162,980  244,087,173        1  1,497.7  4
 == seqtk
 data: dataset_B.fa
 
-elapsed time: 6.314
-peak rss: 246208
+elapsed time: 6.699
+peak rss: 246164
 
 file                   format  type  num_seqs      sum_len  min_len  avg_len  max_len
 chr19.bed.gz.seqtk.fa  FASTA   DNA    162,980  244,087,173        1  1,497.7  486,463

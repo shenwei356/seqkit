@@ -1,8 +1,6 @@
 Test: C) Sampling by number
-warm-up
-data: dataset_A.fa
-data: dataset_B.fa
 == 1
+read file once with cat
 data: dataset_A.fa
 [INFO][0m sample by number
 [INFO][0m first pass: estimating seq number
@@ -10,9 +8,10 @@ data: dataset_A.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 10000 sequences outputed
 
-elapsed time: 7.073
-peak rss: 42596
+elapsed time: 6.796
+peak rss: 42436
 
+read file once with cat
 data: dataset_B.fa
 [INFO][0m sample by number
 [INFO][0m first pass: estimating seq number
@@ -20,10 +19,11 @@ data: dataset_B.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 19 sequences outputed
 
-elapsed time: 8.416
-peak rss: 1055900
+elapsed time: 8.224
+peak rss: 1178404
 
 == 2
+read file once with cat
 data: dataset_A.fa
 [INFO][0m sample by number
 [INFO][0m first pass: estimating seq number
@@ -31,9 +31,10 @@ data: dataset_A.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 10000 sequences outputed
 
-elapsed time: 6.753
-peak rss: 49880
+elapsed time: 6.668
+peak rss: 47088
 
+read file once with cat
 data: dataset_B.fa
 [INFO][0m sample by number
 [INFO][0m first pass: estimating seq number
@@ -41,10 +42,11 @@ data: dataset_B.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 19 sequences outputed
 
-elapsed time: 8.297
-peak rss: 1057744
+elapsed time: 8.109
+peak rss: 1057836
 
 == 3
+read file once with cat
 data: dataset_A.fa
 [INFO][0m sample by number
 [INFO][0m first pass: estimating seq number
@@ -52,9 +54,10 @@ data: dataset_A.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 10000 sequences outputed
 
-elapsed time: 6.727
-peak rss: 42128
+elapsed time: 6.799
+peak rss: 49696
 
+read file once with cat
 data: dataset_B.fa
 [INFO][0m sample by number
 [INFO][0m first pass: estimating seq number
@@ -62,10 +65,11 @@ data: dataset_B.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 19 sequences outputed
 
-elapsed time: 8.410
-peak rss: 1178476
+elapsed time: 8.342
+peak rss: 1192760
 
 == 4
+read file once with cat
 data: dataset_A.fa
 [INFO][0m sample by number
 [INFO][0m first pass: estimating seq number
@@ -73,9 +77,10 @@ data: dataset_A.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 10000 sequences outputed
 
-elapsed time: 6.726
-peak rss: 50120
+elapsed time: 6.790
+peak rss: 50152
 
+read file once with cat
 data: dataset_B.fa
 [INFO][0m sample by number
 [INFO][0m first pass: estimating seq number
@@ -83,6 +88,6 @@ data: dataset_B.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 19 sequences outputed
 
-elapsed time: 8.419
-peak rss: 1058472
+elapsed time: 8.595
+peak rss: 1178096
 

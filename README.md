@@ -19,7 +19,7 @@ Furthermore, the complicated installation process of dependencies packages and
 running environment also make them less friendly to common users.
 
 SeqKit is a cross-platform, efficient, and practical FASTA/Q manipulations tool
-that is friendly for researchers to complete wide ranges of FASTA file processing.
+that is friendly for researchers to complete wide ranges of FASTA/Q file processing.
 The toolkit supports plain or gzip-compressed input and output
 from either standard stream or files,
 therefore, it could be easily used in command-line pipe.
@@ -157,9 +157,11 @@ For Go developer, just one command:
 
 SeqKit uses author's lightweight and high-performance bioinformatics packages
 [bio](https://github.com/shenwei356/bio) for FASTA/Q parsing,
-which has [high performance](https://github.com/shenwei356/bio#compare-to-kseqh-klib)
+which has [high performance](https://github.com/shenwei356/bio#fastaq-parsing)
 close to the
-famous C lib [kseq.h](https://github.com/attractivechaos/klib/blob/master/kseq.h).
+famous C lib [klib](https://github.com/attractivechaos/klib/) ([kseq.h](https://github.com/attractivechaos/klib/blob/master/kseq.h)).
+
+![](https://github.com/shenwei356/bio/raw/master/benchmark/benchmark.tsv.png)
 
 ### Sequence formats and types
 
@@ -260,7 +262,7 @@ Datasets:
 
 SeqKit version: v0.3.1
 
-![benchmark-5tests.csv.png](benchmark/benchmark.5tests.csv.png)
+![benchmark-5tests.tsv.png](benchmark/benchmark.5tests.tsv.png)
 
 
 ## Citation

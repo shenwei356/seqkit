@@ -3,64 +3,50 @@
 echo Test: A\) Reverse complement
 echo Output sequences of all apps are not wrapped to fixed length.
 
-echo warm-up
-for f in dataset_{A,B}.fa; do echo data: $f; cat $f > t; /bin/rm t; done
+function check() {
+    seqkit stat $1
+    md5sum $1
+    /bin/rm $1
+}
 
-echo == seqkit
+
 for f in dataset_{A,B}.fa; do
-    echo data: $f;
-    memusg -t -H seqkit seq -r -p $f -w 0 > $f.seqkit.rc;
+    echo read file once with cat
+    cat $f > /dev/null
     
-    seqkit stat $f.seqkit.rc;
-    md5sum $f.seqkit.rc;
-    /bin/rm $f.seqkit.rc;
-done
-
-echo == fasta_utilities
-for f in dataset_{A,B}.fa; do
-    echo data: $f;
-    memusg -t -H reverse_complement.pl $f > $f.fautil.rc;
     
-    seqkit stat $f.fautil.rc;
-    md5sum $f.fautil.rc;
-    /bin/rm $f.fautil.rc;
-done
-
-# too high memory usage and too slow
-# echo == pyfaidx
-# for f in dataset_{A,B}.fa; do
-#     echo data: $f;
-#     memusg -t -H faidx -c -r $f > $f.pyfaidx.rc;
-#     # seqkit stat $f.pyfaidx.rc;
-#     /bin/rm $f.pyfaidx.rc;
-# done
-
-echo == seqmagick
-for f in dataset_{A,B}.fa; do
-    echo data: $f;
-    memusg -t -H seqmagick convert --line-wrap 0 --reverse-complement $f - > $f.seqmagick.rc;
+    echo == seqkit
+    echo data: $f
+    out=$f.seqkit.rc
+    memusg -t -H seqkit seq -r -p $f -w 0 > $out
+    check $out
     
-    seqkit stat $f.seqmagick.rc;
-    md5sum $f.seqmagick.rc;
-    /bin/rm $f.seqmagick.rc;
-done
-
-echo == seqtk
-for f in dataset_{A,B}.fa;
-    do echo data: $f;
-    memusg -t -H seqtk seq -r $f > $f.seqtk.rc;
     
-    seqkit stat $f.seqtk.rc;
-    md5sum $f.seqtk.rc;
-    /bin/rm $f.seqtk.rc;
-done
-
-echo == biogo
-for f in dataset_{A,B}.fa; do
-    echo data: $f;
-    memusg -t -H ./revcom_biogo $f > $f.biogo.rc;
+    echo == fasta_utilities    
+    echo data: $f
+    out=$f.fautil.rc
+    memusg -t -H reverse_complement.pl $f > $out
+    check $out
     
-    seqkit stat $f.biogo.rc;
-    md5sum $f.biogo.rc;
-    /bin/rm $f.biogo.rc;
+    
+    echo == seqmagick
+    echo data: $f
+    out=$f.seqmagick.rc
+    memusg -t -H seqmagick convert --line-wrap 0 --reverse-complement $f - > $out
+    check $out
+    
+    
+    echo == seqtk
+    echo data: $f
+    out=$f.seqtk.rc
+    memusg -t -H seqtk seq -r $f > $out
+    check $out
+    
+    
+    echo == biogo
+    echo data: $f
+    out=$f.biogo.rc
+    memusg -t -H ./revcom_biogo $f > $out
+    check $out
+    
 done

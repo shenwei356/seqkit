@@ -1,56 +1,62 @@
 Test: D) Removing duplicates by seq
-warm-up
-data: dataset_A.fa
-data: dataset_B.fa
+Output sequences of all apps are not wrapped to fixed length.
 == 1
+read file once with cat
 data: dataset_A.fa
 [INFO][0m 12351 duplicated records removed
 
-elapsed time: 10.702
-peak rss: 49156
+elapsed time: 10.890
+peak rss: 44004
 
+read file once with cat
 data: dataset_B.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 12.057
-peak rss: 786932
+elapsed time: 11.512
+peak rss: 787008
 
 == 2
+read file once with cat
 data: dataset_A.fa
 [INFO][0m 12351 duplicated records removed
 
-elapsed time: 10.746
-peak rss: 47476
+elapsed time: 10.806
+peak rss: 47288
 
+read file once with cat
 data: dataset_B.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 11.624
-peak rss: 786896
+elapsed time: 11.400
+peak rss: 786636
 
 == 3
+read file once with cat
 data: dataset_A.fa
 [INFO][0m 12351 duplicated records removed
 
-elapsed time: 10.690
-peak rss: 47064
+elapsed time: 10.586
+peak rss: 47140
 
+read file once with cat
 data: dataset_B.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 12.152
-peak rss: 786936
+elapsed time: 11.835
+peak rss: 786692
 
 == 4
+read file once with cat
 data: dataset_A.fa
 [INFO][0m 12351 duplicated records removed
 
-elapsed time: 11.405
-peak rss: 47200
+elapsed time: 10.667
+peak rss: 47088
 
+read file once with cat
 data: dataset_B.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 11.561
-peak rss: 786492
+elapsed time: 11.709
+peak rss: 786576
 

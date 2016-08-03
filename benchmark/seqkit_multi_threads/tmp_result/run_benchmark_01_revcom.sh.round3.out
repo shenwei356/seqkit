@@ -1,48 +1,54 @@
 Test: A) Reverse complement
-warm-up
-data: dataset_A.fa
-data: dataset_B.fa
+Output sequences of all apps are not wrapped to fixed length.
 == 1
+read file once with cat
 data: dataset_A.fa
 
-elapsed time: 18.988
-peak rss: 36816
+elapsed time: 16.832
+peak rss: 36672
 
+read file once with cat
 data: dataset_B.fa
 
-elapsed time: 18.323
-peak rss: 787116
+elapsed time: 21.200
+peak rss: 786908
 
 == 2
+read file once with cat
 data: dataset_A.fa
 
-elapsed time: 16.103
-peak rss: 45104
+elapsed time: 15.640
+peak rss: 45036
 
+read file once with cat
 data: dataset_B.fa
 
-elapsed time: 16.976
-peak rss: 787016
+elapsed time: 16.351
+peak rss: 786584
 
 == 3
+read file once with cat
 data: dataset_A.fa
 
-elapsed time: 15.740
-peak rss: 46496
+elapsed time: 15.416
+peak rss: 46320
 
+read file once with cat
 data: dataset_B.fa
 
-elapsed time: 15.157
-peak rss: 786976
+elapsed time: 15.195
+peak rss: 786780
 
 == 4
+read file once with cat
 data: dataset_A.fa
 
-elapsed time: 15.525
-peak rss: 46840
+elapsed time: 15.351
+peak rss: 46272
 
+read file once with cat
 data: dataset_B.fa
 
-elapsed time: 14.537
-peak rss: 787132
+elapsed time: 14.403
+peak rss: 786716
 

@@ -1,62 +1,70 @@
 #!/bin/sh
 
 echo Test: C\) Sampling by number
+echo Output sequences of all apps are not wrapped to fixed length.
 
-echo warm-up
-for f in dataset_{A,B}.fa; do echo data: $f; cat $f > t; /bin/rm t; done
+function check() {
+    seqkit stat $1
+    md5sum $1
+    /bin/rm $1
+}
+
 
 n=10000
-n2=20
 
-echo == seqkit
 for f in dataset_A.fa; do
+    echo read file once with cat
+    cat $f > /dev/null
+    
+    
+    echo == seqkit
     echo data: $f;
-    memusg -t -H seqkit sample -2 -n $n $f -w 0 > $f.sample.seqkit.fa;
-    
-    seqkit stat $f.sample.seqkit.fa;
-    md5sum $f.sample.seqkit.fa;
-    /bin/rm $f.sample.seqkit.fa;
-done
+    out=$f.sample.seqkit.fa
+    memusg -t -H seqkit sample -2 -n $n $f -w 0 > $out
+    check $out
 
-for f in dataset_B.fa; do
+    
+    echo == seqmagick
     echo data: $f;
-    memusg -t -H seqkit sample -2 -n $n2 $f -w 0 > $f.sample.seqkit.fa;
+    out=$f.sample.seqmagick.fa
+    memusg -t -H seqmagick convert --line-wrap 0 --sample $n  $f - > $out
+    check $out
     
-    seqkit stat $f.sample.seqkit.fa;
-    md5sum $f.sample.seqkit.fa;
-    /bin/rm $f.sample.seqkit.fa;
+   
+    echo == seqtk
+    echo data: $f;
+    out=$f.sample.seqtk.fa
+    memusg -t -H seqtk sample $f $n  > $out;
+    check $out
+    
 done
 
-echo == seqmagick
-for f in dataset_A.fa; do
-    echo data: $f; memusg -t -H seqmagick convert --line-wrap 0 --sample $n  $f - > $f.sample.seqmagick.fa;
-    
-    seqkit stat $f.sample.seqmagick.fa;
-    md5sum $f.sample.seqmagick.fa;
-    /bin/rm $f.sample.seqmagick.fa;
-done
 
-for f in dataset_B.fa; do
-    echo data: $f; memusg -t -H seqmagick convert --line-wrap 0 --sample $n2 $f - > $f.sample.seqmagick.fa;
-    
-    seqkit stat $f.sample.seqmagick.fa;
-    md5sum $f.sample.seqmagick.fa;
-    /bin/rm $f.sample.seqmagick.fa;
-done
 
-echo == seqtk
-for f in dataset_A.fa; do
-    echo data: $f; memusg -t -H seqtk sample $f $n  > $f.sample.seqtk.fa;
-    
-    seqkit stat $f.sample.seqtk.fa;
-    md5sum $f.sample.seqtk.fa;
-    /bin/rm $f.sample.seqtk.fa;
-done
+n=20
 
 for f in dataset_B.fa; do
-    echo data: $f; memusg -t -H seqtk sample $f $n2 > $f.sample.seqtk.fa;
+    echo read file once with cat
+    cat $f > /dev/null
     
-    seqkit stat $f.sample.seqtk.fa;
-    md5sum $f.sample.seqtk.fa;
-    /bin/rm $f.sample.seqtk.fa;
+    echo == seqkit
+    echo data: $f;
+    out=$f.sample.seqkit.fa
+    memusg -t -H seqkit sample -2 -n $n $f -w 0 > $out
+    check $out
+
+    
+    echo == seqmagick
+    echo data: $f;
+    out=$f.sample.seqmagick.fa
+    memusg -t -H seqmagick convert --line-wrap 0 --sample $n  $f - > $out
+    check $out
+    
+   
+    echo == seqtk
+    echo data: $f;
+    out=$f.sample.seqtk.fa
+    memusg -t -H seqtk sample $f $n  > $out;
+    check $out
+    
 done

@@ -1,39 +1,41 @@
 Test: D) Removing duplicates by seq
-warm-up
-data: dataset_A.fa
-data: dataset_B.fa
+Output sequences of all apps are not wrapped to fixed length.
+read file once with cat
 == seqkit
 data: dataset_A.fa
 [INFO][0m 12351 duplicated records removed
 
-elapsed time: 10.646
-peak rss: 47432
+elapsed time: 10.981
+peak rss: 47272
 
 file                          format  type  num_seqs        sum_len  min_len   avg_len    max_len
 dataset_A.fa.rmdup.seqkit.fa  FASTA   DNA     55,397  2,589,746,144       56  46,748.9  5,976,145
 0a65481fa3446f622bd83b1d57677395  dataset_A.fa.rmdup.seqkit.fa
+== seqmagick
+data: dataset_A.fa
+
+elapsed time: 49.427
+peak rss: 52384
+
+file                             format  type  num_seqs        sum_len  min_len   avg_len    max_len
+dataset_A.fa.rmdup.seqmagick.fa  FASTA   DNA     55,397  2,589,746,144       56  46,748.9  5,976,145
+0a65481fa3446f622bd83b1d57677395  dataset_A.fa.rmdup.seqmagick.fa
+read file once with cat
+== seqkit
 data: dataset_B.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 11.693
-peak rss: 786880
+elapsed time: 11.850
+peak rss: 786568
 
 file                          format  type  num_seqs        sum_len  min_len       avg_len      max_len
 dataset_B.fa.rmdup.seqkit.fa  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422
 af9e765363ffe03aaaaa0a23509f7b32  dataset_B.fa.rmdup.seqkit.fa
 == seqmagick
-data: dataset_A.fa
-
-elapsed time: 49.605
-peak rss: 55956
-
-file                             format  type  num_seqs        sum_len  min_len   avg_len    max_len
-dataset_A.fa.rmdup.seqmagick.fa  FASTA   DNA     55,397  2,589,746,144       56  46,748.9  5,976,145
-0a65481fa3446f622bd83b1d57677395  dataset_A.fa.rmdup.seqmagick.fa
 data: dataset_B.fa
 
-elapsed time: 59.726
-peak rss: 1036376
+elapsed time: 60.848
+peak rss: 1033632
 
 file                             format  type  num_seqs        sum_len  min_len       avg_len      max_len
 dataset_B.fa.rmdup.seqmagick.fa  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422

@@ -10,21 +10,21 @@ Usage:
 
 1. Run all tests:
 
-perl $0 run_benchmark*.sh --outfile benchmark.5test.csv
+perl $0 run_benchmark*.sh --outfile benchmark.5test.tsv
 
 2. Run one test:
 
-perl $0 run_benchmark_04_remove_duplicated_seqs_by_name.sh -o benchmark.rmdup.csv
+perl $0 run_benchmark_04_remove_duplicated_seqs_by_name.sh -o benchmark.rmdup.tsv
 
 3. Custom repeate times:
 
-perl $0 -n 3 run_benchmark_04_remove_duplicated_seqs_by_name.sh -o benchmark.rmdup.csv
+perl $0 -n 3 run_benchmark_04_remove_duplicated_seqs_by_name.sh -o benchmark.rmdup.tsv
 
 USAGE
 
 my $N = 3;    # run $N times
 
-my $resultfile = "$0.benchmark.csv";
+my $resultfile = "$0.benchmark.tsv";
 my $help = 0;
 
 GetOptions( "n=i" => \$N, 'outfile|o=s' => \$resultfile, "help|h" => \$help, )
@@ -89,7 +89,7 @@ for my $test (@tests) {
     }
 
     # benchmark result
-    my $statfile = "$test.benchmark.csv";
+    my $statfile = "$test.benchmark.tsv";
     open my $fh, ">", $statfile or die "failed to write file: $statfile\n";
 
     print "\n=========[ benchmark result ]========\n";

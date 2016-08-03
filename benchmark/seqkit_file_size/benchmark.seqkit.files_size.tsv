@@ -1,0 +1,25 @@
+test	dataset	app	time_mean	time_stdev	mem_mean	mem_stdev
+A) Reverse complement	16X.fa	16X	35.35	2.12	786770	140
+A) Reverse complement	1X.fa	1X	1.90	0.10	786650	137
+A) Reverse complement	2X.fa	2X	3.59	0.08	786806	161
+A) Reverse complement	32X.fa	32X	71.62	1.55	786809	65
+A) Reverse complement	4X.fa	4X	6.90	0.37	786764	31
+A) Reverse complement	8X.fa	8X	16.79	1.61	786860	195
+B) Removing duplicates by seq	16X.fa	16X	18.57	0.04	786698	236
+B) Removing duplicates by seq	1X.fa	1X	1.65	0.04	786669	52
+B) Removing duplicates by seq	2X.fa	2X	2.76	0.00	786608	16
+B) Removing duplicates by seq	32X.fa	32X	37.35	0.07	786709	71
+B) Removing duplicates by seq	4X.fa	4X	5.01	0.05	786650	166
+B) Removing duplicates by seq	8X.fa	8X	9.54	0.04	786676	51
+C) Shuffling	16X.fa	16X	29.70	1.22	730993	15861
+C) Shuffling	1X.fa	1X	1.30	0.05	413516	9860
+C) Shuffling	2X.fa	2X	2.43	0.04	682173	36129
+C) Shuffling	32X.fa	32X	73.24	0.13	729378	30826
+C) Shuffling	4X.fa	4X	4.63	0.05	686813	19412
+C) Shuffling	8X.fa	8X	11.51	0.36	712880	17309
+D) Sorting by length	16X.fa	16X	29.58	1.53	756124	12894
+D) Sorting by length	1X.fa	1X	1.27	0.05	442533	10109
+D) Sorting by length	2X.fa	2X	2.42	0.07	677005	17068
+D) Sorting by length	32X.fa	32X	69.76	2.11	741020	11393
+D) Sorting by length	4X.fa	4X	4.67	0.03	693501	34378
+D) Sorting by length	8X.fa	8X	11.48	0.80	734877	21550

@@ -69,26 +69,26 @@ Usage:
 
 1. Run all tests:
 
-perl run.pl run_benchmark*.sh --outfile benchmark.5test.csv
+perl run.pl run_benchmark*.sh --outfile benchmark.5test.tsv
 
 2. Run one test:
 
-perl run.pl run_benchmark_04_remove_duplicated_seqs_by_name.sh -o benchmark.rmdup.csv
+perl run.pl run_benchmark_04_remove_duplicated_seqs_by_name.sh -o benchmark.rmdup.tsv
 
 3. Custom repeate times:
 
-perl run.pl -n 3 run_benchmark_04_remove_duplicated_seqs_by_name.sh -o benchmark.rmdup.csv
+perl run.pl -n 3 run_benchmark_04_remove_duplicated_seqs_by_name.sh -o benchmark.rmdup.tsv
 ```
 
 To compare performance between different softwares, run:
 
-    ./run.pl run_benchmark*.sh -n 3 -o benchmark.5tests.csv
+    ./run.pl run_benchmark*.sh -n 3 -o benchmark.5tests.tsv
 
 It costed ~50min for me.
 
 To test performance of other functions in seqkit, run:
 
-    ./run.pl run_test*.sh -n 1 -o benchmark.seqkit.csv
+    ./run.pl run_test*.sh -n 1 -o benchmark.seqkit.tsv
 
 ## Plot result
 
@@ -96,8 +96,8 @@ R libraries `dplyr`, `ggplot2`, `scales`, `ggthemes`, `ggrepel` are needed.
 
 Plot for result of the five tests:
 
-    ./plot.R -i benchmark.5tests.csv
+    ./plot.R -i benchmark.5tests.tsv
 
 Plot for result of the tests of other functions in seqkit:
 
-    ./plot.R -i benchmark.seqkit.csv --width 5 --height 3
+    ./plot.R -i benchmark.seqkit.tsv --width 5 --height 3
