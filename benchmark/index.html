@@ -483,7 +483,7 @@ $ seqkit sample -p 0.3 dataset_B.fa | seqkit seq --name --only-id | shuf &gt; id
 <li>CPU: Intel Core i5-3320M @ 2.60GHz, two cores/4 threads</li>
 <li>RAM: DDR3 1600MHz, 12GB</li>
 <li>SSD: SAMSUNG 850 EVO 250G, SATA-3</li>
-<li>OS: Fedora 24 (Scientific KDE spin),  Kernal: 4.6.3-200.fc24.x86_64</li>
+<li>OS: Fedora 24 (Scientific KDE spin),  Kernal: 4.6.4-301.fc24.x86_64</li>
 </ul>
 <p>Softwares:</p>
 <ul>
@@ -503,12 +503,12 @@ and average time and peak memory ware used for plotting.</p>
  (Version <a href="https://github.com/biogo/biogo/commit/7ebd71bd9afc52cdab7a7128467ae1a936b68958">7ebd71b</a>)
  package,
  was also used for comparison of FASTA file parsing performance.</p>
+<p><em>Note that some softwares (fasta_utilities and biogo) have different converting rules of computing complement sequence on ambiguous bases, there fore the results are different from others.</em></p>
 <p><a href="https://github.com/shenwei356/seqkit/blob/master/benchmark/run_benchmark_01_revcom.sh">Commands</a></p>
 <h3 id="test-2-extracting-sequences-by-id-list">Test 2. Extracting sequences by ID list</h3>
 <p><a href="https://github.com/shenwei356/seqkit/blob/master/benchmark/run_benchmark_02_exctact_by_id_list.sh">Commands</a></p>
 <h3 id="test-3-sampling-by-number">Test 3. Sampling by number</h3>
-<p>Note that different softwares have different sampling strategies,
-the peak memory may depends on size of sampled sequences.</p>
+<p><em>Note that different softwares have different sampling strategies, the peak memory  depends on size of sampled sequences and the results may not be the same.</em></p>
 <p><a href="https://github.com/shenwei356/seqkit/blob/master/benchmark/run_benchmark_03_sampling.sh">Commands</a></p>
 <h3 id="test-4-removing-duplicates-by-sequence-content">Test 4. Removing duplicates by sequence content</h3>
 <p><a href="https://github.com/shenwei356/seqkit/blob/master/benchmark/run_benchmark_04_remove_duplicated_seqs_by_seq.sh">Commands</a></p>
