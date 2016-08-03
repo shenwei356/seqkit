@@ -92,7 +92,7 @@ var sampleCmd = &cobra.Command{
 				}
 				// first pass, get seq number
 				if !quiet {
-					log.Info("first pass: estimating seq number")
+					log.Info("first pass: counting seq number")
 				}
 				seqNum, err := fastx.GetSeqNumber(file)
 				checkError(err)

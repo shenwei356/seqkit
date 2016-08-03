@@ -113,7 +113,7 @@ PC:
 - CPU: Intel Core i5-3320M @ 2.60GHz, two cores/4 threads
 - RAM: DDR3 1600MHz, 12GB
 - SSD: SAMSUNG 850 EVO 250G, SATA-3
-- OS: Fedora 24 (Scientific KDE spin),  Kernal: 4.6.3-200.fc24.x86_64
+- OS: Fedora 24 (Scientific KDE spin),  Kernal: 4.6.4-301.fc24.x86_64
 
 Softwares:
 
@@ -139,6 +139,8 @@ Output sequences of all softwares were not wrapped to fixed length.
  (Version [7ebd71b](https://github.com/biogo/biogo/commit/7ebd71bd9afc52cdab7a7128467ae1a936b68958))
  package,
  was also used for comparison of FASTA file parsing performance.
+ 
+*Note that some softwares (fasta_utilities and biogo) have different converting rules of computing complement sequence on ambiguous bases, there fore the results are different from others.*
 
 [Commands](https://github.com/shenwei356/seqkit/blob/master/benchmark/run_benchmark_01_revcom.sh)
 
@@ -148,8 +150,7 @@ Output sequences of all softwares were not wrapped to fixed length.
 
 ### Test 3. Sampling by number
 
-Note that different softwares have different sampling strategies,
-the peak memory may depends on size of sampled sequences.
+*Note that different softwares have different sampling strategies, the peak memory  depends on size of sampled sequences and the results may not be the same.*
 
 [Commands](https://github.com/shenwei356/seqkit/blob/master/benchmark/run_benchmark_03_sampling.sh)
 
