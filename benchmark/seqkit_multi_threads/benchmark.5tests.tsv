@@ -1,37 +1,37 @@
 test	dataset	app	time_mean	time_stdev	mem_mean	mem_stdev
-A) Reverse complement	dataset_A.fa	1	17.21	0.50	36578	120
-A) Reverse complement	dataset_A.fa	2	15.85	0.31	45198	202
-A) Reverse complement	dataset_A.fa	3	15.57	0.28	46453	94
-A) Reverse complement	dataset_A.fa	4	15.30	0.07	48010	2241
-A) Reverse complement	dataset_B.fa	1	19.56	1.27	786852	133
-A) Reverse complement	dataset_B.fa	2	16.12	0.94	786660	54
-A) Reverse complement	dataset_B.fa	3	15.09	0.14	786712	48
-A) Reverse complement	dataset_B.fa	4	14.87	0.78	786620	216
-B) Searching by ID list	dataset_A.fa	1	4.11	0.05	40481	105
-B) Searching by ID list	dataset_A.fa	2	4.07	0.00	40577	204
-B) Searching by ID list	dataset_A.fa	3	4.08	0.01	40362	280
-B) Searching by ID list	dataset_A.fa	4	4.09	0.02	42364	2673
-B) Searching by ID list	dataset_B.fa	1	4.64	0.05	786597	167
-B) Searching by ID list	dataset_B.fa	2	4.72	0.09	786745	129
-B) Searching by ID list	dataset_B.fa	3	4.67	0.08	786933	281
-B) Searching by ID list	dataset_B.fa	4	4.64	0.05	786732	141
-C) Sampling by number	dataset_A.fa	1	6.72	0.05	45065	3918
-C) Sampling by number	dataset_A.fa	2	6.68	0.01	47258	323
-C) Sampling by number	dataset_A.fa	3	6.80	0.01	49956	187
-C) Sampling by number	dataset_A.fa	4	6.79	0.01	49828	286
-C) Sampling by number	dataset_B.fa	1	8.21	0.01	1178425	33
-C) Sampling by number	dataset_B.fa	2	8.26	0.10	1138113	56764
-C) Sampling by number	dataset_B.fa	3	8.36	0.02	1143160	60143
-C) Sampling by number	dataset_B.fa	4	8.38	0.15	1178210	91
-D) Removing duplicates by seq	dataset_A.fa	1	10.70	0.14	44062	44
-D) Removing duplicates by seq	dataset_A.fa	2	10.67	0.10	46868	577
-D) Removing duplicates by seq	dataset_A.fa	3	10.85	0.30	46997	112
-D) Removing duplicates by seq	dataset_A.fa	4	10.67	0.08	46872	158
-D) Removing duplicates by seq	dataset_B.fa	1	11.63	0.11	786942	59
-D) Removing duplicates by seq	dataset_B.fa	2	11.55	0.15	786686	46
-D) Removing duplicates by seq	dataset_B.fa	3	12.03	0.47	786502	150
-D) Removing duplicates by seq	dataset_B.fa	4	11.73	0.06	786693	174
-E) Subsequence with BED file	dataset_B.fa	1	14.72	0.11	1813933	1340
-E) Subsequence with BED file	dataset_B.fa	2	9.15	0.13	1886973	152593
-E) Subsequence with BED file	dataset_B.fa	3	8.52	0.11	1819208	174589
-E) Subsequence with BED file	dataset_B.fa	4	8.20	0.12	1866422	621
+A) Reverse complement	dataset_A.fa	1	10.23	0.22	35020	57
+A) Reverse complement	dataset_A.fa	2	10.31	0.10	44028	105
+A) Reverse complement	dataset_A.fa	3	9.97	0.10	41904	4786
+A) Reverse complement	dataset_A.fa	4	9.86	0.06	45417	48
+A) Reverse complement	dataset_B.fa	1	13.22	2.99	785502	93
+A) Reverse complement	dataset_B.fa	2	9.40	0.29	785381	103
+A) Reverse complement	dataset_B.fa	3	9.71	0.07	785189	132
+A) Reverse complement	dataset_B.fa	4	9.22	0.05	785265	122
+B) Searching by ID list	dataset_A.fa	1	2.88	0.01	39564	82
+B) Searching by ID list	dataset_A.fa	2	2.89	0.01	39438	152
+B) Searching by ID list	dataset_A.fa	3	2.88	0.01	39262	256
+B) Searching by ID list	dataset_A.fa	4	2.89	0.00	39065	216
+B) Searching by ID list	dataset_B.fa	1	3.42	0.05	785480	42
+B) Searching by ID list	dataset_B.fa	2	3.41	0.05	785426	147
+B) Searching by ID list	dataset_B.fa	3	3.47	0.01	785386	38
+B) Searching by ID list	dataset_B.fa	4	3.49	0.07	785217	117
+C) Sampling by number	dataset_A.fa	1	4.46	0.05	41061	19
+C) Sampling by number	dataset_A.fa	2	4.50	0.06	48208	79
+C) Sampling by number	dataset_A.fa	3	4.58	0.08	48369	159
+C) Sampling by number	dataset_A.fa	4	4.54	0.10	48162	289
+C) Sampling by number	dataset_B.fa	1	5.70	0.05	1054130	44
+C) Sampling by number	dataset_B.fa	2	5.75	0.06	1055882	13
+C) Sampling by number	dataset_B.fa	3	5.87	0.06	1056460	612
+C) Sampling by number	dataset_B.fa	4	5.79	0.01	1056650	488
+D) Removing duplicates by seq	dataset_A.fa	1	9.55	0.05	42618	32
+D) Removing duplicates by seq	dataset_A.fa	2	9.40	0.21	45224	626
+D) Removing duplicates by seq	dataset_A.fa	3	9.50	0.20	45950	110
+D) Removing duplicates by seq	dataset_A.fa	4	9.63	0.22	45021	517
+D) Removing duplicates by seq	dataset_B.fa	1	10.37	0.05	785508	48
+D) Removing duplicates by seq	dataset_B.fa	2	10.30	0.05	785154	20
+D) Removing duplicates by seq	dataset_B.fa	3	10.34	0.14	785294	177
+D) Removing duplicates by seq	dataset_B.fa	4	10.57	0.46	785173	244
+E) Subsequence with BED file	dataset_B.fa	1	10.94	0.21	2390820	294107
+E) Subsequence with BED file	dataset_B.fa	2	7.58	0.22	2282576	72367
+E) Subsequence with BED file	dataset_B.fa	3	6.99	0.15	2127222	47725
+E) Subsequence with BED file	dataset_B.fa	4	7.16	0.20	2078264	126836

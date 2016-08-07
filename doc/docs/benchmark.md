@@ -1,11 +1,11 @@
-# Benchmark
+    # Benchmark
 
 
 ## Softwares
 
 1. [seqkit](https://github.com/shenwei356/seqkit). (Go).
-   Version [v0.3.1](https://github.com/shenwei356/seqkit/releases/tag/v0.3.1).
-   Compiled with Go 1.6.3.
+   Version [v0.3.1.1](https://github.com/shenwei356/seqkit/releases/tag/v0.3.1.1).
+   Compiled with Go 1.7rc5.
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    Lots of dependencies to install.
@@ -139,7 +139,7 @@ Output sequences of all softwares were not wrapped to fixed length.
  (Version [7ebd71b](https://github.com/biogo/biogo/commit/7ebd71bd9afc52cdab7a7128467ae1a936b68958))
  package,
  was also used for comparison of FASTA file parsing performance.
- 
+
 *Note that some softwares (fasta_utilities and biogo) have different converting rules of computing complement sequence on ambiguous bases, there fore the results are different from others.*
 
 [Commands](https://github.com/shenwei356/seqkit/blob/master/benchmark/run_benchmark_01_revcom.sh)
@@ -164,7 +164,7 @@ Output sequences of all softwares were not wrapped to fixed length.
 
 ## Results
 
-seqkit version: v0.3.1
+seqkit version: v0.3.1.1
 
 ![benchmark-5tests.tsv.png](benchmark/benchmark.5tests.tsv.png)
 

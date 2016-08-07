@@ -6,7 +6,7 @@ echo Output sequences of all apps are not wrapped to fixed length.
 
 echo read file once with cat
 cat dataset_B.fa > /dev/null
-zat chr19.bed.gz  > /dev/null
+zcat chr19.bed.gz  > /dev/null
 
 
 NCPUs=$(grep -c processor /proc/cpuinfo)

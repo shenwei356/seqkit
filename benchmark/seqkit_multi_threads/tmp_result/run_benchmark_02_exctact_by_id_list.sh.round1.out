@@ -3,51 +3,51 @@ Test: B) Searching by ID list
 read file once with cat
 data: dataset_A.fa
 
-elapsed time: 4.184
-peak rss: 40332
+elapsed time: 2.889
+peak rss: 39676
 
 read file once with cat
 data: dataset_B.fa
 
-elapsed time: 4.604
-peak rss: 786512
+elapsed time: 3.349
+peak rss: 785540
 
 == 2
 read file once with cat
 data: dataset_A.fa
 
-elapsed time: 4.069
-peak rss: 40676
+elapsed time: 2.877
+peak rss: 39448
 
 read file once with cat
 data: dataset_B.fa
 
-elapsed time: 4.608
-peak rss: 786904
+elapsed time: 3.433
+peak rss: 785484
 
 == 3
 read file once with cat
 data: dataset_A.fa
 
-elapsed time: 4.080
-peak rss: 40676
+elapsed time: 2.878
+peak rss: 38932
 
 read file once with cat
 data: dataset_B.fa
 
-elapsed time: 4.605
-peak rss: 787316
+elapsed time: 3.456
+peak rss: 785368
 
 == 4
 read file once with cat
 data: dataset_A.fa
 
-elapsed time: 4.079
-peak rss: 46140
+elapsed time: 2.892
+peak rss: 39044
 
 read file once with cat
 data: dataset_B.fa
 
-elapsed time: 4.716
-peak rss: 786632
+elapsed time: 3.588
+peak rss: 785192
 

@@ -6,7 +6,7 @@ SeqKit is implemented in [Golang](https://golang.org/) programming language,
 
 ## Latest Version
 
-[SeqKit v0.3.1](https://github.com/shenwei356/seqkit/releases/tag/v0.3.1)
+[SeqKit v0.3.1.1](https://github.com/shenwei356/seqkit/releases/tag/v0.3.1.1)
 
 
 ***64-bit versions are highly recommended.***
@@ -78,6 +78,8 @@ For Go developer, just one command:
 
 ## Release History
 
+- [SeqKit v0.3.1.1](https://github.com/shenwei356/seqkit/releases/tag/v0.3.1.1)
+    - compile with go1.7rc5, with ***higher performance and smaller size of binary file***
 - [SeqKit v0.3.1](https://github.com/shenwei356/seqkit/releases/tag/v0.3.1)
     - improve speed of `seqkit locate`
 - [SeqKit v0.3.0](https://github.com/shenwei356/seqkit/releases/tag/v0.3.0)

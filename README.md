@@ -1,4 +1,4 @@
-# SeqKit - a cross-platform and efficient toolkit for FASTA/Q file manipulation
+# SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
 
 Documents: [http://shenwei356.github.io/seqkit](http://shenwei356.github.io/seqkit)
@@ -18,7 +18,7 @@ and some of them are only available for specific operating systems.
 Furthermore, the complicated installation process of dependencies packages and
 running environment also make them less friendly to common users.
 
-SeqKit is a cross-platform, efficient, and practical FASTA/Q manipulations tool
+SeqKit is a cross-platform, ultrafast, and practical FASTA/Q manipulations tool
 that is friendly for researchers to complete wide ranges of FASTA/Q file processing.
 The toolkit supports plain or gzip-compressed input and output
 from either standard stream or files,
@@ -260,14 +260,14 @@ Datasets:
     dataset_A.fa  FASTA   DNA     67,748  2,807,643,808       56      41,442.5    5,976,145                  
     dataset_B.fa  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422  
 
-SeqKit version: v0.3.1
+SeqKit version: v0.3.1.1
 
 ![benchmark-5tests.tsv.png](benchmark/benchmark.5tests.tsv.png)
 
 
 ## Citation
 
-**W Shen**, S Le, Y Li\*, F Hu\*. seqkit: a cross-platform and efficient toolkit for FASTA/Q file manipulation.
+**W Shen**, S Le, Y Li\*, F Hu\*. SeqKit: a cross-platform and ultrafast toolkit for FASTA/Q file manipulation.
 ***PLOS ONE***. revised.
 
 ## Contact

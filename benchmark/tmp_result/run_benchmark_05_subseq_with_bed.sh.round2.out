@@ -6,8 +6,8 @@ data: dataset_B.fa
 [INFO][0m read BED file ...
 [INFO][0m 162980 BED features loaded
 
-elapsed time: 9.208
-peak rss: 1868208
+elapsed time: 7.135
+peak rss: 2207484
 
 file                    format  type  num_seqs      sum_len  min_len  avg_len  max_len
 chr19.bed.gz.seqkit.fa  FASTA   DNA    162,980  244,087,173        1  1,497.7  486,463
@@ -15,8 +15,8 @@ chr19.bed.gz.seqkit.fa  FASTA   DNA    162,980  244,087,173        1  1,497.7  4
 == seqtk
 data: dataset_B.fa
 
-elapsed time: 6.418
-peak rss: 246092
+elapsed time: 6.411
+peak rss: 246172
 
 file                   format  type  num_seqs      sum_len  min_len  avg_len  max_len
 chr19.bed.gz.seqtk.fa  FASTA   DNA    162,980  244,087,173        1  1,497.7  486,463

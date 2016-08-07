@@ -4,8 +4,8 @@ read file once with cat
 == seqkit
 data: dataset_A.fa
 
-elapsed time: 16.471
-peak rss: 45024
+elapsed time: 10.833
+peak rss: 44360
 
 file                    format  type  num_seqs        sum_len  min_len   avg_len    max_len
 dataset_A.fa.seqkit.rc  FASTA   DNA     67,748  2,807,643,808       56  41,442.5  5,976,145
@@ -14,8 +14,8 @@ a4594bc869003be6244f5619efe371eb  dataset_A.fa.seqkit.rc
 data: dataset_A.fa
 Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94.
 
-elapsed time: 18.412
-peak rss: 52112
+elapsed time: 16.608
+peak rss: 53652
 
 file                    format  type  num_seqs        sum_len  min_len   avg_len    max_len
 dataset_A.fa.fautil.rc  FASTA   DNA     67,748  2,807,643,808       56  41,442.5  5,976,145
@@ -23,8 +23,8 @@ dataset_A.fa.fautil.rc  FASTA   DNA     67,748  2,807,643,808       56  41,442.5
 == seqmagick
 data: dataset_A.fa
 
-elapsed time: 58.044
-peak rss: 52776
+elapsed time: 56.654
+peak rss: 44800
 
 file                       format  type  num_seqs        sum_len  min_len   avg_len    max_len
 dataset_A.fa.seqmagick.rc  FASTA   DNA     67,748  2,807,643,808       56  41,442.5  5,976,145
@@ -32,8 +32,8 @@ a4594bc869003be6244f5619efe371eb  dataset_A.fa.seqmagick.rc
 == seqtk
 data: dataset_A.fa
 
-elapsed time: 8.972
-peak rss: 7568
+elapsed time: 9.234
+peak rss: 7476
 
 file                   format  type  num_seqs        sum_len  min_len   avg_len    max_len
 dataset_A.fa.seqtk.rc  FASTA   DNA     67,748  2,807,643,808       56  41,442.5  5,976,145
@@ -41,8 +41,8 @@ a4594bc869003be6244f5619efe371eb  dataset_A.fa.seqtk.rc
 == biogo
 data: dataset_A.fa
 
-elapsed time: 102.704
-peak rss: 32896
+elapsed time: 114.267
+peak rss: 32420
 
 file                   format  type  num_seqs        sum_len  min_len   avg_len    max_len
 dataset_A.fa.biogo.rc  FASTA   DNA     67,748  2,807,643,808       56  41,442.5  5,976,145
@@ -51,8 +51,8 @@ read file once with cat
 == seqkit
 data: dataset_B.fa
 
-elapsed time: 16.219
-peak rss: 786720
+elapsed time: 9.915
+peak rss: 785472
 
 file                    format  type  num_seqs        sum_len  min_len       avg_len      max_len
 dataset_B.fa.seqkit.rc  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422
@@ -61,8 +61,8 @@ dataset_B.fa.seqkit.rc  FASTA   DNA        194  3,099,750,718      970  15,978,0
 data: dataset_B.fa
 Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94.
 
-elapsed time: 24.227
-peak rss: 1255580
+elapsed time: 23.921
+peak rss: 1255768
 
 file                    format  type  num_seqs        sum_len  min_len       avg_len      max_len
 dataset_B.fa.fautil.rc  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422
@@ -70,8 +70,8 @@ dataset_B.fa.fautil.rc  FASTA   DNA        194  3,099,750,718      970  15,978,0
 == seqmagick
 data: dataset_B.fa
 
-elapsed time: 64.769
-peak rss: 1380848
+elapsed time: 63.733
+peak rss: 1439652
 
 file                       format  type  num_seqs        sum_len  min_len       avg_len      max_len
 dataset_B.fa.seqmagick.rc  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422
@@ -79,8 +79,8 @@ dataset_B.fa.seqmagick.rc  FASTA   DNA        194  3,099,750,718      970  15,97
 == seqtk
 data: dataset_B.fa
 
-elapsed time: 9.621
-peak rss: 244768
+elapsed time: 9.498
+peak rss: 244816
 
 file                   format  type  num_seqs        sum_len  min_len       avg_len      max_len
 dataset_B.fa.seqtk.rc  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422
@@ -88,8 +88,8 @@ dataset_B.fa.seqtk.rc  FASTA   DNA        194  3,099,750,718      970  15,978,09
 == biogo
 data: dataset_B.fa
 
-elapsed time: 96.946
-peak rss: 1335648
+elapsed time: 94.243
+peak rss: 1404560
 
 file                   format  type  num_seqs        sum_len  min_len       avg_len      max_len
 dataset_B.fa.biogo.rc  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422

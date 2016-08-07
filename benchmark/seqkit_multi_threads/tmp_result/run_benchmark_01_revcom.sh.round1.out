@@ -4,51 +4,51 @@ Output sequences of all apps are not wrapped to fixed length.
 read file once with cat
 data: dataset_A.fa
 
-elapsed time: 17.917
-peak rss: 36408
+elapsed time: 10.542
+peak rss: 35016
 
 read file once with cat
 data: dataset_B.fa
 
-elapsed time: 19.389
-peak rss: 786668
+elapsed time: 17.428
+peak rss: 785392
 
 == 2
 read file once with cat
 data: dataset_A.fa
 
-elapsed time: 16.282
-peak rss: 45076
+elapsed time: 10.183
+peak rss: 44084
 
 read file once with cat
 data: dataset_B.fa
 
-elapsed time: 17.129
-peak rss: 786688
+elapsed time: 9.103
+peak rss: 785444
 
 == 3
 read file once with cat
 data: dataset_A.fa
 
-elapsed time: 15.973
-peak rss: 46516
+elapsed time: 10.026
+peak rss: 45220
 
 read file once with cat
 data: dataset_B.fa
 
-elapsed time: 15.180
-peak rss: 786676
+elapsed time: 9.716
+peak rss: 785100
 
 == 4
 read file once with cat
 data: dataset_A.fa
 
-elapsed time: 15.196
-peak rss: 46584
+elapsed time: 9.876
+peak rss: 45372
 
 read file once with cat
 data: dataset_B.fa
 
-elapsed time: 15.976
-peak rss: 786824
+elapsed time: 9.249
+peak rss: 785320
 

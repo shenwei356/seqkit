@@ -3,41 +3,41 @@ Test: B) Removing duplicates by seq
 data: 1X.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 1.603
-peak rss: 786596
+elapsed time: 1.232
+peak rss: 785184
 
 == 2X
 data: 2X.fa
 [INFO][0m 1 duplicated records removed
 
-elapsed time: 2.759
-peak rss: 786596
+elapsed time: 1.783
+peak rss: 785368
 
 == 4X
 data: 4X.fa
 [INFO][0m 3 duplicated records removed
 
-elapsed time: 4.968
-peak rss: 786860
+elapsed time: 3.548
+peak rss: 785564
 
 == 8X
 data: 8X.fa
 [INFO][0m 7 duplicated records removed
 
-elapsed time: 9.516
-peak rss: 786724
+elapsed time: 8.804
+peak rss: 785184
 
 == 16X
 data: 16X.fa
 [INFO][0m 15 duplicated records removed
 
-elapsed time: 18.630
-peak rss: 786632
+elapsed time: 17.704
+peak rss: 785436
 
 == 32X
 data: 32X.fa
 [INFO][0m 31 duplicated records removed
 
-elapsed time: 37.276
-peak rss: 786756
+elapsed time: 33.660
+peak rss: 785152
 

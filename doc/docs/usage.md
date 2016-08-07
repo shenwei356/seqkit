@@ -97,9 +97,9 @@ reproduced in different environments with same random seed.
 Usage
 
 ```
-seqkit -- a cross-platform and efficient toolkit for FASTA/Q file manipulation
+SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.3.1
+Version: 0.3.1.1
 
 Author: Wei Shen <shenwei356@gmail.com>
 

@@ -5,58 +5,58 @@ read file once with cat
 data: dataset_A.fa
 [INFO][0m 12351 duplicated records removed
 
-elapsed time: 10.619
-peak rss: 44112
+elapsed time: 9.608
+peak rss: 42624
 
 read file once with cat
 data: dataset_B.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 11.615
-peak rss: 786864
+elapsed time: 10.302
+peak rss: 785544
 
 == 2
 read file once with cat
 data: dataset_A.fa
 [INFO][0m 12351 duplicated records removed
 
-elapsed time: 10.603
-peak rss: 47264
+elapsed time: 9.296
+peak rss: 46088
 
 read file once with cat
 data: dataset_B.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 11.763
-peak rss: 786676
+elapsed time: 10.242
+peak rss: 785144
 
 == 3
 read file once with cat
 data: dataset_A.fa
 [INFO][0m 12351 duplicated records removed
 
-elapsed time: 11.276
-peak rss: 46988
+elapsed time: 9.257
+peak rss: 45796
 
 read file once with cat
 data: dataset_B.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 11.577
-peak rss: 786324
+elapsed time: 10.522
+peak rss: 785216
 
 == 4
 read file once with cat
 data: dataset_A.fa
 [INFO][0m 12351 duplicated records removed
 
-elapsed time: 10.774
-peak rss: 46712
+elapsed time: 9.932
+peak rss: 44632
 
 read file once with cat
 data: dataset_B.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 11.810
-peak rss: 786564
+elapsed time: 11.195
+peak rss: 785488
 
