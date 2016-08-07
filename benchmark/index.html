@@ -9,7 +9,7 @@
         
         <link rel="shortcut icon" href="../img/favicon.ico">
 
-	<title>Benchmark - SeqKit - FASTA/Q kit</title>
+	<title>Benchmark - SeqKit - Ultrafast FASTA/Q kit</title>
 
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
@@ -53,7 +53,7 @@
             
 
             <!-- Main title -->
-            <a class="navbar-brand" href="..">SeqKit - FASTA/Q kit</a>
+            <a class="navbar-brand" href="..">SeqKit - Ultrafast FASTA/Q kit</a>
         </div>
 
         <!-- Expanded navigation -->
@@ -139,31 +139,57 @@
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
     
-        <li class="main active"><a href="#benchmark">Benchmark</a></li>
+        <li class="main active"><a href="#softwares">Softwares</a></li>
         
-            <li><a href="#softwares">Softwares</a></li>
+    
+        <li class="main "><a href="#features">Features</a></li>
         
-            <li><a href="#features">Features</a></li>
+    
+        <li class="main "><a href="#datasets">Datasets</a></li>
         
-            <li><a href="#datasets">Datasets</a></li>
+            <li><a href="#dataset_afa-large-number-of-short-sequences">dataset_A.fa - large number of short sequences</a></li>
         
-            <li><a href="#platform">Platform</a></li>
+            <li><a href="#dataset_bfa-small-number-of-large-sequences">dataset_B.fa - small number of large sequences</a></li>
         
-            <li><a href="#tests">Tests</a></li>
+            <li><a href="#sequence-id-list">Sequence ID list</a></li>
         
-            <li><a href="#results">Results</a></li>
+            <li><a href="#bed-file">BED file</a></li>
+        
+    
+        <li class="main "><a href="#platform">Platform</a></li>
+        
+    
+        <li class="main "><a href="#tests">Tests</a></li>
+        
+            <li><a href="#test-1-reverse-complement">Test 1. Reverse Complement</a></li>
+        
+            <li><a href="#test-2-extracting-sequences-by-id-list">Test 2. Extracting sequences by ID list</a></li>
+        
+            <li><a href="#test-3-sampling-by-number">Test 3. Sampling by number</a></li>
+        
+            <li><a href="#test-4-removing-duplicates-by-sequence-content">Test 4. Removing duplicates by sequence content</a></li>
+        
+            <li><a href="#test-5-subsequence-with-bed-file">Test 5. Subsequence with BED file</a></li>
+        
+    
+        <li class="main "><a href="#results">Results</a></li>
+        
+            <li><a href="#test-of-multiple-threads">Test of multiple threads:</a></li>
+        
+            <li><a href="#tests-on-different-file-sizes">Tests on different file sizes</a></li>
         
     
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="benchmark">Benchmark</h1>
+<pre><code># Benchmark
+</code></pre>
 <h2 id="softwares">Softwares</h2>
 <ol>
 <li><a href="https://github.com/shenwei356/seqkit">seqkit</a>. (Go).
-   Version <a href="https://github.com/shenwei356/seqkit/releases/tag/v0.3.1">v0.3.1</a>.
-   Compiled with Go 1.6.3.</li>
+   Version <a href="https://github.com/shenwei356/seqkit/releases/tag/v0.3.1.1">v0.3.1.1</a>.
+   Compiled with Go 1.7rc5.</li>
 <li><a href="https://github.com/jimhester/fasta_utilities">fasta_utilities</a>. (Perl).
    Version <a href="https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579">3dcc0bc</a>.
    Lots of dependencies to install.</li>
@@ -515,7 +541,7 @@ and average time and peak memory ware used for plotting.</p>
 <h3 id="test-5-subsequence-with-bed-file">Test 5. Subsequence with BED file</h3>
 <p><a href="https://github.com/shenwei356/seqkit/blob/master/benchmark/run_benchmark_05_subseq_with_bed.sh">Commands</a></p>
 <h2 id="results">Results</h2>
-<p>seqkit version: v0.3.1</p>
+<p>seqkit version: v0.3.1.1</p>
 <p><img alt="benchmark-5tests.tsv.png" src="../benchmark/benchmark.5tests.tsv.png" /></p>
 <h3 id="test-of-multiple-threads">Test of multiple threads:</h3>
 <p>From the results, 2 threads/CPU is enough, so the default threads of seqkit is 2.</p>
