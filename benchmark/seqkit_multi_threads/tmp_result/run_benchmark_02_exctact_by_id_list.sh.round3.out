@@ -3,51 +3,75 @@ Test: B) Searching by ID list
 read file once with cat
 data: dataset_A.fa
 
-elapsed time: 2.876
-peak rss: 39480
+elapsed time: 2.892
+peak rss: 39484
 
 read file once with cat
 data: dataset_B.fa
 
-elapsed time: 3.461
-peak rss: 785452
+elapsed time: 3.589
+peak rss: 785588
+
+read file once with cat
+data: dataset_C.fq
+
+elapsed time: 7.868
+peak rss: 75180
 
 == 2
 read file once with cat
 data: dataset_A.fa
 
-elapsed time: 2.882
-peak rss: 39248
+elapsed time: 2.996
+peak rss: 39692
 
 read file once with cat
 data: dataset_B.fa
 
-elapsed time: 3.456
-peak rss: 785572
+elapsed time: 3.536
+peak rss: 785456
+
+read file once with cat
+data: dataset_C.fq
+
+elapsed time: 8.144
+peak rss: 68576
 
 == 3
 read file once with cat
 data: dataset_A.fa
 
-elapsed time: 2.889
-peak rss: 39300
+elapsed time: 2.887
+peak rss: 39604
 
 read file once with cat
 data: dataset_B.fa
 
-elapsed time: 3.481
-peak rss: 785440
+elapsed time: 3.603
+peak rss: 785224
+
+read file once with cat
+data: dataset_C.fq
+
+elapsed time: 7.970
+peak rss: 77824
 
 == 4
 read file once with cat
 data: dataset_A.fa
 
-elapsed time: 2.890
-peak rss: 39340
+elapsed time: 2.889
+peak rss: 39636
 
 read file once with cat
 data: dataset_B.fa
 
-elapsed time: 3.448
-peak rss: 785088
+elapsed time: 3.460
+peak rss: 785504
+
+read file once with cat
+data: dataset_C.fq
+
+elapsed time: 7.976
+peak rss: 71788
 

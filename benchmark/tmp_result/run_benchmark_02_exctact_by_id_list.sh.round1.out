@@ -4,8 +4,8 @@ read file once with cat
 == seqkit
 data: dataset_A.fa
 
-elapsed time: 2.880
-peak rss: 39628
+elapsed time: 2.877
+peak rss: 39572
 
 file                 format  type  num_seqs      sum_len  min_len   avg_len    max_len
 ids_A.txt.seqkit.fa  FASTA   DNA     20,139  799,917,174       56  39,719.8  4,876,800
@@ -15,8 +15,8 @@ data: dataset_A.fa
 number in list 20138
 Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94, <LIST> line 20138.
 
-elapsed time: 9.587
-peak rss: 51816
+elapsed time: 9.584
+peak rss: 51852
 
 file                 format  type  num_seqs      sum_len  min_len   avg_len    max_len
 ids_A.txt.fautil.fa  FASTA   DNA     20,139  799,917,174       56  39,719.8  4,876,800
@@ -24,8 +24,8 @@ ids_A.txt.fautil.fa  FASTA   DNA     20,139  799,917,174       56  39,719.8  4,8
 == seqmagick
 data: dataset_A.fa
 
-elapsed time: 37.536
-peak rss: 40680
+elapsed time: 37.767
+peak rss: 37116
 
 file                   format  type  num_seqs      sum_len  min_len   avg_len    max_len
 ids_A.txt.seqmagic.fa  FASTA   DNA     20,139  799,917,174       56  39,719.8  4,876,800
@@ -33,8 +33,8 @@ ids_A.txt.seqmagic.fa  FASTA   DNA     20,139  799,917,174       56  39,719.8  4
 == seqtk
 data: dataset_A.fa
 
-elapsed time: 10.567
-peak rss: 10040
+elapsed time: 10.669
+peak rss: 9900
 
 file                format  type  num_seqs      sum_len  min_len   avg_len    max_len
 ids_A.txt.seqtk.fa  FASTA   DNA     20,139  799,917,174       56  39,719.8  4,876,800
@@ -43,8 +43,8 @@ read file once with cat
 == seqkit
 data: dataset_B.fa
 
-elapsed time: 3.435
-peak rss: 785244
+elapsed time: 3.532
+peak rss: 785240
 
 file                 format  type  num_seqs        sum_len  min_len       avg_len      max_len
 ids_B.txt.seqkit.fa  FASTA   DNA         58  1,014,365,529      971  17,489,060.8  248,956,422
@@ -54,8 +54,8 @@ data: dataset_B.fa
 number in list 58
 Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94, <LIST> line 58.
 
-elapsed time: 12.115
-peak rss: 1255720
+elapsed time: 12.334
+peak rss: 1255820
 
 file                 format  type  num_seqs        sum_len  min_len       avg_len      max_len
 ids_B.txt.fautil.fa  FASTA   DNA         58  1,014,365,529      971  17,489,060.8  248,956,422
@@ -63,8 +63,8 @@ f694c89b74d133009be0f4f9961de3ef  ids_B.txt.fautil.fa
 == seqmagick
 data: dataset_B.fa
 
-elapsed time: 42.450
-peak rss: 978088
+elapsed time: 42.711
+peak rss: 977956
 
 file                   format  type  num_seqs        sum_len  min_len       avg_len      max_len
 ids_B.txt.seqmagic.fa  FASTA   DNA         58  1,014,365,529      971  17,489,060.8  248,956,422
@@ -72,9 +72,139 @@ f694c89b74d133009be0f4f9961de3ef  ids_B.txt.seqmagic.fa
 == seqtk
 data: dataset_B.fa
 
-elapsed time: 12.593
-peak rss: 244816
+elapsed time: 12.913
+peak rss: 244796
 
 file                format  type  num_seqs        sum_len  min_len       avg_len      max_len
 ids_B.txt.seqtk.fa  FASTA   DNA         58  1,014,365,529      971  17,489,060.8  248,956,422
 f694c89b74d133009be0f4f9961de3ef  ids_B.txt.seqtk.fa
+read file once with cat
+== seqkit
+data: dataset_C.fq
+
+elapsed time: 8.273
+peak rss: 68852
+
+file                 format  type  num_seqs     sum_len  min_len  avg_len  max_len
+ids_C.txt.seqkit.fa  FASTQ   DNA    275,467  27,546,700      100      100      100
+3817629a520e11cae2058d3680cabf66  ids_C.txt.seqkit.fa
+== fasta_utilities
+data: dataset_C.fq
+number in list 275467
+Use of uninitialized value in subroutine entry at /usr/local/share/perl5/FileBar.pm line 94, <LIST> line 275467.
+Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 400001.
+: 100000 2833Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 800001.
+: 200000 5861Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 1200001.
+: 300000 8820Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 1600001.
+: 400000 11857Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 2000001.
+: 500000 14850Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 2400001.
+: 600000 17839Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 2800001.
+: 700000 20819Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 3200001.
+: 800000 23801Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 3600001.
+: 900000 26835Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 4000001.
+: 1000000 29838Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 4400001.
+: 1100000 32945Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 4800001.
+: 1200000 35948Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 5200001.
+: 1300000 38923Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 5600001.
+: 1400000 41965Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 6000001.
+: 1500000 45028Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 6400001.
+: 1600000 48032Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 6800001.
+: 1700000 51022Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 7200001.
+: 1800000 53982Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 7600001.
+: 1900000 56976Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 8000001.
+: 2000000 59908Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 8400001.
+: 2100000 62874Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 8800001.
+: 2200000 65844Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 9200001.
+: 2300000 68848Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 9600001.
+: 2400000 71837Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 10000001.
+: 2500000 74831Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 10400001.
+: 2600000 77903Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 10800001.
+: 2700000 80844Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 11200001.
+: 2800000 83797Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 11600001.
+: 2900000 86876Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 12000001.
+: 3000000 89849Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 12400001.
+: 3100000 92766Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 12800001.
+: 3200000 95715Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 13200001.
+: 3300000 98697Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 13600001.
+: 3400000 101641Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 14000001.
+: 3500000 104742Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 14400001.
+: 3600000 107677Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 14800001.
+: 3700000 110642Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 15200001.
+: 3800000 113756Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 15600001.
+: 3900000 116768Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 16000001.
+: 4000000 119734Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 16400001.
+: 4100000 122729Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 16800001.
+: 4200000 125714Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 17200001.
+: 4300000 128735Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 17600001.
+: 4400000 131748Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 18000001.
+: 4500000 134753Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 18400001.
+: 4600000 137695Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 18800001.
+: 4700000 140650Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 19200001.
+: 4800000 143567Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 19600001.
+: 4900000 146579Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 20000001.
+: 5000000 149540Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 20400001.
+: 5100000 152591Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 20800001.
+: 5200000 155650Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 21200001.
+: 5300000 158600Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 21600001.
+: 5400000 161669Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 22000001.
+: 5500000 164765Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 22400001.
+: 5600000 167758Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 22800001.
+: 5700000 170830Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 23200001.
+: 5800000 173828Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 23600001.
+: 5900000 176932Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 24000001.
+: 6000000 179953Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 24400001.
+: 6100000 182914Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 24800001.
+: 6200000 185957Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 25200001.
+: 6300000 188923Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 25600001.
+: 6400000 191911Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 26000001.
+: 6500000 194955Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 26400001.
+: 6600000 197951Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 26800001.
+: 6700000 200992Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 27200001.
+: 6800000 203976Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 27600001.
+: 6900000 207032Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 28000001.
+: 7000000 210076Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 28400001.
+: 7100000 213162Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 28800001.
+: 7200000 216029Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 29200001.
+: 7300000 218965Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 29600001.
+: 7400000 221917Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 30000001.
+: 7500000 224873Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 30400001.
+: 7600000 227869Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 30800001.
+: 7700000 230857Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 31200001.
+: 7800000 233817Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 31600001.
+: 7900000 236786Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 32000001.
+: 8000000 239702Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 32400001.
+: 8100000 242730Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 32800001.
+: 8200000 245736Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 33200001.
+: 8300000 248740Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 33600001.
+: 8400000 251763Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 34000001.
+: 8500000 254784Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 34400001.
+: 8600000 257908Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 34800001.
+: 8700000 260857Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 35200001.
+: 8800000 263893Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 35600001.
+: 8900000 266806Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 36000001.
+: 9000000 269788Use of uninitialized value $ARGV in concatenation (.) or string at /usr/local/bin/in_list.pl line 64, <$_[...]> line 36400001.
+: 9100000 272863
+elapsed time: 82.792
+peak rss: 77184
+
+file                 format  type  num_seqs     sum_len  min_len  avg_len  max_len
+ids_C.txt.fautil.fa  FASTQ   DNA    275,467  27,546,700      100      100      100
+65c42f19dc2cdcc5de650bbf4cc21dcc  ids_C.txt.fautil.fa
+== seqmagick
+data: dataset_C.fq
+
+elapsed time: 234.951
+peak rss: 52536
+
+file                   format  type  num_seqs     sum_len  min_len  avg_len  max_len
+ids_C.txt.seqmagic.fa  FASTA   DNA    275,467  27,546,700      100      100      100
+daccda809ebf101302a77f1b7e17e059  ids_C.txt.seqmagic.fa
+== seqtk
+data: dataset_C.fq
+
+elapsed time: 6.052
+peak rss: 39976
+
+file                format  type  num_seqs     sum_len  min_len  avg_len  max_len
+ids_C.txt.seqtk.fa  FASTQ   DNA    275,467  27,546,700      100      100      100
+3817629a520e11cae2058d3680cabf66  ids_C.txt.seqtk.fa

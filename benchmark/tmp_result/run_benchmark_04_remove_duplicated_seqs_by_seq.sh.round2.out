@@ -5,8 +5,8 @@ read file once with cat
 data: dataset_A.fa
 [INFO][0m 12351 duplicated records removed
 
-elapsed time: 9.299
-peak rss: 45216
+elapsed time: 9.931
+peak rss: 45824
 
 file                          format  type  num_seqs        sum_len  min_len   avg_len    max_len
 dataset_A.fa.rmdup.seqkit.fa  FASTA   DNA     55,397  2,589,746,144       56  46,748.9  5,976,145
@@ -14,8 +14,8 @@ dataset_A.fa.rmdup.seqkit.fa  FASTA   DNA     55,397  2,589,746,144       56  46
 == seqmagick
 data: dataset_A.fa
 
-elapsed time: 50.540
-peak rss: 55128
+elapsed time: 49.531
+peak rss: 55088
 
 file                             format  type  num_seqs        sum_len  min_len   avg_len    max_len
 dataset_A.fa.rmdup.seqmagick.fa  FASTA   DNA     55,397  2,589,746,144       56  46,748.9  5,976,145
@@ -25,8 +25,8 @@ read file once with cat
 data: dataset_B.fa
 [INFO][0m 0 duplicated records removed
 
-elapsed time: 10.223
-peak rss: 785516
+elapsed time: 11.284
+peak rss: 785396
 
 file                          format  type  num_seqs        sum_len  min_len       avg_len      max_len
 dataset_B.fa.rmdup.seqkit.fa  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422
@@ -34,9 +34,29 @@ af9e765363ffe03aaaaa0a23509f7b32  dataset_B.fa.rmdup.seqkit.fa
 == seqmagick
 data: dataset_B.fa
 
-elapsed time: 59.011
-peak rss: 1033700
+elapsed time: 63.299
+peak rss: 1033744
 
 file                             format  type  num_seqs        sum_len  min_len       avg_len      max_len
 dataset_B.fa.rmdup.seqmagick.fa  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422
 af9e765363ffe03aaaaa0a23509f7b32  dataset_B.fa.rmdup.seqmagick.fa
+read file once with cat
+== seqkit
+data: dataset_C.fq
+[INFO][0m 501303 duplicated records removed
+
+elapsed time: 39.981
+peak rss: 1556936
+
+file                          format  type   num_seqs      sum_len  min_len  avg_len  max_len
+dataset_C.fq.rmdup.seqkit.fa  FASTQ   DNA   8,684,742  868,474,200      100      100      100
+f41a97678ee77913aaa468ce7f448960  dataset_C.fq.rmdup.seqkit.fa
+== seqmagick
+data: dataset_C.fq
+
+elapsed time: 461.526
+peak rss: 2737728
+
+file                             format  type   num_seqs      sum_len  min_len  avg_len  max_len
+dataset_C.fq.rmdup.seqmagick.fa  FASTA   DNA   8,684,742  868,474,200      100      100      100
+9d9345c7f138691ef7c1f6dbf107f82f  dataset_C.fq.rmdup.seqmagick.fa

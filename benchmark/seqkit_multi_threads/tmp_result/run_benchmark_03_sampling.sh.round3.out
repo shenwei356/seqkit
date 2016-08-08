@@ -8,8 +8,8 @@ data: dataset_A.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 10000 sequences outputed
 
-elapsed time: 4.527
-peak rss: 41040
+elapsed time: 4.554
+peak rss: 41072
 
 read file once with cat
 data: dataset_B.fa
@@ -19,8 +19,19 @@ data: dataset_B.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 19 sequences outputed
 
-elapsed time: 5.770
-peak rss: 1054168
+elapsed time: 5.809
+peak rss: 1050164
+
+read file once with cat
+data: dataset_C.fq
+[INFO][0m sample by number
+[INFO][0m first pass: counting seq number
+[INFO][0m seq number: 9186045
+[INFO][0m second pass: reading and sampling
+[INFO][0m 1000000 sequences outputed
+
+elapsed time: 9.243
+peak rss: 12768
 
 == 2
 read file once with cat
@@ -31,8 +42,8 @@ data: dataset_A.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 10000 sequences outputed
 
-elapsed time: 4.535
-peak rss: 48128
+elapsed time: 4.566
+peak rss: 48712
 
 read file once with cat
 data: dataset_B.fa
@@ -42,8 +53,19 @@ data: dataset_B.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 19 sequences outputed
 
-elapsed time: 5.665
-peak rss: 1055900
+elapsed time: 5.998
+peak rss: 1056064
+
+read file once with cat
+data: dataset_C.fq
+[INFO][0m sample by number
+[INFO][0m first pass: counting seq number
+[INFO][0m seq number: 9186045
+[INFO][0m second pass: reading and sampling
+[INFO][0m 1000000 sequences outputed
+
+elapsed time: 10.079
+peak rss: 13936
 
 == 3
 read file once with cat
@@ -54,8 +76,8 @@ data: dataset_A.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 10000 sequences outputed
 
-elapsed time: 4.521
-peak rss: 48188
+elapsed time: 4.682
+peak rss: 48676
 
 read file once with cat
 data: dataset_B.fa
@@ -65,8 +87,19 @@ data: dataset_B.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 19 sequences outputed
 
-elapsed time: 5.924
-peak rss: 1056172
+elapsed time: 6.035
+peak rss: 1056272
+
+read file once with cat
+data: dataset_C.fq
+[INFO][0m sample by number
+[INFO][0m first pass: counting seq number
+[INFO][0m seq number: 9186045
+[INFO][0m second pass: reading and sampling
+[INFO][0m 1000000 sequences outputed
+
+elapsed time: 10.285
+peak rss: 13952
 
 == 4
 read file once with cat
@@ -77,8 +110,8 @@ data: dataset_A.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 10000 sequences outputed
 
-elapsed time: 4.539
-peak rss: 47792
+elapsed time: 4.663
+peak rss: 48636
 
 read file once with cat
 data: dataset_B.fa
@@ -88,6 +121,17 @@ data: dataset_B.fa
 [INFO][0m second pass: reading and sampling
 [INFO][0m 19 sequences outputed
 
-elapsed time: 5.795
-peak rss: 1055960
+elapsed time: 6.038
+peak rss: 1057228
+
+read file once with cat
+data: dataset_C.fq
+[INFO][0m sample by number
+[INFO][0m first pass: counting seq number
+[INFO][0m seq number: 9186045
+[INFO][0m second pass: reading and sampling
+[INFO][0m 1000000 sequences outputed
+
+elapsed time: 10.607
+peak rss: 13316
 

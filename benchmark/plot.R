@@ -34,6 +34,11 @@ parser$add_argument("--labcolor", type = "character",
 parser$add_argument("--labshape", type = "character",
                     default = "Datasets",
                     help = "label of shape")
+parser$add_argument(
+                  "-d", "--datasets", metavar = "groups", type = "character",
+                  default = "dataset_A.fa,dataset_B.fa", help = 'dataset'
+)
+
 
 args <- parser$parse_args()
 
@@ -49,6 +54,10 @@ w <- args$width
 h <- args$height
 
 df <- read.csv(args$infile, sep = "\t")
+
+# filter
+datasets <- unlist(strsplit(args$datasets, ","))
+df <- df[df$dataset %in% datasets,]
 
 # sort
 df$test <- factor(df$test, levels = unique(df$test), ordered = TRUE)

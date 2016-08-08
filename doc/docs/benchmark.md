@@ -71,18 +71,26 @@ Dataset A is reference genomes DNA sequences of gastrointestinal tract from
 Dataset B is Human genome from [ensembl](http://uswest.ensembl.org/info/data/ftp/index.html).
 
 - Genome DNA:  [`Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz`](ftp://ftp.ensembl.org/pub/release-84/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz) (Gzipped FASTA file, ~900M)
+. Decompress it and rename to dataset_B.fa (~2.9G).
 - GTF file:  [`Homo_sapiens.GRCh38.84.gtf.gz`](ftp://ftp.ensembl.org/pub/release-84/gtf/homo_sapiens/Homo_sapiens.GRCh38.84.gtf.gz) (~44M)
 - BED file: `Homo_sapiens.GRCh38.84.bed.gz` was converted from `Homo_sapiens.GRCh38.84.gtf.gz` by  [`gtf2bed`](http://bedops.readthedocs.org/en/latest/content/reference/file-management/conversion/gtf2bed.html?highlight=gtf2bed)  with command
 
         $ zcat Homo_sapiens.GRCh38.84.gtf.gz | gtf2bed --do-not-sort | gzip -c > Homo_sapiens.GRCh38.84.bed.gz
 
+
+### dataset_C.fq – Illumina single end reads (SE100)
+
+Dataset C is Illumina single end (SE 100bp) reads file (~2.2G).
+
+
 Summary
 
     $ seqkit stat *.fa
-    file          format  type  num_seqs        sum_len  min_len       avg_len      max_len
-    dataset_A.fa  FASTA   DNA     67,748  2,807,643,808       56      41,442.5    5,976,145                  
-    dataset_B.fa  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422  
-
+    file          format  type   num_seqs        sum_len  min_len       avg_len      max_len
+    dataset_A.fa  FASTA   DNA      67,748  2,807,643,808       56      41,442.5    5,976,145
+    dataset_B.fa  FASTA   DNA         194  3,099,750,718      970  15,978,096.5  248,956,422
+    dataset_C.fq  FASTQ   DNA   9,186,045    918,604,500      100           100          100
+    
 ### Sequence ID list
 
 Parts of sequences IDs was sampled and shuffled from original data.
@@ -90,14 +98,16 @@ They were used in test of extracting sequences by ID list.
 
 Commands:
 
-    $ seqkit sample -p 0.3 dataset_A.fa | seqkit seq --name --only-id | shuf > ids_A.txt
-    $ seqkit sample -p 0.3 dataset_B.fa | seqkit seq --name --only-id | shuf > ids_B.txt
+    $ seqkit sample -p 0.3  dataset_A.fa | seqkit seq --name --only-id | shuf > ids_A.txt
+    $ seqkit sample -p 0.3  dataset_B.fa | seqkit seq --name --only-id | shuf > ids_B.txt    
+    $ seqkit sample -p 0.03 dataset_C.fq | seqkit seq --name --only-id | shuf > ids_C.txt
 
 Numbers:
 
-    $ wc -l ids_*
-    20138 ids_A.txt
-       58 ids_B.txt
+    $ wc -l ids*.txt
+        20138 ids_A.txt
+        58 ids_B.txt
+    2754516 ids_C.txt
 
 ### BED file
 
@@ -166,7 +176,13 @@ Output sequences of all softwares were not wrapped to fixed length.
 
 seqkit version: v0.3.1.1
 
+FASTA:
+
 ![benchmark-5tests.tsv.png](benchmark/benchmark.5tests.tsv.png)
+
+FASTQ:
+
+![benchmark-5tests.tsv.png](benchmark/benchmark.5tests.tsv.C.png)
 
 ### Test of multiple threads:
 

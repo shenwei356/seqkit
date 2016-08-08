@@ -256,14 +256,20 @@ More details: [http://shenwei356.github.io/seqkit/benchmark/](http://shenwei356.
 Datasets:
 
     $ seqkit stat *.fa
-    file          format  type  num_seqs        sum_len  min_len       avg_len      max_len
-    dataset_A.fa  FASTA   DNA     67,748  2,807,643,808       56      41,442.5    5,976,145                  
-    dataset_B.fa  FASTA   DNA        194  3,099,750,718      970  15,978,096.5  248,956,422  
+    file          format  type   num_seqs        sum_len  min_len       avg_len      max_len
+    dataset_A.fa  FASTA   DNA      67,748  2,807,643,808       56      41,442.5    5,976,145
+    dataset_B.fa  FASTA   DNA         194  3,099,750,718      970  15,978,096.5  248,956,422
+    dataset_C.fq  FASTQ   DNA   9,186,045    918,604,500      100           100          100  
 
 SeqKit version: v0.3.1.1
 
+FASTA:
+
 ![benchmark-5tests.tsv.png](benchmark/benchmark.5tests.tsv.png)
 
+FASTQ:
+
+![benchmark-5tests.tsv.png](benchmark/benchmark.5tests.tsv.C.png)
 
 ## Citation
 

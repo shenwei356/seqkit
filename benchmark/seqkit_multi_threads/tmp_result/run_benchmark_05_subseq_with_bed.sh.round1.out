@@ -6,30 +6,30 @@ data: dataset_B.fa
 [INFO][0m read BED file ...
 [INFO][0m 162980 BED features loaded
 
-elapsed time: 10.848
-peak rss: 2585352
+elapsed time: 10.397
+peak rss: 2626596
 
 == 2
 data: dataset_B.fa
 [INFO][0m read BED file ...
 [INFO][0m 162980 BED features loaded
 
-elapsed time: 7.322
-peak rss: 2187996
+elapsed time: 7.460
+peak rss: 2262688
 
 == 3
 data: dataset_B.fa
 [INFO][0m read BED file ...
 [INFO][0m 162980 BED features loaded
 
-elapsed time: 6.820
-peak rss: 2136100
+elapsed time: 6.524
+peak rss: 2073036
 
 == 4
 data: dataset_B.fa
 [INFO][0m read BED file ...
 [INFO][0m 162980 BED features loaded
 
-elapsed time: 7.360
-peak rss: 1899296
+elapsed time: 6.194
+peak rss: 2242568
 
