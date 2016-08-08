@@ -98,7 +98,7 @@ p <-
   geom_point(size = 2) +
   geom_hline(aes(yintercept = time_mean, color = app), size = 0.1, alpha = 0.4) +
   geom_vline(aes(xintercept = mem_mean2, color = app), size = 0.1, alpha = 0.4) +
-  geom_text_repel(size = 4, max.iter=200000) +
+  geom_text_repel(size = 4, max.iter=400000) +
   # scale_color_wsj() +
   scale_color_manual(values = c("#b79d1a", "#ff7600", "#d20015", "#00824c", "#00518b")) +
   facet_wrap( ~ test) +
