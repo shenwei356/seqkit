@@ -32,8 +32,8 @@ import (
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "seqkit",
-	Short: "a cross-platform and efficient toolkit for FASTA/Q file manipulation",
-	Long: fmt.Sprintf(`seqkit -- a cross-platform and efficient toolkit for FASTA/Q file manipulation
+	Short: "a cross-platform and ultrafast toolkit for FASTA/Q file manipulation",
+	Long: fmt.Sprintf(`seqkit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
 Version: %s
 
