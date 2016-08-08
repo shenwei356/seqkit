@@ -68,3 +68,32 @@ for f in dataset_B.fa; do
     check $out
     
 done
+
+n=1000000
+
+for f in dataset_C.fq; do
+    echo read file once with cat
+    cat $f > /dev/null
+    
+    
+    echo == seqkit
+    echo data: $f;
+    out=$f.sample.seqkit.fa
+    memusg -t -H seqkit sample -2 -n $n $f -w 0 > $out
+    check $out
+
+    
+    echo == seqmagick
+    echo data: $f;
+    out=$f.sample.seqmagick.fa
+    memusg -t -H seqmagick convert --line-wrap 0 --sample $n  $f - > $out
+    check $out
+    
+   
+    echo == seqtk
+    echo data: $f;
+    out=$f.sample.seqtk.fa
+    memusg -t -H seqtk sample $f $n  > $out;
+    check $out
+    
+done

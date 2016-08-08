@@ -6,7 +6,7 @@ echo Output sequences of all apps are not wrapped to fixed length.
 NCPUs=$(grep -c processor /proc/cpuinfo)
 for i in $(seq 1 $NCPUs); do 
     echo == $i
-    for f in dataset_{A,B}.fa; do
+    for f in dataset_{A,B}.fa dataset_C.fq; do
         echo read file once with cat
         cat $f > /dev/null
         

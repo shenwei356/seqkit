@@ -10,36 +10,42 @@ function check() {
 }
 
 
-for g in A B; do
+for g in A B C; do
     echo read file once with cat
-    cat dataset_$g.fa ids_$g.txt > /dev/null
+    if [ $g == "C" ]; then
+        f=dataset_C.fq
+    else
+        f=dataset_$g.fa
+    fi
+    
+    cat $f ids_$g.txt > /dev/null
     
     
     echo == seqkit
-    echo data: dataset_$g.fa
+    echo data: $f
     out=ids_$g.txt.seqkit.fa
-    memusg -t -H seqkit grep -f ids_$g.txt dataset_$g.fa -w 0 > $out
+    memusg -t -H seqkit grep -f ids_$g.txt $f -w 0 > $out
     check $out
     
     
     echo == fasta_utilities
-    echo data: dataset_$g.fa
+    echo data: $f
     out=ids_$g.txt.fautil.fa
-    memusg -t -H in_list.pl -files ids_$g.txt dataset_$g.fa > $out
+    memusg -t -H in_list.pl -files ids_$g.txt $f > $out
     check $out
     
     
     echo == seqmagick
-    echo data: dataset_$g.fa
+    echo data: $f
     out=ids_$g.txt.seqmagic.fa
-    memusg -t -H seqmagick convert --line-wrap 0 --include-from-file ids_$g.txt dataset_$g.fa - > $out
+    memusg -t -H seqmagick convert --line-wrap 0 --include-from-file ids_$g.txt $f - > $out
     check $out
 
     
     echo == seqtk
-    echo data: dataset_$g.fa
+    echo data: $f
     out=ids_$g.txt.seqtk.fa
-    memusg -t -H seqtk subseq dataset_$g.fa ids_$g.txt > $out
+    memusg -t -H seqtk subseq $f ids_$g.txt > $out
     check $out
 
 done

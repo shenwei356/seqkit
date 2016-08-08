@@ -59,7 +59,6 @@ Examples:
 		quiet := config.Quiet
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
-		fastx.Threads = config.Threads
 		gtf.Threads = config.Threads
 		fai.MapWholeFile = false
 		Threads = config.Threads

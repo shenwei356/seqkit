@@ -57,13 +57,13 @@ df$dataset <-
   factor(df$dataset, levels = unique(df$dataset), ordered = TRUE)
 
 # rename dataset
-re <- function(x) {
-  if (is.character(x) | is.factor(x)) {
-    x <- gsub("\\.fa","",x)
-  }
-  return(x)
-}
-df <- as.data.frame(lapply(df, re))
+# re <- function(x) {
+#   if (is.character(x) | is.factor(x)) {
+#     x <- gsub("\\.fa","",x)
+#   }
+#   return(x)
+# }
+# df <- as.data.frame(lapply(df, re))
 
 
 # humanize mem unit

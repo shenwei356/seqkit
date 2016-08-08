@@ -27,7 +27,6 @@ import (
 	"strings"
 
 	"github.com/shenwei356/xopen"
-	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/breader"
 	"github.com/shenwei356/util/byteutil"
 	"github.com/spf13/cobra"
@@ -44,7 +43,6 @@ var tab2faCmd = &cobra.Command{
 		config := getConfigs(cmd)
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
-		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileList(args)

@@ -28,7 +28,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -315,7 +314,7 @@ func getSeqIDAndLengthFromFaidxFile(file string) ([]string, []int, error) {
 		}
 		return idAndLength{id: items[0], length: length}, true, nil
 	}
-	reader, err := breader.NewBufferedReader(file, runtime.NumCPU(), 100, fn)
+	reader, err := breader.NewBufferedReader(file, 2, 10, fn)
 	if err != nil {
 		return ids, lengths, err
 	}
