@@ -34,7 +34,7 @@ for f in dataset_A.fa; do
     echo == seqtk
     echo data: $f;
     out=$f.sample.seqtk.fa
-    memusg -t -H seqtk sample $f $n  > $out;
+    memusg -t -H seqtk sample -2 $f $n  > $out;
     check $out
     
 done
@@ -64,7 +64,7 @@ for f in dataset_B.fa; do
     echo == seqtk
     echo data: $f;
     out=$f.sample.seqtk.fa
-    memusg -t -H seqtk sample $f $n  > $out;
+    memusg -t -H seqtk sample -2 $f $n  > $out;
     check $out
     
 done
@@ -93,7 +93,7 @@ for f in dataset_C.fq; do
     echo == seqtk
     echo data: $f;
     out=$f.sample.seqtk.fa
-    memusg -t -H seqtk sample $f $n  > $out;
+    memusg -t -H seqtk sample -2 $f $n  > $out;
     check $out
     
 done

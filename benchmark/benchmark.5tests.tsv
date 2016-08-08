@@ -21,15 +21,15 @@ B) Searching by ID list	dataset_C.fq	fasta_utilities	86.42	2.58	77085	87
 B) Searching by ID list	dataset_C.fq	seqkit	8.26	0.02	70129	905
 B) Searching by ID list	dataset_C.fq	seqmagick	237.81	6.33	52580	76
 B) Searching by ID list	dataset_C.fq	seqtk	6.16	0.12	39950	19
-C) Sampling by number	dataset_A.fa	seqkit	4.60	0.17	48717	81
-C) Sampling by number	dataset_A.fa	seqmagick	38.57	1.88	543829	8690
-C) Sampling by number	dataset_A.fa	seqtk	4.13	0.04	1078777	1425
-C) Sampling by number	dataset_B.fa	seqkit	5.90	0.19	1056069	73
-C) Sampling by number	dataset_B.fa	seqmagick	42.59	1.00	2987453	31663
-C) Sampling by number	dataset_B.fa	seqtk	5.97	0.34	2817729	33
-C) Sampling by number	dataset_C.fq	seqkit	9.69	0.11	13405	912
-C) Sampling by number	dataset_C.fq	seqmagick	284.56	4.89	3740949	36
-C) Sampling by number	dataset_C.fq	seqtk	4.98	0.16	501608	42
+C) Sampling by number	dataset_A.fa	seqkit	4.41	0.00	48637	150
+C) Sampling by number	dataset_A.fa	seqmagick	36.07	0.03	543650	5879
+C) Sampling by number	dataset_A.fa	seqtk	6.91	0.05	7848	5
+C) Sampling by number	dataset_B.fa	seqkit	5.61	0.06	1056598	502
+C) Sampling by number	dataset_B.fa	seqmagick	41.12	0.93	2974184	56454
+C) Sampling by number	dataset_B.fa	seqtk	7.43	0.06	244845	26
+C) Sampling by number	dataset_C.fq	seqkit	10.07	0.14	13810	97
+C) Sampling by number	dataset_C.fq	seqmagick	279.13	1.58	3741257	107
+C) Sampling by number	dataset_C.fq	seqtk	7.72	0.06	24022	3707
 D) Removing duplicates by seq	dataset_A.fa	seqkit	10.19	0.24	45918	128
 D) Removing duplicates by seq	dataset_A.fa	seqmagick	49.98	0.48	54606	472
 D) Removing duplicates by seq	dataset_B.fa	seqkit	11.12	0.29	785329	166
