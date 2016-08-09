@@ -30,7 +30,7 @@ therefore, it could be easily used in command-line pipe.
   see [download](http://shenwei356.github.io/seqkit/download/))
 - **Light weight and out-of-the-box, no dependencies, no compilation, no configuration**
   (see [download](http://shenwei356.github.io/seqkit/download/))
-- **Very Fast** (see [benchmark](/#benchmark)),
+- **UltraFast** (see [benchmark](/#benchmark)),
   **multiple-CPUs supported**.
 - **Practical functions supported by 20 subcommands** (see subcommands and
   [usage](http://shenwei356.github.io/seqkit/usage/) )
@@ -71,7 +71,7 @@ Categories          |Features               |seqkit  |fasta_utilities|fastx_tool
                     |Reading gzipped file   |Yes     |Yes            |--           |--     |Yes      |Yes
                     |Writing gzip file      |Yes     |--             |--           |--     |Yes      |--
 
-**Note 1**: See [version information](http://127.0.0.1:8000/benchmark/#softwares) of the softwares.
+**Note 1**: See [version information](http://shenwei356.github.io/seqkit/benchmark/#softwares) of the softwares.
 
 **Note 2**: See [usage](http://shenwei356.github.io/seqkit/usage/) for detailed options of seqkit.
 

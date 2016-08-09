@@ -2,10 +2,13 @@ site_name: SeqKit - Ultrafast FASTA/Q kit
 pages:
 - Home: index.md
 - Download: download.md
-- Usage: usage.md
-- Tutorial: tutorial.md
-- Benchmark: benchmark.md
-- YanLi Lab: yanlilab.md
+- Documents:
+    - Usage: usage.md
+    - Tutorial: tutorial.md
+    - Benchmark: benchmark.md
+- Links:
+    - Wei Shen's Bioinformatic tools: bioinf.md
+    - YanLi Lab: yanlilab.md
 theme: mkdocs
 
 repo_url: https://github.com/shenwei356/seqkit

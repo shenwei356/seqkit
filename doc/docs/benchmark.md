@@ -58,7 +58,7 @@ Categories          |Features               |seqkit  |fasta_utilities|fastx_tool
 
 ## Datasets
 
-All test data is available here: [seqkit-benchmark-data.tar.gz](http://bioinf.shenwei.me/seqkit-benchmark-data.tar.gz)  (1.7G)
+All test data is available here: [seqkit-benchmark-data.tar.gz](http://app.shenwei.me/data/seqkit/seqkit-benchmark-data.tar.gz)  (2.2G)
 
 ### dataset_A.fa - large number of short sequences
 
@@ -134,7 +134,7 @@ Softwares:
 
 Automatic benchmark and plotting scripts are available at:  [https://github.com/shenwei356/seqkit/tree/master/benchmark](https://github.com/shenwei356/seqkit/tree/master/benchmark).
 
-All tests were repeated 3 times ( ~20 min for one time),
+All tests were repeated 3 times,
 and average time and peak memory ware used for plotting.
 
 All data were readed once before tests began to minimize the influence of page cache.
