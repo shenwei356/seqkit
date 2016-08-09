@@ -75,26 +75,50 @@
                 
                 
                 
-                    <li >
-                        <a href="../usage/">Usage</a>
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Documents <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../usage/">Usage</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../tutorial/">Tutorial</a>
+</li>
+
+                        
+                            
+<li class="active">
+    <a href="./">Benchmark</a>
+</li>
+
+                        
+                        </ul>
                     </li>
                 
                 
                 
-                    <li >
-                        <a href="../tutorial/">Tutorial</a>
-                    </li>
-                
-                
-                
-                    <li class="active">
-                        <a href="./">Benchmark</a>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="../yanlilab/">YanLi Lab</a>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Links <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../bioinf/">Wei Shen's Bioinformatic tools</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../yanlilab/">YanLi Lab</a>
+</li>
+
+                        
+                        </ul>
                     </li>
                 
                 
@@ -114,7 +138,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../yanlilab/">
+                        <a rel="prev" href="../bioinf/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -469,7 +493,7 @@ to compute running time and peak memory usage of a process.</p>
 </table>
 <p><strong>Note 2</strong>: See <a href="http://shenwei356.github.io/seqkit/usage/">usage</a> for detailed options of seqkit.</p>
 <h2 id="datasets">Datasets</h2>
-<p>All test data is available here: <a href="http://bioinf.shenwei.me/seqkit-benchmark-data.tar.gz">seqkit-benchmark-data.tar.gz</a>  (1.7G)</p>
+<p>All test data is available here: <a href="http://app.shenwei.me/data/seqkit/seqkit-benchmark-data.tar.gz">seqkit-benchmark-data.tar.gz</a>  (2.2G)</p>
 <h3 id="dataset_afa-large-number-of-short-sequences">dataset_A.fa - large number of short sequences</h3>
 <p>Dataset A is reference genomes DNA sequences of gastrointestinal tract from
 <a href="http://hmpdacc.org/">NIH Human Microbiome Project</a>:
@@ -526,7 +550,7 @@ $ seqkit sample -p 0.03 dataset_C.fq | seqkit seq --name --only-id | shuf &gt; i
 </ul>
 <h2 id="tests">Tests</h2>
 <p>Automatic benchmark and plotting scripts are available at:  <a href="https://github.com/shenwei356/seqkit/tree/master/benchmark">https://github.com/shenwei356/seqkit/tree/master/benchmark</a>.</p>
-<p>All tests were repeated 3 times ( ~20 min for one time),
+<p>All tests were repeated 3 times,
 and average time and peak memory ware used for plotting.</p>
 <p>All data were readed once before tests began to minimize the influence of page cache.</p>
 <p>Output sequences of all softwares were not wrapped to fixed length.</p>
