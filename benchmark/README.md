@@ -9,7 +9,7 @@ Datasets and results are described at [http://shenwei356.github.io/seqkit/benchm
 Softwares
 
 1. [seqkit](https://github.com/shenwei356/seqkit). (Go).
-   Version [v0.3.1](https://github.com/shenwei356/seqkit/releases/tag/v0.3.1).
+   Version [v0.3.1.1](https://github.com/shenwei356/seqkit/releases/tag/v0.3.1.1).
 1. [fasta_utilities](https://github.com/jimhester/fasta_utilities). (Perl).
    Version [3dcc0bc](https://github.com/jimhester/fasta_utilities/tree/3dcc0bc6bf1e97839476221c26984b1789482579).
    Lots of dependencies to install_.
@@ -28,7 +28,7 @@ A Python script [memusg](https://github.com/shenwei356/memusg) was used
 **Attention**: the `fasta_utilities` uses Perl module `Term-ProgressBar`
 which makes it failed to run when using benchmark script `run_benchmark_00_all.pl`.
 Please change the source code of ProgressBar.pm (for me, the path is
-/usr/share/perl5/vendor_perl/Term/ProgressBar.pm). Add the code below after line `535`:
+`/usr/share/perl5/vendor_perl/Term/ProgressBar.pm`). Add the code below after line `535`:
 
     $config{bar_width} = 1 if $config{bar_width} < 1;
 
@@ -51,9 +51,9 @@ The edited code is
 [http://shenwei356.github.io/seqkit/benchmark/#datasets](http://shenwei356.github.io/seqkit/benchmark/#datasets)
 
 Or download all test data [seqkit-benchmark-data.tar.gz](http://app.shenwei.me/data/seqkit/seqkit-benchmark-data.tar.gz)
- (1.7G) and uncompress it, and then move them into directory `seqkit/benchmark`
+ (2.2G) and uncompress it, and then move them into directory `seqkit/benchmark`
 
-    wget ***
+    wget http://app.shenwei.me/data/seqkit/seqkit-benchmark-data.tar.gz
     tar -zxvf seqkit-benchmark-data.tar.gz
     mv seqkit-benchmark-data/* seqkit/benchmark
 
@@ -83,8 +83,6 @@ perl run.pl -n 3 run_benchmark_04_remove_duplicated_seqs_by_name.sh -o benchmark
 To compare performance between different softwares, run:
 
     ./run.pl run_benchmark*.sh -n 3 -o benchmark.5tests.tsv
-
-It costed ~50min for me.
 
 To test performance of other functions in seqkit, run:
 
