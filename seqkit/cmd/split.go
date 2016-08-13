@@ -165,14 +165,14 @@ Examples:
 					}
 					records = append(records, record.Clone())
 					if len(records) == size {
-						outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt))
+						outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
 						writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 						i++
 						records = []*fastx.Record{}
 					}
 				}
 				if len(records) > 0 {
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt))
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
 					writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 				}
 
@@ -233,7 +233,7 @@ Examples:
 
 			n := 1
 			if len(IDs) > 0 {
-				outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", fileName, n, fileExt))
+				outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
 				if !dryRun {
 					outfh, err = xopen.Wopen(outfile)
 					checkError(err)
@@ -260,7 +260,7 @@ Examples:
 						log.Infof("write %d sequences to file: %s\n", j, outfile)
 					}
 					n++
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", fileName, n, fileExt))
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
 					if !dryRun {
 						outfh.Close()
 						outfh, err = xopen.Wopen(outfile)
@@ -323,14 +323,14 @@ Examples:
 					}
 					records = append(records, record)
 					if len(records) == size {
-						outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt))
+						outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
 						writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 						i++
 						records = []*fastx.Record{}
 					}
 				}
 				if len(records) > 0 {
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", fileName, i, fileExt))
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
 					writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 				}
 				return
@@ -402,7 +402,7 @@ Examples:
 
 			n := 1
 			if len(IDs) > 0 {
-				outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", fileName, n, fileExt))
+				outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
 				if !dryRun {
 					outfh, err = xopen.Wopen(outfile)
 					checkError(err)
@@ -429,7 +429,7 @@ Examples:
 						log.Infof("write %d sequences to file: %s\n", j, outfile)
 					}
 					n++
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", fileName, n, fileExt))
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
 					if !dryRun {
 						outfh.Close()
 						outfh, err = xopen.Wopen(outfile)
@@ -488,7 +488,7 @@ Examples:
 
 				var outfile string
 				for id, records := range recordsByID {
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s", fileName, id, fileExt))
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s", filepath.Base(fileName), id, fileExt))
 					writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 				}
 				return
@@ -566,7 +566,7 @@ Examples:
 			var record *fastx.Record
 			for id, ids := range idsMap {
 
-				outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s", fileName, id, fileExt))
+				outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s", filepath.Base(fileName), id, fileExt))
 				if !dryRun {
 					outfh, err = xopen.Wopen(outfile)
 					checkError(err)
@@ -664,7 +664,7 @@ Examples:
 
 				var outfile string
 				for subseq, records := range recordsBySeqs {
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s.region_%d:%d_%s%s", fileName, start, end, subseq, fileExt))
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s.region_%d:%d_%s%s", filepath.Base(fileName), start, end, subseq, fileExt))
 					writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 				}
 				return
@@ -753,7 +753,7 @@ Examples:
 			var outfile string
 			var record *fastx.Record
 			for subseq, chrs := range region2name {
-				outfile = filepath.Join(outdir, fmt.Sprintf("%s.region_%d:%d_%s%s", fileName, start, end, subseq, fileExt))
+				outfile = filepath.Join(outdir, fmt.Sprintf("%s.region_%d:%d_%s%s", filepath.Base(fileName), start, end, subseq, fileExt))
 				if !dryRun {
 					outfh, err = xopen.Wopen(outfile)
 					checkError(err)

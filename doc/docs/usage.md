@@ -463,6 +463,11 @@ Examples
         ACGTac
         >seq_sliding:4-9
         TacgtN
+        >seq_sliding:7-12
+        gtNN
+        >seq_sliding:10-15
+        N
+
 
 2. Circular genome
 

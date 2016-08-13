@@ -25,11 +25,11 @@ import (
 	"io"
 	"runtime"
 
-	"github.com/shenwei356/xopen"
 	"github.com/dustin/go-humanize"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/util/math"
+	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 	"github.com/tatsushid/go-prettytable"
 )

@@ -26,10 +26,10 @@ import (
 	"io"
 	"runtime"
 
-	"github.com/shenwei356/xopen"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/util/byteutil"
+	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
 
@@ -69,7 +69,7 @@ var slidingCmd = &cobra.Command{
 		checkError(err)
 		defer outfh.Close()
 
-		var sequence []byte
+		var sequence, s []byte
 		var originalLen, l, end, e int
 		var text []byte
 		var b *bytes.Buffer
@@ -88,31 +88,31 @@ var slidingCmd = &cobra.Command{
 
 				originalLen = len(record.Seq.Seq)
 				sequence = record.Seq.Seq
-				if circular {
-					sequence = append(sequence, sequence[0:window-1]...)
-				}
-
 				l = len(sequence)
-				end = l - window
+				end = l - 1
 				if end < 0 {
 					end = 0
 				}
 				for i := 0; i <= end; i += step {
 					e = i + window
-					if e > originalLen {
+					if e > originalLen && circular {
 						e = e - originalLen
+						s = sequence[i:]
+						s = append(s, sequence[0:e]...)
+					} else {
+						s = sequence[i : i+window]
 					}
 					outfh.WriteString(fmt.Sprintf(">%s_sliding:%d-%d\n",
 						record.ID, i+1, e))
 
 					// outfh.Write(byteutil.WrapByteSlice(sequence[i:i+window], lineWidth))
 					if window <= pageSize {
-						outfh.Write(byteutil.WrapByteSlice(sequence[i:i+window], lineWidth))
+						outfh.Write(byteutil.WrapByteSlice(s, lineWidth))
 					} else {
 						if bufferedByteSliceWrapper == nil {
 							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, window, lineWidth)
 						}
-						text, b = bufferedByteSliceWrapper.Wrap(sequence[i:i+window], lineWidth)
+						text, b = bufferedByteSliceWrapper.Wrap(s, lineWidth)
 						outfh.Write(text)
 						outfh.Flush()
 						bufferedByteSliceWrapper.Recycle(b)
@@ -130,5 +130,5 @@ func init() {
 
 	slidingCmd.Flags().IntP("step", "s", 0, "step size")
 	slidingCmd.Flags().IntP("window", "W", 0, "window size")
-	slidingCmd.Flags().BoolP("circular-genome", "C", false, "circular genome")
+	slidingCmd.Flags().BoolP("circular-genome", "C", false, "circular genome.")
 }
