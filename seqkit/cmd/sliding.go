@@ -21,14 +21,12 @@
 package cmd
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"runtime"
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
-	"github.com/shenwei356/util/byteutil"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -69,10 +67,9 @@ var slidingCmd = &cobra.Command{
 		checkError(err)
 		defer outfh.Close()
 
-		var sequence, s []byte
+		var sequence, s, qual, q []byte
+		var r *fastx.Record
 		var originalLen, l, end, e int
-		var text []byte
-		var b *bytes.Buffer
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -88,6 +85,7 @@ var slidingCmd = &cobra.Command{
 
 				originalLen = len(record.Seq.Seq)
 				sequence = record.Seq.Seq
+				qual = record.Seq.Qual
 				l = len(sequence)
 				end = l - 1
 				if end < 0 {
@@ -99,26 +97,25 @@ var slidingCmd = &cobra.Command{
 						e = e - originalLen
 						s = sequence[i:]
 						s = append(s, sequence[0:e]...)
+						if len(qual) > 0 {
+							q = qual[i:]
+							q = append(q, qual[0:e]...)
+						}
 					} else {
 						s = sequence[i : i+window]
-					}
-					outfh.WriteString(fmt.Sprintf(">%s_sliding:%d-%d\n",
-						record.ID, i+1, e))
-
-					// outfh.Write(byteutil.WrapByteSlice(sequence[i:i+window], lineWidth))
-					if window <= pageSize {
-						outfh.Write(byteutil.WrapByteSlice(s, lineWidth))
-					} else {
-						if bufferedByteSliceWrapper == nil {
-							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, window, lineWidth)
+						if len(qual) > 0 {
+							q = qual[i : i+window]
 						}
-						text, b = bufferedByteSliceWrapper.Wrap(s, lineWidth)
-						outfh.Write(text)
-						outfh.Flush()
-						bufferedByteSliceWrapper.Recycle(b)
 					}
 
-					outfh.WriteString("\n")
+					if len(qual) > 0 {
+						r, _ = fastx.NewRecordWithQualWithoutValidation(record.Seq.Alphabet,
+							[]byte{}, []byte(fmt.Sprintf("%s_sliding:%d-%d", record.ID, i+1, e)), s, q)
+					} else {
+						r, _ = fastx.NewRecordWithoutValidation(record.Seq.Alphabet,
+							[]byte{}, []byte(fmt.Sprintf("%s_sliding:%d-%d", record.ID, i+1, e)), s)
+					}
+					r.FormatToWriter(outfh, lineWidth)
 				}
 			}
 		}

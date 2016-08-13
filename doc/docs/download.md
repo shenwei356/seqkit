@@ -81,7 +81,8 @@ For Go developer, just one command:
 - [SeqKit v0.3.2](https://github.com/shenwei356/seqkit/releases/tag/v0.3.2)
     - fix bug of `seqkit split`, error when target file is in a directory.
     - improve performance of `seqkit spliding` for big sequences, and output
-      last part even if it's shorter than window sze.
+      last part even if it's shorter than window sze,
+      output of FASTQ is also supported.
 - [SeqKit v0.3.1.1](https://github.com/shenwei356/seqkit/releases/tag/v0.3.1.1)
     - compile with go1.7rc5, with ***higher performance and smaller size of binary file***
 - [SeqKit v0.3.1](https://github.com/shenwei356/seqkit/releases/tag/v0.3.1)
