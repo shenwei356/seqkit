@@ -43,7 +43,7 @@ import (
 )
 
 // VERSION of seqkit
-const VERSION = "0.3.2"
+const VERSION = "0.3.3"
 
 func checkError(err error) {
 	if err != nil {
@@ -378,3 +378,34 @@ var bufferedByteSliceWrapper *byteutil.BufferedByteSliceWrapper
 // func init() {
 // 	bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper(1, defaultBytesBufferSize)
 // }
+
+func readKVs(file string) (map[string]string, error) {
+	type KV [2]string
+	fn := func(line string) (interface{}, bool, error) {
+		if len(line) == 0 {
+			return nil, false, nil
+		}
+		items := strings.Split(strings.TrimRight(line, "\r\n"), "\t")
+		if len(items) < 2 {
+			return nil, false, nil
+		}
+
+		return KV([2]string{items[0], items[1]}), true, nil
+	}
+	kvs := make(map[string]string)
+	reader, err := breader.NewBufferedReader(file, 2, 10, fn)
+	if err != nil {
+		return kvs, err
+	}
+	var items KV
+	for chunk := range reader.Ch {
+		if chunk.Err != nil {
+			return kvs, err
+		}
+		for _, data := range chunk.Data {
+			items = data.(KV)
+			kvs[items[0]] = items[1]
+		}
+	}
+	return kvs, nil
+}

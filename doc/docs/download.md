@@ -6,31 +6,30 @@ SeqKit is implemented in [Golang](https://golang.org/) programming language,
 
 ## Latest Version
 
-[SeqKit v0.3.2](https://github.com/shenwei356/seqkit/releases/tag/v0.3.2)
+[SeqKit v0.3.3](https://github.com/shenwei356/seqkit/releases/tag/v0.3.3)
 
 
 ***64-bit versions are highly recommended.***
 
 ### Links
 
-
 - **Linux**
-    - [seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.2/seqkit_linux_386.tar.gz)
-    - [seqkit_linux_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.2/seqkit_linux_amd64.tar.gz)
-    - [seqkit_linux_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.2/seqkit_linux_arm.tar.gz)
+    - [seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.3/seqkit_linux_386.tar.gz)
+    - [seqkit_linux_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.3/seqkit_linux_amd64.tar.gz)
+    - [seqkit_linux_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.3/seqkit_linux_arm.tar.gz)
 - **Mac OS X**
-    - [seqkit_darwin_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.2/seqkit_darwin_386.tar.gz)
-    - [seqkit_darwin_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.2/seqkit_darwin_amd64.tar.gz)
+    - [seqkit_darwin_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.3/seqkit_darwin_386.tar.gz)
+    - [seqkit_darwin_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.3/seqkit_darwin_amd64.tar.gz)
 - **Windows**
-    - [seqkit_windows_386.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.2/seqkit_windows_386.exe.tar.gz)
-    - [seqkit_windows_amd64.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.2/seqkit_windows_amd64.exe.tar.gz)
+    - [seqkit_windows_386.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.3/seqkit_windows_386.exe.tar.gz)
+    - [seqkit_windows_amd64.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.3/seqkit_windows_amd64.exe.tar.gz)
 - **FreeBSD**
-    - [seqkit_freebsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.2/seqkit_freebsd_386.tar.gz)
-    - [seqkit_freebsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.2/seqkit_freebsd_amd64.tar.gz)
-    - [seqkit_freebsd_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.2/seqkit_freebsd_arm.tar.gz)
+    - [seqkit_freebsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.3/seqkit_freebsd_386.tar.gz)
+    - [seqkit_freebsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.3/seqkit_freebsd_amd64.tar.gz)
+    - [seqkit_freebsd_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.3/seqkit_freebsd_arm.tar.gz)
 - **OpenBSD**
-    - [seqkit_openbsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.2/seqkit_openbsd_386.tar.gz)
-    - [seqkit_openbsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.2/seqkit_openbsd_amd64.tar.gz)
+    - [seqkit_openbsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.3/seqkit_openbsd_386.tar.gz)
+    - [seqkit_openbsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.3/seqkit_openbsd_amd64.tar.gz)
 
 ### Mirror site for Chinese user
 
@@ -78,6 +77,11 @@ For Go developer, just one command:
 
 ## Release History
 
+- [SeqKit v0.3.3](https://github.com/shenwei356/seqkit/releases/tag/v0.3.3)
+    - fix bug of `seqkit replace`, wrongly starting from 2 when using `{nr}`
+      in `-r` (`--replacement`)
+    - new feature: `seqkit replace` supports replacement symbols `{nr}` (record number)
+      and `{kv}` (corresponding value of the key ($1) by key-value file)
 - [SeqKit v0.3.2](https://github.com/shenwei356/seqkit/releases/tag/v0.3.2)
     - fix bug of `seqkit split`, error when target file is in a directory.
     - improve performance of `seqkit spliding` for big sequences, and output

@@ -99,7 +99,7 @@ Usage
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.3.1.1
+Version: 0.3.3
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -1022,7 +1022,7 @@ Examples
 Usage
 
 ```
-replace name/sequence/by regular expression.
+replace name/sequence by regular expression.
 
 Note that the replacement supports capture variables.
 e.g. $1 represents the text of the first submatch.
@@ -1038,14 +1038,20 @@ Or use the \ escape character.
 
 more on: http://shenwei356.github.io/seqkit/usage/#replace
 
+Special repalcement symbols:
+
+        {nr}    Record number, starting from 1
+        {kv}    Corresponding value of the key ($1) by key-value file
+
 Usage:
   seqkit replace [flags]
 
 Flags:
   -s, --by-seq               replace seq
   -i, --ignore-case          ignore case
+  -k, --kv-file string       tab-delimited key-value file for replacing key with value when using "{kv}" in -r (--replacement)
   -p, --pattern string       search regular expression
-  -r, --replacement string   replacement. supporting capture variables.  e.g. $1 represents the text of the first submatch. ATTENTION: use SINGLE quote NOT double quotes in *nix OS or use the \ escape character. record number is also supported by "{NR}"
+  -r, --replacement string   replacement. supporting capture variables.  e.g. $1 represents the text of the first submatch. ATTENTION: use SINGLE quote NOT double quotes in *nix OS or use the \ escape character. Record number is also supported by "{nr}"
 
 ```
 

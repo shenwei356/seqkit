@@ -26,6 +26,7 @@ import (
 	"regexp"
 	"runtime"
 	"strconv"
+	"strings"
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
@@ -53,6 +54,11 @@ Or use the \ escape character.
 
 more on: http://shenwei356.github.io/seqkit/usage/#replace
 
+Special repalcement symbols:
+
+	{nr}	Record number, starting from 1
+	{kv}	Corresponding value of the key ($1) by key-value file
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -66,10 +72,7 @@ more on: http://shenwei356.github.io/seqkit/usage/#replace
 
 		pattern := getFlagString(cmd, "pattern")
 		replacement := []byte(getFlagString(cmd, "replacement"))
-		var replaceeWithNR bool
-		if reNR.Match(replacement) {
-			replaceeWithNR = true
-		}
+		kvFile := getFlagString(cmd, "kv-file")
 
 		bySeq := getFlagBool(cmd, "by-seq")
 		// byName := getFlagBool(cmd, "by-name")
@@ -78,13 +81,47 @@ more on: http://shenwei356.github.io/seqkit/usage/#replace
 		if pattern == "" {
 			checkError(fmt.Errorf("flags -p (--pattern) needed"))
 		}
-
 		p := pattern
 		if ignoreCase {
 			p = "(?i)" + p
 		}
 		patternRegexp, err := regexp.Compile(p)
 		checkError(err)
+
+		var replaceWithNR bool
+		if reNR.Match(replacement) {
+			replaceWithNR = true
+		}
+
+		var replaceWithKV bool
+		var kvs map[string]string
+		if reKV.Match(replacement) {
+			replaceWithKV = true
+			if !regexp.MustCompile(`\(.+\)`).MatchString(pattern) {
+				checkError(fmt.Errorf(`value of -p (--pattern) must contains "(" and ")" to capture data which is used specify the KEY`))
+			}
+			if kvFile == "" {
+				checkError(fmt.Errorf(`since repalcement symbol "{kv}"/"{KV}" found in value of flag -r (--replacement), tab-delimited key-value file should be given by flag -k (--kv-file)`))
+			}
+			log.Infof("read key-value file: %s", kvFile)
+			kvs, err = readKVs(kvFile)
+			if err != nil {
+				checkError(fmt.Errorf("read key-value file: %s", err))
+			}
+			if len(kvs) == 0 {
+				checkError(fmt.Errorf("no valid data in key-value file: %s", kvFile))
+			}
+
+			if ignoreCase {
+				kvs2 := make(map[string]string, len(kvs))
+				for k, v := range kvs {
+					kvs2[strings.ToLower(k)] = v
+				}
+				kvs = kvs2
+			}
+
+			log.Infof("%d pairs of key-value loaded", len(kvs))
+		}
 
 		files := getFileList(args)
 
@@ -93,11 +130,14 @@ more on: http://shenwei356.github.io/seqkit/usage/#replace
 		defer outfh.Close()
 
 		var r []byte
+		var found [][]byte
+		var k string
+		var ok bool
 		for _, file := range files {
 
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
-			nr := 1
+			nr := 0
 			for {
 				record, err := fastxReader.Read()
 				if err != nil {
@@ -113,11 +153,29 @@ more on: http://shenwei356.github.io/seqkit/usage/#replace
 					record.Seq.Seq = patternRegexp.ReplaceAll(record.Seq.Seq, replacement)
 				} else {
 					r = replacement
-					if replaceeWithNR {
-						r = reNR.ReplaceAll(replacement, []byte(strconv.Itoa(nr)))
+
+					if replaceWithNR {
+						r = reNR.ReplaceAll(r, []byte(strconv.Itoa(nr)))
 					}
-					record.Name = patternRegexp.ReplaceAll(record.Name, r)
+
+					if replaceWithKV {
+						found = patternRegexp.FindSubmatch(record.Name)
+						if len(found) > 0 {
+							k = string(found[1])
+							if ignoreCase {
+								k = strings.ToLower(k)
+							}
+							if _, ok = kvs[k]; ok {
+								r = reKV.ReplaceAll(r, []byte(kvs[k]))
+							} else {
+								r = reKV.ReplaceAll(r, found[1])
+							}
+						}
+					}
+
 				}
+
+				record.Name = patternRegexp.ReplaceAll(record.Name, r)
 
 				record.FormatToWriter(outfh, lineWidth)
 			}
@@ -133,10 +191,13 @@ func init() {
 		"replacement. supporting capture variables. "+
 			" e.g. $1 represents the text of the first submatch. "+
 			"ATTENTION: use SINGLE quote NOT double quotes in *nix OS or "+
-			`use the \ escape character. Record number is also supported by "{NR}"`)
+			`use the \ escape character. Record number is also supported by "{nr}"`)
 	// replaceCmd.Flags().BoolP("by-name", "n", false, "replace full name instead of just id")
 	replaceCmd.Flags().BoolP("by-seq", "s", false, "replace seq")
 	replaceCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
+	replaceCmd.Flags().StringP("kv-file", "k", "",
+		`tab-delimited key-value file for replacing key with value when using "{kv}" in -r (--replacement)`)
 }
 
 var reNR = regexp.MustCompile(`\{(NR|nr)\}`)
+var reKV = regexp.MustCompile(`\{(KV|kv)\}`)
