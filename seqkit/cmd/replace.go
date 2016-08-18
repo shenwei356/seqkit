@@ -173,9 +173,8 @@ Special repalcement symbols:
 						}
 					}
 
+					record.Name = patternRegexp.ReplaceAll(record.Name, r)
 				}
-
-				record.Name = patternRegexp.ReplaceAll(record.Name, r)
 
 				record.FormatToWriter(outfh, lineWidth)
 			}
