@@ -12,9 +12,9 @@
 	<title>Benchmark - SeqKit - Ultrafast FASTA/Q kit</title>
 
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
-        <link href="../css/base.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.0.3.css" rel="stylesheet">
         <link rel="stylesheet" href="../css/highlight.css">
+        <link href="../css/base.css" rel="stylesheet">
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
@@ -42,7 +42,6 @@
 
         <!-- Collapsed navigation -->
         <div class="navbar-header">
-            
             <!-- Expander button -->
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
@@ -50,7 +49,6 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            
 
             <!-- Main title -->
             <a class="navbar-brand" href="..">SeqKit - Ultrafast FASTA/Q kit</a>
@@ -58,100 +56,97 @@
 
         <!-- Expanded navigation -->
         <div class="navbar-collapse collapse">
+            <!-- Main navigation -->
+            <ul class="nav navbar-nav">
             
-                <!-- Main navigation -->
-                <ul class="nav navbar-nav">
-                
-                
-                    <li >
-                        <a href="..">Home</a>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="../download/">Download</a>
-                    </li>
-                
-                
-                
-                    <li class="dropdown active">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Documents <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
+            
+                <li >
+                    <a href="..">Home</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../download/">Download</a>
+                </li>
+            
+            
+            
+                <li class="dropdown active">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Documents <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                    
                         
-                            
 <li >
     <a href="../usage/">Usage</a>
 </li>
 
+                    
                         
-                            
 <li >
     <a href="../tutorial/">Tutorial</a>
 </li>
 
+                    
                         
-                            
 <li class="active">
     <a href="./">Benchmark</a>
 </li>
 
+                    
+                    </ul>
+                </li>
+            
+            
+            
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Links <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                    
                         
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Links <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
 <li >
     <a href="../bioinf/">Wei Shen's Bioinformatic tools</a>
 </li>
 
+                    
                         
-                            
 <li >
     <a href="../yanlilab/">YanLi Lab</a>
 </li>
 
-                        
-                        </ul>
-                    </li>
-                
-                
-                </ul>
+                    
+                    </ul>
+                </li>
             
+            
+            </ul>
 
+            <!-- Search, Navigation and Repo links -->
             <ul class="nav navbar-nav navbar-right">
                 <li>
                     <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
                         <i class="fa fa-search"></i> Search
                     </a>
                 </li>
+                <li >
+                    <a rel="next" href="../tutorial/">
+                        <i class="fa fa-arrow-left"></i> Previous
+                    </a>
+                </li>
+                <li >
+                    <a rel="prev" href="../bioinf/">
+                        Next <i class="fa fa-arrow-right"></i>
+                    </a>
+                </li>
                 
-                    <li >
-                        <a rel="next" href="../tutorial/">
-                            <i class="fa fa-arrow-left"></i> Previous
-                        </a>
-                    </li>
-                    <li >
-                        <a rel="prev" href="../bioinf/">
-                            Next <i class="fa fa-arrow-right"></i>
-                        </a>
-                    </li>
-                
-                
-                    <li>
-                        <a href="https://github.com/shenwei356/seqkit">
-                            
-                                <i class="fa fa-github"></i>
-                            
-                            GitHub
-                        </a>
-                    </li>
+                <li>
+                    <a href="https://github.com/shenwei356/seqkit">
+                        
+                            <i class="fa fa-github"></i>
+                        
+                        GitHub
+                    </a>
+                </li>
                 
             </ul>
         </div>
@@ -159,58 +154,29 @@
 </div>
 
         <div class="container">
-            
-                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+            <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
     
-        <li class="main active"><a href="#softwares">Softwares</a></li>
+        <li class="main active"><a href="#benchmark">Benchmark</a></li>
         
-    
-        <li class="main "><a href="#features">Features</a></li>
+            <li><a href="#softwares">Softwares</a></li>
         
-    
-        <li class="main "><a href="#datasets">Datasets</a></li>
+            <li><a href="#features">Features</a></li>
         
-            <li><a href="#dataset_afa-large-number-of-short-sequences">dataset_A.fa - large number of short sequences</a></li>
+            <li><a href="#datasets">Datasets</a></li>
         
-            <li><a href="#dataset_bfa-small-number-of-large-sequences">dataset_B.fa - small number of large sequences</a></li>
+            <li><a href="#platform">Platform</a></li>
         
-            <li><a href="#dataset_cfq-illumina-single-end-reads-se100">dataset_C.fq – Illumina single end reads (SE100)</a></li>
+            <li><a href="#tests">Tests</a></li>
         
-            <li><a href="#sequence-id-list">Sequence ID list</a></li>
-        
-            <li><a href="#bed-file">BED file</a></li>
-        
-    
-        <li class="main "><a href="#platform">Platform</a></li>
-        
-    
-        <li class="main "><a href="#tests">Tests</a></li>
-        
-            <li><a href="#test-1-reverse-complement">Test 1. Reverse Complement</a></li>
-        
-            <li><a href="#test-2-extracting-sequences-by-id-list">Test 2. Extracting sequences by ID list</a></li>
-        
-            <li><a href="#test-3-sampling-by-number">Test 3. Sampling by number</a></li>
-        
-            <li><a href="#test-4-removing-duplicates-by-sequence-content">Test 4. Removing duplicates by sequence content</a></li>
-        
-            <li><a href="#test-5-subsequence-with-bed-file">Test 5. Subsequence with BED file</a></li>
-        
-    
-        <li class="main "><a href="#results">Results</a></li>
-        
-            <li><a href="#test-of-multiple-threads">Test of multiple threads:</a></li>
-        
-            <li><a href="#tests-on-different-file-sizes">Tests on different file sizes</a></li>
+            <li><a href="#results">Results</a></li>
         
     
     </ul>
 </div></div>
-                <div class="col-md-9" role="main">
+            <div class="col-md-9" role="main">
 
-<pre><code># Benchmark
-</code></pre>
+<h1 id="benchmark">Benchmark</h1>
 <h2 id="softwares">Softwares</h2>
 <ol>
 <li><a href="https://github.com/shenwei356/seqkit">seqkit</a>. (Go).
@@ -608,13 +574,12 @@ s.setAttribute('data-timestamp', +new Date());
 </script>
 
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript></div>
-            
         </div>
 
         <footer class="col-md-12">
             <hr>
             
-            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+            <center>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</center>
         </footer>
 
         <script src="../js/jquery-1.10.2.min.js"></script>
@@ -648,6 +613,5 @@ s.setAttribute('data-timestamp', +new Date());
                 </div>
             </div>
         </div>
-
     </body>
 </html>
