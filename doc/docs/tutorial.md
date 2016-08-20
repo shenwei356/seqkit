@@ -334,7 +334,7 @@ For human miRNA hairpins
  A distribution ploting script is used, (
  [plot_distribution.py](https://github.com/shenwei356/bio_scripts/blob/master/plot/plot_distribution.py) )
 
-        $ seqkit fx2tab hairpin.id_hsa.fa.gz -l | cut -f 3  | plot_distribution.py -o hairpin.id_hsa.fa.gz.lendist.png
+        $ seqkit fx2tab hairpin.id_hsa.fa.gz -l | cut -f 4  | plot_distribution.py -o hairpin.id_hsa.fa.gz.lendist.png
 
     ![hairpin.id_hsa.fa.gz.lendist.png](/files/hairpin/hairpin.id_hsa.fa.gz.lendist.png)
 

@@ -83,7 +83,7 @@ Go to [Download Page](http://shenwei356.github.io/seqkit/downlaod) for more down
  executable binary files **for most popular operating systems** are freely available
   in [release](https://github.com/shenwei356/seqkit/releases) page.
 
-Just [download](https://github.com/shenwei356/csvtk/releases) compressed
+Just [download](https://github.com/shenwei356/seqkit/releases) compressed
 executable file of your operating system,
 and uncompress it with `tar -zxvf *.tar.gz` command or other tools.
 And then:
@@ -91,19 +91,19 @@ And then:
 1. **For Linux-like systems**
     1. If you have root privilege simply copy it to `/usr/local/bin`:
 
-            sudo cp csvtk /usr/local/bin/
+            sudo cp seqkit /usr/local/bin/
 
     1. Or add the directory of the executable file to environment variable
     `PATH`:
 
-            echo export PATH=\$PATH:/PATH/OF/csvtk >> ~/.bashrc
+            echo export PATH=\$PATH:/PATH/OF/seqkit >> ~/.bashrc
 
 
-1. **For windows**, just copy `csvtk.exe` to `C:\WINDOWS\system32`.
+1. **For windows**, just copy `seqkit.exe` to `C:\WINDOWS\system32`.
 
 For Go developer, just one command:
 
-    go get -u github.com/shenwei356/csvtk/csvtk
+    go get -u github.com/shenwei356/seqkit/seqkit
 
 ## Subcommands
 

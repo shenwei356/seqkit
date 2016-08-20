@@ -9,7 +9,7 @@ pages:
 - Links:
     - Wei Shen's Bioinformatic tools: bioinf.md
     - YanLi Lab: yanlilab.md
-theme: mkdocs
+theme: yeti
 
 repo_url: https://github.com/shenwei356/seqkit
 site_description: SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
