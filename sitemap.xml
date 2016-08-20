@@ -4,7 +4,7 @@
     
     <url>
      <loc>None/</loc>
-     <lastmod>2016-08-19</lastmod>
+     <lastmod>2016-08-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -12,7 +12,7 @@
     
     <url>
      <loc>None/download/</loc>
-     <lastmod>2016-08-19</lastmod>
+     <lastmod>2016-08-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -21,19 +21,19 @@
         
     <url>
      <loc>None/usage/</loc>
-     <lastmod>2016-08-19</lastmod>
+     <lastmod>2016-08-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>None/tutorial/</loc>
-     <lastmod>2016-08-19</lastmod>
+     <lastmod>2016-08-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>None/benchmark/</loc>
-     <lastmod>2016-08-19</lastmod>
+     <lastmod>2016-08-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
@@ -43,13 +43,13 @@
         
     <url>
      <loc>None/bioinf/</loc>
-     <lastmod>2016-08-19</lastmod>
+     <lastmod>2016-08-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>None/yanlilab/</loc>
-     <lastmod>2016-08-19</lastmod>
+     <lastmod>2016-08-20</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
