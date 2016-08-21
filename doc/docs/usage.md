@@ -103,7 +103,7 @@ Version: 0.3.3
 
 Author: Wei Shen <shenwei356@gmail.com>
 
-Documents  : http://shenwei356.github.io/seqkit
+Documents  : http://bioinf.shenwei.me/seqkit
 Source code: https://github.com/shenwei356/seqkit
 
 Usage:
@@ -1036,7 +1036,7 @@ Or use the \ escape character.
 
     seqkit replace -p "(.)" -r "\$1 " -s
 
-more on: http://shenwei356.github.io/seqkit/usage/#replace
+more on: http://bioinf.shenwei.me/seqkit/usage/#replace
 
 Special repalcement symbols:
 

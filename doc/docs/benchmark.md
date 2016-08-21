@@ -54,7 +54,7 @@ Categories          |Features               |seqkit  |fasta_utilities|fastx_tool
                     |Reading gzipped file   |Yes     |Yes            |--           |--     |Yes      |Yes
                     |Writing gzip file      |Yes     |--             |--           |--     |Yes      |--
 
-**Note 2**: See [usage](http://shenwei356.github.io/seqkit/usage/) for detailed options of seqkit.
+**Note 2**: See [usage](http://bioinf.shenwei.me/seqkit/usage/) for detailed options of seqkit.
 
 ## Datasets
 

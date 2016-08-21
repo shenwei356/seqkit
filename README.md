@@ -1,7 +1,7 @@
 # SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
 
-Documents: [http://shenwei356.github.io/seqkit](http://shenwei356.github.io/seqkit)
+Documents: [http://bioinf.shenwei.me/seqkit](http://bioinf.shenwei.me/seqkit)
 
 Source code: [https://github.com/shenwei356/seqkit](https://github.com/shenwei356/seqkit)
 
@@ -27,15 +27,15 @@ therefore, it could be easily used in command-line pipe.
 ## Features
 
 - **Cross-platform** (Linux/Windows/Mac OS X/OpenBSD/FreeBSD,
-  see [download](http://shenwei356.github.io/seqkit/download/))
+  see [download](http://bioinf.shenwei.me/seqkit/download/))
 - **Light weight and out-of-the-box, no dependencies, no compilation, no configuration**
-  (see [download](http://shenwei356.github.io/seqkit/download/))
+  (see [download](http://bioinf.shenwei.me/seqkit/download/))
 - **UltraFast** (see [benchmark](/#benchmark)),
   **multiple-CPUs supported**.
 - **Practical functions supported by 20 subcommands** (see subcommands and
-  [usage](http://shenwei356.github.io/seqkit/usage/) )
-- **Well documented** (detailed [usage](http://shenwei356.github.io/seqkit/usage/)
-  and [benchmark](http://shenwei356.github.io/seqkit/benchmark/) )
+  [usage](http://bioinf.shenwei.me/seqkit/usage/) )
+- **Well documented** (detailed [usage](http://bioinf.shenwei.me/seqkit/usage/)
+  and [benchmark](http://bioinf.shenwei.me/seqkit/benchmark/) )
 - **Seamlessly parses both FASTA and FASTQ formats**
 - **Support STDIN and gziped input/output file, easy being used in pipe**
 - **Support custom sequence ID regular expression** (especially useful for searching with ID list)
@@ -71,13 +71,13 @@ Categories          |Features               |seqkit  |fasta_utilities|fastx_tool
                     |Reading gzipped file   |Yes     |Yes            |--           |--     |Yes      |Yes
                     |Writing gzip file      |Yes     |--             |--           |--     |Yes      |--
 
-**Note 1**: See [version information](http://shenwei356.github.io/seqkit/benchmark/#softwares) of the softwares.
+**Note 1**: See [version information](http://bioinf.shenwei.me/seqkit/benchmark/#softwares) of the softwares.
 
-**Note 2**: See [usage](http://shenwei356.github.io/seqkit/usage/) for detailed options of seqkit.
+**Note 2**: See [usage](http://bioinf.shenwei.me/seqkit/usage/) for detailed options of seqkit.
 
 ## Installation
 
-Go to [Download Page](http://shenwei356.github.io/seqkit/downlaod) for more download options and changelogs.
+Go to [Download Page](http://bioinf.shenwei.me/seqkit/downlaod) for more download options and changelogs.
 
 `seqkit` is implemented in [Golang](https://golang.org/) programming language,
  executable binary files **for most popular operating systems** are freely available
@@ -245,13 +245,13 @@ reproduced in different environments with same random seed.
 
 ## Usage && Examples
 
-[Usage and examples](http://shenwei356.github.io/seqkit/usage/)
+[Usage and examples](http://bioinf.shenwei.me/seqkit/usage/)
 
-[Tutorial](http://shenwei356.github.io/seqkit/tutorial/)
+[Tutorial](http://bioinf.shenwei.me/seqkit/tutorial/)
 
 ## Benchmark
 
-More details: [http://shenwei356.github.io/seqkit/benchmark/](http://shenwei356.github.io/seqkit/benchmark/)
+More details: [http://bioinf.shenwei.me/seqkit/benchmark/](http://bioinf.shenwei.me/seqkit/benchmark/)
 
 Datasets:
 

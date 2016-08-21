@@ -52,7 +52,7 @@ Or use the \ escape character.
 
     seqkit replace -p "(.)" -r "\$1 " -s
 
-more on: http://shenwei356.github.io/seqkit/usage/#replace
+more on: http://bioinf.shenwei.me/seqkit/usage/#replace
 
 Special repalcement symbols:
 
