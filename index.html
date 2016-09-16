@@ -189,18 +189,21 @@
 <p>Source code: <a href="https://github.com/shenwei356/seqkit">https://github.com/shenwei356/seqkit</a></p>
 <p>Latest version: <a href="https://github.com/shenwei356/seqkit/releases"><img alt="Latest Version" src="https://img.shields.io/github/release/shenwei356/seqkit.svg?style=flat" /></a></p>
 <h2 id="introduction">Introduction</h2>
-<p>FASTA and FASTQ are basic formats for storing nucleotide and protein sequences.
-The manipulations of FASTA/Q file include converting, clipping, searching,
-filtering, deduplication, splitting, shuffling, sampling and so on.
-Existed tools only implemented parts of the functions,
-and some of them are only available for specific operating systems.
-Furthermore, the complicated installation process of dependencies packages and
-running environment also make them less friendly to common users.</p>
-<p>SeqKit is a cross-platform, ultrafast, and practical FASTA/Q manipulations tool
-that is friendly for researchers to complete wide ranges of FASTA/Q file processing.
-The toolkit supports plain or gzip-compressed input and output
-from either standard stream or files,
-therefore, it could be easily used in command-line pipe.</p>
+<p>FASTA and FASTQ are basic and ubiquitous formats for storing nucleotide and
+protein sequences. Common manipulations of FASTA/Q file include converting,
+searching, filtering, deduplication, splitting, shuffling, and sampling.
+Existing tools only implement some of these manipulations,
+and not particularly efficiently, and some are only available for certain
+operating systems. Furthermore, the complicated installation process of
+required packages and running environments can render these programs less
+user friendly.</p>
+<p>This project describes a cross-platform ultrafast comprehensive
+toolkit for FASTA/Q processing. SeqKit provides executable binary files for
+all major operating systems, including Windows, Linux, and Mac OS X, and can
+be directly used without any dependencies or pre-configurations.
+SeqKit demonstrates competitive performance in execution time and memory
+usage compared to similar tools. The efficiency and usability of SeqKit
+enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <h2 id="features">Features</h2>
 <ul>
 <li><strong>Cross-platform</strong> (Linux/Windows/Mac OS X/OpenBSD/FreeBSD,
@@ -609,7 +612,7 @@ the <code>gi</code> number, then use <code>--id-regexp "^gi\|([^\|]+)\|"</code>.
 when input files are (plain or gzipped) FASTA files,
 FASTA index would be optional used for
 rapid access of sequences and reducing memory occupation.</p>
-<p>ATTENTION: the <code>.seqkit.fai</code> file created by SeqKit is a little different from <code>.fai</code> file
+<p>ATTENTION: the <code>.seqkit.fai</code> file created by SeqKit is slightly different from <code>.fai</code> file
 created by <code>samtools</code>. SeqKit uses full sequence head instead of just ID as key.</p>
 <h3 id="parallelization-of-cpu-intensive-jobs">Parallelization of CPU intensive jobs</h3>
 <p>The validation of sequences bases and complement process of sequences
