@@ -1296,7 +1296,41 @@ ATTT
 </code></pre>
 </li>
 <li>
-<p>Replace key</p>
+<p>Replace key with value by key-value file</p>
+<pre><code>$ more test.fa
+&gt;seq1 name1
+CCCCAAAACCCCATGATCATGGATC
+&gt;seq2 name2
+CCCCAAAACCCCATGGCATCATTCA
+&gt;seq3 name3
+CCCCAAAACCCCATGTTGCTACTAG
+
+$ more alias.txt
+name0   ABC
+name1   123
+name3   Hello
+name4   World
+
+$ seqkit replace -p ' (.+)$' -r ' {kv}' -k alias.txt test.fa
+[INFO] read key-value file: alias.txt
+[INFO] 4 pairs of key-value loaded
+&gt;seq1 123
+CCCCAAAACCCCATGATCATGGATC
+&gt;seq2
+CCCCAAAACCCCATGGCATCATTCA
+&gt;seq3 Hello
+CCCCAAAACCCCATGTTGCTACTAG
+
+$ seqkit replace -p ' (.+)$' -r ' {kv}' -k alias.txt test.fa --keep-key
+[INFO] read key-value file: alias.txt
+[INFO] 4 pairs of key-value loaded
+&gt;seq1 123
+CCCCAAAACCCCATGATCATGGATC
+&gt;seq2 name2
+CCCCAAAACCCCATGGCATCATTCA
+&gt;seq3 Hello
+CCCCAAAACCCCATGTTGCTACTAG
+</code></pre>
 </li>
 </ol>
 <h2 id="shuffle">shuffle</h2>
