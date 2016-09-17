@@ -54,7 +54,7 @@ Or use the \ escape character.
 
 more on: http://bioinf.shenwei.me/seqkit/usage/#replace
 
-Special repalcement symbols:
+Special replacement symbols (only for replacing name not sequence):
 
 	{nr}	Record number, starting from 1
 	{kv}	Corresponding value of the key ($1) by key-value file
@@ -73,6 +73,7 @@ Special repalcement symbols:
 		pattern := getFlagString(cmd, "pattern")
 		replacement := []byte(getFlagString(cmd, "replacement"))
 		kvFile := getFlagString(cmd, "kv-file")
+		keepKey := getFlagBool(cmd, "keep-key")
 
 		bySeq := getFlagBool(cmd, "by-seq")
 		// byName := getFlagBool(cmd, "by-name")
@@ -99,6 +100,9 @@ Special repalcement symbols:
 			replaceWithKV = true
 			if !regexp.MustCompile(`\(.+\)`).MatchString(pattern) {
 				checkError(fmt.Errorf(`value of -p (--pattern) must contains "(" and ")" to capture data which is used specify the KEY`))
+			}
+			if bySeq {
+				checkError(fmt.Errorf(`replaceing with key-value pairs was not supported for sequence`))
 			}
 			if kvFile == "" {
 				checkError(fmt.Errorf(`since repalcement symbol "{kv}"/"{KV}" found in value of flag -r (--replacement), tab-delimited key-value file should be given by flag -k (--kv-file)`))
@@ -167,8 +171,10 @@ Special repalcement symbols:
 							}
 							if _, ok = kvs[k]; ok {
 								r = reKV.ReplaceAll(r, []byte(kvs[k]))
-							} else {
+							} else if keepKey {
 								r = reKV.ReplaceAll(r, found[1])
+							} else {
+								r = reKV.ReplaceAll(r, []byte(""))
 							}
 						}
 					}
@@ -196,6 +202,7 @@ func init() {
 	replaceCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	replaceCmd.Flags().StringP("kv-file", "k", "",
 		`tab-delimited key-value file for replacing key with value when using "{kv}" in -r (--replacement)`)
+	replaceCmd.Flags().BoolP("keep-key", "K", false, "keep the key as value when no value found for the key")
 }
 
 var reNR = regexp.MustCompile(`\{(NR|nr)\}`)

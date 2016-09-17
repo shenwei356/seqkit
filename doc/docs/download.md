@@ -6,8 +6,10 @@ SeqKit is implemented in [Golang](https://golang.org/) programming language,
 
 ## Latest Version
 
-[SeqKit v0.3.3](https://github.com/shenwei356/seqkit/releases/tag/v0.3.3)
-
+[SeqKit v0.3.4](https://github.com/shenwei356/seqkit/releases/tag/v0.3.3)
+- new feature: `fxtab` could output alphabet letters of a sequence
+- new feature: new flag `-K` (`--keep-key`) for `replace`,  when replacing
+with key-value file, one can choose keeping the key as value or not.
 
 ***64-bit versions are highly recommended.***
 
@@ -76,7 +78,8 @@ For Go developer, just one command:
     go get -u github.com/shenwei356/seqkit/seqkit
 
 ## Release History
-
+- [SeqKit v0.3.3](https://github.com/shenwei356/seqkit/releases/tag/v0.3.4)
+    - add feature: `seqkit fx2tab ` can print the alphabet letters of every sequence with flag `-a` (`--alphabet`)
 - [SeqKit v0.3.3](https://github.com/shenwei356/seqkit/releases/tag/v0.3.3)
     - fix bug of `seqkit replace`, wrongly starting from 2 when using `{nr}`
       in `-r` (`--replacement`)

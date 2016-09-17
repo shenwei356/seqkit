@@ -24,10 +24,12 @@ import (
 	"fmt"
 	"io"
 	"runtime"
+	"sort"
+	"strings"
 
-	"github.com/shenwei356/xopen"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
 
@@ -57,6 +59,7 @@ like sequence length, GC content/GC skew.
 		baseContents := getFlagStringSlice(cmd, "base-content")
 		onlyName := getFlagBool(cmd, "name")
 		printTitle := getFlagBool(cmd, "header-line")
+		printAlphabet := getFlagBool(cmd, "alphabet")
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
@@ -78,6 +81,10 @@ like sequence length, GC content/GC skew.
 					outfh.WriteString(fmt.Sprintf("\t%s", bc))
 				}
 			}
+			if printAlphabet {
+				outfh.WriteString("\talphabet")
+			}
+
 			outfh.WriteString("\n")
 		}
 
@@ -132,6 +139,10 @@ like sequence length, GC content/GC skew.
 						outfh.WriteString(fmt.Sprintf("\t%.2f", record.Seq.BaseContent(bc)*100))
 					}
 				}
+
+				if printAlphabet {
+					outfh.WriteString(fmt.Sprintf("\t%s", alphabetStr(record.Seq.Seq)))
+				}
 				outfh.WriteString("\n")
 			}
 		}
@@ -148,4 +159,20 @@ func init() {
 	fx2tabCmd.Flags().BoolP("only-id", "i", false, "print ID instead of full head")
 	fx2tabCmd.Flags().BoolP("name", "n", false, "only print names (no sequences and qualities)")
 	fx2tabCmd.Flags().BoolP("header-line", "H", false, "print header line")
+	fx2tabCmd.Flags().BoolP("alphabet", "a", false, "print alphabet letters")
+}
+
+func alphabetStr(s []byte) string {
+	m := make(map[byte]struct{})
+	for _, b := range s {
+		m[b] = struct{}{}
+	}
+	alphabet := make([]string, len(m))
+	i := 0
+	for a := range m {
+		alphabet[i] = string([]byte{a})
+		i++
+	}
+	sort.Strings(alphabet)
+	return strings.Join(alphabet, "")
 }
