@@ -1225,7 +1225,7 @@ Or use the \ escape character.
 
 more on: http://bioinf.shenwei.me/seqkit/usage/#replace
 
-Special repalcement symbols:
+Special replacement symbols (only for replacing name not sequence):
 
         {nr}    Record number, starting from 1
         {kv}    Corresponding value of the key ($1) by key-value file
@@ -1235,7 +1235,8 @@ Usage:
 
 Flags:
   -s, --by-seq               replace seq
-  -i, --ignore-case          ignore case
+  -i, --ignore-case          ignore case  
+  -K, --keep-key             keep the key as value when no value found for the key
   -k, --kv-file string       tab-delimited key-value file for replacing key with value when using &quot;{kv}&quot; in -r (--replacement)
   -p, --pattern string       search regular expression
   -r, --replacement string   replacement. supporting capture variables.  e.g. $1 represents the text of the first submatch. ATTENTION: use SINGLE quote NOT double quotes in *nix OS or use the \ escape character. Record number is also supported by &quot;{nr}&quot;
@@ -1287,12 +1288,15 @@ T       T
 </li>
 <li>
 <p>Rename with number of record</p>
-<pre><code>echo -e "&gt;abc\nACTG\n&gt;123\nATTT" |  seqkit replace -p .+ -r "seq_{NR}"
+<pre><code>echo -e "&gt;abc\nACTG\n&gt;123\nATTT" |  seqkit replace -p .+ -r "seq_{nr}"
 &gt;seq_1
 ACTG
 &gt;seq_2
 ATTT
 </code></pre>
+</li>
+<li>
+<p>Replace key</p>
 </li>
 </ol>
 <h2 id="shuffle">shuffle</h2>
