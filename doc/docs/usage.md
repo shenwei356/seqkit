@@ -1102,7 +1102,41 @@ Examples
         >seq_2
         ATTT
 
-1. Replace key
+1. Replace key with value by key-value file
+
+        $ more test.fa
+        >seq1 name1
+        CCCCAAAACCCCATGATCATGGATC
+        >seq2 name2
+        CCCCAAAACCCCATGGCATCATTCA
+        >seq3 name3
+        CCCCAAAACCCCATGTTGCTACTAG
+
+        $ more alias.txt
+        name0   ABC
+        name1   123
+        name3   Hello
+        name4   World
+
+        $ seqkit replace -p ' (.+)$' -r ' {kv}' -k alias.txt test.fa
+        [INFO] read key-value file: alias.txt
+        [INFO] 4 pairs of key-value loaded
+        >seq1 123
+        CCCCAAAACCCCATGATCATGGATC
+        >seq2
+        CCCCAAAACCCCATGGCATCATTCA
+        >seq3 Hello
+        CCCCAAAACCCCATGTTGCTACTAG
+
+        $ seqkit replace -p ' (.+)$' -r ' {kv}' -k alias.txt test.fa --keep-key
+        [INFO] read key-value file: alias.txt
+        [INFO] 4 pairs of key-value loaded
+        >seq1 123
+        CCCCAAAACCCCATGATCATGGATC
+        >seq2 name2
+        CCCCAAAACCCCATGGCATCATTCA
+        >seq3 Hello
+        CCCCAAAACCCCATGTTGCTACTAG
 
 ## shuffle
 

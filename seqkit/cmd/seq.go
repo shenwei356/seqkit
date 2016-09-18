@@ -94,7 +94,9 @@ var seqCmd = &cobra.Command{
 		var sequence *seq.Seq
 		var text []byte
 		var b *bytes.Buffer
+		fmt.Println(len(files))
 		for _, file := range files {
+			fmt.Println(file)
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
@@ -260,8 +262,9 @@ var seqCmd = &cobra.Command{
 				}
 			}
 
-			outfh.Close()
 		}
+
+		outfh.Close()
 	},
 }
 
