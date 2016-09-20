@@ -277,7 +277,7 @@ FASTQ:
 ## Citation
 
 **W Shen**, S Le, Y Li\*, F Hu\*. SeqKit: a cross-platform and ultrafast toolkit for FASTA/Q file manipulation.
-***PLOS ONE***. accepted.
+***PLOS ONE***. [doi:10.1371/journal.pone.0163962](https://doi.org/10.1371/journal.pone.0163962). Accepted.
 
 ## Contact
 
