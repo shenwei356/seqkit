@@ -80,7 +80,7 @@ Categories          |Features               |seqkit  |fasta_utilities|fastx_tool
 
 ## Installation
 
-Go to [Download Page](http://bioinf.shenwei.me/seqkit/downlaod) for more download options and changelogs.
+Go to [Download Page](http://bioinf.shenwei.me/seqkit/download) for more download options and changelogs.
 
 `seqkit` is implemented in [Golang](https://golang.org/) programming language,
  executable binary files **for most popular operating systems** are freely available
@@ -277,7 +277,7 @@ FASTQ:
 ## Citation
 
 **W Shen**, S Le, Y Li\*, F Hu\*. SeqKit: a cross-platform and ultrafast toolkit for FASTA/Q file manipulation.
-***PLOS ONE***. revised.
+***PLOS ONE***. accepted.
 
 ## Contact
 

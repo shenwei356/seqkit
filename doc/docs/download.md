@@ -8,8 +8,8 @@ SeqKit is implemented in [Golang](https://golang.org/) programming language,
 
 [SeqKit v0.3.4](https://github.com/shenwei356/seqkit/releases/tag/v0.3.4)
 
-- bugfix: `seq` wrongly only handle the first one sequence file when multiple files given
-- new feature: `fxtab` could output alphabet letters of a sequence
+- bugfix: `seq` wrongly handles only the first one sequence file when multiple files given
+- new feature: `fxtab` can output alphabet letters of a sequence by flag `-a` (`--alphabet`)
 - new feature: new flag `-K` (`--keep-key`) for `replace`,  when replacing
 with key-value file, one can choose keeping the key as value or not.
 
