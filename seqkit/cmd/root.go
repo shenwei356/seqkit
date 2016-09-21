@@ -33,14 +33,15 @@ import (
 var RootCmd = &cobra.Command{
 	Use:   "seqkit",
 	Short: "a cross-platform and ultrafast toolkit for FASTA/Q file manipulation",
-	Long: fmt.Sprintf(`seqkit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
+	Long: fmt.Sprintf(`SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
 Version: %s
 
 Author: Wei Shen <shenwei356@gmail.com>
 
-Documents  : http://shenwei356.github.io/seqkit
+Documents  : http://bioinf.shenwei.me/seqkit
 Source code: https://github.com/shenwei356/seqkit
+Please cite: https://doi.org/10.1371/journal.pone.0163962
 
 `, VERSION),
 }

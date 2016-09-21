@@ -99,12 +99,13 @@ Usage
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.3.3
+Version: 0.3.4.1
 
 Author: Wei Shen <shenwei356@gmail.com>
 
 Documents  : http://bioinf.shenwei.me/seqkit
 Source code: https://github.com/shenwei356/seqkit
+Please cite: https://doi.org/10.1371/journal.pone.0163962
 
 Usage:
   seqkit [command]
