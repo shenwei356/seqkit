@@ -1,11 +1,17 @@
 # SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
 
-Documents: [http://bioinf.shenwei.me/seqkit](http://bioinf.shenwei.me/seqkit)
+**Documents:** [http://bioinf.shenwei.me/seqkit](http://bioinf.shenwei.me/seqkit)
 
-Source code: [https://github.com/shenwei356/seqkit](https://github.com/shenwei356/seqkit)
+**Source code:** [https://github.com/shenwei356/seqkit](https://github.com/shenwei356/seqkit)
+[![GitHub stars](https://img.shields.io/github/stars/shenwei356/seqkit.svg?style=social&label=Star&?maxAge=2592000)](https://github.com/shenwei356/seqkit)
+[![license](https://img.shields.io/github/license/shenwei356/seqkit.svg?maxAge=2592000)](https://github.com/shenwei356/seqkit/blob/master/LICENSE)
 
-Latest version: [![Latest Version](https://img.shields.io/github/release/shenwei356/seqkit.svg?style=flat)](https://github.com/shenwei356/seqkit/releases)
+**Latest version:** [![Latest Version](https://img.shields.io/github/release/shenwei356/seqkit.svg?style=flat?maxAge=86400)](https://github.com/shenwei356/seqkit/releases)
+[![Github Releases](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/total.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/latest)
+
+**[Citation](/#citation):** [![doi](https://img.shields.io/badge/doi-10.1371%2Fjournal.pone.0163962-blue.svg?style=flat)](https://doi.org/10.1371/journal.pone.0163962) Accepted
+
 
 
 ## Introduction
