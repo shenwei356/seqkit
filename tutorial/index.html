@@ -516,11 +516,13 @@ is used to sort and view the result.</p>
 <li>
 <p>Length distribution.
  <code>seqkit fx2tab</code> could show extra information like sequence length, GC content.
- A distribution ploting script is used, (
- <a href="https://github.com/shenwei356/bio_scripts/blob/master/plot/plot_distribution.py">plot_distribution.py</a> )</p>
-<pre><code>$ seqkit fx2tab hairpin.id_hsa.fa.gz -l | cut -f 4  | plot_distribution.py -o hairpin.id_hsa.fa.gz.lendist.png
+ <a href="http://bioinf.shenwei.me/csvtk/"><code>csvtk</code></a> is used to plot.</p>
+<pre><code>$ seqkit grep -r -p '^hsa' hairpin.fa.gz  | seqkit fx2tab -l | cut -f 4 | csvtk -H plot hist --xlab Length --title "Human pre-miRNA length distribution"
 </code></pre>
 <p><img alt="hairpin.id_hsa.fa.gz.lendist.png" src="../files/hairpin/hairpin.id_hsa.fa.gz.lendist.png" /></p>
+<pre><code>$ seqkit grep -r -p '^hsa' hairpin.fa.gz  | seqkit fx2tab -l | cut -f 4 | csvtk -H plot box --xlab Length --horiz --height 1.5
+</code></pre>
+<p><img alt="hairpin.id_hsa.fa.gz.lenbox.png" src="../files/hairpin/hairpin.id_hsa.fa.gz.lenbox.png" /></p>
 </li>
 </ol>
 <h2 id="bacteria-genome">Bacteria genome</h2>
