@@ -331,13 +331,15 @@ For human miRNA hairpins
 
 1. Length distribution.
  `seqkit fx2tab` could show extra information like sequence length, GC content.
- A distribution ploting script is used, (
- [plot_distribution.py](https://github.com/shenwei356/bio_scripts/blob/master/plot/plot_distribution.py) )
+ [`csvtk`](http://bioinf.shenwei.me/csvtk/) is used to plot.
 
-        $ seqkit fx2tab hairpin.id_hsa.fa.gz -l | cut -f 4  | plot_distribution.py -o hairpin.id_hsa.fa.gz.lendist.png
+        $ seqkit grep -r -p '^hsa' hairpin.fa.gz  | seqkit fx2tab -l | cut -f 4 | csvtk -H plot hist --xlab Length --title "Human pre-miRNA length distribution"
 
     ![hairpin.id_hsa.fa.gz.lendist.png](/files/hairpin/hairpin.id_hsa.fa.gz.lendist.png)
 
+        $ seqkit grep -r -p '^hsa' hairpin.fa.gz  | seqkit fx2tab -l | cut -f 4 | csvtk -H plot box --xlab Length --horiz --height 1.5
+        
+    ![hairpin.id_hsa.fa.gz.lenbox.png](/files/hairpin/hairpin.id_hsa.fa.gz.lenbox.png)
 
 ## Bacteria genome
 

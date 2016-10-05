@@ -18,21 +18,33 @@ by using `github.com/klauspost/pgzip` package
 
 - **Linux**
     - [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_linux_386.tar.gz)
+    [seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_linux_386.tar.gz)
     - [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_linux_amd64.tar.gz)
+    [seqkit_linux_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_linux_amd64.tar.gz)
     - [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_arm.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_linux_arm.tar.gz)
+    [seqkit_linux_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_linux_arm.tar.gz)
 - **Mac OS X**
     - [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_darwin_386.tar.gz)
+    [seqkit_darwin_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_darwin_386.tar.gz)
     - [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_darwin_amd64.tar.gz)
+    [seqkit_darwin_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_darwin_amd64.tar.gz)
 - **Windows**
     - [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_386.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_windows_386.exe.tar.gz)
+    [seqkit_windows_386.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_windows_386.exe.tar.gz)
     - [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_amd64.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_windows_amd64.exe.tar.gz)
+    [seqkit_windows_amd64.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_windows_amd64.exe.tar.gz)
 - **FreeBSD**
     - [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_freebsd_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_freebsd_386.tar.gz)
+    [seqkit_freebsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_freebsd_386.tar.gz)
     - [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_freebsd_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_freebsd_amd64.tar.gz)
+    [seqkit_freebsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_freebsd_amd64.tar.gz)
     - [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_freebsd_arm.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_freebsd_arm.tar.gz)
+    [seqkit_freebsd_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_freebsd_arm.tar.gz)
 - **OpenBSD**
     - [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_openbsd_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_openbsd_386.tar.gz)
+    [seqkit_openbsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_openbsd_386.tar.gz)
     - [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_openbsd_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_openbsd_amd64.tar.gz)
+    [seqkit_openbsd_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1/seqkit_openbsd_amd64.tar.gz)
 
 ### Mirror site for Chinese user
 
