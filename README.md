@@ -3,8 +3,10 @@
 
 **Documents:** [http://bioinf.shenwei.me/seqkit](http://bioinf.shenwei.me/seqkit)
 ([**Usage**](http://bioinf.shenwei.me/seqkit/usage/),
-[**Tutorial**](http://bioinf.shenwei.me/seqkit/tutorial/) and
-[**Benchmark**](http://bioinf.shenwei.me/seqkit/benchmark/))
+[**Tutorial**](http://bioinf.shenwei.me/seqkit/tutorial/),
+[**Benchmark**](http://bioinf.shenwei.me/seqkit/benchmark/)
+and [**Development Notes**](http://bioinf.shenwei.me/seqkit/note/))
+
 
 **Source code:** [https://github.com/shenwei356/seqkit](https://github.com/shenwei356/seqkit)
 [![GitHub stars](https://img.shields.io/github/stars/shenwei356/seqkit.svg?style=social&label=Star&?maxAge=2592000)](https://github.com/shenwei356/seqkit)
