@@ -6,6 +6,7 @@ pages:
     - Usage: usage.md
     - Tutorial: tutorial.md
     - Benchmark: benchmark.md
+    - Development Notes: note.md
 - Links:
     - Wei Shen's Bioinformatic tools: bioinf.md
     - YanLi Lab: yanlilab.md

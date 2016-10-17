@@ -288,6 +288,21 @@ FASTQ:
 **W Shen**, S Le, Y Li\*, F Hu\*. SeqKit: a cross-platform and ultrafast toolkit for FASTA/Q file manipulation.
 ***PLOS ONE***. [doi:10.1371/journal.pone.0163962](https://doi.org/10.1371/journal.pone.0163962).
 
+## Acknowledgements
+
+We thank [Lei Zhang](https://github.com/jameslz) for testing of SeqKit,
+and also thank [Jim Hester](https://github.com/jimhester/), 
+author of [fasta_utilities](https://github.com/jimhester/fasta_utilities), 
+for advice on early performance improvements of for FASTA parsing 
+and [Brian Bushnell](https://twitter.com/BBToolsBio), 
+author of [BBMaps](https://sourceforge.net/projects/bbmap/), 
+for advice on naming SeqKit and adding accuracy evaluation in benchmarks. 
+We also thank Nicholas C. Wu from the Scripps Research Institute,
+USA for commenting on the manuscript
+and [Guangchuang Yu](http://guangchuangyu.github.io/)
+from State Key Laboratory of Emerging Infectious Diseases,
+The University of Hong Kong, HK for advice on the manuscript.
+
 ## Contact
 
 Email me for any problem when using seqkit. shenwei356(at)gmail.com
