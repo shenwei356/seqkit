@@ -27,10 +27,10 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/shenwei356/xopen"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/breader"
+	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
 
@@ -174,7 +174,7 @@ var grepCmd = &cobra.Command{
 					}
 				} else {
 					k := string(subject)
-					if useRegexp {
+					if ignoreCase {
 						k = strings.ToLower(k)
 					}
 					if _, ok := patterns[k]; ok {

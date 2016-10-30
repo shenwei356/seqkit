@@ -1049,9 +1049,9 @@ Usage:
 
 Flags:
   -s, --by-seq               replace seq
-  -i, --ignore-case          ignore case  
-  -K, --keep-key             keep the key as value when no value found for the key
-  -k, --kv-file string       tab-delimited key-value file for replacing key with value when using "{kv}" in -r (--replacement)
+  -i, --ignore-case          ignore case
+  -K, --keep-key             keep the key as value when no value found for the key (only for sequence name)
+  -k, --kv-file string       tab-delimited key-value file for replacing key with value when using "{kv}" in -r (--replacement)  (only for sequence name)
   -p, --pattern string       search regular expression
   -r, --replacement string   replacement. supporting capture variables.  e.g. $1 represents the text of the first submatch. ATTENTION: use SINGLE quote NOT double quotes in *nix OS or use the \ escape character. Record number is also supported by "{nr}"
 
@@ -1266,23 +1266,21 @@ Examples
 
 <div id="disqus_thread"></div>
 <script>
+
 /**
-* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
-*/
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
 /*
 var disqus_config = function () {
-this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
 this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
 };
 */
 (function() { // DON'T EDIT BELOW THIS LINE
 var d = document, s = d.createElement('script');
-
-s.src = '//fastakit.disqus.com/embed.js';
-
+s.src = '//seqkit.disqus.com/embed.js';
 s.setAttribute('data-timestamp', +new Date());
 (d.head || d.body).appendChild(s);
 })();
 </script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

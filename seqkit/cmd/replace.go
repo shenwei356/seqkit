@@ -201,8 +201,8 @@ func init() {
 	replaceCmd.Flags().BoolP("by-seq", "s", false, "replace seq")
 	replaceCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	replaceCmd.Flags().StringP("kv-file", "k", "",
-		`tab-delimited key-value file for replacing key with value when using "{kv}" in -r (--replacement)`)
-	replaceCmd.Flags().BoolP("keep-key", "K", false, "keep the key as value when no value found for the key")
+		`tab-delimited key-value file for replacing key with value when using "{kv}" in -r (--replacement) (only for sequence name)`)
+	replaceCmd.Flags().BoolP("keep-key", "K", false, "keep the key as value when no value found for the key (only for sequence name)")
 }
 
 var reNR = regexp.MustCompile(`\{(NR|nr)\}`)
