@@ -99,7 +99,7 @@ Usage
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.3.4.1
+Version: 0.3.6
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -635,6 +635,22 @@ Usage
 ```
 search sequences by pattern(s) of name or sequence motifs
 
+You can specify the sequence region for searching with flag -R/--region.
+The definition of region is 1-based and with some custom design.
+
+Examples:
+
+ 1-based index    1 2 3 4 5 6 7 8 9 10
+negative index    0-9-8-7-6-5-4-3-2-1
+           seq    A C G T N a c g t n
+           1:1    A
+           2:4      C G T
+         -4:-2                c g t
+         -4:-1                c g t n
+         -1:-1                      n
+          2:-2      C G T N a c g t
+          1:-1    A C G T N a c g t n
+
 Usage:
   seqkit grep [flags]
 
@@ -645,8 +661,9 @@ Flags:
       --delete-matched        delete matched pattern to speedup
   -i, --ignore-case           ignore case
   -v, --invert-match          invert the sense of matching, to select non-matching records
-  -p, --pattern value         search pattern (multiple values supported) (default [])
+  -p, --pattern stringSlice   search pattern (multiple values supported)
   -f, --pattern-file string   pattern file
+  -R, --region string         specify sequence region for searching. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases
   -r, --use-regexp            patterns are regular expression
 
 ```
@@ -694,6 +711,9 @@ Examples
 
         $ zcat hairpin.fa.gz | seqkit grep -s -r -i -p TT[CG]AA
 
+1. Specify sequence regions for searching. e.g., leading 30 bases.
+
+        $ seqkit grep -s -R 1:30 -i -r -p GCTGG
 
 ## locate
 

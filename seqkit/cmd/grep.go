@@ -25,6 +25,7 @@ import (
 	"io"
 	"regexp"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"github.com/shenwei356/bio/seq"
@@ -38,9 +39,14 @@ import (
 var grepCmd = &cobra.Command{
 	Use:   "grep",
 	Short: "search sequences by pattern(s) of name or sequence motifs",
-	Long: `search sequences by pattern(s) of name or sequence motifs
+	Long: fmt.Sprintf(`search sequences by pattern(s) of name or sequence motifs
 
-`,
+You can specify the sequence region for searching with flag -R/--region.
+The definition of region is 1-based and with some custom design.
+
+Examples:
+%s
+`, regionExample),
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
@@ -60,12 +66,38 @@ var grepCmd = &cobra.Command{
 		byName := getFlagBool(cmd, "by-name")
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		degenerate := getFlagBool(cmd, "degenerate")
+		region := getFlagString(cmd, "region")
 
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
 		}
 		if useRegexp && degenerate {
 			checkError(fmt.Errorf("could not give both flags -d (--degenerat) and -r (--use-regexp)"))
+		}
+
+		var start, end int
+		var err error
+		var limitRegion bool
+		if region != "" {
+			limitRegion = true
+			if !bySeq {
+				log.Infof("when flag -R (--region) given, flag -s (--by-seq) is automatically on")
+				bySeq = true
+			}
+			if !reRegion.MatchString(region) {
+				checkError(fmt.Errorf(`invalid region: %s. type "seqkit grep -h" for more examples`, region))
+			}
+			r := strings.Split(region, ":")
+			start, err = strconv.Atoi(r[0])
+			checkError(err)
+			end, err = strconv.Atoi(r[1])
+			checkError(err)
+			if start == 0 || end == 0 {
+				checkError(fmt.Errorf("both start and end should not be 0"))
+			}
+			if start < 0 && end > 0 {
+				checkError(fmt.Errorf("when start < 0, end should not > 0"))
+			}
 		}
 
 		files := getFileList(args)
@@ -156,7 +188,11 @@ var grepCmd = &cobra.Command{
 				if byName {
 					subject = record.Name
 				} else if bySeq {
-					subject = record.Seq.Seq
+					if limitRegion {
+						subject = record.Seq.SubSeq(start, end).Seq
+					} else {
+						subject = record.Seq.Seq
+					}
 				} else {
 					subject = record.ID
 				}
@@ -210,4 +246,7 @@ func init() {
 	grepCmd.Flags().BoolP("by-seq", "s", false, "match by seq")
 	grepCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	grepCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
+	grepCmd.Flags().StringP("region", "R", "", "specify sequence region for searching. "+
+		"e.g 1:12 for first 12 bases, -12:-1 for last 12 bases")
+
 }

@@ -93,7 +93,7 @@ Categories          |Features               |seqkit  |fasta_utilities|fastx_tool
 
 Go to [Download Page](http://bioinf.shenwei.me/seqkit/download) for more download options and changelogs.
 
-`seqkit` is implemented in [Golang](https://golang.org/) programming language,
+`SeqKit` is implemented in [Go](https://golang.org/) programming language,
  executable binary files **for most popular operating systems** are freely available
   in [release](https://github.com/shenwei356/seqkit/releases) page.
 
