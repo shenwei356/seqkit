@@ -27,11 +27,11 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/shenwei356/xopen"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/util/randutil"
+	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
 
