@@ -11,6 +11,7 @@ and [**Development Notes**](http://bioinf.shenwei.me/seqkit/note/))
 **Source code:** [https://github.com/shenwei356/seqkit](https://github.com/shenwei356/seqkit)
 [![GitHub stars](https://img.shields.io/github/stars/shenwei356/seqkit.svg?style=social&label=Star&?maxAge=2592000)](https://github.com/shenwei356/seqkit)
 [![license](https://img.shields.io/github/license/shenwei356/seqkit.svg?maxAge=2592000)](https://github.com/shenwei356/seqkit/blob/master/LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/shenwei356/seqkit)](https://goreportcard.com/report/github.com/shenwei356/seqkit)
 
 **Latest version:** [![Latest Version](https://img.shields.io/github/release/shenwei356/seqkit.svg?style=flat?maxAge=86400)](https://github.com/shenwei356/seqkit/releases)
 [![Github Releases](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/total.svg?maxAge=3600)](http://bioinf.shenwei.me/seqkit/download/)

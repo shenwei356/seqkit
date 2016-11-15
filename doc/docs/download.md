@@ -7,9 +7,9 @@ SeqKit is implemented in [Go](https://golang.org/) programming language,
 ## Latest Version
 
 [SeqKit v0.3.6](https://github.com/shenwei356/seqkit/releases/tag/v0.3.6)
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.3.6/total.svg)](https://github.com/shenwei356/seqkit/releases/download/v0.3.6)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.3.6/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.3.6)
 
-- add new feature for `seqkit grep`: new flag `-R` (`--region`) for specifing sequence region for searching.
+- add new feature for `seqkit grep`: new flag `-R` (`--region`) for specifying sequence region for searching.
 
 ***64-bit versions are highly recommended.***
 
@@ -92,10 +92,10 @@ For Go developer, just one command:
 ## Release History
 
 - [SeqKit v0.3.5](https://github.com/shenwei356/seqkit/releases/tag/v0.3.5)
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.3.5/total.svg)](https://github.com/shenwei356/seqkit/releases/download/v0.3.5)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.3.5/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.3.5)
     - fig bug of `seqkit grep`: flag `-i` (`--ignore-case`) did not work when not using regular expression
 - [SeqKit v0.3.4.1](https://github.com/shenwei356/seqkit/releases/tag/v0.3.4.1)
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.3.4.1/total.svg)](https://github.com/shenwei356/seqkit/releases/download/v0.3.4.1)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.3.4.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.3.4.1)
     - improve performance of reading (~10%) and writing (100%) gzip-compressed file
     by using `github.com/klauspost/pgzip` package
     - add citation

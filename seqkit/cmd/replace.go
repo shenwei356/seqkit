@@ -105,7 +105,7 @@ Special replacement symbols (only for replacing name not sequence):
 				checkError(fmt.Errorf(`replaceing with key-value pairs was not supported for sequence`))
 			}
 			if kvFile == "" {
-				checkError(fmt.Errorf(`since repalcement symbol "{kv}"/"{KV}" found in value of flag -r (--replacement), tab-delimited key-value file should be given by flag -k (--kv-file)`))
+				checkError(fmt.Errorf(`since replacement symbol "{kv}"/"{KV}" found in value of flag -r (--replacement), tab-delimited key-value file should be given by flag -k (--kv-file)`))
 			}
 			log.Infof("read key-value file: %s", kvFile)
 			kvs, err = readKVs(kvFile)
