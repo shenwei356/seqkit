@@ -274,9 +274,10 @@ And then:</p>
 </code></pre>
 </li>
 <li>
-<p>Or add the directory of the executable file to environment variable
+<p>Or add the current directory of the executable file to environment variable
 <code>PATH</code>:</p>
-<pre><code>echo export PATH=\$PATH:/PATH/OF/seqkit &gt;&gt; ~/.bashrc
+<pre><code>echo export PATH=\$PATH:\"$(pwd)\" &gt;&gt; ~/.bashrc
+source ~/.bashrc
 </code></pre>
 </li>
 </ol>

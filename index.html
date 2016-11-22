@@ -200,7 +200,8 @@
 and <a href="http://bioinf.shenwei.me/seqkit/note/"><strong>Development Notes</strong></a>)</p>
 <p><strong>Source code:</strong> <a href="https://github.com/shenwei356/seqkit">https://github.com/shenwei356/seqkit</a>
 <a href="https://github.com/shenwei356/seqkit"><img alt="GitHub stars" src="https://img.shields.io/github/stars/shenwei356/seqkit.svg?style=social&amp;label=Star&amp;?maxAge=2592000" /></a>
-<a href="https://github.com/shenwei356/seqkit/blob/master/LICENSE"><img alt="license" src="https://img.shields.io/github/license/shenwei356/seqkit.svg?maxAge=2592000" /></a></p>
+<a href="https://github.com/shenwei356/seqkit/blob/master/LICENSE"><img alt="license" src="https://img.shields.io/github/license/shenwei356/seqkit.svg?maxAge=2592000" /></a>
+<a href="https://goreportcard.com/report/github.com/shenwei356/seqkit"><img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/shenwei356/seqkit" /></a></p>
 <p><strong>Latest version:</strong> <a href="https://github.com/shenwei356/seqkit/releases"><img alt="Latest Version" src="https://img.shields.io/github/release/shenwei356/seqkit.svg?style=flat?maxAge=86400" /></a>
 <a href="http://bioinf.shenwei.me/seqkit/download/"><img alt="Github Releases" src="https://img.shields.io/github/downloads/shenwei356/seqkit/latest/total.svg?maxAge=3600" /></a></p>
 <p><strong><a href="./#citation">Citation</a>:</strong> <a href="https://doi.org/10.1371/journal.pone.0163962"><img alt="doi" src="https://img.shields.io/badge/doi-10.1371%2Fjournal.pone.0163962-blue.svg?style=flat" /></a></p>
@@ -516,9 +517,10 @@ And then:</p>
 </code></pre>
 </li>
 <li>
-<p>Or add the directory of the executable file to environment variable
+<p>Or add the current directory of the executable file to environment variable
 <code>PATH</code>:</p>
-<pre><code>echo export PATH=\$PATH:/PATH/OF/seqkit &gt;&gt; ~/.bashrc
+<pre><code>echo export PATH=\$PATH:\"$(pwd)\" &gt;&gt; ~/.bashrc
+source ~/.bashrc
 </code></pre>
 </li>
 </ol>
