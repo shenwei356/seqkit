@@ -157,9 +157,9 @@ Examples:
 
 					if renameFileExt && isstdin {
 						if len(record.Seq.Qual) > 0 {
-							fileExt = ".fastq"
+							fileExt = suffixFQ
 						} else {
-							fileExt = ".fasta"
+							fileExt = suffixFA
 						}
 						renameFileExt = false
 					}
@@ -201,9 +201,9 @@ Examples:
 				checkError(err)
 				if renameFileExt && isstdin {
 					if isFastq {
-						fileExt = ".fastq"
+						fileExt = suffixFQ
 					} else {
-						fileExt = ".fasta"
+						fileExt = suffixFA
 					}
 					renameFileExt = false
 				}
@@ -212,7 +212,7 @@ Examples:
 					checkError(fmt.Errorf("Sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
-			fileExt = ".fasta"
+			fileExt = suffixFA
 
 			if !quiet {
 				log.Infof("create and read FASTA index ...")
@@ -315,9 +315,9 @@ Examples:
 				for _, record := range allRecords {
 					if renameFileExt && isstdin {
 						if len(record.Seq.Qual) > 0 {
-							fileExt = ".fastq"
+							fileExt = suffixFQ
 						} else {
-							fileExt = ".fasta"
+							fileExt = suffixFA
 						}
 						renameFileExt = false
 					}
@@ -358,9 +358,9 @@ Examples:
 				checkError(err)
 				if renameFileExt && isstdin {
 					if isFastq {
-						fileExt = ".fastq"
+						fileExt = suffixFQ
 					} else {
-						fileExt = ".fasta"
+						fileExt = suffixFA
 					}
 					renameFileExt = false
 				}
@@ -369,7 +369,7 @@ Examples:
 					checkError(fmt.Errorf("Sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
-			fileExt = ".fasta"
+			fileExt = suffixFA
 
 			if !quiet {
 				log.Infof("create and read FASTA index ...")
@@ -473,9 +473,9 @@ Examples:
 				for _, record := range allRecords {
 					if renameFileExt && isstdin {
 						if len(record.Seq.Qual) > 0 {
-							fileExt = ".fastq"
+							fileExt = suffixFQ
 						} else {
-							fileExt = ".fasta"
+							fileExt = suffixFA
 						}
 						renameFileExt = false
 					}
@@ -488,7 +488,7 @@ Examples:
 
 				var outfile string
 				for id, records := range recordsByID {
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s", filepath.Base(fileName), id, fileExt))
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s", filepath.Base(fileName), pathutil.RemoveInvalidPathChars(id, "__"), fileExt))
 					writeSeqs(records, outfile, lineWidth, quiet, dryRun)
 				}
 				return
@@ -516,9 +516,9 @@ Examples:
 				checkError(err)
 				if renameFileExt && isstdin {
 					if isFastq {
-						fileExt = ".fastq"
+						fileExt = suffixFQ
 					} else {
-						fileExt = ".fasta"
+						fileExt = suffixFA
 					}
 					renameFileExt = false
 				}
@@ -527,7 +527,7 @@ Examples:
 					checkError(fmt.Errorf("Sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
-			fileExt = ".fasta"
+			fileExt = suffixFA
 
 			if !quiet {
 				log.Infof("create and read FASTA index ...")
@@ -566,7 +566,7 @@ Examples:
 			var record *fastx.Record
 			for id, ids := range idsMap {
 
-				outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s", filepath.Base(fileName), id, fileExt))
+				outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s", filepath.Base(fileName), pathutil.RemoveInvalidPathChars(id, "__"), fileExt))
 				if !dryRun {
 					outfh, err = xopen.Wopen(outfile)
 					checkError(err)
@@ -641,9 +641,9 @@ Examples:
 				for _, record := range allRecords {
 					if renameFileExt && isstdin {
 						if len(record.Seq.Qual) > 0 {
-							fileExt = ".fastq"
+							fileExt = suffixFQ
 						} else {
-							fileExt = ".fasta"
+							fileExt = suffixFA
 						}
 						renameFileExt = false
 					}
@@ -691,9 +691,9 @@ Examples:
 				alphabet2, isFastq, err = fastx.GuessAlphabet(newFile)
 				if renameFileExt && isstdin {
 					if isFastq {
-						fileExt = ".fastq"
+						fileExt = suffixFQ
 					} else {
-						fileExt = ".fasta"
+						fileExt = suffixFA
 					}
 					renameFileExt = false
 				}
@@ -703,7 +703,7 @@ Examples:
 					checkError(fmt.Errorf("Sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
-			fileExt = ".fasta"
+			fileExt = suffixFA
 
 			if !quiet {
 				log.Infof("read sequence IDs and sequence region from FASTA file ...")
@@ -803,3 +803,6 @@ func init() {
 	splitCmd.Flags().StringP("out-dir", "O", "", "output directory (default value is infile.split)")
 	splitCmd.Flags().BoolP("force", "f", false, "overwrite output directory")
 }
+
+var suffixFA = ".fasta"
+var suffixFQ = ".fastq"

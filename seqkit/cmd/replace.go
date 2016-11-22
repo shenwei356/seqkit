@@ -74,6 +74,7 @@ Special replacement symbols (only for replacing name not sequence):
 		replacement := []byte(getFlagString(cmd, "replacement"))
 		kvFile := getFlagString(cmd, "kv-file")
 		keepKey := getFlagBool(cmd, "keep-key")
+		keyCaptIdx := getFlagPositiveInt(cmd, "key-capt-idx")
 
 		bySeq := getFlagBool(cmd, "by-seq")
 		// byName := getFlagBool(cmd, "by-name")
@@ -89,6 +90,14 @@ Special replacement symbols (only for replacing name not sequence):
 		patternRegexp, err := regexp.Compile(p)
 		checkError(err)
 
+		if kvFile != "" {
+			if len(replacement) == 0 {
+				checkError(fmt.Errorf("flag -r (--replacement) needed when given flag -k (--kv-file)"))
+			}
+			if !reKV.Match(replacement) {
+				checkError(fmt.Errorf(`replacement symbol "{kv}"/"{KV}" not found in value of flag -r (--replacement) when flag -k (--kv-file) given`))
+			}
+		}
 		var replaceWithNR bool
 		if reNR.Match(replacement) {
 			replaceWithNR = true
@@ -134,6 +143,7 @@ Special replacement symbols (only for replacing name not sequence):
 		defer outfh.Close()
 
 		var r []byte
+		var founds [][][]byte
 		var found [][]byte
 		var k string
 		var ok bool
@@ -163,16 +173,20 @@ Special replacement symbols (only for replacing name not sequence):
 					}
 
 					if replaceWithKV {
-						found = patternRegexp.FindSubmatch(record.Name)
-						if len(found) > 0 {
-							k = string(found[1])
+						founds = patternRegexp.FindAllSubmatch(record.Name, -1)
+						if len(founds) > 1 {
+							checkError(fmt.Errorf(`pattern "%s" matches multiple targets in "%s", this will cause chaos`, p, record.Name))
+						}
+						if len(founds) > 0 {
+							found = founds[0]
+							k = string(found[keyCaptIdx])
 							if ignoreCase {
 								k = strings.ToLower(k)
 							}
 							if _, ok = kvs[k]; ok {
 								r = reKV.ReplaceAll(r, []byte(kvs[k]))
 							} else if keepKey {
-								r = reKV.ReplaceAll(r, found[1])
+								r = reKV.ReplaceAll(r, found[keyCaptIdx])
 							} else {
 								r = reKV.ReplaceAll(r, []byte(""))
 							}
@@ -203,6 +217,7 @@ func init() {
 	replaceCmd.Flags().StringP("kv-file", "k", "",
 		`tab-delimited key-value file for replacing key with value when using "{kv}" in -r (--replacement) (only for sequence name)`)
 	replaceCmd.Flags().BoolP("keep-key", "K", false, "keep the key as value when no value found for the key (only for sequence name)")
+	replaceCmd.Flags().IntP("key-capt-idx", "I", 1, "capture variable index of key")
 }
 
 var reNR = regexp.MustCompile(`\{(NR|nr)\}`)
