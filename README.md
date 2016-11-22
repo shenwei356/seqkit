@@ -108,10 +108,11 @@ And then:
 
             sudo cp seqkit /usr/local/bin/
 
-    1. Or add the directory of the executable file to environment variable
+    1. Or add the current directory of the executable file to environment variable
     `PATH`:
 
-            echo export PATH=\$PATH:/PATH/OF/seqkit >> ~/.bashrc
+            echo export PATH=\$PATH:\"$(pwd)\" >> ~/.bashrc
+            source ~/.bashrc
 
 
 1. **For windows**, just copy `seqkit.exe` to `C:\WINDOWS\system32`.
