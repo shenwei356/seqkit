@@ -233,7 +233,7 @@ Examples:
 								subseq := subseqByFaix(faidx, chr2, r, start, end)
 								outfh.WriteString(fmt.Sprintf(">%s_%d-%d %s\n",
 									chr, s, e, chr2))
-								outfh.Write(byteutil.WrapByteSlice(subseq, lineWidth))
+								outfh.Write(byteutil.WrapByteSlice(subseq, config.LineWidth))
 								outfh.WriteString("\n")
 							}
 							continue
@@ -261,7 +261,7 @@ Examples:
 							record, err := fastx.NewRecord(alphabet2, fastx.ParseHeadID(idRe, []byte(chr)), []byte(chr), subseq)
 							checkError(err)
 
-							subseqByGTFFile(outfh, record, lineWidth,
+							subseqByGTFFile(outfh, record, config.LineWidth,
 								gtfFeaturesMap, choosedFeatures,
 								onlyFlank, upStream, downStream)
 						}
@@ -287,7 +287,7 @@ Examples:
 							record, err := fastx.NewRecord(alphabet2, fastx.ParseHeadID(idRe, []byte(chr)), []byte(chr), subseq)
 							checkError(err)
 
-							subSeqByBEDFile(outfh, record, lineWidth,
+							subSeqByBEDFile(outfh, record, config.LineWidth,
 								bedFeatureMap,
 								onlyFlank, upStream, downStream)
 						}
@@ -312,9 +312,12 @@ Examples:
 					checkError(err)
 					break
 				}
+				if fastxReader.IsFastq {
+					config.LineWidth = 0
+				}
 
 				if region != "" {
-					subseqByRegion(outfh, record, lineWidth, start, end)
+					subseqByRegion(outfh, record, config.LineWidth, start, end)
 
 				} else if gtfFile != "" {
 					seqname := strings.ToLower(string(record.ID))
@@ -322,7 +325,7 @@ Examples:
 						continue
 					}
 
-					subseqByGTFFile(outfh, record, lineWidth,
+					subseqByGTFFile(outfh, record, config.LineWidth,
 						gtfFeaturesMap, choosedFeatures,
 						onlyFlank, upStream, downStream)
 
@@ -332,11 +335,13 @@ Examples:
 						return
 					}
 
-					subSeqByBEDFile(outfh, record, lineWidth,
+					subSeqByBEDFile(outfh, record, config.LineWidth,
 						bedFeatureMap,
 						onlyFlank, upStream, downStream)
 				}
 			}
+
+			config.LineWidth = lineWidth
 		}
 	},
 }

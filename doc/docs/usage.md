@@ -99,7 +99,7 @@ Usage
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.3.6
+Version: 0.3.7
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -1062,18 +1062,21 @@ more on: http://bioinf.shenwei.me/seqkit/usage/#replace
 Special replacement symbols (only for replacing name not sequence):
 
         {nr}    Record number, starting from 1
-        {kv}    Corresponding value of the key ($1) by key-value file
+        {kv}    Corresponding value of the key (captured variable $n) by key-value file,
+                n can be specified by flag -I (--key-capt-idx) (default: 1)
 
 Usage:
   seqkit replace [flags]
 
 Flags:
-  -s, --by-seq               replace seq
-  -i, --ignore-case          ignore case
-  -K, --keep-key             keep the key as value when no value found for the key (only for sequence name)
-  -k, --kv-file string       tab-delimited key-value file for replacing key with value when using "{kv}" in -r (--replacement)  (only for sequence name)
-  -p, --pattern string       search regular expression
-  -r, --replacement string   replacement. supporting capture variables.  e.g. $1 represents the text of the first submatch. ATTENTION: use SINGLE quote NOT double quotes in *nix OS or use the \ escape character. Record number is also supported by "{nr}"
+  -s, --by-seq                 replace seq
+  -i, --ignore-case            ignore case
+  -K, --keep-key               keep the key as value when no value found for the key (only for sequence name)
+  -I, --key-capt-idx int       capture variable index of key (1-based) (default 1)
+      --key-miss-repl string   replacement for key with no corresponding value
+  -k, --kv-file string         tab-delimited key-value file for replacing key with value when using "{kv}" in -r (--replacement) (only for sequence name)
+  -p, --pattern string         search regular expression
+  -r, --replacement string     replacement. supporting capture variables.  e.g. $1 represents the text of the first submatch. ATTENTION: for *nix OS, use SINGLE quote NOT double quotes or use the \ escape character. Record number is also supported by "{nr}".use ${1} instead of $1 when {kv} given!
 
 ```
 

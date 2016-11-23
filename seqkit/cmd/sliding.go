@@ -82,6 +82,9 @@ var slidingCmd = &cobra.Command{
 					checkError(err)
 					break
 				}
+				if fastxReader.IsFastq {
+					config.LineWidth = 0
+				}
 
 				originalLen = len(record.Seq.Seq)
 				sequence = record.Seq.Seq
@@ -115,9 +118,11 @@ var slidingCmd = &cobra.Command{
 						r, _ = fastx.NewRecordWithoutValidation(record.Seq.Alphabet,
 							[]byte{}, []byte(fmt.Sprintf("%s_sliding:%d-%d", record.ID, i+1, e)), s)
 					}
-					r.FormatToWriter(outfh, lineWidth)
+					r.FormatToWriter(outfh, config.LineWidth)
 				}
 			}
+
+			config.LineWidth = lineWidth
 		}
 	},
 }

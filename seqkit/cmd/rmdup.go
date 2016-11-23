@@ -96,6 +96,9 @@ var rmdupCmd = &cobra.Command{
 					checkError(err)
 					break
 				}
+				if fastxReader.IsFastq {
+					config.LineWidth = 0
+				}
 
 				if bySeq {
 					if ignoreCase {
@@ -121,13 +124,13 @@ var rmdupCmd = &cobra.Command{
 					counter[subject]++
 					removed++
 					if len(dupFile) > 0 {
-						outfhDup.Write(record.Format(lineWidth))
+						outfhDup.Write(record.Format(config.LineWidth))
 					}
 					if len(numFile) > 0 {
 						names[subject] = append(names[subject], string(record.ID))
 					}
 				} else { // new one
-					record.FormatToWriter(outfh, lineWidth)
+					record.FormatToWriter(outfh, config.LineWidth)
 					counter[subject]++
 
 					if len(numFile) > 0 {
@@ -136,6 +139,8 @@ var rmdupCmd = &cobra.Command{
 					}
 				}
 			}
+
+			config.LineWidth = lineWidth
 		}
 		if removed > 0 && len(numFile) > 0 {
 			outfhNum, err := xopen.Wopen(numFile)

@@ -47,7 +47,7 @@ var sampleCmd = &cobra.Command{
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		lineWidth := config.LineWidth
+		// lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
@@ -119,10 +119,13 @@ var sampleCmd = &cobra.Command{
 						checkError(err)
 						break
 					}
+					if fastxReader.IsFastq {
+						config.LineWidth = 0
+					}
 
 					if rand.Float64() <= proportion {
 						n++
-						record.FormatToWriter(outfh, lineWidth)
+						record.FormatToWriter(outfh, config.LineWidth)
 						if n == number {
 							break LOOP
 						}
@@ -137,7 +140,7 @@ var sampleCmd = &cobra.Command{
 				for _, record := range records {
 					if rand.Float64() <= proportion {
 						n++
-						record.FormatToWriter(outfh, lineWidth)
+						record.FormatToWriter(outfh, config.LineWidth)
 						if n == number {
 							break
 						}
@@ -160,10 +163,13 @@ var sampleCmd = &cobra.Command{
 					checkError(err)
 					break
 				}
+				if fastxReader.IsFastq {
+					config.LineWidth = 0
+				}
 
 				if rand.Float64() <= proportion {
 					n++
-					record.FormatToWriter(outfh, lineWidth)
+					record.FormatToWriter(outfh, config.LineWidth)
 				}
 			}
 		}

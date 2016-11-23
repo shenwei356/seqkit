@@ -60,7 +60,7 @@ and extract sequences by FASTA index.
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		lineWidth := config.LineWidth
+		// lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
@@ -133,6 +133,9 @@ and extract sequences by FASTA index.
 						checkError(err)
 						break
 					}
+					if fastxReader.IsFastq {
+						config.LineWidth = 0
+					}
 
 					if byName {
 						name = string(record.Name)
@@ -199,12 +202,12 @@ and extract sequences by FASTA index.
 			if byName || byID || bySeq {
 				for _, kv := range name2sequence {
 					record = sequences[kv.Key]
-					record.FormatToWriter(outfh, lineWidth)
+					record.FormatToWriter(outfh, config.LineWidth)
 				}
 			} else if byLength {
 				for _, kv := range name2length {
 					record = sequences[kv.Key]
-					record.FormatToWriter(outfh, lineWidth)
+					record.FormatToWriter(outfh, config.LineWidth)
 				}
 			}
 

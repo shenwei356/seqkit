@@ -71,6 +71,9 @@ var renameCmd = &cobra.Command{
 					checkError(err)
 					break
 				}
+				if fastxReader.IsFastq {
+					config.LineWidth = 0
+				}
 
 				if byName {
 					k = string(record.Name)
@@ -86,8 +89,10 @@ var renameCmd = &cobra.Command{
 					numbers[k] = 1
 				}
 
-				record.FormatToWriter(outfh, lineWidth)
+				record.FormatToWriter(outfh, config.LineWidth)
 			}
+
+			config.LineWidth = lineWidth
 		}
 	},
 }

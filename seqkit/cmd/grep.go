@@ -51,8 +51,8 @@ Examples:
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		lineWidth := config.LineWidth
 		outFile := config.OutFile
+		lineWidth := config.LineWidth
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
@@ -184,6 +184,9 @@ Examples:
 					checkError(err)
 					break
 				}
+				if fastxReader.IsFastq {
+					config.LineWidth = 0
+				}
 
 				if byName {
 					subject = record.Name
@@ -228,8 +231,10 @@ Examples:
 					}
 				}
 
-				record.FormatToWriter(outfh, lineWidth)
+				record.FormatToWriter(outfh, config.LineWidth)
 			}
+
+			config.LineWidth = lineWidth
 		}
 	},
 }

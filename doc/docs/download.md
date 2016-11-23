@@ -10,8 +10,9 @@ SeqKit is implemented in [Go](https://golang.org/) programming language,
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.3.7/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.3.7)
 
 - fix bug in `seqkit split --by-id` when sequence ID contains invalid characters for system path.
-- add more flags validation for `seqkit replace`
-- enhancement: raise error when key pattern matches multiple targes in cases of replacing with key-value files
+- add more flags validation for `seqkit replace`.
+- enhancement: raise error when key pattern matches multiple targes in cases of replacing with key-value files and more controls are added.
+- changes: do not wrap sequence and quality in output for FASTQ  format.
 
 ***64-bit versions are highly recommended.***
 

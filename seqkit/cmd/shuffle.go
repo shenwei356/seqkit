@@ -55,7 +55,7 @@ Secondly, seqkit shuffles sequence IDs and extract sequences by FASTA index.
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		lineWidth := config.LineWidth
+		// lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
@@ -92,6 +92,9 @@ Secondly, seqkit shuffles sequence IDs and extract sequences by FASTA index.
 						checkError(err)
 						break
 					}
+					if fastxReader.IsFastq {
+						config.LineWidth = 0
+					}
 
 					sequences[string(record.Name)] = record.Clone()
 					index2name[i] = string(record.Name)
@@ -121,7 +124,7 @@ Secondly, seqkit shuffles sequence IDs and extract sequences by FASTA index.
 			var record *fastx.Record
 			for _, i := range indices {
 				record = sequences[index2name[i]]
-				record.FormatToWriter(outfh, lineWidth)
+				record.FormatToWriter(outfh, config.LineWidth)
 			}
 			return
 		}

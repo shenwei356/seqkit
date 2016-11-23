@@ -108,6 +108,9 @@ var seqCmd = &cobra.Command{
 					checkError(err)
 					break
 				}
+				if fastxReader.IsFastq {
+					config.LineWidth = 0
+				}
 
 				if checkSeqType {
 					if len(record.Seq.Qual) > 0 {
@@ -212,12 +215,12 @@ var seqCmd = &cobra.Command{
 					}
 
 					if len(sequence.Seq) <= pageSize {
-						outfh.Write(byteutil.WrapByteSlice(sequence.Seq, lineWidth))
+						outfh.Write(byteutil.WrapByteSlice(sequence.Seq, config.LineWidth))
 					} else {
 						if bufferedByteSliceWrapper == nil {
-							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Seq), lineWidth)
+							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Seq), config.LineWidth)
 						}
-						text, b = bufferedByteSliceWrapper.Wrap(sequence.Seq, lineWidth)
+						text, b = bufferedByteSliceWrapper.Wrap(sequence.Seq, config.LineWidth)
 						outfh.Write(text)
 						outfh.Flush()
 						bufferedByteSliceWrapper.Recycle(b)
@@ -245,12 +248,12 @@ var seqCmd = &cobra.Command{
 					}
 
 					if len(sequence.Qual) <= pageSize {
-						outfh.Write(byteutil.WrapByteSlice(sequence.Qual, lineWidth))
+						outfh.Write(byteutil.WrapByteSlice(sequence.Qual, config.LineWidth))
 					} else {
 						if bufferedByteSliceWrapper == nil {
-							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Qual), lineWidth)
+							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Qual), config.LineWidth)
 						}
-						text, b = bufferedByteSliceWrapper.Wrap(sequence.Qual, lineWidth)
+						text, b = bufferedByteSliceWrapper.Wrap(sequence.Qual, config.LineWidth)
 						outfh.Write(text)
 						outfh.Flush()
 						bufferedByteSliceWrapper.Recycle(b)
@@ -260,6 +263,7 @@ var seqCmd = &cobra.Command{
 				}
 			}
 
+			config.LineWidth = lineWidth
 		}
 
 		outfh.Close()

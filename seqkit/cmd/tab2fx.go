@@ -90,25 +90,31 @@ var tab2faCmd = &cobra.Command{
 			for chunk := range reader.Ch {
 				for _, data := range chunk.Data {
 					items := data.(Slice)
-					if len(items) == 3 && len(items[2]) > 0 {
+					if len(items) == 3 && len(items[2]) > 0 { // fastq
 						outfh.WriteString(fmt.Sprintf("@%s\n", items[0]))
 
 						// 	outfh.Write(byteutil.WrapByteSlice([]byte(items[1]), lineWidth))
-						if bufferedByteSliceWrapper == nil {
-							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(items[1]), lineWidth)
-						}
-						text, b = bufferedByteSliceWrapper.Wrap([]byte(items[1]), lineWidth)
-						outfh.Write(text)
-						outfh.Flush()
-						bufferedByteSliceWrapper.Recycle(b)
+
+						// if bufferedByteSliceWrapper == nil {
+						// 	bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(items[1]), lineWidth)
+						// }
+						// text, b = bufferedByteSliceWrapper.Wrap([]byte(items[1]), lineWidth)
+						// outfh.Write(text)
+						// outfh.Flush()
+						// bufferedByteSliceWrapper.Recycle(b)
+
+						outfh.WriteString(items[1]) // seq
 
 						outfh.WriteString("\n+\n")
 
 						// outfh.Write(byteutil.WrapByteSlice([]byte(items[2]), lineWidth))
-						text, b = bufferedByteSliceWrapper.Wrap([]byte(items[2]), lineWidth)
-						outfh.Write(text)
-						outfh.Flush()
-						bufferedByteSliceWrapper.Recycle(b)
+
+						// text, b = bufferedByteSliceWrapper.Wrap([]byte(items[2]), lineWidth)
+						// outfh.Write(text)
+						// outfh.Flush()
+						// bufferedByteSliceWrapper.Recycle(b)
+
+						outfh.WriteString(items[2]) // qual
 
 						outfh.WriteString("\n")
 					} else {

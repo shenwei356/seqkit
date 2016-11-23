@@ -58,7 +58,7 @@ Examples:
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		lineWidth := config.LineWidth
+		// lineWidth := config.LineWidth
 		quiet := config.Quiet
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
@@ -154,6 +154,9 @@ Examples:
 						checkError(err)
 						break
 					}
+					if fastxReader.IsFastq {
+						config.LineWidth = 0
+					}
 
 					if renameFileExt && isstdin {
 						if len(record.Seq.Qual) > 0 {
@@ -166,14 +169,14 @@ Examples:
 					records = append(records, record.Clone())
 					if len(records) == size {
 						outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
-						writeSeqs(records, outfile, lineWidth, quiet, dryRun)
+						writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 						i++
 						records = []*fastx.Record{}
 					}
 				}
 				if len(records) > 0 {
 					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
-					writeSeqs(records, outfile, lineWidth, quiet, dryRun)
+					writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 				}
 
 				return
@@ -252,7 +255,7 @@ Examples:
 					record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), sequence)
 					checkError(err)
 
-					record.FormatToWriter(outfh, lineWidth)
+					record.FormatToWriter(outfh, config.LineWidth)
 				}
 				j++
 				if j == size {
@@ -324,14 +327,14 @@ Examples:
 					records = append(records, record)
 					if len(records) == size {
 						outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
-						writeSeqs(records, outfile, lineWidth, quiet, dryRun)
+						writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 						i++
 						records = []*fastx.Record{}
 					}
 				}
 				if len(records) > 0 {
 					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
-					writeSeqs(records, outfile, lineWidth, quiet, dryRun)
+					writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 				}
 				return
 			}
@@ -421,7 +424,7 @@ Examples:
 					record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), sequence)
 					checkError(err)
 
-					record.FormatToWriter(outfh, lineWidth)
+					record.FormatToWriter(outfh, config.LineWidth)
 				}
 				j++
 				if j == size {
@@ -488,8 +491,10 @@ Examples:
 
 				var outfile string
 				for id, records := range recordsByID {
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s", filepath.Base(fileName), pathutil.RemoveInvalidPathChars(id, "__"), fileExt))
-					writeSeqs(records, outfile, lineWidth, quiet, dryRun)
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s",
+						filepath.Base(fileName),
+						pathutil.RemoveInvalidPathChars(id, "__"), fileExt))
+					writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 				}
 				return
 			}
@@ -566,7 +571,9 @@ Examples:
 			var record *fastx.Record
 			for id, ids := range idsMap {
 
-				outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s", filepath.Base(fileName), pathutil.RemoveInvalidPathChars(id, "__"), fileExt))
+				outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s",
+					filepath.Base(fileName),
+					pathutil.RemoveInvalidPathChars(id, "__"), fileExt))
 				if !dryRun {
 					outfh, err = xopen.Wopen(outfile)
 					checkError(err)
@@ -584,7 +591,7 @@ Examples:
 						record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), sequence)
 						checkError(err)
 
-						record.FormatToWriter(outfh, lineWidth)
+						record.FormatToWriter(outfh, config.LineWidth)
 					}
 				}
 
@@ -665,7 +672,7 @@ Examples:
 				var outfile string
 				for subseq, records := range recordsBySeqs {
 					outfile = filepath.Join(outdir, fmt.Sprintf("%s.region_%d:%d_%s%s", filepath.Base(fileName), start, end, subseq, fileExt))
-					writeSeqs(records, outfile, lineWidth, quiet, dryRun)
+					writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 				}
 				return
 			}
@@ -770,7 +777,7 @@ Examples:
 						record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), sequence)
 						checkError(err)
 
-						record.FormatToWriter(outfh, lineWidth)
+						record.FormatToWriter(outfh, config.LineWidth)
 					}
 				}
 
