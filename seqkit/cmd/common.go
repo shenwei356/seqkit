@@ -42,9 +42,6 @@ var commonCmd = &cobra.Command{
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) < 2 {
-			checkError(errors.New("at least 2 files needed"))
-		}
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
@@ -68,21 +65,34 @@ var commonCmd = &cobra.Command{
 		}
 
 		files := getFileList(args)
+		if len(files) < 2 {
+			checkError(errors.New("at least 2 files needed"))
+		}
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Close()
 
-		counter := make(map[string]map[string]int)
-		names := make(map[string]map[string]string)
+		// target -> file -> struct{}
+		counter := make(map[string]map[string]struct{})
+		// target -> file -> seqname
+		names := make(map[string]map[string][]string)
+
 		var fastxReader *fastx.Reader
 
 		// read all files
 		var subject string
+		var checkFirstFile = true
+		var firstFile string
 		for _, file := range files {
 			if !quiet {
 				log.Infof("read file: %s", file)
 			}
+			if checkFirstFile {
+				firstFile = file
+				checkFirstFile = false
+			}
+
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 			for {
@@ -124,14 +134,14 @@ var commonCmd = &cobra.Command{
 				}
 
 				if _, ok := counter[subject]; !ok {
-					counter[subject] = make(map[string]int)
+					counter[subject] = make(map[string]struct{})
 				}
-				counter[subject][file] = counter[subject][file] + 1
+				counter[subject][file] = struct{}{}
 
 				if _, ok := names[subject]; !ok {
-					names[subject] = make(map[string]string)
+					names[subject] = make(map[string][]string)
 				}
-				names[subject][file] = string(record.Name)
+				names[subject][file] = append(names[subject][file], string(record.Name))
 			}
 		}
 
@@ -139,27 +149,41 @@ var commonCmd = &cobra.Command{
 		if !quiet {
 			log.Info("find common seqs ...")
 		}
-		fileNum := len(args)
-		firstFile := args[0]
-		namesOK := make(map[string]int)
-		n := 0
-		for subject, count := range counter {
-			if len(count) != fileNum {
+		fileNum := len(files)
+		namesOK := make(map[string]struct{})
+		var n, n2 int
+		var seqname string
+		for subject, presence := range counter {
+			if len(presence) != fileNum {
 				continue
 			}
-			namesOK[names[subject][firstFile]] = counter[subject][firstFile]
+
 			n++
-		}
-		if !quiet {
-			log.Infof("%d common seqs found", n)
+			for _, seqname = range names[subject][firstFile] {
+				n2++
+				namesOK[seqname] = struct{}{}
+			}
 		}
 
+		var t string
+		if byName {
+			t = "sequence headers"
+		} else if bySeq {
+			t = "sequences"
+		} else {
+			t = "sequence IDs"
+		}
 		if n == 0 {
+			log.Infof("no common %s found", t)
 			return
 		}
+		if !quiet {
+			log.Infof("%d unique %s found in %d files, which belong to %d records in the first file: %s",
+				n, t, fileNum, len(namesOK), firstFile)
+		}
 
 		if !quiet {
-			log.Infof("extract common seqs from first file: %s", firstFile)
+			log.Infof("extract seqs from the first file: %s", firstFile)
 		}
 
 		// extract
@@ -174,11 +198,12 @@ var commonCmd = &cobra.Command{
 				checkError(err)
 				break
 			}
+			if fastxReader.IsFastq {
+				config.LineWidth = 0
+			}
 
-			name := string(record.Name)
-			if _, ok := namesOK[name]; ok && namesOK[name] > 0 {
+			if _, ok := namesOK[string(record.Name)]; ok {
 				record.FormatToWriter(outfh, lineWidth)
-				namesOK[name] = 0
 			}
 		}
 	},

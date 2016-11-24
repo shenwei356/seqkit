@@ -6,13 +6,10 @@ SeqKit is implemented in [Go](https://golang.org/) programming language,
 
 ## Latest Version
 
-[SeqKit v0.3.7](https://github.com/shenwei356/seqkit/releases/tag/v0.3.7)
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.3.7/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.3.7)
+[SeqKit v0.3.8](https://github.com/shenwei356/seqkit/releases/tag/v0.3.8)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.3.8/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.3.8)
 
-- fix bug in `seqkit split --by-id` when sequence ID contains invalid characters for system path.
-- add more flags validation for `seqkit replace`.
-- enhancement: raise error when key pattern matches multiple targes in cases of replacing with key-value files and more controls are added.
-- changes: do not wrap sequence and quality in output for FASTQ  format.
+- enhancement of `seqkit common`: better handling of files containing replicated sequences
 
 ***64-bit versions are highly recommended.***
 
@@ -94,6 +91,12 @@ For Go developer, just one command:
 
 ## Release History
 
+- [SeqKit v0.3.7](https://github.com/shenwei356/seqkit/releases/tag/v0.3.7)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.3.7/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.3.7)
+    - fix bug in `seqkit split --by-id` when sequence ID contains invalid characters for system path.
+    - add more flags validation for `seqkit replace`.
+    - enhancement: raise error when key pattern matches multiple targes in cases of replacing with key-value files and more controls are added.
+    - changes: do not wrap sequence and quality in output for FASTQ  format.
 - [SeqKit v0.3.6](https://github.com/shenwei356/seqkit/releases/tag/v0.3.6)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.3.6/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.3.6)
     - add new feature for `seqkit grep`: new flag `-R` (`--region`) for specifying sequence region for searching.
