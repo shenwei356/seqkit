@@ -45,7 +45,7 @@ var commonCmd = &cobra.Command{
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		lineWidth := config.LineWidth
+		// lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
 		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
@@ -84,17 +84,26 @@ var commonCmd = &cobra.Command{
 		var subject string
 		var checkFirstFile = true
 		var firstFile string
+		var filenames = make(map[string]int)
 		for _, file := range files {
 			if !quiet {
 				log.Infof("read file: %s", file)
 			}
-			if checkFirstFile {
+			if checkFirstFile && !isStdin(file) {
 				firstFile = file
 				checkFirstFile = false
 			}
 
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
+
+			if _, ok := filenames[file]; !ok {
+				filenames[file] = 1
+			} else {
+				filenames[file]++
+				file = fmt.Sprintf("%s_%d", file, filenames[file])
+			}
+
 			for {
 				record, err := fastxReader.Read()
 				if err != nil {
@@ -179,7 +188,7 @@ var commonCmd = &cobra.Command{
 		}
 		if !quiet {
 			log.Infof("%d unique %s found in %d files, which belong to %d records in the first file: %s",
-				n, t, fileNum, len(namesOK), firstFile)
+				n, t, fileNum, n2, firstFile)
 		}
 
 		if !quiet {
@@ -203,7 +212,7 @@ var commonCmd = &cobra.Command{
 			}
 
 			if _, ok := namesOK[string(record.Name)]; ok {
-				record.FormatToWriter(outfh, lineWidth)
+				record.FormatToWriter(outfh, config.LineWidth)
 			}
 		}
 	},
