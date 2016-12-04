@@ -43,7 +43,7 @@ import (
 )
 
 // VERSION of seqkit
-const VERSION = "0.3.8.1"
+const VERSION = "0.3.9"
 
 func checkError(err error) {
 	if err != nil {
@@ -346,6 +346,8 @@ negative index    0-9-8-7-6-5-4-3-2-1
          -1:-1                      n
           2:-2      C G T N a c g t
           1:-1    A C G T N a c g t n
+          1:12    A C G T N a c g t n
+        -12:-1    A C G T N a c g t n
 `
 
 func writeSeqs(records []*fastx.Record, file string, lineWidth int, quiet bool, dryRun bool) error {
