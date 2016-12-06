@@ -65,7 +65,7 @@ var statCmd = &cobra.Command{
 			checkError(err)
 
 			seqFormat = ""
-			num, lenMin, lenMax, lenSum = 0, ^uint64(0), 0, 0
+			num, lenMin, lenMax, lenSum = 0, 0, 0, 0
 			for {
 				record, err := fastxReader.Read()
 				if err != nil {
@@ -101,9 +101,16 @@ var statCmd = &cobra.Command{
 				t = fmt.Sprintf("%s", fastxReader.Alphabet())
 			}
 
-			statInfos = append(statInfos, statInfo{file, seqFormat, t,
-				int64(num), int64(lenSum), int64(lenMin),
-				math.Round(float64(lenSum)/float64(num), 1), int64(lenMax)})
+			if num == 0 {
+				statInfos = append(statInfos, statInfo{file, seqFormat, t,
+					int64(num), int64(lenSum), int64(lenMin),
+					0, int64(lenMax)})
+
+			} else {
+				statInfos = append(statInfos, statInfo{file, seqFormat, t,
+					int64(num), int64(lenSum), int64(lenMin),
+					math.Round(float64(lenSum)/float64(num), 1), int64(lenMax)})
+			}
 		}
 
 		// format output
