@@ -9,6 +9,8 @@ SeqKit is implemented in [Go](https://golang.org/) programming language,
 [SeqKit v0.4.0](https://github.com/shenwei356/seqkit/releases/tag/v0.4.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.4.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.4.0)
 
+- fix bug of `seqkit locate`, e.g, only find two locations
+(`1-4`, `7-10`, missing `4-7`) of `ACGA` in `ACGACGACGA`.
 - better output of `seqkit stat` for empty file.
 
 ***64-bit versions are highly recommended.***

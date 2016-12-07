@@ -124,6 +124,8 @@ For example: "\w" will be wrongly converted to "\[AT]".
 
 		outfh.WriteString("seqID\tpatternName\tpattern\tstrand\tstart\tend\tmatched\n")
 		var seqRP *seq.Seq
+		var offset, l int
+		var loc []int
 		for _, file := range files {
 
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
@@ -138,43 +140,56 @@ For example: "\w" will be wrongly converted to "\[AT]".
 					break
 				}
 
+				l = len(record.Seq.Seq)
 				if !onlyPositiveStrand {
 					seqRP = record.Seq.RevCom()
 				}
 				for pName, re := range regexps {
-					found := re.FindAllSubmatchIndex(record.Seq.Seq, -1)
-					if len(found) > 0 {
-						for _, loc := range found {
-							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-								record.ID,
-								pName,
-								patterns[pName],
-								"+",
-								loc[0]+1,
-								loc[1],
-								record.Seq.Seq[loc[0]:loc[1]]))
+					offset = 0
+					for {
+						loc = re.FindSubmatchIndex(record.Seq.Seq[offset:])
+						if loc == nil {
+							break
+						}
+						outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+							record.ID,
+							pName,
+							patterns[pName],
+							"+",
+							offset+loc[0]+1,
+							offset+loc[1],
+							record.Seq.Seq[offset+loc[0]:offset+loc[1]]))
+
+						offset = offset + loc[0] + 1
+						if offset >= len(record.Seq.Seq) {
+							break
 						}
 					}
 
 					if onlyPositiveStrand {
 						continue
 					}
-					found = re.FindAllSubmatchIndex(seqRP.Seq, -1)
-					if len(found) > 0 {
-						l := len(seqRP.Seq)
-						tlocs := make([][]int, len(found))
-						for i, loc := range found {
-							tlocs[i] = []int{l - loc[1], l - loc[0]}
+
+					offset = 0
+					for {
+						loc = re.FindSubmatchIndex(seqRP.Seq[offset:])
+						if loc == nil {
+							break
 						}
-						for _, loc := range tlocs {
+						if len(loc) > 0 {
 							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 								record.ID,
 								pName,
 								patterns[pName],
 								"-",
-								loc[0]+1,
-								loc[1],
-								record.Seq.SubSeq(loc[0]+1, loc[1]).RevCom().Seq))
+								l-offset-loc[1]+1,
+								l-offset-loc[0],
+								record.Seq.SubSeq(l-offset-loc[1]+1, l-offset-loc[0]).RevCom().Seq))
+						}
+
+						offset = offset + loc[0] + 1
+						if offset >= len(record.Seq.Seq) {
+							break
 						}
 					}
 				}
