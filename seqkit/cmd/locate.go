@@ -126,6 +126,9 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		var seqRP *seq.Seq
 		var offset, l int
 		var loc []int
+		var locs, locsNeg [][2]int
+		var i, begin, end int
+		var flag bool
 		for _, file := range files {
 
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
@@ -145,20 +148,35 @@ For example: "\w" will be wrongly converted to "\[AT]".
 					seqRP = record.Seq.RevCom()
 				}
 				for pName, re := range regexps {
+					locs = make([][2]int, 0, 1000)
+
 					offset = 0
 					for {
 						loc = re.FindSubmatchIndex(record.Seq.Seq[offset:])
 						if loc == nil {
 							break
 						}
-						outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-							record.ID,
-							pName,
-							patterns[pName],
-							"+",
-							offset+loc[0]+1,
-							offset+loc[1],
-							record.Seq.Seq[offset+loc[0]:offset+loc[1]]))
+						begin = offset + loc[0] + 1
+						end = offset + loc[1]
+
+						flag = true
+						for i = len(locs) - 1; i >= 0; i-- {
+							if locs[i][0] <= begin && locs[i][1] >= end {
+								flag = false
+							}
+						}
+
+						if flag {
+							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+								record.ID,
+								pName,
+								patterns[pName],
+								"+",
+								begin,
+								end,
+								record.Seq.Seq[offset+loc[0]:offset+loc[1]]))
+						}
+						locs = append(locs, [2]int{begin, end})
 
 						offset = offset + loc[0] + 1
 						if offset >= len(record.Seq.Seq) {
@@ -170,22 +188,37 @@ For example: "\w" will be wrongly converted to "\[AT]".
 						continue
 					}
 
+					locsNeg = make([][2]int, 0, 1000)
+
 					offset = 0
+
 					for {
 						loc = re.FindSubmatchIndex(seqRP.Seq[offset:])
 						if loc == nil {
 							break
 						}
-						if len(loc) > 0 {
+						begin = l - offset - loc[1] + 1
+						end = l - offset - loc[0]
+
+						flag = true
+						for i = len(locsNeg) - 1; i >= 0; i-- {
+							if locsNeg[i][0] <= begin && locsNeg[i][1] >= end {
+								flag = false
+							}
+						}
+						locsNeg = append(locsNeg, [2]int{begin, end})
+
+						if flag {
 							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 								record.ID,
 								pName,
 								patterns[pName],
 								"-",
-								l-offset-loc[1]+1,
-								l-offset-loc[0],
+								begin,
+								end,
 								record.Seq.SubSeq(l-offset-loc[1]+1, l-offset-loc[0]).RevCom().Seq))
 						}
+						locs = append(locs, [2]int{begin, end})
 
 						offset = offset + loc[0] + 1
 						if offset >= len(record.Seq.Seq) {
