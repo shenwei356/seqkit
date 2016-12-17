@@ -187,7 +187,8 @@
 <li>
 <p>enchancement: remove redudant regions for <code>seqkit locate</code>. e.g.:</p>
 <p>previous version:</p>
-<pre><code>$ echo -ne "&gt;test\nAACGcgcA" | seqkit locate -i -P -p "(CG)+"seqID   patternName     pattern strand  start   end     matched
+<pre><code>$ echo -ne "&gt;test\nAACGcgcA" | seqkit locate -i -P -p "(CG)+"
+seqID   patternName     pattern strand  start   end     matched
 test    (CG)+   (CG)+   +       3       6       CGcg
 test    (CG)+   (CG)+   +       5       6       cg
 </code></pre>
