@@ -163,6 +163,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 						for i = len(locs) - 1; i >= 0; i-- {
 							if locs[i][0] <= begin && locs[i][1] >= end {
 								flag = false
+								break
 							}
 						}
 
@@ -175,8 +176,8 @@ For example: "\w" will be wrongly converted to "\[AT]".
 								begin,
 								end,
 								record.Seq.Seq[offset+loc[0]:offset+loc[1]]))
+							locs = append(locs, [2]int{begin, end})
 						}
-						locs = append(locs, [2]int{begin, end})
 
 						offset = offset + loc[0] + 1
 						if offset >= len(record.Seq.Seq) {
@@ -204,9 +205,9 @@ For example: "\w" will be wrongly converted to "\[AT]".
 						for i = len(locsNeg) - 1; i >= 0; i-- {
 							if locsNeg[i][0] <= begin && locsNeg[i][1] >= end {
 								flag = false
+								break
 							}
 						}
-						locsNeg = append(locsNeg, [2]int{begin, end})
 
 						if flag {
 							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
@@ -217,8 +218,8 @@ For example: "\w" will be wrongly converted to "\[AT]".
 								begin,
 								end,
 								record.Seq.SubSeq(l-offset-loc[1]+1, l-offset-loc[0]).RevCom().Seq))
+							locsNeg = append(locsNeg, [2]int{begin, end})
 						}
-						locs = append(locs, [2]int{begin, end})
 
 						offset = offset + loc[0] + 1
 						if offset >= len(record.Seq.Seq) {
