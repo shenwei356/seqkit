@@ -6,58 +6,45 @@ SeqKit is implemented in [Go](https://golang.org/) programming language,
 
 ## Latest Version
 
-[SeqKit v0.4.1](https://github.com/shenwei356/seqkit/releases/tag/v0.4.1)
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.4.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.4.1)
+[SeqKit v0.4.2](https://github.com/shenwei356/seqkit/releases/tag/v0.4.2)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.4.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.4.2)
 
-- enchancement: remove redudant regions for `seqkit locate`. e.g.:
-
-    previous version:
-
-        $ echo -ne ">test\nAACGcgcA" | seqkit locate -i -P -p "(CG)+"
-        seqID   patternName     pattern strand  start   end     matched
-        test    (CG)+   (CG)+   +       3       6       CGcg
-        test    (CG)+   (CG)+   +       5       6       cg
-
-    current version:
-
-        $ echo -ne ">test\nAACGcgcA" | ./seqkit locate -i -P -p "(CG)+"
-        seqID   patternName     pattern strand  start   end     matched
-        test    (CG)+   (CG)+   +       3       6       CGcg
-
+- fix header information of `seqkit subseq` when restriving up- and down-steam
+sequences using GTF/BED file.
 
 ### Links
 
 ***64-bit versions are highly recommended.***
 
 - **Linux**
-    - 32-bit [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_linux_386.tar.gz)
-    [seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_linux_386.tar.gz)
-    - **64-bit** [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_linux_amd64.tar.gz)
-    [**seqkit_linux_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_linux_amd64.tar.gz)
-    - 32-bit [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_arm.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_linux_arm.tar.gz)
-    [seqkit_linux_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_linux_arm.tar.gz)
+    - 32-bit [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_linux_386.tar.gz)
+    [seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_linux_386.tar.gz)
+    - **64-bit** [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_linux_amd64.tar.gz)
+    [**seqkit_linux_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_linux_amd64.tar.gz)
+    - 32-bit [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_arm.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_linux_arm.tar.gz)
+    [seqkit_linux_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_linux_arm.tar.gz)
 - **Mac OS X**
-    - 32-bit [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_darwin_386.tar.gz)
-    [seqkit_darwin_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_darwin_386.tar.gz)
-    - **64-bit** [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_darwin_amd64.tar.gz)
-    [**seqkit_darwin_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_darwin_amd64.tar.gz)
+    - 32-bit [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_darwin_386.tar.gz)
+    [seqkit_darwin_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_darwin_386.tar.gz)
+    - **64-bit** [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_darwin_amd64.tar.gz)
+    [**seqkit_darwin_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_darwin_amd64.tar.gz)
 - **Windows**
-    - 32-bit [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_386.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_windows_386.exe.tar.gz)
-    [seqkit_windows_386.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_windows_386.exe.tar.gz)
-    - **64-bit** [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_amd64.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_windows_amd64.exe.tar.gz)
-    [**seqkit_windows_amd64.exe.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_windows_amd64.exe.tar.gz)
+    - 32-bit [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_386.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_windows_386.exe.tar.gz)
+    [seqkit_windows_386.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_windows_386.exe.tar.gz)
+    - **64-bit** [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_amd64.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_windows_amd64.exe.tar.gz)
+    [**seqkit_windows_amd64.exe.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_windows_amd64.exe.tar.gz)
 - **FreeBSD**
-    - 32-bit [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_freebsd_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_freebsd_386.tar.gz)
-    [seqkit_freebsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_freebsd_386.tar.gz)
-    - **64-bit** [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_freebsd_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_freebsd_amd64.tar.gz)
-    [**seqkit_freebsd_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_freebsd_amd64.tar.gz)
-    - 32-bit [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_freebsd_arm.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_freebsd_arm.tar.gz)
-    [**seqkit_freebsd_arm.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_freebsd_arm.tar.gz)
+    - 32-bit [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_freebsd_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_freebsd_386.tar.gz)
+    [seqkit_freebsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_freebsd_386.tar.gz)
+    - **64-bit** [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_freebsd_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_freebsd_amd64.tar.gz)
+    [**seqkit_freebsd_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_freebsd_amd64.tar.gz)
+    - 32-bit [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_freebsd_arm.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_freebsd_arm.tar.gz)
+    [**seqkit_freebsd_arm.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_freebsd_arm.tar.gz)
 - **OpenBSD**
-    - 32-bit [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_openbsd_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_openbsd_386.tar.gz)
-    [seqkit_openbsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_openbsd_386.tar.gz)
-    - **64-bit** [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_openbsd_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_openbsd_amd64.tar.gz)
-    [**seqkit_openbsd_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.4.1/seqkit_openbsd_amd64.tar.gz)
+    - 32-bit [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_openbsd_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_openbsd_386.tar.gz)
+    [seqkit_openbsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_openbsd_386.tar.gz)
+    - **64-bit** [![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_openbsd_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_openbsd_amd64.tar.gz)
+    [**seqkit_openbsd_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.4.2/seqkit_openbsd_amd64.tar.gz)
 
 ### Mirror site for Chinese users
 
@@ -105,6 +92,9 @@ For Go developer, just one command:
 
 ## Release History
 
+- [SeqKit v0.4.1](https://github.com/shenwei356/seqkit/releases/tag/v0.4.1)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.4.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.4.1)
+    - enchancement: remove redudant regions for `seqkit locate`.
 - [SeqKit v0.4.0](https://github.com/shenwei356/seqkit/releases/tag/v0.4.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.4.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.4.0)
     - fix bug of `seqkit locate`, e.g, only find two locations

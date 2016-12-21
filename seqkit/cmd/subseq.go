@@ -421,12 +421,16 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 			if upStream > 0 {
 				if onlyFlank {
 					flankInfo = fmt.Sprintf("_usf:%d", upStream)
+				} else if downStream > 0 {
+					flankInfo = fmt.Sprintf("_us:%d_ds:%d", upStream, downStream)
 				} else {
 					flankInfo = fmt.Sprintf("_us:%d", upStream)
 				}
 			} else if downStream > 0 {
 				if onlyFlank {
 					flankInfo = fmt.Sprintf("_dsf:%d", downStream)
+				} else if upStream > 0 {
+					flankInfo = fmt.Sprintf("_us:%d_ds:%d", upStream, downStream)
 				} else {
 					flankInfo = fmt.Sprintf("_ds:%d", downStream)
 				}
@@ -494,12 +498,16 @@ func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 		if upStream > 0 {
 			if onlyFlank {
 				flankInfo = fmt.Sprintf("_usf:%d", upStream)
+			} else if downStream > 0 {
+				flankInfo = fmt.Sprintf("_us:%d_ds:%d", upStream, downStream)
 			} else {
 				flankInfo = fmt.Sprintf("_us:%d", upStream)
 			}
 		} else if downStream > 0 {
 			if onlyFlank {
 				flankInfo = fmt.Sprintf("_dsf:%d", downStream)
+			} else if upStream > 0 {
+				flankInfo = fmt.Sprintf("_us:%d_ds:%d", upStream, downStream)
 			} else {
 				flankInfo = fmt.Sprintf("_ds:%d", downStream)
 			}

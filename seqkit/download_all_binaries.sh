@@ -1,7 +1,7 @@
 #!/bin/sh
 
 rm seqkit_*.tar.gz
-version="0.3.8"
+version="0.4.2"
 
 wget https://github.com/shenwei356/seqkit/releases/download/v$version/seqkit_linux_386.tar.gz
 wget https://github.com/shenwei356/seqkit/releases/download/v$version/seqkit_linux_amd64.tar.gz
