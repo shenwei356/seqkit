@@ -65,7 +65,7 @@ var statCmd = &cobra.Command{
 			checkError(err)
 
 			seqFormat = ""
-			num, lenMin, lenMax, lenSum = 0, 0, 0, 0
+			num, lenMin, lenMax, lenSum = 0, ^uint64(0), 0, 0
 			for {
 				record, err := fastxReader.Read()
 				if err != nil {
