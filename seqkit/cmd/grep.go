@@ -243,7 +243,7 @@ func init() {
 	RootCmd.AddCommand(grepCmd)
 
 	grepCmd.Flags().StringSliceP("pattern", "p", []string{""}, "search pattern (multiple values supported)")
-	grepCmd.Flags().StringP("pattern-file", "f", "", "pattern file")
+	grepCmd.Flags().StringP("pattern-file", "f", "", "pattern file (one record per line)")
 	grepCmd.Flags().BoolP("use-regexp", "r", false, "patterns are regular expression")
 	grepCmd.Flags().BoolP("delete-matched", "", false, "delete matched pattern to speedup")
 	grepCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")

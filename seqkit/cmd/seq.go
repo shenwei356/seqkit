@@ -275,7 +275,7 @@ var pageSize = syscall.Getpagesize()
 func init() {
 	RootCmd.AddCommand(seqCmd)
 
-	seqCmd.Flags().BoolP("reverse", "r", false, "reverse sequence)")
+	seqCmd.Flags().BoolP("reverse", "r", false, "reverse sequence")
 	seqCmd.Flags().BoolP("complement", "p", false, "complement sequence (blank for Protein sequence)")
 	seqCmd.Flags().BoolP("name", "n", false, "only print names")
 	seqCmd.Flags().BoolP("seq", "s", false, "only print sequences")

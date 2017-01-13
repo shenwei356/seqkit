@@ -99,7 +99,7 @@ Usage
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.3.9
+Version: 0.4.3
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -169,15 +169,15 @@ Only DNA and gtf/bed data of Chr1 were used:
 
 - `chr1.fa.gz`
 
-            seqkit grep -p 1 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz -o chr1.fa.gz
+        seqkit grep -p 1 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz -o chr1.fa.gz
 
 - `chr1.gtf.gz`
 
-            zcat Homo_sapiens.GRCh38.84.gtf.gz | grep -w '^1' | gzip -c > chr1.gtf.gz
+        zcat Homo_sapiens.GRCh38.84.gtf.gz | grep -w '^1' | gzip -c > chr1.gtf.gz
 
 - `chr1.bed.gz`
 
-            zcat Homo_sapiens.GRCh38.84.bed.gz | grep -w '^1' | gzip -c > chr1.bed.gz
+        zcat Homo_sapiens.GRCh38.84.bed.gz | grep -w '^1' | gzip -c > chr1.bed.gz
 
 
 ## seq
@@ -199,7 +199,7 @@ Flags:
   -i, --only-id                   print ID instead of full head
   -q, --qual                      only print qualities
   -g, --remove-gaps               remove gaps
-  -r, --reverse                   reverse sequence)
+  -r, --reverse                   reverse sequence
       --rna2dna                   RNA to DNA
   -s, --seq                       only print sequences
   -u, --upper-case                print sequences in upper case
@@ -221,15 +221,9 @@ Examples
 
             $ seqkit seq read_1.fq.gz
             @HWI-D00523:240:HF3WGBCXX:1:1101:2574:2226 1:N:0:CTGTAG
-            TGAGGAATATTGGTCAATGGGCGCGAGCCTGAACCAGCCAAGTAGCGTGAAGGATGACTG
-            CCCTACGGGTTGTAAACTTCTTTTATAAAGGAATAAAGTGAGGCACGTGTGCCTTTTTGT
-            ATGTACTTTATGAATAAGGATCGGCTAACTCCGTGCCAGCAGCCGCGGTAATACGGAGGA
-            TCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGTGCGCAGGCGGT
+            TGAGGAATATTGGTCAATGGGCGCGAGCCTGAACCAGCCAAGTAGCGTGAAGGATGACTGCCCTACGGG
             +
-            HIHIIIIIHIIHGHHIHHIIIIIIIIIIIIIIIHHIIIIIHHIHIIIIIGIHIIIIHHHH
-            HHGHIHIIIIIIIIIIIGHIIIIIGHIIIIHIIHIHHIIIIHIHHIIIIIIIGIIIIIII
-            HIIIIIGHIIIIHIIIH?DGHEEGHIIIIIIIIIIIHIIHIIIHHIIHIHHIHCHHIIHG
-            IHHHHHHH<GG?B@EHDE-BEHHHII5B@GHHF?CGEHHHDHIHIIH
+            HIHIIIIIHIIHGHHIHHIIIIIIIIIIIIIIIHHIIIIIHHIHIIIIIGIHIIIIHHHHHHGHIHIII
 
     - From stdin:
 
@@ -380,10 +374,10 @@ Examples
         $ cat t.fa
         >seq
         actgACTGactgn
+
         $ cat t.gtf
         seq     test    CDS     5       8       .       .       .       gene_id "A"; transcript_id "";
         seq     test    CDS     5       8       .       -       .       gene_id "B"; transcript_id "";
-        $ seqkit
 
         $ seqkit subseq --gtf t.gtf t.fa
         >seq_5:8:. A
@@ -609,7 +603,7 @@ we could also print title line by flag `-T`.
 
     Sorting or filtering by GC (or other base by -flag `-B`) content could also achieved in similar way.
 
-1. Get first 1000 sequences
+1. Get first 1000 sequences (use `seqkit head -n 1000`)
 
         $ seqkit fx2tab hairpin.fa.gz | head -n 1000 | seqkit tab2fx
 
@@ -1032,15 +1026,9 @@ Examples
 
         $ seqkit head -n 1 reads_1.fq.gz
         @HWI-D00523:240:HF3WGBCXX:1:1101:2574:2226 1:N:0:CTGTAG
-        TGAGGAATATTGGTCAATGGGCGCGAGCCTGAACCAGCCAAGTAGCGTGAAGGATGACTG
-        CCCTACGGGTTGTAAACTTCTTTTATAAAGGAATAAAGTGAGGCACGTGTGCCTTTTTGT
-        ATGTACTTTATGAATAAGGATCGGCTAACTCCGTGCCAGCAGCCGCGGTAATACGGAGGA
-        TCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGTGCGCAGGCGGT
+        TGAGGAATATTGGTCAATGGGCGCGAGCCTGAACCAGCCAAGTAGCGTGAAGGATGACTGCCCTACGGGTTGTAA
         +
-        HIHIIIIIHIIHGHHIHHIIIIIIIIIIIIIIIHHIIIIIHHIHIIIIIGIHIIIIHHHH
-        HHGHIHIIIIIIIIIIIGHIIIIIGHIIIIHIIHIHHIIIIHIHHIIIIIIIGIIIIIII
-        HIIIIIGHIIIIHIIIH?DGHEEGHIIIIIIIIIIIHIIHIIIHHIIHIHHIHCHHIIHG
-        IHHHHHHH<GG?B@EHDE-BEHHHII5B@GHHF?CGEHHHDHIHIIH
+        HIHIIIIIHIIHGHHIHHIIIIIIIIIIIIIIIHHIIIIIHHIHIIIIIGIHIIIIHHHHHHGHIHIIIIIIIII
 
 
 
