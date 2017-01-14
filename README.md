@@ -19,6 +19,35 @@ and [**Development Notes**](http://bioinf.shenwei.me/seqkit/note/))
 **[Citation](/#citation):** [![doi](https://img.shields.io/badge/doi-10.1371%2Fjournal.pone.0163962-blue.svg?style=flat)](https://doi.org/10.1371/journal.pone.0163962)
 
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Introduction](#introduction)
+- [Features](#features)
+    - [Features comparison](#features-comparison)
+- [Installation](#installation)
+    - [Method 1: Download binaries](#method-1-download-binaries)
+    - [Method 2: Install using conda](#method-2-install-using-conda)
+    - [Method 3: For Go developer](#method-3-for-go-developer)
+- [Subcommands](#subcommands)
+- [Technical details and guides for use](#technical-details-and-guides-for-use)
+    - [FASTA/Q format parsing](#fastaq-format-parsing)
+    - [Sequence formats and types](#sequence-formats-and-types)
+    - [Sequence ID](#sequence-id)
+    - [FASTA index](#fasta-index)
+    - [Parallelization of CPU intensive jobs](#parallelization-of-cpu-intensive-jobs)
+    - [Memory occupation](#memory-occupation)
+    - [Reproducibility](#reproducibility)
+- [Usage && Examples](#usage--examples)
+- [Benchmark](#benchmark)
+- [Citation](#citation)
+- [Acknowledgements](#acknowledgements)
+- [Contact](#contact)
+- [License](#license)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 ## Introduction
 
@@ -98,9 +127,11 @@ Go to [Download Page](http://bioinf.shenwei.me/seqkit/download) for more downloa
  executable binary files **for most popular operating systems** are freely available
   in [release](https://github.com/shenwei356/seqkit/releases) page.
 
+#### Method 1: Download binaries
+
 Just [download](https://github.com/shenwei356/seqkit/releases) compressed
 executable file of your operating system,
-and uncompress it with `tar -zxvf *.tar.gz` command or other tools.
+and decompress it with `tar -zxvf *.tar.gz` command or other tools.
 And then:
 
 1. **For Linux-like systems**
@@ -117,7 +148,11 @@ And then:
 
 1. **For windows**, just copy `seqkit.exe` to `C:\WINDOWS\system32`.
 
-For Go developer, just one command:
+#### Method 2: Install using conda
+
+    conda install seqkit
+
+#### Method 3: For Go developer
 
     go get -u github.com/shenwei356/seqkit/seqkit
 

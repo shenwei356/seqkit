@@ -31,9 +31,11 @@ OpenBSD|**64-bit**|[**seqkit_openbsd_amd64.tar.gz**](https://github.com/shenwei3
 
 ## Installation
 
+#### Method 1: Download binaries
+
 Just [download](https://github.com/shenwei356/seqkit/releases) compressed
 executable file of your operating system,
-and uncompress it with `tar -zxvf xxxx.tar.gz` command or other tools.
+and decompress it with `tar -zxvf *.tar.gz` command or other tools.
 And then:
 
 1. **For Linux-like systems**
@@ -44,14 +46,20 @@ And then:
     1. Or add the current directory of the executable file to environment variable
     `PATH`:
 
-            echo export PATH=\"$(pwd)\":\$PATH >> ~/.bashrc
+            echo export PATH=\$PATH:\"$(pwd)\" >> ~/.bashrc
             source ~/.bashrc
+
 
 1. **For windows**, just copy `seqkit.exe` to `C:\WINDOWS\system32`.
 
-For Go developer, just one command:
+#### Method 2: Install using conda
+
+    conda install seqkit
+
+#### Method 3: For Go developer
 
     go get -u github.com/shenwei356/seqkit/seqkit
+
 
 ## Release History
 
