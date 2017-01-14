@@ -172,6 +172,8 @@
         
             <li><a href="#introduction">Introduction</a></li>
         
+            <li><a href="#table-of-contents">Table of Contents</a></li>
+        
             <li><a href="#features">Features</a></li>
         
             <li><a href="#installation">Installation</a></li>
@@ -199,24 +201,42 @@
                 <div class="col-md-9" role="main">
 
 <h1 id="seqkit-a-cross-platform-and-ultrafast-toolkit-for-fastaq-file-manipulation">SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation</h1>
-<p><strong>Documents:</strong> <a href="http://bioinf.shenwei.me/seqkit">http://bioinf.shenwei.me/seqkit</a>
+<ul>
+<li><strong>Documents:</strong> <a href="http://bioinf.shenwei.me/seqkit">http://bioinf.shenwei.me/seqkit</a>
 (<a href="http://bioinf.shenwei.me/seqkit/usage/"><strong>Usage</strong></a>,
 <a href="http://bioinf.shenwei.me/seqkit/tutorial/"><strong>Tutorial</strong></a>,
 <a href="http://bioinf.shenwei.me/seqkit/benchmark/"><strong>Benchmark</strong></a>
-and <a href="http://bioinf.shenwei.me/seqkit/note/"><strong>Development Notes</strong></a>)</p>
-<p><strong>Source code:</strong> <a href="https://github.com/shenwei356/seqkit">https://github.com/shenwei356/seqkit</a>
+and <a href="http://bioinf.shenwei.me/seqkit/note/"><strong>Development Notes</strong></a>)</li>
+<li><strong>Source code:</strong> <a href="https://github.com/shenwei356/seqkit">https://github.com/shenwei356/seqkit</a>
 <a href="https://github.com/shenwei356/seqkit"><img alt="GitHub stars" src="https://img.shields.io/github/stars/shenwei356/seqkit.svg?style=social&amp;label=Star&amp;?maxAge=2592000" /></a>
 <a href="https://github.com/shenwei356/seqkit/blob/master/LICENSE"><img alt="license" src="https://img.shields.io/github/license/shenwei356/seqkit.svg?maxAge=2592000" /></a>
-<a href="https://goreportcard.com/report/github.com/shenwei356/seqkit"><img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/shenwei356/seqkit" /></a></p>
-<p><strong>Latest version:</strong> <a href="https://github.com/shenwei356/seqkit/releases"><img alt="Latest Version" src="https://img.shields.io/github/release/shenwei356/seqkit.svg?style=flat?maxAge=86400" /></a>
-<a href="http://bioinf.shenwei.me/seqkit/download/"><img alt="Github Releases" src="https://img.shields.io/github/downloads/shenwei356/seqkit/latest/total.svg?maxAge=3600" /></a></p>
-<p><strong><a href="./#citation">Citation</a>:</strong> <a href="https://doi.org/10.1371/journal.pone.0163962"><img alt="doi" src="https://img.shields.io/badge/doi-10.1371%2Fjournal.pone.0163962-blue.svg?style=flat" /></a></p>
+<a href="https://goreportcard.com/report/github.com/shenwei356/seqkit"><img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/shenwei356/seqkit" /></a></li>
+<li><strong>Latest version:</strong> <a href="https://github.com/shenwei356/seqkit/releases"><img alt="Latest Version" src="https://img.shields.io/github/release/shenwei356/seqkit.svg?style=flat?maxAge=86400" /></a>
+<a href="http://bioinf.shenwei.me/seqkit/download/"><img alt="Github Releases" src="https://img.shields.io/github/downloads/shenwei356/seqkit/latest/total.svg?maxAge=3600" /></a></li>
+<li><strong><a href="./#citation">Citation</a>:</strong> <a href="https://doi.org/10.1371/journal.pone.0163962"><img alt="doi" src="https://img.shields.io/badge/doi-10.1371%2Fjournal.pone.0163962-blue.svg?style=flat" /></a></li>
+</ul>
+<h2 id="introduction">Introduction</h2>
+<p>FASTA and FASTQ are basic and ubiquitous formats for storing nucleotide and
+protein sequences. Common manipulations of FASTA/Q file include converting,
+searching, filtering, deduplication, splitting, shuffling, and sampling.
+Existing tools only implement some of these manipulations,
+and not particularly efficiently, and some are only available for certain
+operating systems. Furthermore, the complicated installation process of
+required packages and running environments can render these programs less
+user friendly.</p>
+<p>This project describes a cross-platform ultrafast comprehensive
+toolkit for FASTA/Q processing. SeqKit provides executable binary files for
+all major operating systems, including Windows, Linux, and Mac OS X, and can
+be directly used without any dependencies or pre-configurations.
+SeqKit demonstrates competitive performance in execution time and memory
+usage compared to similar tools. The efficiency and usability of SeqKit
+enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+<h2 id="table-of-contents">Table of Contents</h2>
 <ul>
-<li><a href="#introduction">Introduction</a></li>
 <li><a href="#features">Features</a><ul>
 <li><a href="#features-comparison">Features comparison</a></li>
 </ul>
@@ -247,22 +267,6 @@ and <a href="http://bioinf.shenwei.me/seqkit/note/"><strong>Development Notes</s
 </ul>
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-<h2 id="introduction">Introduction</h2>
-<p>FASTA and FASTQ are basic and ubiquitous formats for storing nucleotide and
-protein sequences. Common manipulations of FASTA/Q file include converting,
-searching, filtering, deduplication, splitting, shuffling, and sampling.
-Existing tools only implement some of these manipulations,
-and not particularly efficiently, and some are only available for certain
-operating systems. Furthermore, the complicated installation process of
-required packages and running environments can render these programs less
-user friendly.</p>
-<p>This project describes a cross-platform ultrafast comprehensive
-toolkit for FASTA/Q processing. SeqKit provides executable binary files for
-all major operating systems, including Windows, Linux, and Mac OS X, and can
-be directly used without any dependencies or pre-configurations.
-SeqKit demonstrates competitive performance in execution time and memory
-usage compared to similar tools. The efficiency and usability of SeqKit
-enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <h2 id="features">Features</h2>
 <ul>
 <li><strong>Cross-platform</strong> (Linux/Windows/Mac OS X/OpenBSD/FreeBSD,
