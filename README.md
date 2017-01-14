@@ -1,29 +1,44 @@
 # SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
 
-**Documents:** [http://bioinf.shenwei.me/seqkit](http://bioinf.shenwei.me/seqkit)
+- **Documents:** [http://bioinf.shenwei.me/seqkit](http://bioinf.shenwei.me/seqkit)
 ([**Usage**](http://bioinf.shenwei.me/seqkit/usage/),
 [**Tutorial**](http://bioinf.shenwei.me/seqkit/tutorial/),
 [**Benchmark**](http://bioinf.shenwei.me/seqkit/benchmark/)
 and [**Development Notes**](http://bioinf.shenwei.me/seqkit/note/))
-
-
-**Source code:** [https://github.com/shenwei356/seqkit](https://github.com/shenwei356/seqkit)
+- **Source code:** [https://github.com/shenwei356/seqkit](https://github.com/shenwei356/seqkit)
 [![GitHub stars](https://img.shields.io/github/stars/shenwei356/seqkit.svg?style=social&label=Star&?maxAge=2592000)](https://github.com/shenwei356/seqkit)
 [![license](https://img.shields.io/github/license/shenwei356/seqkit.svg?maxAge=2592000)](https://github.com/shenwei356/seqkit/blob/master/LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/shenwei356/seqkit)](https://goreportcard.com/report/github.com/shenwei356/seqkit)
-
-**Latest version:** [![Latest Version](https://img.shields.io/github/release/shenwei356/seqkit.svg?style=flat?maxAge=86400)](https://github.com/shenwei356/seqkit/releases)
+- **Latest version:** [![Latest Version](https://img.shields.io/github/release/shenwei356/seqkit.svg?style=flat?maxAge=86400)](https://github.com/shenwei356/seqkit/releases)
 [![Github Releases](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/total.svg?maxAge=3600)](http://bioinf.shenwei.me/seqkit/download/)
+- **[Citation](/#citation):** [![doi](https://img.shields.io/badge/doi-10.1371%2Fjournal.pone.0163962-blue.svg?style=flat)](https://doi.org/10.1371/journal.pone.0163962)
 
-**[Citation](/#citation):** [![doi](https://img.shields.io/badge/doi-10.1371%2Fjournal.pone.0163962-blue.svg?style=flat)](https://doi.org/10.1371/journal.pone.0163962)
 
+## Introduction
+
+FASTA and FASTQ are basic and ubiquitous formats for storing nucleotide and
+protein sequences. Common manipulations of FASTA/Q file include converting,
+searching, filtering, deduplication, splitting, shuffling, and sampling.
+Existing tools only implement some of these manipulations,
+and not particularly efficiently, and some are only available for certain
+operating systems. Furthermore, the complicated installation process of
+required packages and running environments can render these programs less
+user friendly.
+
+This project describes a cross-platform ultrafast comprehensive
+toolkit for FASTA/Q processing. SeqKit provides executable binary files for
+all major operating systems, including Windows, Linux, and Mac OS X, and can
+be directly used without any dependencies or pre-configurations.
+SeqKit demonstrates competitive performance in execution time and memory
+usage compared to similar tools. The efficiency and usability of SeqKit
+enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+## Table of Contents
 
-- [Introduction](#introduction)
 - [Features](#features)
     - [Features comparison](#features-comparison)
 - [Installation](#installation)
@@ -48,25 +63,6 @@ and [**Development Notes**](http://bioinf.shenwei.me/seqkit/note/))
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-
-## Introduction
-
-FASTA and FASTQ are basic and ubiquitous formats for storing nucleotide and
-protein sequences. Common manipulations of FASTA/Q file include converting,
-searching, filtering, deduplication, splitting, shuffling, and sampling.
-Existing tools only implement some of these manipulations,
-and not particularly efficiently, and some are only available for certain
-operating systems. Furthermore, the complicated installation process of
-required packages and running environments can render these programs less
-user friendly.
-
-This project describes a cross-platform ultrafast comprehensive
-toolkit for FASTA/Q processing. SeqKit provides executable binary files for
-all major operating systems, including Windows, Linux, and Mac OS X, and can
-be directly used without any dependencies or pre-configurations.
-SeqKit demonstrates competitive performance in execution time and memory
-usage compared to similar tools. The efficiency and usability of SeqKit
-enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 ## Features
 
