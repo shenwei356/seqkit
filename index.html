@@ -211,6 +211,42 @@ and <a href="http://bioinf.shenwei.me/seqkit/note/"><strong>Development Notes</s
 <p><strong>Latest version:</strong> <a href="https://github.com/shenwei356/seqkit/releases"><img alt="Latest Version" src="https://img.shields.io/github/release/shenwei356/seqkit.svg?style=flat?maxAge=86400" /></a>
 <a href="http://bioinf.shenwei.me/seqkit/download/"><img alt="Github Releases" src="https://img.shields.io/github/downloads/shenwei356/seqkit/latest/total.svg?maxAge=3600" /></a></p>
 <p><strong><a href="./#citation">Citation</a>:</strong> <a href="https://doi.org/10.1371/journal.pone.0163962"><img alt="doi" src="https://img.shields.io/badge/doi-10.1371%2Fjournal.pone.0163962-blue.svg?style=flat" /></a></p>
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#features">Features</a><ul>
+<li><a href="#features-comparison">Features comparison</a></li>
+</ul>
+</li>
+<li><a href="#installation">Installation</a><ul>
+<li><a href="#method-1-download-binaries">Method 1: Download binaries</a></li>
+<li><a href="#method-2-install-using-conda">Method 2: Install using conda</a></li>
+<li><a href="#method-3-for-go-developer">Method 3: For Go developer</a></li>
+</ul>
+</li>
+<li><a href="#subcommands">Subcommands</a></li>
+<li><a href="#technical-details-and-guides-for-use">Technical details and guides for use</a><ul>
+<li><a href="#fastaq-format-parsing">FASTA/Q format parsing</a></li>
+<li><a href="#sequence-formats-and-types">Sequence formats and types</a></li>
+<li><a href="#sequence-id">Sequence ID</a></li>
+<li><a href="#fasta-index">FASTA index</a></li>
+<li><a href="#parallelization-of-cpu-intensive-jobs">Parallelization of CPU intensive jobs</a></li>
+<li><a href="#memory-occupation">Memory occupation</a></li>
+<li><a href="#reproducibility">Reproducibility</a></li>
+</ul>
+</li>
+<li><a href="#usage--examples">Usage &amp;&amp; Examples</a></li>
+<li><a href="#benchmark">Benchmark</a></li>
+<li><a href="#citation">Citation</a></li>
+<li><a href="#acknowledgements">Acknowledgements</a></li>
+<li><a href="#contact">Contact</a></li>
+<li><a href="#license">License</a></li>
+</ul>
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 <h2 id="introduction">Introduction</h2>
 <p>FASTA and FASTQ are basic and ubiquitous formats for storing nucleotide and
 protein sequences. Common manipulations of FASTA/Q file include converting,
@@ -509,9 +545,10 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <p><code>SeqKit</code> is implemented in <a href="https://golang.org/">Go</a> programming language,
  executable binary files <strong>for most popular operating systems</strong> are freely available
   in <a href="https://github.com/shenwei356/seqkit/releases">release</a> page.</p>
+<h4 id="method-1-download-binaries">Method 1: Download binaries</h4>
 <p>Just <a href="https://github.com/shenwei356/seqkit/releases">download</a> compressed
 executable file of your operating system,
-and uncompress it with <code>tar -zxvf *.tar.gz</code> command or other tools.
+and decompress it with <code>tar -zxvf *.tar.gz</code> command or other tools.
 And then:</p>
 <ol>
 <li>
@@ -535,7 +572,10 @@ source ~/.bashrc
 <p><strong>For windows</strong>, just copy <code>seqkit.exe</code> to <code>C:\WINDOWS\system32</code>.</p>
 </li>
 </ol>
-<p>For Go developer, just one command:</p>
+<h4 id="method-2-install-using-conda">Method 2: Install using conda</h4>
+<pre><code>conda install seqkit
+</code></pre>
+<h4 id="method-3-for-go-developer">Method 3: For Go developer</h4>
 <pre><code>go get -u github.com/shenwei356/seqkit/seqkit
 </code></pre>
 <h2 id="subcommands">Subcommands</h2>

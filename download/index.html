@@ -278,9 +278,10 @@
 </tbody>
 </table>
 <h2 id="installation">Installation</h2>
+<h4 id="method-1-download-binaries">Method 1: Download binaries</h4>
 <p>Just <a href="https://github.com/shenwei356/seqkit/releases">download</a> compressed
 executable file of your operating system,
-and uncompress it with <code>tar -zxvf xxxx.tar.gz</code> command or other tools.
+and decompress it with <code>tar -zxvf *.tar.gz</code> command or other tools.
 And then:</p>
 <ol>
 <li>
@@ -294,7 +295,7 @@ And then:</p>
 <li>
 <p>Or add the current directory of the executable file to environment variable
 <code>PATH</code>:</p>
-<pre><code>echo export PATH=\"$(pwd)\":\$PATH &gt;&gt; ~/.bashrc
+<pre><code>echo export PATH=\$PATH:\"$(pwd)\" &gt;&gt; ~/.bashrc
 source ~/.bashrc
 </code></pre>
 </li>
@@ -304,7 +305,10 @@ source ~/.bashrc
 <p><strong>For windows</strong>, just copy <code>seqkit.exe</code> to <code>C:\WINDOWS\system32</code>.</p>
 </li>
 </ol>
-<p>For Go developer, just one command:</p>
+<h4 id="method-2-install-using-conda">Method 2: Install using conda</h4>
+<pre><code>conda install seqkit
+</code></pre>
+<h4 id="method-3-for-go-developer">Method 3: For Go developer</h4>
 <pre><code>go get -u github.com/shenwei356/seqkit/seqkit
 </code></pre>
 <h2 id="release-history">Release History</h2>
