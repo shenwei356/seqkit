@@ -8,7 +8,7 @@
         <meta name="author" content="Wei Shen">
         
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>FAQ - SeqKit - Ultrafast FASTA/Q kit</title>
+        <title>FAQ (New!) - SeqKit - Ultrafast FASTA/Q kit</title>
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.0.3.css" rel="stylesheet">
         <link rel="stylesheet" href="../css/highlight.css">
@@ -82,7 +82,7 @@
                     
                         
 <li class="active">
-    <a href="./">FAQ</a>
+    <a href="./">FAQ (New!)</a>
 </li>
 
                     
@@ -192,6 +192,8 @@
         
             <li><a href="#how-to-extract-paired-reads-from-two-paired-end-reads-file">How to extract paired reads from two paired-end reads file?</a></li>
         
+            <li><a href="#how-to-concatenate-two-fasta-sequences-in-to-one">How to concatenate two FASTA sequences in to one?</a></li>
+        
     
     
     </ul>
@@ -212,6 +214,7 @@ usage but you can always use it on the other type as well.</p>
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 <ul>
+<li><a href="#example-data">Example data</a></li>
 <li><a href="#how-to-produce-an-overview-of-fastq-files">How to produce an overview of FASTQ files?</a></li>
 <li><a href="#how-to-get-gc-content-of-every-sequence-in-fastaq-file">How to get GC content of every sequence in FASTA/Q file?</a></li>
 <li><a href="#how-to-extract-sequences-subset-from-fastaq-file-with-nameid-list-file">How to extract sequences subset from FASTA/Q file with name/ID list file?</a></li>
@@ -222,6 +225,7 @@ usage but you can always use it on the other type as well.</p>
 <li><a href="#how-to-split-fasta-sequences-according-to-information-in-header">How to split FASTA sequences according to information in header?</a></li>
 <li><a href="#how-to-search-and-replace-fasta-header-with-known-character-strings-from-a-text-file">How to search and replace FASTA header with known character strings from a text file?</a></li>
 <li><a href="#how-to-extract-paired-reads-from-two-paired-end-reads-file">How to extract paired reads from two paired-end reads file?</a></li>
+<li><a href="#how-to-concatenate-two-fasta-sequences-in-to-one">How to concatenate two FASTA sequences in to one?</a></li>
 </ul>
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -450,6 +454,58 @@ can sort large file using disk, so temporary directory is set as
 current directory by option <code>-T .</code>.</p>
 <pre><code>$ gzip -d -c read_1.f.fq.gz | seqkit fx2tab | sort -k1,1 -T . | seqkit tab2fx | gzip -c &gt; read_1.f.sorted.fq.gz
 $ gzip -d -c read_2.f.fq.gz | seqkit fx2tab | sort -k1,1 -T . | seqkit tab2fx | gzip -c &gt; read_2.f.sorted.fq.gz
+</code></pre>
+<h2 id="how-to-concatenate-two-fasta-sequences-in-to-one">How to concatenate two FASTA sequences in to one?</h2>
+<p>Related posts: <a href="https://www.biostars.org/p/231806/">Combining two fasta sequences into one</a></p>
+<p>Data (not in same order):</p>
+<pre><code>$ cat 1.fa
+&gt;seq1
+aaaaa
+&gt;seq2
+ccccc
+&gt;seq3
+ggggg
+
+$ cat 2.fa
+&gt;seq3
+TTTTT
+&gt;seq2
+GGGGG
+&gt;seq1
+CCCCC
+</code></pre>
+<p><strong>Step 1</strong>. Convert FASTA to tab-delimited (3 columns, the 3rd column is blank (no quality for FASTA)) file:</p>
+<pre><code>$ seqkit fx2tab 1.fa &gt; 1.fa.tsv
+$ seqkit fx2tab 2.fa &gt; 2.fa.tsv
+
+$ cat -A 1.fa.tsv 
+seq1^Iaaaaa^I$
+seq2^Iccccc^I$
+seq3^Iggggg^I$
+</code></pre>
+<p><strong>Step 2</strong>. Merge  two table files:</p>
+<pre><code>$ csvtk join -H -t 1.fa.tsv 2.fa.tsv | cat -A
+seq1^Iaaaaa^I^ICCCCC^I$
+seq2^Iccccc^I^IGGGGG^I$
+seq3^Iggggg^I^ITTTTT^I$
+</code></pre>
+<p><strong>Step 3</strong>. Note that there are two TAB between the two sequences, so we can remove them to join the sequences</p>
+<pre><code>$ csvtk join -H -t 1.fa.tsv 2.fa.tsv | sed 's/\t\t//'
+seq1    aaaaaCCCCC
+seq2    cccccGGGGG
+seq3    gggggTTTTT
+</code></pre>
+<p><strong>Step 4</strong>. Convert tab-delimited file back to FASTA file:</p>
+<pre><code>$ csvtk join -H -t 1.fa.tsv 2.fa.tsv | sed 's/\t\t//' | seqkit tab2fx
+&gt;seq1
+aaaaaCCCCC
+&gt;seq2
+cccccGGGGG
+&gt;seq3
+gggggTTTTT
+</code></pre>
+<p>All in one command:</p>
+<pre><code>$ csvtk join -H -t &lt;(seqkit fx2tab 1.fa) &lt;(seqkit fx2tab 2.fa) | sed 's/\t\t//' | seqkit tab2fx
 </code></pre></div>
         </div>
 
