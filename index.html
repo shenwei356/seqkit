@@ -577,7 +577,11 @@ source ~/.bashrc
 </li>
 </ol>
 <h4 id="method-2-install-using-conda">Method 2: Install using conda</h4>
-<pre><code>conda install seqkit
+<pre><code>conda config --add channels conda-forge
+conda config --add channels defaults
+conda config --add channels r
+conda config --add channels bioconda
+conda install seqkit
 </code></pre>
 <h4 id="method-3-for-go-developer">Method 3: For Go developer</h4>
 <pre><code>go get -u github.com/shenwei356/seqkit/seqkit
