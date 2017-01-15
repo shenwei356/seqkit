@@ -3,6 +3,7 @@
 
 - **Documents:** [http://bioinf.shenwei.me/seqkit](http://bioinf.shenwei.me/seqkit)
 ([**Usage**](http://bioinf.shenwei.me/seqkit/usage/),
+[**FAQ (New!)**](http://bioinf.shenwei.me/seqkit/faq/),
 [**Tutorial**](http://bioinf.shenwei.me/seqkit/tutorial/),
 [**Benchmark**](http://bioinf.shenwei.me/seqkit/benchmark/)
 and [**Development Notes**](http://bioinf.shenwei.me/seqkit/note/))

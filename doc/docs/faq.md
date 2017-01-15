@@ -16,6 +16,8 @@ usage but you can always use it on the other type as well.
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
+- [Example data](#example-data)
 - [How to produce an overview of FASTQ files?](#how-to-produce-an-overview-of-fastq-files)
 - [How to get GC content of every sequence in FASTA/Q file?](#how-to-get-gc-content-of-every-sequence-in-fastaq-file)
 - [How to extract sequences subset from FASTA/Q file with name/ID list file?](#how-to-extract-sequences-subset-from-fastaq-file-with-nameid-list-file)
@@ -26,6 +28,7 @@ usage but you can always use it on the other type as well.
 - [How to split FASTA sequences according to information in header?](#how-to-split-fasta-sequences-according-to-information-in-header)
 - [How to search and replace FASTA header with known character strings from a text file?](#how-to-search-and-replace-fasta-header-with-known-character-strings-from-a-text-file)
 - [How to extract paired reads from two paired-end reads file?](#how-to-extract-paired-reads-from-two-paired-end-reads-file)
+- [How to concatenate two FASTA sequences in to one?](#how-to-concatenate-two-fasta-sequences-in-to-one)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -304,3 +307,63 @@ current directory by option `-T .`.
 
     $ gzip -d -c read_1.f.fq.gz | seqkit fx2tab | sort -k1,1 -T . | seqkit tab2fx | gzip -c > read_1.f.sorted.fq.gz
     $ gzip -d -c read_2.f.fq.gz | seqkit fx2tab | sort -k1,1 -T . | seqkit tab2fx | gzip -c > read_2.f.sorted.fq.gz
+
+## How to concatenate two FASTA sequences in to one?
+
+Related posts: [Combining two fasta sequences into one](https://www.biostars.org/p/231806/)
+
+Data (not in same order):
+
+    $ cat 1.fa
+    >seq1
+    aaaaa
+    >seq2
+    ccccc
+    >seq3
+    ggggg
+
+    $ cat 2.fa
+    >seq3
+    TTTTT
+    >seq2
+    GGGGG
+    >seq1
+    CCCCC
+
+**Step 1**. Convert FASTA to tab-delimited (3 columns, the 3rd column is blank (no quality for FASTA)) file:
+
+    $ seqkit fx2tab 1.fa > 1.fa.tsv
+    $ seqkit fx2tab 2.fa > 2.fa.tsv
+
+    $ cat -A 1.fa.tsv 
+    seq1^Iaaaaa^I$
+    seq2^Iccccc^I$
+    seq3^Iggggg^I$
+
+**Step 2**. Merge  two table files:
+
+    $ csvtk join -H -t 1.fa.tsv 2.fa.tsv | cat -A
+    seq1^Iaaaaa^I^ICCCCC^I$
+    seq2^Iccccc^I^IGGGGG^I$
+    seq3^Iggggg^I^ITTTTT^I$
+
+**Step 3**. Note that there are two TAB between the two sequences, so we can remove them to join the sequences
+
+    $ csvtk join -H -t 1.fa.tsv 2.fa.tsv | sed 's/\t\t//'
+    seq1    aaaaaCCCCC
+    seq2    cccccGGGGG
+    seq3    gggggTTTTT
+
+**Step 4**. Convert tab-delimited file back to FASTA file:
+
+    $ csvtk join -H -t 1.fa.tsv 2.fa.tsv | sed 's/\t\t//' | seqkit tab2fx
+    >seq1
+    aaaaaCCCCC
+    >seq2
+    cccccGGGGG
+    >seq3
+    gggggTTTTT
+
+All in one command:
+
+    $ csvtk join -H -t <(seqkit fx2tab 1.fa) <(seqkit fx2tab 2.fa) | sed 's/\t\t//' | seqkit tab2fx
