@@ -15,6 +15,8 @@ and [**Development Notes**](http://bioinf.shenwei.me/seqkit/note/))
 - **Latest version:** [![Latest Version](https://img.shields.io/github/release/shenwei356/seqkit.svg?style=flat?maxAge=86400)](https://github.com/shenwei356/seqkit/releases)
 [![Github Releases](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/total.svg?maxAge=3600)](http://bioinf.shenwei.me/seqkit/download/)
 [![Cross-platform](https://img.shields.io/badge/platform-any-ec2eb4.svg?style=flat)](http://bioinf.shenwei.me/seqkit/download/)
+[![Install-with-conda](	https://anaconda.org/bioconda/seqkit/badges/installer/conda.svg)](http://bioinf.shenwei.me/seqkit/download/)
+[![Anaconda Cloud](	https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit)
 - **[Citation](/#citation):** [![doi](https://img.shields.io/badge/doi-10.1371%2Fjournal.pone.0163962-blue.svg?style=flat)](https://doi.org/10.1371/journal.pone.0163962)
 
 
@@ -46,7 +48,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
     - [Features comparison](#features-comparison)
 - [Installation](#installation)
     - [Method 1: Download binaries](#method-1-download-binaries)
-    - [Method 2: Install using conda](#method-2-install-using-conda)
+    - [Method 2: Install via conda](#method-2-install-via-conda)
     - [Method 3: For Go developer](#method-3-for-go-developer)
 - [Subcommands](#subcommands)
 - [Technical details and guides for use](#technical-details-and-guides-for-use)
@@ -147,7 +149,7 @@ And then:
 
 1. **For windows**, just copy `seqkit.exe` to `C:\WINDOWS\system32`.
 
-#### Method 2: Install using conda
+#### Method 2: Install via conda
 
     conda install -c bioconda seqkit
 
