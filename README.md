@@ -120,42 +120,6 @@ Categories          |Features               |seqkit  |fasta_utilities|fastx_tool
 
 **Note 2**: See [usage](http://bioinf.shenwei.me/seqkit/usage/) for detailed options of seqkit.
 
-## Installation
-
-Go to [Download Page](http://bioinf.shenwei.me/seqkit/download) for more download options and changelogs.
-
-`SeqKit` is implemented in [Go](https://golang.org/) programming language,
- executable binary files **for most popular operating systems** are freely available
-  in [release](https://github.com/shenwei356/seqkit/releases) page.
-
-#### Method 1: Download binaries
-
-Just [download](https://github.com/shenwei356/seqkit/releases) compressed
-executable file of your operating system,
-and decompress it with `tar -zxvf *.tar.gz` command or other tools.
-And then:
-
-1. **For Linux-like systems**
-    1. If you have root privilege simply copy it to `/usr/local/bin`:
-
-            sudo cp seqkit /usr/local/bin/
-
-    1. Or add the current directory of the executable file to environment variable
-    `PATH`:
-
-            echo export PATH=\$PATH:\"$(pwd)\" >> ~/.bashrc
-            source ~/.bashrc
-
-
-1. **For windows**, just copy `seqkit.exe` to `C:\WINDOWS\system32`.
-
-#### Method 2: Install via conda [![Install-with-conda](https://anaconda.org/bioconda/seqkit/badges/installer/conda.svg)](http://bioinf.shenwei.me/seqkit/download/) [![Anaconda Cloud](https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit) [![downloads](https://anaconda.org/bioconda/seqkit/badges/downloads.svg)](https://anaconda.org/bioconda/seqkit)
-
-    conda install -c bioconda seqkit
-
-#### Method 3: For Go developer
-
-    go get -u github.com/shenwei356/seqkit/seqkit
 
 ## Subcommands
 
@@ -202,6 +166,42 @@ And then:
 
 - `version`   print version information and check for update
 
+## Installation
+
+Go to [Download Page](http://bioinf.shenwei.me/seqkit/download) for more download options and changelogs.
+
+`SeqKit` is implemented in [Go](https://golang.org/) programming language,
+ executable binary files **for most popular operating systems** are freely available
+  in [release](https://github.com/shenwei356/seqkit/releases) page.
+
+#### Method 1: Download binaries
+
+Just [download](https://github.com/shenwei356/seqkit/releases) compressed
+executable file of your operating system,
+and decompress it with `tar -zxvf *.tar.gz` command or other tools.
+And then:
+
+1. **For Linux-like systems**
+    1. If you have root privilege simply copy it to `/usr/local/bin`:
+
+            sudo cp seqkit /usr/local/bin/
+
+    1. Or add the current directory of the executable file to environment variable
+    `PATH`:
+
+            echo export PATH=\$PATH:\"$(pwd)\" >> ~/.bashrc
+            source ~/.bashrc
+
+
+1. **For windows**, just copy `seqkit.exe` to `C:\WINDOWS\system32`.
+
+#### Method 2: Install via conda [![Install-with-conda](https://anaconda.org/bioconda/seqkit/badges/installer/conda.svg)](http://bioinf.shenwei.me/seqkit/download/) [![Anaconda Cloud](https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit) [![downloads](https://anaconda.org/bioconda/seqkit/badges/downloads.svg)](https://anaconda.org/bioconda/seqkit)
+
+    conda install -c bioconda seqkit
+
+#### Method 3: For Go developer
+
+    go get -u github.com/shenwei356/seqkit/seqkit
 
 ## Technical details and guides for use
 

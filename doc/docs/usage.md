@@ -1,5 +1,50 @@
 # Usage and Examples
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Table of Contents
+
+- [Technical details and guides for use](#technical-details-and-guides-for-use)
+- [seqkit](#seqkit)
+
+**Sequence and subsequence**
+
+- [seq](#seq)
+- [subseq](#subseq)
+- [sliding](#sliding)
+- [stat](#stat)
+
+**Format conversion**
+
+- [fq2fa](#fq2fa)
+- [fx2tab & tab2fx](#fx2tab--tab2fx)
+
+**Searching**
+
+- [grep](#grep)
+- [locate](#locate)
+
+**Set operations**
+
+- [rmdup](#rmdup)
+- [common](#common)
+- [split](#split)
+- [sample](#sample)
+- [head](#head)
+
+**Edit**
+
+- [replace](#replace)
+- [rename](#rename)
+
+**Ordering**
+
+- [shuffle](#shuffle)
+- [sort](#sort)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+
 ## Technical details and guides for use
 
 ### FASTA/Q format parsing
@@ -734,8 +779,8 @@ Usage:
 Flags:
   -d, --degenerate                pattern/motif contains degenerate base
   -i, --ignore-case               ignore case
-  -P, --only-positive-strand      only search at positive strand
-  -p, --pattern value             search pattern/motif (multiple values supported) (default [])
+  -P, --only-positive-strand      only search on positive strand
+  -p, --pattern stringSlice       pattern/motif (multiple values supported. use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
   -f, --pattern-file string       pattern/motif file (FASTA format)
   -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
 
@@ -962,7 +1007,7 @@ Usage:
 Flags:
   -n, --number int         sample by number (result may not exactly match)
   -p, --proportion float   sample by proportion
-  -s, --rand-seed int      rand seed for shuffle (default 11)
+  -s, --rand-seed int      rand seed (default 11)
   -2, --two-pass           2-pass mode read files twice to lower memory usage. Not allowed when reading from stdin
 
 ```
@@ -1155,6 +1200,40 @@ Examples
         CCCCAAAACCCCATGGCATCATTCA
         >seq3 Hello
         CCCCAAAACCCCATGTTGCTACTAG
+
+## rename
+
+Usage
+
+```
+rename duplicated IDs
+
+Usage:
+  seqkit rename [flags]
+
+Flags:
+  -n, --by-name   check duplicated by full name instead of just id
+
+```
+
+Examples
+
+```
+$ echo -e ">a comment\nacgt\n>b comment of b\nACTG\n>a comment\naaaa"  
+>a comment
+acgt
+>b comment of b
+ACTG
+>a comment
+aaaa
+$ echo -e ">a comment\nacgt\n>b comment of b\nACTG\n>a comment\naaaa" | seqkit rename
+>a comment
+acgt
+>b comment of b
+ACTG
+>a_2 a comment
+aaaa
+```
 
 ## shuffle
 

@@ -66,7 +66,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
 
 		if len(pattern) == 0 && patternFile == "" {
-			checkError(fmt.Errorf("one of flags -p (--pattern) and -f ()--pattern-file) needed"))
+			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
 		}
 
 		files := getFileList(args)
