@@ -158,20 +158,21 @@ var seqCmd = &cobra.Command{
 					}
 				}
 
+				sequence = record.Seq
+				if reverse {
+					sequence = sequence.ReverseInplace()
+				}
+				if complement {
+					if !config.Quiet && record.Seq.Alphabet == seq.Protein || record.Seq.Alphabet == seq.Unlimit {
+						log.Warning("Complement does no take effect on protein/unlimit sequence")
+					}
+					sequence = sequence.ComplementInplace()
+				}
+				if removeGaps {
+					sequence = sequence.RemoveGaps(gapLetters)
+				}
+
 				if printSeq {
-					sequence = record.Seq
-					if reverse {
-						sequence = sequence.ReverseInplace()
-					}
-					if complement {
-						if !config.Quiet && record.Seq.Alphabet == seq.Protein || record.Seq.Alphabet == seq.Unlimit {
-							log.Warning("Complement does no take effect on protein/unlimit sequence")
-						}
-						sequence = sequence.ComplementInplace()
-					}
-					if removeGaps {
-						sequence = sequence.RemoveGaps(gapLetters)
-					}
 					if dna2rna {
 						ab := fastxReader.Alphabet()
 						if ab == seq.RNA || ab == seq.RNAredundant {
@@ -230,19 +231,6 @@ var seqCmd = &cobra.Command{
 				}
 
 				if printQual {
-					sequence = record.Seq
-					if reverse {
-						sequence = sequence.ReverseInplace()
-					}
-					if complement {
-						if !config.Quiet && record.Seq.Alphabet == seq.Protein || record.Seq.Alphabet == seq.Unlimit {
-							log.Warning("Complement does no take effect on protein/unlimit sequence")
-						}
-						sequence = sequence.ComplementInplace()
-					}
-					if removeGaps {
-						sequence = sequence.RemoveGaps(gapLetters)
-					}
 					if !onlyQual {
 						outfh.WriteString("+\n")
 					}

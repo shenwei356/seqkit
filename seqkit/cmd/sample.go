@@ -66,10 +66,10 @@ var sampleCmd = &cobra.Command{
 		}
 
 		if number < 0 {
-			checkError(fmt.Errorf("value of --number and should be greater than 0"))
+			checkError(fmt.Errorf("value of -n (--number) and should be greater than 0"))
 		}
 		if proportion < 0 || proportion > 1 {
-			checkError(fmt.Errorf("value of --propotion (%f) should be in range of [0, 1]", proportion))
+			checkError(fmt.Errorf("value of -p (--proportion) (%f) should be in range of [0, 1]", proportion))
 		}
 
 		outfh, err := xopen.Wopen(outFile)
@@ -183,7 +183,7 @@ var sampleCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(sampleCmd)
 
-	sampleCmd.Flags().Int64P("rand-seed", "s", 11, "rand seed for shuffle")
+	sampleCmd.Flags().Int64P("rand-seed", "s", 11, "rand seed")
 	sampleCmd.Flags().Int64P("number", "n", 0, "sample by number (result may not exactly match)")
 	sampleCmd.Flags().Float64P("proportion", "p", 0, "sample by proportion")
 	sampleCmd.Flags().BoolP("two-pass", "2", false, "2-pass mode read files twice to lower memory usage. Not allowed when reading from stdin")
