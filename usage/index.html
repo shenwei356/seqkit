@@ -170,6 +170,8 @@
     
         <li class="main active"><a href="#usage-and-examples">Usage and Examples</a></li>
         
+            <li><a href="#table-of-contents">Table of Contents</a></li>
+        
             <li><a href="#technical-details-and-guides-for-use">Technical details and guides for use</a></li>
         
             <li><a href="#seqkit">seqkit</a></li>
@@ -202,6 +204,8 @@
         
             <li><a href="#replace">replace</a></li>
         
+            <li><a href="#rename">rename</a></li>
+        
             <li><a href="#shuffle">shuffle</a></li>
         
             <li><a href="#sort">sort</a></li>
@@ -213,6 +217,52 @@
                 <div class="col-md-9" role="main">
 
 <h1 id="usage-and-examples">Usage and Examples</h1>
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#technical-details-and-guides-for-use">Technical details and guides for use</a></li>
+<li><a href="#seqkit">seqkit</a></li>
+</ul>
+<p><strong>Sequence and subsequence</strong></p>
+<ul>
+<li><a href="#seq">seq</a></li>
+<li><a href="#subseq">subseq</a></li>
+<li><a href="#sliding">sliding</a></li>
+<li><a href="#stat">stat</a></li>
+</ul>
+<p><strong>Format conversion</strong></p>
+<ul>
+<li><a href="#fq2fa">fq2fa</a></li>
+<li><a href="#fx2tab--tab2fx">fx2tab &amp; tab2fx</a></li>
+</ul>
+<p><strong>Searching</strong></p>
+<ul>
+<li><a href="#grep">grep</a></li>
+<li><a href="#locate">locate</a></li>
+</ul>
+<p><strong>Set operations</strong></p>
+<ul>
+<li><a href="#rmdup">rmdup</a></li>
+<li><a href="#common">common</a></li>
+<li><a href="#split">split</a></li>
+<li><a href="#sample">sample</a></li>
+<li><a href="#head">head</a></li>
+</ul>
+<p><strong>Edit</strong></p>
+<ul>
+<li><a href="#replace">replace</a></li>
+<li><a href="#rename">rename</a></li>
+</ul>
+<p><strong>Ordering</strong></p>
+<ul>
+<li><a href="#shuffle">shuffle</a></li>
+<li><a href="#sort">sort</a></li>
+</ul>
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 <h2 id="technical-details-and-guides-for-use">Technical details and guides for use</h2>
 <h3 id="fastaq-format-parsing">FASTA/Q format parsing</h3>
 <p>SeqKit uses author's lightweight and high-performance bioinformatics packages
@@ -942,8 +992,8 @@ Usage:
 Flags:
   -d, --degenerate                pattern/motif contains degenerate base
   -i, --ignore-case               ignore case
-  -P, --only-positive-strand      only search at positive strand
-  -p, --pattern value             search pattern/motif (multiple values supported) (default [])
+  -P, --only-positive-strand      only search on positive strand
+  -p, --pattern stringSlice       pattern/motif (multiple values supported. use double quotation marks for patterns containing comma, e.g., -p '&quot;A{2,}&quot;')
   -f, --pattern-file string       pattern/motif file (FASTA format)
   -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
 
@@ -1166,7 +1216,7 @@ Usage:
 Flags:
   -n, --number int         sample by number (result may not exactly match)
   -p, --proportion float   sample by proportion
-  -s, --rand-seed int      rand seed for shuffle (default 11)
+  -s, --rand-seed int      rand seed (default 11)
   -2, --two-pass           2-pass mode read files twice to lower memory usage. Not allowed when reading from stdin
 
 </code></pre>
@@ -1365,6 +1415,35 @@ CCCCAAAACCCCATGTTGCTACTAG
 </code></pre>
 </li>
 </ol>
+<h2 id="rename">rename</h2>
+<p>Usage</p>
+<pre><code>rename duplicated IDs
+
+Usage:
+  seqkit rename [flags]
+
+Flags:
+  -n, --by-name   check duplicated by full name instead of just id
+
+</code></pre>
+
+<p>Examples</p>
+<pre><code>$ echo -e &quot;&gt;a comment\nacgt\n&gt;b comment of b\nACTG\n&gt;a comment\naaaa&quot;  
+&gt;a comment
+acgt
+&gt;b comment of b
+ACTG
+&gt;a comment
+aaaa
+$ echo -e &quot;&gt;a comment\nacgt\n&gt;b comment of b\nACTG\n&gt;a comment\naaaa&quot; | seqkit rename
+&gt;a comment
+acgt
+&gt;b comment of b
+ACTG
+&gt;a_2 a comment
+aaaa
+</code></pre>
+
 <h2 id="shuffle">shuffle</h2>
 <p>Usage</p>
 <pre><code>shuffle sequences.
