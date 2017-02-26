@@ -46,11 +46,11 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 - [Features](#features)
     - [Features comparison](#features-comparison)
+- [Subcommands](#subcommands)
 - [Installation](#installation)
     - [Method 1: Download binaries](#method-1-download-binaries)
     - [Method 2: Install via conda](#method-2-install-via-conda)
     - [Method 3: For Go developer](#method-3-for-go-developer)
-- [Subcommands](#subcommands)
 - [Technical details and guides for use](#technical-details-and-guides-for-use)
     - [FASTA/Q format parsing](#fastaq-format-parsing)
     - [Sequence formats and types](#sequence-formats-and-types)
