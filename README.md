@@ -49,7 +49,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - [Subcommands](#subcommands)
 - [Installation](#installation)
     - [Method 1: Download binaries](#method-1-download-binaries)
-    - [Method 2: Install via conda](#method-2-install-via-conda)
+    - [Method 2: Install via conda](#method-2-install-via-conda---)
     - [Method 3: For Go developer](#method-3-for-go-developer)
 - [Technical details and guides for use](#technical-details-and-guides-for-use)
     - [FASTA/Q format parsing](#fastaq-format-parsing)
