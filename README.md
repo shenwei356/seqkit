@@ -42,23 +42,11 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-## Table of Contents
 
 - [Features](#features)
-    - [Features comparison](#features-comparison)
 - [Subcommands](#subcommands)
 - [Installation](#installation)
-    - [Method 1: Download binaries](#method-1-download-binaries)
-    - [Method 2: Install via conda](#method-2-install-via-conda---)
-    - [Method 3: For Go developer](#method-3-for-go-developer)
 - [Technical details and guides for use](#technical-details-and-guides-for-use)
-    - [FASTA/Q format parsing](#fastaq-format-parsing)
-    - [Sequence formats and types](#sequence-formats-and-types)
-    - [Sequence ID](#sequence-id)
-    - [FASTA index](#fasta-index)
-    - [Parallelization of CPU intensive jobs](#parallelization-of-cpu-intensive-jobs)
-    - [Memory occupation](#memory-occupation)
-    - [Reproducibility](#reproducibility)
 - [Usage && Examples](#usage--examples)
 - [Benchmark](#benchmark)
 - [Citation](#citation)
