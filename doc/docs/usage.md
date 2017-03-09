@@ -281,20 +281,20 @@ Examples
     - By default, `seqkit seq` automatically detect the sequence type
 
             $ echo -e ">seq\nacgtryswkmbdhvACGTRYSWKMBDHV" | seqkit stats
-            file  format  type  num_seqs  sum_len  sum_gap  min_len  avg_len  max_len
-            -     FASTA   DNA          1       28        0       28       28       28
+            file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+            -     FASTA   DNA          1       28       28       28       28
 
             $ echo -e ">seq\nACGUN ACGUN" | seqkit stats
-            file  format  type  num_seqs  sum_len  sum_gap  min_len  avg_len  max_len
-            -     FASTA   RNA          1       11        1       11       11       11
+            file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+            -     FASTA   RNA          1       11       11       11       11
 
             $ echo -e ">seq\nabcdefghijklmnpqrstvwyz" | seqkit stats
-            file  format  type     num_seqs  sum_len  sum_gap  min_len  avg_len  max_len
-            -     FASTA   Protein         1       23        0       23       23       23
+            file  format  type     num_seqs  sum_len  min_len  avg_len  max_len
+            -     FASTA   Protein         1       23       23       23       23
 
             $ echo -e "@read\nACTGCN\n+\n@IICCG" | seqkit stats
-            file  format  type  num_seqs  sum_len  sum_gap  min_len  avg_len  max_len
-            -     FASTQ   DNA          1        6        0        6        6        6
+            file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+            -     FASTQ   DNA          1        6        6        6        6
 
     - You can also set sequence type by flag `-t` (`--seq-type`).
       But this only take effect on subcommands `seq` and `locate`.
@@ -360,16 +360,17 @@ Examples
 1. Filter by sequence length
 
         $ cat hairpin.fa | seqkit seq | seqkit stats
-        file  format  type  num_seqs    sum_len  sum_gap  min_len  avg_len  max_len
-        -     FASTA   RNA     28,645  2,949,871        0       39      103    2,354
+        file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
+        -     FASTA   RNA     28,645  2,949,871       39      103    2,354
 
         $ cat hairpin.fa | seqkit seq -m 100 | seqkit stats
-        file  format  type  num_seqs    sum_len  sum_gap  min_len  avg_len  max_len
-        -     FASTA   RNA     10,975  1,565,486        0      100    142.6    2,354
+        file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
+        -     FASTA   RNA     10,975  1,565,486      100    142.6    2,354
 
         $ cat hairpin.fa | seqkit seq -m 100 -M 1000 | seqkit stats
-        file  format  type  num_seqs    sum_len  sum_gap  min_len  avg_len  max_len
-        -     FASTA   RNA     10,972  1,560,270        0      100    142.2      938
+        file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
+        -     FASTA   RNA     10,972  1,560,270      100    142.2      938
+
 
 ## subseq
 
@@ -454,8 +455,8 @@ Examples
         $ seqkit subseq --gtf Homo_sapiens.GRCh38.84.gtf.gz --chr 1 --feature cds  hsa.fa > chr1.gtf.cds.fa
 
         $ seqkit stats chr1.gtf.cds.fa
-        file             format  type  num_seqs    sum_len  sum_gap  min_len  avg_len  max_len
-        chr1.gtf.cds.fa  FASTA   DNA     65,012  9,842,274        0        1    151.4   12,045
+        file             format  type  num_seqs    sum_len  min_len  avg_len  max_len
+        chr1.gtf.cds.fa  FASTA   DNA     65,012  9,842,274        1    151.4   12,045
 
 1. Get CDS and 3bp up-stream sequences
 
@@ -488,9 +489,9 @@ Examples
     Summary:
 
         $ seqkit stats chr1.gz.*.gz
-        file               seq_format   seq_type   num_seqs  sum_gap   min_len   avg_len     max_len
-        chr1.gz.fa         FASTA        DNA         231,974        0         1   3,089.5   1,551,957
-        chr1.gz.rmdup.fa   FASTA        DNA          90,914        0         1   6,455.8   1,551,957
+        file               seq_format   seq_type   num_seqs   min_len   avg_len     max_len
+        chr1.gz.fa         FASTA        DNA         231,974         1   3,089.5   1,551,957
+        chr1.gz.rmdup.fa   FASTA        DNA          90,914         1   6,455.8   1,551,957
 
 
 ## sliding
@@ -569,6 +570,11 @@ Usage:
 Aliases:
   stats, stat
 
+
+Flags:
+  -a, --all                  all statistics, including sum_gap, N50, L50
+  -G, --gap-letters string   gap letters (default "- ")
+
 ```
 
 Eexamples
@@ -576,11 +582,21 @@ Eexamples
 1. General use
 
         $ seqkit stats *.f{a,q}.gz
-        file           format  type  num_seqs    sum_len  sum_gap  min_len  avg_len  max_len
-        hairpin.fa.gz  FASTA   RNA     28,645  2,949,871        0       39      103    2,354
-        mature.fa.gz   FASTA   RNA     35,828    781,222        0       15     21.8       34
-        reads_1.fq.gz  FASTQ   DNA      2,500    567,516        0      226      227      229
-        reads_2.fq.gz  FASTQ   DNA      2,500    560,002        0      223      224      225
+        file           format  type  num_seqs    sum_len  min_len  avg_len  max_len
+        hairpin.fa.gz  FASTA   RNA     28,645  2,949,871       39      103    2,354
+        mature.fa.gz   FASTA   RNA     35,828    781,222       15     21.8       34
+        reads_1.fq.gz  FASTQ   DNA      2,500    567,516      226      227      229
+        reads_2.fq.gz  FASTQ   DNA      2,500    560,002      223      224      225
+
+1. Extra information
+
+        $ seqkit stats *.f{a,q}.gz -a
+        file           format  type  num_seqs    sum_len  min_len  avg_len  max_len  sum_gap  N50     L50
+        hairpin.fa.gz  FASTA   RNA     28,645  2,949,871       39      103    2,354        0  101  10,075
+        mature.fa.gz   FASTA   RNA     35,828    781,222       15     21.8       34        0   22  17,144
+        reads_1.fq.gz  FASTQ   DNA      2,500    567,516      226      227      229        0  227   1,250
+        reads_2.fq.gz  FASTQ   DNA      2,500    560,002      223      224      225        0  224   1,250
+
 
 ## fq2fa
 

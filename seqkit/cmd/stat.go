@@ -24,7 +24,9 @@ import (
 	"fmt"
 	"io"
 	"runtime"
+	"sort"
 
+	"github.com/cznic/sortutil"
 	"github.com/dustin/go-humanize"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
@@ -56,6 +58,7 @@ var statCmd = &cobra.Command{
 		if len(gapLetters) == 0 {
 			checkError(fmt.Errorf("value of flag -G (--gap-letters) should not be empty"))
 		}
+		all := getFlagBool(cmd, "all")
 
 		files := getFileList(args)
 
@@ -65,6 +68,8 @@ var statCmd = &cobra.Command{
 
 		var fastxReader *fastx.Reader
 		var num, l, lenMin, lenMax, lenSum, gapSum int64
+		var n50, sum, l50 int64
+		var lens sortutil.Int64Slice
 		var seqFormat, t string
 		statInfos := []statInfo{}
 		for _, file := range files {
@@ -73,6 +78,10 @@ var statCmd = &cobra.Command{
 
 			seqFormat = ""
 			num, lenMin, lenMax, lenSum, gapSum = 0, int64(^uint64(0)>>1), 0, 0, 0
+			n50, sum, l50 = 0, 0, 0
+			if all {
+				lens = make(sortutil.Int64Slice, 0, 1000)
+			}
 			for {
 				record, err := fastxReader.Read()
 				if err != nil {
@@ -92,6 +101,9 @@ var statCmd = &cobra.Command{
 					}
 				}
 				l = int64(len(record.Seq.Seq))
+				if all {
+					lens = append(lens, l)
+				}
 				lenSum += l
 				if l < lenMin {
 					lenMin = l
@@ -101,6 +113,7 @@ var statCmd = &cobra.Command{
 				}
 				gapSum += int64(byteutil.CountBytes(record.Seq.Seq, gapLetters))
 			}
+
 			if fastxReader.Alphabet() == seq.DNAredundant {
 				t = "DNA"
 			} else if fastxReader.Alphabet() == seq.RNAredundant {
@@ -109,43 +122,79 @@ var statCmd = &cobra.Command{
 				t = fmt.Sprintf("%s", fastxReader.Alphabet())
 			}
 
+			if all {
+				sort.Sort(lens)
+				for i := num - 1; i >= 0; i-- {
+					sum += lens[i]
+					if (sum << 1) >= lenSum {
+						n50 = lens[i]
+						l50 = num - i
+						break
+					}
+				}
+			}
+
 			if num == 0 {
 				statInfos = append(statInfos, statInfo{file, seqFormat, t,
 					num, lenSum, gapSum, lenMin,
-					0, lenMax})
+					0, lenMax, n50, l50})
 
 			} else {
 				statInfos = append(statInfos, statInfo{file, seqFormat, t,
 					num, lenSum, gapSum, lenMin,
-					math.Round(float64(lenSum)/float64(num), 1), lenMax})
+					math.Round(float64(lenSum)/float64(num), 1), lenMax, n50, l50})
 			}
 		}
 
 		// format output
-		tbl, err := prettytable.NewTable([]prettytable.Column{
+		columns := []prettytable.Column{
 			{Header: "file"},
 			{Header: "format"},
 			{Header: "type"},
 			{Header: "num_seqs", AlignRight: true},
 			{Header: "sum_len", AlignRight: true},
-			{Header: "sum_gap", AlignRight: true},
 			{Header: "min_len", AlignRight: true},
 			{Header: "avg_len", AlignRight: true},
-			{Header: "max_len", AlignRight: true}}...)
+			{Header: "max_len", AlignRight: true}}
+
+		if all {
+			columns = append(columns, []prettytable.Column{
+				{Header: "sum_gap", AlignRight: true},
+				{Header: "N50", AlignRight: true},
+				{Header: "L50", AlignRight: true},
+			}...)
+		}
+
+		tbl, err := prettytable.NewTable(columns...)
+
 		checkError(err)
 		tbl.Separator = "  "
 
 		for _, info := range statInfos {
-			tbl.AddRow(
-				info.file,
-				info.format,
-				info.t,
-				humanize.Comma(info.num),
-				humanize.Comma(info.lenSum),
-				humanize.Comma(info.gapSum),
-				humanize.Comma(info.lenMin),
-				humanize.Commaf(info.lenAvg),
-				humanize.Comma(info.lenMax))
+			if !all {
+				tbl.AddRow(
+					info.file,
+					info.format,
+					info.t,
+					humanize.Comma(info.num),
+					humanize.Comma(info.lenSum),
+					humanize.Comma(info.lenMin),
+					humanize.Commaf(info.lenAvg),
+					humanize.Comma(info.lenMax))
+			} else {
+				tbl.AddRow(
+					info.file,
+					info.format,
+					info.t,
+					humanize.Comma(info.num),
+					humanize.Comma(info.lenSum),
+					humanize.Comma(info.lenMin),
+					humanize.Commaf(info.lenAvg),
+					humanize.Comma(info.lenMax),
+					humanize.Comma(info.gapSum),
+					humanize.Comma(info.N50),
+					humanize.Comma(info.L50))
+			}
 		}
 		outfh.Write(tbl.Bytes())
 	},
@@ -161,10 +210,13 @@ type statInfo struct {
 	lenMin int64
 	lenAvg float64
 	lenMax int64
+	N50    int64
+	L50    int64
 }
 
 func init() {
 	RootCmd.AddCommand(statCmd)
 
 	statCmd.Flags().StringP("gap-letters", "G", "- ", "gap letters")
+	statCmd.Flags().BoolP("all", "a", false, "all statistics, including sum_gap, N50, L50")
 }
