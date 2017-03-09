@@ -65,6 +65,12 @@ var seqCmd = &cobra.Command{
 		rna2dna := getFlagBool(cmd, "rna2dna")
 		validateSeq := getFlagBool(cmd, "validate-seq")
 		validateSeqLength := getFlagValidateSeqLength(cmd, "validate-seq-length")
+		minLen := getFlagInt(cmd, "min-len")
+		maxLen := getFlagInt(cmd, "max-len")
+
+		if minLen >= 0 && maxLen >= 0 && minLen > maxLen {
+			checkError(fmt.Errorf("value of flag -m (--min-len) should be >= value of flag -M (--max-len)"))
+		}
 
 		seq.ValidateSeq = validateSeq
 		seq.ValidateWholeSeq = false
@@ -108,6 +114,14 @@ var seqCmd = &cobra.Command{
 					checkError(err)
 					break
 				}
+
+				if minLen >= 0 && len(record.Seq.Seq) < minLen {
+					continue
+				}
+				if maxLen >= 0 && len(record.Seq.Seq) > maxLen {
+					continue
+				}
+
 				if fastxReader.IsFastq {
 					config.LineWidth = 0
 				}
@@ -277,5 +291,6 @@ func init() {
 	seqCmd.Flags().BoolP("rna2dna", "", false, "RNA to DNA")
 	seqCmd.Flags().BoolP("validate-seq", "v", false, "validate bases according to the alphabet")
 	seqCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
-
+	seqCmd.Flags().IntP("min-len", "m", -1, "only print sequences longer than the minimum length (-1 for no limit)")
+	seqCmd.Flags().IntP("max-len", "M", -1, "only print sequences shorter than the maximum length (-1 for no limit)")
 }

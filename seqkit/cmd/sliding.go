@@ -50,6 +50,7 @@ var slidingCmd = &cobra.Command{
 
 		files := getFileList(args)
 
+		greedy := getFlagBool(cmd, "greedy")
 		circular := getFlagBool(cmd, "circular-genome")
 		step := getFlagInt(cmd, "step")
 		window := getFlagInt(cmd, "window")
@@ -96,13 +97,22 @@ var slidingCmd = &cobra.Command{
 				}
 				for i := 0; i <= end; i += step {
 					e = i + window
-					if e > originalLen && circular {
-						e = e - originalLen
-						s = sequence[i:]
-						s = append(s, sequence[0:e]...)
-						if len(qual) > 0 {
-							q = qual[i:]
-							q = append(q, qual[0:e]...)
+					if e > originalLen {
+						if circular {
+							e = e - originalLen
+							s = sequence[i:]
+							s = append(s, sequence[0:e]...)
+							if len(qual) > 0 {
+								q = qual[i:]
+								q = append(q, qual[0:e]...)
+							}
+						} else if greedy {
+							s = sequence[i : i+window]
+							if len(qual) > 0 {
+								q = qual[i : i+window]
+							}
+						} else {
+							break
 						}
 					} else {
 						s = sequence[i : i+window]
@@ -132,5 +142,6 @@ func init() {
 
 	slidingCmd.Flags().IntP("step", "s", 0, "step size")
 	slidingCmd.Flags().IntP("window", "W", 0, "window size")
+	slidingCmd.Flags().BoolP("greedy", "g", false, "greedy mode, i.e., exporting last subsequences even shorter than windows size")
 	slidingCmd.Flags().BoolP("circular-genome", "C", false, "circular genome.")
 }

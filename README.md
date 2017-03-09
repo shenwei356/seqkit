@@ -39,9 +39,11 @@ SeqKit demonstrates competitive performance in execution time and memory
 usage compared to similar tools. The efficiency and usability of SeqKit
 enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
+
+## Table of Contents
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 
 - [Features](#features)
 - [Subcommands](#subcommands)
