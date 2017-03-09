@@ -99,7 +99,7 @@ Categories          |Features               |seqkit  |fasta_utilities|fastx_tool
                     |Cleaning bases         |Yes     |Yes            |Yes          |Yes    |--       |--
                     |Transcription          |Yes     |Yes            |Yes          |Yes    |Yes      |Yes
                     |Translation            |--      |Yes            |Yes          |Yes    |Yes      |--
-                    |Filtering by size      |Indirect|Yes            |--           |Yes    |Yes      |--
+                    |Filtering by size      |Yes     |Yes            |--           |Yes    |Yes      |--
                     |Renaming header        |Yes     |Yes            |--           |--     |Yes      |Yes
 **Other features**  |Cross-platform         |Yes     |Partly         |Partly       |Yes    |Yes      |Yes
                     |Reading STDIN          |Yes     |Yes            |Yes          |--     |Yes      |Yes
@@ -120,7 +120,7 @@ Categories          |Features               |seqkit  |fasta_utilities|fastx_tool
 - `seq`        transform sequences (revserse, complement, extract ID...)
 - `subseq`     get subsequences by region/gtf/bed, including flanking sequences
 - `sliding`    sliding sequences, circular genome supported
-- `stat`       simple statistics of FASTA files
+- `stats`       simple statistics of FASTA files
 - `faidx`      create FASTA index file
 
 **Format conversion**
@@ -146,6 +146,7 @@ Categories          |Features               |seqkit  |fasta_utilities|fastx_tool
 
 - `replace`    replace name/sequence by regular expression
 - `rename`     rename duplicated IDs
+- `restart`    reset start position for circular genome
 
 **Ordering**
 

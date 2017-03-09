@@ -28,6 +28,7 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/util/byteutil"
 	"github.com/shenwei356/util/math"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
@@ -36,8 +37,9 @@ import (
 
 // statCmd represents the stat command
 var statCmd = &cobra.Command{
-	Use:   "stat",
-	Short: "simple statistics of FASTA files",
+	Use:     "stats",
+	Aliases: []string{"stat"},
+	Short:   "simple statistics of FASTA files",
 	Long: `simple statistics of FASTA files
 
 `,
@@ -50,6 +52,11 @@ var statCmd = &cobra.Command{
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
+		gapLetters := []byte(getFlagString(cmd, "gap-letters"))
+		if len(gapLetters) == 0 {
+			checkError(fmt.Errorf("value of flag -G (--gap-letters) should not be empty"))
+		}
+
 		files := getFileList(args)
 
 		outfh, err := xopen.Wopen(outFile)
@@ -57,7 +64,7 @@ var statCmd = &cobra.Command{
 		defer outfh.Close()
 
 		var fastxReader *fastx.Reader
-		var num, l, lenMin, lenMax, lenSum uint64
+		var num, l, lenMin, lenMax, lenSum, gapSum int64
 		var seqFormat, t string
 		statInfos := []statInfo{}
 		for _, file := range files {
@@ -65,7 +72,7 @@ var statCmd = &cobra.Command{
 			checkError(err)
 
 			seqFormat = ""
-			num, lenMin, lenMax, lenSum = 0, ^uint64(0), 0, 0
+			num, lenMin, lenMax, lenSum, gapSum = 0, int64(^uint64(0)>>1), 0, 0, 0
 			for {
 				record, err := fastxReader.Read()
 				if err != nil {
@@ -84,7 +91,7 @@ var statCmd = &cobra.Command{
 						seqFormat = "FASTA"
 					}
 				}
-				l = uint64(len(record.Seq.Seq))
+				l = int64(len(record.Seq.Seq))
 				lenSum += l
 				if l < lenMin {
 					lenMin = l
@@ -92,6 +99,7 @@ var statCmd = &cobra.Command{
 				if l > lenMax {
 					lenMax = l
 				}
+				gapSum += int64(byteutil.CountBytes(record.Seq.Seq, gapLetters))
 			}
 			if fastxReader.Alphabet() == seq.DNAredundant {
 				t = "DNA"
@@ -103,13 +111,13 @@ var statCmd = &cobra.Command{
 
 			if num == 0 {
 				statInfos = append(statInfos, statInfo{file, seqFormat, t,
-					int64(num), int64(lenSum), int64(lenMin),
-					0, int64(lenMax)})
+					num, lenSum, gapSum, lenMin,
+					0, lenMax})
 
 			} else {
 				statInfos = append(statInfos, statInfo{file, seqFormat, t,
-					int64(num), int64(lenSum), int64(lenMin),
-					math.Round(float64(lenSum)/float64(num), 1), int64(lenMax)})
+					num, lenSum, gapSum, lenMin,
+					math.Round(float64(lenSum)/float64(num), 1), lenMax})
 			}
 		}
 
@@ -120,6 +128,7 @@ var statCmd = &cobra.Command{
 			{Header: "type"},
 			{Header: "num_seqs", AlignRight: true},
 			{Header: "sum_len", AlignRight: true},
+			{Header: "sum_gap", AlignRight: true},
 			{Header: "min_len", AlignRight: true},
 			{Header: "avg_len", AlignRight: true},
 			{Header: "max_len", AlignRight: true}}...)
@@ -133,6 +142,7 @@ var statCmd = &cobra.Command{
 				info.t,
 				humanize.Comma(info.num),
 				humanize.Comma(info.lenSum),
+				humanize.Comma(info.gapSum),
 				humanize.Comma(info.lenMin),
 				humanize.Commaf(info.lenAvg),
 				humanize.Comma(info.lenMax))
@@ -147,6 +157,7 @@ type statInfo struct {
 	t      string
 	num    int64
 	lenSum int64
+	gapSum int64
 	lenMin int64
 	lenAvg float64
 	lenMax int64
@@ -154,4 +165,6 @@ type statInfo struct {
 
 func init() {
 	RootCmd.AddCommand(statCmd)
+
+	statCmd.Flags().StringP("gap-letters", "G", "- ", "gap letters")
 }

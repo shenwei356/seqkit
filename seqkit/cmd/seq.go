@@ -58,7 +58,7 @@ var seqCmd = &cobra.Command{
 		onlyQual := getFlagBool(cmd, "qual")
 		onlyID := getFlagBool(cmd, "only-id")
 		removeGaps := getFlagBool(cmd, "remove-gaps")
-		gapLetters := getFlagString(cmd, "gap-letter")
+		gapLetters := getFlagString(cmd, "gap-letters")
 		lowerCase := getFlagBool(cmd, "lower-case")
 		upperCase := getFlagBool(cmd, "upper-case")
 		dna2rna := getFlagBool(cmd, "dna2rna")
@@ -68,6 +68,9 @@ var seqCmd = &cobra.Command{
 		minLen := getFlagInt(cmd, "min-len")
 		maxLen := getFlagInt(cmd, "max-len")
 
+		if gapLetters == "" {
+			checkError(fmt.Errorf("value of flag -G (--gap-letters) should not be empty"))
+		}
 		if minLen >= 0 && maxLen >= 0 && minLen > maxLen {
 			checkError(fmt.Errorf("value of flag -m (--min-len) should be >= value of flag -M (--max-len)"))
 		}
@@ -284,7 +287,7 @@ func init() {
 	seqCmd.Flags().BoolP("qual", "q", false, "only print qualities")
 	seqCmd.Flags().BoolP("only-id", "i", false, "print ID instead of full head")
 	seqCmd.Flags().BoolP("remove-gaps", "g", false, "remove gaps")
-	seqCmd.Flags().StringP("gap-letter", "G", "- ", "gap letters")
+	seqCmd.Flags().StringP("gap-letters", "G", "- ", "gap letters")
 	seqCmd.Flags().BoolP("lower-case", "l", false, "print sequences in lower case")
 	seqCmd.Flags().BoolP("upper-case", "u", false, "print sequences in upper case")
 	seqCmd.Flags().BoolP("dna2rna", "", false, "DNA to RNA")
