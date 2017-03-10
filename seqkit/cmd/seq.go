@@ -71,6 +71,12 @@ var seqCmd = &cobra.Command{
 		if gapLetters == "" {
 			checkError(fmt.Errorf("value of flag -G (--gap-letters) should not be empty"))
 		}
+		for _, c := range gapLetters {
+			if c > 127 {
+				checkError(fmt.Errorf("value of -G (--gap-letters) contains non-ASCII characters"))
+			}
+		}
+
 		if minLen >= 0 && maxLen >= 0 && minLen > maxLen {
 			checkError(fmt.Errorf("value of flag -m (--min-len) should be >= value of flag -M (--max-len)"))
 		}

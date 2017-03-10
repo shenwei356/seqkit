@@ -54,10 +54,17 @@ var statCmd = &cobra.Command{
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		gapLetters := []byte(getFlagString(cmd, "gap-letters"))
+		gapLetters := getFlagString(cmd, "gap-letters")
 		if len(gapLetters) == 0 {
 			checkError(fmt.Errorf("value of flag -G (--gap-letters) should not be empty"))
 		}
+		for _, c := range gapLetters {
+			if c > 127 {
+				checkError(fmt.Errorf("value of -G (--gap-letters) contains non-ASCII characters"))
+			}
+		}
+		gapLettersBytes := []byte(gapLetters)
+
 		all := getFlagBool(cmd, "all")
 
 		files := getFileList(args)
@@ -111,7 +118,7 @@ var statCmd = &cobra.Command{
 				if l > lenMax {
 					lenMax = l
 				}
-				gapSum += int64(byteutil.CountBytes(record.Seq.Seq, gapLetters))
+				gapSum += int64(byteutil.CountBytes(record.Seq.Seq, gapLettersBytes))
 			}
 
 			if fastxReader.Alphabet() == seq.DNAredundant {
@@ -136,8 +143,8 @@ var statCmd = &cobra.Command{
 
 			if num == 0 {
 				statInfos = append(statInfos, statInfo{file, seqFormat, t,
-					num, lenSum, gapSum, lenMin,
-					0, lenMax, n50, l50})
+					0, 0, 0, 0,
+					0, lenMax, 0, 0})
 
 			} else {
 				statInfos = append(statInfos, statInfo{file, seqFormat, t,

@@ -9,7 +9,7 @@ pages:
     - Benchmark: benchmark.md
     - Development Notes: note.md
 - Links:
-    - Wei Shen's Bioinformatic tools: bioinf.md
+    - More tools: bioinf.md
     - YanLi Lab: yanlilab.md
 theme: yeti
 

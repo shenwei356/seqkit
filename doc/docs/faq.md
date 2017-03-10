@@ -184,7 +184,7 @@ Related posts:
 [Question: extract same all similar sequences in FASTA based on the header](https://www.biostars.org/p/223937/)
 .
 
-For exmaple, FASTA header line of `viral.1.protein.faa.gz` contain species name
+For example, FASTA header line of `viral.1.protein.faa.gz` contain species name
 in square brackets.
 
 Overview of FASTA Headers:
