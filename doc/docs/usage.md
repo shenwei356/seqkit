@@ -145,7 +145,7 @@ Usage
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.4.3
+Version: 0.5.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -163,9 +163,11 @@ Available Commands:
   fx2tab      covert FASTA/Q to tabular format (with length/GC content/GC skew)
   grep        search sequences by pattern(s) of name or sequence motifs
   head        print first N FASTA/Q records
+  help        Help about any command
   locate      locate subsequences/motifs
   rename      rename duplicated IDs
   replace     replace name/sequence by regular expression
+  restart     reset start position for circular genome
   rmdup       remove duplicated sequences by id/name/sequence
   sample      sample sequences by number or proportion
   seq         transform sequences (revserse, complement, extract ID...)
@@ -173,7 +175,7 @@ Available Commands:
   sliding     sliding sequences, circular genome supported
   sort        sort sequences by id/name/sequence/length
   split       split sequences into files by id/seq region/size/parts
-  stat        simple statistics of FASTA files
+  stats       simple statistics of FASTA files
   subseq      get subsequences by region/gtf/bed, including flanking sequences
   tab2fx      covert tabular format to FASTA/Q format
   version     print version information and check for update
@@ -181,7 +183,7 @@ Available Commands:
 Flags:
       --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
       --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
-      --id-regexp string                regular expression for parsing ID (default "^([^\\s]+)\\s?")
+      --id-regexp string                regular expression for parsing ID (default "^([^\s]+)\s?")
   -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
   -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
       --quiet                           be quiet and do not show extra information
