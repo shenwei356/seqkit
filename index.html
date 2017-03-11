@@ -115,7 +115,7 @@
                     
                         
 <li >
-    <a href="bioinf/">Wei Shen's Bioinformatic tools</a>
+    <a href="bioinf/">More tools</a>
 </li>
 
                     
@@ -171,6 +171,8 @@
         <li class="main active"><a href="#seqkit-a-cross-platform-and-ultrafast-toolkit-for-fastaq-file-manipulation">SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation</a></li>
         
             <li><a href="#introduction">Introduction</a></li>
+        
+            <li><a href="#table-of-contents">Table of Contents</a></li>
         
             <li><a href="#features">Features</a></li>
         
@@ -234,6 +236,7 @@ be directly used without any dependencies or pre-configurations.
 SeqKit demonstrates competitive performance in execution time and memory
 usage compared to similar tools. The efficiency and usability of SeqKit
 enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
+<h2 id="table-of-contents">Table of Contents</h2>
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -468,7 +471,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <tr>
 <td align="left"></td>
 <td align="left">Filtering by size</td>
-<td align="center">Indirect</td>
+<td align="center">Yes</td>
 <td align="center">Yes</td>
 <td align="center">--</td>
 <td align="center">Yes</td>
@@ -536,7 +539,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <li><code>seq</code>        transform sequences (revserse, complement, extract ID...)</li>
 <li><code>subseq</code>     get subsequences by region/gtf/bed, including flanking sequences</li>
 <li><code>sliding</code>    sliding sequences, circular genome supported</li>
-<li><code>stat</code>       simple statistics of FASTA files</li>
+<li><code>stats</code>       simple statistics of FASTA files</li>
 <li><code>faidx</code>      create FASTA index file</li>
 </ul>
 <p><strong>Format conversion</strong></p>
@@ -562,6 +565,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <ul>
 <li><code>replace</code>    replace name/sequence by regular expression</li>
 <li><code>rename</code>     rename duplicated IDs</li>
+<li><code>restart</code>    reset start position for circular genome</li>
 </ul>
 <p><strong>Ordering</strong></p>
 <ul>

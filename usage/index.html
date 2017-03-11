@@ -115,7 +115,7 @@
                     
                         
 <li >
-    <a href="../bioinf/">Wei Shen's Bioinformatic tools</a>
+    <a href="../bioinf/">More tools</a>
 </li>
 
                     
@@ -206,6 +206,8 @@
         
             <li><a href="#rename">rename</a></li>
         
+            <li><a href="#restart">restart</a></li>
+        
             <li><a href="#shuffle">shuffle</a></li>
         
             <li><a href="#sort">sort</a></li>
@@ -255,6 +257,7 @@
 <ul>
 <li><a href="#replace">replace</a></li>
 <li><a href="#rename">rename</a></li>
+<li><a href="#restart">restart</a></li>
 </ul>
 <p><strong>Ordering</strong></p>
 <ul>
@@ -350,7 +353,7 @@ reproduced in different environments with same random seed.</p>
 <p>Usage</p>
 <pre><code>SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.4.3
+Version: 0.5.0
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -368,9 +371,11 @@ Available Commands:
   fx2tab      covert FASTA/Q to tabular format (with length/GC content/GC skew)
   grep        search sequences by pattern(s) of name or sequence motifs
   head        print first N FASTA/Q records
+  help        Help about any command
   locate      locate subsequences/motifs
   rename      rename duplicated IDs
   replace     replace name/sequence by regular expression
+  restart     reset start position for circular genome
   rmdup       remove duplicated sequences by id/name/sequence
   sample      sample sequences by number or proportion
   seq         transform sequences (revserse, complement, extract ID...)
@@ -378,7 +383,7 @@ Available Commands:
   sliding     sliding sequences, circular genome supported
   sort        sort sequences by id/name/sequence/length
   split       split sequences into files by id/seq region/size/parts
-  stat        simple statistics of FASTA files
+  stats       simple statistics of FASTA files
   subseq      get subsequences by region/gtf/bed, including flanking sequences
   tab2fx      covert tabular format to FASTA/Q format
   version     print version information and check for update
@@ -386,7 +391,7 @@ Available Commands:
 Flags:
       --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
       --id-ncbi                         FASTA head is NCBI-style, e.g. &gt;gi|110645304|ref|NC_002516.2| Pseud...
-      --id-regexp string                regular expression for parsing ID (default &quot;^([^\\s]+)\\s?&quot;)
+      --id-regexp string                regular expression for parsing ID (default &quot;^([^\s]+)\s?&quot;)
   -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
   -o, --out-file string                 out file (&quot;-&quot; for stdout, suffix .gz for gzipped out) (default &quot;-&quot;)
       --quiet                           be quiet and do not show extra information
@@ -489,19 +494,19 @@ HIHIIIIIHIIHGHHIHHIIIIIIIIIIIIIIIHHIIIIIHHIHIIIIIGIHIIIIHHHHHHGHIHIII
 <ul>
 <li>
 <p>By default, <code>seqkit seq</code> automatically detect the sequence type</p>
-<pre><code>$ echo -e "&gt;seq\nacgtryswkmbdhvACGTRYSWKMBDHV" | seqkit stat
+<pre><code>$ echo -e "&gt;seq\nacgtryswkmbdhvACGTRYSWKMBDHV" | seqkit stats
 file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
 -     FASTA   DNA          1       28       28       28       28
 
-$ echo -e "&gt;seq\nACGUN ACGUN" | seqkit stat
+$ echo -e "&gt;seq\nACGUN ACGUN" | seqkit stats
 file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
 -     FASTA   RNA          1       11       11       11       11
 
-$ echo -e "&gt;seq\nabcdefghijklmnpqrstvwyz" | seqkit stat
+$ echo -e "&gt;seq\nabcdefghijklmnpqrstvwyz" | seqkit stats
 file  format  type     num_seqs  sum_len  min_len  avg_len  max_len
 -     FASTA   Protein         1       23       23       23       23
 
-$ echo -e "@read\nACTGCN\n+\n@IICCG" | seqkit stat
+$ echo -e "@read\nACTGCN\n+\n@IICCG" | seqkit stats
 file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
 -     FASTQ   DNA          1        6        6        6        6
 </code></pre>
@@ -578,6 +583,21 @@ ACGTACTGCACC
 <pre><code>$ echo -e "&gt;seq\nUCAUAUGCUUGUCUCAAAGAUUA" | seqkit seq --rna2dna
 &gt;seq
 TCATATGCTTGTCTCAAAGATTA
+</code></pre>
+</li>
+<li>
+<p>Filter by sequence length</p>
+<pre><code>$ cat hairpin.fa | seqkit seq | seqkit stats
+file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
+-     FASTA   RNA     28,645  2,949,871       39      103    2,354
+
+$ cat hairpin.fa | seqkit seq -m 100 | seqkit stats
+file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
+-     FASTA   RNA     10,975  1,565,486      100    142.6    2,354
+
+$ cat hairpin.fa | seqkit seq -m 100 -M 1000 | seqkit stats
+file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
+-     FASTA   RNA     10,972  1,560,270      100    142.2      938
 </code></pre>
 </li>
 </ol>
@@ -659,7 +679,7 @@ the uncompressed data are so big and may exhaust your RAM.</em></strong></p>
 <p>We could specify chromesomes and features.</p>
 <pre><code>$ seqkit subseq --gtf Homo_sapiens.GRCh38.84.gtf.gz --chr 1 --feature cds  hsa.fa &gt; chr1.gtf.cds.fa
 
-$ seqkit stat chr1.gtf.cds.fa
+$ seqkit stats chr1.gtf.cds.fa
 file             format  type  num_seqs    sum_len  min_len  avg_len  max_len
 chr1.gtf.cds.fa  FASTA   DNA     65,012  9,842,274        1    151.4   12,045
 </code></pre>
@@ -693,7 +713,7 @@ the uncompressed data are so big and may exhaust your RAM.</em></strong></p>
 [INFO] 141060 duplicated records removed
 </code></pre>
 <p>Summary:</p>
-<pre><code>$ seqkit stat chr1.gz.*.gz
+<pre><code>$ seqkit stats chr1.gz.*.gz
 file               seq_format   seq_type   num_seqs   min_len   avg_len     max_len
 chr1.gz.fa         FASTA        DNA         231,974         1   3,089.5   1,551,957
 chr1.gz.rmdup.fa   FASTA        DNA          90,914         1   6,455.8   1,551,957
@@ -708,9 +728,10 @@ Usage:
   seqkit sliding [flags]
 
 Flags:
-  -C, --circular-genome   circular genome
-  -s, --step int        step size
-  -W, --window int      window size
+  -C, --circular-genome   circular genome.
+  -g, --greedy            greedy mode, i.e., exporting last subsequences even shorter than windows size
+  -s, --step int          step size
+  -W, --window int        window size
 
 </code></pre>
 
@@ -719,6 +740,15 @@ Flags:
 <li>
 <p>General use</p>
 <pre><code>$ echo -e "&gt;seq\nACGTacgtNN" | seqkit sliding -s 3 -W 6
+&gt;seq_sliding:1-6
+ACGTac
+&gt;seq_sliding:4-9
+TacgtN
+</code></pre>
+</li>
+<li>
+<p>Greedy mode</p>
+<pre><code>$ echo -e "&gt;seq\nACGTacgtNN" | seqkit sliding -s 3 -W 6 -g
 &gt;seq_sliding:1-6
 ACGTac
 &gt;seq_sliding:4-9
@@ -760,18 +790,38 @@ cel-let-7_sliding:26-55         40.00
 <pre><code>simple statistics of FASTA files
 
 Usage:
-  seqkit stat [flags]
+  seqkit stats [flags]
+
+Aliases:
+  stats, stat
+
+
+Flags:
+  -a, --all                  all statistics, including sum_gap, N50, L50
+  -G, --gap-letters string   gap letters (default &quot;- &quot;)
 
 </code></pre>
 
 <p>Eexamples</p>
 <ol>
-<li>General use<pre><code>$ seqkit stat *.f{a,q}.gz
+<li>
+<p>General use</p>
+<pre><code>$ seqkit stats *.f{a,q}.gz
 file           format  type  num_seqs    sum_len  min_len  avg_len  max_len
 hairpin.fa.gz  FASTA   RNA     28,645  2,949,871       39      103    2,354
 mature.fa.gz   FASTA   RNA     35,828    781,222       15     21.8       34
 reads_1.fq.gz  FASTQ   DNA      2,500    567,516      226      227      229
 reads_2.fq.gz  FASTQ   DNA      2,500    560,002      223      224      225
+</code></pre>
+</li>
+<li>
+<p>Extra information</p>
+<pre><code>$ seqkit stats *.f{a,q}.gz -a
+file           format  type  num_seqs    sum_len  min_len  avg_len  max_len  sum_gap  N50     L50
+hairpin.fa.gz  FASTA   RNA     28,645  2,949,871       39      103    2,354        0  101  10,075
+mature.fa.gz   FASTA   RNA     35,828    781,222       15     21.8       34        0   22  17,144
+reads_1.fq.gz  FASTQ   DNA      2,500    567,516      226      227      229        0  227   1,250
+reads_2.fq.gz  FASTQ   DNA      2,500    560,002      223      224      225        0  224   1,250
 </code></pre>
 </li>
 </ol>
@@ -1442,6 +1492,32 @@ acgt
 ACTG
 &gt;a_2 a comment
 aaaa
+</code></pre>
+
+<h2 id="restart">restart</h2>
+<p>Usage</p>
+<pre><code>reset start position for circular genome
+
+Examples
+
+    $ echo -e &quot;&gt;seq\nacgtnACGTN&quot;
+    &gt;seq
+    acgtnACGTN
+
+    $ echo -e &quot;&gt;seq\nacgtnACGTN&quot; | seqkit restart -i 2
+    &gt;seq
+    cgtnACGTNa
+
+    $ echo -e &quot;&gt;seq\nacgtnACGTN&quot; | seqkit restart -i -2
+    &gt;seq
+    TNacgtnACG
+
+Usage:
+  seqkit restart [flags]
+
+Flags:
+  -i, --new-start int   new start position (1-base, supporting negative value counting from the end) (default 1)
+
 </code></pre>
 
 <h2 id="shuffle">shuffle</h2>
