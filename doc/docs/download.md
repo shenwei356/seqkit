@@ -9,14 +9,14 @@ SeqKit is implemented in [Go](https://golang.org/) programming language,
 [SeqKit v0.5.0](https://github.com/shenwei356/seqkit/releases/tag/v0.5.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.5.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.5.0)
 
+- **new command `seqkit restart`, for resetting start position for circular genome**.
 - `seqkit sliding`: add flag `-g/--greedy`, exporting last subsequences even shorter than windows size.
 - `seqkit seq`:
-    - add flag `-m/--min-len` and `-M/--max-len` to filter sequences by length.
+    - **add flag `-m/--min-len` and `-M/--max-len` to filter sequences by length**.
     - rename flag `-G/--gap-letter` to `-G/--gap-letters`.
 - `seqkit stat`:
     - renamed to `seqkit stats`, don't worry, old name is still available as an alias.
-    - add new flag `-a/all`, for all statistics, including `sum_gap`, `N50`, and `L50`.
-- new command `seqkit restart`, for resetting start position for circular genome.
+    - **add new flag `-a/all`, for all statistics, including `sum_gap`, `N50`, and `L50`**.
 
 ### Links
 
