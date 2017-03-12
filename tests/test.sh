@@ -167,10 +167,10 @@ testseq() {
     echo -e ">seq\nacgtnACGTN"
 }
 fun () {
-    testseq | $app sliding -W 5 -s 5 | $app seq -s -w 0 | paste -s -d "+"
+    testseq | $app sliding -W 5 -s 5 | $app seq -s -w 0
 }
 run sliding fun
-assert_equal "acgtn+ACGTN" $(cat $STDOUT_FILE)
+assert_equal $(echo -e "acgtn\nACGTN" | md5sum | cut -d" " -f 1) $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1)
 
 
 # ------------------------------------------------------------
