@@ -61,11 +61,11 @@ assert_in_stdout "FASTQ"
 
 # head
 run seq_head $app seq -n $file
-assert_equal $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1) $(grep  "^>" $file | sed -s 's/^>//g' | md5sum | cut -d" " -f 1)
+assert_equal $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1) $(grep  "^>" $file | sed 's/^>//g' | md5sum | cut -d" " -f 1)
 
 # id
 run seq_id $app seq -n -i $file
-assert_equal $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1) $(grep  "^>" $file | sed -s 's/^>//g' | sed -s 's/ .*//g' | md5sum | cut -d" " -f 1)
+assert_equal $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1) $(grep  "^>" $file | sed 's/^>//g' | sed 's/ .*//g' | md5sum | cut -d" " -f 1)
 
 # seq
 run seq_seq $app seq $file -s -w 0
