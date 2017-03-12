@@ -142,19 +142,19 @@ assert_equal N $(cat $STDOUT_FILE)
 gtf="seq\ttest\tCDS\t4\t6\t.\t+\t.\tgene_id \"A\"; transcript_id \"A\"\nseq\ttest\tCDS\t4\t6\t.\t-\t.\tgene_id \"B\"; transcript_id \"B\"\n"
 
 fun () {
-    testseq | $app subseq --gtf <(echo -ne $gtf) | $app seq -s -w 0 | paste -sd"+"
+    testseq | $app subseq --gtf <(echo -ne $gtf) | $app seq -s -w 0 | paste -s -d "+"
 }
 run subseq_gtf fun
 assert_equal "tnA+Tna" $(cat $STDOUT_FILE)
 
 fun () {
-    testseq | $app subseq --gtf <(echo -ne $gtf) -u 3 -d 2 | $app seq -s -w 0 | paste -sd"+"
+    testseq | $app subseq --gtf <(echo -ne $gtf) -u 3 -d 2 | $app seq -s -w 0 | paste -s -d "+"
 }
 run subseq_gtf fun
 assert_equal "acgtnACG+ACGTnacg" $(cat $STDOUT_FILE)
 
 fun () {
-    testseq | $app subseq --gtf <(echo -ne $gtf) -u 3 -f | $app seq -s -w 0 | paste -sd"+"
+    testseq | $app subseq --gtf <(echo -ne $gtf) -u 3 -f | $app seq -s -w 0 | paste -s -d "+"
 }
 run subseq_gtf fun
 assert_equal "acg+ACG" $(cat $STDOUT_FILE)
@@ -167,7 +167,7 @@ testseq() {
     echo -e ">seq\nacgtnACGTN"
 }
 fun () {
-    testseq | $app sliding -W 5 -s 5 | $app seq -s -w 0 | paste -sd"+"
+    testseq | $app sliding -W 5 -s 5 | $app seq -s -w 0 | paste -s -d "+"
 }
 run sliding fun
 assert_equal "acgtn+ACGTN" $(cat $STDOUT_FILE)
