@@ -6,35 +6,21 @@ SeqKit is implemented in [Go](https://golang.org/) programming language,
 
 ## Latest Version
 
-[SeqKit v0.5.0](https://github.com/shenwei356/seqkit/releases/tag/v0.5.0)
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.5.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.5.0)
+[SeqKit v0.5.1](https://github.com/shenwei356/seqkit/releases/tag/v0.5.1)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.5.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.5.1)
 
-- **new command `seqkit restart`, for resetting start position for circular genome**.
-- `seqkit sliding`: add flag `-g/--greedy`, exporting last subsequences even shorter than windows size.
-- `seqkit seq`:
-    - **add flag `-m/--min-len` and `-M/--max-len` to filter sequences by length**.
-    - rename flag `-G/--gap-letter` to `-G/--gap-letters`.
-- `seqkit stat`:
-    - renamed to `seqkit stats`, don't worry, old name is still available as an alias.
-    - **add new flag `-a/all`, for all statistics, including `sum_gap`, `N50`, and `L50`**.
+- `seqkit restart`: fix bug of flag parsing
 
 ### Links
 
 OS     |Arch      |File, (Mirror for Chinese Users)                                                                                                                                                                                   |Download Count
 :------|:---------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Linux  |32-bit    |[seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_linux_386.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_linux_386.tar.gz))                            |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_linux_386.tar.gz)
-Linux  |**64-bit**|[**seqkit_linux_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_linux_amd64.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_linux_amd64.tar.gz))                  |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_linux_amd64.tar.gz)
-Linux  |ARM       |[seqkit_linux_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_linux_arm.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_linux_arm.tar.gz))                            |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_arm.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_linux_arm.tar.gz)
-OS X   |32-bit    |[seqkit_darwin_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_darwin_386.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_darwin_386.tar.gz))                         |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_darwin_386.tar.gz)
-OS X   |**64-bit**|[**seqkit_darwin_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_darwin_amd64.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_darwin_amd64.tar.gz))               |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_darwin_amd64.tar.gz)
-Windows|32-bit    |[seqkit_windows_386.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_windows_386.exe.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_windows_386.exe.tar.gz))          |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_386.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_windows_386.exe.tar.gz)
-Windows|**64-bit**|[**seqkit_windows_amd64.exe.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_windows_amd64.exe.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_windows_amd64.exe.tar.gz))|[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_amd64.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_windows_amd64.exe.tar.gz)
-FreeBSD|32-bit    |[seqkit_freebsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_freebsd_386.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_freebsd_386.tar.gz))                      |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_freebsd_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_freebsd_386.tar.gz)
-FreeBSD|**64-bit**|[**seqkit_freebsd_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_freebsd_amd64.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_freebsd_amd64.tar.gz))            |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_freebsd_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_freebsd_amd64.tar.gz)
-FreeBSD|ARM       |[seqkit_freebsd_arm.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_freebsd_arm.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_freebsd_arm.tar.gz))                      |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_freebsd_arm.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_freebsd_arm.tar.gz)
-OpenBSD|32-bit    |[seqkit_openbsd_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_openbsd_386.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_openbsd_386.tar.gz))                      |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_openbsd_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_openbsd_386.tar.gz)
-OpenBSD|**64-bit**|[**seqkit_openbsd_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_openbsd_amd64.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_openbsd_amd64.tar.gz))            |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_openbsd_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.0/seqkit_openbsd_amd64.tar.gz)
-
+Linux  |32-bit    |[seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.5.1/seqkit_linux_386.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_linux_386.tar.gz))                            |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.1/seqkit_linux_386.tar.gz)
+Linux  |**64-bit**|[**seqkit_linux_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.5.1/seqkit_linux_amd64.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_linux_amd64.tar.gz))                  |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.1/seqkit_linux_amd64.tar.gz)
+OS X   |32-bit    |[seqkit_darwin_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.5.1/seqkit_darwin_386.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_darwin_386.tar.gz))                         |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.1/seqkit_darwin_386.tar.gz)
+OS X   |**64-bit**|[**seqkit_darwin_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.5.1/seqkit_darwin_amd64.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_darwin_amd64.tar.gz))               |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.1/seqkit_darwin_amd64.tar.gz)
+Windows|32-bit    |[seqkit_windows_386.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.5.1/seqkit_windows_386.exe.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_windows_386.exe.tar.gz))          |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_386.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.1/seqkit_windows_386.exe.tar.gz)
+Windows|**64-bit**|[**seqkit_windows_amd64.exe.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.5.1/seqkit_windows_amd64.exe.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_windows_amd64.exe.tar.gz))|[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_amd64.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.5.1/seqkit_windows_amd64.exe.tar.gz)
 
 ## Installation
 
@@ -70,6 +56,16 @@ And then:
 
 ## Release History
 
+- [SeqKit v0.5.0](https://github.com/shenwei356/seqkit/releases/tag/v0.5.0)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.5.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.5.0)
+    - **new command `seqkit restart`, for resetting start position for circular genome**.
+    - `seqkit sliding`: add flag `-g/--greedy`, exporting last subsequences even shorter than windows size.
+    - `seqkit seq`:
+        - **add flag `-m/--min-len` and `-M/--max-len` to filter sequences by length**.
+        - rename flag `-G/--gap-letter` to `-G/--gap-letters`.
+    - `seqkit stat`:
+        - renamed to `seqkit stats`, don't worry, old name is still available as an alias.
+        - **add new flag `-a/all`, for all statistics, including `sum_gap`, `N50`, and `L50`**.
 - [SeqKit v0.4.5](https://github.com/shenwei356/seqkit/releases/tag/v0.4.5)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.4.5/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.4.5)
     - `seqkit seq`: fix bug of failing to reverse quality of FASTQ sequence

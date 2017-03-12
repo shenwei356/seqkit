@@ -1,0 +1,11 @@
+language: go
+
+os:
+  - linux
+  - osx
+
+go:
+  - 1.8
+
+script:
+    - ./tests/test.sh

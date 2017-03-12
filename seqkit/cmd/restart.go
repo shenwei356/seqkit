@@ -65,7 +65,7 @@ Examples
 
 		files := getFileList(args)
 
-		newstart := getFlagInt(cmd, "start")
+		newstart := getFlagInt(cmd, "new-start")
 		if newstart == 0 {
 			checkError(fmt.Errorf("value of flag -s (--start) should not be 0"))
 		}
