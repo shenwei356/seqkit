@@ -224,6 +224,6 @@ type statInfo struct {
 func init() {
 	RootCmd.AddCommand(statCmd)
 
-	statCmd.Flags().StringP("gap-letters", "G", "- ", "gap letters")
+	statCmd.Flags().StringP("gap-letters", "G", "- .", "gap letters")
 	statCmd.Flags().BoolP("all", "a", false, "all statistics, including sum_gap, N50, L50")
 }

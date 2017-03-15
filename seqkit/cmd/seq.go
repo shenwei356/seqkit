@@ -293,7 +293,7 @@ func init() {
 	seqCmd.Flags().BoolP("qual", "q", false, "only print qualities")
 	seqCmd.Flags().BoolP("only-id", "i", false, "print ID instead of full head")
 	seqCmd.Flags().BoolP("remove-gaps", "g", false, "remove gaps")
-	seqCmd.Flags().StringP("gap-letters", "G", "- ", "gap letters")
+	seqCmd.Flags().StringP("gap-letters", "G", "- .", "gap letters")
 	seqCmd.Flags().BoolP("lower-case", "l", false, "print sequences in lower case")
 	seqCmd.Flags().BoolP("upper-case", "u", false, "print sequences in upper case")
 	seqCmd.Flags().BoolP("dna2rna", "", false, "DNA to RNA")
