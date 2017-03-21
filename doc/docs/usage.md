@@ -12,7 +12,7 @@
 - [seq](#seq)
 - [subseq](#subseq)
 - [sliding](#sliding)
-- [stat](#stat)
+- [stats](#stats)
 
 **Format conversion**
 
@@ -559,7 +559,7 @@ Examples
         cel-let-7_sliding:26-55         40.00
         ...
 
-## stat
+## stats
 
 Usage
 
