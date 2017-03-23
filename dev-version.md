@@ -1,6 +1,8 @@
-## v0.5.2-dev
+## v0.5.2-dev2
 
 - `seqkit stats -a` and `seqkit seq -g -G`: change default gap letters from '- ' to '- .'
+- `seqkit subseq`: fix bug of range overflow when using `-d/--down-stream`
+    or `-u/--up-stream` for retieving subseq using BED (`--beb`) or GTF (`--gtf`) file.
 - `seqkit locate`: add flag `-G/--non-greedy`, non-greedy mode,
  faster but may miss motifs overlaping with others. Example:
 

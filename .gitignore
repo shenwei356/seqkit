@@ -31,3 +31,5 @@ benchmark/.Rhistory
 seqkit/binaries*
 doc/site*
 *ssshtest
+t.*
+seqkit/t.*

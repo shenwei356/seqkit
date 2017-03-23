@@ -389,6 +389,12 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 					s = feature.Start - downStream // seq.SubSeq will check it
 					e = feature.End + upStream
 				}
+				if s < 1 {
+					s = 1
+				}
+				if e > len(record.Seq.Seq) {
+					e = len(record.Seq.Seq)
+				}
 				subseq = record.Seq.SubSeq(s, e).RevComInplace()
 			} else {
 				if onlyFlank {
@@ -402,6 +408,12 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 				} else {
 					s = feature.Start - upStream
 					e = feature.End + downStream
+				}
+				if s < 1 {
+					s = 1
+				}
+				if e > len(record.Seq.Seq) {
+					e = len(record.Seq.Seq)
 				}
 				subseq = record.Seq.SubSeq(s, e)
 			}
@@ -469,6 +481,12 @@ func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 				s = feature.Start - downStream // seq.SubSeq will check it
 				e = feature.End + upStream
 			}
+			if s < 1 {
+				s = 1
+			}
+			if e > len(record.Seq.Seq) {
+				e = len(record.Seq.Seq)
+			}
 			subseq = record.Seq.SubSeq(s, e).RevComInplace()
 		} else {
 			if onlyFlank {
@@ -482,6 +500,12 @@ func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 			} else {
 				s = feature.Start - upStream
 				e = feature.End + downStream
+			}
+			if s < 1 {
+				s = 1
+			}
+			if e > len(record.Seq.Seq) {
+				e = len(record.Seq.Seq)
 			}
 			subseq = record.Seq.SubSeq(s, e)
 		}

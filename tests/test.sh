@@ -154,10 +154,17 @@ run subseq_gtf fun
 assert_equal $(echo -e "acgtnACG\nACGTnacg" | md5sum | cut -d" " -f 1) $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1)
 
 fun () {
+    testseq | $app subseq --gtf <(echo -ne $gtf) -u 100 -d 100 | $app seq -s -w 0
+}
+run subseq_gtf fun
+assert_equal $(echo -e "acgtnACGTN\nNACGTnacgt" | md5sum | cut -d" " -f 1) $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1)
+
+fun () {
     testseq | $app subseq --gtf <(echo -ne $gtf) -u 3 -f | $app seq -s -w 0
 }
 run subseq_gtf fun
 assert_equal $(echo -e "acg\nACG" | md5sum | cut -d" " -f 1) $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1)
+
 
 
 # ------------------------------------------------------------
