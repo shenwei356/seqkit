@@ -64,6 +64,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		degenerate := getFlagBool(cmd, "degenerate")
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
+		nonGreedy := getFlagBool(cmd, "non-greedy")
 
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
@@ -179,7 +180,11 @@ For example: "\w" will be wrongly converted to "\[AT]".
 							locs = append(locs, [2]int{begin, end})
 						}
 
-						offset = offset + loc[0] + 1
+						if nonGreedy {
+							offset = offset + loc[1] + 1
+						} else {
+							offset = offset + loc[0] + 1
+						}
 						if offset >= len(record.Seq.Seq) {
 							break
 						}
@@ -221,7 +226,11 @@ For example: "\w" will be wrongly converted to "\[AT]".
 							locsNeg = append(locsNeg, [2]int{begin, end})
 						}
 
-						offset = offset + loc[0] + 1
+						if nonGreedy {
+							offset = offset + loc[1] + 1
+						} else {
+							offset = offset + loc[0] + 1
+						}
 						if offset >= len(record.Seq.Seq) {
 							break
 						}
@@ -241,5 +250,5 @@ func init() {
 	locateCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	locateCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on positive strand")
 	locateCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
-
+	locateCmd.Flags().BoolP("non-greedy", "G", false, "non-greedy mode, faster but may miss motifs overlaping with others")
 }
