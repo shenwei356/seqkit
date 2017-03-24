@@ -145,7 +145,7 @@ Usage
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.5.0
+Version: 0.5.2
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -241,7 +241,7 @@ Usage:
 Flags:
   -p, --complement                complement sequence (blank for Protein sequence)
       --dna2rna                   DNA to RNA
-  -G, --gap-letter string         gap letters (default "- ")
+  -G, --gap-letter string         gap letters (default "- .")
   -l, --lower-case                print sequences in lower case
   -n, --name                      only print names
   -i, --only-id                   print ID instead of full head
@@ -575,7 +575,7 @@ Aliases:
 
 Flags:
   -a, --all                  all statistics, including sum_gap, N50, L50
-  -G, --gap-letters string   gap letters (default "- ")
+  -G, --gap-letters string   gap letters (default "- .")
 
 ```
 
@@ -822,6 +822,7 @@ Usage:
 Flags:
   -d, --degenerate                pattern/motif contains degenerate base
   -i, --ignore-case               ignore case
+  -G, --non-greedy                non-greedy mode, faster but may miss motifs overlaping with others
   -P, --only-positive-strand      only search on positive strand
   -p, --pattern stringSlice       pattern/motif (multiple values supported. use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
   -f, --pattern-file string       pattern/motif file (FASTA format)
@@ -848,6 +849,20 @@ Examples
 
     Notice that `seqkit grep` only searches in positive strand, but `seqkit loate` could recognize both strand
 
+1. greedy mode (default)
+
+         $ echo -e '>seq\nACGACGACGA' | seqkit locate -p ACGA | csvtk -t pretty
+         seqID   patternName   pattern   strand   start   end   matched
+         seq     ACGA          ACGA      +        1       4     ACGA
+         seq     ACGA          ACGA      +        4       7     ACGA
+         seq     ACGA          ACGA      +        7       10    ACGA
+
+1. non-greedy mode (`-G`)
+
+        $ echo -e '>seq\nACGACGACGA' | seqkit locate -p ACGA -G | csvtk -t pretty
+        seqID   patternName   pattern   strand   start   end   matched
+        seq     ACGA          ACGA      +        1       4     ACGA
+        seq     ACGA          ACGA      +        7       10    ACGA
 
 ## rmdup
 
