@@ -111,6 +111,9 @@ Examples:
 				checkError(chunk.Err)
 				for _, data := range chunk.Data {
 					p := data.(string)
+					if p == "" {
+						continue
+					}
 					if degenerate || useRegexp {
 						if degenerate {
 							pattern2seq, err := seq.NewSeq(alphabet, []byte(p))
