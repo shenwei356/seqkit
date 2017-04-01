@@ -208,14 +208,20 @@ run grep_by_regexp $app grep -r -p "^hsa" $file
 assert_equal $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1) $($app fx2tab $file | grep -E "^hsa" | $app tab2fx | md5sum | cut -d" " -f 1)
 
 # by list
+
+$app fx2tab -n $file -i | cut -f 1 > list
+run grep_by_list_all $app grep -f list $file
+assert_equal $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1) $(md5sum $file | cut -d" " -f 1)
+rm list
+
 cat $file | $app head -n 100 | $app seq -n -i > list
-run grep_by_list $app grep -f list $file
-assert_equal $($app fx2tab $STDOUT_FILE | wc -l | cut -d" " -f 1) 100
+run grep_by_list_head100 $app grep -f list $file
+assert_equal $($app fx2tab $STDOUT_FILE | wc -l) 100
 rm list
 
 echo -en "Homo\nMus\n" > list
 run grep_by_regexp_list $app grep -r -n -f list $file
-assert_equal $($app fx2tab $STDOUT_FILE | wc -l | cut -d" " -f 1) $($app seq -n $file | grep -E "Homo|Mus" | wc -l | cut -d" " -f 1)
+assert_equal $($app fx2tab $STDOUT_FILE | wc -l) $($app seq -n $file | grep -E "Homo|Mus" | wc -l)
 rm list
 
 # ------------------------------------------------------------
