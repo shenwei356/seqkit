@@ -8,7 +8,7 @@
         <meta name="author" content="Wei Shen">
         
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>Development Notes - SeqKit - Ultrafast FASTA/Q kit</title>
+        <title>Notes - SeqKit - Ultrafast FASTA/Q kit</title>
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.0.3.css" rel="stylesheet">
         <link rel="stylesheet" href="../css/highlight.css">
@@ -82,7 +82,7 @@
                     
                         
 <li >
-    <a href="../faq/">FAQ (New!)</a>
+    <a href="../faq/">FAQ</a>
 </li>
 
                     
@@ -100,7 +100,7 @@
                     
                         
 <li class="active">
-    <a href="./">Development Notes</a>
+    <a href="./">Notes</a>
 </li>
 
                     
@@ -168,9 +168,11 @@
     <ul class="nav bs-sidenav">
     
     
-        <li class="main active"><a href="#development-notes">Development Notes</a></li>
+        <li class="main active"><a href="#notes">Notes</a></li>
         
             <li><a href="#sequence-parsing-strategies">Sequence Parsing Strategies</a></li>
+        
+            <li><a href="#effect-of-random-seed-on-results-of-seqkit-sample">Effect of random seed on results of seqkit sample</a></li>
         
     
     
@@ -178,12 +180,62 @@
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="development-notes">Development Notes</h1>
+<h1 id="notes">Notes</h1>
 <h2 id="sequence-parsing-strategies">Sequence Parsing Strategies</h2>
 <p>In general, most FASTA/Q file processing softwares read one sequence record and process it immediately, and then read the next one (Fig 1A). The early version of SeqKit adopted this strategy too; however, our sequence parsing algorithm was not efficient. Therefore, we tried another strategy by using a separated thread to non-blocking read and parse sequences (Fig 1B): The sequence parsing thread parsed fixed number of sequences and packaged them into Chunks, then one or more chunks were buffered in memory so they could be paralleled processed by one or more processing threads. This strategy saved time by reducing the waiting time between parsing sequences and by paralleled processing of sequences in some cases. However, this strategy consumes more memories especially for long sequences like human genome and it is hard to find an optimum combination of buffer and chunk size for different scales of sequences. </p>
 <p>During the major revision, we kept on optimizing the sequence parsing algorithm and several optimizations had been made (<a href="https://github.com/shenwei356/seqkit/releases/tag/v0.2.7">Seqkit v0.2.7</a>). The most important one is using custom buffered file reading algorithm instead of using standard library “bufio” which is not efficient in memory for large sequences. This increased the speed and lowered memory usage significantly. Note that the “buffer” here is different from the previously mentioned one in Fig 1B, this “buffer” evolved in the low level processing of file reading. At last, the FASTA/Q format parsing algorithm was significant improved by factor of about 3× in speed and the memory usage was only 1/2 compared to SeqKit version 0.2.4 in the first manuscript (this was not descripted in the manuscript). Therefore, we discarded the strategy of “buffer and chunk” and adopt the serially reading strategy again (Fig 1C). The only difference between Fig C and Fig A is that the time of parsing one sequence is much shorter.</p>
 <p><img alt="sequence-parsing-strategies.png" src="../files/sequence-parsing-strategies.png" /></p>
 <p><strong>Figure 1 Illustration of FASTA/Q file parsing strategies</strong>. (A) and (C) Main thread parses one sequence, waits (blocked) it to be processed and then parses next one. (B) Sequence parsing thread continuously (non-blocked) parses sequences and passes them to main thread. The width of rectangles representing sequence parsing and sequence processing is proportional with running time. Sequence parsing speeds in (A) and (B) are the same, which are both much slower than that in (C). The speeds of sequence processing are identical in (A), (B) and (C). In (B), chunks of sequences in buffer can be processed in parallel, but most of the time the main thread needs to serially manipulate the sequences.</p>
+<h2 id="effect-of-random-seed-on-results-of-seqkit-sample">Effect of random seed on results of <code>seqkit sample</code></h2>
+<p><code>seqkit sample</code> supports FASTA/Q sampling by proportion or amount.</p>
+<ul>
+<li>For sampling by proportion (<code>P</code>), SeqKit returns a record if a random number (<code>[0, 1</code>])
+  is less than <code>P</code>.</li>
+<li>For sampling by amount (<code>N</code>), Seqkit firstly gets the total amount of records,
+  and compute the proportion (<code>P</code>), and sampling by proportion (<code>P</code>).
+  Cause the generated random number is <a href="https://en.wikipedia.org/wiki/Pseudorandomness">pseudorandom</a>
+  and affected by the random seed (<code>-s/--rand-seed</code>), the number of sampled records
+  may not be equal to <code>N</code>.</li>
+</ul>
+<p>Here we evaluate the effect of random seed on <code>seqkit sample</code> results.
+Used softwares</p>
+<ul>
+<li>csvtk: <a href="https://github.com/shenwei356/csvtk">https://github.com/shenwei356/csvtk</a></li>
+<li>rush: <a href="https://github.com/shenwei356/rush">https://github.com/shenwei356/rush</a></li>
+</ul>
+<h3 id="amount-distribution-of-sampled-records">Amount distribution of sampled records</h3>
+<p>1000 FASTA records with IDs of <code>1</code>, <code>2</code>, ..., <code>1000</code> were sampled by proportion of <code>0.1</code>
+with random seeds from <code>1</code> to <code>1000</code>, and the distribution of number of sampled records
+was plotted in boxplot.</p>
+<pre><code>seq 1000 \
+    | rush 'seq 1000 | csvtk -t -H mutate | seqkit tab2fx \
+        | seqkit sample -p 0.1 -s {} \
+        | seqkit fx2tab | wc -l' \
+    &gt; ns.txt
+
+cat ns.txt | csvtk -H -t plot box -f 1 --horiz --height 2 \
+    --xlab "# of sampled records" \
+    &gt; ns.png
+</code></pre>
+<p><img alt="" src="../files/ns.png" /></p>
+<h3 id="location-distribution-of-sampled-records">Location distribution of sampled records</h3>
+<p>1000 FASTA records with IDs of <code>1</code>, <code>2</code>, ..., <code>1000</code> were sampled by proportion of <code>0.1</code>
+with random seeds from <code>1</code> to <code>10</code>. The record IDs (<code>x axis</code>) was used to plot a scatter plot,
+which show the location distribution of sampled records. The ideal distribution
+would produces a straight line in the plot.</p>
+<pre><code>seq 10 \
+    | rush 'seq 1000 | csvtk -t -H mutate | seqkit tab2fx \
+        | seqkit sample -p 0.1 -s {} \
+        | seqkit fx2tab | csvtk -H -t mutate \
+        | csvtk -H -t replace -f 2 -p '.+' -r '{nr}' \
+        | csvtk -H -t replace -f 4 -p '.+' -r {}' \
+    | csvtk -H -t plot line -x 1 -y 2 -g 4 \
+        --xlab "sampled locations" --ylab "new ID of sampled records" \
+        --title "location distribution of sampled records" \
+        --width 8 --height 6 --point-size 2 \
+    &gt; pos.png
+</code></pre>
+<p><img alt="" src="../files/pos.png" /></p>
 <div id="disqus_thread"></div>
 
 <script>

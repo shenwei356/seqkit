@@ -82,7 +82,7 @@
                     
                         
 <li >
-    <a href="../faq/">FAQ (New!)</a>
+    <a href="../faq/">FAQ</a>
 </li>
 
                     
@@ -100,7 +100,7 @@
                     
                         
 <li >
-    <a href="../note/">Development Notes</a>
+    <a href="../note/">Notes</a>
 </li>
 
                     
@@ -353,7 +353,7 @@ reproduced in different environments with same random seed.</p>
 <p>Usage</p>
 <pre><code>SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.5.2
+Version: 0.5.3
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -1304,6 +1304,7 @@ Flags:
 [INFO] sample by number
 [INFO] 949 sequences outputed
 </code></pre>
+<p>949 != 1000 ??? see <a href="http:bioinf.shenwei.me/seqkit/note/#effect-of-random-seed-on-results-of-seqkit-sample">Effect of random seed on results of <code>seqkit sample</code></a></p>
 <p><strong><em>To reduce memory usage when spliting big file, we could use flag <code>--two-pass</code></em></strong></p>
 <p><strong><em>We can also use <code>seqkit sample -p</code> followed with <code>seqkit head -n</code>:</em></strong></p>
 <pre><code>$ zcat hairpin.fa.gz | seqkit sample -p 0.1 | seqkit head -n 1000 -o sample.fa.gz
