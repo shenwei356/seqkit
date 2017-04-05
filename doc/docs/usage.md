@@ -145,7 +145,7 @@ Usage
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.5.2
+Version: 0.5.3
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -1084,6 +1084,8 @@ Examples
         [INFO] sample by number
         [INFO] 949 sequences outputed
 
+    949 != 1000 ??? see [Effect of random seed on results of `seqkit sample`](http:bioinf.shenwei.me/seqkit/note/#effect-of-random-seed-on-results-of-seqkit-sample)
+    
     ***To reduce memory usage when spliting big file, we could use flag `--two-pass`***
 
     ***We can also use `seqkit sample -p` followed with `seqkit head -n`:***

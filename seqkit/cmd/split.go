@@ -303,6 +303,10 @@ Examples:
 					log.Infof("read %d sequences", len(allRecords))
 				}
 
+				if len(allRecords) > 0 && len(allRecords[0].Seq.Qual) > 0 {
+					config.LineWidth = 0
+				}
+
 				n := len(allRecords)
 				if n%part > 0 {
 					size = int(n/part) + 1
@@ -468,6 +472,10 @@ Examples:
 				checkError(err)
 				if !quiet {
 					log.Infof("read %d sequences", len(allRecords))
+				}
+
+				if len(allRecords) > 0 && len(allRecords[0].Seq.Qual) > 0 {
+					config.LineWidth = 0
 				}
 
 				recordsByID := make(map[string][]*fastx.Record)
@@ -638,6 +646,10 @@ Examples:
 				checkError(err)
 				if !quiet {
 					log.Infof("read %d sequences", len(allRecords))
+				}
+
+				if len(allRecords) > 0 && len(allRecords[0].Seq.Qual) > 0 {
+					config.LineWidth = 0
 				}
 
 				recordsBySeqs := make(map[string][]*fastx.Record)

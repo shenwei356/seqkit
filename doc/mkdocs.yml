@@ -4,10 +4,10 @@ pages:
 - Download: download.md
 - Documents:
     - Usage: usage.md
-    - FAQ (New!): faq.md
+    - FAQ: faq.md
     - Tutorial: tutorial.md
     - Benchmark: benchmark.md
-    - Development Notes: note.md
+    - Notes: note.md
 - Links:
     - More tools: bioinf.md
     - YanLi Lab: yanlilab.md

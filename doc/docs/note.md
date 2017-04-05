@@ -1,4 +1,4 @@
-# Development Notes
+# Notes
 
 
 ## Sequence Parsing Strategies
@@ -10,6 +10,64 @@ During the major revision, we kept on optimizing the sequence parsing algorithm 
 ![sequence-parsing-strategies.png](files/sequence-parsing-strategies.png)
 
 **Figure 1 Illustration of FASTA/Q file parsing strategies**. (A) and (C) Main thread parses one sequence, waits (blocked) it to be processed and then parses next one. (B) Sequence parsing thread continuously (non-blocked) parses sequences and passes them to main thread. The width of rectangles representing sequence parsing and sequence processing is proportional with running time. Sequence parsing speeds in (A) and (B) are the same, which are both much slower than that in (C). The speeds of sequence processing are identical in (A), (B) and (C). In (B), chunks of sequences in buffer can be processed in parallel, but most of the time the main thread needs to serially manipulate the sequences.
+
+
+## Effect of random seed on results of `seqkit sample`
+
+`seqkit sample` supports FASTA/Q sampling by proportion or amount.
+
+- For sampling by proportion (`P`), SeqKit returns a record if a random number (`[0, 1`])
+  is less than `P`.
+- For sampling by amount (`N`), Seqkit firstly gets the total amount of records,
+  and compute the proportion (`P`), and sampling by proportion (`P`).
+  Cause the generated random number is [pseudorandom](https://en.wikipedia.org/wiki/Pseudorandomness)
+  and affected by the random seed (`-s/--rand-seed`), the number of sampled records
+  may not be equal to `N`.
+
+Here we evaluate the effect of random seed on `seqkit sample` results.
+Used softwares
+
+- csvtk: [https://github.com/shenwei356/csvtk](https://github.com/shenwei356/csvtk)
+- rush: [https://github.com/shenwei356/rush](https://github.com/shenwei356/rush)
+
+### Amount distribution of sampled records
+
+1000 FASTA records with IDs of `1`, `2`, ..., `1000` were sampled by proportion of `0.1`
+with random seeds from `1` to `1000`, and the distribution of number of sampled records
+was plotted in boxplot.
+
+    seq 1000 \
+        | rush 'seq 1000 | csvtk -t -H mutate | seqkit tab2fx \
+            | seqkit sample -p 0.1 -s {} \
+            | seqkit fx2tab | wc -l' \
+        > ns.txt
+
+    cat ns.txt | csvtk -H -t plot box -f 1 --horiz --height 2 \
+        --xlab "# of sampled records" \
+        > ns.png
+
+![](files/ns.png)
+
+### Location distribution of sampled records
+
+1000 FASTA records with IDs of `1`, `2`, ..., `1000` were sampled by proportion of `0.1`
+with random seeds from `1` to `10`. The record IDs (`x axis`) was used to plot a scatter plot,
+which show the location distribution of sampled records. The ideal distribution
+would produces a straight line in the plot.
+
+    seq 10 \
+        | rush 'seq 1000 | csvtk -t -H mutate | seqkit tab2fx \
+            | seqkit sample -p 0.1 -s {} \
+            | seqkit fx2tab | csvtk -H -t mutate \
+            | csvtk -H -t replace -f 2 -p '.+' -r '{nr}' \
+            | csvtk -H -t replace -f 4 -p '.+' -r {}' \
+        | csvtk -H -t plot line -x 1 -y 2 -g 4 \
+            --xlab "sampled locations" --ylab "new ID of sampled records" \
+            --title "location distribution of sampled records" \
+            --width 8 --height 6 --point-size 2 \
+        > pos.png
+
+![](files/pos.png)
 
 
 <div id="disqus_thread"></div>
