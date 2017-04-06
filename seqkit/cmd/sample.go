@@ -135,6 +135,10 @@ var sampleCmd = &cobra.Command{
 				records, err := fastx.GetSeqs(file, alphabet, config.Threads, 10, idRegexp)
 				checkError(err)
 
+				if len(records) > 0 && len(records[0].Seq.Qual) > 0 {
+					config.LineWidth = 0
+				}
+
 				proportion = float64(number) / float64(len(records))
 
 				for _, record := range records {
