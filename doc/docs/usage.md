@@ -409,6 +409,7 @@ Flags:
   -d, --down-stream int   down stream length
       --feature value     select limited feature types (multiple value supported, case ignored, only works with GTF) (default [])
       --gtf string        by GTF (version 2.2) file
+      --gtf-tag string        output this tag as sequence comment (default "gene_id")
   -f, --only-flank        only return up/down stream sequence
   -r, --region string     by region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases, 13:-1 for cutting first 12 bases. type "seqkit subseq -h" for more examples
   -u, --up-stream int     up stream length
@@ -1085,7 +1086,7 @@ Examples
         [INFO] 949 sequences outputed
 
     949 != 1000 ??? see [Effect of random seed on results of `seqkit sample`](http:bioinf.shenwei.me/seqkit/note/#effect-of-random-seed-on-results-of-seqkit-sample)
-    
+
     ***To reduce memory usage when spliting big file, we could use flag `--two-pass`***
 
     ***We can also use `seqkit sample -p` followed with `seqkit head -n`:***

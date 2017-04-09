@@ -80,6 +80,7 @@ Examples:
 
 		gtfFile := getFlagString(cmd, "gtf")
 		bedFile := getFlagString(cmd, "bed")
+		gtfTag := getFlagString(cmd, "gtf-tag")
 		choosedFeatures := getFlagStringSlice(cmd, "feature")
 		choosedFeatures2 := make([]string, len(choosedFeatures))
 		for i, f := range choosedFeatures {
@@ -145,9 +146,9 @@ Examples:
 			var features []gtf.Feature
 			var err error
 			if len(chrs) > 0 || len(choosedFeatures) > 0 {
-				features, err = gtf.ReadFilteredFeatures(gtfFile, chrs, choosedFeatures, []string{"gene_id"})
+				features, err = gtf.ReadFilteredFeatures(gtfFile, chrs, choosedFeatures, []string{gtfTag})
 			} else {
-				features, err = gtf.ReadFilteredFeatures(gtfFile, []string{}, []string{}, []string{"gene_id"})
+				features, err = gtf.ReadFilteredFeatures(gtfFile, []string{}, []string{}, []string{gtfTag})
 			}
 			checkError(err)
 
@@ -263,7 +264,7 @@ Examples:
 
 							subseqByGTFFile(outfh, record, config.LineWidth,
 								gtfFeaturesMap, choosedFeatures,
-								onlyFlank, upStream, downStream)
+								onlyFlank, upStream, downStream, gtfTag)
 						}
 
 						continue
@@ -327,7 +328,7 @@ Examples:
 
 					subseqByGTFFile(outfh, record, config.LineWidth,
 						gtfFeaturesMap, choosedFeatures,
-						onlyFlank, upStream, downStream)
+						onlyFlank, upStream, downStream, gtfTag)
 
 				} else if bedFile != "" {
 					seqname := strings.ToLower(string(record.ID))
@@ -355,11 +356,11 @@ func subseqByRegion(outfh *xopen.Writer, record *fastx.Record, lineWidth int, st
 
 func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 	gtfFeaturesMap map[string]type2gtfFeatures, choosedFeatures []string,
-	onlyFlank bool, upStream int, downStream int) {
+	onlyFlank bool, upStream int, downStream int, gtfTag string) {
 
 	seqname := strings.ToLower(string(record.ID))
 
-	var strand, geneID, outname, flankInfo string
+	var strand, tag, outname, flankInfo string
 	var s, e int
 	var subseq *seq.Seq
 
@@ -423,10 +424,10 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 			} else {
 				strand = *feature.Strand
 			}
-			geneID = ""
+			tag = ""
 			for _, arrtribute := range feature.Attributes {
-				if arrtribute.Tag == "gene_id" {
-					geneID = arrtribute.Value
+				if arrtribute.Tag == gtfTag {
+					tag = arrtribute.Value
 					break
 				}
 			}
@@ -449,7 +450,7 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 			} else {
 				flankInfo = ""
 			}
-			outname = fmt.Sprintf("%s_%d-%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, geneID)
+			outname = fmt.Sprintf("%s_%d-%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, tag)
 			newRecord, err := fastx.NewRecord(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq)
 			checkError(err)
 			outfh.Write(newRecord.Format(lineWidth))
@@ -559,4 +560,5 @@ func init() {
 	subseqCmd.Flags().IntP("down-stream", "d", 0, "down stream length")
 	subseqCmd.Flags().BoolP("only-flank", "f", false, "only return up/down stream sequence")
 	subseqCmd.Flags().StringP("bed", "", "", "by BED file")
+	subseqCmd.Flags().StringP("gtf-tag", "", "gene_id", `output this tag as sequence comment`)
 }
