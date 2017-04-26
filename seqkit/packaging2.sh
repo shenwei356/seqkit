@@ -10,7 +10,7 @@ for f in seqkit_*; do
     mkdir -p $dir/$f;
     mv $f $dir/$f;
     cd $dir/$f;
-    brename -p '_[^\.]+';
+    mv $f $(echo $f | perl -pe 's/_[^\.]+//g');
     tar -zcf $f.tar.gz seqkit*;
     mv *.tar.gz ../;
     cd ..;
