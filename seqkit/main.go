@@ -21,10 +21,13 @@
 package main
 
 import (
+	"io"
 	"os"
+	"runtime"
 	// "runtime/pprof"
 
-	"github.com/op/go-logging"
+	colorable "github.com/mattn/go-colorable"
+	"github.com/shenwei356/go-logging"
 	"github.com/shenwei356/seqkit/seqkit/cmd"
 )
 
@@ -34,7 +37,11 @@ var logFormat = logging.MustStringFormatter(
 )
 
 func init() {
-	backend := logging.NewLogBackend(os.Stderr, "", 0)
+	var stderr io.Writer = os.Stderr
+	if runtime.GOOS == "windows" {
+		stderr = colorable.NewColorableStderr()
+	}
+	backend := logging.NewLogBackend(stderr, "", 0)
 	backendFormatter := logging.NewBackendFormatter(backend, logFormat)
 	logging.SetBackend(backendFormatter)
 }

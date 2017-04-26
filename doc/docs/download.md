@@ -11,6 +11,7 @@ SeqKit is implemented in [Go](https://golang.org/) programming language,
 
 - `seqkit subseq --gtf`, add flag `--gtf-tag` to set tag that's outputted as sequence comment
 - fix `seqkit split` and `seqkit sample`: forget not to wrap sequence and quality in output for FASTQ format
+- compile with go1.8.1
 
 
 ### Links

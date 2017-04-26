@@ -20,6 +20,6 @@
 
 package cmd
 
-import "github.com/op/go-logging"
+import "github.com/shenwei356/go-logging"
 
 var log = logging.MustGetLogger("seqkit")
