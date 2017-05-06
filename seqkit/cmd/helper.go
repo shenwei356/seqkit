@@ -381,7 +381,7 @@ var bufferedByteSliceWrapper *byteutil.BufferedByteSliceWrapper
 // 	bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper(1, defaultBytesBufferSize)
 // }
 
-func readKVs(file string) (map[string]string, error) {
+func readKVs(file string, ignoreCase bool) (map[string]string, error) {
 	type KV [2]string
 	fn := func(line string) (interface{}, bool, error) {
 		if len(line) == 0 {
@@ -391,7 +391,9 @@ func readKVs(file string) (map[string]string, error) {
 		if len(items) < 2 {
 			return nil, false, nil
 		}
-
+		if ignoreCase {
+			return KV([2]string{strings.ToLower(items[0]), items[1]}), true, nil
+		}
 		return KV([2]string{items[0], items[1]}), true, nil
 	}
 	kvs := make(map[string]string)

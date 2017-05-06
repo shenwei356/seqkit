@@ -119,20 +119,12 @@ Special replacement symbols (only for replacing name not sequence):
 				checkError(fmt.Errorf(`since replacement symbol "{kv}"/"{KV}" found in value of flag -r (--replacement), tab-delimited key-value file should be given by flag -k (--kv-file)`))
 			}
 			log.Infof("read key-value file: %s", kvFile)
-			kvs, err = readKVs(kvFile)
+			kvs, err = readKVs(kvFile, ignoreCase)
 			if err != nil {
 				checkError(fmt.Errorf("read key-value file: %s", err))
 			}
 			if len(kvs) == 0 {
 				checkError(fmt.Errorf("no valid data in key-value file: %s", kvFile))
-			}
-
-			if ignoreCase {
-				kvs2 := make(map[string]string, len(kvs))
-				for k, v := range kvs {
-					kvs2[strings.ToLower(k)] = v
-				}
-				kvs = kvs2
 			}
 
 			log.Infof("%d pairs of key-value loaded", len(kvs))
@@ -228,7 +220,7 @@ func init() {
 		`tab-delimited key-value file for replacing key with value when using "{kv}" in -r (--replacement) (only for sequence name)`)
 	replaceCmd.Flags().BoolP("keep-key", "K", false, "keep the key as value when no value found for the key (only for sequence name)")
 	replaceCmd.Flags().IntP("key-capt-idx", "I", 1, "capture variable index of key (1-based)")
-	replaceCmd.Flags().StringP("key-miss-repl", "", "", "replacement for key with no corresponding value")
+	replaceCmd.Flags().StringP("key-miss-repl", "m", "", "replacement for key with no corresponding value")
 }
 
 var reNR = regexp.MustCompile(`\{(NR|nr)\}`)
