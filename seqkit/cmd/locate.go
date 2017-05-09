@@ -65,6 +65,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
 		nonGreedy := getFlagBool(cmd, "non-greedy")
+		outFmtGTF := getFlagBool(cmd, "gtf")
 
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
@@ -123,7 +124,9 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		checkError(err)
 		defer outfh.Close()
 
-		outfh.WriteString("seqID\tpatternName\tpattern\tstrand\tstart\tend\tmatched\n")
+		if !outFmtGTF {
+			outfh.WriteString("seqID\tpatternName\tpattern\tstrand\tstart\tend\tmatched\n")
+		}
 		var seqRP *seq.Seq
 		var offset, l int
 		var loc []int
@@ -169,14 +172,27 @@ For example: "\w" will be wrongly converted to "\[AT]".
 						}
 
 						if flag {
-							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-								record.ID,
-								pName,
-								patterns[pName],
-								"+",
-								begin,
-								end,
-								record.Seq.Seq[offset+loc[0]:offset+loc[1]]))
+							if outFmtGTF {
+								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%s\tgene_id \"%s\"; \n",
+									record.ID,
+									"SeqKit",
+									"location",
+									begin,
+									end,
+									0,
+									"+",
+									".",
+									pName))
+							} else {
+								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+									record.ID,
+									pName,
+									patterns[pName],
+									"+",
+									begin,
+									end,
+									record.Seq.Seq[offset+loc[0]:offset+loc[1]]))
+							}
 							locs = append(locs, [2]int{begin, end})
 						}
 
@@ -215,14 +231,27 @@ For example: "\w" will be wrongly converted to "\[AT]".
 						}
 
 						if flag {
-							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-								record.ID,
-								pName,
-								patterns[pName],
-								"-",
-								begin,
-								end,
-								record.Seq.SubSeq(l-offset-loc[1]+1, l-offset-loc[0]).RevCom().Seq))
+							if outFmtGTF {
+								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%s\tgene_id \"%s\"; \n",
+									record.ID,
+									"SeqKit",
+									"location",
+									begin,
+									end,
+									0,
+									"-",
+									".",
+									pName))
+							} else {
+								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+									record.ID,
+									pName,
+									patterns[pName],
+									"-",
+									begin,
+									end,
+									record.Seq.SubSeq(l-offset-loc[1]+1, l-offset-loc[0]).RevCom().Seq))
+							}
 							locsNeg = append(locsNeg, [2]int{begin, end})
 						}
 
@@ -251,4 +280,5 @@ func init() {
 	locateCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on positive strand")
 	locateCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
 	locateCmd.Flags().BoolP("non-greedy", "G", false, "non-greedy mode, faster but may miss motifs overlaping with others")
+	locateCmd.Flags().BoolP("gtf", "", false, "output in GTF format")
 }
