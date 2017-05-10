@@ -145,7 +145,7 @@ Usage
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.5.3
+Version: 0.5.5
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -821,7 +821,9 @@ Usage:
   seqkit locate [flags]
 
 Flags:
+      --bed                       output in BED6 format
   -d, --degenerate                pattern/motif contains degenerate base
+      --gtf                       output in GTF format
   -i, --ignore-case               ignore case
   -G, --non-greedy                non-greedy mode, faster but may miss motifs overlaping with others
   -P, --only-positive-strand      only search on positive strand
@@ -848,7 +850,17 @@ Examples
         cel-mir-58a   AUGGACUN      AUGGACUN   +        81      88    AUGGACUG
         ath-MIR163    AUGGACUN      AUGGACUN   -        122     129   AUGGACUC
 
-    Notice that `seqkit grep` only searches in positive strand, but `seqkit loate` could recognize both strand
+    Notice that `seqkit grep` only searches in positive strand, but `seqkit loate` could recognize both strand.
+
+1. Output in `GTF` or `BED6` format, which you can use in `seqkit subseq`
+
+        $ zcat hairpin.fa.gz | seqkit locate -i -d -p AUGGACUN --bed
+        cel-mir-58a     80      88      AUGGACUN        0       +
+        ath-MIR163      121     129     AUGGACUN        0       -
+
+        $ zcat hairpin.fa.gz | seqkit locate -i -d -p AUGGACUN --gtf
+        cel-mir-58a     SeqKit  location        81      88      0       +       .       gene_id "AUGGACUN";
+        ath-MIR163      SeqKit  location        122     129     0       -       .       gene_id "AUGGACUN";
 
 1. greedy mode (default)
 
@@ -1305,7 +1317,7 @@ Flags:
 Examples
 
 ```
-$ echo -e ">a comment\nacgt\n>b comment of b\nACTG\n>a comment\naaaa"  
+$ echo -e ">a comment\nacgt\n>b comment of b\nACTG\n>a comment\naaaa"
 >a comment
 acgt
 >b comment of b
