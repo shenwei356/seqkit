@@ -333,7 +333,7 @@ Examples:
 				} else if bedFile != "" {
 					seqname := strings.ToLower(string(record.ID))
 					if _, ok := bedFeatureMap[seqname]; !ok {
-						return
+						continue
 					}
 
 					subSeqByBEDFile(outfh, record, config.LineWidth,

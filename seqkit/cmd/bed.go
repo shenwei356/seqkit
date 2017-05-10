@@ -59,12 +59,14 @@ func ReadBedFilteredFeatures(file string, chrs []string) ([]BedFeature, error) {
 	}
 
 	fn := func(line string) (interface{}, bool, error) {
-		if len(line) == 0 || line[0] == '#' || string(line[0:7]) == "browser" || string(line[0:5]) == "track" {
+		line = strings.TrimRight(line, "\r\n")
+
+		if line == "" || line[0] == '#' || string(line[0:7]) == "browser" || string(line[0:5]) == "track" {
 			return nil, false, nil
 		}
 		//
 		// do not use regexp.Split(), it's very slow
-		items := stringutil.Split(strings.TrimRight(line, "\r\n"), " \t")
+		items := stringutil.Split(line, " \t")
 		n := len(items)
 		if n < 3 {
 			return nil, false, nil
@@ -78,11 +80,14 @@ func ReadBedFilteredFeatures(file string, chrs []string) ([]BedFeature, error) {
 
 		start, err := strconv.Atoi(items[1])
 		if err != nil {
-			return nil, false, fmt.Errorf("bad start: %s", items[1])
+			return nil, false, fmt.Errorf("%s: bad start: %s", items[0], items[1])
 		}
 		end, err := strconv.Atoi(items[2])
 		if err != nil {
-			return nil, false, fmt.Errorf("bad end: %s", items[2])
+			return nil, false, fmt.Errorf("%s: bad end: %s", items[0], items[2])
+		}
+		if start >= end {
+			return nil, false, fmt.Errorf("%s: start (%d) must be <= end (%d)", items[0], start, end)
 		}
 
 		var name *string

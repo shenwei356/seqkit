@@ -66,6 +66,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
 		nonGreedy := getFlagBool(cmd, "non-greedy")
 		outFmtGTF := getFlagBool(cmd, "gtf")
+		outFmtBED := getFlagBool(cmd, "bed")
 
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
@@ -124,7 +125,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		checkError(err)
 		defer outfh.Close()
 
-		if !outFmtGTF {
+		if !(outFmtGTF || outFmtBED) {
 			outfh.WriteString("seqID\tpatternName\tpattern\tstrand\tstart\tend\tmatched\n")
 		}
 		var seqRP *seq.Seq
@@ -183,6 +184,14 @@ For example: "\w" will be wrongly converted to "\[AT]".
 									"+",
 									".",
 									pName))
+							} else if outFmtBED {
+								outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
+									record.ID,
+									begin-1,
+									end,
+									pName,
+									0,
+									"+"))
 							} else {
 								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 									record.ID,
@@ -242,6 +251,14 @@ For example: "\w" will be wrongly converted to "\[AT]".
 									"-",
 									".",
 									pName))
+							} else if outFmtBED {
+								outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
+									record.ID,
+									begin-1,
+									end,
+									pName,
+									0,
+									"-"))
 							} else {
 								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 									record.ID,
@@ -281,4 +298,5 @@ func init() {
 	locateCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
 	locateCmd.Flags().BoolP("non-greedy", "G", false, "non-greedy mode, faster but may miss motifs overlaping with others")
 	locateCmd.Flags().BoolP("gtf", "", false, "output in GTF format")
+	locateCmd.Flags().BoolP("bed", "", false, "output in BED6 format")
 }

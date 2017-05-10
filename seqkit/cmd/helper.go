@@ -43,7 +43,7 @@ import (
 )
 
 // VERSION of seqkit
-const VERSION = "0.5.4"
+const VERSION = "0.5.5"
 
 func checkError(err error) {
 	if err != nil {
@@ -300,10 +300,11 @@ func getSeqIDAndLengthFromFaidxFile(file string) ([]string, []int, error) {
 		length int
 	}
 	fn := func(line string) (interface{}, bool, error) {
-		if len(line) == 0 {
+		line = strings.TrimRight(line, "\r\n")
+		if line == "" {
 			return nil, false, nil
 		}
-		items := strings.Split(strings.TrimRight(line, "\r\n"), "\t")
+		items := strings.Split(line, "\t")
 		if len(items) != 5 {
 			return nil, false, nil
 		}
