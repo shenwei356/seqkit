@@ -290,7 +290,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 func init() {
 	RootCmd.AddCommand(locateCmd)
 
-	locateCmd.Flags().StringSliceP("pattern", "p", []string{""}, `pattern/motif (multiple values supported. use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')`)
+	locateCmd.Flags().StringSliceP("pattern", "p", []string{""}, `pattern/motif (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')`)
 	locateCmd.Flags().StringP("pattern-file", "f", "", "pattern/motif file (FASTA format)")
 	locateCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
 	locateCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
