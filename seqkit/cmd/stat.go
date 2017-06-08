@@ -168,7 +168,7 @@ var statCmd = &cobra.Command{
 			columns = append(columns, []prettytable.Column{
 				{Header: "sum_gap", AlignRight: true},
 				{Header: "N50", AlignRight: true},
-				{Header: "L50", AlignRight: true},
+				// {Header: "L50", AlignRight: true},
 			}...)
 		}
 
@@ -200,7 +200,8 @@ var statCmd = &cobra.Command{
 					humanize.Comma(info.lenMax),
 					humanize.Comma(info.gapSum),
 					humanize.Comma(info.N50),
-					humanize.Comma(info.L50))
+					// humanize.Comma(info.L50),
+				)
 			}
 		}
 		outfh.Write(tbl.Bytes())

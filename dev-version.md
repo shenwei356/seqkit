@@ -1,0 +1,2 @@
+- `seqkit stats -a` does not show L5O which may bring confusion ([#15](https://github.com/shenwei356/seqkit/issues/15))
+- `seqkit subseq --bed`: more robust for bad BED files
