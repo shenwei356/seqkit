@@ -61,7 +61,7 @@ func ReadBedFilteredFeatures(file string, chrs []string) ([]BedFeature, error) {
 	fn := func(line string) (interface{}, bool, error) {
 		line = strings.TrimRight(line, "\r\n")
 
-		if line == "" || line[0] == '#' || string(line[0:7]) == "browser" || string(line[0:5]) == "track" {
+		if line == "" || line[0] == '#' || (len(line) > 7 && string(line[0:7]) == "browser") || (len(line) > 5 && string(line[0:5]) == "track") {
 			return nil, false, nil
 		}
 		//
