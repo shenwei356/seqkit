@@ -193,6 +193,8 @@
         
             <li><a href="#locate">locate</a></li>
         
+            <li><a href="#dup">dup</a></li>
+        
             <li><a href="#rmdup">rmdup</a></li>
         
             <li><a href="#common">common</a></li>
@@ -212,6 +214,8 @@
             <li><a href="#shuffle">shuffle</a></li>
         
             <li><a href="#sort">sort</a></li>
+        
+            <li><a href="#genautocomplete">genautocomplete</a></li>
         
     
     </ul>
@@ -247,6 +251,7 @@
 </ul>
 <p><strong>Set operations</strong></p>
 <ul>
+<li><a href="#dup">dup</a></li>
 <li><a href="#rmdup">rmdup</a></li>
 <li><a href="#common">common</a></li>
 <li><a href="#split">split</a></li>
@@ -263,6 +268,10 @@
 <ul>
 <li><a href="#shuffle">shuffle</a></li>
 <li><a href="#sort">sort</a></li>
+</ul>
+<p><strong>Misc</strong></p>
+<ul>
+<li><a href="#genautocomplete">genautocomplete</a></li>
 </ul>
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1102,6 +1111,54 @@ seq     ACGA          ACGA      +        7       10    ACGA
 </code></pre>
 </li>
 </ol>
+<h2 id="dup">dup</h2>
+<p>Usage</p>
+<pre><code>duplicate sequences N times
+
+You may need &quot;seqkit rename&quot; to make the the sequence IDs unique.
+
+Usage:
+  seqkit dup [flags]
+
+Flags:
+  -h, --help        help for dup
+  -n, --times int   duplication number (default 1)
+
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>Data</p>
+<pre><code>$ cat tests/hairpin.fa | seqkit head -n 1
+&gt;cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
+UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
+</code></pre>
+</li>
+<li>
+<p>Duplicate 2 times</p>
+<pre><code>$ cat tests/hairpin.fa | seqkit head -n 1 | seqkit dup -n 2
+&gt;cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
+UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
+&gt;cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
+UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
+</code></pre>
+</li>
+<li>
+<p>use <code>seqkit rename</code> to make the the sequence IDs unique.</p>
+<pre><code>$ cat tests/hairpin.fa | seqkit head -n 1 | seqkit dup -n 2 | seqkit rename
+&gt;cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
+UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
+&gt;cel-let-7_2 cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
+UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
+</code></pre>
+</li>
+</ol>
 <h2 id="rmdup">rmdup</h2>
 <p>Usage</p>
 <pre><code>remove duplicated sequences by id/name/sequence
@@ -1703,6 +1760,37 @@ acgtnAAAAnnn
 </code></pre>
 </li>
 </ol>
+<h2 id="genautocomplete">genautocomplete</h2>
+<p>Usage</p>
+<pre><code>generate shell autocompletion script
+
+Note: The current version supports Bash only.
+This should work for *nix systems with Bash installed.
+
+Howto:
+
+1. run: seqkit genautocomplete
+
+2. create and edit ~/.bash_completion file if you don't have it.
+
+        nano ~/.bash_completion
+
+   add the following:
+
+        for bcfile in ~/.bash_completion.d/* ; do
+          . $bcfile
+        done
+
+Usage:
+  seqkit genautocomplete [flags]
+
+Flags:
+      --file string   autocompletion file (default &quot;/home/shenwei/.bash_completion.d/seqkit.sh&quot;)
+  -h, --help          help for genautocomplete
+      --type string   autocompletion type (currently only bash supported) (default &quot;bash&quot;)
+
+</code></pre>
+
 <div id="disqus_thread"></div>
 
 <script>

@@ -181,6 +181,8 @@
         
             <li><a href="#installation">Installation</a></li>
         
+            <li><a href="#bash-completion">Bash-completion</a></li>
+        
             <li><a href="#technical-details-and-guides-for-use">Technical details and guides for use</a></li>
         
             <li><a href="#usage-examples">Usage &amp;&amp; Examples</a></li>
@@ -245,6 +247,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <li><a href="#features">Features</a></li>
 <li><a href="#subcommands">Subcommands</a></li>
 <li><a href="#installation">Installation</a></li>
+<li><a href="#bash-completion">Bash-completion</a></li>
 <li><a href="#technical-details-and-guides-for-use">Technical details and guides for use</a></li>
 <li><a href="#usage--examples">Usage &amp;&amp; Examples</a></li>
 <li><a href="#benchmark">Benchmark</a></li>
@@ -262,16 +265,17 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <li><strong>Light weight and out-of-the-box, no dependencies, no compilation, no configuration</strong>
   (see <a href="http://bioinf.shenwei.me/seqkit/download/">download</a>)</li>
 <li><strong>UltraFast</strong> (see <a href="./#benchmark">benchmark</a>),
-  <strong>multiple-CPUs supported</strong>.</li>
+  <strong>multiple-CPUs supported</strong></li>
 <li><strong>Practical functions supported by 20 subcommands</strong> (see subcommands and
   <a href="http://bioinf.shenwei.me/seqkit/usage/">usage</a> )</li>
+<li><strong>Support <a href="#bash-completion">Bash-completion</a></strong></li>
 <li><strong>Well documented</strong> (detailed <a href="http://bioinf.shenwei.me/seqkit/usage/">usage</a>
   and <a href="http://bioinf.shenwei.me/seqkit/benchmark/">benchmark</a> )</li>
 <li><strong>Seamlessly parses both FASTA and FASTQ formats</strong></li>
 <li><strong>Support STDIN and gziped input/output file, easy being used in pipe</strong></li>
 <li><strong>Support custom sequence ID regular expression</strong> (especially useful for searching with ID list)</li>
 <li>Reproducible results (configurable rand seed in <code>sample</code> and <code>shuffle</code>)</li>
-<li>Well organized source code, friendly to use and easy to extend.</li>
+<li>Well organized source code, friendly to use and easy to extend</li>
 </ul>
 <h3 id="features-comparison">Features comparison</h3>
 <table>
@@ -533,7 +537,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <p><strong>Note 1</strong>: See <a href="http://bioinf.shenwei.me/seqkit/benchmark/#softwares">version information</a> of the softwares.</p>
 <p><strong>Note 2</strong>: See <a href="http://bioinf.shenwei.me/seqkit/usage/">usage</a> for detailed options of seqkit.</p>
 <h2 id="subcommands">Subcommands</h2>
-<p>20 subcommands in total.</p>
+<p>21 subcommands in total.</p>
 <p><strong>Sequence and subsequence</strong></p>
 <ul>
 <li><code>seq</code>        transform sequences (revserse, complement, extract ID...)</li>
@@ -555,6 +559,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 </ul>
 <p><strong>Set operations</strong></p>
 <ul>
+<li><code>dup</code>        duplicate sequences N times</li>
 <li><code>rmdup</code>      remove duplicated sequences by id/name/sequence</li>
 <li><code>common</code>     find common sequences of multiple files by id/name/sequence</li>
 <li><code>split</code>      split sequences into files by id/seq region/size/parts</li>
@@ -575,6 +580,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <p><strong>Misc</strong></p>
 <ul>
 <li><code>version</code>   print version information and check for update</li>
+<li><code>genautocomplete</code> generate shell autocompletion script</li>
 </ul>
 <h2 id="installation">Installation</h2>
 <p>Go to <a href="http://bioinf.shenwei.me/seqkit/download">Download Page</a> for more download options and changelogs.</p>
@@ -614,6 +620,25 @@ source ~/.bashrc
 <h4 id="method-3-for-go-developer">Method 3: For Go developer</h4>
 <pre><code>go get -u github.com/shenwei356/seqkit/seqkit
 </code></pre>
+<h2 id="bash-completion">Bash-completion</h2>
+<p>Note: The current version supports Bash only.
+This should work for *nix systems with Bash installed.</p>
+<p>Howto:</p>
+<ol>
+<li>
+<p>run: <code>seqkit genautocomplete</code></p>
+</li>
+<li>
+<p>create and edit <code>~/.bash_completion</code> file if you don't have it.</p>
+<pre><code>nano ~/.bash_completion
+</code></pre>
+<p>add the following:</p>
+<pre><code>for bcfile in ~/.bash_completion.d/* ; do
+  . $bcfile
+done
+</code></pre>
+</li>
+</ol>
 <h2 id="technical-details-and-guides-for-use">Technical details and guides for use</h2>
 <h3 id="fastaq-format-parsing">FASTA/Q format parsing</h3>
 <p>SeqKit uses author's lightweight and high-performance bioinformatics packages
