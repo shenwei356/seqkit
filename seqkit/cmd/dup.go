@@ -21,7 +21,6 @@
 package cmd
 
 import (
-	"fmt"
 	"io"
 	"runtime"
 
@@ -31,11 +30,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// renameCmd represents the rename command
-var renameCmd = &cobra.Command{
-	Use:   "rename",
-	Short: "rename duplicated IDs",
-	Long: `rename duplicated IDs
+// dupCmd represents the fq2fa command
+var dupCmd = &cobra.Command{
+	Use:   "dup",
+	Short: "duplicate sequences N times",
+	Long: `duplicate sequences N times
+
+You may need "seqkit rename" to make the the sequence IDs unique.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -48,8 +49,9 @@ var renameCmd = &cobra.Command{
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
+		times := getFlagPositiveInt(cmd, "times")
+
 		files := getFileList(args)
-		byName := getFlagBool(cmd, "by-name")
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
@@ -57,13 +59,11 @@ var renameCmd = &cobra.Command{
 
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
-		var newID string
-		var k string
+		var i int
 		for _, file := range files {
-			numbers := make(map[string]int)
-
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
+
 			for {
 				record, err = fastxReader.Read()
 				if err != nil {
@@ -73,34 +73,16 @@ var renameCmd = &cobra.Command{
 					checkError(err)
 					break
 				}
-				if fastxReader.IsFastq {
-					config.LineWidth = 0
-				}
 
-				if byName {
-					k = string(record.Name)
-				} else {
-					k = string(record.ID)
+				for i = 0; i < times; i++ {
+					record.FormatToWriter(outfh, lineWidth)
 				}
-
-				if _, ok := numbers[k]; ok {
-					numbers[k]++
-					newID = fmt.Sprintf("%s_%d", record.ID, numbers[k])
-					record.Name = []byte(fmt.Sprintf("%s %s", newID, record.Name))
-				} else {
-					numbers[k] = 1
-				}
-
-				record.FormatToWriter(outfh, config.LineWidth)
 			}
-
-			config.LineWidth = lineWidth
 		}
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(renameCmd)
-
-	renameCmd.Flags().BoolP("by-name", "n", false, "check duplicated by full name instead of just id")
+	RootCmd.AddCommand(dupCmd)
+	dupCmd.Flags().IntP("times", "n", 1, "duplication number")
 }

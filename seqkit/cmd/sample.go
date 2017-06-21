@@ -81,6 +81,8 @@ var sampleCmd = &cobra.Command{
 		file := files[0]
 
 		n := int64(0)
+		var record *fastx.Record
+		var fastxReader *fastx.Reader
 		if number > 0 { // by number
 			if !quiet {
 				log.Info("sample by number")
@@ -107,11 +109,11 @@ var sampleCmd = &cobra.Command{
 				if !quiet {
 					log.Info("second pass: reading and sampling")
 				}
-				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
+				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 			LOOP:
 				for {
-					record, err := fastxReader.Read()
+					record, err = fastxReader.Read()
 					if err != nil {
 						if err == io.EOF {
 							break
@@ -156,10 +158,10 @@ var sampleCmd = &cobra.Command{
 				log.Info("sample by proportion")
 			}
 
-			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 			for {
-				record, err := fastxReader.Read()
+				record, err = fastxReader.Read()
 				if err != nil {
 					if err == io.EOF {
 						break

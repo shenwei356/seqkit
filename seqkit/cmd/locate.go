@@ -134,12 +134,13 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		var locs, locsNeg [][2]int
 		var i, begin, end int
 		var flag bool
+		var record *fastx.Record
+		var fastxReader *fastx.Reader
 		for _, file := range files {
-
-			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 			for {
-				record, err := fastxReader.Read()
+				record, err = fastxReader.Read()
 				if err != nil {
 					if err == io.EOF {
 						break

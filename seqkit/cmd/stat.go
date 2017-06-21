@@ -73,12 +73,13 @@ var statCmd = &cobra.Command{
 		checkError(err)
 		defer outfh.Close()
 
-		var fastxReader *fastx.Reader
 		var num, l, lenMin, lenMax, lenSum, gapSum int64
 		var n50, sum, l50 int64
 		var lens sortutil.Int64Slice
 		var seqFormat, t string
 		statInfos := []statInfo{}
+		var record *fastx.Record
+		var fastxReader *fastx.Reader
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -90,7 +91,7 @@ var statCmd = &cobra.Command{
 				lens = make(sortutil.Int64Slice, 0, 1000)
 			}
 			for {
-				record, err := fastxReader.Read()
+				record, err = fastxReader.Read()
 				if err != nil {
 					if err == io.EOF {
 						break

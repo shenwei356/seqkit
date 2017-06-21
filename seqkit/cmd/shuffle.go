@@ -72,6 +72,9 @@ Secondly, seqkit shuffles sequence IDs and extract sequences by FASTA index.
 		}
 
 		index2name := make(map[int]string)
+		var record *fastx.Record
+		var fastxReader *fastx.Reader
+		var err error
 
 		if !twoPass { // read all records into memory
 			sequences := make(map[string]*fastx.Record)
@@ -81,10 +84,10 @@ Secondly, seqkit shuffles sequence IDs and extract sequences by FASTA index.
 			}
 			i := 0
 			for _, file := range files {
-				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
+				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 				for {
-					record, err := fastxReader.Read()
+					record, err = fastxReader.Read()
 					if err != nil {
 						if err == io.EOF {
 							break

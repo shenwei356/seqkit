@@ -113,6 +113,9 @@ and extract sequences by FASTA index.
 
 		// for indexing when output and duplicated sequences checking
 		id2name := make(map[string][]byte)
+		var record *fastx.Record
+		var fastxReader *fastx.Reader
+		var err error
 
 		if !twoPass { // read all records into memory
 			sequences := make(map[string]*fastx.Record)
@@ -122,10 +125,10 @@ and extract sequences by FASTA index.
 			}
 			var name string
 			for _, file := range files {
-				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
+				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 				for {
-					record, err := fastxReader.Read()
+					record, err = fastxReader.Read()
 					if err != nil {
 						if err == io.EOF {
 							break
@@ -198,7 +201,6 @@ and extract sequences by FASTA index.
 			checkError(err)
 			defer outfh.Close()
 
-			var record *fastx.Record
 			if byName || byID || bySeq {
 				for _, kv := range name2sequence {
 					record = sequences[kv.Key]

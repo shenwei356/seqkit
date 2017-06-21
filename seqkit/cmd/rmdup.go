@@ -83,12 +83,14 @@ var rmdupCmd = &cobra.Command{
 		names := make(map[string][]string)
 
 		var subject string
-		removed := 0
+		var removed int
+		var record *fastx.Record
+		var fastxReader *fastx.Reader
 		for _, file := range files {
-			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 			for {
-				record, err := fastxReader.Read()
+				record, err = fastxReader.Read()
 				if err != nil {
 					if err == io.EOF {
 						break

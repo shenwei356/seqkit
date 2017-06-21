@@ -112,6 +112,9 @@ Examples:
 
 		renameFileExt := true
 		var outfile string
+		var record *fastx.Record
+		var fastxReader *fastx.Reader
+		var err error
 
 		if !dryRun {
 			existed, err := pathutil.DirExists(outdir)
@@ -143,10 +146,10 @@ Examples:
 				i := 1
 				records := []*fastx.Record{}
 
-				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
+				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 				for {
-					record, err := fastxReader.Read()
+					record, err = fastxReader.Read()
 					if err != nil {
 						if err == io.EOF {
 							break
@@ -729,7 +732,7 @@ Examples:
 			}
 			region2name := make(map[string][]string)
 
-			fastxReader, err := fastx.NewReader(alphabet2, newFile, idRegexp)
+			fastxReader, err = fastx.NewReader(alphabet2, newFile, idRegexp)
 			checkError(err)
 			var name string
 			var subseq string

@@ -1,2 +1,4 @@
+- add new command `genautocomplete` to generate **shell autocompletion** script! ([#17](https://github.com/shenwei356/seqkit/issues/17))
+- add new command `seqkit dup` for duplicating sequences ([#16](https://github.com/shenwei356/seqkit/issues/16))
 - `seqkit stats -a` does not show L5O which may bring confusion ([#15](https://github.com/shenwei356/seqkit/issues/15))
 - `seqkit subseq --bed`: more robust for bad BED files
