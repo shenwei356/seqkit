@@ -47,7 +47,7 @@ Howto:
 
         nano ~/.bash_completion
 
-   add the following:
+    add the following:
 
         for bcfile in ~/.bash_completion.d/* ; do
           . $bcfile

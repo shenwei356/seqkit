@@ -26,6 +26,7 @@
 
 **Set operations**
 
+- [dup](#dup)
 - [rmdup](#rmdup)
 - [common](#common)
 - [split](#split)
@@ -42,6 +43,10 @@
 
 - [shuffle](#shuffle)
 - [sort](#sort)
+
+**Misc**
+
+- [genautocomplete](#genautocomplete)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -877,6 +882,53 @@ Examples
         seq     ACGA          ACGA      +        1       4     ACGA
         seq     ACGA          ACGA      +        7       10    ACGA
 
+## dup
+
+Usage
+
+```
+duplicate sequences N times
+
+You may need "seqkit rename" to make the the sequence IDs unique.
+
+Usage:
+  seqkit dup [flags]
+
+Flags:
+  -h, --help        help for dup
+  -n, --times int   duplication number (default 1)
+
+```
+
+Examples
+
+1. Data
+
+        $ cat tests/hairpin.fa | seqkit head -n 1
+        >cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+        UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
+        UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
+
+1. Duplicate 2 times
+
+        $ cat tests/hairpin.fa | seqkit head -n 1 | seqkit dup -n 2
+        >cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+        UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
+        UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
+        >cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+        UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
+        UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
+
+1. use `seqkit rename` to make the the sequence IDs unique.
+
+        $ cat tests/hairpin.fa | seqkit head -n 1 | seqkit dup -n 2 | seqkit rename
+        >cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+        UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
+        UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
+        >cel-let-7_2 cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+        UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
+        UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
+
 ## rmdup
 
 Usage
@@ -1486,6 +1538,40 @@ Examples
         ACGTNcccc
         >SEQ2
         acgtnAAAAnnn
+
+## genautocomplete
+
+Usage
+
+```
+generate shell autocompletion script
+
+Note: The current version supports Bash only.
+This should work for *nix systems with Bash installed.
+
+Howto:
+
+1. run: seqkit genautocomplete
+
+2. create and edit ~/.bash_completion file if you don't have it.
+
+        nano ~/.bash_completion
+
+   add the following:
+
+        for bcfile in ~/.bash_completion.d/* ; do
+          . $bcfile
+        done
+
+Usage:
+  seqkit genautocomplete [flags]
+
+Flags:
+      --file string   autocompletion file (default "/home/shenwei/.bash_completion.d/seqkit.sh")
+  -h, --help          help for genautocomplete
+      --type string   autocompletion type (currently only bash supported) (default "bash")
+
+```
 
 <div id="disqus_thread"></div>
 <script>

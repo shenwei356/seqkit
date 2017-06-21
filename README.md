@@ -48,6 +48,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - [Features](#features)
 - [Subcommands](#subcommands)
 - [Installation](#installation)
+- [Bash-completion](#bash-completion)
 - [Technical details and guides for use](#technical-details-and-guides-for-use)
 - [Usage && Examples](#usage--examples)
 - [Benchmark](#benchmark)
@@ -66,16 +67,17 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - **Light weight and out-of-the-box, no dependencies, no compilation, no configuration**
   (see [download](http://bioinf.shenwei.me/seqkit/download/))
 - **UltraFast** (see [benchmark](/#benchmark)),
-  **multiple-CPUs supported**.
+  **multiple-CPUs supported**
 - **Practical functions supported by 20 subcommands** (see subcommands and
   [usage](http://bioinf.shenwei.me/seqkit/usage/) )
+- **Support [Bash-completion](#bash-completion)**
 - **Well documented** (detailed [usage](http://bioinf.shenwei.me/seqkit/usage/)
   and [benchmark](http://bioinf.shenwei.me/seqkit/benchmark/) )
 - **Seamlessly parses both FASTA and FASTQ formats**
 - **Support STDIN and gziped input/output file, easy being used in pipe**
 - **Support custom sequence ID regular expression** (especially useful for searching with ID list)
 - Reproducible results (configurable rand seed in `sample` and `shuffle`)
-- Well organized source code, friendly to use and easy to extend.
+- Well organized source code, friendly to use and easy to extend
 
 ### Features comparison
 
@@ -113,7 +115,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 ## Subcommands
 
-20 subcommands in total.
+21 subcommands in total.
 
 **Sequence and subsequence**
 
@@ -136,6 +138,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 **Set operations**
 
+- `dup`        duplicate sequences N times
 - `rmdup`      remove duplicated sequences by id/name/sequence
 - `common`     find common sequences of multiple files by id/name/sequence
 - `split`      split sequences into files by id/seq region/size/parts
@@ -156,6 +159,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 **Misc**
 
 - `version`   print version information and check for update
+- `genautocomplete` generate shell autocompletion script
 
 ## Installation
 
@@ -193,6 +197,25 @@ And then:
 #### Method 3: For Go developer
 
     go get -u github.com/shenwei356/seqkit/seqkit
+
+## Bash-completion
+
+Note: The current version supports Bash only.
+This should work for *nix systems with Bash installed.
+
+Howto:
+
+1. run: `seqkit genautocomplete`
+
+2. create and edit `~/.bash_completion` file if you don't have it.
+
+        nano ~/.bash_completion
+
+    add the following:
+
+        for bcfile in ~/.bash_completion.d/* ; do
+          . $bcfile
+        done
 
 ## Technical details and guides for use
 
@@ -302,7 +325,7 @@ Datasets:
     file          format  type   num_seqs        sum_len  min_len       avg_len      max_len
     dataset_A.fa  FASTA   DNA      67,748  2,807,643,808       56      41,442.5    5,976,145
     dataset_B.fa  FASTA   DNA         194  3,099,750,718      970  15,978,096.5  248,956,422
-    dataset_C.fq  FASTQ   DNA   9,186,045    918,604,500      100           100          100  
+    dataset_C.fq  FASTQ   DNA   9,186,045    918,604,500      100           100          100
 
 SeqKit version: v0.3.1.1
 
