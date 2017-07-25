@@ -81,7 +81,7 @@ var convertCmd = &cobra.Command{
 			encodingsMark = make([]int, seq.NQualityEncoding)
 		} else {
 			fromEncoding = seq.QualityEncoding(from)
-			log.Infof("convert %s -> %s", fromEncoding, toEncoding)
+			log.Infof("converting %s -> %s", fromEncoding, toEncoding)
 		}
 
 		var record *fastx.Record
@@ -100,7 +100,7 @@ var convertCmd = &cobra.Command{
 									encodingsGuessed = append(encodingsGuessed, seq.QualityEncoding(e))
 								}
 							}
-							// fmt.Println(encodingsGuessed)
+							log.Infof("possible quality encodings: %v", encodingsGuessed)
 							switch len(encodingsGuessed) {
 							case 0:
 								checkError(fmt.Errorf("quality encoding not consistent"))
@@ -128,7 +128,7 @@ var convertCmd = &cobra.Command{
 								}
 							}
 
-							log.Infof("convert %s -> %s", fromEncoding, toEncoding)
+							log.Infof("converting %s -> %s", fromEncoding, toEncoding)
 							for _, record = range records {
 								if record == nil {
 									break
@@ -162,7 +162,7 @@ var convertCmd = &cobra.Command{
 								encodingsGuessed = append(encodingsGuessed, seq.QualityEncoding(e))
 							}
 						}
-						// fmt.Println(encodingsGuessed)
+						log.Infof("possible quality encodings: %v", encodingsGuessed)
 						switch len(encodingsGuessed) {
 						case 0:
 							checkError(fmt.Errorf("quality encoding not consistent"))
@@ -183,6 +183,7 @@ var convertCmd = &cobra.Command{
 								offset = encodingsGuessed[i].Offset()
 							}
 							if same {
+								// choose the latest encoding
 								fromEncoding = encodingsGuessed[len(encodingsGuessed)-1]
 								log.Infof("guessed quality encoding: %s", fromEncoding)
 							} else {
@@ -190,7 +191,7 @@ var convertCmd = &cobra.Command{
 							}
 						}
 
-						log.Infof("convert %s -> %s", fromEncoding, toEncoding)
+						log.Infof("converting %s -> %s", fromEncoding, toEncoding)
 						records[n] = record.Clone()
 						for _, record = range records {
 							record.Seq.Qual, err = seq.QualityConvert(fromEncoding, toEncoding, record.Seq.Qual)
