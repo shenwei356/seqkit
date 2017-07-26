@@ -61,6 +61,9 @@ var convertCmd = &cobra.Command{
 
 		nrecords := getFlagPositiveInt(cmd, "nrecords")
 
+		seq.NMostCommonThreshold = getFlagPositiveInt(cmd, "thresh-B-in-n-most-common")
+		threshIllumina1p5Frac := getFlagFloat64(cmd, "thresh-illumina1.5-frac")
+
 		files := getFileList(args)
 
 		outfh, err := xopen.Wopen(outFile)
@@ -100,6 +103,11 @@ var convertCmd = &cobra.Command{
 									encodingsGuessed = append(encodingsGuessed, seq.QualityEncoding(e))
 								}
 							}
+
+							if float64(encodingsMark[seq.Illumina1p5]/len(records)) > threshIllumina1p5Frac {
+								encodingsGuessed = []seq.QualityEncoding{seq.Illumina1p5}
+							}
+
 							log.Infof("possible quality encodings: %v", encodingsGuessed)
 							switch len(encodingsGuessed) {
 							case 0:
@@ -162,6 +170,11 @@ var convertCmd = &cobra.Command{
 								encodingsGuessed = append(encodingsGuessed, seq.QualityEncoding(e))
 							}
 						}
+
+						if float64(encodingsMark[seq.Illumina1p5]/len(records)) > threshIllumina1p5Frac {
+							encodingsGuessed = []seq.QualityEncoding{seq.Illumina1p5}
+						}
+
 						log.Infof("possible quality encodings: %v", encodingsGuessed)
 						switch len(encodingsGuessed) {
 						case 0:
@@ -228,4 +241,7 @@ func init() {
 	convertCmd.Flags().IntP("to", "", int(seq.Illumina1p8),
 		fmt.Sprintf(`target quality encoding. available value: %s`, qualityEncodingCode))
 	convertCmd.Flags().IntP("nrecords", "n", 1000, "number of records for guessing quality encoding")
+
+	convertCmd.Flags().IntP("thresh-B-in-n-most-common", "N", seq.NMostCommonThreshold, "threshold of 'B' in top N most common quality for guessing Illumina 1.5.")
+	convertCmd.Flags().Float64P("thresh-illumina1.5-frac", "f", 0.1, "threshold of faction of Illumina 1.5 in the leading N records")
 }
