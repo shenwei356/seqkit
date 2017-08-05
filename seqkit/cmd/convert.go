@@ -21,10 +21,10 @@
 package cmd
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"runtime"
+	"strings"
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
@@ -48,16 +48,14 @@ var convertCmd = &cobra.Command{
 		seq.ValidateSeq = true
 		runtime.GOMAXPROCS(config.Threads)
 
-		from := getFlagNonNegativeInt(cmd, "from")
-		if from >= seq.NQualityEncoding {
-			checkError(fmt.Errorf("unsupported quality encoding code: %d", from))
-		}
-		to := getFlagNonNegativeInt(cmd, "to")
-		if to >= seq.NQualityEncoding {
-			checkError(fmt.Errorf("unsupported quality encoding code: %d", to))
-		}
+		dryRun := getFlagBool(cmd, "dry-run")
+		force := getFlagBool(cmd, "force")
+
+		from := parseQualityEncoding(getFlagString(cmd, "from"))
+
+		toEncoding := parseQualityEncoding(getFlagString(cmd, "to"))
+
 		var fromEncoding seq.QualityEncoding
-		toEncoding := seq.QualityEncoding(to)
 
 		nrecords := getFlagPositiveInt(cmd, "nrecords")
 
@@ -83,7 +81,7 @@ var convertCmd = &cobra.Command{
 			encodingsGuessed = make([]seq.QualityEncoding, 0, seq.NQualityEncoding)
 			encodingsMark = make([]int, seq.NQualityEncoding)
 		} else {
-			fromEncoding = seq.QualityEncoding(from)
+			fromEncoding = from
 			log.Infof("converting %s -> %s", fromEncoding, toEncoding)
 		}
 
@@ -130,6 +128,9 @@ var convertCmd = &cobra.Command{
 								}
 								if same {
 									fromEncoding = encodingsGuessed[len(encodingsGuessed)-1]
+									if fromEncoding == seq.Illumina1p8 {
+										fromEncoding = seq.Sanger
+									}
 									log.Infof("guessed quality encoding: %s", fromEncoding)
 								} else {
 									checkError(fmt.Errorf("fail to guess the source quality encoding, please specify it"))
@@ -137,6 +138,19 @@ var convertCmd = &cobra.Command{
 							}
 
 							log.Infof("converting %s -> %s", fromEncoding, toEncoding)
+
+							if encodingsMatch(fromEncoding, toEncoding) {
+								if force {
+									log.Warningf("source and target quality encoding match.")
+								} else {
+									log.Warningf("source and target quality encoding match. aborted.")
+									break
+								}
+							}
+
+							if dryRun {
+								break
+							}
 							for _, record = range records {
 								if record == nil {
 									break
@@ -198,6 +212,9 @@ var convertCmd = &cobra.Command{
 							if same {
 								// choose the latest encoding
 								fromEncoding = encodingsGuessed[len(encodingsGuessed)-1]
+								if fromEncoding == seq.Illumina1p8 {
+									fromEncoding = seq.Sanger
+								}
 								log.Infof("guessed quality encoding: %s", fromEncoding)
 							} else {
 								checkError(fmt.Errorf("fail to guess the source quality encoding, please specify it"))
@@ -205,6 +222,19 @@ var convertCmd = &cobra.Command{
 						}
 
 						log.Infof("converting %s -> %s", fromEncoding, toEncoding)
+
+						if encodingsMatch(fromEncoding, toEncoding) {
+							if force {
+								log.Warningf("source and target quality encoding match.")
+							} else {
+								log.Warningf("source and target quality encoding match. aborted.")
+								break
+							}
+						}
+
+						if dryRun {
+							break
+						}
 						records[n] = record.Clone()
 						for _, record = range records {
 							record.Seq.Qual, err = seq.QualityConvert(fromEncoding, toEncoding, record.Seq.Qual)
@@ -215,6 +245,19 @@ var convertCmd = &cobra.Command{
 					}
 					n++
 					continue
+				}
+
+				if encodingsMatch(fromEncoding, toEncoding) {
+					if force {
+						log.Warningf("source and target quality encoding match.")
+					} else {
+						log.Warningf("source and target quality encoding match. aborted.")
+						break
+					}
+				}
+
+				if dryRun {
+					break
 				}
 
 				record.Seq.Qual, err = seq.QualityConvert(fromEncoding, toEncoding, record.Seq.Qual)
@@ -230,18 +273,45 @@ var qualityEncodingCode string
 func init() {
 	RootCmd.AddCommand(convertCmd)
 
-	var buf bytes.Buffer
-	for i := 0; i < seq.NQualityEncoding; i++ {
-		buf.WriteString(fmt.Sprintf("%d for %s, ", i, seq.QualityEncoding(i)))
-	}
-	qualityEncodingCode = buf.String()
-
-	convertCmd.Flags().IntP("from", "", 0,
-		fmt.Sprintf(`source quality encoding. available value: %s`, qualityEncodingCode))
-	convertCmd.Flags().IntP("to", "", int(seq.Illumina1p8),
-		fmt.Sprintf(`target quality encoding. available value: %s`, qualityEncodingCode))
+	convertCmd.Flags().StringP("from", "", "", `source quality encoding`)
+	convertCmd.Flags().StringP("to", "", "Sanger", `target quality encoding`)
+	convertCmd.Flags().BoolP("dry-run", "d", false, `dry run`)
+	convertCmd.Flags().BoolP("force", "f", false, `force convert even source and target encoding match`)
 	convertCmd.Flags().IntP("nrecords", "n", 1000, "number of records for guessing quality encoding")
 
 	convertCmd.Flags().IntP("thresh-B-in-n-most-common", "N", seq.NMostCommonThreshold, "threshold of 'B' in top N most common quality for guessing Illumina 1.5.")
-	convertCmd.Flags().Float64P("thresh-illumina1.5-frac", "f", 0.1, "threshold of faction of Illumina 1.5 in the leading N records")
+	convertCmd.Flags().Float64P("thresh-illumina1.5-frac", "F", 0.1, "threshold of faction of Illumina 1.5 in the leading N records")
+}
+
+func parseQualityEncoding(s string) seq.QualityEncoding {
+	switch strings.ToLower(s) {
+	case "sanger":
+		return seq.Sanger
+	case "solexa":
+		return seq.Solexa
+	case "illumina-1.3+":
+		return seq.Illumina1p3
+	case "illumina-1.5+":
+		return seq.Illumina1p5
+	case "illumina-1.8+":
+		return seq.Illumina1p8
+	case "":
+		return seq.Unknown
+	default:
+		checkError(fmt.Errorf("unsupported quality encoding: %s", s))
+		return -1
+	}
+}
+
+func encodingsMatch(source, target seq.QualityEncoding) bool {
+	if source == target {
+		return true
+	}
+	if source == seq.Sanger && target == seq.Illumina1p8 {
+		return true
+	}
+	if source == seq.Illumina1p8 && target == seq.Sanger {
+		return true
+	}
+	return false
 }
