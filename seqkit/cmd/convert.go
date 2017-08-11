@@ -87,10 +87,11 @@ var convertCmd = &cobra.Command{
 
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
+		var once = true
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
-
+			once = true
 			for {
 				record, err = fastxReader.Read()
 				if err != nil {
@@ -139,13 +140,15 @@ var convertCmd = &cobra.Command{
 
 							log.Infof("converting %s -> %s", fromEncoding, toEncoding)
 
-							if encodingsMatch(fromEncoding, toEncoding) {
-								if force {
-									log.Warningf("source and target quality encoding match.")
-								} else {
-									log.Warningf("source and target quality encoding match. aborted.")
-									break
-								}
+							if once && encodingsMatch(fromEncoding, toEncoding, force) {
+								once = false
+								// if force {
+								// 	log.Warningf("source and target quality encoding match.")
+								// } else {
+								// 	log.Warningf("source and target quality encoding match. aborted.")
+								// 	break
+								// }
+								log.Warningf("source and target quality encoding match.")
 							}
 
 							if dryRun {
@@ -155,7 +158,7 @@ var convertCmd = &cobra.Command{
 								if record == nil {
 									break
 								}
-								record.Seq.Qual, err = seq.QualityConvert(fromEncoding, toEncoding, record.Seq.Qual)
+								record.Seq.Qual, err = seq.QualityConvert(fromEncoding, toEncoding, record.Seq.Qual, force)
 								checkError(err)
 								record.FormatToWriter(outfh, config.LineWidth)
 							}
@@ -223,13 +226,15 @@ var convertCmd = &cobra.Command{
 
 						log.Infof("converting %s -> %s", fromEncoding, toEncoding)
 
-						if encodingsMatch(fromEncoding, toEncoding) {
-							if force {
-								log.Warningf("source and target quality encoding match.")
-							} else {
-								log.Warningf("source and target quality encoding match. aborted.")
-								break
-							}
+						if once && encodingsMatch(fromEncoding, toEncoding, force) {
+							once = false
+							// if force {
+							// 	log.Warningf("source and target quality encoding match.")
+							// } else {
+							// 	log.Warningf("source and target quality encoding match. aborted.")
+							// 	break
+							// }
+							log.Warningf("source and target quality encoding match.")
 						}
 
 						if dryRun {
@@ -237,7 +242,7 @@ var convertCmd = &cobra.Command{
 						}
 						records[n] = record.Clone()
 						for _, record = range records {
-							record.Seq.Qual, err = seq.QualityConvert(fromEncoding, toEncoding, record.Seq.Qual)
+							record.Seq.Qual, err = seq.QualityConvert(fromEncoding, toEncoding, record.Seq.Qual, force)
 							checkError(err)
 							record.FormatToWriter(outfh, config.LineWidth)
 						}
@@ -247,20 +252,22 @@ var convertCmd = &cobra.Command{
 					continue
 				}
 
-				if encodingsMatch(fromEncoding, toEncoding) {
-					if force {
-						log.Warningf("source and target quality encoding match.")
-					} else {
-						log.Warningf("source and target quality encoding match. aborted.")
-						break
-					}
+				if once && encodingsMatch(fromEncoding, toEncoding, force) {
+					once = false
+					// if force {
+					// 	log.Warningf("source and target quality encoding match.")
+					// } else {
+					// 	log.Warningf("source and target quality encoding match. aborted.")
+					// 	break
+					// }
+					log.Warningf("source and target quality encoding match.")
 				}
 
 				if dryRun {
 					break
 				}
 
-				record.Seq.Qual, err = seq.QualityConvert(fromEncoding, toEncoding, record.Seq.Qual)
+				record.Seq.Qual, err = seq.QualityConvert(fromEncoding, toEncoding, record.Seq.Qual, force)
 				checkError(err)
 				record.FormatToWriter(outfh, config.LineWidth)
 			}
@@ -276,7 +283,7 @@ func init() {
 	convertCmd.Flags().StringP("from", "", "", `source quality encoding`)
 	convertCmd.Flags().StringP("to", "", "Sanger", `target quality encoding`)
 	convertCmd.Flags().BoolP("dry-run", "d", false, `dry run`)
-	convertCmd.Flags().BoolP("force", "f", false, `force convert even source and target encoding match`)
+	convertCmd.Flags().BoolP("force", "f", false, `for Illumina-1.8+ -> Sanger, truncate scores > 40 to 40.`)
 	convertCmd.Flags().IntP("nrecords", "n", 1000, "number of records for guessing quality encoding")
 
 	convertCmd.Flags().IntP("thresh-B-in-n-most-common", "N", seq.NMostCommonThreshold, "threshold of 'B' in top N most common quality for guessing Illumina 1.5.")
@@ -303,15 +310,17 @@ func parseQualityEncoding(s string) seq.QualityEncoding {
 	}
 }
 
-func encodingsMatch(source, target seq.QualityEncoding) bool {
+func encodingsMatch(source, target seq.QualityEncoding, force bool) bool {
 	if source == target {
 		return true
 	}
-	if source == seq.Sanger && target == seq.Illumina1p8 {
-		return true
-	}
-	if source == seq.Illumina1p8 && target == seq.Sanger {
-		return true
+	if !force {
+		if source == seq.Sanger && target == seq.Illumina1p8 {
+			return true
+		}
+		if source == seq.Illumina1p8 && target == seq.Sanger {
+			return true
+		}
 	}
 	return false
 }
