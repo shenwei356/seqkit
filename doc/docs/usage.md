@@ -18,6 +18,7 @@
 
 - [fq2fa](#fq2fa)
 - [fx2tab & tab2fx](#fx2tab--tab2fx)
+- [convert](#convert)
 
 **Searching**
 
@@ -32,12 +33,14 @@
 - [split](#split)
 - [sample](#sample)
 - [head](#head)
+- [range](#range)
 
 **Edit**
 
 - [replace](#replace)
 - [rename](#rename)
 - [restart](#restart)
+- [concate](#concate)
 
 **Ordering**
 
@@ -717,6 +720,125 @@ as `seqkit common -n` along with shell.
 - [csv_melt](https://github.com/shenwei356/datakit/blob/master/csv_melt)
 provides melt function, could be used in preparation of data for ploting.
 
+## convert
+
+Usage
+
+```
+covert FASTQ quality encoding between Sanger, Solexa and Illumina
+
+Usage:
+  seqkit convert [flags]
+
+Flags:
+  -d, --dry-run                         dry run
+  -f, --force                           for Illumina-1.8+ -> Sanger, truncate scores > 40 to 40
+      --from string                     source quality encoding. if not given, we'll guess it
+  -h, --help                            help for convert
+  -n, --nrecords int                    number of records for guessing quality encoding (default 1000)
+  -N, --thresh-B-in-n-most-common int   threshold of 'B' in top N most common quality for guessing Illumina 1.5. (default 4)
+  -F, --thresh-illumina1.5-frac float   threshold of faction of Illumina 1.5 in the leading N records (default 0.1)
+      --to string                       target quality encoding (default "Sanger")
+```
+
+Examples:
+
+Note that `seqkit convert` always output sequences.
+
+The test dataset contains score 41 (`J`):
+
+```
+$ seqkit head -n 1 tests/Illimina1.8.fq.gz
+@ST-E00493:56:H33MFALXX:4:1101:23439:1379 1:N:0:NACAACCA
+NCGTGGAAAGACGCTAAGATTGTGATGTGCTTCCCTGACGATTACAACTGGCGTAAGGACGTTTTGCCTACCTATAAGGCTAACCGTAAGGGTTCTCGCAAGCCTGTAGGTTACAAGAGGTTCGTAGCCGAAGTGATGGCTGACTCACGG
++
+#AAAFAAJFFFJJJ<JJJJJFFFJFJJJJJFJJAJJJFJJFJFJJJJFAFJ<JA<FFJ7FJJFJJAAJJJJ<JJJJJJJFJJJAJJJJJFJJ77<JJJJ-F7A-FJFFJJJJJJ<FFJ-<7FJJJFJJ)A7)7AA<7--)<-7F-A7FA<
+```
+
+By default, nothing changes when converting Illumina 1.8 to Sanger. A warning message show that source and target quality encoding match.
+
+```
+$ seqkit convert tests/Illimina1.8.fq.gz  | seqkit head -n 1
+[INFO] possible quality encodings: [Illumina-1.8+]
+[INFO] guessed quality encoding: Illumina-1.8+
+[INFO] converting Illumina-1.8+ -> Sanger
+[WARN] source and target quality encoding match.
+@ST-E00493:56:H33MFALXX:4:1101:23439:1379 1:N:0:NACAACCA
+NCGTGGAAAGACGCTAAGATTGTGATGTGCTTCCCTGACGATTACAACTGGCGTAAGGACGTTTTGCCTACCTATAAGGCTAACCGTAAGGGTTCTCGCAAGCCTGTAGGTTACAAGAGGTTCGTAGCCGAAGTGATGGCTGACTCACGG
++
+#AAAFAAJFFFJJJ<JJJJJFFFJFJJJJJFJJAJJJFJJFJFJJJJFAFJ<JA<FFJ7FJJFJJAAJJJJ<JJJJJJJFJJJAJJJJJFJJ77<JJJJ-F7A-FJFFJJJJJJ<FFJ-<7FJJJFJJ)A7)7AA<7--)<-7F-A7FA<
+```
+
+When switching flag `--force` on,  `J` (41) was converted to `I` (40).
+
+```
+$ seqkit convert tests/Illimina1.8.fq.gz -f | seqkit head -n 1
+[INFO] possible quality encodings: [Illumina-1.8+]
+[INFO] guessed quality encoding: Illumina-1.8+
+[INFO] converting Illumina-1.8+ -> Sanger
+@ST-E00493:56:H33MFALXX:4:1101:23439:1379 1:N:0:NACAACCA
+NCGTGGAAAGACGCTAAGATTGTGATGTGCTTCCCTGACGATTACAACTGGCGTAAGGACGTTTTGCCTACCTATAAGGCTAACCGTAAGGGTTCTCGCAAGCCTGTAGGTTACAAGAGGTTCGTAGCCGAAGTGATGGCTGACTCACGG
++
+#AAAFAAIFFFIII<IIIIIFFFIFIIIIIFIIAIIIFIIFIFIIIIFAFI<IA<FFI7FIIFIIAAIIII<IIIIIIIFIIIAIIIIIFII77<IIII-F7A-FIFFIIIIII<FFI-<7FIIIFII)A7)7AA<7--)<-7F-A7FA<
+```
+
+Other cases:
+
+To Illumina-1.5.
+
+```
+$ seqkit convert tests/Illimina1.8.fq.gz --to Illumina-1.5+ | seqkit head -n 1
+[INFO] possible quality encodings: [Illumina-1.8+]
+[INFO] guessed quality encoding: Illumina-1.8+
+[INFO] converting Illumina-1.8+ -> Illumina-1.5+
+@ST-E00493:56:H33MFALXX:4:1101:23439:1379 1:N:0:NACAACCA
+NCGTGGAAAGACGCTAAGATTGTGATGTGCTTCCCTGACGATTACAACTGGCGTAAGGACGTTTTGCCTACCTATAAGGCTAACCGTAAGGGTTCTCGCAAGCCTGTAGGTTACAAGAGGTTCGTAGCCGAAGTGATGGCTGACTCACGG
++
+B```e``ieeeiii[iiiiieeeieiiiiieii`iiieiieieiiiie`ei[i`[eeiVeiieii``iiii[iiiiiiieiii`iiiiieiiVV[iiiiLeV`Leieeiiiiii[eeiL[VeiiieiiH`VHV``[VLLH[LVeL`Ve`[
+```
+
+To Illumina-1.5 and back to Sanger.
+
+```
+$ seqkit convert tests/Illimina1.8.fq.gz --to Illumina-1.5+ | seqkit convert | seqkit head -n 1
+[INFO] possible quality encodings: [Illumina-1.8+]
+[INFO] guessed quality encoding: Illumina-1.8+
+[INFO] converting Illumina-1.8+ -> Illumina-1.5+
+[INFO] possible quality encodings: [Illumina-1.5+]
+[INFO] guessed quality encoding: Illumina-1.5+
+[INFO] converting Illumina-1.5+ -> Sanger
+@ST-E00493:56:H33MFALXX:4:1101:23439:1379 1:N:0:NACAACCA
+NCGTGGAAAGACGCTAAGATTGTGATGTGCTTCCCTGACGATTACAACTGGCGTAAGGACGTTTTGCCTACCTATAAGGCTAACCGTAAGGGTTCTCGCAAGCCTGTAGGTTACAAGAGGTTCGTAGCCGAAGTGATGGCTGACTCACGG
++
+!AAAFAAJFFFJJJ<JJJJJFFFJFJJJJJFJJAJJJFJJFJFJJJJFAFJ<JA<FFJ7FJJFJJAAJJJJ<JJJJJJJFJJJAJJJJJFJJ77<JJJJ-F7A-FJFFJJJJJJ<FFJ-<7FJJJFJJ)A7)7AA<7--)<-7F-A7FA<
+```
+
+Checking encoding
+
+```
+$ seqkit convert tests/Illimina1.8.fq.gz --from Solexa
+[INFO] converting Solexa -> Sanger
+[ERRO] seq: invalid Solexa quality
+```
+Real Illumina 1.5+ data
+
+```
+$ seqkit seq tests/Illimina1.5.fq
+@HWI-EAS209_0006_FC706VJ:5:58:5894:21141#ATCACG/1
+TTAATTGGTAAATAAATCTCCTAATAGCTTAGATNTTACCTTNNNNNNNNNNTAGTTTCTTGAGATTTGTTGGGGGAGACATTTTTGTGATTGCCTTGAT
++
+efcfffffcfeefffcffffffddf`feed]`]_Ba_^__[YBBBBBBBBBBRTT\]][]dddd`ddd^dddadd^BBBBBBBBBBBBBBBBBBBBBBBB
+
+$ seqkit convert tests/Illimina1.5.fq | seqkit head -n 1
+[INFO] possible quality encodings: [Illumina-1.5+]
+[INFO] guessed quality encoding: Illumina-1.5+
+[INFO] converting Illumina-1.5+ -> Sanger
+@HWI-EAS209_0006_FC706VJ:5:58:5894:21141#ATCACG/1
+TTAATTGGTAAATAAATCTCCTAATAGCTTAGATNTTACCTTNNNNNNNNNNTAGTTTCTTGAGATTTGTTGGGGGAGACATTTTTGTGATTGCCTTGAT
++
+FGDGGGGGDGFFGGGDGGGGGGEEGAGFFE>A>@!B@?@@<:!!!!!!!!!!355=>><>EEEEAEEE?EEEBEE?!!!!!!!!!!!!!!!!!!!!!!!!
+```
+
 
 ## grep
 
@@ -1201,6 +1323,46 @@ Examples
         HIHIIIIIHIIHGHHIHHIIIIIIIIIIIIIIIHHIIIIIHHIHIIIIIGIHIIIIHHHHHHGHIHIIIIIIIII
 
 
+## range
+
+Usage
+
+```
+print FASTA/Q records in a range (start:end)
+
+Usage:
+  seqkit range [flags]
+
+Flags:
+  -h, --help           help for range
+  -r, --range string   range. e.g., 1:12 for first 12 records (head -n 12), -12:-1 for last 12 records (tail -n 12)
+```
+
+Examples
+
+1. leading N records (head)
+
+        $ cat tests/hairpin.fa | seqkit head -n 100 | md5sum
+        f65116af7d9298d93ba4b3d19077bbf1  -
+        $ cat tests/hairpin.fa | seqkit range -r 1:100 | md5sum
+        f65116af7d9298d93ba4b3d19077bbf1  -
+
+1. last N records (tail)
+
+        $ cat tests/hairpin.fa | seqkit range -r -100:-1 | seqkit stats
+        file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+        -     FASTA   RNA        100    8,656       58     86.6      172
+
+1. Other ranges
+
+        $ cat tests/hairpin.fa | seqkit range -r 101:150 | seqkit stats
+        file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+        -     FASTA   RNA         50    3,777       63     75.5       96
+
+        $ cat tests/hairpin.fa | seqkit range -r -100:-2 | seqkit stats
+        file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+        -     FASTA   RNA         99    8,484       58     85.7      146
+
 
 ## replace
 
@@ -1413,6 +1575,38 @@ Flags:
   -i, --new-start int   new start position (1-base, supporting negative value counting from the end) (default 1)
 
 ```
+
+## concate
+
+Usage
+
+```
+concatenate sequences with same ID from multiple files
+
+Usage:
+  seqkit concate [flags]
+
+Flags:
+  -h, --help   help for concate
+
+```
+
+Examples
+
+1. concatenating leanding 2 bases and last 2 bases
+
+        $ cat t.fa
+        >test
+        ACCTGATGT
+        >test2
+        TGATAGCTACTAGGGTGTCTATCG
+
+        $ seqkit concate <(seqkit subseq -r 1:2 t.fa) <(seqkit subseq -r -2:-1 t.fa)
+        >test
+        ACGT
+        >test2
+        TGCG
+
 
 ## shuffle
 

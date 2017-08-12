@@ -36,8 +36,8 @@ import (
 // concateCmd represents the concatenate command
 var concateCmd = &cobra.Command{
 	Use:   "concate",
-	Short: "concatenate sequences from multiple files",
-	Long: `concatenate sequences from multiple files
+	Short: "concatenate sequences with same ID from multiple files",
+	Long: `concatenate sequences with same ID from multiple files
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {

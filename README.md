@@ -145,13 +145,14 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - `split`      split sequences into files by id/seq region/size/parts
 - `sample`     sample sequences by number or proportion
 - `head`       print first N FASTA/Q records
-- `concate`    concatenate sequences from multiple files
+- `range`      print FASTA/Q records in a range (start:end)
 
 **Edit**
 
 - `replace`    replace name/sequence by regular expression
 - `rename`     rename duplicated IDs
 - `restart`    reset start position for circular genome
+- `concate`    concatenate sequences with same ID from multiple files
 
 **Ordering**
 

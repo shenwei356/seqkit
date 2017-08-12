@@ -280,10 +280,10 @@ var qualityEncodingCode string
 func init() {
 	RootCmd.AddCommand(convertCmd)
 
-	convertCmd.Flags().StringP("from", "", "", `source quality encoding`)
+	convertCmd.Flags().StringP("from", "", "", `source quality encoding. if not given, we'll guess it`)
 	convertCmd.Flags().StringP("to", "", "Sanger", `target quality encoding`)
 	convertCmd.Flags().BoolP("dry-run", "d", false, `dry run`)
-	convertCmd.Flags().BoolP("force", "f", false, `for Illumina-1.8+ -> Sanger, truncate scores > 40 to 40.`)
+	convertCmd.Flags().BoolP("force", "f", false, `for Illumina-1.8+ -> Sanger, truncate scores > 40 to 40`)
 	convertCmd.Flags().IntP("nrecords", "n", 1000, "number of records for guessing quality encoding")
 
 	convertCmd.Flags().IntP("thresh-B-in-n-most-common", "N", seq.NMostCommonThreshold, "threshold of 'B' in top N most common quality for guessing Illumina 1.5.")
