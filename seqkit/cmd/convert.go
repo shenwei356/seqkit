@@ -35,8 +35,8 @@ import (
 // convertCmd represents the convert command
 var convertCmd = &cobra.Command{
 	Use:   "convert",
-	Short: "covert FASTQ quality",
-	Long: `covert FASTQ quality
+	Short: "covert FASTQ quality encoding between Sanger, Solexa and Illumina",
+	Long: `covert FASTQ quality encoding between Sanger, Solexa and Illumina
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {

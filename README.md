@@ -115,14 +115,14 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 ## Subcommands
 
-21 subcommands in total.
+23 subcommands in total.
 
 **Sequence and subsequence**
 
 - `seq`        transform sequences (revserse, complement, extract ID...)
 - `subseq`     get subsequences by region/gtf/bed, including flanking sequences
 - `sliding`    sliding sequences, circular genome supported
-- `stats`       simple statistics of FASTA files
+- `stats`      simple statistics of FASTA files
 - `faidx`      create FASTA index file
 
 **Format conversion**
@@ -130,6 +130,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - `fx2tab`     covert FASTA/Q to tabular format (and length/GC content/GC skew)
 - `tab2fx`     covert tabular format to FASTA/Q format
 - `fq2fa`      covert FASTQ to FASTA
+- `convert`    covert FASTQ quality encoding between Sanger, Solexa and Illumina
 
 **Searching**
 
@@ -144,6 +145,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - `split`      split sequences into files by id/seq region/size/parts
 - `sample`     sample sequences by number or proportion
 - `head`       print first N FASTA/Q records
+- `concate`    concatenate sequences from multiple files
 
 **Edit**
 
