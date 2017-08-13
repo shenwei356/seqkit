@@ -39,6 +39,20 @@ var concateCmd = &cobra.Command{
 	Short: "concatenate sequences with same ID from multiple files",
 	Long: `concatenate sequences with same ID from multiple files
 
+Example: concatenating leading 2 bases and last 2 bases
+
+    $ cat t.fa
+    >test
+    ACCTGATGT
+    >test2
+    TGATAGCTACTAGGGTGTCTATCG
+
+    $ seqkit concate <(seqkit subseq -r 1:2 t.fa) <(seqkit subseq -r -2:-1 t.fa)
+    >test
+    ACGT
+    >test2
+    TGCG
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
