@@ -1789,30 +1789,29 @@ Flags:
 <p>Usage</p>
 <pre><code>concatenate sequences with same ID from multiple files
 
+Example: concatenating leading 2 bases and last 2 bases
+
+    $ cat t.fa
+    &gt;test
+    ACCTGATGT
+    &gt;test2
+    TGATAGCTACTAGGGTGTCTATCG
+
+    $ seqkit concate &lt;(seqkit subseq -r 1:2 t.fa) &lt;(seqkit subseq -r -2:-1 t.fa)
+    &gt;test
+    ACGT
+    &gt;test2
+    TGCG
+
 Usage:
   seqkit concate [flags]
 
 Flags:
   -h, --help   help for concate
 
+
 </code></pre>
 
-<p>Examples</p>
-<ol>
-<li>concatenating leanding 2 bases and last 2 bases<pre><code>$ cat t.fa
-&gt;test
-ACCTGATGT
-&gt;test2
-TGATAGCTACTAGGGTGTCTATCG
-
-$ seqkit concate &lt;(seqkit subseq -r 1:2 t.fa) &lt;(seqkit subseq -r -2:-1 t.fa)
-&gt;test
-ACGT
-&gt;test2
-TGCG
-</code></pre>
-</li>
-</ol>
 <h2 id="shuffle">shuffle</h2>
 <p>Usage</p>
 <pre><code>shuffle sequences.
