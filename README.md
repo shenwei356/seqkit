@@ -68,7 +68,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
   (see [download](http://bioinf.shenwei.me/seqkit/download/))
 - **UltraFast** (see [benchmark](/#benchmark)),
   **multiple-CPUs supported**
-- **Practical functions supported by 21 subcommands** (see subcommands and
+- **Practical functions supported by 23 subcommands** (see subcommands and
   [usage](http://bioinf.shenwei.me/seqkit/usage/) )
 - **Support [Bash-completion](#bash-completion)**
 - **Well documented** (detailed [usage](http://bioinf.shenwei.me/seqkit/usage/)
@@ -122,7 +122,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - `seq`        transform sequences (revserse, complement, extract ID...)
 - `subseq`     get subsequences by region/gtf/bed, including flanking sequences
 - `sliding`    sliding sequences, circular genome supported
-- `stats`      simple statistics of FASTA files
+- `stats`      simple statistics of FASTA/Q files
 - `faidx`      create FASTA index file
 
 **Format conversion**

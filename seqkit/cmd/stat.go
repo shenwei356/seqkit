@@ -41,8 +41,8 @@ import (
 var statCmd = &cobra.Command{
 	Use:     "stats",
 	Aliases: []string{"stat"},
-	Short:   "simple statistics of FASTA files",
-	Long: `simple statistics of FASTA files
+	Short:   "simple statistics of FASTA/Q files",
+	Long: `simple statistics of FASTA/Q files
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {

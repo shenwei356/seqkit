@@ -22,6 +22,8 @@ SeqKit is implemented in [Go](https://golang.org/) programming language,
 
 ***Tip: run `seqkit version` to check update !!!***
 
+***Tip: run `seqkit genautocomplete` to update Bash completion !!!***
+
 OS     |Arch      |File, (mirror为中国用户下载镜像链接)                                                                                                                                                                                   |Download Count
 :------|:---------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Linux  |32-bit    |[seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.7.0/seqkit_linux_386.tar.gz), ([mirror](http://app.shenwei.me/data/seqkit/seqkit_linux_386.tar.gz))                            |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.7.0/seqkit_linux_386.tar.gz)
