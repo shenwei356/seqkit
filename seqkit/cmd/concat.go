@@ -35,8 +35,9 @@ import (
 
 // concateCmd represents the concatenate command
 var concateCmd = &cobra.Command{
-	Use:   "concate",
-	Short: "concatenate sequences with same ID from multiple files",
+	Use:     "concat",
+	Aliases: []string{"concate"},
+	Short:   "concatenate sequences with same ID from multiple files",
 	Long: `concatenate sequences with same ID from multiple files
 
 Example: concatenating leading 2 bases and last 2 bases

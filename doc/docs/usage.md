@@ -40,7 +40,7 @@
 - [replace](#replace)
 - [rename](#rename)
 - [restart](#restart)
-- [concate](#concate)
+- [concat](#concat)
 
 **Ordering**
 
@@ -1576,7 +1576,7 @@ Flags:
 
 ```
 
-## concate
+## concat
 
 Usage
 
@@ -1591,17 +1591,17 @@ Example: concatenating leading 2 bases and last 2 bases
     >test2
     TGATAGCTACTAGGGTGTCTATCG
 
-    $ seqkit concate <(seqkit subseq -r 1:2 t.fa) <(seqkit subseq -r -2:-1 t.fa)
+    $ seqkit concat <(seqkit subseq -r 1:2 t.fa) <(seqkit subseq -r -2:-1 t.fa)
     >test
     ACGT
     >test2
     TGCG
 
 Usage:
-  seqkit concate [flags]
+  seqkit concat [flags]
 
 Flags:
-  -h, --help   help for concate
+  -h, --help   help for concat
 
 
 ```

@@ -152,7 +152,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - `replace`    replace name/sequence by regular expression
 - `rename`     rename duplicated IDs
 - `restart`    reset start position for circular genome
-- `concate`    concatenate sequences with same ID from multiple files
+- `concat`     concatenate sequences with same ID from multiple files
 
 **Ordering**
 
