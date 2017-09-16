@@ -573,7 +573,7 @@ Examples
 Usage
 
 ```
-simple statistics of FASTA files
+simple statistics of FASTA/Q files
 
 Usage:
   seqkit stats [flags]
@@ -581,10 +581,11 @@ Usage:
 Aliases:
   stats, stat
 
-
 Flags:
-  -a, --all                  all statistics, including sum_gap, N50, L50
+  -a, --all                  all statistics, including sum_gap, N50
   -G, --gap-letters string   gap letters (default "- .")
+  -h, --help                 help for stats
+  -T, --tabular              output in machine-friendly tabular format
 
 ```
 
@@ -598,6 +599,25 @@ Eexamples
         mature.fa.gz   FASTA   RNA     35,828    781,222       15     21.8       34
         reads_1.fq.gz  FASTQ   DNA      2,500    567,516      226      227      229
         reads_2.fq.gz  FASTQ   DNA      2,500    560,002      223      224      225
+
+1. Machine-friendly tabular format
+
+        $ seqkit stats *.f{a,q}.gz -T
+        file    format  type    num_seqs        sum_len min_len avg_len max_len
+        hairpin.fa.gz   FASTA   RNA     28645   2949871 39      103.0   2354
+        mature.fa.gz    FASTA   RNA     35828   781222  15      21.8    34
+        Illimina1.8.fq.gz       FASTQ   DNA     10000   1500000 150     150.0   150
+        reads_1.fq.gz   FASTQ   DNA     2500    567516  226     227.0   229
+        reads_2.fq.gz   FASTQ   DNA     2500    560002  223     224.0   225
+
+        $ seqkit stats *.f{a,q}.gz -T | csvtk pretty -t
+        file                format   type   num_seqs   sum_len   min_len   avg_len   max_len
+        hairpin.fa.gz       FASTA    RNA    28645      2949871   39        103.0     2354
+        mature.fa.gz        FASTA    RNA    35828      781222    15        21.8      34
+        Illimina1.8.fq.gz   FASTQ    DNA    10000      1500000   150       150.0     150
+        reads_1.fq.gz       FASTQ    DNA    2500       567516    226       227.0     229
+        reads_2.fq.gz       FASTQ    DNA    2500       560002    223       224.0     225
+
 
 1. Extra information
 

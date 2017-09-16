@@ -25,6 +25,7 @@ import (
 	"io"
 	"runtime"
 	"sort"
+	"strings"
 
 	"github.com/cznic/sortutil"
 	"github.com/dustin/go-humanize"
@@ -66,6 +67,7 @@ var statCmd = &cobra.Command{
 		gapLettersBytes := []byte(gapLetters)
 
 		all := getFlagBool(cmd, "all")
+		tabular := getFlagBool(cmd, "tabular")
 
 		files := getFileList(args)
 
@@ -154,6 +156,51 @@ var statCmd = &cobra.Command{
 			}
 		}
 
+		// tabular output
+		if tabular {
+			colnames := []string{
+				"file",
+				"format",
+				"type",
+				"num_seqs",
+				"sum_len",
+				"min_len",
+				"avg_len",
+				"max_len",
+			}
+			if all {
+				colnames = append(colnames, []string{"sum_gap", "N50"}...)
+			}
+			outfh.WriteString(strings.Join(colnames, "\t") + "\n")
+
+			for _, info := range statInfos {
+				if !all {
+					outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\n",
+						info.file,
+						info.format,
+						info.t,
+						info.num,
+						info.lenSum,
+						info.lenMin,
+						info.lenAvg,
+						info.lenMax))
+				} else {
+					outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%d\t%d\n",
+						info.file,
+						info.format,
+						info.t,
+						info.num,
+						info.lenSum,
+						info.lenMin,
+						info.lenAvg,
+						info.lenMax,
+						info.gapSum,
+						info.N50))
+				}
+			}
+			return
+		}
+
 		// format output
 		columns := []prettytable.Column{
 			{Header: "file"},
@@ -226,6 +273,7 @@ type statInfo struct {
 func init() {
 	RootCmd.AddCommand(statCmd)
 
+	statCmd.Flags().BoolP("tabular", "T", false, "output in machine-friendly tabular format")
 	statCmd.Flags().StringP("gap-letters", "G", "- .", "gap letters")
-	statCmd.Flags().BoolP("all", "a", false, "all statistics, including sum_gap, N50, L50")
+	statCmd.Flags().BoolP("all", "a", false, "all statistics, including sum_gap, N50")
 }
