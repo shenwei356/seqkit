@@ -172,6 +172,10 @@ Go to [Download Page](http://bioinf.shenwei.me/seqkit/download) for more downloa
  executable binary files **for most popular operating systems** are freely available
   in [release](https://github.com/shenwei356/seqkit/releases) page.
 
+Seqkit calls `pigz` (much faster than `gzip`) or `gzip` to decompress .gz file if they are available.
+So please **install [pigz](http://zlib.net/pigz/) to gain better parsing performance for gzipped data**.
+
+
 #### Method 1: Download binaries
 
 Just [download](https://github.com/shenwei356/seqkit/releases) compressed
@@ -231,6 +235,9 @@ close to the
 famous C lib [klib](https://github.com/attractivechaos/klib/) ([kseq.h](https://github.com/attractivechaos/klib/blob/master/kseq.h)).
 
 ![](https://github.com/shenwei356/bio/raw/master/benchmark/benchmark.tsv.png)
+
+Seqkit calls `pigz` (much faster than `gzip`) or `gzip` to decompress .gz file if they are available.
+So please **install [pigz](http://zlib.net/pigz/) to gain better parsing performance for gzipped data**.
 
 ### Sequence formats and types
 

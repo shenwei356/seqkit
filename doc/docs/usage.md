@@ -66,6 +66,9 @@ famous C lib [klib](https://github.com/attractivechaos/klib/) ([kseq.h](https://
 
 ![](https://github.com/shenwei356/bio/raw/master/benchmark/benchmark.tsv.png)
 
+Seqkit calls `pigz` (much faster than `gzip`) or `gzip` to decompress .gz file if they are available.
+So please **install [pigz](http://zlib.net/pigz/) to gain better parsing performance for gzipped data**.
+
 ### Sequence formats and types
 
 SeqKit seamlessly support FASTA and FASTQ format.
