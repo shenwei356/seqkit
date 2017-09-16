@@ -35,8 +35,8 @@ import (
 // tab2faCmd represents the tab2fx command
 var tab2faCmd = &cobra.Command{
 	Use:   "tab2fx",
-	Short: "covert tabular format to FASTA/Q format",
-	Long: `covert tabular format (first two/three columns) to FASTA/Q format
+	Short: "convert tabular format to FASTA/Q format",
+	Long: `convert tabular format (first two/three columns) to FASTA/Q format
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {

@@ -36,8 +36,8 @@ import (
 // fx2tabCmd represents the fx2tab command
 var fx2tabCmd = &cobra.Command{
 	Use:   "fx2tab",
-	Short: "covert FASTA/Q to tabular format (with length/GC content/GC skew)",
-	Long: `covert FASTA/Q to tabular format, and provide various information,
+	Short: "convert FASTA/Q to tabular format (with length/GC content/GC skew)",
+	Long: `convert FASTA/Q to tabular format, and provide various information,
 like sequence length, GC content/GC skew.
 
 `,

@@ -127,10 +127,10 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 **Format conversion**
 
-- `fx2tab`     covert FASTA/Q to tabular format (and length/GC content/GC skew)
-- `tab2fx`     covert tabular format to FASTA/Q format
-- `fq2fa`      covert FASTQ to FASTA
-- `convert`    covert FASTQ quality encoding between Sanger, Solexa and Illumina
+- `fx2tab`     convert FASTA/Q to tabular format (and length/GC content/GC skew)
+- `tab2fx`     convert tabular format to FASTA/Q format
+- `fq2fa`      convert FASTQ to FASTA
+- `convert`    convert FASTQ quality encoding between Sanger, Solexa and Illumina
 
 **Searching**
 

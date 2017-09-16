@@ -33,8 +33,8 @@ import (
 // fq2faCmd represents the fq2fa command
 var fq2faCmd = &cobra.Command{
 	Use:   "fq2fa",
-	Short: "covert FASTQ to FASTA",
-	Long: `covert FASTQ to FASTA
+	Short: "convert FASTQ to FASTA",
+	Long: `convert FASTQ to FASTA
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
