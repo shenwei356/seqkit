@@ -53,7 +53,7 @@ Sequence format and type are automatically detected.
 
 ## How to get GC content of every sequence in FASTA/Q file?
 
-`seqkit fx2tab` coverts FASTA/Q to 3-column tabular format (1th: name/ID,
+`seqkit fx2tab` converts FASTA/Q to 3-column tabular format (1th: name/ID,
 2nd: sequence, 3rd: quality), and can also provides
 various information in new columns, including sequence length, GC content/GC skew, alphabet.
 
@@ -92,7 +92,7 @@ Searching by ID list file:
 
 ## How to find FASTA/Q sequences containing degenerate bases and locate them?
 
-`seqkit fx2tab` coverts FASTA/Q to tabular format and can output the sequence
+`seqkit fx2tab` converts FASTA/Q to tabular format and can output the sequence
 alphabet in a new column. And then text searching tools can be used to filter
 the table.
 
@@ -116,7 +116,7 @@ You can then exclude these sequences with `seqkit grep`:
 Or locate the degenerate bases, e.g, `N` and `K`
 
     $ seqkit grep --pattern-file id2.txt viral.1.1.genomic.fna.gz | seqkit locate --ignore-case --only-positive-strand --pattern K+ --pattern N+
-    seqID   patternName     pattern strand  start   end     matched                                    
+    seqID   patternName     pattern strand  start   end     matched
     gi|564292828|ref|NC_023009.1|   N+      N+      +       87972   87972   N
     gi|564292828|ref|NC_023009.1|   N+      N+      +       100983  100983  N
     gi|557307918|ref|NC_022755.1|   K+      K+      +       1788    1788    K
@@ -251,29 +251,29 @@ And flag `-I/--key-capt-idx` (default: 1) is set to 2 because the key `(\w+)`
 is the second captured match. Command:
 
     $ seqkit replace --kv-file changes.tsv --pattern "^([^ ]+ )(\w+) " --replacement "\${1}{kv} " --key-capt-idx 2 --keep-key viral.1.protein.faa.gz > renamed.fa
-    
+
 ## How to extract paired reads from two paired-end reads file?
 
 Let's create two unbanlanced PE reads file:
 
-    $ seqkit rmdup duplicated-reads.fq.gz | seqkit replace --pattern " .+" --replacement " 1" | seqkit sample --proportion 0.9 --rand-seed 1 --out-file read_1.fq.gz    
+    $ seqkit rmdup duplicated-reads.fq.gz | seqkit replace --pattern " .+" --replacement " 1" | seqkit sample --proportion 0.9 --rand-seed 1 --out-file read_1.fq.gz
     $ seqkit rmdup duplicated-reads.fq.gz | seqkit replace --pattern " .+" --replacement " 2" | seqkit sample --proportion 0.9 --rand-seed 2 --out-file read_2.fq.gz
 
 Overview:
-    
+
     # number of records
-    $ seqkit stat read_1.fq.gz read_2.fq.gz 
+    $ seqkit stat read_1.fq.gz read_2.fq.gz
     file          format  type  num_seqs  sum_len  min_len  avg_len  max_len
     read_1.fq.gz  FASTQ   DNA      9,033  912,333      101      101      101
     read_2.fq.gz  FASTQ   DNA      8,965  905,465      101      101      101
-    
+
     # sequence headers
-    $ seqkit head -n 3 read_1.fq.gz | seqkit seq --name 
+    $ seqkit head -n 3 read_1.fq.gz | seqkit seq --name
     SRR1972739.1 1
     SRR1972739.3 1
     SRR1972739.4 1
-    
-    $ seqkit head -n 3 read_2.fq.gz | seqkit seq --name 
+
+    $ seqkit head -n 3 read_2.fq.gz | seqkit seq --name
     SRR1972739.1 2
     SRR1972739.2 2
     SRR1972739.3 2
@@ -281,28 +281,28 @@ Overview:
 Firstly, extract sequence IDs of two file and compute the intersection:
 
     $ seqkit seq --name --only-id read_1.fq.gz read_2.fq.gz | sort | uniq -d > id.txt
-    
+
     # number of IDs
     wc -l id.txt
     8090 id.txt
-    
+
 Then extract reads using `id.txt`:
 
     $ seqkit grep --pattern-file id.txt read_1.fq.gz -o read_1.f.fq.gz
     $ seqkit grep --pattern-file id.txt read_2.fq.gz -o read_2.f.fq.gz
-    
+
 Check if the IDs in two files are the same by `md5sum`:
-    
+
     $ seqkit seq --name --only-id read_1.f.fq.gz > read_1.f.fq.gz.id.txt
     $ seqkit seq --name --only-id read_2.f.fq.gz > read_2.f.fq.gz.id.txt
-    
+
     $ md5sum read_*.f.fq.gz.id.txt
     537c57cfdc3923bb94a3dc31a0c3b02a  read_1.f.fq.gz.id.txt
     537c57cfdc3923bb94a3dc31a0c3b02a  read_2.f.fq.gz.id.txt
 
 Note that this example assumes that the IDs in the two reads file have
 same order. If not you can sort them after previous steps. Shell `sort`
-can sort large file using disk, so temporary directory is set as 
+can sort large file using disk, so temporary directory is set as
 current directory by option `-T .`.
 
     $ gzip -d -c read_1.f.fq.gz | seqkit fx2tab | sort -k1,1 -T . | seqkit tab2fx | gzip -c > read_1.f.sorted.fq.gz
@@ -335,7 +335,7 @@ Data (not in same order):
     $ seqkit fx2tab 1.fa > 1.fa.tsv
     $ seqkit fx2tab 2.fa > 2.fa.tsv
 
-    $ cat -A 1.fa.tsv 
+    $ cat -A 1.fa.tsv
     seq1^Iaaaaa^I$
     seq2^Iccccc^I$
     seq3^Iggggg^I$

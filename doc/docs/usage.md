@@ -167,8 +167,8 @@ Usage:
 Available Commands:
   common      find common sequences of multiple files by id/name/sequence
   faidx       create FASTA index file
-  fq2fa       covert FASTQ to FASTA
-  fx2tab      covert FASTA/Q to tabular format (with length/GC content/GC skew)
+  fq2fa       convert FASTQ to FASTA
+  fx2tab      convert FASTA/Q to tabular format (with length/GC content/GC skew)
   grep        search sequences by pattern(s) of name or sequence motifs
   head        print first N FASTA/Q records
   help        Help about any command
@@ -185,7 +185,7 @@ Available Commands:
   split       split sequences into files by id/seq region/size/parts
   stats       simple statistics of FASTA files
   subseq      get subsequences by region/gtf/bed, including flanking sequences
-  tab2fx      covert tabular format to FASTA/Q format
+  tab2fx      convert tabular format to FASTA/Q format
   version     print version information and check for update
 
 Flags:
@@ -614,7 +614,7 @@ Eexamples
 Usage
 
 ```
-covert FASTQ to FASTA
+convert FASTQ to FASTA
 
 Usage:
   seqkit fq2fa [flags]
@@ -631,7 +631,7 @@ Examples
 Usage (fx2tab)
 
 ```
-covert FASTA/Q to tabular format, and provide various information,
+convert FASTA/Q to tabular format, and provide various information,
 like sequence length, GC content/GC skew.
 
 Usage:
@@ -651,7 +651,7 @@ Flags:
 Usage (tab2fx)
 
 ```
-covert tabular format (first two/three columns) to FASTA/Q format
+convert tabular format (first two/three columns) to FASTA/Q format
 
 Usage:
   seqkit tab2fx [flags]
@@ -725,7 +725,7 @@ provides melt function, could be used in preparation of data for ploting.
 Usage
 
 ```
-covert FASTQ quality encoding between Sanger, Solexa and Illumina
+convert FASTQ quality encoding between Sanger, Solexa and Illumina
 
 Usage:
   seqkit convert [flags]
