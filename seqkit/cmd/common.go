@@ -76,9 +76,11 @@ var commonCmd = &cobra.Command{
 		// target -> file -> struct{}
 		counter := make(map[string]map[string]struct{})
 		// target -> file -> seqname
+		// records with same sequences in multiple files may have different names
 		names := make(map[string]map[string][]string)
 
 		var fastxReader *fastx.Reader
+		var record *fastx.Record
 
 		// read all files
 		var subject string
@@ -97,6 +99,7 @@ var commonCmd = &cobra.Command{
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
+			// alowing finding common records in ONE file
 			if _, ok := filenames[file]; !ok {
 				filenames[file] = 1
 			} else {
@@ -105,7 +108,7 @@ var commonCmd = &cobra.Command{
 			}
 
 			for {
-				record, err := fastxReader.Read()
+				record, err = fastxReader.Read()
 				if err != nil {
 					if err == io.EOF {
 						break
@@ -199,7 +202,7 @@ var commonCmd = &cobra.Command{
 		fastxReader, err = fastx.NewReader(alphabet, firstFile, idRegexp)
 		checkError(err)
 		for {
-			record, err := fastxReader.Read()
+			record, err = fastxReader.Read()
 			if err != nil {
 				if err == io.EOF {
 					break

@@ -33,3 +33,4 @@ doc/site*
 *ssshtest
 t.*
 seqkit/t.*
+seqkit/bench-fx2tab
