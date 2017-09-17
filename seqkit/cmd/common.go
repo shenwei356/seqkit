@@ -40,6 +40,15 @@ var commonCmd = &cobra.Command{
 	Short: "find common sequences of multiple files by id/name/sequence",
 	Long: `find common sequences of multiple files by id/name/sequence
 
+Note:
+    1. 'seqkit common' is designed to support 2 and MORE files.
+    2. For 2 files, 'seqkit grep' is much faster and consumes lesser memory:
+         seqkit grep -f <(seqkit seq -n -i small.fq.gz) big.fq.gz # by seq ID
+         seqkit grep -s -f <(seqkit seq -s small.fq.gz) big.fq.gz # by seq
+    3. Some records in one file may have same sequences/IDs. They will ALL be
+       retrieved if the sequence/ID was shared in multiple files.
+       So the records number may be larger than that of the smallest file.
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -74,10 +83,11 @@ var commonCmd = &cobra.Command{
 		defer outfh.Close()
 
 		// target -> file -> struct{}
-		counter := make(map[string]map[string]struct{})
-		// target -> file -> seqname
-		// records with same sequences in multiple files may have different names
-		names := make(map[string]map[string][]string)
+		counter := make(map[string]map[string]struct{}, 1000)
+
+		// target -> seqnames in firstFile
+		// note that it's []string, i.e., records may have same sequences
+		names := make(map[string][]string, 1000)
 
 		var fastxReader *fastx.Reader
 		var record *fastx.Record
@@ -85,8 +95,10 @@ var commonCmd = &cobra.Command{
 		// read all files
 		var subject string
 		var checkFirstFile = true
+		var isFirstFile = true
 		var firstFile string
 		var filenames = make(map[string]int)
+		var ok bool
 		for _, file := range files {
 			if !quiet {
 				log.Infof("read file: %s", file)
@@ -100,7 +112,7 @@ var commonCmd = &cobra.Command{
 			checkError(err)
 
 			// alowing finding common records in ONE file
-			if _, ok := filenames[file]; !ok {
+			if _, ok = filenames[file]; !ok {
 				filenames[file] = 1
 			} else {
 				filenames[file]++
@@ -145,15 +157,20 @@ var commonCmd = &cobra.Command{
 					}
 				}
 
-				if _, ok := counter[subject]; !ok {
+				if _, ok = counter[subject]; !ok {
 					counter[subject] = make(map[string]struct{})
 				}
 				counter[subject][file] = struct{}{}
 
-				if _, ok := names[subject]; !ok {
-					names[subject] = make(map[string][]string)
+				if isFirstFile {
+					if _, ok = names[subject]; !ok {
+						names[subject] = make([]string, 0, 1)
+					}
+					names[subject] = append(names[subject], string(record.Name))
 				}
-				names[subject][file] = append(names[subject][file], string(record.Name))
+			}
+			if isFirstFile {
+				isFirstFile = false
 			}
 		}
 
@@ -171,7 +188,7 @@ var commonCmd = &cobra.Command{
 			}
 
 			n++
-			for _, seqname = range names[subject][firstFile] {
+			for _, seqname = range names[subject] {
 				n2++
 				namesOK[seqname] = struct{}{}
 			}
@@ -195,10 +212,10 @@ var commonCmd = &cobra.Command{
 		}
 
 		if !quiet {
-			log.Infof("extract seqs from the first file: %s", firstFile)
+			log.Infof("retrieve seqs from the first file: %s", firstFile)
 		}
 
-		// extract
+		// retrieve
 		fastxReader, err = fastx.NewReader(alphabet, firstFile, idRegexp)
 		checkError(err)
 		for {
