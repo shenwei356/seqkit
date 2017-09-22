@@ -330,40 +330,12 @@ Data (not in same order):
     >seq1
     CCCCC
 
-**Step 1**. Convert FASTA to tab-delimited (3 columns, the 3rd column is blank (no quality for FASTA)) file:
+Just one command:
 
-    $ seqkit fx2tab 1.fa > 1.fa.tsv
-    $ seqkit fx2tab 2.fa > 2.fa.tsv
-
-    $ cat -A 1.fa.tsv
-    seq1^Iaaaaa^I$
-    seq2^Iccccc^I$
-    seq3^Iggggg^I$
-
-**Step 2**. Merge  two table files:
-
-    $ csvtk join -H -t 1.fa.tsv 2.fa.tsv | cat -A
-    seq1^Iaaaaa^I^ICCCCC^I$
-    seq2^Iccccc^I^IGGGGG^I$
-    seq3^Iggggg^I^ITTTTT^I$
-
-**Step 3**. Note that there are two TAB between the two sequences, so we can remove them to join the sequences
-
-    $ csvtk join -H -t 1.fa.tsv 2.fa.tsv | sed 's/\t\t//'
-    seq1    aaaaaCCCCC
-    seq2    cccccGGGGG
-    seq3    gggggTTTTT
-
-**Step 4**. Convert tab-delimited file back to FASTA file:
-
-    $ csvtk join -H -t 1.fa.tsv 2.fa.tsv | sed 's/\t\t//' | seqkit tab2fx
+    $ seqkit concat 1.fa 2.fa
     >seq1
     aaaaaCCCCC
     >seq2
     cccccGGGGG
     >seq3
     gggggTTTTT
-
-All in one command:
-
-    $ csvtk join -H -t <(seqkit fx2tab 1.fa) <(seqkit fx2tab 2.fa) | sed 's/\t\t//' | seqkit tab2fx

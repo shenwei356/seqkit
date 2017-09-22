@@ -613,6 +613,8 @@ Eexamples
         reads_1.fq.gz   FASTQ   DNA     2500    567516  226     227.0   229
         reads_2.fq.gz   FASTQ   DNA     2500    560002  223     224.0   225
 
+        # So you can process the result with tools like [csvtk](http://bioinf.shenwei.me/csvtk)
+
         $ seqkit stats *.f{a,q}.gz -T | csvtk pretty -t
         file                format   type   num_seqs   sum_len   min_len   avg_len   max_len
         hairpin.fa.gz       FASTA    RNA    28645      2949871   39        103.0     2354
@@ -621,15 +623,36 @@ Eexamples
         reads_1.fq.gz       FASTQ    DNA    2500       567516    226       227.0     229
         reads_2.fq.gz       FASTQ    DNA    2500       560002    223       224.0     225
 
+        # To markdown
+
+        $ seqkit stats *.f{a,q}.gz -T | csvtk csv2md -t
+        file             |format|type|num_seqs|sum_len|min_len|avg_len|max_len
+        :----------------|:-----|:---|:-------|:------|:------|:------|:------
+        hairpin.fa.gz    |FASTA |RNA |28645   |2949871|39     |103.0  |2354
+        mature.fa.gz     |FASTA |RNA |35828   |781222 |15     |21.8   |34
+        Illimina1.8.fq.gz|FASTQ |DNA |10000   |1500000|150    |150.0  |150
+        reads_1.fq.gz    |FASTQ |DNA |2500    |567516 |226    |227.0  |229
+        reads_2.fq.gz    |FASTQ |DNA |2500    |560002 |223    |224.0  |225
+
+    file             |format|type|num_seqs|sum_len|min_len|avg_len|max_len
+    :----------------|:-----|:---|:-------|:------|:------|:------|:------
+    hairpin.fa.gz    |FASTA |RNA |28645   |2949871|39     |103.0  |2354
+    mature.fa.gz     |FASTA |RNA |35828   |781222 |15     |21.8   |34
+    Illimina1.8.fq.gz|FASTQ |DNA |10000   |1500000|150    |150.0  |150
+    reads_1.fq.gz    |FASTQ |DNA |2500    |567516 |226    |227.0  |229
+    reads_2.fq.gz    |FASTQ |DNA |2500    |560002 |223    |224.0  |225
+
 
 1. Extra information
 
         $ seqkit stats *.f{a,q}.gz -a
-        file           format  type  num_seqs    sum_len  min_len  avg_len  max_len  sum_gap  N50     L50
-        hairpin.fa.gz  FASTA   RNA     28,645  2,949,871       39      103    2,354        0  101  10,075
-        mature.fa.gz   FASTA   RNA     35,828    781,222       15     21.8       34        0   22  17,144
-        reads_1.fq.gz  FASTQ   DNA      2,500    567,516      226      227      229        0  227   1,250
-        reads_2.fq.gz  FASTQ   DNA      2,500    560,002      223      224      225        0  224   1,250
+        file               format  type  num_seqs    sum_len  min_len  avg_len  max_len  sum_gap  N50
+        hairpin.fa.gz      FASTA   RNA     28,645  2,949,871       39      103    2,354        0  101
+        mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34        0   22
+        Illimina1.8.fq.gz  FASTQ   DNA     10,000  1,500,000      150      150      150        0  150
+        reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229        0  227
+        reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225        0  224
+
 
 
 ## fq2fa
@@ -1123,14 +1146,24 @@ Usage
 ```
 find common sequences of multiple files by id/name/sequence
 
+Note:
+    1. 'seqkit common' is designed to support 2 and MORE files.
+    2. For 2 files, 'seqkit grep' is much faster and consumes lesser memory:
+         seqkit grep -f <(seqkit seq -n -i small.fq.gz) big.fq.gz # by seq ID
+         seqkit grep -s -f <(seqkit seq -s small.fq.gz) big.fq.gz # by seq
+    3. Some records in one file may have same sequences/IDs. They will ALL be
+       retrieved if the sequence/ID was shared in multiple files.
+       So the records number may be larger than that of the smallest file.
+
 Usage:
   seqkit common [flags]
 
 Flags:
-    -n, --by-name       match by full name instead of just id
-    -s, --by-seq        match by sequence
-    -i, --ignore-case   ignore case
-    -m, --md5           use MD5 instead of original seqs to reduce memory usage when comparing by seqs
+  -n, --by-name       match by full name instead of just id
+  -s, --by-seq        match by sequence
+  -h, --help          help for common
+  -i, --ignore-case   ignore case
+  -m, --md5           use MD5 instead of original seqs to reduce memory usage when comparing by seqs
 
 ```
 
