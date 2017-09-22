@@ -215,7 +215,7 @@
         
             <li><a href="#restart">restart</a></li>
         
-            <li><a href="#concate">concate</a></li>
+            <li><a href="#concat">concat</a></li>
         
             <li><a href="#shuffle">shuffle</a></li>
         
@@ -271,7 +271,7 @@
 <li><a href="#replace">replace</a></li>
 <li><a href="#rename">rename</a></li>
 <li><a href="#restart">restart</a></li>
-<li><a href="#concate">concate</a></li>
+<li><a href="#concat">concat</a></li>
 </ul>
 <p><strong>Ordering</strong></p>
 <ul>
@@ -292,6 +292,8 @@ which has <a href="https://github.com/shenwei356/bio#fastaq-parsing">high perfor
 close to the
 famous C lib <a href="https://github.com/attractivechaos/klib/">klib</a> (<a href="https://github.com/attractivechaos/klib/blob/master/kseq.h">kseq.h</a>).</p>
 <p><img alt="" src="https://github.com/shenwei356/bio/raw/master/benchmark/benchmark.tsv.png" /></p>
+<p>Seqkit calls <code>pigz</code> (much faster than <code>gzip</code>) or <code>gzip</code> to decompress .gz file if they are available.
+So please <strong>install <a href="http://zlib.net/pigz/">pigz</a> to gain better parsing performance for gzipped data</strong>.</p>
 <h3 id="sequence-formats-and-types">Sequence formats and types</h3>
 <p>SeqKit seamlessly support FASTA and FASTQ format.
 Sequence format is automatically detected.
@@ -385,8 +387,8 @@ Usage:
 Available Commands:
   common      find common sequences of multiple files by id/name/sequence
   faidx       create FASTA index file
-  fq2fa       covert FASTQ to FASTA
-  fx2tab      covert FASTA/Q to tabular format (with length/GC content/GC skew)
+  fq2fa       convert FASTQ to FASTA
+  fx2tab      convert FASTA/Q to tabular format (with length/GC content/GC skew)
   grep        search sequences by pattern(s) of name or sequence motifs
   head        print first N FASTA/Q records
   help        Help about any command
@@ -403,7 +405,7 @@ Available Commands:
   split       split sequences into files by id/seq region/size/parts
   stats       simple statistics of FASTA files
   subseq      get subsequences by region/gtf/bed, including flanking sequences
-  tab2fx      covert tabular format to FASTA/Q format
+  tab2fx      convert tabular format to FASTA/Q format
   version     print version information and check for update
 
 Flags:
@@ -806,7 +808,7 @@ cel-let-7_sliding:26-55         40.00
 </ol>
 <h2 id="stats">stats</h2>
 <p>Usage</p>
-<pre><code>simple statistics of FASTA files
+<pre><code>simple statistics of FASTA/Q files
 
 Usage:
   seqkit stats [flags]
@@ -814,10 +816,11 @@ Usage:
 Aliases:
   stats, stat
 
-
 Flags:
-  -a, --all                  all statistics, including sum_gap, N50, L50
+  -a, --all                  all statistics, including sum_gap, N50
   -G, --gap-letters string   gap letters (default &quot;- .&quot;)
+  -h, --help                 help for stats
+  -T, --tabular              output in machine-friendly tabular format
 
 </code></pre>
 
@@ -834,19 +837,118 @@ reads_2.fq.gz  FASTQ   DNA      2,500    560,002      223      224      225
 </code></pre>
 </li>
 <li>
+<p>Machine-friendly tabular format</p>
+<pre><code>$ seqkit stats *.f{a,q}.gz -T
+file    format  type    num_seqs        sum_len min_len avg_len max_len
+hairpin.fa.gz   FASTA   RNA     28645   2949871 39      103.0   2354
+mature.fa.gz    FASTA   RNA     35828   781222  15      21.8    34
+Illimina1.8.fq.gz       FASTQ   DNA     10000   1500000 150     150.0   150
+reads_1.fq.gz   FASTQ   DNA     2500    567516  226     227.0   229
+reads_2.fq.gz   FASTQ   DNA     2500    560002  223     224.0   225
+
+# So you can process the result with tools like [csvtk](http://bioinf.shenwei.me/csvtk)
+
+$ seqkit stats *.f{a,q}.gz -T | csvtk pretty -t
+file                format   type   num_seqs   sum_len   min_len   avg_len   max_len
+hairpin.fa.gz       FASTA    RNA    28645      2949871   39        103.0     2354
+mature.fa.gz        FASTA    RNA    35828      781222    15        21.8      34
+Illimina1.8.fq.gz   FASTQ    DNA    10000      1500000   150       150.0     150
+reads_1.fq.gz       FASTQ    DNA    2500       567516    226       227.0     229
+reads_2.fq.gz       FASTQ    DNA    2500       560002    223       224.0     225
+
+# To markdown
+
+$ seqkit stats *.f{a,q}.gz -T | csvtk csv2md -t
+file             |format|type|num_seqs|sum_len|min_len|avg_len|max_len
+:----------------|:-----|:---|:-------|:------|:------|:------|:------
+hairpin.fa.gz    |FASTA |RNA |28645   |2949871|39     |103.0  |2354
+mature.fa.gz     |FASTA |RNA |35828   |781222 |15     |21.8   |34
+Illimina1.8.fq.gz|FASTQ |DNA |10000   |1500000|150    |150.0  |150
+reads_1.fq.gz    |FASTQ |DNA |2500    |567516 |226    |227.0  |229
+reads_2.fq.gz    |FASTQ |DNA |2500    |560002 |223    |224.0  |225
+</code></pre>
+<table>
+<thead>
+<tr>
+<th align="left">file</th>
+<th align="left">format</th>
+<th align="left">type</th>
+<th align="left">num_seqs</th>
+<th align="left">sum_len</th>
+<th align="left">min_len</th>
+<th align="left">avg_len</th>
+<th align="left">max_len</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">hairpin.fa.gz</td>
+<td align="left">FASTA</td>
+<td align="left">RNA</td>
+<td align="left">28645</td>
+<td align="left">2949871</td>
+<td align="left">39</td>
+<td align="left">103.0</td>
+<td align="left">2354</td>
+</tr>
+<tr>
+<td align="left">mature.fa.gz</td>
+<td align="left">FASTA</td>
+<td align="left">RNA</td>
+<td align="left">35828</td>
+<td align="left">781222</td>
+<td align="left">15</td>
+<td align="left">21.8</td>
+<td align="left">34</td>
+</tr>
+<tr>
+<td align="left">Illimina1.8.fq.gz</td>
+<td align="left">FASTQ</td>
+<td align="left">DNA</td>
+<td align="left">10000</td>
+<td align="left">1500000</td>
+<td align="left">150</td>
+<td align="left">150.0</td>
+<td align="left">150</td>
+</tr>
+<tr>
+<td align="left">reads_1.fq.gz</td>
+<td align="left">FASTQ</td>
+<td align="left">DNA</td>
+<td align="left">2500</td>
+<td align="left">567516</td>
+<td align="left">226</td>
+<td align="left">227.0</td>
+<td align="left">229</td>
+</tr>
+<tr>
+<td align="left">reads_2.fq.gz</td>
+<td align="left">FASTQ</td>
+<td align="left">DNA</td>
+<td align="left">2500</td>
+<td align="left">560002</td>
+<td align="left">223</td>
+<td align="left">224.0</td>
+<td align="left">225</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>
 <p>Extra information</p>
 <pre><code>$ seqkit stats *.f{a,q}.gz -a
-file           format  type  num_seqs    sum_len  min_len  avg_len  max_len  sum_gap  N50     L50
-hairpin.fa.gz  FASTA   RNA     28,645  2,949,871       39      103    2,354        0  101  10,075
-mature.fa.gz   FASTA   RNA     35,828    781,222       15     21.8       34        0   22  17,144
-reads_1.fq.gz  FASTQ   DNA      2,500    567,516      226      227      229        0  227   1,250
-reads_2.fq.gz  FASTQ   DNA      2,500    560,002      223      224      225        0  224   1,250
+file               format  type  num_seqs    sum_len  min_len  avg_len  max_len  sum_gap  N50
+hairpin.fa.gz      FASTA   RNA     28,645  2,949,871       39      103    2,354        0  101
+mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34        0   22
+Illimina1.8.fq.gz  FASTQ   DNA     10,000  1,500,000      150      150      150        0  150
+reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229        0  227
+reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225        0  224
 </code></pre>
 </li>
 </ol>
 <h2 id="fq2fa">fq2fa</h2>
 <p>Usage</p>
-<pre><code>covert FASTQ to FASTA
+<pre><code>convert FASTQ to FASTA
 
 Usage:
   seqkit fq2fa [flags]
@@ -858,7 +960,7 @@ Usage:
 </code></pre>
 <h2 id="fx2tab-tab2fx">fx2tab &amp; tab2fx</h2>
 <p>Usage (fx2tab)</p>
-<pre><code>covert FASTA/Q to tabular format, and provide various information,
+<pre><code>convert FASTA/Q to tabular format, and provide various information,
 like sequence length, GC content/GC skew.
 
 Usage:
@@ -876,7 +978,7 @@ Flags:
 </code></pre>
 
 <p>Usage (tab2fx)</p>
-<pre><code>covert tabular format (first two/three columns) to FASTA/Q format
+<pre><code>convert tabular format (first two/three columns) to FASTA/Q format
 
 Usage:
   seqkit tab2fx [flags]
@@ -950,7 +1052,7 @@ provides melt function, could be used in preparation of data for ploting.</li>
 </ul>
 <h2 id="convert">convert</h2>
 <p>Usage</p>
-<pre><code>covert FASTQ quality encoding between Sanger, Solexa and Illumina
+<pre><code>convert FASTQ quality encoding between Sanger, Solexa and Illumina
 
 Usage:
   seqkit convert [flags]
@@ -1313,14 +1415,24 @@ $ cat duplicated.detail.txt   # here is not the entire list
 <p>Usage</p>
 <pre><code>find common sequences of multiple files by id/name/sequence
 
+Note:
+    1. 'seqkit common' is designed to support 2 and MORE files.
+    2. For 2 files, 'seqkit grep' is much faster and consumes lesser memory:
+         seqkit grep -f &lt;(seqkit seq -n -i small.fq.gz) big.fq.gz # by seq ID
+         seqkit grep -s -f &lt;(seqkit seq -s small.fq.gz) big.fq.gz # by seq
+    3. Some records in one file may have same sequences/IDs. They will ALL be
+       retrieved if the sequence/ID was shared in multiple files.
+       So the records number may be larger than that of the smallest file.
+
 Usage:
   seqkit common [flags]
 
 Flags:
-    -n, --by-name       match by full name instead of just id
-    -s, --by-seq        match by sequence
-    -i, --ignore-case   ignore case
-    -m, --md5           use MD5 instead of original seqs to reduce memory usage when comparing by seqs
+  -n, --by-name       match by full name instead of just id
+  -s, --by-seq        match by sequence
+  -h, --help          help for common
+  -i, --ignore-case   ignore case
+  -m, --md5           use MD5 instead of original seqs to reduce memory usage when comparing by seqs
 
 </code></pre>
 
@@ -1785,7 +1897,7 @@ Flags:
 
 </code></pre>
 
-<h2 id="concate">concate</h2>
+<h2 id="concat">concat</h2>
 <p>Usage</p>
 <pre><code>concatenate sequences with same ID from multiple files
 
@@ -1797,17 +1909,17 @@ Example: concatenating leading 2 bases and last 2 bases
     &gt;test2
     TGATAGCTACTAGGGTGTCTATCG
 
-    $ seqkit concate &lt;(seqkit subseq -r 1:2 t.fa) &lt;(seqkit subseq -r -2:-1 t.fa)
+    $ seqkit concat &lt;(seqkit subseq -r 1:2 t.fa) &lt;(seqkit subseq -r -2:-1 t.fa)
     &gt;test
     ACGT
     &gt;test2
     TGCG
 
 Usage:
-  seqkit concate [flags]
+  seqkit concat [flags]
 
 Flags:
-  -h, --help   help for concate
+  -h, --help   help for concat
 
 
 </code></pre>

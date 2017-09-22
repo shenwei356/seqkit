@@ -548,10 +548,10 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 </ul>
 <p><strong>Format conversion</strong></p>
 <ul>
-<li><code>fx2tab</code>     covert FASTA/Q to tabular format (and length/GC content/GC skew)</li>
-<li><code>tab2fx</code>     covert tabular format to FASTA/Q format</li>
-<li><code>fq2fa</code>      covert FASTQ to FASTA</li>
-<li><code>convert</code>    covert FASTQ quality encoding between Sanger, Solexa and Illumina</li>
+<li><code>fx2tab</code>     convert FASTA/Q to tabular format (and length/GC content/GC skew)</li>
+<li><code>tab2fx</code>     convert tabular format to FASTA/Q format</li>
+<li><code>fq2fa</code>      convert FASTQ to FASTA</li>
+<li><code>convert</code>    convert FASTQ quality encoding between Sanger, Solexa and Illumina</li>
 </ul>
 <p><strong>Searching</strong></p>
 <ul>
@@ -573,7 +573,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <li><code>replace</code>    replace name/sequence by regular expression</li>
 <li><code>rename</code>     rename duplicated IDs</li>
 <li><code>restart</code>    reset start position for circular genome</li>
-<li><code>concate</code>    concatenate sequences with same ID from multiple files</li>
+<li><code>concat</code>     concatenate sequences with same ID from multiple files</li>
 </ul>
 <p><strong>Ordering</strong></p>
 <ul>
@@ -590,6 +590,8 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <p><code>SeqKit</code> is implemented in <a href="https://golang.org/">Go</a> programming language,
  executable binary files <strong>for most popular operating systems</strong> are freely available
   in <a href="https://github.com/shenwei356/seqkit/releases">release</a> page.</p>
+<p>Seqkit calls <code>pigz</code> (much faster than <code>gzip</code>) or <code>gzip</code> to decompress .gz file if they are available.
+So please <strong>install <a href="http://zlib.net/pigz/">pigz</a> to gain better parsing performance for gzipped data</strong>.</p>
 <h4 id="method-1-download-binaries">Method 1: Download binaries</h4>
 <p>Just <a href="https://github.com/shenwei356/seqkit/releases">download</a> compressed
 executable file of your operating system,
@@ -650,6 +652,8 @@ which has <a href="https://github.com/shenwei356/bio#fastaq-parsing">high perfor
 close to the
 famous C lib <a href="https://github.com/attractivechaos/klib/">klib</a> (<a href="https://github.com/attractivechaos/klib/blob/master/kseq.h">kseq.h</a>).</p>
 <p><img alt="" src="https://github.com/shenwei356/bio/raw/master/benchmark/benchmark.tsv.png" /></p>
+<p>Seqkit calls <code>pigz</code> (much faster than <code>gzip</code>) or <code>gzip</code> to decompress .gz file if they are available.
+So please <strong>install <a href="http://zlib.net/pigz/">pigz</a> to gain better parsing performance for gzipped data</strong>.</p>
 <h3 id="sequence-formats-and-types">Sequence formats and types</h3>
 <p>SeqKit seamlessly support FASTA and FASTQ format.
 Sequence format is automatically detected.
