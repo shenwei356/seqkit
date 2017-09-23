@@ -12,6 +12,7 @@ So please **install [pigz](http://zlib.net/pigz/) to gain better parsing perform
 
 [SeqKit v0.7.1](https://github.com/shenwei356/seqkit/releases/tag/v0.7.1)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.7.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.7.1)
+
 - `seqkit convert`: fix bug of read quality containing only 3 or less values.  [shenwei356/bio/issues/3](https://github.com/shenwei356/bio/issues/3)
 - `seqkit stats`: add option `-T/--tabular` to output in machine-friendly tabular format.   [#23](https://github.com/shenwei356/seqkit/issues/23)
 - `seqkit common`: increase speed and decrease memory occupation, and add some notes.
@@ -29,7 +30,7 @@ So please **install [pigz](http://zlib.net/pigz/) to gain better parsing perform
 
 - run `seqkit version` to check update !!!
 - run `seqkit genautocomplete` to update Bash completion !!!
-- install [pigz](http://zlib.net/pigz/) to gain better parsing performance for gzipped data
+- install [pigz](http://zlib.net/pigz/) to gain better parsing performance for gzipped data.
 
 
 OS     |Arch      |File, (mirror为中国用户下载镜像链接)                                                                                                                                                                                   |Download Count
@@ -94,7 +95,7 @@ Howto:
 
 ## Release History
 
-[SeqKit v0.7.0](https://github.com/shenwei356/seqkit/releases/tag/v0.7.0)
+- [SeqKit v0.7.0](https://github.com/shenwei356/seqkit/releases/tag/v0.7.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.7.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.7.0)
     - add new command `convert` for converting FASTQ quality encoding between Sanger, Solexa and Illumina. Thanks suggestion from [@cviner](https://github.com/cviner) ( [#18](https://github.com/shenwei356/seqkit/issues/18)). [usage & example](http://bioinf.shenwei.me/seqkit/usage/#convert).
     - add new command `range` for printing FASTA/Q records in a range (start:end). [#19](https://github.com/shenwei356/seqkit/issues/19). [usage & example](http://bioinf.shenwei.me/seqkit/usage/#range).
