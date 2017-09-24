@@ -32,8 +32,9 @@ import (
 
 // dupCmd represents the fq2fa command
 var dupCmd = &cobra.Command{
-	Use:   "dup",
-	Short: "duplicate sequences N times",
+	Use:     "duplicate",
+	Aliases: []string{"dup"},
+	Short:   "duplicate sequences N times",
 	Long: `duplicate sequences N times
 
 You may need "seqkit rename" to make the the sequence IDs unique.

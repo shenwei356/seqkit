@@ -139,7 +139,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 **Set operations**
 
-- `dup`        duplicate sequences N times
+- `duplicate`  duplicate sequences N times
 - `rmdup`      remove duplicated sequences by id/name/sequence
 - `common`     find common sequences of multiple files by id/name/sequence
 - `split`      split sequences into files by id/seq region/size/parts

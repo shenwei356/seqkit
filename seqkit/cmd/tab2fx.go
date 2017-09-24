@@ -88,6 +88,10 @@ var tab2faCmd = &cobra.Command{
 			var text []byte
 			var b *bytes.Buffer
 			for chunk := range reader.Ch {
+				if chunk.Err != nil {
+					checkError(chunk.Err)
+					break
+				}
 				for _, data := range chunk.Data {
 					items := data.(Slice)
 					if len(items) == 3 && len(items[2]) > 0 { // fastq

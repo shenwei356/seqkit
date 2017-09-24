@@ -59,8 +59,10 @@ var renameCmd = &cobra.Command{
 		var fastxReader *fastx.Reader
 		var newID string
 		var k string
+		var ok bool
+		var numbers map[string]int
 		for _, file := range files {
-			numbers := make(map[string]int)
+			numbers = make(map[string]int)
 
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -83,7 +85,7 @@ var renameCmd = &cobra.Command{
 					k = string(record.ID)
 				}
 
-				if _, ok := numbers[k]; ok {
+				if _, ok = numbers[k]; ok {
 					numbers[k]++
 					newID = fmt.Sprintf("%s_%d", record.ID, numbers[k])
 					record.Name = []byte(fmt.Sprintf("%s %s", newID, record.Name))
@@ -102,5 +104,5 @@ var renameCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(renameCmd)
 
-	renameCmd.Flags().BoolP("by-name", "n", false, "check duplicated by full name instead of just id")
+	renameCmd.Flags().BoolP("by-name", "n", false, "check duplication by full name instead of just id")
 }

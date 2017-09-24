@@ -27,7 +27,7 @@
 
 **Set operations**
 
-- [dup](#dup)
+- [duplicate](#duplicate)
 - [rmdup](#rmdup)
 - [common](#common)
 - [split](#split)
@@ -1050,7 +1050,7 @@ Examples
         seq     ACGA          ACGA      +        1       4     ACGA
         seq     ACGA          ACGA      +        7       10    ACGA
 
-## dup
+## duplicate
 
 Usage
 
@@ -1060,10 +1060,13 @@ duplicate sequences N times
 You may need "seqkit rename" to make the the sequence IDs unique.
 
 Usage:
-  seqkit dup [flags]
+  seqkit duplicate [flags]
+
+Aliases:
+  duplicate, dup
 
 Flags:
-  -h, --help        help for dup
+  -h, --help        help for duplicate
   -n, --times int   duplication number (default 1)
 
 ```
@@ -1079,7 +1082,7 @@ Examples
 
 1. Duplicate 2 times
 
-        $ cat tests/hairpin.fa | seqkit head -n 1 | seqkit dup -n 2
+        $ cat tests/hairpin.fa | seqkit head -n 1 | seqkit duplicate -n 2
         >cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
         UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
         UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
@@ -1089,7 +1092,7 @@ Examples
 
 1. use `seqkit rename` to make the the sequence IDs unique.
 
-        $ cat tests/hairpin.fa | seqkit head -n 1 | seqkit dup -n 2 | seqkit rename
+        $ cat tests/hairpin.fa | seqkit head -n 1 | seqkit duplicate -n 2 | seqkit rename
         >cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
         UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
         UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
@@ -1580,7 +1583,7 @@ Usage:
   seqkit rename [flags]
 
 Flags:
-  -n, --by-name   check duplicated by full name instead of just id
+  -n, --by-name   check duplication by full name instead of just id
 
 ```
 
