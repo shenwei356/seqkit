@@ -585,7 +585,7 @@ Aliases:
   stats, stat
 
 Flags:
-  -a, --all                  all statistics, including sum_gap, N50
+  -a, --all                  all statistics, including quartiles of seq length, sum_gap, N50
   -G, --gap-letters string   gap letters (default "- .")
   -h, --help                 help for stats
   -T, --tabular              output in machine-friendly tabular format
@@ -646,12 +646,12 @@ Eexamples
 1. Extra information
 
         $ seqkit stats *.f{a,q}.gz -a
-        file               format  type  num_seqs    sum_len  min_len  avg_len  max_len  sum_gap  N50
-        hairpin.fa.gz      FASTA   RNA     28,645  2,949,871       39      103    2,354        0  101
-        mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34        0   22
-        Illimina1.8.fq.gz  FASTQ   DNA     10,000  1,500,000      150      150      150        0  150
-        reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229        0  227
-        reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225        0  224
+        file               format  type  num_seqs    sum_len  min_len  avg_len  max_len   Q1   Q2   Q3  sum_gap  N50
+        hairpin.fa.gz      FASTA   RNA     28,645  2,949,871       39      103    2,354   76   91  111        0  101
+        mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34   21   22   22        0   22
+        Illimina1.8.fq.gz  FASTQ   DNA     10,000  1,500,000      150      150      150  150  150  150        0  150
+        reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229  227  227  227        0  227
+        reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225  224  224  224        0  224
 
 
 

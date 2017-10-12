@@ -43,7 +43,7 @@ import (
 )
 
 // VERSION of seqkit
-const VERSION = "0.7.1"
+const VERSION = "0.7.2-dev"
 
 func checkError(err error) {
 	if err != nil {

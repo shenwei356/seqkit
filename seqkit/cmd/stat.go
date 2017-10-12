@@ -77,6 +77,7 @@ var statCmd = &cobra.Command{
 
 		var num, l, lenMin, lenMax, lenSum, gapSum int64
 		var n50, sum, l50 int64
+		var q1, q2, q3 int64
 		var lens sortutil.Int64Slice
 		var seqFormat, t string
 		statInfos := []statInfo{}
@@ -142,17 +143,20 @@ var statCmd = &cobra.Command{
 						break
 					}
 				}
+				q1, q2, q3 = quartile(lens)
 			}
 
 			if num == 0 {
 				statInfos = append(statInfos, statInfo{file, seqFormat, t,
 					0, 0, 0, 0,
-					0, lenMax, 0, 0})
+					0, lenMax, 0, 0,
+					q1, q2, q3})
 
 			} else {
 				statInfos = append(statInfos, statInfo{file, seqFormat, t,
 					num, lenSum, gapSum, lenMin,
-					math.Round(float64(lenSum)/float64(num), 1), lenMax, n50, l50})
+					math.Round(float64(lenSum)/float64(num), 1), lenMax, n50, l50,
+					q1, q2, q3})
 			}
 		}
 
@@ -169,7 +173,7 @@ var statCmd = &cobra.Command{
 				"max_len",
 			}
 			if all {
-				colnames = append(colnames, []string{"sum_gap", "N50"}...)
+				colnames = append(colnames, []string{"Q1", "Q2", "Q3", "sum_gap", "N50"}...)
 			}
 			outfh.WriteString(strings.Join(colnames, "\t") + "\n")
 
@@ -185,7 +189,7 @@ var statCmd = &cobra.Command{
 						info.lenAvg,
 						info.lenMax))
 				} else {
-					outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%d\t%d\n",
+					outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%d\t%d\t%d\t%d\t%d\n",
 						info.file,
 						info.format,
 						info.t,
@@ -194,6 +198,9 @@ var statCmd = &cobra.Command{
 						info.lenMin,
 						info.lenAvg,
 						info.lenMax,
+						info.Q1,
+						info.Q2,
+						info.Q3,
 						info.gapSum,
 						info.N50))
 				}
@@ -214,6 +221,9 @@ var statCmd = &cobra.Command{
 
 		if all {
 			columns = append(columns, []prettytable.Column{
+				{Header: "Q1", AlignRight: true},
+				{Header: "Q2", AlignRight: true},
+				{Header: "Q3", AlignRight: true},
 				{Header: "sum_gap", AlignRight: true},
 				{Header: "N50", AlignRight: true},
 				// {Header: "L50", AlignRight: true},
@@ -246,6 +256,9 @@ var statCmd = &cobra.Command{
 					humanize.Comma(info.lenMin),
 					humanize.Commaf(info.lenAvg),
 					humanize.Comma(info.lenMax),
+					humanize.Comma(info.Q1),
+					humanize.Comma(info.Q2),
+					humanize.Comma(info.Q3),
 					humanize.Comma(info.gapSum),
 					humanize.Comma(info.N50),
 					// humanize.Comma(info.L50),
@@ -268,6 +281,9 @@ type statInfo struct {
 	lenMax int64
 	N50    int64
 	L50    int64
+	Q1     int64
+	Q2     int64
+	Q3     int64
 }
 
 func init() {
@@ -275,5 +291,36 @@ func init() {
 
 	statCmd.Flags().BoolP("tabular", "T", false, "output in machine-friendly tabular format")
 	statCmd.Flags().StringP("gap-letters", "G", "- .", "gap letters")
-	statCmd.Flags().BoolP("all", "a", false, "all statistics, including sum_gap, N50")
+	statCmd.Flags().BoolP("all", "a", false, "all statistics, including quartiles of seq length, sum_gap, N50")
+}
+
+func median(sorted []int64) int64 {
+	l := len(sorted)
+	if l == 0 {
+		return 0
+	}
+	if l%2 == 0 {
+		return (sorted[l/2-1] + sorted[l/2]) / 2
+	}
+	return sorted[l/2]
+}
+
+func quartile(sorted []int64) (q1, q2, q3 int64) {
+	l := len(sorted)
+	if l == 0 {
+		return
+	}
+
+	var c1, c2 int
+	if l%2 == 0 {
+		c1 = l / 2
+		c2 = l / 2
+	} else {
+		c1 = (l - 1) / 2
+		c2 = c1 + 1
+	}
+	q1 = median(sorted[:c1])
+	q2 = median(sorted)
+	q3 = median(sorted[c2:])
+	return
 }
