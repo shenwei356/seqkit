@@ -185,6 +185,8 @@
         
             <li><a href="#stats">stats</a></li>
         
+            <li><a href="#faidx">faidx</a></li>
+        
             <li><a href="#fq2fa">fq2fa</a></li>
         
             <li><a href="#fx2tab-tab2fx">fx2tab &amp; tab2fx</a></li>
@@ -195,7 +197,7 @@
         
             <li><a href="#locate">locate</a></li>
         
-            <li><a href="#dup">dup</a></li>
+            <li><a href="#duplicate">duplicate</a></li>
         
             <li><a href="#rmdup">rmdup</a></li>
         
@@ -244,6 +246,7 @@
 <li><a href="#subseq">subseq</a></li>
 <li><a href="#sliding">sliding</a></li>
 <li><a href="#stats">stats</a></li>
+<li><a href="#faidx">faidx</a></li>
 </ul>
 <p><strong>Format conversion</strong></p>
 <ul>
@@ -258,7 +261,7 @@
 </ul>
 <p><strong>Set operations</strong></p>
 <ul>
-<li><a href="#dup">dup</a></li>
+<li><a href="#duplicate">duplicate</a></li>
 <li><a href="#rmdup">rmdup</a></li>
 <li><a href="#common">common</a></li>
 <li><a href="#split">split</a></li>
@@ -370,10 +373,9 @@ They use FASTA index for rapid acccess of sequences and reducing memory occupati
 given by flag <code>-s</code> (<code>--rand-seed</code>). This makes sure that sampling result could be
 reproduced in different environments with same random seed.</p>
 <h2 id="seqkit">seqkit</h2>
-<p>Usage</p>
 <pre><code>SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.5.5
+Version: 0.7.2
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -381,37 +383,45 @@ Documents  : http://bioinf.shenwei.me/seqkit
 Source code: https://github.com/shenwei356/seqkit
 Please cite: https://doi.org/10.1371/journal.pone.0163962
 
+Suggestion : Install pigz to gain better parsing performance for gzipped data
+
 Usage:
   seqkit [command]
 
 Available Commands:
-  common      find common sequences of multiple files by id/name/sequence
-  faidx       create FASTA index file
-  fq2fa       convert FASTQ to FASTA
-  fx2tab      convert FASTA/Q to tabular format (with length/GC content/GC skew)
-  grep        search sequences by pattern(s) of name or sequence motifs
-  head        print first N FASTA/Q records
-  help        Help about any command
-  locate      locate subsequences/motifs
-  rename      rename duplicated IDs
-  replace     replace name/sequence by regular expression
-  restart     reset start position for circular genome
-  rmdup       remove duplicated sequences by id/name/sequence
-  sample      sample sequences by number or proportion
-  seq         transform sequences (revserse, complement, extract ID...)
-  shuffle     shuffle sequences
-  sliding     sliding sequences, circular genome supported
-  sort        sort sequences by id/name/sequence/length
-  split       split sequences into files by id/seq region/size/parts
-  stats       simple statistics of FASTA files
-  subseq      get subsequences by region/gtf/bed, including flanking sequences
-  tab2fx      convert tabular format to FASTA/Q format
-  version     print version information and check for update
+  common          find common sequences of multiple files by id/name/sequence
+  concat          concatenate sequences with same ID from multiple files
+  convert         convert FASTQ quality encoding between Sanger, Solexa and Illumina
+  duplicate       duplicate sequences N times
+  faidx           create FASTA index file and extract subsequence
+  fq2fa           convert FASTQ to FASTA
+  fx2tab          convert FASTA/Q to tabular format (with length/GC content/GC skew)
+  genautocomplete generate shell autocompletion script
+  grep            search sequences by pattern(s) of name or sequence motifs
+  head            print first N FASTA/Q records
+  help            Help about any command
+  locate          locate subsequences/motifs
+  range           print FASTA/Q records in a range (start:end)
+  rename          rename duplicated IDs
+  replace         replace name/sequence by regular expression
+  restart         reset start position for circular genome
+  rmdup           remove duplicated sequences by id/name/sequence
+  sample          sample sequences by number or proportion
+  seq             transform sequences (revserse, complement, extract ID...)
+  shuffle         shuffle sequences
+  sliding         sliding sequences, circular genome supported
+  sort            sort sequences by id/name/sequence/length
+  split           split sequences into files by id/seq region/size/parts
+  stats           simple statistics of FASTA/Q files
+  subseq          get subsequences by region/gtf/bed, including flanking sequences
+  tab2fx          convert tabular format to FASTA/Q format
+  version         print version information and check for update
 
 Flags:
       --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
+  -h, --help                            help for seqkit
       --id-ncbi                         FASTA head is NCBI-style, e.g. &gt;gi|110645304|ref|NC_002516.2| Pseud...
-      --id-regexp string                regular expression for parsing ID (default &quot;^([^\s]+)\s?&quot;)
+      --id-regexp string                regular expression for parsing ID (default &quot;^([^\\s]+)\\s?&quot;)
   -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
   -o, --out-file string                 out file (&quot;-&quot; for stdout, suffix .gz for gzipped out) (default &quot;-&quot;)
       --quiet                           be quiet and do not show extra information
@@ -817,7 +827,7 @@ Aliases:
   stats, stat
 
 Flags:
-  -a, --all                  all statistics, including sum_gap, N50
+  -a, --all                  all statistics, including quartiles of seq length, sum_gap, N50
   -G, --gap-letters string   gap letters (default &quot;- .&quot;)
   -h, --help                 help for stats
   -T, --tabular              output in machine-friendly tabular format
@@ -937,12 +947,79 @@ reads_2.fq.gz    |FASTQ |DNA |2500    |560002 |223    |224.0  |225
 <li>
 <p>Extra information</p>
 <pre><code>$ seqkit stats *.f{a,q}.gz -a
-file               format  type  num_seqs    sum_len  min_len  avg_len  max_len  sum_gap  N50
-hairpin.fa.gz      FASTA   RNA     28,645  2,949,871       39      103    2,354        0  101
-mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34        0   22
-Illimina1.8.fq.gz  FASTQ   DNA     10,000  1,500,000      150      150      150        0  150
-reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229        0  227
-reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225        0  224
+file               format  type  num_seqs    sum_len  min_len  avg_len  max_len   Q1   Q2   Q3  sum_gap  N50
+hairpin.fa.gz      FASTA   RNA     28,645  2,949,871       39      103    2,354   76   91  111        0  101
+mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34   21   22   22        0   22
+Illimina1.8.fq.gz  FASTQ   DNA     10,000  1,500,000      150      150      150  150  150  150        0  150
+reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229  227  227  227        0  227
+reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225  224  224  224        0  224
+</code></pre>
+</li>
+</ol>
+<h2 id="faidx">faidx</h2>
+<p>Usage</p>
+<pre><code>create FASTA index file and extract subsequence
+
+This command is similar with &quot;samtools faidx&quot; but has some extra features:
+
+  1. output full header line with flag -f
+  2. support regular expression as sequence ID with flag -r
+
+Usage:
+  seqkit faidx [flags] &lt;fasta-file&gt; [regions...]
+
+Flags:
+  -f, --full-head     print full header line instead of just ID. New fasta index file ending with .seqkit.fai will be created
+  -h, --help          help for faidx
+  -i, --ignore-case   ignore case
+  -r, --use-regexp    IDs are regular expression. But subseq region is not suppored here.
+
+</code></pre>
+
+<p>Example</p>
+<ol>
+<li>
+<p>common usage</p>
+<pre><code>$ seqkit faidx tests/hairpin.fa hsa-let-7a-1 hsa-let-7a-2
+&gt;hsa-let-7a-1
+UGGGAUGAGGUAGUAGGUUGUAUAGUUUUAGGGUCACACCCACCACUGGGAGAUAACUAU
+ACAAUCUACUGUCUUUCCUA
+&gt;hsa-let-7a-2
+AGGUUGAGGUAGUAGGUUGUAUAGUUUAGAAUUACAUCAAGGGAGAUAACUGUACAGCCU
+CCUAGCUUUCCU
+</code></pre>
+</li>
+<li>
+<p>output full header</p>
+<pre><code>$ seqkit faidx tests/hairpin.fa hsa-let-7a-1 hsa-let-7a-2 -f
+&gt;hsa-let-7a-1 MI0000060 Homo sapiens let-7a-1 stem-loop
+UGGGAUGAGGUAGUAGGUUGUAUAGUUUUAGGGUCACACCCACCACUGGGAGAUAACUAU
+ACAAUCUACUGUCUUUCCUA
+&gt;hsa-let-7a-2 MI0000061 Homo sapiens let-7a-2 stem-loop
+AGGUUGAGGUAGUAGGUUGUAUAGUUUAGAAUUACAUCAAGGGAGAUAACUGUACAGCCU
+CCUAGCUUUCCU
+</code></pre>
+</li>
+<li>
+<p>extract subsequence of specific region</p>
+<pre><code>$ seqkit faidx tests/hairpin.fa hsa-let-7a-1:1-10
+&gt;hsa-let-7a-1:1-10
+UGGGAUGAGG
+
+$ seqkit faidx tests/hairpin.fa hsa-let-7a-1:-10--1
+&gt;hsa-let-7a-1:-10--1
+GUCUUUCCUA
+
+$ seqkit faidx tests/hairpin.fa hsa-let-7a-1:1
+&gt;hsa-let-7a-1:1-1
+U
+</code></pre>
+</li>
+<li>
+<p>use regular expression</p>
+<pre><code>$ seqkit faidx tests/hairpin.fa hsa -r | seqkit stats
+file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+-     FASTA   RNA      1,881  154,002       41     81.9      180
 </code></pre>
 </li>
 </ol>
@@ -1154,6 +1231,9 @@ FGDGGGGGDGFFGGGDGGGGGGEEGAGFFE&gt;A&gt;@!B@?@@&lt;:!!!!!!!!!!355=&gt;&gt;&lt;&gt
 <p>Usage</p>
 <pre><code>search sequences by pattern(s) of name or sequence motifs
 
+Note that the order of sequences in result is consistent with that in original
+file, not the order of the query patterns.
+
 You can specify the sequence region for searching with flag -R/--region.
 The definition of region is 1-based and with some custom design.
 
@@ -1322,17 +1402,20 @@ seq     ACGA          ACGA      +        7       10    ACGA
 </code></pre>
 </li>
 </ol>
-<h2 id="dup">dup</h2>
+<h2 id="duplicate">duplicate</h2>
 <p>Usage</p>
 <pre><code>duplicate sequences N times
 
 You may need &quot;seqkit rename&quot; to make the the sequence IDs unique.
 
 Usage:
-  seqkit dup [flags]
+  seqkit duplicate [flags]
+
+Aliases:
+  duplicate, dup
 
 Flags:
-  -h, --help        help for dup
+  -h, --help        help for duplicate
   -n, --times int   duplication number (default 1)
 
 </code></pre>
@@ -1349,7 +1432,7 @@ UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 </li>
 <li>
 <p>Duplicate 2 times</p>
-<pre><code>$ cat tests/hairpin.fa | seqkit head -n 1 | seqkit dup -n 2
+<pre><code>$ cat tests/hairpin.fa | seqkit head -n 1 | seqkit duplicate -n 2
 &gt;cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
 UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
 UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
@@ -1360,7 +1443,7 @@ UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 </li>
 <li>
 <p>use <code>seqkit rename</code> to make the the sequence IDs unique.</p>
-<pre><code>$ cat tests/hairpin.fa | seqkit head -n 1 | seqkit dup -n 2 | seqkit rename
+<pre><code>$ cat tests/hairpin.fa | seqkit head -n 1 | seqkit duplicate -n 2 | seqkit rename
 &gt;cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
 UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
 UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
@@ -1850,7 +1933,7 @@ Usage:
   seqkit rename [flags]
 
 Flags:
-  -n, --by-name   check duplicated by full name instead of just id
+  -n, --by-name   check duplication by full name instead of just id
 
 </code></pre>
 
