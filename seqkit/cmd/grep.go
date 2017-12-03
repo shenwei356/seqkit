@@ -41,6 +41,9 @@ var grepCmd = &cobra.Command{
 	Short: "search sequences by pattern(s) of name or sequence motifs",
 	Long: fmt.Sprintf(`search sequences by pattern(s) of name or sequence motifs
 
+Note that the order of sequences in result is consistent with that in original
+file, not the order of the query patterns.
+
 You can specify the sequence region for searching with flag -R (--region).
 The definition of region is 1-based and with some custom design.
 

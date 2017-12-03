@@ -123,7 +123,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - `subseq`     get subsequences by region/gtf/bed, including flanking sequences
 - `sliding`    sliding sequences, circular genome supported
 - `stats`      simple statistics of FASTA/Q files
-- `faidx`      create FASTA index file
+- `faidx`      create FASTA index file and extract subsequence
 
 **Format conversion**
 

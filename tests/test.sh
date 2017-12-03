@@ -364,3 +364,34 @@ assert_equal $(cat $file | $app stat -a | md5sum | cut -d" " -f 1) $(cat t.sort.
 assert_equal $(cat $file | $app stat -a | md5sum | cut -d" " -f 1) $(cat t.sort.n | $app stat -a | md5sum | cut -d" " -f 1)
 assert_equal $(cat $file | $app stat -a | md5sum | cut -d" " -f 1) $(cat t.sort.s | $app stat -a | md5sum | cut -d" " -f 1)
 rm t.sort.*
+
+# ------------------------------------------------------------
+#                       faidx
+# ------------------------------------------------------------
+
+idFile=tests/t.ids
+outFile=tests/t.fa
+$app sample -n 10 $file| $app seq -i -n | shuf > $idFile
+
+fun(){
+    $app faidx $file $(paste -s -d ' ' $idFile) > $outFile
+}
+run faidx_id fun
+assert_equal $($app grep -f $idFile $file | seqkit seq -i | seqkit sort | md5sum | cut -d" " -f 1) $(cat $outFile | seqkit sort | md5sum | cut -d" " -f 1)
+rm $outFile
+
+fun(){
+    $app faidx $file $(paste -s -d ' ' $idFile) -f > $outFile
+}
+run faidx_full_head fun
+assert_equal $($app grep -f $idFile $file | seqkit sort | md5sum | cut -d" " -f 1) $(cat $outFile | seqkit sort | md5sum | cut -d" " -f 1)
+rm $outFile
+
+
+ref=$(head -n 1 $idFile)
+fun(){
+    $app faidx $file "${ref}:5--5" -f > $outFile
+}
+run faidx_region fun
+assert_equal $($app grep -p $ref $file | seqkit subseq -r 5:-5 | seqkit seq -s -w 0) $(cat $outFile | seqkit seq -s -w 0)
+rm $idFile $outFile

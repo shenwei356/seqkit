@@ -144,7 +144,6 @@ Examples:
 
 			gtf.Threads = config.Threads // threads of gtf.ReadFeatures
 			var features []gtf.Feature
-			var err error
 			if len(chrs) > 0 || len(choosedFeatures) > 0 {
 				features, err = gtf.ReadFilteredFeatures(gtfFile, chrs, choosedFeatures, []string{gtfTag})
 			} else {
@@ -178,7 +177,6 @@ Examples:
 			Threads = config.Threads // threads of ReadBedFeatures
 
 			var features []BedFeature
-			var err error
 			if len(chrs) > 0 {
 				features, err = ReadBedFilteredFeatures(bedFile, chrs)
 			} else {
