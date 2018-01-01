@@ -559,6 +559,6 @@ func init() {
 	subseqCmd.Flags().IntP("up-stream", "u", 0, "up stream length")
 	subseqCmd.Flags().IntP("down-stream", "d", 0, "down stream length")
 	subseqCmd.Flags().BoolP("only-flank", "f", false, "only return up/down stream sequence")
-	subseqCmd.Flags().StringP("bed", "", "", "by BED file")
+	subseqCmd.Flags().StringP("bed", "", "", "by tab-delimited BED file")
 	subseqCmd.Flags().StringP("gtf-tag", "", "gene_id", `output this tag as sequence comment`)
 }

@@ -66,7 +66,7 @@ func ReadBedFilteredFeatures(file string, chrs []string) ([]BedFeature, error) {
 		}
 		//
 		// do not use regexp.Split(), it's very slow
-		items := stringutil.Split(line, " \t")
+		items := stringutil.Split(line, "\t")
 		n := len(items)
 		if n < 3 {
 			return nil, false, nil
