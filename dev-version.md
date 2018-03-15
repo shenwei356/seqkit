@@ -1,1 +1,2 @@
 - `subseq`, require BED file to be tab-delimited.
+- `seq`, fix output format for zero-length fastq records when using flag `-M 1` or `-M 0`.

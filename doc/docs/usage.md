@@ -28,13 +28,13 @@
 
 **Set operations**
 
-- [duplicate](#duplicate)
-- [rmdup](#rmdup)
-- [common](#common)
-- [split](#split)
-- [sample](#sample)
 - [head](#head)
 - [range](#range)
+- [sample](#sample)
+- [rmdup](#rmdup)
+- [duplicate](#duplicate)
+- [common](#common)
+- [split](#split)
 
 **Edit**
 

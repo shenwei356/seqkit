@@ -102,8 +102,8 @@ var seqCmd = &cobra.Command{
 		checkError(err)
 		defer outfh.Close()
 
+		var checkSeqType bool
 		var isFastq bool
-		checkSeqType := true
 		var printName, printSeq, printQual bool
 		var head []byte
 		var sequence *seq.Seq
@@ -115,6 +115,8 @@ var seqCmd = &cobra.Command{
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
+			checkSeqType = true
+			printQual = false
 			once := true
 			for {
 				record, err = fastxReader.Read()
@@ -126,6 +128,15 @@ var seqCmd = &cobra.Command{
 					break
 				}
 
+				if checkSeqType {
+					isFastq = fastxReader.IsFastq
+					if isFastq {
+						config.LineWidth = 0
+						printQual = true
+					}
+					checkSeqType = false
+				}
+
 				if minLen >= 0 && len(record.Seq.Seq) < minLen {
 					continue
 				}
@@ -133,20 +144,6 @@ var seqCmd = &cobra.Command{
 					continue
 				}
 
-				if fastxReader.IsFastq {
-					config.LineWidth = 0
-				}
-
-				if checkSeqType {
-					if len(record.Seq.Qual) > 0 {
-						isFastq = true
-					}
-					checkSeqType = false
-				}
-				printQual = false
-				if isFastq {
-					printQual = true
-				}
 				printName, printSeq = true, true
 				if onlyName && onlySeq {
 					printName, printSeq = true, true
