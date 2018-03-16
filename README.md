@@ -66,16 +66,18 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
   see [download](http://bioinf.shenwei.me/seqkit/download/))
 - **Light weight and out-of-the-box, no dependencies, no compilation, no configuration**
   (see [download](http://bioinf.shenwei.me/seqkit/download/))
-- **UltraFast** (see [benchmark](/#benchmark)),
+- **UltraFast** (see [benchmark](#benchmark)),
   **multiple-CPUs supported**
 - **Practical functions supported by 23 subcommands** (see subcommands and
   [usage](http://bioinf.shenwei.me/seqkit/usage/) )
-- **Support [Bash-completion](#bash-completion)**
+- **Supporting [Bash-completion](#bash-completion)**
 - **Well documented** (detailed [usage](http://bioinf.shenwei.me/seqkit/usage/)
   and [benchmark](http://bioinf.shenwei.me/seqkit/benchmark/) )
-- **Seamlessly parses both FASTA and FASTQ formats**
-- **Support STDIN and gziped input/output file, easy being used in pipe**
-- **Support custom sequence ID regular expression** (especially useful for searching with ID list)
+- **Seamlessly parsing both FASTA and FASTQ formats**
+- **Supporting STDIN and gzipped input/output file, easy being used in pipe**
+  , **writing gzip file is very faster (10X of `gzip`, 4X of `pigz`)** by
+  using package [pgzip](https://github.com/klauspost/pgzip)
+- **Supporting custom sequence ID regular expression** (especially useful for searching with ID list)
 - Reproducible results (configurable rand seed in `sample` and `shuffle`)
 - Well organized source code, friendly to use and easy to extend
 
@@ -238,6 +240,8 @@ famous C lib [klib](https://github.com/attractivechaos/klib/) ([kseq.h](https://
 
 Seqkit calls `pigz` (much faster than `gzip`) or `gzip` to decompress .gz file if they are available.
 So please **install [pigz](http://zlib.net/pigz/) to gain better parsing performance for gzipped data**.
+Seqkit uses package [pgzip](https://github.com/klauspost/pgzip) to write gzip file,
+which is very fast (**10X of `gzip`, 4X of `pigz`**) and the gzip file would be slighty larger.
 
 ### Sequence formats and types
 

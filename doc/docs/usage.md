@@ -69,6 +69,8 @@ famous C lib [klib](https://github.com/attractivechaos/klib/) ([kseq.h](https://
 
 Seqkit calls `pigz` (much faster than `gzip`) or `gzip` to decompress .gz file if they are available.
 So please **install [pigz](http://zlib.net/pigz/) to gain better parsing performance for gzipped data**.
+Seqkit uses package [pgzip](https://github.com/klauspost/pgzip) to write gzip file,
+which is very fast (**10X of `gzip`, 4X of `pigz`**) and the gzip file would be slighty larger.
 
 ### Sequence formats and types
 
