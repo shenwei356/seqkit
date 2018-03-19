@@ -123,6 +123,7 @@ var sampleCmd = &cobra.Command{
 					}
 					if fastxReader.IsFastq {
 						config.LineWidth = 0
+						fastx.ForcelyOutputFastq = true
 					}
 
 					if rand.Float64() <= proportion {
@@ -171,6 +172,7 @@ var sampleCmd = &cobra.Command{
 				}
 				if fastxReader.IsFastq {
 					config.LineWidth = 0
+					fastx.ForcelyOutputFastq = true
 				}
 
 				if rand.Float64() <= proportion {

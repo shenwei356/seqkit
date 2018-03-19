@@ -229,6 +229,7 @@ Note:
 			}
 			if fastxReader.IsFastq {
 				config.LineWidth = 0
+				fastx.ForcelyOutputFastq = true
 			}
 
 			if _, ok := namesOK[string(record.Name)]; ok {

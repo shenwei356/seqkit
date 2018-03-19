@@ -107,6 +107,9 @@ Example: concatenating leading 2 bases and last 2 bases
 
 				if i == 0 {
 					isFastq = fastxReader.IsFastq
+					if isFastq {
+						fastx.ForcelyOutputFastq = true
+					}
 				} else {
 					if isFastq != fastxReader.IsFastq {
 						checkError(fmt.Errorf("concatenating FASTA and FASTQ is not allowed"))
@@ -121,7 +124,7 @@ Example: concatenating leading 2 bases and last 2 bases
 				clone = record.Seq.Clone()
 				seqs[id] = append(seqs[id], clone.Seq)
 
-				if fastxReader.IsFastq {
+				if isFastq {
 					if _, ok = quals[id]; !ok {
 						quals[id] = make([][]byte, 0, len(files))
 					}

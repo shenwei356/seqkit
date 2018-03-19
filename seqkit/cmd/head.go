@@ -73,6 +73,7 @@ var headCmd = &cobra.Command{
 				}
 				if fastxReader.IsFastq {
 					config.LineWidth = 0
+					fastx.ForcelyOutputFastq = true
 				}
 				i++
 				record.FormatToWriter(outfh, config.LineWidth)

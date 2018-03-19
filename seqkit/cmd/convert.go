@@ -170,6 +170,7 @@ var convertCmd = &cobra.Command{
 				}
 				if fastxReader.IsFastq {
 					config.LineWidth = 0
+					fastx.ForcelyOutputFastq = true
 				} else {
 					checkError(fmt.Errorf("this command only works for FASTQ format"))
 				}

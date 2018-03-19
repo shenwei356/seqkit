@@ -13,6 +13,12 @@ pages:
     - YanLi Lab: yanlilab.md
 theme: yeti
 
+# cluster
+# tamerdocs
+# cinder
+# unidata
+# yeti
+
 repo_url: https://github.com/shenwei356/seqkit
 site_description: SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 site_author: Wei Shen

@@ -74,7 +74,9 @@ You may need "seqkit rename" to make the the sequence IDs unique.
 					checkError(err)
 					break
 				}
-
+				if fastxReader.IsFastq {
+					fastx.ForcelyOutputFastq = true
+				}
 				for i = 0; i < times; i++ {
 					record.FormatToWriter(outfh, lineWidth)
 				}

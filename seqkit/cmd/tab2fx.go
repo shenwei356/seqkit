@@ -87,6 +87,7 @@ var tab2faCmd = &cobra.Command{
 			checkError(err)
 			var text []byte
 			var b *bytes.Buffer
+			isFastq := false
 			for chunk := range reader.Ch {
 				if chunk.Err != nil {
 					checkError(chunk.Err)
@@ -94,7 +95,8 @@ var tab2faCmd = &cobra.Command{
 				}
 				for _, data := range chunk.Data {
 					items := data.(Slice)
-					if len(items) == 3 && len(items[2]) > 0 { // fastq
+					if len(items) == 3 && (len(items[2]) > 0 || isFastq) { // fastq
+						isFastq = true
 						outfh.WriteString(fmt.Sprintf("@%s\n", items[0]))
 
 						// 	outfh.Write(byteutil.WrapByteSlice([]byte(items[1]), lineWidth))

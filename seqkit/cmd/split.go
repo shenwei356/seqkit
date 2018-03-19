@@ -159,6 +159,7 @@ Examples:
 					}
 					if fastxReader.IsFastq {
 						config.LineWidth = 0
+						fastx.ForcelyOutputFastq = true
 					}
 
 					if renameFileExt && isstdin {

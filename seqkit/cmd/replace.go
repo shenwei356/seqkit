@@ -158,6 +158,7 @@ Special replacement symbols (only for replacing name not sequence):
 				}
 				if fastxReader.IsFastq {
 					config.LineWidth = 0
+					fastx.ForcelyOutputFastq = true
 				}
 
 				nr++

@@ -97,6 +97,7 @@ Secondly, seqkit shuffles sequence IDs and extract sequences by FASTA index.
 					}
 					if fastxReader.IsFastq {
 						config.LineWidth = 0
+						fastx.ForcelyOutputFastq = true
 					}
 
 					sequences[string(record.Name)] = record.Clone()
