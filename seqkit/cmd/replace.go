@@ -25,7 +25,6 @@ import (
 	"io"
 	"regexp"
 	"runtime"
-	"strconv"
 	"strings"
 
 	"github.com/shenwei356/bio/seq"
@@ -73,6 +72,7 @@ Special replacement symbols (only for replacing name not sequence):
 
 		pattern := getFlagString(cmd, "pattern")
 		replacement := []byte(getFlagString(cmd, "replacement"))
+		nrWidth := getFlagPositiveInt(cmd, "nr-width")
 		kvFile := getFlagString(cmd, "kv-file")
 		keepKey := getFlagBool(cmd, "keep-key")
 		keyCaptIdx := getFlagPositiveInt(cmd, "key-capt-idx")
@@ -143,6 +143,7 @@ Special replacement symbols (only for replacing name not sequence):
 		var ok bool
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
+		nrFormat := fmt.Sprintf("%%0%dd", nrWidth)
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -168,7 +169,7 @@ Special replacement symbols (only for replacing name not sequence):
 					r = replacement
 
 					if replaceWithNR {
-						r = reNR.ReplaceAll(r, []byte(strconv.Itoa(nr)))
+						r = reNR.ReplaceAll(r, []byte(fmt.Sprintf(nrFormat, nr)))
 					}
 
 					if replaceWithKV {
@@ -215,6 +216,7 @@ func init() {
 			"ATTENTION: for *nix OS, use SINGLE quote NOT double quotes or "+
 			`use the \ escape character. Record number is also supported by "{nr}".`+
 			`use ${1} instead of $1 when {kv} given!`)
+	replaceCmd.Flags().IntP("nr-width", "", 1, `minimum width for {nr} in flag -r/--replacement. e.g., formating "1" to "001" by --nr-width 3`)
 	// replaceCmd.Flags().BoolP("by-name", "n", false, "replace full name instead of just id")
 	replaceCmd.Flags().BoolP("by-seq", "s", false, "replace seq")
 	replaceCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
