@@ -1531,11 +1531,13 @@ Usage:
 
 Flags:
   -s, --by-seq                 replace seq
+  -h, --help                   help for replace
   -i, --ignore-case            ignore case
   -K, --keep-key               keep the key as value when no value found for the key (only for sequence name)
   -I, --key-capt-idx int       capture variable index of key (1-based) (default 1)
-      --key-miss-repl string   replacement for key with no corresponding value
+  -m, --key-miss-repl string   replacement for key with no corresponding value
   -k, --kv-file string         tab-delimited key-value file for replacing key with value when using "{kv}" in -r (--replacement) (only for sequence name)
+      --nr-width int           minimum width for {nr} in flag -r/--replacement. e.g., formating "1" to "001" by --nr-width 3 (default 1)
   -p, --pattern string         search regular expression
   -r, --replacement string     replacement. supporting capture variables.  e.g. $1 represents the text of the first submatch. ATTENTION: for *nix OS, use SINGLE quote NOT double quotes or use the \ escape character. Record number is also supported by "{nr}".use ${1} instead of $1 when {kv} given!
 
@@ -1581,10 +1583,16 @@ Examples
 
 1. Rename with number of record
 
-        echo -e ">abc\nACTG\n>123\nATTT" |  seqkit replace -p .+ -r "seq_{nr}"
+        $ echo -e ">abc\nACTG\n>123\nATTT" |  seqkit replace -p .+ -r "seq_{nr}"
         >seq_1
         ACTG
         >seq_2
+        ATTT
+
+        $ echo -e ">abc\nACTG\n>123\nATTT" |  seqkit replace -p .+ -r "seq_{nr}" --nr-width 5
+        >seq_00001
+        ACTG
+        >seq_00002
         ATTT
 
 1. Replace key with value by key-value file

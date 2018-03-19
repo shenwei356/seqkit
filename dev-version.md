@@ -1,3 +1,4 @@
 - `seqkit`, fix output format for FASTQ files containing zero-length records.
 - `seqkit`, add amino acid code `O` (pyrrolysine) and `U` (selenocysteine).
+- `replace`, add flag `--nr-width` to filling leading 0s for `{nr}`
 - `subseq`, require BED file to be tab-delimited.
