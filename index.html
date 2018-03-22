@@ -264,16 +264,18 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
   see <a href="http://bioinf.shenwei.me/seqkit/download/">download</a>)</li>
 <li><strong>Light weight and out-of-the-box, no dependencies, no compilation, no configuration</strong>
   (see <a href="http://bioinf.shenwei.me/seqkit/download/">download</a>)</li>
-<li><strong>UltraFast</strong> (see <a href="./#benchmark">benchmark</a>),
+<li><strong>UltraFast</strong> (see <a href="#benchmark">benchmark</a>),
   <strong>multiple-CPUs supported</strong></li>
 <li><strong>Practical functions supported by 23 subcommands</strong> (see subcommands and
   <a href="http://bioinf.shenwei.me/seqkit/usage/">usage</a> )</li>
-<li><strong>Support <a href="#bash-completion">Bash-completion</a></strong></li>
+<li><strong>Supporting <a href="#bash-completion">Bash-completion</a></strong></li>
 <li><strong>Well documented</strong> (detailed <a href="http://bioinf.shenwei.me/seqkit/usage/">usage</a>
   and <a href="http://bioinf.shenwei.me/seqkit/benchmark/">benchmark</a> )</li>
-<li><strong>Seamlessly parses both FASTA and FASTQ formats</strong></li>
-<li><strong>Support STDIN and gziped input/output file, easy being used in pipe</strong></li>
-<li><strong>Support custom sequence ID regular expression</strong> (especially useful for searching with ID list)</li>
+<li><strong>Seamlessly parsing both FASTA and FASTQ formats</strong></li>
+<li><strong>Supporting STDIN and gzipped input/output file, easy being used in pipe</strong>
+  , <strong>writing gzip file is very faster (10X of <code>gzip</code>, 4X of <code>pigz</code>)</strong> by
+  using package <a href="https://github.com/klauspost/pgzip">pgzip</a></li>
+<li><strong>Supporting custom sequence ID regular expression</strong> (especially useful for searching with ID list)</li>
 <li>Reproducible results (configurable rand seed in <code>sample</code> and <code>shuffle</code>)</li>
 <li>Well organized source code, friendly to use and easy to extend</li>
 </ul>
@@ -560,13 +562,13 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 </ul>
 <p><strong>Set operations</strong></p>
 <ul>
-<li><code>duplicate</code>  duplicate sequences N times</li>
-<li><code>rmdup</code>      remove duplicated sequences by id/name/sequence</li>
-<li><code>common</code>     find common sequences of multiple files by id/name/sequence</li>
-<li><code>split</code>      split sequences into files by id/seq region/size/parts</li>
-<li><code>sample</code>     sample sequences by number or proportion</li>
 <li><code>head</code>       print first N FASTA/Q records</li>
 <li><code>range</code>      print FASTA/Q records in a range (start:end)</li>
+<li><code>sample</code>     sample sequences by number or proportion</li>
+<li><code>rmdup</code>      remove duplicated sequences by id/name/sequence</li>
+<li><code>duplicate</code>  duplicate sequences N times</li>
+<li><code>common</code>     find common sequences of multiple files by id/name/sequence</li>
+<li><code>split</code>      split sequences into files by id/seq region/size/parts</li>
 </ul>
 <p><strong>Edit</strong></p>
 <ul>
@@ -653,7 +655,9 @@ close to the
 famous C lib <a href="https://github.com/attractivechaos/klib/">klib</a> (<a href="https://github.com/attractivechaos/klib/blob/master/kseq.h">kseq.h</a>).</p>
 <p><img alt="" src="https://github.com/shenwei356/bio/raw/master/benchmark/benchmark.tsv.png" /></p>
 <p>Seqkit calls <code>pigz</code> (much faster than <code>gzip</code>) or <code>gzip</code> to decompress .gz file if they are available.
-So please <strong>install <a href="http://zlib.net/pigz/">pigz</a> to gain better parsing performance for gzipped data</strong>.</p>
+So please <strong>install <a href="http://zlib.net/pigz/">pigz</a> to gain better parsing performance for gzipped data</strong>.
+Seqkit uses package <a href="https://github.com/klauspost/pgzip">pgzip</a> to write gzip file,
+which is very fast (<strong>10X of <code>gzip</code>, 4X of <code>pigz</code></strong>) and the gzip file would be slighty larger.</p>
 <h3 id="sequence-formats-and-types">Sequence formats and types</h3>
 <p>SeqKit seamlessly support FASTA and FASTQ format.
 Sequence format is automatically detected.

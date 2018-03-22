@@ -261,13 +261,13 @@
 </ul>
 <p><strong>Set operations</strong></p>
 <ul>
-<li><a href="#duplicate">duplicate</a></li>
-<li><a href="#rmdup">rmdup</a></li>
-<li><a href="#common">common</a></li>
-<li><a href="#split">split</a></li>
-<li><a href="#sample">sample</a></li>
 <li><a href="#head">head</a></li>
 <li><a href="#range">range</a></li>
+<li><a href="#sample">sample</a></li>
+<li><a href="#rmdup">rmdup</a></li>
+<li><a href="#duplicate">duplicate</a></li>
+<li><a href="#common">common</a></li>
+<li><a href="#split">split</a></li>
 </ul>
 <p><strong>Edit</strong></p>
 <ul>
@@ -296,7 +296,9 @@ close to the
 famous C lib <a href="https://github.com/attractivechaos/klib/">klib</a> (<a href="https://github.com/attractivechaos/klib/blob/master/kseq.h">kseq.h</a>).</p>
 <p><img alt="" src="https://github.com/shenwei356/bio/raw/master/benchmark/benchmark.tsv.png" /></p>
 <p>Seqkit calls <code>pigz</code> (much faster than <code>gzip</code>) or <code>gzip</code> to decompress .gz file if they are available.
-So please <strong>install <a href="http://zlib.net/pigz/">pigz</a> to gain better parsing performance for gzipped data</strong>.</p>
+So please <strong>install <a href="http://zlib.net/pigz/">pigz</a> to gain better parsing performance for gzipped data</strong>.
+Seqkit uses package <a href="https://github.com/klauspost/pgzip">pgzip</a> to write gzip file,
+which is very fast (<strong>10X of <code>gzip</code>, 4X of <code>pigz</code></strong>) and the gzip file would be slighty larger.</p>
 <h3 id="sequence-formats-and-types">Sequence formats and types</h3>
 <p>SeqKit seamlessly support FASTA and FASTQ format.
 Sequence format is automatically detected.
@@ -375,7 +377,7 @@ reproduced in different environments with same random seed.</p>
 <h2 id="seqkit">seqkit</h2>
 <pre><code>SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.7.2
+Version: 0.8.0
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -1800,11 +1802,13 @@ Usage:
 
 Flags:
   -s, --by-seq                 replace seq
+  -h, --help                   help for replace
   -i, --ignore-case            ignore case
   -K, --keep-key               keep the key as value when no value found for the key (only for sequence name)
   -I, --key-capt-idx int       capture variable index of key (1-based) (default 1)
-      --key-miss-repl string   replacement for key with no corresponding value
+  -m, --key-miss-repl string   replacement for key with no corresponding value
   -k, --kv-file string         tab-delimited key-value file for replacing key with value when using &quot;{kv}&quot; in -r (--replacement) (only for sequence name)
+      --nr-width int           minimum width for {nr} in flag -r/--replacement. e.g., formating &quot;1&quot; to &quot;001&quot; by --nr-width 3 (default 1)
   -p, --pattern string         search regular expression
   -r, --replacement string     replacement. supporting capture variables.  e.g. $1 represents the text of the first submatch. ATTENTION: for *nix OS, use SINGLE quote NOT double quotes or use the \ escape character. Record number is also supported by &quot;{nr}&quot;.use ${1} instead of $1 when {kv} given!
 
@@ -1855,10 +1859,16 @@ T       T
 </li>
 <li>
 <p>Rename with number of record</p>
-<pre><code>echo -e "&gt;abc\nACTG\n&gt;123\nATTT" |  seqkit replace -p .+ -r "seq_{nr}"
+<pre><code>$ echo -e "&gt;abc\nACTG\n&gt;123\nATTT" |  seqkit replace -p .+ -r "seq_{nr}"
 &gt;seq_1
 ACTG
 &gt;seq_2
+ATTT
+
+$ echo -e "&gt;abc\nACTG\n&gt;123\nATTT" |  seqkit replace -p .+ -r "seq_{nr}" --nr-width 5
+&gt;seq_00001
+ACTG
+&gt;seq_00002
 ATTT
 </code></pre>
 </li>
