@@ -75,7 +75,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
   and [benchmark](http://bioinf.shenwei.me/seqkit/benchmark/) )
 - **Seamlessly parsing both FASTA and FASTQ formats**
 - **Supporting STDIN and gzipped input/output file, easy being used in pipe**
-  , **writing gzip file is very faster (10X of `gzip`, 4X of `pigz`)** by
+  , **writing gzip file is very fast (10X of `gzip`, 4X of `pigz`)** by
   using package [pgzip](https://github.com/klauspost/pgzip)
 - **Supporting custom sequence ID regular expression** (especially useful for searching with ID list)
 - Reproducible results (configurable rand seed in `sample` and `shuffle`)
