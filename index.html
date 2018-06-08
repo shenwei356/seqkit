@@ -8,21 +8,20 @@
         <meta name="author" content="Wei Shen">
         
         <link rel="shortcut icon" href="./img/favicon.ico">
-
-	<title>SeqKit - Ultrafast FASTA/Q kit</title>
-
+        <title>SeqKit - Ultrafast FASTA/Q kit</title>
         <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="./css/font-awesome-4.0.3.css" rel="stylesheet">
-        <link rel="stylesheet" href="./css/highlight.css">
+        <link href="./css/font-awesome-4.5.0.css" rel="stylesheet">
         <link href="./css/base.css" rel="stylesheet">
-
+        <link rel="stylesheet" href="./css/highlight.css">
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
 
-        
+        <script src="./js/jquery-1.10.2.min.js"></script>
+        <script src="./js/bootstrap-3.0.3.min.js"></script>
+        <script src="./js/highlight.pack.js"></script>
         <script>
             (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
             (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -31,11 +30,10 @@
 
             ga('create', 'UA-28948626-9', 'bioinf.shenwei.me/seqkit');
             ga('send', 'pageview');
-        </script>
-        
+        </script> 
     </head>
 
-    <body>
+    <body class="homepage">
 
         <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
@@ -49,158 +47,103 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-
-            <!-- Main title -->
             <a class="navbar-brand" href=".">SeqKit - Ultrafast FASTA/Q kit</a>
         </div>
 
         <!-- Expanded navigation -->
         <div class="navbar-collapse collapse">
-            <!-- Main navigation -->
-            <ul class="nav navbar-nav">
-            
-            
-                <li class="active">
-                    <a href=".">Home</a>
-                </li>
-            
-            
-            
-                <li >
-                    <a href="download/">Download</a>
-                </li>
-            
-            
-            
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Documents <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                    
-                        
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                    <li class="active">
+                        <a href=".">Home</a>
+                    </li>
+                    <li >
+                        <a href="download/">Download</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Documents <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
 <li >
     <a href="usage/">Usage</a>
 </li>
-
-                    
-                        
+                            
 <li >
     <a href="faq/">FAQ</a>
 </li>
-
-                    
-                        
+                            
 <li >
     <a href="tutorial/">Tutorial</a>
 </li>
-
-                    
-                        
+                            
 <li >
     <a href="benchmark/">Benchmark</a>
 </li>
-
-                    
-                        
+                            
 <li >
     <a href="note/">Notes</a>
 </li>
-
-                    
-                    </ul>
-                </li>
-            
-            
-            
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Links <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                    
-                        
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Links <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
 <li >
     <a href="bioinf/">More tools</a>
 </li>
-
-                    
-                        
+                            
 <li >
     <a href="yanlilab/">YanLi Lab</a>
 </li>
+                        </ul>
+                    </li>
+                </ul>
 
-                    
-                    </ul>
-                </li>
-            
-            
-            </ul>
-
-            <!-- Search, Navigation and Repo links -->
             <ul class="nav navbar-nav navbar-right">
                 <li>
                     <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
                         <i class="fa fa-search"></i> Search
                     </a>
                 </li>
-                <li class="disabled">
-                    <a rel="next" >
-                        <i class="fa fa-arrow-left"></i> Previous
-                    </a>
-                </li>
-                <li >
-                    <a rel="prev" href="download/">
-                        Next <i class="fa fa-arrow-right"></i>
-                    </a>
-                </li>
-                
-                <li>
-                    <a href="https://github.com/shenwei356/seqkit">
-                        
-                            <i class="fa fa-github"></i>
-                        
-                        GitHub
-                    </a>
-                </li>
-                
+                    <li class="disabled">
+                        <a rel="next" >
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="download/">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/shenwei356/seqkit/edit/master/docs/index.md"><i class="fa fa-github"></i> Edit on GitHub</a>
+                    </li>
             </ul>
         </div>
     </div>
 </div>
 
         <div class="container">
-            <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-    
         <li class="main active"><a href="#seqkit-a-cross-platform-and-ultrafast-toolkit-for-fastaq-file-manipulation">SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation</a></li>
-        
             <li><a href="#introduction">Introduction</a></li>
-        
             <li><a href="#table-of-contents">Table of Contents</a></li>
-        
             <li><a href="#features">Features</a></li>
-        
             <li><a href="#subcommands">Subcommands</a></li>
-        
             <li><a href="#installation">Installation</a></li>
-        
             <li><a href="#bash-completion">Bash-completion</a></li>
-        
             <li><a href="#technical-details-and-guides-for-use">Technical details and guides for use</a></li>
-        
             <li><a href="#usage-examples">Usage &amp;&amp; Examples</a></li>
-        
             <li><a href="#benchmark">Benchmark</a></li>
-        
             <li><a href="#citation">Citation</a></li>
-        
             <li><a href="#acknowledgements">Acknowledgements</a></li>
-        
             <li><a href="#contact">Contact</a></li>
-        
             <li><a href="#license">License</a></li>
-        
-    
     </ul>
 </div></div>
-            <div class="col-md-9" role="main">
+                <div class="col-md-9" role="main">
 
 <h1 id="seqkit-a-cross-platform-and-ultrafast-toolkit-for-fastaq-file-manipulation">SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation</h1>
 <ul>
@@ -273,7 +216,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
   and <a href="http://bioinf.shenwei.me/seqkit/benchmark/">benchmark</a> )</li>
 <li><strong>Seamlessly parsing both FASTA and FASTQ formats</strong></li>
 <li><strong>Supporting STDIN and gzipped input/output file, easy being used in pipe</strong>
-  , <strong>writing gzip file is very faster (10X of <code>gzip</code>, 4X of <code>pigz</code>)</strong> by
+  , <strong>writing gzip file is very fast (10X of <code>gzip</code>, 4X of <code>pigz</code>)</strong> by
   using package <a href="https://github.com/klauspost/pgzip">pgzip</a></li>
 <li><strong>Supporting custom sequence ID regular expression</strong> (especially useful for searching with ID list)</li>
 <li>Reproducible results (configurable rand seed in <code>sample</code> and <code>shuffle</code>)</li>
@@ -777,40 +720,82 @@ propose new functions or ask for help.</p>
 
         <footer class="col-md-12">
             <hr>
-            
-            <center>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</center>
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
-
-        <script src="./js/jquery-1.10.2.min.js"></script>
-        <script src="./js/bootstrap-3.0.3.min.js"></script>
-        <script src="./js/highlight.pack.js"></script>
         <script>var base_url = '.';</script>
-        <script data-main="./mkdocs/js/search.js" src="./mkdocs/js/require.js"></script>
         <script src="./js/base.js"></script>
+        <script src="./search/require.js"></script>
+        <script src="./search/search.js"></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                        <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
                     </div>
-                    <div class="modal-body">
-                        <p>
-                            From here you can search these documents. Enter
-                            your search terms below.
-                        </p>
-                        <form role="form">
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                            </div>
-                        </form>
-                        <div id="mkdocs-search-results"></div>
-                    </div>
-                    <div class="modal-footer">
-                    </div>
-                </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
             </div>
         </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>&larr;</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>&rarr;</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+
     </body>
 </html>
+
+<!--
+MkDocs version : 0.17.3
+Build Date UTC : 2018-06-08 15:26:07
+-->
