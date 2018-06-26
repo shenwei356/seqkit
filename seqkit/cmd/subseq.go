@@ -452,7 +452,13 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 				flankInfo = ""
 			}
 			outname = fmt.Sprintf("%s_%d-%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, tag)
-			newRecord, err := fastx.NewRecord(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq)
+			var newRecord *fastx.Record
+			var err error
+			if len(subseq.Qual) > 0 {
+				newRecord, err = fastx.NewRecordWithQualWithoutValidation(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq, subseq.Qual)
+			} else {
+				newRecord, err = fastx.NewRecordWithoutValidation(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq)
+			}
 			checkError(err)
 			outfh.Write(newRecord.Format(lineWidth))
 		}
@@ -467,7 +473,6 @@ func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 	var strand, geneID, outname, flankInfo string
 	var s, e int
 	var subseq *seq.Seq
-
 	for _, feature := range bedFeatureMap[seqname] {
 		s, e = feature.Start, feature.End
 		if feature.Strand != nil && *feature.Strand == "-" {
@@ -541,7 +546,13 @@ func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 			flankInfo = ""
 		}
 		outname = fmt.Sprintf("%s_%d-%d:%s%s %s", record.ID, feature.Start, feature.End, strand, flankInfo, geneID)
-		newRecord, err := fastx.NewRecord(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq)
+		var newRecord *fastx.Record
+		var err error
+		if len(subseq.Qual) > 0 {
+			newRecord, err = fastx.NewRecordWithQualWithoutValidation(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq, subseq.Qual)
+		} else {
+			newRecord, err = fastx.NewRecordWithoutValidation(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq)
+		}
 		checkError(err)
 		outfh.Write(newRecord.Format(lineWidth))
 	}

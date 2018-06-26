@@ -1,0 +1,1 @@
+- `seqkit subseq`: fix bug of missing quality when using `--gtf` or `--bed`
