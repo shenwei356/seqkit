@@ -67,8 +67,12 @@ famous C lib [klib](https://github.com/attractivechaos/klib/) ([kseq.h](https://
 
 ![](https://github.com/shenwei356/bio/raw/master/benchmark/benchmark.tsv.png)
 
-Seqkit calls `pigz` (much faster than `gzip`) or `gzip` to decompress .gz file if they are available.
-So please **install [pigz](http://zlib.net/pigz/) to gain better parsing performance for gzipped data**.
+<s>Seqkit calls `pigz` (much faster than `gzip`) or `gzip` to decompress .gz file if they are available.
+So please **install [pigz](http://zlib.net/pigz/) to gain better parsing performance for gzipped data**.</s>
+Seqkit does not call `pigz` or `gzip` any more since v0.8.1,
+Because it does not always increase the speed.
+But you can still utilize `pigz` or `gzip` by `pigz -d -c seqs.fq.gz | seqkit xxx`.
+
 Seqkit uses package [pgzip](https://github.com/klauspost/pgzip) to write gzip file,
 which is very fast (**10X of `gzip`, 4X of `pigz`**) and the gzip file would be slighty larger.
 
@@ -157,15 +161,13 @@ reproduced in different environments with same random seed.
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.8.0
+Version: 0.8.1
 
 Author: Wei Shen <shenwei356@gmail.com>
 
 Documents  : http://bioinf.shenwei.me/seqkit
 Source code: https://github.com/shenwei356/seqkit
 Please cite: https://doi.org/10.1371/journal.pone.0163962
-
-Suggestion : Install pigz to gain better parsing performance for gzipped data
 
 Usage:
   seqkit [command]
@@ -587,6 +589,10 @@ Usage
 ```
 simple statistics of FASTA/Q files
 
+Tips:
+  1. For lots of small files (especially on SDD), use big value of '-j' to
+     parallelize counting.
+
 Usage:
   seqkit stats [flags]
 
@@ -597,8 +603,8 @@ Flags:
   -a, --all                  all statistics, including quartiles of seq length, sum_gap, N50
   -G, --gap-letters string   gap letters (default "- .")
   -h, --help                 help for stats
+  -e, --skip-err             skip error, only show warning message
   -T, --tabular              output in machine-friendly tabular format
-
 ```
 
 Eexamples
@@ -662,6 +668,29 @@ Eexamples
         reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229  227  227  227        0  227
         reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225  224  224  224        0  224
 
+1. Parallelize counting files, it's much faster for lots of small files, especially for files on SSD
+
+        seqkit stats -j 10 refseq/virual/*.fna.gz
+
+1. Skip error
+
+        $ seqkit stats tests/*
+        [ERRO] tests/hairpin.fa.fai: fastx: invalid FASTA/Q format
+
+        $ seqkit stats tests/* -e
+        [WARN] tests/hairpin.fa.fai: fastx: invalid FASTA/Q format
+        [WARN] tests/hairpin.fa.seqkit.fai: fastx: invalid FASTA/Q format
+        [WARN] tests/miRNA.diff.gz: fastx: invalid FASTA/Q format
+        [WARN] tests/test.sh: fastx: invalid FASTA/Q format
+        file                     format  type  num_seqs    sum_len  min_len  avg_len  max_len
+        tests/contigs.fa         FASTA   DNA          9         54        2        6       10
+        tests/hairpin.fa         FASTA   RNA     28,645  2,949,871       39      103    2,354
+        tests/Illimina1.5.fq     FASTQ   DNA          1        100      100      100      100
+        tests/Illimina1.8.fq.gz  FASTQ   DNA     10,000  1,500,000      150      150      150
+        tests/hairpin.fa.gz      FASTA   RNA     28,645  2,949,871       39      103    2,354
+        tests/reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229
+        tests/mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34
+        tests/reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225
 
 ## faidx
 

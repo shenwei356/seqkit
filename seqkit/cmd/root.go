@@ -43,8 +43,6 @@ Documents  : http://bioinf.shenwei.me/seqkit
 Source code: https://github.com/shenwei356/seqkit
 Please cite: https://doi.org/10.1371/journal.pone.0163962
 
-Suggestion : Install pigz to gain better parsing performance for gzipped data
-
 `, VERSION),
 }
 
