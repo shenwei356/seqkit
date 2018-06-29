@@ -224,9 +224,12 @@ which has <a href="https://github.com/shenwei356/bio#fastaq-parsing">high perfor
 close to the
 famous C lib <a href="https://github.com/attractivechaos/klib/">klib</a> (<a href="https://github.com/attractivechaos/klib/blob/master/kseq.h">kseq.h</a>).</p>
 <p><img alt="" src="https://github.com/shenwei356/bio/raw/master/benchmark/benchmark.tsv.png" /></p>
-<p>Seqkit calls <code>pigz</code> (much faster than <code>gzip</code>) or <code>gzip</code> to decompress .gz file if they are available.
-So please <strong>install <a href="http://zlib.net/pigz/">pigz</a> to gain better parsing performance for gzipped data</strong>.
-Seqkit uses package <a href="https://github.com/klauspost/pgzip">pgzip</a> to write gzip file,
+<p><s>Seqkit calls <code>pigz</code> (much faster than <code>gzip</code>) or <code>gzip</code> to decompress .gz file if they are available.
+So please <strong>install <a href="http://zlib.net/pigz/">pigz</a> to gain better parsing performance for gzipped data</strong>.</s>
+Seqkit does not call <code>pigz</code> or <code>gzip</code> any more since v0.8.1,
+Because it does not always increase the speed.
+But you can still utilize <code>pigz</code> or <code>gzip</code> by <code>pigz -d -c seqs.fq.gz | seqkit xxx</code>.</p>
+<p>Seqkit uses package <a href="https://github.com/klauspost/pgzip">pgzip</a> to write gzip file,
 which is very fast (<strong>10X of <code>gzip</code>, 4X of <code>pigz</code></strong>) and the gzip file would be slighty larger.</p>
 <h3 id="sequence-formats-and-types">Sequence formats and types</h3>
 <p>SeqKit seamlessly support FASTA and FASTQ format.
@@ -306,15 +309,13 @@ reproduced in different environments with same random seed.</p>
 <h2 id="seqkit">seqkit</h2>
 <pre><code>SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.8.0
+Version: 0.8.1
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
 Documents  : http://bioinf.shenwei.me/seqkit
 Source code: https://github.com/shenwei356/seqkit
 Please cite: https://doi.org/10.1371/journal.pone.0163962
-
-Suggestion : Install pigz to gain better parsing performance for gzipped data
 
 Usage:
   seqkit [command]
@@ -751,6 +752,10 @@ cel-let-7_sliding:26-55         40.00
 <p>Usage</p>
 <pre><code>simple statistics of FASTA/Q files
 
+Tips:
+  1. For lots of small files (especially on SDD), use big value of '-j' to
+     parallelize counting.
+
 Usage:
   seqkit stats [flags]
 
@@ -761,8 +766,8 @@ Flags:
   -a, --all                  all statistics, including quartiles of seq length, sum_gap, N50
   -G, --gap-letters string   gap letters (default &quot;- .&quot;)
   -h, --help                 help for stats
+  -e, --skip-err             skip error, only show warning message
   -T, --tabular              output in machine-friendly tabular format
-
 </code></pre>
 
 <p>Eexamples</p>
@@ -884,6 +889,32 @@ mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34 
 Illimina1.8.fq.gz  FASTQ   DNA     10,000  1,500,000      150      150      150  150  150  150        0  150
 reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229  227  227  227        0  227
 reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225  224  224  224        0  224
+</code></pre>
+</li>
+<li>
+<p>Parallelize counting files, it's much faster for lots of small files, especially for files on SSD</p>
+<pre><code>seqkit stats -j 10 refseq/virual/*.fna.gz
+</code></pre>
+</li>
+<li>
+<p>Skip error</p>
+<pre><code>$ seqkit stats tests/*
+[ERRO] tests/hairpin.fa.fai: fastx: invalid FASTA/Q format
+
+$ seqkit stats tests/* -e
+[WARN] tests/hairpin.fa.fai: fastx: invalid FASTA/Q format
+[WARN] tests/hairpin.fa.seqkit.fai: fastx: invalid FASTA/Q format
+[WARN] tests/miRNA.diff.gz: fastx: invalid FASTA/Q format
+[WARN] tests/test.sh: fastx: invalid FASTA/Q format
+file                     format  type  num_seqs    sum_len  min_len  avg_len  max_len
+tests/contigs.fa         FASTA   DNA          9         54        2        6       10
+tests/hairpin.fa         FASTA   RNA     28,645  2,949,871       39      103    2,354
+tests/Illimina1.5.fq     FASTQ   DNA          1        100      100      100      100
+tests/Illimina1.8.fq.gz  FASTQ   DNA     10,000  1,500,000      150      150      150
+tests/hairpin.fa.gz      FASTA   RNA     28,645  2,949,871       39      103    2,354
+tests/reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229
+tests/mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34
+tests/reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225
 </code></pre>
 </li>
 </ol>

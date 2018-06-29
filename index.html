@@ -597,9 +597,12 @@ which has <a href="https://github.com/shenwei356/bio#fastaq-parsing">high perfor
 close to the
 famous C lib <a href="https://github.com/attractivechaos/klib/">klib</a> (<a href="https://github.com/attractivechaos/klib/blob/master/kseq.h">kseq.h</a>).</p>
 <p><img alt="" src="https://github.com/shenwei356/bio/raw/master/benchmark/benchmark.tsv.png" /></p>
-<p>Seqkit calls <code>pigz</code> (much faster than <code>gzip</code>) or <code>gzip</code> to decompress .gz file if they are available.
-So please <strong>install <a href="http://zlib.net/pigz/">pigz</a> to gain better parsing performance for gzipped data</strong>.
-Seqkit uses package <a href="https://github.com/klauspost/pgzip">pgzip</a> to write gzip file,
+<p><s>Seqkit calls <code>pigz</code> (much faster than <code>gzip</code>) or <code>gzip</code> to decompress .gz file if they are available.
+So please <strong>install <a href="http://zlib.net/pigz/">pigz</a> to gain better parsing performance for gzipped data</strong>.</s>
+Seqkit does not call <code>pigz</code> or <code>gzip</code> any more since v0.8.1,
+Because it does not always increase the speed.
+But you can still utilize <code>pigz</code> or <code>gzip</code> by <code>pigz -d -c seqs.fq.gz | seqkit xxx</code>.</p>
+<p>Seqkit uses package <a href="https://github.com/klauspost/pgzip">pgzip</a> to write gzip file,
 which is very fast (<strong>10X of <code>gzip</code>, 4X of <code>pigz</code></strong>) and the gzip file would be slighty larger.</p>
 <h3 id="sequence-formats-and-types">Sequence formats and types</h3>
 <p>SeqKit seamlessly support FASTA and FASTQ format.
@@ -797,5 +800,5 @@ propose new functions or ask for help.</p>
 
 <!--
 MkDocs version : 0.17.3
-Build Date UTC : 2018-06-08 15:26:07
+Build Date UTC : 2018-06-29 09:26:56
 -->
