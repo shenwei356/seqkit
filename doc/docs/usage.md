@@ -263,8 +263,11 @@ Usage:
 Flags:
   -p, --complement                complement sequence (blank for Protein sequence)
       --dna2rna                   DNA to RNA
-  -G, --gap-letter string         gap letters (default "- .")
+  -G, --gap-letters string        gap letters (default "- .")
+  -h, --help                      help for seq
   -l, --lower-case                print sequences in lower case
+  -M, --max-len int               only print sequences shorter than the maximum length (-1 for no limit) (default -1)
+  -m, --min-len int               only print sequences longer than the minimum length (-1 for no limit) (default -1)
   -n, --name                      only print names
   -i, --only-id                   print ID instead of full head
   -q, --qual                      only print qualities
