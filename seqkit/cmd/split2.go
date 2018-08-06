@@ -269,7 +269,9 @@ accorting to the input files.
 				sort.Ints(sortedI)
 
 				for _, i := range sortedI {
-					outfhs[i].Close()
+					if outfhs[i] != nil {
+						outfhs[i].Close()
+					}
 
 					log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
 				}

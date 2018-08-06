@@ -1,7 +1,7 @@
 - [SeqKit v0.8.2](https://github.com/shenwei356/seqkit/releases/tag/v0.8.2)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.8.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.8.2)
     - `seqkit`: better handle of empty file, no error message shown. [#36](https://github.com/shenwei356/seqkit/issues/36)
-    - new subcommand `seqkit split2`: split sequences into files by size/parts (FASTA, PE/SE FASTQ)
+    - new subcommand `seqkit split2`: split sequences into files by size/parts (FASTA, PE/SE FASTQ) [#35](https://github.com/shenwei356/seqkit/issues/35)
 
 - [SeqKit v0.8.1](https://github.com/shenwei356/seqkit/releases/tag/v0.8.1)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.8.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.8.1)
