@@ -68,7 +68,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
   (see [download](http://bioinf.shenwei.me/seqkit/download/))
 - **UltraFast** (see [benchmark](#benchmark)),
   **multiple-CPUs supported**
-- **Practical functions supported by 23 subcommands** (see subcommands and
+- **Practical functions supported by 24 subcommands** (see subcommands and
   [usage](http://bioinf.shenwei.me/seqkit/usage/) )
 - **Supporting [Bash-completion](#bash-completion)**
 - **Well documented** (detailed [usage](http://bioinf.shenwei.me/seqkit/usage/)
@@ -147,7 +147,8 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - `rmdup`      remove duplicated sequences by id/name/sequence
 - `duplicate`  duplicate sequences N times
 - `common`     find common sequences of multiple files by id/name/sequence
-- `split`      split sequences into files by id/seq region/size/parts
+- `split`      split sequences into files by id/seq region/size/parts (mainly for FASTA)
+- `split2`     split sequences into files by size/parts (FASTA, PE/SE FASTQ)
 
 **Edit**
 

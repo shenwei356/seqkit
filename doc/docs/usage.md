@@ -35,6 +35,7 @@
 - [duplicate](#duplicate)
 - [common](#common)
 - [split](#split)
+- [split2](#split2)
 
 **Edit**
 
@@ -97,7 +98,7 @@ be checked.
 By default, most softwares, including `seqkit`, take the leading non-space
 letters as sequence identifier (ID). For example,
 
-|   FASTA header                                                  |     ID                                            |
+|   FASTA header                                                |     ID                                            |
 |:--------------------------------------------------------------|:--------------------------------------------------|
 | >123456 gene name                                             | 123456                                            |
 | >longname                                                     | longname                                          |
@@ -161,7 +162,7 @@ reproduced in different environments with same random seed.
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.8.1
+Version: 0.9.0-dev
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -195,7 +196,8 @@ Available Commands:
   shuffle         shuffle sequences
   sliding         sliding sequences, circular genome supported
   sort            sort sequences by id/name/sequence/length
-  split           split sequences into files by id/seq region/size/parts
+  split           split sequences into files by id/seq region/size/parts (mainly for FASTA)
+  split2          split sequences into files by size/parts (FASTA, PE/SE FASTQ)
   stats           simple statistics of FASTA/Q files
   subseq          get subsequences by region/gtf/bed, including flanking sequences
   tab2fx          convert tabular format to FASTA/Q format
@@ -1305,6 +1307,8 @@ Usage
 split sequences into files by name ID, subsequence of given region,
 part size or number of parts.
 
+Please use "seqkit split2" for paired- and single-end FASTAQ.
+
 The definition of region is 1-based and with some custom design.
 
 Examples:
@@ -1326,16 +1330,16 @@ Usage:
   seqkit split [flags]
 
 Flags:
-Flags:
   -i, --by-id              split squences according to sequence ID
-  -p, --by-part int        split squences into N parts
+  -p, --by-part int        split sequences into N parts
   -r, --by-region string   split squences according to subsequence of given region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type "seqkit split -h" for more examples
-  -s, --by-size int        split squences into multi parts with N sequences
+  -s, --by-size int        split sequences into multi parts with N sequences
   -d, --dry-run            dry run, just print message and no files will be created.
   -f, --force              overwrite output directory
+  -h, --help               help for split
   -k, --keep-temp          keep tempory FASTA and .fai file when using 2-pass mode
   -m, --md5                use MD5 instead of region sequence in output file when using flag -r (--by-region)
-  -O, --out-dir string     output directory (default value is infile.split)
+  -O, --out-dir string     output directory (default value is $infile.split)
   -2, --two-pass           two-pass mode read files twice to lower memory usage. (only for FASTA format)
 
 ```
@@ -1405,6 +1409,80 @@ Examples
     i.e. use MD5 instead of region sequence in output file.
 
     Sequence suffix could be defined as `-r -12:-1`
+
+## split2
+
+Usage
+
+```
+split sequences into files by part size or number of parts
+
+This command supports FASTA and paired- or single-end FASTQ with low memory
+occupation and fast speed.
+
+The file extensions of output are automatically detected and created
+accorting to the input files.
+
+Usage:
+  seqkit split2 [flags]
+
+Flags:
+  -p, --by-part int      split sequences into N parts
+  -s, --by-size int      split sequences into multi parts with N sequences
+  -f, --force            overwrite output directory
+  -h, --help             help for split2
+  -O, --out-dir string   output directory (default value is $infile.split)
+  -1, --read1 string     read1 file
+  -2, --read2 string     read2 file
+```
+
+Examples
+
+1. Split sequences into parts with at most 10000 sequences
+
+        $ seqkit split2 hairpin.fa.gz -s 10000 -f
+        [INFO] split into 10000 seqs per file
+        [INFO] write 10000 sequences to file: hairpin.fa.part_001.gz
+        [INFO] write 10000 sequences to file: hairpin.fa.part_002.gz
+        [INFO] write 8645 sequences to file: hairpin.fa.part_003.gz
+
+1. Split sequences into 4 parts
+
+        $ seqkit split hairpin.fa.gz -p 4 -f
+        [INFO] split into 4 parts
+        [INFO] read sequences ...
+        [INFO] read 28645 sequences
+        [INFO] write 7162 sequences to file: hairpin.fa.gz.split/hairpin.part_001.fa.gz
+        [INFO] write 7162 sequences to file: hairpin.fa.gz.split/hairpin.part_002.fa.gz
+        [INFO] write 7162 sequences to file: hairpin.fa.gz.split/hairpin.part_003.fa.gz
+        [INFO] write 7159 sequences to file: hairpin.fa.gz.split/hairpin.part_004.fa.gz
+
+1. For FASTQ files (paired-end)
+
+        $ seqkit split2 -1 reads_1.fq.gz -2 reads_2.fq.gz -p 2 -O out -f
+        [INFO] split seqs from reads_1.fq.gz and reads_2.fq.gz
+        [INFO] split into 2 parts
+        [INFO] write 1250 sequences to file: out/reads_2.part_001.fq.gz
+        [INFO] write 1250 sequences to file: out/reads_2.part_002.fq.gz
+        [INFO] write 1250 sequences to file: out/reads_1.part_001.fq.gz
+        [INFO] write 1250 sequences to file: out/reads_1.part_002.fq.gz
+
+1. For FASTA files (single-end)
+
+        $ seqkit split2 -1 reads_1.fq.gz reads_2.fq.gz -p 2 -O out -f
+        [INFO] flag -1/--read1 given, ignore: reads_2.fq.gz
+        [INFO] split seqs from reads_1.fq.gz
+        [INFO] split into 2 parts
+        [INFO] write 1250 sequences to file: out/reads_1.part_001.fq.gz
+        [INFO] write 1250 sequences to file: out/reads_1.part_002.fq.gz
+
+
+        $ seqkit split2 reads_1.fq.gz -p 2 -O out -f
+        [INFO] split seqs from reads_1.fq.gz
+        [INFO] split into 2 parts
+        [INFO] write 1250 sequences to file: out/reads_1.part_001.fq.gz
+        [INFO] write 1250 sequences to file: out/reads_1.part_002.fq.gz
+
 
 ## sample
 

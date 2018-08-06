@@ -41,9 +41,11 @@ import (
 // splitCmd represents the split command
 var splitCmd = &cobra.Command{
 	Use:   "split",
-	Short: "split sequences into files by id/seq region/size/parts",
+	Short: "split sequences into files by id/seq region/size/parts (mainly for FASTA)",
 	Long: fmt.Sprintf(`split sequences into files by name ID, subsequence of given region,
 part size or number of parts.
+
+Please use "seqkit split2" for paired- and single-end FASTAQ.
 
 The definition of region is 1-based and with some custom design.
 
@@ -71,14 +73,8 @@ Examples:
 			checkError(fmt.Errorf("no more than one file should be given"))
 		}
 
-		size := getFlagInt(cmd, "by-size")
-		if size < 0 {
-			checkError(fmt.Errorf("value of flag -s (--size) should be greater than 0: %d ", size))
-		}
-		part := getFlagInt(cmd, "by-part")
-		if part < 0 {
-			checkError(fmt.Errorf("value of flag -p (--part) should be greater than 0: %d ", part))
-		}
+		size := getFlagNonNegativeInt(cmd, "by-size")
+		part := getFlagNonNegativeInt(cmd, "by-part")
 
 		byID := getFlagBool(cmd, "by-id")
 		region := getFlagString(cmd, "by-region")
@@ -814,8 +810,8 @@ Examples:
 func init() {
 	RootCmd.AddCommand(splitCmd)
 
-	splitCmd.Flags().IntP("by-size", "s", 0, "split squences into multi parts with N sequences")
-	splitCmd.Flags().IntP("by-part", "p", 0, "split squences into N parts")
+	splitCmd.Flags().IntP("by-size", "s", 0, "split sequences into multi parts with N sequences")
+	splitCmd.Flags().IntP("by-part", "p", 0, "split sequences into N parts")
 	splitCmd.Flags().BoolP("by-id", "i", false, "split squences according to sequence ID")
 	splitCmd.Flags().StringP("by-region", "r", "", "split squences according to subsequence of given region. "+
 		`e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type "seqkit split -h" for more examples`)
@@ -823,7 +819,7 @@ func init() {
 	splitCmd.Flags().BoolP("two-pass", "2", false, "two-pass mode read files twice to lower memory usage. (only for FASTA format)")
 	splitCmd.Flags().BoolP("dry-run", "d", false, "dry run, just print message and no files will be created.")
 	splitCmd.Flags().BoolP("keep-temp", "k", false, "keep tempory FASTA and .fai file when using 2-pass mode")
-	splitCmd.Flags().StringP("out-dir", "O", "", "output directory (default value is infile.split)")
+	splitCmd.Flags().StringP("out-dir", "O", "", "output directory (default value is $infile.split)")
 	splitCmd.Flags().BoolP("force", "f", false, "overwrite output directory")
 }
 
