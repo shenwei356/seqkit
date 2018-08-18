@@ -145,6 +145,7 @@
             <li><a href="#rmdup">rmdup</a></li>
             <li><a href="#common">common</a></li>
             <li><a href="#split">split</a></li>
+            <li><a href="#split2">split2</a></li>
             <li><a href="#sample">sample</a></li>
             <li><a href="#head">head</a></li>
             <li><a href="#range">range</a></li>
@@ -197,6 +198,7 @@
 <li><a href="#duplicate">duplicate</a></li>
 <li><a href="#common">common</a></li>
 <li><a href="#split">split</a></li>
+<li><a href="#split2">split2</a></li>
 </ul>
 <p><strong>Edit</strong></p>
 <ul>
@@ -309,7 +311,7 @@ reproduced in different environments with same random seed.</p>
 <h2 id="seqkit">seqkit</h2>
 <pre><code>SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.8.1
+Version: 0.9.0-dev2
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -343,7 +345,8 @@ Available Commands:
   shuffle         shuffle sequences
   sliding         sliding sequences, circular genome supported
   sort            sort sequences by id/name/sequence/length
-  split           split sequences into files by id/seq region/size/parts
+  split           split sequences into files by id/seq region/size/parts (mainly for FASTA)
+  split2          split sequences into files by size/parts (FASTA, PE/SE FASTQ)
   stats           simple statistics of FASTA/Q files
   subseq          get subsequences by region/gtf/bed, including flanking sequences
   tab2fx          convert tabular format to FASTA/Q format
@@ -1512,6 +1515,8 @@ Flags:
 <pre><code>split sequences into files by name ID, subsequence of given region,
 part size or number of parts.
 
+Please use &quot;seqkit split2&quot; for paired- and single-end FASTAQ.
+
 The definition of region is 1-based and with some custom design.
 
 Examples:
@@ -1533,16 +1538,16 @@ Usage:
   seqkit split [flags]
 
 Flags:
-Flags:
   -i, --by-id              split squences according to sequence ID
-  -p, --by-part int        split squences into N parts
+  -p, --by-part int        split sequences into N parts
   -r, --by-region string   split squences according to subsequence of given region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type &quot;seqkit split -h&quot; for more examples
-  -s, --by-size int        split squences into multi parts with N sequences
+  -s, --by-size int        split sequences into multi parts with N sequences
   -d, --dry-run            dry run, just print message and no files will be created.
   -f, --force              overwrite output directory
+  -h, --help               help for split
   -k, --keep-temp          keep tempory FASTA and .fai file when using 2-pass mode
   -m, --md5                use MD5 instead of region sequence in output file when using flag -r (--by-region)
-  -O, --out-dir string     output directory (default value is infile.split)
+  -O, --out-dir string     output directory (default value is $infile.split)
   -2, --two-pass           two-pass mode read files twice to lower memory usage. (only for FASTA format)
 
 </code></pre>
@@ -1612,6 +1617,80 @@ Flags:
 <p><strong>If region is too long, we could use falg <code>--md5</code></strong>,
 i.e. use MD5 instead of region sequence in output file.</p>
 <p>Sequence suffix could be defined as <code>-r -12:-1</code></p>
+</li>
+</ol>
+<h2 id="split2">split2</h2>
+<p>Usage</p>
+<pre><code>split sequences into files by part size or number of parts
+
+This command supports FASTA and paired- or single-end FASTQ with low memory
+occupation and fast speed.
+
+The file extensions of output are automatically detected and created
+accorting to the input files.
+
+Usage:
+  seqkit split2 [flags]
+
+Flags:
+  -p, --by-part int      split sequences into N parts
+  -s, --by-size int      split sequences into multi parts with N sequences
+  -f, --force            overwrite output directory
+  -h, --help             help for split2
+  -O, --out-dir string   output directory (default value is $infile.split)
+  -1, --read1 string     read1 file
+  -2, --read2 string     read2 file
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>Split sequences into parts with at most 10000 sequences</p>
+<pre><code>$ seqkit split2 hairpin.fa.gz -s 10000 -f
+[INFO] split into 10000 seqs per file
+[INFO] write 10000 sequences to file: hairpin.fa.part_001.gz
+[INFO] write 10000 sequences to file: hairpin.fa.part_002.gz
+[INFO] write 8645 sequences to file: hairpin.fa.part_003.gz
+</code></pre>
+</li>
+<li>
+<p>Split sequences into 4 parts</p>
+<pre><code>$ seqkit split hairpin.fa.gz -p 4 -f
+[INFO] split into 4 parts
+[INFO] read sequences ...
+[INFO] read 28645 sequences
+[INFO] write 7162 sequences to file: hairpin.fa.gz.split/hairpin.part_001.fa.gz
+[INFO] write 7162 sequences to file: hairpin.fa.gz.split/hairpin.part_002.fa.gz
+[INFO] write 7162 sequences to file: hairpin.fa.gz.split/hairpin.part_003.fa.gz
+[INFO] write 7159 sequences to file: hairpin.fa.gz.split/hairpin.part_004.fa.gz
+</code></pre>
+</li>
+<li>
+<p>For FASTQ files (paired-end)</p>
+<pre><code>$ seqkit split2 -1 reads_1.fq.gz -2 reads_2.fq.gz -p 2 -O out -f
+[INFO] split seqs from reads_1.fq.gz and reads_2.fq.gz
+[INFO] split into 2 parts
+[INFO] write 1250 sequences to file: out/reads_2.part_001.fq.gz
+[INFO] write 1250 sequences to file: out/reads_2.part_002.fq.gz
+[INFO] write 1250 sequences to file: out/reads_1.part_001.fq.gz
+[INFO] write 1250 sequences to file: out/reads_1.part_002.fq.gz
+</code></pre>
+</li>
+<li>
+<p>For FASTA files (single-end)</p>
+<pre><code>$ seqkit split2 -1 reads_1.fq.gz reads_2.fq.gz -p 2 -O out -f
+[INFO] flag -1/--read1 given, ignore: reads_2.fq.gz
+[INFO] split seqs from reads_1.fq.gz
+[INFO] split into 2 parts
+[INFO] write 1250 sequences to file: out/reads_1.part_001.fq.gz
+[INFO] write 1250 sequences to file: out/reads_1.part_002.fq.gz
+
+$ seqkit split2 reads_1.fq.gz -p 2 -O out -f
+[INFO] split seqs from reads_1.fq.gz
+[INFO] split into 2 parts
+[INFO] write 1250 sequences to file: out/reads_1.part_001.fq.gz
+[INFO] write 1250 sequences to file: out/reads_1.part_002.fq.gz
+</code></pre>
 </li>
 </ol>
 <h2 id="sample">sample</h2>
@@ -2057,6 +2136,7 @@ Flags:
   -s, --by-seq                  by sequence
   -i, --ignore-case             ignore case
   -k, --keep-temp               keep tempory FASTA and .fai file when using 2-pass mode
+  -N, --natural-order           sort in natural order, when sorting by IDs/full name
   -r, --reverse                 reverse the result
   -L, --seq-prefix-length int   length of sequence prefix on which seqkit sorts by sequences (0 for whole sequence) (default 10000)
   -2, --two-pass                two-pass mode read files twice to lower memory usage. (only for FASTA format)
@@ -2073,6 +2153,41 @@ Flags:
 acgtnAAAA
 &gt;seq1
 ACGTNcccc
+</code></pre>
+</li>
+<li>
+<p>sort by ID and in natural order</p>
+<pre><code>$ echo -e "&gt;3\na\n&gt;1\na\n&gt;Y\na\n&gt;x\na\n&gt;Mt\na\n&gt;11\na\n&gt;2\na\n"
+&gt;3
+a
+&gt;1
+a
+&gt;Y
+a
+&gt;x
+a
+&gt;Mt
+a
+&gt;11
+a
+&gt;2
+a
+
+$ echo -e "&gt;3\na\n&gt;1\na\n&gt;Y\na\n&gt;x\na\n&gt;Mt\na\n&gt;11\na\n&gt;2\na\n" | ./seqkit sort -N -i -2
+&gt;1
+a
+&gt;2
+a
+&gt;3
+a
+&gt;11
+a
+&gt;Mt
+a
+&gt;x
+a
+&gt;Y
+a
 </code></pre>
 </li>
 <li>
