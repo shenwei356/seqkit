@@ -1,8 +1,8 @@
-- [SeqKit v0.8.2](https://github.com/shenwei356/seqkit/releases/tag/v0.8.2)
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.8.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.8.2)
+- [SeqKit v0.9.0](https://github.com/shenwei356/seqkit/releases/tag/v0.9.0)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.9.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.9.0)
     - `seqkit`: better handle of empty file, no error message shown. [#36](https://github.com/shenwei356/seqkit/issues/36)
     - new subcommand `seqkit split2`: split sequences into files by size/parts (FASTA, PE/SE FASTQ) [#35](https://github.com/shenwei356/seqkit/issues/35)
-
+    - `seqkit sort`: fix bug when using `-2 -i`, and add support for sorting in natural order. [#39](https://github.com/shenwei356/seqkit/issues/39)
 - [SeqKit v0.8.1](https://github.com/shenwei356/seqkit/releases/tag/v0.8.1)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.8.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.8.1)
     - `seqkit`: do not call `pigz` or `gzip` for decompressing gzipped file any more. But you can still utilize `pigz` or `gzip` by `pigz -d -c seqs.fq.gz | seqkit xxx`.

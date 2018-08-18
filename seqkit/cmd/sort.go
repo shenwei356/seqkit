@@ -70,6 +70,7 @@ and extract sequences by FASTA index.
 
 		files := getFileList(args)
 
+		inNaturalOrder := getFlagBool(cmd, "natural-order")
 		bySeq := getFlagBool(cmd, "by-seq")
 		byName := getFlagBool(cmd, "by-name")
 		byLength := getFlagBool(cmd, "by-length")
@@ -108,6 +109,7 @@ and extract sequences by FASTA index.
 			}
 		}
 
+		name2name0 := make(map[string]string, 1000)
 		name2sequence := []stringutil.String2ByteSlice{}
 		name2length := []stringutil.StringCount{}
 
@@ -154,6 +156,9 @@ and extract sequences by FASTA index.
 
 					if ignoreCase {
 						name = strings.ToLower(name)
+						name2name0[strings.ToLower(name)] = name
+					} else {
+						name2name0[name] = name
 					}
 
 					record2 := record.Clone()
@@ -188,6 +193,7 @@ and extract sequences by FASTA index.
 					sort.Sort(stringutil.StringCountList(name2length))
 				}
 			} else if byName || byID { // by name/id
+				stringutil.NaturalOrder = inNaturalOrder
 				if reverse {
 					sort.Sort(stringutil.ReversedString2ByteSliceList{stringutil.String2ByteSliceList(name2sequence)})
 				} else {
@@ -284,7 +290,10 @@ and extract sequences by FASTA index.
 				id2name[name] = []byte(head)
 
 				if ignoreCase {
+					name2name0[strings.ToLower(name)] = name
 					name = strings.ToLower(name)
+				} else {
+					name2name0[name] = name
 				}
 
 				name2sequence = append(name2sequence,
@@ -322,6 +331,7 @@ and extract sequences by FASTA index.
 				id2name[name] = []byte(string(record.Name))
 
 				if ignoreCase {
+					name2name0[strings.ToLower(name)] = name
 					name = strings.ToLower(name)
 				}
 
@@ -355,6 +365,7 @@ and extract sequences by FASTA index.
 				sort.Sort(stringutil.StringCountList(name2length))
 			}
 		} else if byName || byID { // by name/id
+			stringutil.NaturalOrder = inNaturalOrder
 			if reverse {
 				sort.Sort(stringutil.ReversedString2ByteSliceList{stringutil.String2ByteSliceList(name2sequence)})
 			} else {
@@ -373,7 +384,7 @@ and extract sequences by FASTA index.
 		var chr string
 		if byName || byID || bySeq {
 			for _, kv := range name2sequence {
-				chr = string(id2name[kv.Key])
+				chr = string(id2name[name2name0[kv.Key]])
 				r, ok := faidx.Index[chr]
 				if !ok {
 					checkError(fmt.Errorf(`sequence (%s) not found in file: %s`, chr, newFile))
@@ -390,7 +401,7 @@ and extract sequences by FASTA index.
 			}
 		} else if byLength {
 			for _, kv := range name2length {
-				chr = string(id2name[kv.Key])
+				chr = string(id2name[name2name0[kv.Key]])
 				r, ok := faidx.Index[chr]
 				if !ok {
 					checkError(fmt.Errorf(`sequence (%s) not found in file: %s`, chr, newFile))
@@ -416,6 +427,7 @@ and extract sequences by FASTA index.
 
 func init() {
 	RootCmd.AddCommand(sortCmd)
+	sortCmd.Flags().BoolP("natural-order", "N", false, "sort in natural order, when sorting by IDs/full name")
 	sortCmd.Flags().BoolP("by-name", "n", false, "by full name instead of just id")
 	sortCmd.Flags().BoolP("by-seq", "s", false, "by sequence")
 	sortCmd.Flags().BoolP("by-length", "l", false, "by sequence length")

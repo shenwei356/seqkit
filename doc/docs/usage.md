@@ -162,7 +162,7 @@ reproduced in different environments with same random seed.
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.9.0-dev
+Version: 0.9.0-dev2
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -1941,6 +1941,7 @@ Flags:
   -s, --by-seq                  by sequence
   -i, --ignore-case             ignore case
   -k, --keep-temp               keep tempory FASTA and .fai file when using 2-pass mode
+  -N, --natural-order           sort in natural order, when sorting by IDs/full name
   -r, --reverse                 reverse the result
   -L, --seq-prefix-length int   length of sequence prefix on which seqkit sorts by sequences (0 for whole sequence) (default 10000)
   -2, --two-pass                two-pass mode read files twice to lower memory usage. (only for FASTA format)
@@ -1958,6 +1959,40 @@ Examples
         acgtnAAAA
         >seq1
         ACGTNcccc
+
+1. sort by ID and in natural order
+
+        $ echo -e ">3\na\n>1\na\n>Y\na\n>x\na\n>Mt\na\n>11\na\n>2\na\n"
+        >3
+        a
+        >1
+        a
+        >Y
+        a
+        >x
+        a
+        >Mt
+        a
+        >11
+        a
+        >2
+        a
+
+        $ echo -e ">3\na\n>1\na\n>Y\na\n>x\na\n>Mt\na\n>11\na\n>2\na\n" | ./seqkit sort -N -i -2
+        >1
+        a
+        >2
+        a
+        >3
+        a
+        >11
+        a
+        >Mt
+        a
+        >x
+        a
+        >Y
+        a
 
 1. sort by ID, ignoring case.
 
