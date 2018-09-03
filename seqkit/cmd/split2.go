@@ -48,7 +48,7 @@ This command supports FASTA and paired- or single-end FASTQ with low memory
 occupation and fast speed.
 
 The file extensions of output are automatically detected and created
-accorting to the input files.
+according to the input files.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {

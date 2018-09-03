@@ -45,7 +45,7 @@ var splitCmd = &cobra.Command{
 	Long: fmt.Sprintf(`split sequences into files by name ID, subsequence of given region,
 part size or number of parts.
 
-Please use "seqkit split2" for paired- and single-end FASTAQ.
+Please use "seqkit split2" for paired- and single-end FASTQ.
 
 The definition of region is 1-based and with some custom design.
 

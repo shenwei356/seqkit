@@ -1307,7 +1307,7 @@ Usage
 split sequences into files by name ID, subsequence of given region,
 part size or number of parts.
 
-Please use "seqkit split2" for paired- and single-end FASTAQ.
+Please use "seqkit split2" for paired- and single-end FASTQ.
 
 The definition of region is 1-based and with some custom design.
 
@@ -1421,7 +1421,7 @@ This command supports FASTA and paired- or single-end FASTQ with low memory
 occupation and fast speed.
 
 The file extensions of output are automatically detected and created
-accorting to the input files.
+according to the input files.
 
 Usage:
   seqkit split2 [flags]
