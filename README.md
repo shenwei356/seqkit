@@ -208,6 +208,21 @@ And then:
 
     go get -u github.com/shenwei356/seqkit/seqkit
 
+#### Method 4: Docker based installation
+    [Install Docker](https://docs.docker.com/engine/installation/#supported-platforms)
+    git clone this repo:
+    `git clone https://github.com/shenwei356/seqkit`
+
+    Run the following commands:
+    ```
+    cd seqkit
+    docker build -t shenwei356/seqkit .
+    docker run -it -p 8888:8888 shenwei356/seqkit:latest
+    go build
+    cd ../tests
+    ../seqkit/seqkit stats contigs.fa
+    ```
+
 ## Bash-completion
 
 Note: The current version supports Bash only.
