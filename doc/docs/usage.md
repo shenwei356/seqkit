@@ -162,7 +162,7 @@ reproduced in different environments with same random seed.
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.9.0-dev2
+Version: 0.9.0-dev3
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -182,10 +182,10 @@ Available Commands:
   fq2fa           convert FASTQ to FASTA
   fx2tab          convert FASTA/Q to tabular format (with length/GC content/GC skew)
   genautocomplete generate shell autocompletion script
-  grep            search sequences by pattern(s) of name or sequence motifs
+  grep            search sequences by ID/name/sequence/sequence motifs, mismatch allowed
   head            print first N FASTA/Q records
   help            Help about any command
-  locate          locate subsequences/motifs
+  locate          locate subsequences/motifs, mismatch allowed
   range           print FASTA/Q records in a range (start:end)
   rename          rename duplicated IDs
   replace         replace name/sequence by regular expression
@@ -1000,10 +1000,16 @@ Usage
 ```
 search sequences by pattern(s) of name or sequence motifs
 
-Note that the order of sequences in result is consistent with that in original
-file, not the order of the query patterns.
+Attentions:
+    1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
+       (ID/full header) by default. Please switch "-r/--use-regexp" on
+       for partly matching.
+    2. While when searching by sequences, it's partly matching. And mismatch
+       is allowed using flag "-m/--max-mismatch".
+    3. The order of sequences in result is consistent with that in original
+       file, not the order of the query patterns.
 
-You can specify the sequence region for searching with flag -R/--region.
+You can specify the sequence region for searching with flag -R (--region).
 The definition of region is 1-based and with some custom design.
 
 Examples:
@@ -1031,6 +1037,7 @@ Flags:
       --delete-matched        delete matched pattern to speedup
   -i, --ignore-case           ignore case
   -v, --invert-match          invert the sense of matching, to select non-matching records
+  -m, --max-mismatch int      max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)
   -p, --pattern stringSlice   search pattern (multiple values supported)
   -f, --pattern-file string   pattern file
   -R, --region string         specify sequence region for searching. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases
@@ -1069,6 +1076,28 @@ Examples
 
             $ zcat hairpin.fa.gz | seqkit grep -f list > new.fa
 
+1  Extract sequences containing AGGCG
+
+        $ cat hairpin.fa.gz | seqkit grep -s -i -p aggcg
+
+
+1  Extract sequences containing AGGCG (allow mismatch, **only for short (<50kb) sequences now**)
+
+        $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg | seqkit stats
+        file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+        -     FASTA   RNA      1,181  145,789       49    123.4    2,354
+
+        real    0m0.070s
+        user    0m0.107s
+        sys     0m0.017s
+
+        $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg -m 1 | seqkit stats
+        file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
+        -     FASTA   RNA     17,168  1,881,005       39    109.6    2,354
+
+        real    0m4.655s
+        user    0m4.753s
+
 1. Extract sequences starting with AGGCG
 
         $ zcat hairpin.fa.gz | seqkit grep -s -r -i -p ^aggcg
@@ -1090,7 +1119,7 @@ Examples
 Usage
 
 ```
-locate subsequences/motifs
+locate subsequences/motifs, mismatch allowed
 
 Motifs could be EITHER plain sequence containing "ACTGN" OR regular
 expression like "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" for ORFs.
@@ -1107,16 +1136,53 @@ Flags:
       --bed                       output in BED6 format
   -d, --degenerate                pattern/motif contains degenerate base
       --gtf                       output in GTF format
+  -h, --help                      help for locate
   -i, --ignore-case               ignore case
+  -m, --max-mismatch int          max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)
   -G, --non-greedy                non-greedy mode, faster but may miss motifs overlaping with others
   -P, --only-positive-strand      only search on positive strand
-  -p, --pattern stringSlice       pattern/motif (multiple values supported. use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
+  -p, --pattern strings           pattern/motif (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
   -f, --pattern-file string       pattern/motif file (FASTA format)
   -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
-
 ```
 
 Examples
+
+1. Locating subsequences (mismatch allowed)
+
+        $ cat t.fa
+        >seq
+        agctggagctacc
+
+        $ cat t.fa | seqkit locate -p agc
+        seqID   patternName     pattern strand  start   end     matched
+        seq     agc     agc     +       1       3       agc
+        seq     agc     agc     +       7       9       agc
+        seq     agc     agc     -       8       10      agc
+        seq     agc     agc     -       2       4       agc
+
+        $ cat t.fa | seqkit locate -p agc -m 1
+        seqID   patternName     pattern strand  start   end     matched
+        seq     agc     agc     +       1       3       agc
+        seq     agc     agc     +       7       9       agc
+        seq     agc     agc     +       11      13      acc
+        seq     agc     agc     -       8       10      agc
+        seq     agc     agc     -       2       4       agc
+
+
+        $ cat t.fa | seqkit locate -p agc -m 2
+        seqID   patternName     pattern strand  start   end     matched
+        seq     agc     agc     +       1       3       agc
+        seq     agc     agc     +       4       6       tgg
+        seq     agc     agc     +       5       7       gga
+        seq     agc     agc     +       7       9       agc
+        seq     agc     agc     +       10      12      tac
+        seq     agc     agc     +       11      13      acc
+        seq     agc     agc     -       11      13      ggt
+        seq     agc     agc     -       8       10      agc
+        seq     agc     agc     -       6       8       ctc
+        seq     agc     agc     -       5       7       tcc
+        seq     agc     agc     -       2       4       agc
 
 1. Locate ORFs.
 
@@ -1134,6 +1200,7 @@ Examples
         ath-MIR163    AUGGACUN      AUGGACUN   -        122     129   AUGGACUC
 
     Notice that `seqkit grep` only searches in positive strand, but `seqkit loate` could recognize both strand.
+
 
 1. Output in `GTF` or `BED6` format, which you can use in `seqkit subseq`
 

@@ -37,8 +37,8 @@ import (
 // locateCmd represents the locate command
 var locateCmd = &cobra.Command{
 	Use:   "locate",
-	Short: "locate subsequences/motifs",
-	Long: `locate subsequences/motifs
+	Short: "locate subsequences/motifs, mismatch allowed",
+	Long: `locate subsequences/motifs, mismatch allowed
 
 Motifs could be EITHER plain sequence containing "ACTGN" OR regular
 expression like "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" for ORFs.
