@@ -42,9 +42,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// VERSION of seqkit
-const VERSION = "0.9.0-dev2"
-
 func checkError(err error) {
 	if err != nil {
 		log.Error(err)

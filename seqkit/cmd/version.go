@@ -28,6 +28,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// VERSION of seqkit
+const VERSION = "0.9.0-dev3"
+
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
 	Use:   "version",

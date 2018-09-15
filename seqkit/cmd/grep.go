@@ -272,6 +272,7 @@ Examples:
 				}
 
 				hit = false
+
 				if degenerate || useRegexp {
 					for pattern, re := range patterns {
 						if re.Match(target) {
@@ -309,7 +310,6 @@ Examples:
 							}
 						}
 					}
-
 				} else {
 					k = string(target)
 					if ignoreCase {
@@ -348,7 +348,7 @@ func init() {
 	grepCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")
 	grepCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
 	grepCmd.Flags().BoolP("by-seq", "s", false, "search subseq on seq, mismach allowed using flag -m/--max-mismatch")
-	grepCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)")
+	// grepCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)")
 	grepCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	grepCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
 	grepCmd.Flags().StringP("region", "R", "", "specify sequence region for searching. "+

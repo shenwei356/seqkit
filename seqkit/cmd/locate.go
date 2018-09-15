@@ -447,5 +447,5 @@ func init() {
 	locateCmd.Flags().BoolP("non-greedy", "G", false, "non-greedy mode, faster but may miss motifs overlaping with others")
 	locateCmd.Flags().BoolP("gtf", "", false, "output in GTF format")
 	locateCmd.Flags().BoolP("bed", "", false, "output in BED6 format")
-	locateCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)")
+	// locateCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)")
 }
