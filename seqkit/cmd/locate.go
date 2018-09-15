@@ -138,8 +138,8 @@ For example: "\w" will be wrongly converted to "\[AT]".
 				}
 
 				if mismatches > 0 {
-					if mismatches >= len(patterns[p]) {
-						checkError(fmt.Errorf("mismatch should be smaller than length of sequence: %s", p))
+					if mismatches > len(patterns[p]) {
+						checkError(fmt.Errorf("mismatch should be <= length of sequence: %s", p))
 					}
 					if seq.DNAredundant.IsValid(patterns[p]) == nil ||
 						seq.RNAredundant.IsValid(patterns[p]) == nil ||
@@ -252,7 +252,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 
 					_, err = sfmi.TransformForLocate(seqRP.Seq)
 					if err != nil {
-						checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
+						checkError(fmt.Errorf("fail to build FMIndex for reverse complement sequence: %s", record.Name))
 					}
 					for pName, pSeq = range patterns {
 						loc, err = sfmi.Locate(pSeq, mismatches)
@@ -447,5 +447,5 @@ func init() {
 	locateCmd.Flags().BoolP("non-greedy", "G", false, "non-greedy mode, faster but may miss motifs overlaping with others")
 	locateCmd.Flags().BoolP("gtf", "", false, "output in GTF format")
 	locateCmd.Flags().BoolP("bed", "", false, "output in BED6 format")
-	// locateCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)")
+	locateCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)")
 }

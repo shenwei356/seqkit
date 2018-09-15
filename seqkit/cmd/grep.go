@@ -166,8 +166,8 @@ Examples:
 						patterns[p] = r
 					} else if bySeq {
 						pbyte = []byte(p)
-						if mismatches > 0 && mismatches >= len(p) {
-							checkError(fmt.Errorf("mismatch should be smaller than length of sequence: %s", p))
+						if mismatches > 0 && mismatches > len(p) {
+							checkError(fmt.Errorf("mismatch should be <= length of sequence: %s", p))
 						}
 						if seq.DNAredundant.IsValid(pbyte) == nil ||
 							seq.RNAredundant.IsValid(pbyte) == nil ||
@@ -207,8 +207,8 @@ Examples:
 					patterns[p] = r
 				} else if bySeq {
 					pbyte = []byte(p)
-					if mismatches > 0 && mismatches >= len(p) {
-						checkError(fmt.Errorf("mismatch should be smaller than length of sequence: %s", p))
+					if mismatches > 0 && mismatches > len(p) {
+						checkError(fmt.Errorf("mismatch should be <= length of sequence: %s", p))
 					}
 					if seq.DNAredundant.IsValid(pbyte) == nil ||
 						seq.RNAredundant.IsValid(pbyte) == nil ||
@@ -348,7 +348,7 @@ func init() {
 	grepCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")
 	grepCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
 	grepCmd.Flags().BoolP("by-seq", "s", false, "search subseq on seq, mismach allowed using flag -m/--max-mismatch")
-	// grepCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)")
+	grepCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)")
 	grepCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	grepCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
 	grepCmd.Flags().StringP("region", "R", "", "specify sequence region for searching. "+
