@@ -175,10 +175,6 @@ Go to [Download Page](http://bioinf.shenwei.me/seqkit/download) for more downloa
  executable binary files **for most popular operating systems** are freely available
   in [release](https://github.com/shenwei356/seqkit/releases) page.
 
-Seqkit calls `pigz` (much faster than `gzip`) or `gzip` to decompress .gz file if they are available.
-So please **install [pigz](http://zlib.net/pigz/) to gain better parsing performance for gzipped data**.
-
-
 #### Method 1: Download binaries
 
 Just [download](https://github.com/shenwei356/seqkit/releases) compressed

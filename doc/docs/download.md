@@ -4,10 +4,6 @@ SeqKit is implemented in [Go](https://golang.org/) programming language,
  executable binary files **for most popular operating systems** are freely available
   in [release](https://github.com/shenwei356/seqkit/releases) page.
 
-Seqkit calls `pigz` (much faster than `gzip`) or `gzip` to decompress .gz file if they are available.
-So please **install [pigz](http://zlib.net/pigz/) to gain better parsing performance for gzipped data**.
-
-
 ## Latest Version
 
 [SeqKit v0.8.1](https://github.com/shenwei356/seqkit/releases/tag/v0.8.1)

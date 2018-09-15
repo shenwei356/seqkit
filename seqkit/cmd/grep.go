@@ -5,7 +5,7 @@
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// furnished to do so, target to the following conditions:
 //
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
@@ -21,6 +21,7 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"regexp"
@@ -31,6 +32,7 @@ import (
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/breader"
+	"github.com/shenwei356/bwt/fmi"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -41,8 +43,14 @@ var grepCmd = &cobra.Command{
 	Short: "search sequences by pattern(s) of name or sequence motifs",
 	Long: fmt.Sprintf(`search sequences by pattern(s) of name or sequence motifs
 
-Note that the order of sequences in result is consistent with that in original
-file, not the order of the query patterns.
+Attention:
+    1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
+	   (ID/full header) by default. Please switch "-r/--use-regexp" on
+	   for partly matching.
+	2. While when searching by sequences, it's partly matching. And mismatch
+	   is allowed using flag "-m/--max-mismatch".
+    3. The order of sequences in result is consistent with that in original
+       file, not the order of the query patterns.
 
 You can specify the sequence region for searching with flag -R (--region).
 The definition of region is 1-based and with some custom design.
@@ -66,6 +74,7 @@ Examples:
 		deleteMatched := getFlagBool(cmd, "delete-matched")
 		invertMatch := getFlagBool(cmd, "invert-match")
 		bySeq := getFlagBool(cmd, "by-seq")
+		mismatches := getFlagNonNegativeInt(cmd, "max-mismatch")
 		byName := getFlagBool(cmd, "by-name")
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		degenerate := getFlagBool(cmd, "degenerate")
@@ -74,8 +83,29 @@ Examples:
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
 		}
+
+		if degenerate && !bySeq {
+			log.Infof("when flag -d (--degenerate) given, flag -s (--by-seq) is automatically on")
+			bySeq = true
+		}
+
+		var sfmi *fmi.FMIndex
+		if mismatches > 0 {
+			if useRegexp || degenerate {
+				checkError(fmt.Errorf("flag -r (--use-regexp) or -d (--degenerate) not allowed when giving flag -m (--max-mismatch)"))
+			}
+			if !bySeq {
+				log.Infof("when value of flag -m (--max-mismatch) > 0, flag -s (--by-seq) is automatically on")
+				bySeq = true
+			}
+			sfmi = fmi.NewFMIndex()
+			if mismatches > 4 {
+				log.Warningf("large value flag -m/--max-mismatch will slow down the search")
+			}
+		}
+
 		if useRegexp && degenerate {
-			checkError(fmt.Errorf("could not give both flags -d (--degenerat) and -r (--use-regexp)"))
+			checkError(fmt.Errorf("could not give both flags -d (--degenerate) and -r (--use-regexp)"))
 		}
 
 		var start, end int
@@ -107,8 +137,11 @@ Examples:
 
 		// prepare pattern
 		patterns := make(map[string]*regexp.Regexp)
+		var pattern2seq *seq.Seq
+		var pbyte []byte
 		if patternFile != "" {
-			reader, err := breader.NewDefaultBufferedReader(patternFile)
+			var reader *breader.BufferedReader
+			reader, err = breader.NewDefaultBufferedReader(patternFile)
 			checkError(err)
 			for chunk := range reader.Ch {
 				checkError(chunk.Err)
@@ -119,10 +152,9 @@ Examples:
 					}
 					if degenerate || useRegexp {
 						if degenerate {
-							pattern2seq, err := seq.NewSeq(alphabet, []byte(p))
+							pattern2seq, err = seq.NewSeq(alphabet, []byte(p))
 							if err != nil {
-								checkError(fmt.Errorf("it seems that flag -d is given, "+
-									"but you provide regular expression instead of available %s sequence", alphabet))
+								checkError(fmt.Errorf("it seems that flag -d is given, but you provide regular expression instead of available %s sequence", alphabet.String()))
 							}
 							p = pattern2seq.Degenerate2Regexp()
 						}
@@ -132,6 +164,19 @@ Examples:
 						r, err := regexp.Compile(p)
 						checkError(err)
 						patterns[p] = r
+					} else if bySeq {
+						pbyte = []byte(p)
+						if seq.DNAredundant.IsValid(pbyte) == nil ||
+							seq.RNAredundant.IsValid(pbyte) == nil ||
+							seq.Protein.IsValid(pbyte) == nil { // legal sequence
+							if ignoreCase {
+								patterns[strings.ToLower(p)] = nil
+							} else {
+								patterns[p] = nil
+							}
+						} else {
+							checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", p))
+						}
 					} else {
 						if ignoreCase {
 							patterns[strings.ToLower(p)] = nil
@@ -142,26 +187,35 @@ Examples:
 				}
 			}
 		} else {
-			if degenerate || useRegexp {
-				for _, p := range pattern {
+			for _, p := range pattern {
+				if degenerate || useRegexp {
 					if degenerate {
-						pattern2seq, err := seq.NewSeq(alphabet, []byte(p))
+						pattern2seq, err = seq.NewSeq(alphabet, []byte(p))
 						if err != nil {
-							checkError(fmt.Errorf("it seems that flag -d is given, "+
-								"but you provide regular expression instead of available %s sequence", alphabet))
+							checkError(fmt.Errorf("it seems that flag -d is given, but you provide regular expression instead of available %s sequence", alphabet.String()))
 						}
 						p = pattern2seq.Degenerate2Regexp()
 					}
 					if ignoreCase {
 						p = "(?i)" + p
 					}
-
-					re, err := regexp.Compile(p)
+					r, err := regexp.Compile(p)
 					checkError(err)
-					patterns[p] = re
-				}
-			} else {
-				for _, p := range pattern {
+					patterns[p] = r
+				} else if bySeq {
+					pbyte = []byte(p)
+					if seq.DNAredundant.IsValid(pbyte) == nil ||
+						seq.RNAredundant.IsValid(pbyte) == nil ||
+						seq.Protein.IsValid(pbyte) == nil { // legal sequence
+						if ignoreCase {
+							patterns[strings.ToLower(p)] = nil
+						} else {
+							patterns[p] = nil
+						}
+					} else {
+						checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", p))
+					}
+				} else {
 					if ignoreCase {
 						patterns[strings.ToLower(p)] = nil
 					} else {
@@ -175,10 +229,12 @@ Examples:
 		checkError(err)
 		defer outfh.Close()
 
-		var subject []byte
-		var hit bool
+		var target []byte
+		var ok, hit bool
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
+		var k string
+		var locs []int
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -198,21 +254,21 @@ Examples:
 				}
 
 				if byName {
-					subject = record.Name
+					target = record.Name
 				} else if bySeq {
 					if limitRegion {
-						subject = record.Seq.SubSeq(start, end).Seq
+						target = record.Seq.SubSeq(start, end).Seq
 					} else {
-						subject = record.Seq.Seq
+						target = record.Seq.Seq
 					}
 				} else {
-					subject = record.ID
+					target = record.ID
 				}
 
 				hit = false
 				if degenerate || useRegexp {
 					for pattern, re := range patterns {
-						if re.Match(subject) {
+						if re.Match(target) {
 							hit = true
 							if deleteMatched {
 								delete(patterns, pattern)
@@ -220,12 +276,40 @@ Examples:
 							break
 						}
 					}
+				} else if bySeq {
+					if ignoreCase {
+						target = bytes.ToLower(target)
+					}
+					if mismatches == 0 {
+						for k = range patterns {
+							if bytes.Contains(target, []byte(k)) {
+								hit = true
+								break
+							}
+						}
+					} else {
+						_, err = sfmi.TransformForLocate(target)
+						if err != nil {
+							checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
+						}
+						for k = range patterns {
+							locs, err = sfmi.Locate([]byte(k), mismatches)
+							if err != nil {
+								checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", k, record.Name, err))
+							}
+							if len(locs) > 0 {
+								hit = true
+								break
+							}
+						}
+					}
+
 				} else {
-					k := string(subject)
+					k = string(target)
 					if ignoreCase {
 						k = strings.ToLower(k)
 					}
-					if _, ok := patterns[k]; ok {
+					if _, ok = patterns[k]; ok {
 						hit = true
 					}
 				}
@@ -257,7 +341,8 @@ func init() {
 	grepCmd.Flags().BoolP("delete-matched", "", false, "delete matched pattern to speedup")
 	grepCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")
 	grepCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
-	grepCmd.Flags().BoolP("by-seq", "s", false, "match by seq")
+	grepCmd.Flags().BoolP("by-seq", "s", false, "search subseq on seq, mismach allowed using flag -m/--max-mismatch")
+	grepCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq")
 	grepCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	grepCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
 	grepCmd.Flags().StringP("region", "R", "", "specify sequence region for searching. "+
