@@ -200,24 +200,30 @@ And then:
 
     conda install -c bioconda seqkit
 
-#### Method 3: For Go developer
+### Method 3: Install via homebrew
+
+    brew install brewsci/bio/seqkit
+
+#### Method 4: For Go developer
 
     go get -u github.com/shenwei356/seqkit/seqkit
 
-#### Method 4: Docker based installation
-    [Install Docker](https://docs.docker.com/engine/installation/#supported-platforms)
-    git clone this repo:
-    `git clone https://github.com/shenwei356/seqkit`
+#### Method 5: Docker based installation
 
-    Run the following commands:
-    ```
+[Install Docker](https://docs.docker.com/engine/installation/#supported-platforms)
+
+git clone this repo:
+
+    git clone https://github.com/shenwei356/seqkit
+
+Run the following commands:
+
     cd seqkit
     docker build -t shenwei356/seqkit .
     docker run -it -p 8888:8888 shenwei356/seqkit:latest
     go build
     cd ../tests
     ../seqkit/seqkit stats contigs.fa
-    ```
 
 ## Bash-completion
 
