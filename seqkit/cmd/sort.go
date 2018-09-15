@@ -63,7 +63,7 @@ and extract sequences by FASTA index.
 		// lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
-		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
+		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		fai.MapWholeFile = false
 		runtime.GOMAXPROCS(config.Threads)

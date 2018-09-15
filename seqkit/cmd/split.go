@@ -62,7 +62,7 @@ Examples:
 		idRegexp := config.IDRegexp
 		// lineWidth := config.LineWidth
 		quiet := config.Quiet
-		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
+		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		fai.MapWholeFile = false
 		runtime.GOMAXPROCS(config.Threads)

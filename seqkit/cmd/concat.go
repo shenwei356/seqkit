@@ -62,7 +62,7 @@ Example: concatenating leading 2 bases and last 2 bases
 		// lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
-		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
+		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 

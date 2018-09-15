@@ -56,7 +56,7 @@ Tips:
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
 		outFile := config.OutFile
-		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
+		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 

@@ -40,15 +40,15 @@ import (
 // grepCmd represents the grep command
 var grepCmd = &cobra.Command{
 	Use:   "grep",
-	Short: "search sequences by pattern(s) of name or sequence motifs",
-	Long: fmt.Sprintf(`search sequences by pattern(s) of name or sequence motifs
+	Short: "search sequences by ID/name/sequence/sequence motifs, mismatch allowed",
+	Long: fmt.Sprintf(`search sequences by ID/name/sequence/sequence motifs, mismatch allowed
 
-Attention:
+Attentions:
     1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
-	   (ID/full header) by default. Please switch "-r/--use-regexp" on
-	   for partly matching.
-	2. While when searching by sequences, it's partly matching. And mismatch
-	   is allowed using flag "-m/--max-mismatch".
+       (ID/full header) by default. Please switch "-r/--use-regexp" on
+       for partly matching.
+    2. While when searching by sequences, it's partly matching. And mismatch
+       is allowed using flag "-m/--max-mismatch".
     3. The order of sequences in result is consistent with that in original
        file, not the order of the query patterns.
 
@@ -64,7 +64,7 @@ Examples:
 		idRegexp := config.IDRegexp
 		outFile := config.OutFile
 		lineWidth := config.LineWidth
-		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
+		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
@@ -166,6 +166,9 @@ Examples:
 						patterns[p] = r
 					} else if bySeq {
 						pbyte = []byte(p)
+						if mismatches > 0 && mismatches >= len(p) {
+							checkError(fmt.Errorf("mismatch should be smaller than length of sequence: %s", p))
+						}
 						if seq.DNAredundant.IsValid(pbyte) == nil ||
 							seq.RNAredundant.IsValid(pbyte) == nil ||
 							seq.Protein.IsValid(pbyte) == nil { // legal sequence
@@ -204,6 +207,9 @@ Examples:
 					patterns[p] = r
 				} else if bySeq {
 					pbyte = []byte(p)
+					if mismatches > 0 && mismatches >= len(p) {
+						checkError(fmt.Errorf("mismatch should be smaller than length of sequence: %s", p))
+					}
 					if seq.DNAredundant.IsValid(pbyte) == nil ||
 						seq.RNAredundant.IsValid(pbyte) == nil ||
 						seq.Protein.IsValid(pbyte) == nil { // legal sequence
@@ -342,7 +348,7 @@ func init() {
 	grepCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")
 	grepCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
 	grepCmd.Flags().BoolP("by-seq", "s", false, "search subseq on seq, mismach allowed using flag -m/--max-mismatch")
-	grepCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq")
+	grepCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)")
 	grepCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	grepCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
 	grepCmd.Flags().StringP("region", "R", "", "specify sequence region for searching. "+

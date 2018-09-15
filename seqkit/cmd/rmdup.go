@@ -48,7 +48,7 @@ var rmdupCmd = &cobra.Command{
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
-		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
+		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 

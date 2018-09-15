@@ -21,6 +21,7 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"regexp"
@@ -28,6 +29,7 @@ import (
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/bwt/fmi"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -51,7 +53,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
 		outFile := config.OutFile
-		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
+		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = true
 		seq.ValidateWholeSeq = false
 		seq.ValidSeqLengthThreshold = getFlagValidateSeqLength(cmd, "validate-seq-length")
@@ -67,9 +69,24 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		nonGreedy := getFlagBool(cmd, "non-greedy")
 		outFmtGTF := getFlagBool(cmd, "gtf")
 		outFmtBED := getFlagBool(cmd, "bed")
+		mismatches := getFlagNonNegativeInt(cmd, "max-mismatch")
 
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
+		}
+
+		var sfmi *fmi.FMIndex
+		if mismatches > 0 {
+			if degenerate {
+				checkError(fmt.Errorf("flag -d (--degenerate) not allowed when giving flag -m (--max-mismatch)"))
+			}
+			if nonGreedy {
+				log.Infof("flag -G (--non-greedy) ignored when giving flag -m (--max-mismatch)")
+			}
+			sfmi = fmi.NewFMIndex()
+			if mismatches > 4 {
+				log.Warningf("large value flag -m/--max-mismatch will slow down the search")
+			}
 		}
 
 		files := getFileList(args)
@@ -90,12 +107,21 @@ For example: "\w" will be wrongly converted to "\[AT]".
 					s = string(record.Seq.Seq)
 				}
 
-				if ignoreCase {
-					s = "(?i)" + s
+				if mismatches > 0 {
+					if seq.DNAredundant.IsValid(record.Seq.Seq) == nil ||
+						seq.RNAredundant.IsValid(record.Seq.Seq) == nil ||
+						seq.Protein.IsValid(record.Seq.Seq) == nil { // legal sequence
+					} else {
+						checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", record.Name))
+					}
+				} else {
+					if ignoreCase {
+						s = "(?i)" + s
+					}
+					re, err := regexp.Compile(s)
+					checkError(err)
+					regexps[name] = re
 				}
-				re, err := regexp.Compile(s)
-				checkError(err)
-				regexps[name] = re
 			}
 		} else {
 			for _, p := range pattern {
@@ -104,20 +130,31 @@ For example: "\w" will be wrongly converted to "\[AT]".
 				if degenerate {
 					pattern2seq, err := seq.NewSeq(alphabet, []byte(p))
 					if err != nil {
-						checkError(fmt.Errorf("it seems that flag -d is given, "+
-							"but you provide regular expression instead of available %s sequence", alphabet))
+						checkError(fmt.Errorf("it seems that flag -d is given, but you provide regular expression instead of available %s sequence", alphabet.String()))
 					}
 					s = pattern2seq.Degenerate2Regexp()
 				} else {
 					s = p
 				}
 
-				if ignoreCase {
-					s = "(?i)" + s
+				if mismatches > 0 {
+					if mismatches >= len(patterns[p]) {
+						checkError(fmt.Errorf("mismatch should be smaller than length of sequence: %s", p))
+					}
+					if seq.DNAredundant.IsValid(patterns[p]) == nil ||
+						seq.RNAredundant.IsValid(patterns[p]) == nil ||
+						seq.Protein.IsValid(patterns[p]) == nil { // legal sequence
+					} else {
+						checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", p))
+					}
+				} else {
+					if ignoreCase {
+						s = "(?i)" + s
+					}
+					re, err := regexp.Compile(s)
+					checkError(err)
+					regexps[p] = re
 				}
-				re, err := regexp.Compile(s)
-				checkError(err)
-				regexps[p] = re
 			}
 		}
 
@@ -136,6 +173,8 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		var flag bool
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
+		var pSeq []byte
+		var pName string
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -149,10 +188,112 @@ For example: "\w" will be wrongly converted to "\[AT]".
 					break
 				}
 
+				if mismatches > 0 && ignoreCase {
+					record.Seq.Seq = bytes.ToLower(record.Seq.Seq)
+				}
+
 				l = len(record.Seq.Seq)
 				if !onlyPositiveStrand {
 					seqRP = record.Seq.RevCom()
 				}
+
+				if mismatches > 0 {
+					_, err = sfmi.TransformForLocate(record.Seq.Seq)
+					if err != nil {
+						checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
+					}
+
+					for pName, pSeq = range patterns {
+						loc, err = sfmi.Locate(pSeq, mismatches)
+						if err != nil {
+							checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", pName, record.Name, err))
+						}
+						for _, i = range loc {
+							begin = i + 1
+							end = i + len(pSeq)
+							if outFmtGTF {
+								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%s\tgene_id \"%s\"; \n",
+									record.ID,
+									"SeqKit",
+									"location",
+									begin,
+									end,
+									0,
+									"+",
+									".",
+									pName))
+							} else if outFmtBED {
+								outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
+									record.ID,
+									begin-1,
+									end,
+									pName,
+									0,
+									"+"))
+							} else {
+								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+									record.ID,
+									pName,
+									patterns[pName],
+									"+",
+									begin,
+									end,
+									record.Seq.Seq[i:i+len(pSeq)]))
+							}
+						}
+					}
+
+					if onlyPositiveStrand {
+						continue
+					}
+
+					_, err = sfmi.TransformForLocate(seqRP.Seq)
+					if err != nil {
+						checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
+					}
+					for pName, pSeq = range patterns {
+						loc, err = sfmi.Locate(pSeq, mismatches)
+						if err != nil {
+							checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", pName, record.Name, err))
+						}
+						for _, i = range loc {
+							begin = l - i - len(pSeq) + 1
+							end = l - i
+							if outFmtGTF {
+								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%s\tgene_id \"%s\"; \n",
+									record.ID,
+									"SeqKit",
+									"location",
+									begin,
+									end,
+									0,
+									"-",
+									".",
+									pName))
+							} else if outFmtBED {
+								outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
+									record.ID,
+									begin-1,
+									end,
+									pName,
+									0,
+									"-"))
+							} else {
+								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+									record.ID,
+									pName,
+									patterns[pName],
+									"-",
+									begin,
+									end,
+									seqRP.Seq[i:i+len(pSeq)]))
+							}
+						}
+					}
+
+					continue
+				}
+
 				for pName, re := range regexps {
 					locs = make([][2]int, 0, 1000)
 
@@ -300,4 +441,5 @@ func init() {
 	locateCmd.Flags().BoolP("non-greedy", "G", false, "non-greedy mode, faster but may miss motifs overlaping with others")
 	locateCmd.Flags().BoolP("gtf", "", false, "output in GTF format")
 	locateCmd.Flags().BoolP("bed", "", false, "output in BED6 format")
+	locateCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)")
 }

@@ -136,7 +136,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 **Searching**
 
-- `grep`       search sequences by pattern(s) of name or sequence motifs
+- `grep`       search sequences by ID/name/sequence/sequence motifs, mismatch allowed
 - `locate`     locate subsequences/motifs
 
 **Set operations**

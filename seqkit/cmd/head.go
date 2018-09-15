@@ -43,7 +43,7 @@ var headCmd = &cobra.Command{
 		idRegexp := config.IDRegexp
 		outFile := config.OutFile
 		lineWidth := config.LineWidth
-		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
+		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 

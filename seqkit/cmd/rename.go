@@ -44,7 +44,7 @@ var renameCmd = &cobra.Command{
 		idRegexp := config.IDRegexp
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
-		seq.AlphabetGuessSeqLenghtThreshold = config.AlphabetGuessSeqLength
+		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
