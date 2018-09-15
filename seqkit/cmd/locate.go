@@ -211,6 +211,9 @@ For example: "\w" will be wrongly converted to "\[AT]".
 						for _, i = range loc {
 							begin = i + 1
 							end = i + len(pSeq)
+							if i+len(pSeq) > len(record.Seq.Seq) {
+								continue
+							}
 							if outFmtGTF {
 								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%s\tgene_id \"%s\"; \n",
 									record.ID,
@@ -259,6 +262,9 @@ For example: "\w" will be wrongly converted to "\[AT]".
 						for _, i = range loc {
 							begin = l - i - len(pSeq) + 1
 							end = l - i
+							if i+len(pSeq) > len(record.Seq.Seq) {
+								continue
+							}
 							if outFmtGTF {
 								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%s\tgene_id \"%s\"; \n",
 									record.ID,
