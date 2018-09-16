@@ -46,7 +46,7 @@ You may need "seqkit rename" to make the the sequence IDs unique.
 		idRegexp := config.IDRegexp
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
-		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
+		//seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 

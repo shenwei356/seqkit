@@ -57,7 +57,7 @@ Examples:
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
-		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
+		//seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		gtf.Threads = config.Threads
 		fai.MapWholeFile = false

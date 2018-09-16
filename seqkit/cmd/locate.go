@@ -53,7 +53,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
 		outFile := config.OutFile
-		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
+		//seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = true
 		seq.ValidateWholeSeq = false
 		seq.ValidSeqLengthThreshold = getFlagValidateSeqLength(cmd, "validate-seq-length")

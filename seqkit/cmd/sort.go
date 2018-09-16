@@ -63,14 +63,14 @@ and extract sequences by FASTA index.
 		// lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
-		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
+		//seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		fai.MapWholeFile = false
 		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileList(args)
 
-		inNaturalOrder := getFlagBool(cmd, "natural-order")
+		//inNaturalOrder := getFlagBool(cmd, "natural-order")
 		bySeq := getFlagBool(cmd, "by-seq")
 		byName := getFlagBool(cmd, "by-name")
 		byLength := getFlagBool(cmd, "by-length")
@@ -193,7 +193,7 @@ and extract sequences by FASTA index.
 					sort.Sort(stringutil.StringCountList(name2length))
 				}
 			} else if byName || byID { // by name/id
-				stringutil.NaturalOrder = inNaturalOrder
+				//stringutil.NaturalOrder = inNaturalOrder
 				if reverse {
 					sort.Sort(stringutil.ReversedString2ByteSliceList{stringutil.String2ByteSliceList(name2sequence)})
 				} else {
@@ -365,7 +365,7 @@ and extract sequences by FASTA index.
 				sort.Sort(stringutil.StringCountList(name2length))
 			}
 		} else if byName || byID { // by name/id
-			stringutil.NaturalOrder = inNaturalOrder
+			//stringutil.NaturalOrder = inNaturalOrder
 			if reverse {
 				sort.Sort(stringutil.ReversedString2ByteSliceList{stringutil.String2ByteSliceList(name2sequence)})
 			} else {
