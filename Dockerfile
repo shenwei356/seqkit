@@ -28,7 +28,7 @@ ENV GOLANG_VERSION 1.11
 ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
 ENV GOLANG_SHA256_CHECKSUM b3fcf280ff86558e0559e185b601c9eade0fd24c900b4c63cd14d1d38613e499
 ENV GOPATH $HOME/go
-ENV PATH $PATH:$GOPATH/bin:/usr/local/go/bin
+ENV PATH $PATH:/usr/local/go/bin:$GOPATH/bin
 RUN curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz && \
     echo "$GOLANG_SHA256_CHECKSUM golang.tar.gz" | sha256sum -c - && \
     sudo tar -C /usr/local -xzf golang.tar.gz && \
@@ -44,4 +44,4 @@ RUN go get github.com/derekparker/delve/cmd/dlv
 RUN go get -u github.com/shenwei356/seqkit/seqkit
 #End: install seqkit
 
-WORKDIR $HOME/go/src/github.com/shenwei356/seqkit/seqkit
+WORKDIR $HOME/go/src/github.com/shenwei356/seqkit
