@@ -61,7 +61,7 @@ according to the input files.
 		idRegexp := config.IDRegexp
 		// lineWidth := config.LineWidth
 		quiet := config.Quiet
-		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
+		//seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		fai.MapWholeFile = false
 		runtime.GOMAXPROCS(config.Threads)

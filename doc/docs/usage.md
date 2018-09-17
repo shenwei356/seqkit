@@ -2121,6 +2121,27 @@ Flags:
 
 ```
 
+## translate
+
+Usage
+
+```
+translate mRNA sequences into amino acid sequences (protein).
+
+Usage:
+  seqkit translate [flags]
+
+Flags:
+
+```
+
+Examples
+
+1. translate mRNA sequence
+
+        $ seqkit translate -u ../tests/mrna-drosopholia-DQ327736.fa
+        RSGRTRKAPGRRRRRQKAQPAGRRARPSKARRSPPASAPATAPPRARE
+
 <div id="disqus_thread"></div>
 <script>
 

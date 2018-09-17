@@ -44,7 +44,7 @@ var convertCmd = &cobra.Command{
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
 		outFile := config.OutFile
-		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
+		//seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = true
 		runtime.GOMAXPROCS(config.Threads)
 

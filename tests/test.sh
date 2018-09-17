@@ -395,3 +395,16 @@ fun(){
 run faidx_region fun
 assert_equal $($app grep -p $ref $file | seqkit subseq -r 5:-5 | seqkit seq -s -w 0) $(cat $outFile | seqkit seq -s -w 0)
 rm $idFile $outFile
+
+# ------------------------------------------------------------
+#                       translate
+# ------------------------------------------------------------
+
+file=tests/mrna-drosopholia-DQ327736.fa
+
+fun(){
+    $app translate $file > t.translate.0
+}
+run translate fun
+assert_equal $(cat t.translate.0 | $app stat) "Protein"
+rm t.translate.*

@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         software-properties-common \
         sudo \
         unzip \
+        vim \
         wget \
         zip \
         zlib1g-dev \
