@@ -25,7 +25,6 @@ import (
 	"fmt"
 	"io"
 	"runtime"
-	"syscall"
 	// "runtime/debug"
 
 	"github.com/shenwei356/bio/seq"
@@ -279,8 +278,6 @@ var seqCmd = &cobra.Command{
 		outfh.Close()
 	},
 }
-
-var pageSize = syscall.Getpagesize()
 
 func init() {
 	RootCmd.AddCommand(seqCmd)

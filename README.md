@@ -102,7 +102,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 |                    |Common sequences       |Yes     |--             |--           |--     |--       |--
 |                    |Cleaning bases         |Yes     |Yes            |Yes          |Yes    |--       |--
 |                    |Transcription          |Yes     |Yes            |Yes          |Yes    |Yes      |Yes
-|                    |Translation            |--      |Yes            |Yes          |Yes    |Yes      |--
+|                    |Translation            |Yes     |Yes            |Yes          |Yes    |Yes      |--
 |                    |Filtering by size      |Yes     |Yes            |--           |Yes    |Yes      |--
 |                    |Renaming header        |Yes     |Yes            |--           |--     |Yes      |Yes
 |**Other features**  |Cross-platform         |Yes     |Partly         |Partly       |Yes    |Yes      |Yes
@@ -117,7 +117,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 ## Subcommands
 
-23 subcommands in total.
+24 subcommands in total.
 
 **Sequence and subsequence**
 
@@ -126,6 +126,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - `sliding`    sliding sequences, circular genome supported
 - `stats`      simple statistics of FASTA/Q files
 - `faidx`      create FASTA index file and extract subsequence
+- `translate`  translate mRNA sequences into amino acids (protein)
 
 **Format conversion**
 
@@ -322,7 +323,7 @@ flag `-j` or `--threads` (default value: 1 for single-CPU PC, 2 for others).
 
 Most of the subcommands do not read whole FASTA/Q records in to memory,
 including `stat`, `fq2fa`, `fx2tab`, `tab2fx`, `grep`, `locate`, `replace`,
- `seq`, `sliding`, `subseq`.
+ `seq`, `sliding`, `subseq`, `translate`.
 
 Note that when using `subseq --gtf | --bed`, if the GTF/BED files are too
 big, the memory usage will increase.

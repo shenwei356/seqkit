@@ -24,10 +24,13 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"syscall"
 
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/spf13/cobra"
 )
+
+var pageSize = syscall.Getpagesize()
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{

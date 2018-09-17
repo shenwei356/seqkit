@@ -2121,6 +2121,38 @@ Flags:
 
 ```
 
+## translate
+
+Usage
+
+```
+translate mRNA sequences into amino acid sequences (protein).
+
+By default, all records will be readed into memory.
+For FASTA format, use flag -2 (--two-pass) to reduce memory usage. FASTQ not
+supported.
+
+Firstly, seqkit reads the sequence head and length information.
+If the file is not plain FASTA file,
+seqkit will write the sequences to tempory files, and create FASTA index.
+
+Secondly, seqkit sort sequence by head and length information
+and extract sequences by FASTA index.
+
+Usage:
+  seqkit translate [flags]
+
+Flags:
+
+```
+
+Examples
+
+1. translate mRNA sequence
+
+        $ seqkit translate -u ../tests/mrna-drosopholia-DQ327736.fa
+        RSGRTRKAPGRRRRRQKAQPAGRRARPSKARRSPPASAPATAPPRARE
+
 <div id="disqus_thread"></div>
 <script>
 

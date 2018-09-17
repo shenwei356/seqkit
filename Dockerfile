@@ -41,7 +41,7 @@ RUN go get github.com/derekparker/delve/cmd/dlv
 #End: install delve
 
 #Begin: install seqkit
-RUN go get -u github.com/shenwei356/seqkit/seqkit
+RUN go get -u github.com/ctava/seqkit/seqkit
 #End: install seqkit
 
-WORKDIR $HOME/go/src/github.com/shenwei356/seqkit
+WORKDIR $HOME/go/src/github.com/ctava/seqkit
