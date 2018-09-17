@@ -400,7 +400,7 @@ rm $idFile $outFile
 #                       translate
 # ------------------------------------------------------------
 
-file=tests/mrna-genbank.fa.gz
+file=tests/mrna-drosopholia-DQ327736.fa
 
 fun(){
     $app translate $file > t.translate.0

@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         software-properties-common \
         sudo \
         unzip \
+        vim \
         wget \
         zip \
         zlib1g-dev \
@@ -41,7 +42,7 @@ RUN go get github.com/derekparker/delve/cmd/dlv
 #End: install delve
 
 #Begin: install seqkit
-RUN go get -u github.com/ctava/seqkit/seqkit
+RUN go get -u github.com/shenwei356/seqkit/seqkit
 #End: install seqkit
 
-WORKDIR $HOME/go/src/github.com/ctava/seqkit
+WORKDIR $HOME/go/src/github.com/shenwei356/seqkit
