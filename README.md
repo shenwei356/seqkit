@@ -117,7 +117,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 ## Subcommands
 
-23 subcommands in total.
+24 subcommands in total.
 
 **Sequence and subsequence**
 
@@ -126,6 +126,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - `sliding`    sliding sequences, circular genome supported
 - `stats`      simple statistics of FASTA/Q files
 - `faidx`      create FASTA index file and extract subsequence
+- `translate`  translate sequences into amino acids (protein)
 
 **Format conversion**
 

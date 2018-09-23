@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         software-properties-common \
         sudo \
         unzip \
+        vim \
         wget \
         zip \
         zlib1g-dev \
@@ -40,8 +41,33 @@ RUN curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz && \
 RUN go get github.com/derekparker/delve/cmd/dlv
 #End: install delve
 
-#Begin: install seqkit
-RUN go get -u github.com/shenwei356/seqkit/seqkit
-#End: install seqkit
+#Begin: install seqkit - for developers
+#RUN go get -u github.com/cznic/sortutil
+#RUN go get -u github.com/dustin/go-humanize
+#RUN go get -u github.com/edsrzf/mmap-go
+#RUN go get -u github.com/mattn/go-colorable
+#RUN go get -u github.com/tatsushid/go-prettytable
+#RUN go get -u github.com/mitchellh/go-homedir
+#RUN go get -u github.com/spf13/cobra
+#RUN go get -u github.com/shenwei356/breader
+#RUN go get -u github.com/shenwei356/bwt/fmi
+#RUN go get -u github.com/shenwei356/bio/seq
+#RUN go get -u github.com/shenwei356/bio/seqio/fastx
+#RUN go get -u github.com/shenwei356/util/byteutil
+#RUN go get -u github.com/shenwei356/util/math
+#RUN go get -u github.com/shenwei356/natsort
+#RUN go get -u github.com/shenwei356/bwt/fmi
+#RUN go get -u github.com/shenwei356/go-logging
+#RUN go get -u github.com/shenwei356/xopen
 
-WORKDIR $HOME/go/src/github.com/shenwei356/seqkit
+#ADD seqkit /go/src/github.com/<developer>/seqkit/seqkit
+#ADD tests /go/src/github.com/<developer>/seqkit/tests
+#RUN go get -u github.com/<developer>/bio/seq
+#End: install seqkit - for developers
+
+#Begin: install seqkit - for users
+RUN go get -u github.com/shenwei356/seqkit/seqkit
+#End: install seqkit - for users
+
+#WORKDIR /go/src/github.com/<developer>/seqkit
+WORKDIR /go/src/github.com/shenwei356/seqkit
