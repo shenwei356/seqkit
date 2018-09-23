@@ -395,3 +395,17 @@ fun(){
 run faidx_region fun
 assert_equal $($app grep -p $ref $file | seqkit subseq -r 5:-5 | seqkit seq -s -w 0) $(cat $outFile | seqkit seq -s -w 0)
 rm $idFile $outFile
+
+# ------------------------------------------------------------
+#                       translate
+# ------------------------------------------------------------
+
+inFile=tests/translate-rna.fa
+controlFile=tests/t.translate.control
+outFile=tests/t.translate.result
+fun(){
+    $app translate $inFile > $outFile
+}
+run translate fun
+assert_equal $(grep -c "^>" $controlFile) $(grep -c "^>" $outFile)
+rm tests/t.translate.result

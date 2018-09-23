@@ -35,3 +35,5 @@ t.*
 seqkit/t.*
 seqkit/bench-fx2tab
 doc/docs/chinese/
+
+.DS_Store
