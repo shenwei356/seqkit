@@ -63,7 +63,7 @@ And then:
 
     conda install -c bioconda seqkit
 
-### Method 3: Install via homebrew
+#### Method 3: Install via homebrew
 
     brew install brewsci/bio/seqkit
 

@@ -52,8 +52,8 @@ Firstly, seqkit reads the sequence head and length information.
 If the file is not plain FASTA file,
 seqkit will write the sequences to tempory files, and create FASTA index.
 
-Secondly, seqkit sort sequence by head and length information
-and extract sequences by FASTA index.
+Secondly, seqkit sorts sequence by head and length information
+and extracts sequences by FASTA index.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
