@@ -220,10 +220,8 @@ Run the following commands:
 
     cd seqkit
     docker build -t shenwei356/seqkit .
-    docker run -it -p 8888:8888 shenwei356/seqkit:latest
-    go build
-    cd ../tests
-    ../seqkit/seqkit stats contigs.fa
+    docker run -it shenwei356/seqkit:latest
+
 
 ## Bash-completion
 
