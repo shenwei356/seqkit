@@ -37,17 +37,17 @@ var translateCmd = &cobra.Command{
 	Short: "translate DNA/RNA to protein sequence",
 	Long: `translate DNA/RNA to protein sequence
 
-Translate Table/Genetic Codes:
+Translate Tables/Genetic Codes:
 
     # https://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/index.cgi?chapter=tgencodes
 
-    1: The Standard Code
-    2: The Vertebrate Mitochondrial Code
-    3: The Yeast Mitochondrial Code
-    4: The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
-    5: The Invertebrate Mitochondrial Code
-    6: The Ciliate, Dasycladacean and Hexamita Nuclear Code
-    9: The Echinoderm and Flatworm Mitochondrial Code
+     1: The Standard Code
+     2: The Vertebrate Mitochondrial Code
+     3: The Yeast Mitochondrial Code
+     4: The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
+     5: The Invertebrate Mitochondrial Code
+     6: The Ciliate, Dasycladacean and Hexamita Nuclear Code
+     9: The Echinoderm and Flatworm Mitochondrial Code
     10: The Euplotid Nuclear Code
     11: The Bacterial, Archaeal and Plant Plastid Code
     12: The Alternative Yeast Nuclear Code
@@ -72,7 +72,6 @@ Translate Table/Genetic Codes:
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
 		outFile := config.OutFile
-		lineWidth := config.LineWidth
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
@@ -82,6 +81,9 @@ Translate Table/Genetic Codes:
 			checkError(fmt.Errorf("invalid translate table: %d", translTable))
 		}
 		frame := getFlagInt(cmd, "frame")
+		if !(frame == 1 || frame == 2 || frame == 3 || frame == -1 || frame == -2 || frame == -3) {
+			checkError(fmt.Errorf("invalid frame: %d. available: 1, 2, 3, -1, -2, -3", frame))
+		}
 		trim := getFlagBool(cmd, "trim")
 		clean := getFlagBool(cmd, "clean")
 
@@ -123,14 +125,13 @@ Translate Table/Genetic Codes:
 
 			}
 
-			config.LineWidth = lineWidth
 		}
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(translateCmd)
-	translateCmd.Flags().IntP("transl-table", "T", 1, `translate table/genetic codes, type 'seqkit translate --help' for more details`)
+	translateCmd.Flags().IntP("transl-table", "T", 1, `translate table/genetic code, type 'seqkit translate --help' for more details`)
 	translateCmd.Flags().IntP("frame", "", 1, "frame to translate, available value: 1, 2, 3, -1, -2, -3")
 	translateCmd.Flags().BoolP("trim", "", false, "removes all 'X' and '*' characters from the right end of the translation")
 	translateCmd.Flags().BoolP("clean", "", false, "changes all STOP codon positions from the '*' character to 'X' (an unknown residue)")

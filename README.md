@@ -102,7 +102,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 |                    |Common sequences       |Yes     |--             |--           |--     |--       |--
 |                    |Cleaning bases         |Yes     |Yes            |Yes          |Yes    |--       |--
 |                    |Transcription          |Yes     |Yes            |Yes          |Yes    |Yes      |Yes
-|                    |Translation            |--      |Yes            |Yes          |Yes    |Yes      |--
+|                    |Translation            |Yes     |Yes            |Yes          |Yes    |Yes      |--
 |                    |Filtering by size      |Yes     |Yes            |--           |Yes    |Yes      |--
 |                    |Renaming header        |Yes     |Yes            |--           |--     |Yes      |Yes
 |**Other features**  |Cross-platform         |Yes     |Partly         |Partly       |Yes    |Yes      |Yes

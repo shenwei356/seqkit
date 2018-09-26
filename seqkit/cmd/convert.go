@@ -306,7 +306,7 @@ func parseQualityEncoding(s string) seq.QualityEncoding {
 	case "":
 		return seq.Unknown
 	default:
-		checkError(fmt.Errorf("unsupported quality encoding: %s", s))
+		checkError(fmt.Errorf("unsupported quality encoding: %s. available values: 'sanger', 'solexa', 'illumina-1.3+', 'illumina-1.5+', 'illumina-1.8+'", s))
 		return -1
 	}
 }

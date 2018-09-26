@@ -74,6 +74,7 @@ Tips:
 		all := getFlagBool(cmd, "all")
 		tabular := getFlagBool(cmd, "tabular")
 		skipErr := getFlagBool(cmd, "skip-err")
+		fqEncoding := parseQualityEncoding(getFlagString(cmd, "fq-encoding"))
 
 		files := getFileList(args)
 
@@ -94,7 +95,7 @@ Tips:
 				"max_len",
 			}
 			if all {
-				colnames = append(colnames, []string{"Q1", "Q2", "Q3", "sum_gap", "N50"}...)
+				colnames = append(colnames, []string{"Q1", "Q2", "Q3", "sum_gap", "N50", "Q20(%)", "Q30(%)"}...)
 			}
 			outfh.WriteString(strings.Join(colnames, "\t") + "\n")
 		}
@@ -136,7 +137,7 @@ Tips:
 								info.lenAvg,
 								info.lenMax))
 						} else {
-							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%d\t%d\t%d\t%d\t%d\n",
+							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%d\t%d\t%d\t%d\t%d\t%.2f\t%.2f\n",
 								info.file,
 								info.format,
 								info.t,
@@ -149,7 +150,9 @@ Tips:
 								info.Q2,
 								info.Q3,
 								info.gapSum,
-								info.N50))
+								info.N50,
+								info.q20,
+								info.q30))
 						}
 					}
 					id++
@@ -170,7 +173,7 @@ Tips:
 										info1.lenAvg,
 										info1.lenMax))
 								} else {
-									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%d\t%d\t%d\t%d\t%d\n",
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%d\t%d\t%d\t%d\t%d\t%.2f\t%.2f\n",
 										info1.file,
 										info1.format,
 										info1.t,
@@ -183,7 +186,9 @@ Tips:
 										info1.Q2,
 										info1.Q3,
 										info1.gapSum,
-										info1.N50))
+										info1.N50,
+										info1.q20,
+										info1.q30))
 								}
 							}
 
@@ -221,7 +226,7 @@ Tips:
 								info.lenAvg,
 								info.lenMax))
 						} else {
-							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%d\t%d\t%d\t%d\t%d\n",
+							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%d\t%d\t%d\t%d\t%d\t%.2f\t%.2f\n",
 								info.file,
 								info.format,
 								info.t,
@@ -234,7 +239,9 @@ Tips:
 								info.Q2,
 								info.Q3,
 								info.gapSum,
-								info.N50))
+								info.N50,
+								info.q20,
+								info.q30))
 						}
 					}
 				}
@@ -280,6 +287,9 @@ Tips:
 				var num, l, lenMin, lenMax, lenSum, gapSum int64
 				var n50, sum, l50 int64
 				var q1, q2, q3 int64
+				var q20, q30 int64
+				var q byte
+				var encodeOffset int = fqEncoding.Offset()
 				var lens sortutil.Int64Slice
 				var seqFormat, t string
 				var record *fastx.Record
@@ -300,6 +310,7 @@ Tips:
 				seqFormat = ""
 				num, lenMin, lenMax, lenSum, gapSum = 0, int64(^uint64(0)>>1), 0, 0, 0
 				n50, sum, l50 = 0, 0, 0
+				q20, q30 = 0, 0
 				if all {
 					lens = make(sortutil.Int64Slice, 0, 1000)
 				}
@@ -340,7 +351,20 @@ Tips:
 					if l > lenMax {
 						lenMax = l
 					}
-					gapSum += int64(byteutil.CountBytes(record.Seq.Seq, gapLettersBytes))
+					if all {
+						if fastxReader.IsFastq {
+							for _, q = range record.Seq.Qual {
+								if int(q)-encodeOffset >= 20 {
+									q20++
+									if int(q)-encodeOffset >= 30 {
+										q30++
+									}
+								}
+							}
+						}
+
+						gapSum += int64(byteutil.CountBytes(record.Seq.Seq, gapLettersBytes))
+					}
 				}
 
 				if fastxReader.Alphabet() == seq.DNAredundant {
@@ -348,7 +372,7 @@ Tips:
 				} else if fastxReader.Alphabet() == seq.RNAredundant {
 					t = "RNA"
 				} else {
-					t = fmt.Sprintf("%s", fastxReader.Alphabet())
+					t = fastxReader.Alphabet().String()
 				}
 
 				if all {
@@ -374,12 +398,14 @@ Tips:
 						0, 0, 0, 0,
 						0, lenMax, 0, 0,
 						q1, q2, q3,
+						0, 0,
 						nil, id}
 				} else {
 					ch <- statInfo{file, seqFormat, t,
 						num, lenSum, gapSum, lenMin,
 						math.Round(float64(lenSum)/float64(num), 1), lenMax, n50, l50,
 						q1, q2, q3,
+						math.Round(float64(q20)/float64(lenSum)*100, 2), math.Round(float64(q30)/float64(lenSum)*100, 2),
 						nil, id}
 				}
 			}(file, id)
@@ -418,6 +444,8 @@ Tips:
 				{Header: "Q3", AlignRight: true},
 				{Header: "sum_gap", AlignRight: true},
 				{Header: "N50", AlignRight: true},
+				{Header: "Q20(%)", AlignRight: true},
+				{Header: "Q30(%)", AlignRight: true},
 				// {Header: "L50", AlignRight: true},
 			}...)
 		}
@@ -453,6 +481,8 @@ Tips:
 					humanize.Comma(info.Q3),
 					humanize.Comma(info.gapSum),
 					humanize.Comma(info.N50),
+					humanize.Commaf(info.q20),
+					humanize.Commaf(info.q30),
 					// humanize.Comma(info.L50),
 				)
 			}
@@ -476,6 +506,8 @@ type statInfo struct {
 	Q1     int64
 	Q2     int64
 	Q3     int64
+	q20    float64
+	q30    float64
 
 	err error
 	id  uint64
@@ -488,6 +520,7 @@ func init() {
 	statCmd.Flags().StringP("gap-letters", "G", "- .", "gap letters")
 	statCmd.Flags().BoolP("all", "a", false, "all statistics, including quartiles of seq length, sum_gap, N50")
 	statCmd.Flags().BoolP("skip-err", "e", false, "skip error, only show warning message")
+	statCmd.Flags().StringP("fq-encoding", "E", "sanger", `fastq quality encoding. available values: 'sanger', 'solexa', 'illumina-1.3+', 'illumina-1.5+', 'illumina-1.8+'.`)
 }
 
 func median(sorted []int64) int64 {
