@@ -20,6 +20,7 @@
 - [fq2fa](#fq2fa)
 - [fx2tab & tab2fx](#fx2tab--tab2fx)
 - [convert](#convert)
+- [translate](#translate)
 
 **Searching**
 
@@ -162,7 +163,7 @@ reproduced in different environments with same random seed.
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.9.0-dev3
+Version: 0.9.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -201,6 +202,7 @@ Available Commands:
   stats           simple statistics of FASTA/Q files
   subseq          get subsequences by region/gtf/bed, including flanking sequences
   tab2fx          convert tabular format to FASTA/Q format
+  translate       translate DNA/RNA to protein sequence
   version         print version information and check for update
 
 Flags:
@@ -213,8 +215,6 @@ Flags:
       --quiet                           be quiet and do not show extra information
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
   -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
-
-Use "seqkit [command] --help" for more information about a command.
 
 ```
 
@@ -666,12 +666,12 @@ Eexamples
 1. Extra information
 
         $ seqkit stats *.f{a,q}.gz -a
-        file               format  type  num_seqs    sum_len  min_len  avg_len  max_len   Q1   Q2   Q3  sum_gap  N50
-        hairpin.fa.gz      FASTA   RNA     28,645  2,949,871       39      103    2,354   76   91  111        0  101
-        mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34   21   22   22        0   22
-        Illimina1.8.fq.gz  FASTQ   DNA     10,000  1,500,000      150      150      150  150  150  150        0  150
-        reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229  227  227  227        0  227
-        reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225  224  224  224        0  224
+        file               format  type  num_seqs    sum_len  min_len  avg_len  max_len   Q1   Q2   Q3  sum_gap  N50  Q20(%)  Q30(%)
+        hairpin.fa.gz      FASTA   RNA     28,645  2,949,871       39      103    2,354   76   91  111        0  101       0       0
+        mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34   21   22   22        0   22       0       0
+        Illimina1.8.fq.gz  FASTQ   DNA     10,000  1,500,000      150      150      150  150  150  150        0  150   96.16   89.71
+        reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229  227  227  227        0  227   91.24   86.62
+        reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225  224  224  224        0  224   91.06   87.66
 
 1. Parallelize counting files, it's much faster for lots of small files, especially for files on SSD
 
@@ -992,6 +992,86 @@ TTAATTGGTAAATAAATCTCCTAATAGCTTAGATNTTACCTTNNNNNNNNNNTAGTTTCTTGAGATTTGTTGGGGGAGAC
 FGDGGGGGDGFFGGGDGGGGGGEEGAGFFE>A>@!B@?@@<:!!!!!!!!!!355=>><>EEEEAEEE?EEEBEE?!!!!!!!!!!!!!!!!!!!!!!!!
 ```
 
+## translate
+
+Usage
+
+```
+translate DNA/RNA to protein sequence
+
+Translate Tables/Genetic Codes:
+
+    # https://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/index.cgi?chapter=tgencodes
+
+     1: The Standard Code
+     2: The Vertebrate Mitochondrial Code
+     3: The Yeast Mitochondrial Code
+     4: The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
+     5: The Invertebrate Mitochondrial Code
+     6: The Ciliate, Dasycladacean and Hexamita Nuclear Code
+     9: The Echinoderm and Flatworm Mitochondrial Code
+    10: The Euplotid Nuclear Code
+    11: The Bacterial, Archaeal and Plant Plastid Code
+    12: The Alternative Yeast Nuclear Code
+    13: The Ascidian Mitochondrial Code
+    14: The Alternative Flatworm Mitochondrial Code
+    16: Chlorophycean Mitochondrial Code
+    21: Trematode Mitochondrial Code
+    22: Scenedesmus obliquus Mitochondrial Code
+    23: Thraustochytrium Mitochondrial Code
+    24: Pterobranchia Mitochondrial Code
+    25: Candidate Division SR1 and Gracilibacteria Code
+    26: Pachysolen tannophilus Nuclear Code
+    27: Karyorelict Nuclear
+    28: Condylostoma Nuclear
+    29: Mesodinium Nuclear
+    30: Peritrich Nuclear
+    31: Blastocrithidia Nuclear
+
+Usage:
+  seqkit translate [flags]
+
+Flags:
+      --clean              changes all STOP codon positions from the '*' character to 'X' (an unknown residue)
+      --frame int          frame to translate, available value: 1, 2, 3, -1, -2, -3 (default 1)
+  -h, --help               help for translate
+  -T, --transl-table int   translate table/genetic code, type 'seqkit translate --help' for more details (default 1)
+      --trim               removes all 'X' and '*' characters from the right end of the translation
+
+```
+
+Examples
+
+1. common usage
+
+        $ seqkit translate tests/mouse-p53-cds.fna
+        >lcl|AB021961.1_cds_BAA82344.1_1 [gene=p53] [protein=P53] [protein_id=BAA82344.1] [location=101..1273] [gbkey=CDS]
+        MTAMEESQSDISLELPLSQETFSGLWKLLPPEDILPSPHCMDDLLLPQDVEEFFEGPSEA
+        LRVSGAPAAQDPVTETPGPVAPAPATPWPLSSFVPSQKTYQGNYGFHLGFLQSGTAKSVM
+        CTYSPPLNKLFCQLAKTCPVQLWVSATPPAGSRVRAMAIYKKSQHMTEVVRRCPHHERCS
+        DGDGLAPPQHRIRVEGNLYPEYLEDRQTFRHSVVVPYEPPEAGSEYTTIHYKYMCNSSCM
+        GGMNRRPILTIITLEDSSGNLLGRDSFEVRVCACPGRDRRTEEENFRKKEVLCPELPPGS
+        AKRALPTCTSASPPQKKKPLDGEYFTLKIRGRKRFEMFRELNEALELKDAHATEESGDSR
+        AHSSYLKTKKGQSTSRHKKTMVKKVGPDSD*
+
+1. trim the '*'
+
+        $ seqkit translate tests/mouse-p53-cds.fna --trim
+        >lcl|AB021961.1_cds_BAA82344.1_1 [gene=p53] [protein=P53] [protein_id=BAA82344.1] [location=101..1273] [gbkey=CDS]
+        MTAMEESQSDISLELPLSQETFSGLWKLLPPEDILPSPHCMDDLLLPQDVEEFFEGPSEA
+        LRVSGAPAAQDPVTETPGPVAPAPATPWPLSSFVPSQKTYQGNYGFHLGFLQSGTAKSVM
+        CTYSPPLNKLFCQLAKTCPVQLWVSATPPAGSRVRAMAIYKKSQHMTEVVRRCPHHERCS
+        DGDGLAPPQHRIRVEGNLYPEYLEDRQTFRHSVVVPYEPPEAGSEYTTIHYKYMCNSSCM
+        GGMNRRPILTIITLEDSSGNLLGRDSFEVRVCACPGRDRRTEEENFRKKEVLCPELPPGS
+        AKRALPTCTSASPPQKKKPLDGEYFTLKIRGRKRFEMFRELNEALELKDAHATEESGDSR
+        AHSSYLKTKKGQSTSRHKKTMVKKVGPDSD
+
+1. different translate table
+
+        $ seqkit translate tests/Lactococcus-lactis-phage-BK5-T-ORF25.fasta -T 11 --trim
+        >CAC80166.1 hypothetical protein [Lactococcus phage BK5-T]
+        MEEQAWREVLERLARIETKLDNYETVRDKAERALLIAQSNAKLIEKMEANNKWAWGFMLT
+        LAVTVIGYLFTKIRF
 
 ## grep
 

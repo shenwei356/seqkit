@@ -117,7 +117,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 ## Subcommands
 
-23 subcommands in total.
+26 functional subcommands in total.
 
 **Sequence and subsequence**
 
@@ -133,6 +133,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - `tab2fx`     convert tabular format to FASTA/Q format
 - `fq2fa`      convert FASTQ to FASTA
 - `convert`    convert FASTQ quality encoding between Sanger, Solexa and Illumina
+- `translate`  translate DNA/RNA to protein sequence
 
 **Searching**
 
@@ -175,7 +176,7 @@ Go to [Download Page](http://bioinf.shenwei.me/seqkit/download) for more downloa
  executable binary files **for most popular operating systems** are freely available
   in [release](https://github.com/shenwei356/seqkit/releases) page.
 
-#### Method 1: Download binaries
+#### Method 1: Download binaries (latest stable/dev version)
 
 Just [download](https://github.com/shenwei356/seqkit/releases) compressed
 executable file of your operating system,
@@ -187,28 +188,26 @@ And then:
 
             sudo cp seqkit /usr/local/bin/
 
-    1. Or add the current directory of the executable file to environment variable
-    `PATH`:
+    1. Or copy to anywhere in the environment variable `PATH`:
 
-            echo export PATH=\$PATH:\"$(pwd)\" >> ~/.bashrc
-            source ~/.bashrc
+            mkdir -p $HOME/bin/; cp seqkit $HOME/bin/
 
 
 1. **For windows**, just copy `seqkit.exe` to `C:\WINDOWS\system32`.
 
-#### Method 2: Install via conda [![Install-with-conda](https://anaconda.org/bioconda/seqkit/badges/installer/conda.svg)](http://bioinf.shenwei.me/seqkit/download/) [![Anaconda Cloud](https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit) [![downloads](https://anaconda.org/bioconda/seqkit/badges/downloads.svg)](https://anaconda.org/bioconda/seqkit)
+#### Method 2: Install via conda  (latest stable version) [![Install-with-conda](https://anaconda.org/bioconda/seqkit/badges/installer/conda.svg)](http://bioinf.shenwei.me/seqkit/download/) [![Anaconda Cloud](https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit) [![downloads](https://anaconda.org/bioconda/seqkit/badges/downloads.svg)](https://anaconda.org/bioconda/seqkit)
 
     conda install -c bioconda seqkit
 
-#### Method 3: Install via homebrew
+#### Method 3: Install via homebrew  (latest stable version)
 
     brew install brewsci/bio/seqkit
 
-#### Method 4: For Go developer
+#### Method 4: For Go developer (latest stable/dev version)
 
     go get -u github.com/shenwei356/seqkit/seqkit
 
-#### Method 5: Docker based installation
+#### Method 5: Docker based installation (latest stable/dev version)
 
 [Install Docker](https://docs.docker.com/engine/installation/#supported-platforms)
 
