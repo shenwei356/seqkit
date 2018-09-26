@@ -410,7 +410,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <tr>
 <td align="left"></td>
 <td align="left">Translation</td>
-<td align="center">--</td>
+<td align="center">Yes</td>
 <td align="center">Yes</td>
 <td align="center">Yes</td>
 <td align="center">Yes</td>
@@ -482,7 +482,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <p><strong>Note 1</strong>: See <a href="http://bioinf.shenwei.me/seqkit/benchmark/#softwares">version information</a> of the softwares.</p>
 <p><strong>Note 2</strong>: See <a href="http://bioinf.shenwei.me/seqkit/usage/">usage</a> for detailed options of seqkit.</p>
 <h2 id="subcommands">Subcommands</h2>
-<p>23 subcommands in total.</p>
+<p>26 functional subcommands in total.</p>
 <p><strong>Sequence and subsequence</strong></p>
 <ul>
 <li><code>seq</code>        transform sequences (revserse, complement, extract ID...)</li>
@@ -497,10 +497,11 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <li><code>tab2fx</code>     convert tabular format to FASTA/Q format</li>
 <li><code>fq2fa</code>      convert FASTQ to FASTA</li>
 <li><code>convert</code>    convert FASTQ quality encoding between Sanger, Solexa and Illumina</li>
+<li><code>translate</code>  translate DNA/RNA to protein sequence</li>
 </ul>
 <p><strong>Searching</strong></p>
 <ul>
-<li><code>grep</code>       search sequences by pattern(s) of name or sequence motifs</li>
+<li><code>grep</code>       search sequences by ID/name/sequence/sequence motifs, mismatch allowed</li>
 <li><code>locate</code>     locate subsequences/motifs</li>
 </ul>
 <p><strong>Set operations</strong></p>
@@ -536,9 +537,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <p><code>SeqKit</code> is implemented in <a href="https://golang.org/">Go</a> programming language,
  executable binary files <strong>for most popular operating systems</strong> are freely available
   in <a href="https://github.com/shenwei356/seqkit/releases">release</a> page.</p>
-<p>Seqkit calls <code>pigz</code> (much faster than <code>gzip</code>) or <code>gzip</code> to decompress .gz file if they are available.
-So please <strong>install <a href="http://zlib.net/pigz/">pigz</a> to gain better parsing performance for gzipped data</strong>.</p>
-<h4 id="method-1-download-binaries">Method 1: Download binaries</h4>
+<h4 id="method-1-download-binaries-latest-stabledev-version">Method 1: Download binaries (latest stable/dev version)</h4>
 <p>Just <a href="https://github.com/shenwei356/seqkit/releases">download</a> compressed
 executable file of your operating system,
 and decompress it with <code>tar -zxvf *.tar.gz</code> command or other tools.
@@ -553,10 +552,8 @@ And then:</p>
 </code></pre>
 </li>
 <li>
-<p>Or add the current directory of the executable file to environment variable
-<code>PATH</code>:</p>
-<pre><code>echo export PATH=\$PATH:\"$(pwd)\" &gt;&gt; ~/.bashrc
-source ~/.bashrc
+<p>Or copy to anywhere in the environment variable <code>PATH</code>:</p>
+<pre><code>mkdir -p $HOME/bin/; cp seqkit $HOME/bin/
 </code></pre>
 </li>
 </ol>
@@ -565,11 +562,24 @@ source ~/.bashrc
 <p><strong>For windows</strong>, just copy <code>seqkit.exe</code> to <code>C:\WINDOWS\system32</code>.</p>
 </li>
 </ol>
-<h4 id="method-2-install-via-conda">Method 2: Install via conda <a href="http://bioinf.shenwei.me/seqkit/download/"><img alt="Install-with-conda" src="https://anaconda.org/bioconda/seqkit/badges/installer/conda.svg" /></a> <a href="https://anaconda.org/bioconda/seqkit"><img alt="Anaconda Cloud" src="https://anaconda.org/bioconda/seqkit/badges/version.svg" /></a> <a href="https://anaconda.org/bioconda/seqkit"><img alt="downloads" src="https://anaconda.org/bioconda/seqkit/badges/downloads.svg" /></a></h4>
+<h4 id="method-2-install-via-conda-latest-stable-version">Method 2: Install via conda  (latest stable version) <a href="http://bioinf.shenwei.me/seqkit/download/"><img alt="Install-with-conda" src="https://anaconda.org/bioconda/seqkit/badges/installer/conda.svg" /></a> <a href="https://anaconda.org/bioconda/seqkit"><img alt="Anaconda Cloud" src="https://anaconda.org/bioconda/seqkit/badges/version.svg" /></a> <a href="https://anaconda.org/bioconda/seqkit"><img alt="downloads" src="https://anaconda.org/bioconda/seqkit/badges/downloads.svg" /></a></h4>
 <pre><code>conda install -c bioconda seqkit
 </code></pre>
-<h4 id="method-3-for-go-developer">Method 3: For Go developer</h4>
+<h4 id="method-3-install-via-homebrew-latest-stable-version">Method 3: Install via homebrew  (latest stable version)</h4>
+<pre><code>brew install brewsci/bio/seqkit
+</code></pre>
+<h4 id="method-4-for-go-developer-latest-stabledev-version">Method 4: For Go developer (latest stable/dev version)</h4>
 <pre><code>go get -u github.com/shenwei356/seqkit/seqkit
+</code></pre>
+<h4 id="method-5-docker-based-installation-latest-stabledev-version">Method 5: Docker based installation (latest stable/dev version)</h4>
+<p><a href="https://docs.docker.com/engine/installation/#supported-platforms">Install Docker</a></p>
+<p>git clone this repo:</p>
+<pre><code>git clone https://github.com/shenwei356/seqkit
+</code></pre>
+<p>Run the following commands:</p>
+<pre><code>cd seqkit
+docker build -t shenwei356/seqkit .
+docker run -it shenwei356/seqkit:latest
 </code></pre>
 <h2 id="bash-completion">Bash-completion</h2>
 <p>Note: The current version supports Bash only.
@@ -801,5 +811,5 @@ propose new functions or ask for help.</p>
 
 <!--
 MkDocs version : 0.17.3
-Build Date UTC : 2018-09-03 13:54:56
+Build Date UTC : 2018-09-26 12:32:44
 -->

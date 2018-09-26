@@ -139,6 +139,7 @@
             <li><a href="#fq2fa">fq2fa</a></li>
             <li><a href="#fx2tab-tab2fx">fx2tab &amp; tab2fx</a></li>
             <li><a href="#convert">convert</a></li>
+            <li><a href="#translate">translate</a></li>
             <li><a href="#grep">grep</a></li>
             <li><a href="#locate">locate</a></li>
             <li><a href="#duplicate">duplicate</a></li>
@@ -183,6 +184,7 @@
 <li><a href="#fq2fa">fq2fa</a></li>
 <li><a href="#fx2tab--tab2fx">fx2tab &amp; tab2fx</a></li>
 <li><a href="#convert">convert</a></li>
+<li><a href="#translate">translate</a></li>
 </ul>
 <p><strong>Searching</strong></p>
 <ul>
@@ -311,7 +313,7 @@ reproduced in different environments with same random seed.</p>
 <h2 id="seqkit">seqkit</h2>
 <pre><code>SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.9.0-dev2
+Version: 0.9.0
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -331,10 +333,10 @@ Available Commands:
   fq2fa           convert FASTQ to FASTA
   fx2tab          convert FASTA/Q to tabular format (with length/GC content/GC skew)
   genautocomplete generate shell autocompletion script
-  grep            search sequences by pattern(s) of name or sequence motifs
+  grep            search sequences by ID/name/sequence/sequence motifs, mismatch allowed
   head            print first N FASTA/Q records
   help            Help about any command
-  locate          locate subsequences/motifs
+  locate          locate subsequences/motifs, mismatch allowed
   range           print FASTA/Q records in a range (start:end)
   rename          rename duplicated IDs
   replace         replace name/sequence by regular expression
@@ -350,6 +352,7 @@ Available Commands:
   stats           simple statistics of FASTA/Q files
   subseq          get subsequences by region/gtf/bed, including flanking sequences
   tab2fx          convert tabular format to FASTA/Q format
+  translate       translate DNA/RNA to protein sequence
   version         print version information and check for update
 
 Flags:
@@ -362,8 +365,6 @@ Flags:
       --quiet                           be quiet and do not show extra information
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default &quot;auto&quot;)
   -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
-
-Use &quot;seqkit [command] --help&quot; for more information about a command.
 
 </code></pre>
 
@@ -889,12 +890,12 @@ reads_2.fq.gz    |FASTQ |DNA |2500    |560002 |223    |224.0  |225
 <li>
 <p>Extra information</p>
 <pre><code>$ seqkit stats *.f{a,q}.gz -a
-file               format  type  num_seqs    sum_len  min_len  avg_len  max_len   Q1   Q2   Q3  sum_gap  N50
-hairpin.fa.gz      FASTA   RNA     28,645  2,949,871       39      103    2,354   76   91  111        0  101
-mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34   21   22   22        0   22
-Illimina1.8.fq.gz  FASTQ   DNA     10,000  1,500,000      150      150      150  150  150  150        0  150
-reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229  227  227  227        0  227
-reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225  224  224  224        0  224
+file               format  type  num_seqs    sum_len  min_len  avg_len  max_len   Q1   Q2   Q3  sum_gap  N50  Q20(%)  Q30(%)
+hairpin.fa.gz      FASTA   RNA     28,645  2,949,871       39      103    2,354   76   91  111        0  101       0       0
+mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34   21   22   22        0   22       0       0
+Illimina1.8.fq.gz  FASTQ   DNA     10,000  1,500,000      150      150      150  150  150  150        0  150   96.16   89.71
+reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229  227  227  227        0  227   91.24   86.62
+reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225  224  224  224        0  224   91.06   87.66
 </code></pre>
 </li>
 <li>
@@ -1195,14 +1196,102 @@ TTAATTGGTAAATAAATCTCCTAATAGCTTAGATNTTACCTTNNNNNNNNNNTAGTTTCTTGAGATTTGTTGGGGGAGAC
 FGDGGGGGDGFFGGGDGGGGGGEEGAGFFE&gt;A&gt;@!B@?@@&lt;:!!!!!!!!!!355=&gt;&gt;&lt;&gt;EEEEAEEE?EEEBEE?!!!!!!!!!!!!!!!!!!!!!!!!
 </code></pre>
 
+<h2 id="translate">translate</h2>
+<p>Usage</p>
+<pre><code>translate DNA/RNA to protein sequence
+
+Translate Tables/Genetic Codes:
+
+    # https://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/index.cgi?chapter=tgencodes
+
+     1: The Standard Code
+     2: The Vertebrate Mitochondrial Code
+     3: The Yeast Mitochondrial Code
+     4: The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
+     5: The Invertebrate Mitochondrial Code
+     6: The Ciliate, Dasycladacean and Hexamita Nuclear Code
+     9: The Echinoderm and Flatworm Mitochondrial Code
+    10: The Euplotid Nuclear Code
+    11: The Bacterial, Archaeal and Plant Plastid Code
+    12: The Alternative Yeast Nuclear Code
+    13: The Ascidian Mitochondrial Code
+    14: The Alternative Flatworm Mitochondrial Code
+    16: Chlorophycean Mitochondrial Code
+    21: Trematode Mitochondrial Code
+    22: Scenedesmus obliquus Mitochondrial Code
+    23: Thraustochytrium Mitochondrial Code
+    24: Pterobranchia Mitochondrial Code
+    25: Candidate Division SR1 and Gracilibacteria Code
+    26: Pachysolen tannophilus Nuclear Code
+    27: Karyorelict Nuclear
+    28: Condylostoma Nuclear
+    29: Mesodinium Nuclear
+    30: Peritrich Nuclear
+    31: Blastocrithidia Nuclear
+
+Usage:
+  seqkit translate [flags]
+
+Flags:
+      --clean              changes all STOP codon positions from the '*' character to 'X' (an unknown residue)
+      --frame int          frame to translate, available value: 1, 2, 3, -1, -2, -3 (default 1)
+  -h, --help               help for translate
+  -T, --transl-table int   translate table/genetic code, type 'seqkit translate --help' for more details (default 1)
+      --trim               removes all 'X' and '*' characters from the right end of the translation
+
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>common usage</p>
+<pre><code>$ seqkit translate tests/mouse-p53-cds.fna
+&gt;lcl|AB021961.1_cds_BAA82344.1_1 [gene=p53] [protein=P53] [protein_id=BAA82344.1] [location=101..1273] [gbkey=CDS]
+MTAMEESQSDISLELPLSQETFSGLWKLLPPEDILPSPHCMDDLLLPQDVEEFFEGPSEA
+LRVSGAPAAQDPVTETPGPVAPAPATPWPLSSFVPSQKTYQGNYGFHLGFLQSGTAKSVM
+CTYSPPLNKLFCQLAKTCPVQLWVSATPPAGSRVRAMAIYKKSQHMTEVVRRCPHHERCS
+DGDGLAPPQHRIRVEGNLYPEYLEDRQTFRHSVVVPYEPPEAGSEYTTIHYKYMCNSSCM
+GGMNRRPILTIITLEDSSGNLLGRDSFEVRVCACPGRDRRTEEENFRKKEVLCPELPPGS
+AKRALPTCTSASPPQKKKPLDGEYFTLKIRGRKRFEMFRELNEALELKDAHATEESGDSR
+AHSSYLKTKKGQSTSRHKKTMVKKVGPDSD*
+</code></pre>
+</li>
+<li>
+<p>trim the '*'</p>
+<pre><code>$ seqkit translate tests/mouse-p53-cds.fna --trim
+&gt;lcl|AB021961.1_cds_BAA82344.1_1 [gene=p53] [protein=P53] [protein_id=BAA82344.1] [location=101..1273] [gbkey=CDS]
+MTAMEESQSDISLELPLSQETFSGLWKLLPPEDILPSPHCMDDLLLPQDVEEFFEGPSEA
+LRVSGAPAAQDPVTETPGPVAPAPATPWPLSSFVPSQKTYQGNYGFHLGFLQSGTAKSVM
+CTYSPPLNKLFCQLAKTCPVQLWVSATPPAGSRVRAMAIYKKSQHMTEVVRRCPHHERCS
+DGDGLAPPQHRIRVEGNLYPEYLEDRQTFRHSVVVPYEPPEAGSEYTTIHYKYMCNSSCM
+GGMNRRPILTIITLEDSSGNLLGRDSFEVRVCACPGRDRRTEEENFRKKEVLCPELPPGS
+AKRALPTCTSASPPQKKKPLDGEYFTLKIRGRKRFEMFRELNEALELKDAHATEESGDSR
+AHSSYLKTKKGQSTSRHKKTMVKKVGPDSD
+</code></pre>
+</li>
+<li>
+<p>different translate table</p>
+<pre><code>$ seqkit translate tests/Lactococcus-lactis-phage-BK5-T-ORF25.fasta -T 11 --trim
+&gt;CAC80166.1 hypothetical protein [Lactococcus phage BK5-T]
+MEEQAWREVLERLARIETKLDNYETVRDKAERALLIAQSNAKLIEKMEANNKWAWGFMLT
+LAVTVIGYLFTKIRF
+</code></pre>
+</li>
+</ol>
 <h2 id="grep">grep</h2>
 <p>Usage</p>
 <pre><code>search sequences by pattern(s) of name or sequence motifs
 
-Note that the order of sequences in result is consistent with that in original
-file, not the order of the query patterns.
+Attentions:
+    1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
+       (ID/full header) by default. Please switch &quot;-r/--use-regexp&quot; on
+       for partly matching.
+    2. While when searching by sequences, it's partly matching. And mismatch
+       is allowed using flag &quot;-m/--max-mismatch&quot;.
+    3. The order of sequences in result is consistent with that in original
+       file, not the order of the query patterns.
 
-You can specify the sequence region for searching with flag -R/--region.
+You can specify the sequence region for searching with flag -R (--region).
 The definition of region is 1-based and with some custom design.
 
 Examples:
@@ -1230,6 +1319,7 @@ Flags:
       --delete-matched        delete matched pattern to speedup
   -i, --ignore-case           ignore case
   -v, --invert-match          invert the sense of matching, to select non-matching records
+  -m, --max-mismatch int      max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)
   -p, --pattern stringSlice   search pattern (multiple values supported)
   -f, --pattern-file string   pattern file
   -R, --region string         specify sequence region for searching. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases
@@ -1274,6 +1364,27 @@ pmi-let-7
 </li>
 </ol>
 </li>
+</ol>
+<p>1  Extract sequences containing AGGCG</p>
+<pre><code>    $ cat hairpin.fa.gz | seqkit grep -s -i -p aggcg
+</code></pre>
+<p>1  Extract sequences containing AGGCG (allow mismatch, <strong>only for short (&lt;50kb) sequences now</strong>)</p>
+<pre><code>    $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg | seqkit stats
+    file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+    -     FASTA   RNA      1,181  145,789       49    123.4    2,354
+
+    real    0m0.070s
+    user    0m0.107s
+    sys     0m0.017s
+
+    $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg -m 1 | seqkit stats
+    file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
+    -     FASTA   RNA     17,168  1,881,005       39    109.6    2,354
+
+    real    0m4.655s
+    user    0m4.753s
+</code></pre>
+<ol>
 <li>
 <p>Extract sequences starting with AGGCG</p>
 <pre><code>$ zcat hairpin.fa.gz | seqkit grep -s -r -i -p ^aggcg
@@ -1295,7 +1406,7 @@ pmi-let-7
 </ol>
 <h2 id="locate">locate</h2>
 <p>Usage</p>
-<pre><code>locate subsequences/motifs
+<pre><code>locate subsequences/motifs, mismatch allowed
 
 Motifs could be EITHER plain sequence containing &quot;ACTGN&quot; OR regular
 expression like &quot;A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)&quot; for ORFs.
@@ -1312,17 +1423,54 @@ Flags:
       --bed                       output in BED6 format
   -d, --degenerate                pattern/motif contains degenerate base
       --gtf                       output in GTF format
+  -h, --help                      help for locate
   -i, --ignore-case               ignore case
+  -m, --max-mismatch int          max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)
   -G, --non-greedy                non-greedy mode, faster but may miss motifs overlaping with others
   -P, --only-positive-strand      only search on positive strand
-  -p, --pattern stringSlice       pattern/motif (multiple values supported. use double quotation marks for patterns containing comma, e.g., -p '&quot;A{2,}&quot;')
+  -p, --pattern strings           pattern/motif (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '&quot;A{2,}&quot;')
   -f, --pattern-file string       pattern/motif file (FASTA format)
   -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
-
 </code></pre>
 
 <p>Examples</p>
 <ol>
+<li>
+<p>Locating subsequences (mismatch allowed)</p>
+<pre><code>$ cat t.fa
+&gt;seq
+agctggagctacc
+
+$ cat t.fa | seqkit locate -p agc
+seqID   patternName     pattern strand  start   end     matched
+seq     agc     agc     +       1       3       agc
+seq     agc     agc     +       7       9       agc
+seq     agc     agc     -       8       10      agc
+seq     agc     agc     -       2       4       agc
+
+$ cat t.fa | seqkit locate -p agc -m 1
+seqID   patternName     pattern strand  start   end     matched
+seq     agc     agc     +       1       3       agc
+seq     agc     agc     +       7       9       agc
+seq     agc     agc     +       11      13      acc
+seq     agc     agc     -       8       10      agc
+seq     agc     agc     -       2       4       agc
+
+$ cat t.fa | seqkit locate -p agc -m 2
+seqID   patternName     pattern strand  start   end     matched
+seq     agc     agc     +       1       3       agc
+seq     agc     agc     +       4       6       tgg
+seq     agc     agc     +       5       7       gga
+seq     agc     agc     +       7       9       agc
+seq     agc     agc     +       10      12      tac
+seq     agc     agc     +       11      13      acc
+seq     agc     agc     -       11      13      ggt
+seq     agc     agc     -       8       10      agc
+seq     agc     agc     -       6       8       ctc
+seq     agc     agc     -       5       7       tcc
+seq     agc     agc     -       2       4       agc
+</code></pre>
+</li>
 <li>
 <p>Locate ORFs.</p>
 <pre><code>$ zcat hairpin.fa.gz | seqkit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)"
@@ -2124,8 +2272,8 @@ Firstly, seqkit reads the sequence head and length information.
 If the file is not plain FASTA file,
 seqkit will write the sequences to tempory files, and create FASTA index.
 
-Secondly, seqkit sort sequence by head and length information
-and extract sequences by FASTA index.
+Secondly, seqkit sorts sequence by head and length information
+and extracts sequences by FASTA index.
 
 Usage:
   seqkit sort [flags]
