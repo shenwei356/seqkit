@@ -122,8 +122,7 @@ This command is similar with "samtools faidx" but has some extra features:
 
 		// handle queries
 		queries := files[1:]
-		ids := make([]string, 0, len(queries))
-		regions := make(map[string][2]int, len(queries))
+		faidxQueries := make([]faidxQuery, 0, len(queries))
 		var region [2]int
 
 		var ok bool
@@ -135,14 +134,12 @@ This command is similar with "samtools faidx" but has some extra features:
 				if ignoreCase {
 					id = strings.ToLower(id)
 				}
-
-				regions[id] = [2]int{begin, end}
-
 				if _, ok = id2head[id]; !ok {
 					log.Warningf("sequence not found: %s", id)
 					continue
 				}
-				ids = append(ids, id)
+
+				faidxQueries = append(faidxQueries, faidxQuery{ID: id, Region: [2]int{begin, end}})
 			}
 		} else {
 			queriesRe := make([]*regexp.Regexp, len(queries))
@@ -157,8 +154,7 @@ This command is similar with "samtools faidx" but has some extra features:
 			for id = range id2head {
 				for _, re = range queriesRe {
 					if re.MatchString(id) {
-						ids = append(ids, id)
-						regions[id] = [2]int{1, -1}
+						faidxQueries = append(faidxQueries, faidxQuery{ID: id, Region: [2]int{1, -1}})
 						break
 					}
 				}
@@ -169,9 +165,9 @@ This command is similar with "samtools faidx" but has some extra features:
 		var subseq []byte
 		var text []byte
 		var b *bytes.Buffer
-		for _, id = range ids {
-			head = id2head[id]
-			region = regions[id]
+		for _, faidxQ := range faidxQueries {
+			head = id2head[faidxQ.ID]
+			region = faidxQ.Region
 			subseq, _ = faidx.SubSeq(head, region[0], region[1])
 			if region[0] == 1 && region[1] == -1 {
 				outfh.WriteString(fmt.Sprintf(">%s\n", head))
@@ -194,6 +190,11 @@ This command is similar with "samtools faidx" but has some extra features:
 			outfh.WriteString("\n")
 		}
 	},
+}
+
+type faidxQuery struct {
+	ID     string
+	Region [2]int
 }
 
 func init() {
