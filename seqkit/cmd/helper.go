@@ -187,13 +187,13 @@ type Config struct {
 
 func getConfigs(cmd *cobra.Command) Config {
 	return Config{
-		Alphabet:  getAlphabet(cmd, "seq-type"),
-		Threads:   getFlagPositiveInt(cmd, "threads"),
-		LineWidth: getFlagNonNegativeInt(cmd, "line-width"),
-		IDRegexp:  getIDRegexp(cmd, "id-regexp"),
-		IDNCBI:    getFlagBool(cmd, "id-ncbi"),
-		OutFile:   getFlagString(cmd, "out-file"),
-		Quiet:     getFlagBool(cmd, "quiet"),
+		Alphabet:               getAlphabet(cmd, "seq-type"),
+		Threads:                getFlagPositiveInt(cmd, "threads"),
+		LineWidth:              getFlagNonNegativeInt(cmd, "line-width"),
+		IDRegexp:               getIDRegexp(cmd, "id-regexp"),
+		IDNCBI:                 getFlagBool(cmd, "id-ncbi"),
+		OutFile:                getFlagString(cmd, "out-file"),
+		Quiet:                  getFlagBool(cmd, "quiet"),
 		AlphabetGuessSeqLength: getFlagAlphabetGuessSeqLength(cmd, "alphabet-guess-seq-length"),
 	}
 
@@ -239,17 +239,37 @@ func fileNotExists(file string) bool {
 	return os.IsNotExist(err)
 }
 
-func copySeqs(file, newFile string) {
-	fh, err := xopen.Ropen(file)
-	checkError(err)
-	defer fh.Close()
-
+func copySeqs(file, newFile string) (int, error) {
 	outfh, err := xopen.Wopen(newFile)
-	checkError(err)
+	if err != nil {
+		return 0, err
+	}
 	defer outfh.Close()
 
-	_, err = io.Copy(outfh, fh)
-	checkError(err)
+	lineWidth := 60
+	fastxReader, err := fastx.NewDefaultReader(file)
+	if err != nil {
+		return 0, err
+	}
+	var record *fastx.Record
+	var n int
+	for {
+		record, err = fastxReader.Read()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return 0, err
+			break
+		}
+		if fastxReader.IsFastq {
+			lineWidth = 0
+			fastx.ForcelyOutputFastq = true
+		}
+		n++
+		record.FormatToWriter(outfh, lineWidth)
+	}
+	return n, nil
 }
 
 func getFaidx(file string, idRegexp string) *fai.Faidx {

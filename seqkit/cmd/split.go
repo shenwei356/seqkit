@@ -196,7 +196,12 @@ Examples:
 					log.Infof("read and write sequences to tempory file: %s ...", newFile)
 				}
 
-				copySeqs(file, newFile)
+				var nseqs int
+				nseqs, err = copySeqs(file, newFile)
+				checkError(err)
+				if !quiet {
+					log.Infof("%d sequences saved", nseqs)
+				}
 
 				var isFastq bool
 				var err error
@@ -357,7 +362,12 @@ Examples:
 					log.Infof("read and write sequences to tempory file: %s ...", newFile)
 				}
 
-				copySeqs(file, newFile)
+				var nseqs int
+				nseqs, err = copySeqs(file, newFile)
+				checkError(err)
+				if !quiet {
+					log.Infof("%d sequences saved", nseqs)
+				}
 
 				var isFastq bool
 				var err error
@@ -521,7 +531,12 @@ Examples:
 					log.Infof("read and write sequences to tempory file: %s ...", newFile)
 				}
 
-				copySeqs(file, newFile)
+				var nseqs int
+				nseqs, err = copySeqs(file, newFile)
+				checkError(err)
+				if !quiet {
+					log.Infof("%d sequences saved", nseqs)
+				}
 
 				var isFastq bool
 				var err error
@@ -703,7 +718,12 @@ Examples:
 					log.Infof("read and write sequences to tempory file: %s ...", newFile)
 				}
 
-				copySeqs(file, newFile)
+				var nseqs int
+				nseqs, err = copySeqs(file, newFile)
+				checkError(err)
+				if !quiet {
+					log.Infof("%d sequences saved", nseqs)
+				}
 
 				var isFastq bool
 				var err error

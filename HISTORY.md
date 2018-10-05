@@ -1,6 +1,7 @@
 - [SeqKit v0.9.1](https://github.com/shenwei356/seqkit/releases/tag/v0.9.1)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.9.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.9.1)
-    - `seqkit faidx`: fix bug of retriving subsequence with multiple regions on same sequence. [#48](https://github.com/shenwei356/seqkit/issues/48)
+    - `seqkit faidx`: fix bug of retrieving subsequence with multiple regions on same sequence. [#48](https://github.com/shenwei356/seqkit/issues/48)
+    - `seqkit sort/shuffle/split`: fix bug when using `-2--two-pass` to process `.gz` files. [#52](https://github.com/shenwei356/seqkit/issues/52)
 - [SeqKit v0.9.0](https://github.com/shenwei356/seqkit/releases/tag/v0.9.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.9.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.9.0)
     - `seqkit`: better handle of empty file, no error message shown. [#36](https://github.com/shenwei356/seqkit/issues/36)
