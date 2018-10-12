@@ -163,7 +163,7 @@ reproduced in different environments with same random seed.
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.9.0
+Version: 0.9.1
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -432,7 +432,7 @@ Usage:
 
 Flags:
       --bed string        by BED file
-      --chr value         select limited sequence with sequence IDs (multiple value supported, case ignored) (default [])
+      --chr value         select limited sequence with sequence IDs when using flag --gtf or --bed  (multiple value supported, case ignored) (default [])
   -d, --down-stream int   down stream length
       --feature value     select limited feature types (multiple value supported, case ignored, only works with GTF) (default [])
       --gtf string        by GTF (version 2.2) file

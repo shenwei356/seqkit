@@ -561,7 +561,7 @@ func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 func init() {
 	RootCmd.AddCommand(subseqCmd)
 
-	subseqCmd.Flags().StringSliceP("chr", "", []string{}, "select limited sequence with sequence IDs (multiple value supported, case ignored)")
+	subseqCmd.Flags().StringSliceP("chr", "", []string{}, "select limited sequence with sequence IDs when using --gtf or --bed (multiple value supported, case ignored)")
 	subseqCmd.Flags().StringP("region", "r", "", "by region. "+
 		"e.g 1:12 for first 12 bases, -12:-1 for last 12 bases,"+
 		` 13:-1 for cutting first 12 bases. type "seqkit subseq -h" for more examples`)
