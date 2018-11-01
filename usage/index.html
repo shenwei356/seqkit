@@ -1,41 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
-        <meta name="author" content="Wei Shen">
-        
-        <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>Usage - SeqKit - Ultrafast FASTA/Q kit</title>
-        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
-        <link href="../css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="../css/highlight.css">
-        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation"> 
+    <meta name="author" content="Wei Shen"> 
+    <link rel="shortcut icon" href="../img/favicon.ico">
+
+    <title>Usage - SeqKit - Ultrafast FASTA/Q kit</title>
+
+    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.018/css/hack.min.css">
+    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href="../css/base.css" rel="stylesheet">
+    <link href="../css/cinder.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/highlight.css">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
 
-        <script src="../js/jquery-1.10.2.min.js"></script>
-        <script src="../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../js/highlight.pack.js"></script>
-        <script>
-            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js"></script>
+    <script>
+    WebFont.load({
+        google: {
+            families: ['Open Sans', 'PT Sans']
+        }
+    });
+    </script>
 
-            ga('create', 'UA-28948626-9', 'bioinf.shenwei.me/seqkit');
-            ga('send', 'pageview');
-        </script> 
-    </head>
+    
+</head>
 
-    <body>
+<body>
 
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
 
         <!-- Collapsed navigation -->
@@ -47,6 +52,10 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
+            
+
+            <!-- Main title -->
+
             <a class="navbar-brand" href="..">SeqKit - Ultrafast FASTA/Q kit</a>
         </div>
 
@@ -54,58 +63,87 @@
         <div class="navbar-collapse collapse">
                 <!-- Main navigation -->
                 <ul class="nav navbar-nav">
+                
+                
                     <li >
                         <a href="..">Home</a>
                     </li>
+                
+                
+                
                     <li >
                         <a href="../download/">Download</a>
                     </li>
+                
+                
+                
                     <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Documents <b class="caret"></b></a>
                         <ul class="dropdown-menu">
+                        
                             
 <li class="active">
     <a href="./">Usage</a>
 </li>
+
+                        
                             
 <li >
     <a href="../faq/">FAQ</a>
 </li>
+
+                        
                             
 <li >
     <a href="../tutorial/">Tutorial</a>
 </li>
+
+                        
                             
 <li >
     <a href="../benchmark/">Benchmark</a>
 </li>
+
+                        
                             
 <li >
     <a href="../note/">Notes</a>
 </li>
+
+                        
                         </ul>
                     </li>
+                
+                
+                
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Links <b class="caret"></b></a>
                         <ul class="dropdown-menu">
+                        
                             
 <li >
     <a href="../bioinf/">More tools</a>
 </li>
+
+                        
                             
 <li >
     <a href="../yanlilab/">YanLi Lab</a>
 </li>
+
+                        
                         </ul>
                     </li>
+                
+                
                 </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                        <i class="fa fa-search"></i> Search
-                    </a>
-                </li>
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <i class="fa fa-search"></i> Search
+                        </a>
+                    </li>
                     <li >
                         <a rel="next" href="../download/">
                             <i class="fa fa-arrow-left"></i> Previous
@@ -124,42 +162,80 @@
     </div>
 </div>
 
-        <div class="container">
-                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <div class="container">
+        
+        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#usage-and-examples">Usage and Examples</a></li>
-            <li><a href="#table-of-contents">Table of Contents</a></li>
-            <li><a href="#technical-details-and-guides-for-use">Technical details and guides for use</a></li>
-            <li><a href="#seqkit">seqkit</a></li>
-            <li><a href="#seq">seq</a></li>
-            <li><a href="#subseq">subseq</a></li>
-            <li><a href="#sliding">sliding</a></li>
-            <li><a href="#stats">stats</a></li>
-            <li><a href="#faidx">faidx</a></li>
-            <li><a href="#fq2fa">fq2fa</a></li>
-            <li><a href="#fx2tab-tab2fx">fx2tab &amp; tab2fx</a></li>
-            <li><a href="#convert">convert</a></li>
-            <li><a href="#translate">translate</a></li>
-            <li><a href="#grep">grep</a></li>
-            <li><a href="#locate">locate</a></li>
-            <li><a href="#duplicate">duplicate</a></li>
-            <li><a href="#rmdup">rmdup</a></li>
-            <li><a href="#common">common</a></li>
-            <li><a href="#split">split</a></li>
-            <li><a href="#split2">split2</a></li>
-            <li><a href="#sample">sample</a></li>
-            <li><a href="#head">head</a></li>
-            <li><a href="#range">range</a></li>
-            <li><a href="#replace">replace</a></li>
-            <li><a href="#rename">rename</a></li>
-            <li><a href="#restart">restart</a></li>
-            <li><a href="#concat">concat</a></li>
-            <li><a href="#shuffle">shuffle</a></li>
-            <li><a href="#sort">sort</a></li>
-            <li><a href="#genautocomplete">genautocomplete</a></li>
+        <li class="first-level active"><a href="#usage-and-examples">Usage and Examples</a></li>
+            <li class="second-level"><a href="#table-of-contents">Table of Contents</a></li>
+                
+            <li class="second-level"><a href="#technical-details-and-guides-for-use">Technical details and guides for use</a></li>
+                
+                <li class="third-level"><a href="#fastaq-format-parsing">FASTA/Q format parsing</a></li>
+                <li class="third-level"><a href="#sequence-formats-and-types">Sequence formats and types</a></li>
+                <li class="third-level"><a href="#sequence-id">Sequence ID</a></li>
+                <li class="third-level"><a href="#fasta-index">FASTA index</a></li>
+                <li class="third-level"><a href="#parallelization-of-cpu-intensive-jobs">Parallelization of CPU intensive jobs</a></li>
+                <li class="third-level"><a href="#memory-occupation">Memory occupation</a></li>
+                <li class="third-level"><a href="#reproducibility">Reproducibility</a></li>
+            <li class="second-level"><a href="#seqkit">seqkit</a></li>
+                
+                <li class="third-level"><a href="#datasets">Datasets</a></li>
+            <li class="second-level"><a href="#seq">seq</a></li>
+                
+            <li class="second-level"><a href="#subseq">subseq</a></li>
+                
+            <li class="second-level"><a href="#sliding">sliding</a></li>
+                
+            <li class="second-level"><a href="#stats">stats</a></li>
+                
+            <li class="second-level"><a href="#faidx">faidx</a></li>
+                
+            <li class="second-level"><a href="#fq2fa">fq2fa</a></li>
+                
+            <li class="second-level"><a href="#fx2tab-tab2fx">fx2tab &amp; tab2fx</a></li>
+                
+            <li class="second-level"><a href="#convert">convert</a></li>
+                
+            <li class="second-level"><a href="#translate">translate</a></li>
+                
+            <li class="second-level"><a href="#grep">grep</a></li>
+                
+            <li class="second-level"><a href="#locate">locate</a></li>
+                
+            <li class="second-level"><a href="#duplicate">duplicate</a></li>
+                
+            <li class="second-level"><a href="#rmdup">rmdup</a></li>
+                
+            <li class="second-level"><a href="#common">common</a></li>
+                
+            <li class="second-level"><a href="#split">split</a></li>
+                
+            <li class="second-level"><a href="#split2">split2</a></li>
+                
+            <li class="second-level"><a href="#sample">sample</a></li>
+                
+            <li class="second-level"><a href="#head">head</a></li>
+                
+            <li class="second-level"><a href="#range">range</a></li>
+                
+            <li class="second-level"><a href="#replace">replace</a></li>
+                
+            <li class="second-level"><a href="#rename">rename</a></li>
+                
+            <li class="second-level"><a href="#restart">restart</a></li>
+                
+            <li class="second-level"><a href="#concat">concat</a></li>
+                
+            <li class="second-level"><a href="#shuffle">shuffle</a></li>
+                
+            <li class="second-level"><a href="#sort">sort</a></li>
+                
+            <li class="second-level"><a href="#genautocomplete">genautocomplete</a></li>
+                
     </ul>
 </div></div>
-                <div class="col-md-9" role="main">
+        <div class="col-md-9" role="main">
 
 <h1 id="usage-and-examples">Usage and Examples</h1>
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -1116,6 +1192,8 @@ Flags:
 
 <p>Examples:</p>
 <p>Note that <code>seqkit convert</code> always output sequences.</p>
+<ul>
+<li>
 <p>The test dataset contains score 41 (<code>J</code>):</p>
 <pre><code>$ seqkit head -n 1 tests/Illimina1.8.fq.gz
 @ST-E00493:56:H33MFALXX:4:1101:23439:1379 1:N:0:NACAACCA
@@ -1123,7 +1201,8 @@ NCGTGGAAAGACGCTAAGATTGTGATGTGCTTCCCTGACGATTACAACTGGCGTAAGGACGTTTTGCCTACCTATAAGGC
 +
 #AAAFAAJFFFJJJ&lt;JJJJJFFFJFJJJJJFJJAJJJFJJFJFJJJJFAFJ&lt;JA&lt;FFJ7FJJFJJAAJJJJ&lt;JJJJJJJFJJJAJJJJJFJJ77&lt;JJJJ-F7A-FJFFJJJJJJ&lt;FFJ-&lt;7FJJJFJJ)A7)7AA&lt;7--)&lt;-7F-A7FA&lt;
 </code></pre>
-
+</li>
+<li>
 <p>By default, nothing changes when converting Illumina 1.8 to Sanger. A warning message show that source and target quality encoding match.</p>
 <pre><code>$ seqkit convert tests/Illimina1.8.fq.gz  | seqkit head -n 1
 [INFO] possible quality encodings: [Illumina-1.8+]
@@ -1135,7 +1214,8 @@ NCGTGGAAAGACGCTAAGATTGTGATGTGCTTCCCTGACGATTACAACTGGCGTAAGGACGTTTTGCCTACCTATAAGGC
 +
 #AAAFAAJFFFJJJ&lt;JJJJJFFFJFJJJJJFJJAJJJFJJFJFJJJJFAFJ&lt;JA&lt;FFJ7FJJFJJAAJJJJ&lt;JJJJJJJFJJJAJJJJJFJJ77&lt;JJJJ-F7A-FJFFJJJJJJ&lt;FFJ-&lt;7FJJJFJJ)A7)7AA&lt;7--)&lt;-7F-A7FA&lt;
 </code></pre>
-
+</li>
+<li>
 <p>When switching flag <code>--force</code> on,  <code>J</code> (41) was converted to <code>I</code> (40).</p>
 <pre><code>$ seqkit convert tests/Illimina1.8.fq.gz -f | seqkit head -n 1
 [INFO] possible quality encodings: [Illumina-1.8+]
@@ -1146,8 +1226,11 @@ NCGTGGAAAGACGCTAAGATTGTGATGTGCTTCCCTGACGATTACAACTGGCGTAAGGACGTTTTGCCTACCTATAAGGC
 +
 #AAAFAAIFFFIII&lt;IIIIIFFFIFIIIIIFIIAIIIFIIFIFIIIIFAFI&lt;IA&lt;FFI7FIIFIIAAIIII&lt;IIIIIIIFIIIAIIIIIFII77&lt;IIII-F7A-FIFFIIIIII&lt;FFI-&lt;7FIIIFII)A7)7AA&lt;7--)&lt;-7F-A7FA&lt;
 </code></pre>
-
+</li>
+</ul>
 <p>Other cases:</p>
+<ol>
+<li>
 <p>To Illumina-1.5.</p>
 <pre><code>$ seqkit convert tests/Illimina1.8.fq.gz --to Illumina-1.5+ | seqkit head -n 1
 [INFO] possible quality encodings: [Illumina-1.8+]
@@ -1158,7 +1241,8 @@ NCGTGGAAAGACGCTAAGATTGTGATGTGCTTCCCTGACGATTACAACTGGCGTAAGGACGTTTTGCCTACCTATAAGGC
 +
 B```e``ieeeiii[iiiiieeeieiiiiieii`iiieiieieiiiie`ei[i`[eeiVeiieii``iiii[iiiiiiieiii`iiiiieiiVV[iiiiLeV`Leieeiiiiii[eeiL[VeiiieiiH`VHV``[VLLH[LVeL`Ve`[
 </code></pre>
-
+</li>
+<li>
 <p>To Illumina-1.5 and back to Sanger.</p>
 <pre><code>$ seqkit convert tests/Illimina1.8.fq.gz --to Illumina-1.5+ | seqkit convert | seqkit head -n 1
 [INFO] possible quality encodings: [Illumina-1.8+]
@@ -1172,13 +1256,15 @@ NCGTGGAAAGACGCTAAGATTGTGATGTGCTTCCCTGACGATTACAACTGGCGTAAGGACGTTTTGCCTACCTATAAGGC
 +
 !AAAFAAJFFFJJJ&lt;JJJJJFFFJFJJJJJFJJAJJJFJJFJFJJJJFAFJ&lt;JA&lt;FFJ7FJJFJJAAJJJJ&lt;JJJJJJJFJJJAJJJJJFJJ77&lt;JJJJ-F7A-FJFFJJJJJJ&lt;FFJ-&lt;7FJJJFJJ)A7)7AA&lt;7--)&lt;-7F-A7FA&lt;
 </code></pre>
-
+</li>
+<li>
 <p>Checking encoding</p>
 <pre><code>$ seqkit convert tests/Illimina1.8.fq.gz --from Solexa
 [INFO] converting Solexa -&gt; Sanger
 [ERRO] seq: invalid Solexa quality
 </code></pre>
-
+</li>
+<li>
 <p>Real Illumina 1.5+ data</p>
 <pre><code>$ seqkit seq tests/Illimina1.5.fq
 @HWI-EAS209_0006_FC706VJ:5:58:5894:21141#ATCACG/1
@@ -1195,7 +1281,8 @@ TTAATTGGTAAATAAATCTCCTAATAGCTTAGATNTTACCTTNNNNNNNNNNTAGTTTCTTGAGATTTGTTGGGGGAGAC
 +
 FGDGGGGGDGFFGGGDGGGGGGEEGAGFFE&gt;A&gt;@!B@?@@&lt;:!!!!!!!!!!355=&gt;&gt;&lt;&gt;EEEEAEEE?EEEBEE?!!!!!!!!!!!!!!!!!!!!!!!!
 </code></pre>
-
+</li>
+</ol>
 <h2 id="translate">translate</h2>
 <p>Usage</p>
 <pre><code>translate DNA/RNA to protein sequence
@@ -1347,7 +1434,7 @@ CCUAGCUUUCCU
 </li>
 <li>
 <p>Extract new entries by information from miRNA.diff.gz</p>
-<ol>
+<ul>
 <li>
 <p>Get IDs of new entries.</p>
 <pre><code>$ zcat miRNA.diff.gz | grep ^# -v | grep NEW | cut -f 2 &gt; list
@@ -1362,29 +1449,31 @@ pmi-let-7
 <pre><code>$ zcat hairpin.fa.gz | seqkit grep -f list &gt; new.fa
 </code></pre>
 </li>
-</ol>
+</ul>
 </li>
-</ol>
-<p>1  Extract sequences containing AGGCG</p>
-<pre><code>    $ cat hairpin.fa.gz | seqkit grep -s -i -p aggcg
+<li>
+<p>Extract sequences containing AGGCG</p>
+<pre><code>$ cat hairpin.fa.gz | seqkit grep -s -i -p aggcg
 </code></pre>
-<p>1  Extract sequences containing AGGCG (allow mismatch, <strong>only for short (&lt;50kb) sequences now</strong>)</p>
-<pre><code>    $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg | seqkit stats
-    file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
-    -     FASTA   RNA      1,181  145,789       49    123.4    2,354
+</li>
+<li>
+<p>Extract sequences containing AGGCG (allow mismatch, <strong>only for short (&lt;50kb) sequences now</strong>)</p>
+<pre><code>$ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg | seqkit stats
+file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+-     FASTA   RNA      1,181  145,789       49    123.4    2,354
 
-    real    0m0.070s
-    user    0m0.107s
-    sys     0m0.017s
+real    0m0.070s
+user    0m0.107s
+sys     0m0.017s
 
-    $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg -m 1 | seqkit stats
-    file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
-    -     FASTA   RNA     17,168  1,881,005       39    109.6    2,354
+$ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg -m 1 | seqkit stats
+file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
+-     FASTA   RNA     17,168  1,881,005       39    109.6    2,354
 
-    real    0m4.655s
-    user    0m4.753s
+real    0m4.655s
+user    0m4.753s
 </code></pre>
-<ol>
+</li>
 <li>
 <p>Extract sequences starting with AGGCG</p>
 <pre><code>$ zcat hairpin.fa.gz | seqkit grep -s -r -i -p ^aggcg
@@ -2036,7 +2125,8 @@ A C G T - A C G T
 </li>
 <li>
 <p>Transpose sequence with <a href="https://github.com/shenwei356/csvtk">csvtk</a></p>
-<pre><code>$ echo -e "&gt;seq1\nACTGACGT\n&gt;seq2\nactgccgt" | seqkit replace -p "(.)" -r     "\$1 " -s | seqkit seq -s -u | csvtk space2tab | csvtk -t transpose
+<pre><code>$ echo -e "&gt;seq1\nACTGACGT\n&gt;seq2\nactgccgt" | seqkit replace -p "(.)" -r     "\$1 " -s \
+    | seqkit seq -s -u | csvtk space2tab | csvtk -t transpose
 A       A
 C       C
 T       T
@@ -2421,81 +2511,53 @@ s.setAttribute('data-timestamp', +new Date());
 </script>
 
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
-        </div>
+        
+    </div>
 
-        <footer class="col-md-12">
-            <hr>
-            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
-        </footer>
-        <script>var base_url = '..';</script>
-        <script src="../js/base.js"></script>
-        <script src="../search/require.js"></script>
-        <script src="../search/search.js"></script>
+    <footer class="col-md-12 text-center">
+        <hr>
+        <p>
+        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
+    </footer>
 
-        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-            </div>
-            <div class="modal-body">
-                <p>
-                    From here you can search these documents. Enter
-                    your search terms below.
-                </p>
-                <form role="form">
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                    </div>
-                </form>
-                <div id="mkdocs-search-results"></div>
-            </div>
-            <div class="modal-footer">
+    <script src="../js/jquery-1.10.2.min.js"></script>
+    <script src="../js/bootstrap-3.0.3.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script>
+    var base_url = '..';
+    </script>
+    <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
+    <script src="../js/base.js"></script>
+    <script src="../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        From here you can search these documents. Enter your search terms below.
+                    </p>
+                    <form role="form">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                        </div>
+                    </form>
+                    <div id="mkdocs-search-results"></div>
+                </div>
+                <div class="modal-footer">
+                </div>
             </div>
         </div>
     </div>
-</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
-            </div>
-            <div class="modal-body">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th style="width: 20%;">Keys</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><kbd>?</kbd></td>
-                    <td>Open this help</td>
-                  </tr>
-                  <tr>
-                    <td><kbd>&larr;</kbd></td>
-                    <td>Previous page</td>
-                  </tr>
-                  <tr>
-                    <td><kbd>&rarr;</kbd></td>
-                    <td>Next page</td>
-                  </tr>
-                  <tr>
-                    <td><kbd>s</kbd></td>
-                    <td>Search</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
-    </div>
-</div>
-
 
     </body>
+
 </html>
