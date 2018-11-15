@@ -1,3 +1,6 @@
+- [SeqKit v0.9.2](https://github.com/shenwei356/seqkit/releases/tag/v0.9.2)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.9.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.9.2)
+    - `seqkit sliding`: fix bug for option `-g/--greedy`.
 - [SeqKit v0.9.1](https://github.com/shenwei356/seqkit/releases/tag/v0.9.1)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.9.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.9.1)
     - `seqkit faidx`: fix bug of retrieving subsequence with multiple regions on same sequence. [#48](https://github.com/shenwei356/seqkit/issues/48)

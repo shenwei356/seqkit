@@ -110,10 +110,11 @@ var slidingCmd = &cobra.Command{
 								q = append(q, qual[0:e]...)
 							}
 						} else if greedy {
-							s = sequence[i : i+window]
+							s = sequence[i:]
 							if len(qual) > 0 {
-								q = qual[i : i+window]
+								q = qual[i:]
 							}
+							e = l
 						} else {
 							break
 						}
