@@ -150,6 +150,7 @@ func getAlphabet(cmd *cobra.Command, flag string) *seq.Alphabet {
 	case "auto":
 		return nil
 	default:
+		checkError(fmt.Errorf("invalid sequence type: %s, available value: dna|rna|protein|unlimit|auto", value))
 		return nil
 	}
 }

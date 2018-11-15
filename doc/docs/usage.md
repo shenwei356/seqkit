@@ -1073,6 +1073,21 @@ Examples
         MEEQAWREVLERLARIETKLDNYETVRDKAERALLIAQSNAKLIEKMEANNKWAWGFMLT
         LAVTVIGYLFTKIRF
 
+1. different frame
+
+        $ cat tests/Lactococcus-lactis-phage-BK5-T-ORF25.fasta \
+            | seqkit translate -T 11 --frame -1
+        >CAC80166.1 hypothetical protein [Lactococcus phage BK5-T]
+        SESNFSE*ITNNSYGKSKHKAPSPLIISFHFFYKFRI*LSY*ERSFCFISNCFIVI*LCF
+        NSS*TFEDFSPCLFLH
+
+        $ cat tests/Lactococcus-lactis-phage-BK5-T-ORF25.fasta \
+            | seqkit seq -r -p \
+            | seqkit translate -T 11 --frame -1
+        >CAC80166.1 hypothetical protein [Lactococcus phage BK5-T]
+        MEEQAWREVLERLARIETKLDNYETVRDKAERALLIAQSNAKLIEKMEANNKWAWGFMLT
+        LAVTVIGYLFTKIRF*
+
 ## grep
 
 Usage
