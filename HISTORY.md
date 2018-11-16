@@ -1,6 +1,9 @@
 - [SeqKit v0.9.2](https://github.com/shenwei356/seqkit/releases/tag/v0.9.2)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.9.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.9.2)
-    - `seqkit sliding`: fix bug for option `-g/--greedy`.
+    - `seqkit`: stricter checking for value of global flag `-t/--seq-type`.
+    - `seqkit sliding`: fix bug for flag `-g/--greedy`. [#54](https://github.com/shenwei356/seqkit/issues/54)
+    - `seqkit translate`: fix bug for frame < 0. [#55](https://github.com/shenwei356/seqkit/issues/55)
+    - `seqkit seq`: add TAB to default blank characters (flag `-G/--gap-letters`), and fix filter result when using flag `-g/--remove-gaps` along with `-m/--min-len` or `-M/--max-len`
 - [SeqKit v0.9.1](https://github.com/shenwei356/seqkit/releases/tag/v0.9.1)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.9.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.9.1)
     - `seqkit faidx`: fix bug of retrieving subsequence with multiple regions on same sequence. [#48](https://github.com/shenwei356/seqkit/issues/48)

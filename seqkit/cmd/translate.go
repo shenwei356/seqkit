@@ -81,7 +81,7 @@ Translate Tables/Genetic Codes:
 			checkError(fmt.Errorf("invalid translate table: %d", translTable))
 		}
 		frame := getFlagInt(cmd, "frame")
-		if !(frame == 1 || frame == 2 || frame == 3 || frame == -1 || frame == -2 || frame == -3) {
+		if frame < -3 || frame > 3 || frame == 0 {
 			checkError(fmt.Errorf("invalid frame: %d. available: 1, 2, 3, -1, -2, -3", frame))
 		}
 		trim := getFlagBool(cmd, "trim")
@@ -96,7 +96,6 @@ Translate Tables/Genetic Codes:
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
 		once := true
-		var fframe int
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -119,13 +118,7 @@ Translate Tables/Genetic Codes:
 					once = false
 				}
 
-				if frame < 1 {
-					record.Seq.RevComInplace()
-					fframe = -frame
-				} else {
-					fframe = frame
-				}
-				record.Seq, err = record.Seq.Translate(translTable, fframe, trim, clean)
+				record.Seq, err = record.Seq.Translate(translTable, frame, trim, clean)
 				checkError(err)
 
 				record.FormatToWriter(outfh, config.LineWidth)

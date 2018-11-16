@@ -26,6 +26,7 @@ import (
 	"io"
 	"runtime"
 	"syscall"
+
 	// "runtime/debug"
 
 	"github.com/shenwei356/bio/seq"
@@ -137,6 +138,10 @@ var seqCmd = &cobra.Command{
 					checkSeqType = false
 				}
 
+				if removeGaps {
+					record.Seq.RemoveGapsInplace(gapLetters)
+				}
+
 				if minLen >= 0 && len(record.Seq.Seq) < minLen {
 					continue
 				}
@@ -189,9 +194,6 @@ var seqCmd = &cobra.Command{
 						log.Warning("Complement does no take effect on protein/unlimit sequence")
 					}
 					sequence = sequence.ComplementInplace()
-				}
-				if removeGaps {
-					sequence = sequence.RemoveGaps(gapLetters)
 				}
 
 				if printSeq {
@@ -292,7 +294,7 @@ func init() {
 	seqCmd.Flags().BoolP("qual", "q", false, "only print qualities")
 	seqCmd.Flags().BoolP("only-id", "i", false, "print ID instead of full head")
 	seqCmd.Flags().BoolP("remove-gaps", "g", false, "remove gaps")
-	seqCmd.Flags().StringP("gap-letters", "G", "- .", "gap letters")
+	seqCmd.Flags().StringP("gap-letters", "G", "- 	.", "gap letters")
 	seqCmd.Flags().BoolP("lower-case", "l", false, "print sequences in lower case")
 	seqCmd.Flags().BoolP("upper-case", "u", false, "print sequences in upper case")
 	seqCmd.Flags().BoolP("dna2rna", "", false, "DNA to RNA")
