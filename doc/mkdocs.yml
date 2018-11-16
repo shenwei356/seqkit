@@ -11,7 +11,7 @@ pages:
 - Links:
     - More tools: bioinf.md
     - YanLi Lab: yanlilab.md
-theme: yeti
+theme: cinder
 
 # cluster
 # tamerdocs
