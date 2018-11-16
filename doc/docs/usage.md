@@ -163,7 +163,7 @@ reproduced in different environments with same random seed.
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.9.1
+Version: 0.9.2
 
 Author: Wei Shen <shenwei356@gmail.com>
 
