@@ -81,6 +81,10 @@ var seqCmd = &cobra.Command{
 		if minLen >= 0 && maxLen >= 0 && minLen > maxLen {
 			checkError(fmt.Errorf("value of flag -m (--min-len) should be >= value of flag -M (--max-len)"))
 		}
+		if minLen >= 0 || maxLen >= 0 {
+			removeGaps = true
+			log.Infof("flag -g (--remove-gaps) is switched on when using -m (--min-len) or -M (--max-len)")
+		}
 
 		seq.ValidateSeq = validateSeq
 		seq.ValidateWholeSeq = false
