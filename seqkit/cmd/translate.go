@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"os"
 	"runtime"
 
 	"github.com/shenwei356/bio/seq"
@@ -81,11 +82,12 @@ Translate Tables/Genetic Codes:
 			checkError(fmt.Errorf("invalid translate table: %d", translTable))
 		}
 		frame := getFlagInt(cmd, "frame")
-		if frame < -3 || frame > 3 || frame == 0 {
+		if !(frame == 1 || frame == 2 || frame == 3 || frame == -1 || frame == -2 || frame == -3) {
 			checkError(fmt.Errorf("invalid frame: %d. available: 1, 2, 3, -1, -2, -3", frame))
 		}
 		trim := getFlagBool(cmd, "trim")
 		clean := getFlagBool(cmd, "clean")
+		allUnknownCodon := getFlagBool(cmd, "allow-unknown-codon")
 
 		files := getFileList(args)
 
@@ -118,10 +120,18 @@ Translate Tables/Genetic Codes:
 					once = false
 				}
 
-				record.Seq, err = record.Seq.Translate(translTable, frame, trim, clean)
+				record.Seq, err = record.Seq.Translate(translTable, frame, trim, clean, allUnknownCodon)
+				if err != nil {
+					if err == seq.ErrUnknownCodon {
+						log.Error("unknown codon detected, you can use flag -x/--allow-unknown-codon to translate it to 'X'.")
+						os.Exit(-1)
+					}
+					checkError(err)
+				}
 				checkError(err)
 
 				record.FormatToWriter(outfh, config.LineWidth)
+
 			}
 
 		}
@@ -134,4 +144,5 @@ func init() {
 	translateCmd.Flags().IntP("frame", "", 1, "frame to translate, available value: 1, 2, 3, -1, -2, -3")
 	translateCmd.Flags().BoolP("trim", "", false, "removes all 'X' and '*' characters from the right end of the translation")
 	translateCmd.Flags().BoolP("clean", "", false, "changes all STOP codon positions from the '*' character to 'X' (an unknown residue)")
+	translateCmd.Flags().BoolP("allow-unknown-codon", "x", false, "translate unknown code to 'X'. And you may not use flag --trim which removes 'X'")
 }

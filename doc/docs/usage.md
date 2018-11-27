@@ -163,7 +163,7 @@ reproduced in different environments with same random seed.
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.9.2
+Version: 0.9.3
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -1032,6 +1032,7 @@ Usage:
   seqkit translate [flags]
 
 Flags:
+      -x, --allow-unknown-codon   translate unknown code to 'X'. And you may not use flag --trim which removes 'X'
       --clean              changes all STOP codon positions from the '*' character to 'X' (an unknown residue)
       --frame int          frame to translate, available value: 1, 2, 3, -1, -2, -3 (default 1)
   -h, --help               help for translate
