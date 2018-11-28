@@ -1,5 +1,6 @@
 - [SeqKit v0.9.3](https://github.com/shenwei356/seqkit/releases/tag/v0.9.3)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.9.3/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.9.3)
+    - `seqkit stats`: fix panic for empty file. [#57](https://github.com/shenwei356/seqkit/issues/57)
     - `seqkit translate`: add flag `-x/--allow-unknown-codon` to translate unknown codon to `X`.
 - [SeqKit v0.9.2](https://github.com/shenwei356/seqkit/releases/tag/v0.9.2)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.9.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.9.2)

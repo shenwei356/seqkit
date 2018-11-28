@@ -371,6 +371,8 @@ Tips:
 					t = "DNA"
 				} else if fastxReader.Alphabet() == seq.RNAredundant {
 					t = "RNA"
+				} else if seqFormat == "" && fastxReader.Alphabet() == seq.Unlimit {
+					t = ""
 				} else {
 					t = fastxReader.Alphabet().String()
 				}
