@@ -1,3 +1,9 @@
+- [SeqKit v0.10.0](https://github.com/shenwei356/seqkit/releases/tag/v0.10.0)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.10.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.10.0)
+    - new command `seqkit mutate`: edit sequence (point mutation, insertion, deletion)
+- [SeqKit v0.9.4](https://github.com/shenwei356/seqkit/releases/tag/v0.9.4)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.9.4/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.9.4)
+    - `seqkit`: report error when input is directory now.
 - [SeqKit v0.9.3](https://github.com/shenwei356/seqkit/releases/tag/v0.9.3)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.9.3/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.9.3)
     - `seqkit stats`: fix panic for empty file. [#57](https://github.com/shenwei356/seqkit/issues/57)

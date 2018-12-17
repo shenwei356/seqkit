@@ -261,7 +261,6 @@ func copySeqs(file, newFile string) (int, error) {
 				break
 			}
 			return 0, err
-			break
 		}
 		if fastxReader.IsFastq {
 			lineWidth = 0
