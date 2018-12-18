@@ -17,7 +17,7 @@ and [**Development Notes**](http://bioinf.shenwei.me/seqkit/note/))
 [![Cross-platform](https://img.shields.io/badge/platform-any-ec2eb4.svg?style=flat)](http://bioinf.shenwei.me/seqkit/download/)
 [![Install-with-conda](https://anaconda.org/bioconda/seqkit/badges/installer/conda.svg)](http://bioinf.shenwei.me/seqkit/download/)
 [![Anaconda Cloud](https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit)
-- **[Please cite](/#citation):** [![doi](https://img.shields.io/badge/doi-10.1371%2Fjournal.pone.0163962-blue.svg?style=flat)](https://doi.org/10.1371/journal.pone.0163962)
+- **[Please cite](#citation):** [![doi](https://img.shields.io/badge/doi-10.1371%2Fjournal.pone.0163962-blue.svg?style=flat)](https://doi.org/10.1371/journal.pone.0163962)
 
 
 ## Introduction
