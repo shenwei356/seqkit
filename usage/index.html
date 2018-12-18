@@ -2310,7 +2310,7 @@ Flags:
 
 Attentions:
 
-1. Mutiple point mutations (-p/--point) are allowed, but only single 
+1. Mutiple point mutations (-p/--point) are allowed, but only single
    insertion (-i/--insertion) OR single deletion (-d/--deletion) is allowed.
 2. Point mutation takes place before insertion/deletion.
 
@@ -2352,38 +2352,42 @@ ACTGNactgn
 actgnACTGN
 
 # first base
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | ./seqkit mutate -p 1:x
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -p 1:x
 &gt;1
 xCTGNactgn
 &gt;2
 xctgnACTGN
 
 # 5th base
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | ./seqkit mutate -p 5:x
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -p 5:x
 &gt;1
 ACTGxactgn
 &gt;2
 actgxACTGN
 
 # last base
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | ./seqkit mutate -p -1:x
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -p -1:x
 &gt;1
 ACTGNactgx
 &gt;2
 actgnACTGx
+
+# mutiple locations:
+
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -p 1:x -p -1:x
 </code></pre>
 </li>
 <li>
 <p>Deletion</p>
 <pre><code># first base
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | ./seqkit mutate -d 1:1
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -d 1:1
 &gt;1
 CTGNactgn
 &gt;2
 ctgnACTGN
 
 # last 3 bases
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | ./seqkit mutate -d -3:-1
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -d -3:-1
 &gt;1
 ACTGNac
 &gt;2
@@ -2393,21 +2397,21 @@ actgnAC
 <li>
 <p>Insertion: inserting bases <strong>behind</strong> of given position</p>
 <pre><code># at the beginning
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | ./seqkit mutate -i 0:xx
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -i 0:xx
 &gt;1
 xxACTGNactgn
 &gt;2
 xxactgnACTGN
 
 # at the end
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | ./seqkit mutate -i -1:xx
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -i -1:xx
 &gt;1
 ACTGNactgnxx
 &gt;2
 actgnACTGNxx
 
 # behind of 5th base
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | ./seqkit mutate -i 5:x
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -i 5:x
 &gt;1
 ACTGNxactgn
 &gt;2
@@ -2529,7 +2533,7 @@ a
 &gt;2
 a
 
-$ echo -e "&gt;3\na\n&gt;1\na\n&gt;Y\na\n&gt;x\na\n&gt;Mt\na\n&gt;11\na\n&gt;2\na\n" | ./seqkit sort -N -i -2
+$ echo -e "&gt;3\na\n&gt;1\na\n&gt;Y\na\n&gt;x\na\n&gt;Mt\na\n&gt;11\na\n&gt;2\na\n" | seqkit sort -N -i -2
 &gt;1
 a
 &gt;2
