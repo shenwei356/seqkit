@@ -38,7 +38,7 @@ import (
 var mutateCmd = &cobra.Command{
 	Use:   "mutate",
 	Short: "edit sequence (point mutation, insertion, deletion)",
-	Long: `edit sequence (point mutation, insertion, deletion)
+	Long: fmt.Sprintf(`edit sequence (point mutation, insertion, deletion)
 
 Attentions:
 
@@ -46,7 +46,11 @@ Attentions:
    insertion (-i/--insertion) OR single deletion (-d/--deletion) is allowed.
 2. Point mutation takes place before insertion/deletion.
 
-`,
+The definition of position is 1-based and with some custom design.
+
+Examples:
+%s
+`, regionExample),
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
@@ -66,8 +70,8 @@ Attentions:
 			}
 			items := strings.Split(val, ":")
 			pos, _ := strconv.Atoi(items[0])
-			if pos < 1 {
-				checkError(fmt.Errorf("position should be positive integer, %d given", pos))
+			if pos == 0 {
+				checkError(fmt.Errorf("position should be non-zero integer"))
 			}
 			mPoints = append(mPoints, _mutatePoint{pos: pos, base: items[1][0]})
 		}
@@ -84,17 +88,15 @@ Attentions:
 			if !reMutationDel.MatchString(valDel) {
 				checkError(fmt.Errorf("invalid value of flag -id/--deletion : %s", valDel))
 			}
-			items := strings.Split(valDel, "-")
+			items := strings.Split(valDel, ":")
 			start, _ := strconv.Atoi(items[0])
 			end, _ := strconv.Atoi(items[1])
-			if start < 1 {
-				checkError(fmt.Errorf("start position should be positive integer, %d given", start))
+
+			if start == 0 || end == 0 {
+				checkError(fmt.Errorf("both start and end should not be 0"))
 			}
-			if end < 1 {
-				checkError(fmt.Errorf("end position should be positive integer, %d given", end))
-			}
-			if start > end {
-				checkError(fmt.Errorf("start position (%d) should be smaller than end position (%d)", start, end))
+			if start < 0 && end > 0 {
+				checkError(fmt.Errorf("when start < 0, end should not > 0"))
 			}
 
 			mDel = &_mutateDel{start: start, end: end}
@@ -107,9 +109,7 @@ Attentions:
 			}
 			items := strings.Split(valIns, ":")
 			pos, _ := strconv.Atoi(items[0])
-			if pos < 1 {
-				checkError(fmt.Errorf("position should be positive integer, %d given", pos))
-			}
+
 			mIns = &_mutateIns{pos: pos, seq: []byte(items[1])}
 		}
 
@@ -122,7 +122,8 @@ Attentions:
 		var checkFQ = true
 		var mp _mutatePoint
 		var seqLen int
-		// var newSeq []byte
+		var s, e int
+		var ok bool
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -145,30 +146,42 @@ Attentions:
 				seqLen = len(record.Seq.Seq)
 
 				for _, mp = range mPoints {
-					if mp.pos > seqLen {
+					s, _, ok = seq.SubLocation(seqLen, mp.pos, mp.pos)
+					if !ok {
 						log.Warningf("[%s]: point mutation: position (%d) out of sequence length (%d)", record.ID, mp.pos, seqLen)
 						continue
 					}
-					record.Seq.Seq[mp.pos-1] = mp.base
+					record.Seq.Seq[s-1] = mp.base
 				}
 
 				if mDel != nil {
-					if mDel.start > seqLen || mDel.end > seqLen {
+					s, e, ok = seq.SubLocation(seqLen, mDel.start, mDel.end)
+
+					if !ok {
 						log.Warningf("[%s]: deletion mutation: range (%d-%d) out of sequence length (%d)", record.ID, mDel.start, mDel.end, seqLen)
 					} else {
-						copy(record.Seq.Seq[mDel.start-1:seqLen-(mDel.end-mDel.start+1)], record.Seq.Seq[mDel.end:])
-						record.Seq.Seq = record.Seq.Seq[0 : seqLen-(mDel.end-mDel.start+1)]
+						copy(record.Seq.Seq[s-1:seqLen-(e-s+1)], record.Seq.Seq[e:])
+						record.Seq.Seq = record.Seq.Seq[0 : seqLen-(e-s+1)]
 					}
 				}
 
 				if mIns != nil {
-					if mIns.pos > seqLen+1 {
-						log.Warningf("[%s]: point mutation: position (%d) out of sequence length + 1 (%d)", record.ID, mp.pos, seqLen+1)
-					} else {
+					if mIns.pos == 0 {
+						s = 0
 						record.Seq.Seq = append(record.Seq.Seq, mIns.seq...)
-						copy(record.Seq.Seq[mIns.pos+len(mIns.seq)-1:], record.Seq.Seq[mIns.pos-1:mIns.pos+seqLen])
-						copy(record.Seq.Seq[mIns.pos-1:mIns.pos+len(mIns.seq)-1], mIns.seq)
+						copy(record.Seq.Seq[s+len(mIns.seq):], record.Seq.Seq[s:s+seqLen])
+						copy(record.Seq.Seq[s:s+len(mIns.seq)], mIns.seq)
+					} else {
+						s, _, ok = seq.SubLocation(seqLen, mIns.pos, mIns.pos)
+						if !ok {
+							log.Warningf("[%s]: insertion mutation: position (%d) out of sequence length (%d)", record.ID, mIns.pos, seqLen)
+						} else {
+							record.Seq.Seq = append(record.Seq.Seq, mIns.seq...)
+							copy(record.Seq.Seq[s+len(mIns.seq):], record.Seq.Seq[s:s+seqLen])
+							copy(record.Seq.Seq[s:s+len(mIns.seq)], mIns.seq)
+						}
 					}
+
 				}
 				record.FormatToWriter(outfh, lineWidth)
 			}
@@ -179,14 +192,14 @@ Attentions:
 func init() {
 	RootCmd.AddCommand(mutateCmd)
 
-	mutateCmd.Flags().StringSliceP("point", "p", []string{}, `point mutation: change base at sepcific postion. e.g., -p 2:C for setting 2nd base as C`)
-	mutateCmd.Flags().StringP("deletion", "d", "", `deletion mutation: delete subsequence in a range. e.g., -d 1:2 for deleting leading two bases`)
-	mutateCmd.Flags().StringP("insertion", "i", "", `insertion mutation: insert at front of position, e.g., -i 1:ACGT for inserting ACGT at the beginning`)
+	mutateCmd.Flags().StringSliceP("point", "p", []string{}, `point mutation: changing base at given postion. e.g., -p 2:C for setting 2nd base as C, -p -1:A for change last base as A`)
+	mutateCmd.Flags().StringP("deletion", "d", "", `deletion mutation: deleting subsequence in a range. e.g., -d 1:2 for deleting leading two bases, -d -3:-1 for removing last 3 bases`)
+	mutateCmd.Flags().StringP("insertion", "i", "", `insertion mutation: inserting bases behind of given position, e.g., -i 0:ACGT for inserting ACGT at the beginning, -1:* for add * to the end`)
 }
 
-var reMutationPoint = regexp.MustCompile(`^(\d+)\:(\w)$`)
-var reMutationDel = regexp.MustCompile(`^(\d+)\-(\d+)$`)
-var reMutationIns = regexp.MustCompile(`^(\d+)\:(\w+)$`)
+var reMutationPoint = regexp.MustCompile(`^(\-?\d+)\:(.)$`)
+var reMutationDel = regexp.MustCompile(`^(\-?\d+):(\-?\d+)$`)
+var reMutationIns = regexp.MustCompile(`^(\-?\d+)\:(.+)$`)
 
 type _mutatePoint struct {
 	pos  int

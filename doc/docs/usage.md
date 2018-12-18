@@ -44,6 +44,7 @@
 - [rename](#rename)
 - [restart](#restart)
 - [concat](#concat)
+- [mutate](#mutate)
 
 **Ordering**
 
@@ -163,7 +164,7 @@ reproduced in different environments with same random seed.
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.9.3
+Version: 0.10.0-dev
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -187,6 +188,7 @@ Available Commands:
   head            print first N FASTA/Q records
   help            Help about any command
   locate          locate subsequences/motifs, mismatch allowed
+  mutate          edit sequence (point mutation, insertion, deletion)
   range           print FASTA/Q records in a range (start:end)
   rename          rename duplicated IDs
   replace         replace name/sequence by regular expression
@@ -2022,6 +2024,115 @@ Flags:
 
 ```
 
+## mutate
+
+Usage
+
+```
+edit sequence (point mutation, insertion, deletion)
+
+Attentions:
+
+1. Mutiple point mutations (-p/--point) are allowed, but only single 
+   insertion (-i/--insertion) OR single deletion (-d/--deletion) is allowed.
+2. Point mutation takes place before insertion/deletion.
+
+The definition of position is 1-based and with some custom design.
+
+Examples:
+
+ 1-based index    1 2 3 4 5 6 7 8 9 10
+negative index    0-9-8-7-6-5-4-3-2-1
+           seq    A C G T N a c g t n
+           1:1    A
+           2:4      C G T
+         -4:-2                c g t
+         -4:-1                c g t n
+         -1:-1                      n
+          2:-2      C G T N a c g t
+          1:-1    A C G T N a c g t n
+          1:12    A C G T N a c g t n
+        -12:-1    A C G T N a c g t n
+
+Usage:
+  seqkit mutate [flags]
+
+Flags:
+  -d, --deletion string    deletion mutation: deleting subsequence in a range. e.g., -d 1:2 for deleting leading two bases, -d -3:-1 for removing last 3 bases
+  -h, --help               help for mutate
+  -i, --insertion string   insertion mutation: inserting bases behind of given position, e.g., -i 0:ACGT for inserting ACGT at the beginning, -1:* for add * to the end
+  -p, --point strings      point mutation: changing base at given postion. e.g., -p 2:C for setting 2nd base as C, -p -1:A for change last base as A
+```
+
+Examples:
+
+1. Point mutation:
+
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n"
+        >1
+        ACTGNactgn
+        >2
+        actgnACTGN
+
+        # first base
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" | ./seqkit mutate -p 1:x
+        >1
+        xCTGNactgn
+        >2
+        xctgnACTGN
+
+        # 5th base
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" | ./seqkit mutate -p 5:x
+        >1
+        ACTGxactgn
+        >2
+        actgxACTGN
+
+        # last base
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" | ./seqkit mutate -p -1:x
+        >1
+        ACTGNactgx
+        >2
+        actgnACTGx
+
+1. Deletion
+
+        # first base
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" | ./seqkit mutate -d 1:1
+        >1
+        CTGNactgn
+        >2
+        ctgnACTGN
+
+        # last 3 bases
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" | ./seqkit mutate -d -3:-1
+        >1
+        ACTGNac
+        >2
+        actgnAC
+
+1. Insertion: inserting bases **behind** of given position
+
+        # at the beginning
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" | ./seqkit mutate -i 0:xx
+        >1
+        xxACTGNactgn
+        >2
+        xxactgnACTGN
+
+        # at the end
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" | ./seqkit mutate -i -1:xx
+        >1
+        ACTGNactgnxx
+        >2
+        actgnACTGNxx
+
+        # behind of 5th base
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" | ./seqkit mutate -i 5:x
+        >1
+        ACTGNxactgn
+        >2
+        actgnxACTGN
 
 ## shuffle
 

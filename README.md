@@ -117,7 +117,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 ## Subcommands
 
-26 functional subcommands in total.
+27 functional subcommands in total.
 
 **Sequence and subsequence**
 
@@ -157,6 +157,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - `rename`     rename duplicated IDs
 - `restart`    reset start position for circular genome
 - `concat`     concatenate sequences with same ID from multiple files
+- `mutate`     edit sequence (point mutation, insertion, deletion)
 
 **Ordering**
 
