@@ -227,6 +227,8 @@
                 
             <li class="second-level"><a href="#concat">concat</a></li>
                 
+            <li class="second-level"><a href="#mutate">mutate</a></li>
+                
             <li class="second-level"><a href="#shuffle">shuffle</a></li>
                 
             <li class="second-level"><a href="#sort">sort</a></li>
@@ -284,6 +286,7 @@
 <li><a href="#rename">rename</a></li>
 <li><a href="#restart">restart</a></li>
 <li><a href="#concat">concat</a></li>
+<li><a href="#mutate">mutate</a></li>
 </ul>
 <p><strong>Ordering</strong></p>
 <ul>
@@ -389,7 +392,7 @@ reproduced in different environments with same random seed.</p>
 <h2 id="seqkit">seqkit</h2>
 <pre><code>SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.9.3
+Version: 0.10.0-dev
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -413,6 +416,7 @@ Available Commands:
   head            print first N FASTA/Q records
   help            Help about any command
   locate          locate subsequences/motifs, mismatch allowed
+  mutate          edit sequence (point mutation, insertion, deletion)
   range           print FASTA/Q records in a range (start:end)
   rename          rename duplicated IDs
   replace         replace name/sequence by regular expression
@@ -2300,6 +2304,117 @@ Flags:
 
 </code></pre>
 
+<h2 id="mutate">mutate</h2>
+<p>Usage</p>
+<pre><code>edit sequence (point mutation, insertion, deletion)
+
+Attentions:
+
+1. Mutiple point mutations (-p/--point) are allowed, but only single 
+   insertion (-i/--insertion) OR single deletion (-d/--deletion) is allowed.
+2. Point mutation takes place before insertion/deletion.
+
+The definition of position is 1-based and with some custom design.
+
+Examples:
+
+ 1-based index    1 2 3 4 5 6 7 8 9 10
+negative index    0-9-8-7-6-5-4-3-2-1
+           seq    A C G T N a c g t n
+           1:1    A
+           2:4      C G T
+         -4:-2                c g t
+         -4:-1                c g t n
+         -1:-1                      n
+          2:-2      C G T N a c g t
+          1:-1    A C G T N a c g t n
+          1:12    A C G T N a c g t n
+        -12:-1    A C G T N a c g t n
+
+Usage:
+  seqkit mutate [flags]
+
+Flags:
+  -d, --deletion string    deletion mutation: deleting subsequence in a range. e.g., -d 1:2 for deleting leading two bases, -d -3:-1 for removing last 3 bases
+  -h, --help               help for mutate
+  -i, --insertion string   insertion mutation: inserting bases behind of given position, e.g., -i 0:ACGT for inserting ACGT at the beginning, -1:* for add * to the end
+  -p, --point strings      point mutation: changing base at given postion. e.g., -p 2:C for setting 2nd base as C, -p -1:A for change last base as A
+</code></pre>
+
+<p>Examples:</p>
+<ol>
+<li>
+<p>Point mutation:</p>
+<pre><code>$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n"
+&gt;1
+ACTGNactgn
+&gt;2
+actgnACTGN
+
+# first base
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | ./seqkit mutate -p 1:x
+&gt;1
+xCTGNactgn
+&gt;2
+xctgnACTGN
+
+# 5th base
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | ./seqkit mutate -p 5:x
+&gt;1
+ACTGxactgn
+&gt;2
+actgxACTGN
+
+# last base
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | ./seqkit mutate -p -1:x
+&gt;1
+ACTGNactgx
+&gt;2
+actgnACTGx
+</code></pre>
+</li>
+<li>
+<p>Deletion</p>
+<pre><code># first base
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | ./seqkit mutate -d 1:1
+&gt;1
+CTGNactgn
+&gt;2
+ctgnACTGN
+
+# last 3 bases
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | ./seqkit mutate -d -3:-1
+&gt;1
+ACTGNac
+&gt;2
+actgnAC
+</code></pre>
+</li>
+<li>
+<p>Insertion: inserting bases <strong>behind</strong> of given position</p>
+<pre><code># at the beginning
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | ./seqkit mutate -i 0:xx
+&gt;1
+xxACTGNactgn
+&gt;2
+xxactgnACTGN
+
+# at the end
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | ./seqkit mutate -i -1:xx
+&gt;1
+ACTGNactgnxx
+&gt;2
+actgnACTGNxx
+
+# behind of 5th base
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | ./seqkit mutate -i 5:x
+&gt;1
+ACTGNxactgn
+&gt;2
+actgnxACTGN
+</code></pre>
+</li>
+</ol>
 <h2 id="shuffle">shuffle</h2>
 <p>Usage</p>
 <pre><code>shuffle sequences.
