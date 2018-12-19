@@ -2310,9 +2310,14 @@ Flags:
 
 Attentions:
 
-1. Mutiple point mutations (-p/--point) are allowed, but only single
-   insertion (-i/--insertion) OR single deletion (-d/--deletion) is allowed.
-2. Point mutation takes place before insertion/deletion.
+  1. Mutiple point mutations (-p/--point) are allowed, but only single 
+     insertion (-i/--insertion) OR single deletion (-d/--deletion) is allowed.
+  2. Point mutation takes place before insertion/deletion.
+
+Notes:
+
+  1. You can choose certain sequences to edit using similar flags in
+     'seqkit grep'.
 
 The definition of position is 1-based and with some custom design.
 
@@ -2335,10 +2340,17 @@ Usage:
   seqkit mutate [flags]
 
 Flags:
-  -d, --deletion string    deletion mutation: deleting subsequence in a range. e.g., -d 1:2 for deleting leading two bases, -d -3:-1 for removing last 3 bases
-  -h, --help               help for mutate
-  -i, --insertion string   insertion mutation: inserting bases behind of given position, e.g., -i 0:ACGT for inserting ACGT at the beginning, -1:* for add * to the end
-  -p, --point strings      point mutation: changing base at given postion. e.g., -p 2:C for setting 2nd base as C, -p -1:A for change last base as A
+  -n, --by-name               [match seqs to mutate] match by full name instead of just id
+  -d, --deletion string       deletion mutation: deleting subsequence in a range. e.g., -d 1:2 for deleting leading two bases, -d -3:-1 for removing last 3 bases
+  -h, --help                  help for mutate
+  -I, --ignore-case           [match seqs to mutate] ignore case of search pattern
+  -i, --insertion string      insertion mutation: inserting bases behind of given position, e.g., -i 0:ACGT for inserting ACGT at the beginning, -1:* for add * to the end
+  -v, --invert-match          [match seqs to mutate] invert the sense of matching, to select non-matching records
+      --pattern strings       [match seqs to mutate] search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '&quot;A{2,}&quot;'))
+  -f, --pattern-file string   [match seqs to mutate] pattern file (one record per line)
+  -p, --point strings         point mutation: changing base at given postion. e.g., -p 2:C for setting 2nd base as C, -p -1:A for change last base as A
+  -r, --use-regexp            [match seqs to mutate] search patterns are regular expression
+
 </code></pre>
 
 <p>Examples:</p>
@@ -2353,20 +2365,22 @@ actgnACTGN
 
 # first base
 $ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -p 1:x
+[INFO] edit seq: 1
+[INFO] edit seq: 2
 &gt;1
 xCTGNactgn
 &gt;2
 xctgnACTGN
 
 # 5th base
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -p 5:x
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -p 5:x --quiet
 &gt;1
 ACTGxactgn
 &gt;2
 actgxACTGN
 
 # last base
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -p -1:x
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -p -1:x --quiet
 &gt;1
 ACTGNactgx
 &gt;2
@@ -2374,20 +2388,24 @@ actgnACTGx
 
 # mutiple locations:
 
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -p 1:x -p -1:x
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -p 1:x -p -1:x --quiet
+&gt;1
+xCTGNactgx
+&gt;2
+xctgnACTGx
 </code></pre>
 </li>
 <li>
 <p>Deletion</p>
 <pre><code># first base
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -d 1:1
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -d 1:1 --quiet
 &gt;1
 CTGNactgn
 &gt;2
 ctgnACTGN
 
 # last 3 bases
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -d -3:-1
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -d -3:-1 --quiet
 &gt;1
 ACTGNac
 &gt;2
@@ -2397,25 +2415,80 @@ actgnAC
 <li>
 <p>Insertion: inserting bases <strong>behind</strong> of given position</p>
 <pre><code># at the beginning
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -i 0:xx
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -i 0:xx --quiet
 &gt;1
 xxACTGNactgn
 &gt;2
 xxactgnACTGN
 
 # at the end
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -i -1:xx
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -i -1:xx --quiet
 &gt;1
 ACTGNactgnxx
 &gt;2
 actgnACTGNxx
 
 # behind of 5th base
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -i 5:x
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -i 5:x --quiet
 &gt;1
 ACTGNxactgn
 &gt;2
 actgnxACTGN
+</code></pre>
+</li>
+<li>
+<p><strong>Choosing which sequences to edit</strong>, using similar flags in <code>seqkit grep</code>.</p>
+<pre><code>$ cat tests/hsa.fa
+&gt;chr1 1th seq
+ACTGNactgn
+&gt;chr2 2nd seq
+actgnACTGN
+&gt;chr11 11th seq
+ACTGNACTGN
+&gt;MT mitochondrial seq
+actgnactgn
+
+# only edit chr1 and chr2
+$    cat tests/hsa.fa | seqkit mutate -p -1:X -s chr1,chr2
+# or cat tests/hsa.fa | seqkit mutate -p -1:X -s chr1 -s chr2
+[INFO] edit seq: chr1 1th seq
+[INFO] edit seq: chr2 2nd seq
+&gt;chr1 1th seq
+ACTGNactgX
+&gt;chr2 2nd seq
+actgnACTGX
+&gt;chr11 11th seq
+ACTGNACTGN
+&gt;MT mitochondrial seq
+actgnactgn
+
+# using regular expression to match.
+# e,g., editing all chrosomes:
+$ cat tests/hsa.fa | seqkit mutate -p -1:X -r -s chr
+[INFO] edit seq: chr1 1th seq
+[INFO] edit seq: chr2 2nd seq
+[INFO] edit seq: chr11 11th seq
+&gt;chr1 1th seq
+ACTGNactgX
+&gt;chr2 2nd seq
+actgnACTGX
+&gt;chr11 11th seq
+ACTGNACTGX
+&gt;MT mitochondrial seq
+actgnactgn
+
+# excluding seqs
+$ cat tests/hsa.fa | seqkit mutate -p -1:X -s chr1 -s chr2 -v 
+[INFO] edit seq: chr11 11th seq
+[INFO] edit seq: MT mitochondrial seq
+&gt;chr1 1th seq
+ACTGNactgn
+&gt;chr2 2nd seq
+actgnACTGN
+&gt;chr11 11th seq
+ACTGNACTGX
+&gt;MT mitochondrial seq
+actgnactgX
 </code></pre>
 </li>
 </ol>
