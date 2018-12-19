@@ -46,6 +46,7 @@ var convertCmd = &cobra.Command{
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = true
+		quiet := config.Quiet
 		runtime.GOMAXPROCS(config.Threads)
 
 		dryRun := getFlagBool(cmd, "dry-run")
@@ -82,7 +83,9 @@ var convertCmd = &cobra.Command{
 			encodingsMark = make([]int, seq.NQualityEncoding)
 		} else {
 			fromEncoding = from
-			log.Infof("converting %s -> %s", fromEncoding, toEncoding)
+			if !quiet {
+				log.Infof("converting %s -> %s", fromEncoding, toEncoding)
+			}
 		}
 
 		var record *fastx.Record
@@ -107,13 +110,17 @@ var convertCmd = &cobra.Command{
 								encodingsGuessed = []seq.QualityEncoding{seq.Illumina1p5}
 							}
 
-							log.Infof("possible quality encodings: %v", encodingsGuessed)
+							if !quiet {
+								log.Infof("possible quality encodings: %v", encodingsGuessed)
+							}
 							switch len(encodingsGuessed) {
 							case 0:
 								checkError(fmt.Errorf("quality encoding not consistent"))
 							case 1:
 								fromEncoding = encodingsGuessed[0]
-								log.Infof("guessed quality encoding: %s", fromEncoding)
+								if !quiet {
+									log.Infof("guessed quality encoding: %s", fromEncoding)
+								}
 							default:
 								same := true
 								isSolexa := encodingsGuessed[0].IsSolexa()
@@ -132,13 +139,17 @@ var convertCmd = &cobra.Command{
 									if fromEncoding == seq.Illumina1p8 {
 										fromEncoding = seq.Sanger
 									}
-									log.Infof("guessed quality encoding: %s", fromEncoding)
+									if !quiet {
+										log.Infof("guessed quality encoding: %s", fromEncoding)
+									}
 								} else {
 									checkError(fmt.Errorf("fail to guess the source quality encoding, please specify it"))
 								}
 							}
 
-							log.Infof("converting %s -> %s", fromEncoding, toEncoding)
+							if !quiet {
+								log.Infof("converting %s -> %s", fromEncoding, toEncoding)
+							}
 
 							if once && encodingsMatch(fromEncoding, toEncoding, force) {
 								once = false
@@ -193,13 +204,17 @@ var convertCmd = &cobra.Command{
 							encodingsGuessed = []seq.QualityEncoding{seq.Illumina1p5}
 						}
 
-						log.Infof("possible quality encodings: %v", encodingsGuessed)
+						if !quiet {
+							log.Infof("possible quality encodings: %v", encodingsGuessed)
+						}
 						switch len(encodingsGuessed) {
 						case 0:
 							checkError(fmt.Errorf("quality encoding not consistent"))
 						case 1:
 							fromEncoding = encodingsGuessed[0]
-							log.Infof("guessed quality encoding: %s", fromEncoding)
+							if !quiet {
+								log.Infof("guessed quality encoding: %s", fromEncoding)
+							}
 						default:
 							same := true
 							isSolexa := encodingsGuessed[0].IsSolexa()
@@ -219,13 +234,17 @@ var convertCmd = &cobra.Command{
 								if fromEncoding == seq.Illumina1p8 {
 									fromEncoding = seq.Sanger
 								}
-								log.Infof("guessed quality encoding: %s", fromEncoding)
+								if !quiet {
+									log.Infof("guessed quality encoding: %s", fromEncoding)
+								}
 							} else {
 								checkError(fmt.Errorf("fail to guess the source quality encoding, please specify it"))
 							}
 						}
 
-						log.Infof("converting %s -> %s", fromEncoding, toEncoding)
+						if !quiet {
+							log.Infof("converting %s -> %s", fromEncoding, toEncoding)
+						}
 
 						if once && encodingsMatch(fromEncoding, toEncoding, force) {
 							once = false

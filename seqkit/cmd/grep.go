@@ -241,6 +241,8 @@ Examples:
 		var fastxReader *fastx.Reader
 		var k string
 		var locs []int
+		var re *regexp.Regexp
+		var p string
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -274,11 +276,11 @@ Examples:
 				hit = false
 
 				if degenerate || useRegexp {
-					for pattern, re := range patterns {
+					for p, re = range patterns {
 						if re.Match(target) {
 							hit = true
 							if deleteMatched {
-								delete(patterns, pattern)
+								delete(patterns, p)
 							}
 							break
 						}

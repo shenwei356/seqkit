@@ -221,7 +221,9 @@ according to the input files.
 					if size > 0 {
 						if j == size {
 							outfhs[i].Close()
-							log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
+							if !quiet {
+								log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
+							}
 							delete(outfhs, i)
 
 							i++
@@ -273,7 +275,9 @@ according to the input files.
 						outfhs[i].Close()
 					}
 
-					log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
+					if !quiet {
+						log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
+					}
 				}
 
 			}(file)

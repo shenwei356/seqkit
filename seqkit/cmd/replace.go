@@ -68,6 +68,7 @@ Special replacement symbols (only for replacing name not sequence):
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
+		quiet := config.Quiet
 		runtime.GOMAXPROCS(config.Threads)
 
 		pattern := getFlagString(cmd, "pattern")
@@ -118,7 +119,9 @@ Special replacement symbols (only for replacing name not sequence):
 			if kvFile == "" {
 				checkError(fmt.Errorf(`since replacement symbol "{kv}"/"{KV}" found in value of flag -r (--replacement), tab-delimited key-value file should be given by flag -k (--kv-file)`))
 			}
-			log.Infof("read key-value file: %s", kvFile)
+			if !quiet {
+				log.Infof("read key-value file: %s", kvFile)
+			}
 			kvs, err = readKVs(kvFile, ignoreCase)
 			if err != nil {
 				checkError(fmt.Errorf("read key-value file: %s", err))
@@ -126,8 +129,9 @@ Special replacement symbols (only for replacing name not sequence):
 			if len(kvs) == 0 {
 				checkError(fmt.Errorf("no valid data in key-value file: %s", kvFile))
 			}
-
-			log.Infof("%d pairs of key-value loaded", len(kvs))
+			if !quiet {
+				log.Infof("%d pairs of key-value loaded", len(kvs))
+			}
 		}
 
 		files := getFileList(args)

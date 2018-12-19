@@ -49,6 +49,7 @@ var seqCmd = &cobra.Command{
 		idRegexp := config.IDRegexp
 		lineWidth := config.LineWidth
 		outFile := config.OutFile
+		quiet := config.Quiet
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		runtime.GOMAXPROCS(config.Threads)
 
@@ -83,7 +84,9 @@ var seqCmd = &cobra.Command{
 		}
 		if minLen >= 0 || maxLen >= 0 {
 			removeGaps = true
-			log.Infof("flag -g (--remove-gaps) is switched on when using -m (--min-len) or -M (--max-len)")
+			if !quiet {
+				log.Infof("flag -g (--remove-gaps) is switched on when using -m (--min-len) or -M (--max-len)")
+			}
 		}
 
 		seq.ValidateSeq = validateSeq
@@ -93,7 +96,9 @@ var seqCmd = &cobra.Command{
 		seq.ComplementThreads = config.Threads
 
 		if !(alphabet == nil || alphabet == seq.Unlimit) {
-			log.Info("when flag -t (--seq-type) given, flag -v (--validate-seq) is automatically switched on")
+			if !quiet {
+				log.Info("when flag -t (--seq-type) given, flag -v (--validate-seq) is automatically switched on")
+			}
 			seq.ValidateSeq = true
 		}
 

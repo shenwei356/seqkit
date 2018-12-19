@@ -51,6 +51,7 @@ This command is similar with "samtools faidx" but has some extra features:
 		config := getConfigs(cmd)
 		runtime.GOMAXPROCS(config.Threads)
 		fai.MapWholeFile = false
+		quiet := config.Quiet
 
 		fullHead := getFlagBool(cmd, "full-head")
 		ignoreCase := getFlagBool(cmd, "ignore-case")
@@ -84,7 +85,9 @@ This command is similar with "samtools faidx" but has some extra features:
 			idRegexp = fastx.DefaultIDRegexp
 		}
 		if fileNotExists(fileFai) {
-			log.Infof("create FASTA index for %s", file)
+			if !quiet {
+				log.Infof("create FASTA index for %s", file)
+			}
 			idx, err = fai.CreateWithIDRegexp(file, fileFai, idRegexp)
 			checkError(err)
 		} else {

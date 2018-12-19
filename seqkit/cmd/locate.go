@@ -59,6 +59,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		seq.ValidSeqLengthThreshold = getFlagValidateSeqLength(cmd, "validate-seq-length")
 		seq.ValidSeqThreads = config.Threads
 		seq.ComplementThreads = config.Threads
+		quiet := config.Quiet
 		runtime.GOMAXPROCS(config.Threads)
 
 		pattern := getFlagStringSlice(cmd, "pattern")
@@ -80,7 +81,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 			if degenerate {
 				checkError(fmt.Errorf("flag -d (--degenerate) not allowed when giving flag -m (--max-mismatch)"))
 			}
-			if nonGreedy {
+			if nonGreedy && !quiet {
 				log.Infof("flag -G (--non-greedy) ignored when giving flag -m (--max-mismatch)")
 			}
 			sfmi = fmi.NewFMIndex()
