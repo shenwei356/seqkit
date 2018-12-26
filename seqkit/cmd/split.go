@@ -98,7 +98,9 @@ Examples:
 		var fileName, fileExt string
 		if isstdin {
 			fileName, fileExt = "stdin", ".fastx"
-			outdir = "stdin.split"
+			if outdir == "" {
+				outdir = "stdin.split"
+			}
 		} else {
 			fileName, fileExt = filepathTrimExtension(file)
 			if outdir == "" {

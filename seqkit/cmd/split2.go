@@ -94,7 +94,9 @@ according to the input files.
 			if read2 == "" {
 				// single end from file or stdin
 				if isStdin(files[0]) {
-					outdir = "stdin.split"
+					if outdir == "" {
+						outdir = "stdin.split"
+					}
 					source = "stdin"
 				} else {
 					source = files[0]
@@ -137,7 +139,9 @@ according to the input files.
 			var fileName, fileExt string
 			if isstdin {
 				fileName, fileExt = "stdin", ".fastx"
-				outdir = "stdin.split"
+				if outdir == "" {
+					outdir = "stdin.split"
+				}
 			} else {
 				fileName, fileExt = filepathTrimExtension(file)
 				if outdir == "" {
