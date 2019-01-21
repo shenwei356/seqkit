@@ -150,7 +150,7 @@ like sequence length, GC content/GC skew.
 				}
 
 				if printAvgQual {
-					outfh.WriteString(fmt.Sprintf("\t%d", avgQual(record.Seq, qBase)))
+					outfh.WriteString(fmt.Sprintf("\t%.2f", avgQual(record.Seq, qBase)))
 				}
 				outfh.WriteString("\n")
 			}
@@ -189,14 +189,14 @@ func alphabetStr(s []byte) string {
 	return strings.Join(alphabet, "")
 }
 
-func avgQual(s *seq.Seq, base int) int {
+func avgQual(s *seq.Seq, base int) float64 {
 	if len(s.Qual) == 0 {
 		return 0
 	}
 	s.ParseQual(base)
 	var sum float64
 	for _, q := range s.QualValue {
-		sum += math.Pow(10, float64(q/-10))
+		sum += math.Pow(10, float64(q)/-10)
 	}
-	return int(-10 * math.Log10(sum/float64(len(s.QualValue))))
+	return -10 * math.Log10(sum/float64(len(s.QualValue)))
 }
