@@ -99,3 +99,5 @@ Plot for result of the five tests:
 Plot for result of the tests of other functions in seqkit:
 
     ./plot.R -i benchmark.seqkit.tsv --width 5 --height 3
+
+./plot.R -i benchmark.5tests.tsv --width 8 --height 3 --lx 0.75 --ly 0.3

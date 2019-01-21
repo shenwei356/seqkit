@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"math"
 	"runtime"
 	"sort"
 	"strings"
@@ -60,6 +61,8 @@ like sequence length, GC content/GC skew.
 		onlyName := getFlagBool(cmd, "name")
 		printTitle := getFlagBool(cmd, "header-line")
 		printAlphabet := getFlagBool(cmd, "alphabet")
+		printAvgQual := getFlagBool(cmd, "avg-qual")
+		qBase := getFlagPositiveInt(cmd, "qual-ascii-base")
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
@@ -145,6 +148,10 @@ like sequence length, GC content/GC skew.
 				if printAlphabet {
 					outfh.WriteString(fmt.Sprintf("\t%s", alphabetStr(record.Seq.Seq)))
 				}
+
+				if printAvgQual {
+					outfh.WriteString(fmt.Sprintf("\t%d", avgQual(record.Seq, qBase)))
+				}
 				outfh.WriteString("\n")
 			}
 		}
@@ -162,6 +169,9 @@ func init() {
 	fx2tabCmd.Flags().BoolP("name", "n", false, "only print names (no sequences and qualities)")
 	fx2tabCmd.Flags().BoolP("header-line", "H", false, "print header line")
 	fx2tabCmd.Flags().BoolP("alphabet", "a", false, "print alphabet letters")
+	fx2tabCmd.Flags().BoolP("avg-qual", "q", false, "print average quality of a read")
+	fx2tabCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
+
 }
 
 func alphabetStr(s []byte) string {
@@ -177,4 +187,16 @@ func alphabetStr(s []byte) string {
 	}
 	sort.Strings(alphabet)
 	return strings.Join(alphabet, "")
+}
+
+func avgQual(s *seq.Seq, base int) int {
+	if len(s.Qual) == 0 {
+		return 0
+	}
+	s.ParseQual(base)
+	var sum float64
+	for _, q := range s.QualValue {
+		sum += math.Pow(10, float64(q/-10))
+	}
+	return int(-10 * math.Log10(sum/float64(len(s.QualValue))))
 }
