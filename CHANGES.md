@@ -1,8 +1,11 @@
 
 - [SeqKit v0.10.1](https://github.com/shenwei356/seqkit/releases/tag/v0.10.1)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.10.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.10.1)
-    - `seqkit fx2tab`: new option `-q/--avg-qual` for outputting average read quality.
+    - `seqkit fx2tab`: new option `-q/--avg-qual` for outputting average read quality. [#60](https://github.com/shenwei356/seqkit/issues/60)
     - `seqkit grep/locate`: fix support of `X` when using `-d/--degenerate`. [#61](https://github.com/shenwei356/seqkit/issues/61)
+    - `seqkit translate`:
+        - mark amino acid of start codon as `M` when it acts as start codon. [#62](https://github.com/shenwei356/seqkit/issues/62)
+        - translate `---` to `-` for aligned DNA/RNA, `-X` needed. [#63](https://github.com/shenwei356/seqkit/issues/63)
 - [SeqKit v0.10.0](https://github.com/shenwei356/seqkit/releases/tag/v0.10.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.10.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.10.0)
     - `seqkit`: report error when input is directory.
