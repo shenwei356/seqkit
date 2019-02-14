@@ -164,7 +164,7 @@ reproduced in different environments with same random seed.
 ```
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.10.0
+Version: 0.10.1
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -1034,12 +1034,13 @@ Usage:
   seqkit translate [flags]
 
 Flags:
-      -x, --allow-unknown-codon   translate unknown code to 'X'. And you may not use flag --trim which removes 'X'
-      --clean              changes all STOP codon positions from the '*' character to 'X' (an unknown residue)
-      --frame int          frame to translate, available value: 1, 2, 3, -1, -2, -3 (default 1)
-  -h, --help               help for translate
-  -T, --transl-table int   translate table/genetic code, type 'seqkit translate --help' for more details (default 1)
-      --trim               removes all 'X' and '*' characters from the right end of the translation
+  -x, --allow-unknown-codon   translate unknown code to 'X'. And you may not use flag --trim which removes 'X'
+      --clean                 change all STOP codon positions from the '*' character to 'X' (an unknown residue)
+  -f, --frame int             frame to translate, available value: 1, 2, 3, -1, -2, -3 (default 1)
+  -h, --help                  help for translate
+  -M, --init-codon-as-M       translate initial codon at beginning to 'M'
+  -T, --transl-table int      translate table/genetic code, type 'seqkit translate --help' for more details (default 1)
+      --trim                  remove all 'X' and '*' characters from the right end of the translation
 
 ```
 
