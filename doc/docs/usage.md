@@ -1001,6 +1001,19 @@ Usage
 ```
 translate DNA/RNA to protein sequence
 
+Note:
+
+  1. this command supports codons containing ambiguous base 'N'. e.g., for standard table:
+
+        ACN -> T
+        CCN -> P
+        CGN -> R
+        CTN -> L
+        GCN -> A
+        GGN -> G
+        GTN -> V
+        TCN -> S
+
 Translate Tables/Genetic Codes:
 
     # https://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/index.cgi?chapter=tgencodes
