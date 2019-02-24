@@ -133,7 +133,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - `tab2fx`     convert tabular format to FASTA/Q format
 - `fq2fa`      convert FASTQ to FASTA
 - `convert`    convert FASTQ quality encoding between Sanger, Solexa and Illumina
-- `translate`  translate DNA/RNA to protein sequence
+- `translate`  translate DNA/RNA to protein sequence (supporting ambiguous bases)
 
 **Searching**
 

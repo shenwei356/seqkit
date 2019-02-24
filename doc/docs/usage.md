@@ -204,7 +204,7 @@ Available Commands:
   stats           simple statistics of FASTA/Q files
   subseq          get subsequences by region/gtf/bed, including flanking sequences
   tab2fx          convert tabular format to FASTA/Q format
-  translate       translate DNA/RNA to protein sequence
+  translate       translate DNA/RNA to protein sequence (supporting ambiguous bases)
   version         print version information and check for update
 
 Flags:
@@ -999,11 +999,12 @@ FGDGGGGGDGFFGGGDGGGGGGEEGAGFFE>A>@!B@?@@<:!!!!!!!!!!355=>><>EEEEAEEE?EEEBEE?!!!!
 Usage
 
 ```
-translate DNA/RNA to protein sequence
+translate DNA/RNA to protein sequence (supporting ambiguous bases)
 
 Note:
 
-  1. this command supports codons containing ambiguous base 'N'. e.g., for standard table:
+  1. this command supports codons containing any ambiguous base.
+     Plese switch on flag -L for details. e.g., for standard table:
 
         ACN -> T
         CCN -> P
@@ -1013,6 +1014,9 @@ Note:
         GGN -> G
         GTN -> V
         TCN -> S
+        
+        MGR -> R
+        YTR -> L
 
 Translate Tables/Genetic Codes:
 
@@ -1047,13 +1051,15 @@ Usage:
   seqkit translate [flags]
 
 Flags:
-  -x, --allow-unknown-codon   translate unknown code to 'X'. And you may not use flag --trim which removes 'X'
-      --clean                 change all STOP codon positions from the '*' character to 'X' (an unknown residue)
-  -f, --frame int             frame to translate, available value: 1, 2, 3, -1, -2, -3 (default 1)
-  -h, --help                  help for translate
-  -M, --init-codon-as-M       translate initial codon at beginning to 'M'
-  -T, --transl-table int      translate table/genetic code, type 'seqkit translate --help' for more details (default 1)
-      --trim                  remove all 'X' and '*' characters from the right end of the translation
+  -x, --allow-unknown-codon                     translate unknown code to 'X'. And you may not use flag --trim which removes 'X'
+      --clean                                   change all STOP codon positions from the '*' character to 'X' (an unknown residue)
+  -f, --frame int                               frame to translate, available value: 1, 2, 3, -1, -2, -3 (default 1)
+  -h, --help                                    help for translate
+  -M, --init-codon-as-M                         translate initial codon at beginning to 'M'
+  -l, --list-transl-table int                   show details of translate table N, 0 for all (default -1)
+  -L, --list-transl-table-with-amb-codons int   show details of translate table N (including ambigugous codons), 0 for all.  (default -1)
+  -T, --transl-table int                        translate table/genetic code, type 'seqkit translate --help' for more details (default 1)
+      --trim                                    remove all 'X' and '*' characters from the right end of the translation
 
 ```
 
@@ -1104,6 +1110,77 @@ Examples
         >CAC80166.1 hypothetical protein [Lactococcus phage BK5-T]
         MEEQAWREVLERLARIETKLDNYETVRDKAERALLIAQSNAKLIEKMEANNKWAWGFMLT
         LAVTVIGYLFTKIRF*
+
+1. show details of translate table 1
+
+        $ seqkit translate -l 1
+        The Standard Code (transl_table=1)
+        Source: https://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/index.cgi?chapter=tgencodes#SG1
+
+        Initiation Codons:
+            ATG, CTG, TTG
+
+        Stop Codons:
+            TAA, TAG, TGA
+
+        Stranslate Table:
+            AAA: K, AAC: N, AAG: K, AAT: N
+            ACA: T, ACC: T, ACG: T, ACT: T
+            AGA: R, AGC: S, AGG: R, AGT: S
+            ATA: I, ATC: I, ATG: M, ATT: I
+
+            CAA: Q, CAC: H, CAG: Q, CAT: H
+            CCA: P, CCC: P, CCG: P, CCT: P
+            CGA: R, CGC: R, CGG: R, CGT: R
+            CTA: L, CTC: L, CTG: L, CTT: L
+
+            GAA: E, GAC: D, GAG: E, GAT: D
+            GCA: A, GCC: A, GCG: A, GCT: A
+            GGA: G, GGC: G, GGG: G, GGT: G
+            GTA: V, GTC: V, GTG: V, GTT: V
+
+            TAA: *, TAC: Y, TAG: *, TAT: Y
+            TCA: S, TCC: S, TCG: S, TCT: S
+            TGA: *, TGC: C, TGG: W, TGT: C
+            TTA: L, TTC: F, TTG: L, TTT: F
+
+1. show details of translate table 1, including ambigugous codons
+
+        $ seqkit translate -L 1
+        The Standard Code (transl_table=1)
+        Source: https://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/index.cgi?chapter=tgencodes#SG1
+
+        Initiation Codons:
+            ATG, CTG, TTG
+
+        Stop Codons:
+            TAA, TAG, TGA
+
+        Stranslate Table:
+            AAA: K, AAC: N, AAG: K, AAR: K, AAT: N, AAY: N
+            ACA: T, ACC: T, ACM: T, ACG: T, ACR: T, ACS: T, ACV: T, ACT: T, ACW: T, ACY: T, ACH: T, ACK: T, ACD: T, ACB: T, ACN: T
+            AGA: R, AGC: S, AGG: R, AGR: R, AGT: S, AGY: S
+            ATA: I, ATC: I, ATM: I, ATG: M, ATT: I, ATW: I, ATY: I, ATH: I
+
+            CAA: Q, CAC: H, CAG: Q, CAR: Q, CAT: H, CAY: H
+            CCA: P, CCC: P, CCM: P, CCG: P, CCR: P, CCS: P, CCV: P, CCT: P, CCW: P, CCY: P, CCH: P, CCK: P, CCD: P, CCB: P, CCN: P
+            CGA: R, CGC: R, CGM: R, CGG: R, CGR: R, CGS: R, CGV: R, CGT: R, CGW: R, CGY: R, CGH: R, CGK: R, CGD: R, CGB: R, CGN: R
+            CTA: L, CTC: L, CTM: L, CTG: L, CTR: L, CTS: L, CTV: L, CTT: L, CTW: L, CTY: L, CTH: L, CTK: L, CTD: L, CTB: L, CTN: L
+
+            MGA: R, MGG: R, MGR: R
+
+            GAA: E, GAC: D, GAG: E, GAR: E, GAT: D, GAY: D
+            GCA: A, GCC: A, GCM: A, GCG: A, GCR: A, GCS: A, GCV: A, GCT: A, GCW: A, GCY: A, GCH: A, GCK: A, GCD: A, GCB: A, GCN: A
+            GGA: G, GGC: G, GGM: G, GGG: G, GGR: G, GGS: G, GGV: G, GGT: G, GGW: G, GGY: G, GGH: G, GGK: G, GGD: G, GGB: G, GGN: G
+            GTA: V, GTC: V, GTM: V, GTG: V, GTR: V, GTS: V, GTV: V, GTT: V, GTW: V, GTY: V, GTH: V, GTK: V, GTD: V, GTB: V, GTN: V
+
+            TAA: *, TAC: Y, TAG: *, TAR: *, TAT: Y, TAY: Y
+            TCA: S, TCC: S, TCM: S, TCG: S, TCR: S, TCS: S, TCV: S, TCT: S, TCW: S, TCY: S, TCH: S, TCK: S, TCD: S, TCB: S, TCN: S
+            TGA: *, TGC: C, TGG: W, TGT: C, TGY: C
+            TRA: *
+            TTA: L, TTC: F, TTG: L, TTR: L, TTT: F, TTY: F
+
+            YTA: L, YTG: L, YTR: L
 
 ## grep
 
