@@ -25,6 +25,7 @@ import (
 	"io"
 	"os"
 	"runtime"
+	"sort"
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
@@ -40,7 +41,8 @@ var translateCmd = &cobra.Command{
 
 Note:
 
-  1. this command supports codons containing ambiguous base 'N'. e.g., for standard table:
+  1. this command supports codons containing any ambiguous base.
+     Plese switch on flag -L for details. e.g., for standard table:
 
         ACN -> T
         CCN -> P
@@ -50,6 +52,9 @@ Note:
         GGN -> G
         GTN -> V
         TCN -> S
+        
+        MGR -> R
+        YTR -> L
 
 Translate Tables/Genetic Codes:
 
@@ -102,12 +107,38 @@ Translate Tables/Genetic Codes:
 		clean := getFlagBool(cmd, "clean")
 		allowUnknownCodon := getFlagBool(cmd, "allow-unknown-codon")
 		markInitCodonAsM := getFlagBool(cmd, "init-codon-as-M")
-
-		files := getFileList(args)
+		listTable := getFlagInt(cmd, "list-transl-table")
+		listTableAmb := getFlagInt(cmd, "list-transl-table-with-amb-codons")
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Close()
+
+		if listTableAmb == 0 || listTable == 0 {
+			ks := make([]int, len(seq.CodonTables))
+			i := 0
+			for k := range seq.CodonTables {
+				ks[i] = k
+				i++
+			}
+			sort.Ints(ks)
+			for _, i = range ks {
+				outfh.WriteString(fmt.Sprintf("%d\t%s\n", seq.CodonTables[i].ID, seq.CodonTables[i].Name))
+			}
+			return
+		} else if listTableAmb > 0 {
+			if table, ok := seq.CodonTables[listTableAmb]; ok {
+				outfh.WriteString(table.StringWithAmbiguousCodons())
+			}
+			return
+		} else if listTable > 0 {
+			if table, ok := seq.CodonTables[listTable]; ok {
+				outfh.WriteString(table.String())
+			}
+			return
+		}
+
+		files := getFileList(args)
 
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
@@ -160,4 +191,6 @@ func init() {
 	translateCmd.Flags().BoolP("clean", "", false, "change all STOP codon positions from the '*' character to 'X' (an unknown residue)")
 	translateCmd.Flags().BoolP("allow-unknown-codon", "x", false, "translate unknown code to 'X'. And you may not use flag --trim which removes 'X'")
 	translateCmd.Flags().BoolP("init-codon-as-M", "M", false, "translate initial codon at beginning to 'M'")
+	translateCmd.Flags().IntP("list-transl-table", "l", -1, "show details of translate table N, 0 for all")
+	translateCmd.Flags().IntP("list-transl-table-with-amb-codons", "L", -1, "show details of translate table N (including ambigugous codons), 0 for all. ")
 }
