@@ -6,9 +6,10 @@
     - `seqkit translate`:
         - new flag `-M/--init-codon-as-M` to translate initial codon at beginning to 'M'. [#62](https://github.com/shenwei356/seqkit/issues/62)
         - translates `---` to `-` for aligned DNA/RNA, `-X` needed. [#63](https://github.com/shenwei356/seqkit/issues/63)
-        - supports codons containing ambiguous base', e.g., `GGN->G`, `ATH->I`. [#64](https://github.com/shenwei356/seqkit/issues/64)
+        - supports codons containing ambiguous bases, e.g., `GGN->G`, `ATH->I`. [#64](https://github.com/shenwei356/seqkit/issues/64)
         - new flag `-l/--list-transl-table` to show details of translate table N
         - new flag `-l/--list-transl-table-with-amb-codons` to show details of translate table N (including ambigugous codons)
+    - `seqkit split/split2`, fix bug of ignoring `-O` when reading from stdin.
 - [SeqKit v0.10.0](https://github.com/shenwei356/seqkit/releases/tag/v0.10.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.10.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.10.0)
     - `seqkit`: report error when input is directory.
