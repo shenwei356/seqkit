@@ -5,7 +5,7 @@
     - `seqkit grep/locate`: fix support of `X` when using `-d/--degenerate`. [#61](https://github.com/shenwei356/seqkit/issues/61)
     - `seqkit translate`:
         - new flag `-M/--init-codon-as-M` to translate initial codon at beginning to 'M'. [#62](https://github.com/shenwei356/seqkit/issues/62)
-        - translates `---` to `-` for aligned DNA/RNA, `-X` needed. [#63](https://github.com/shenwei356/seqkit/issues/63)
+        - translates `---` to `-` for aligned DNA/RNA, flag `-X` needed. [#63](https://github.com/shenwei356/seqkit/issues/63)
         - supports codons containing ambiguous bases, e.g., `GGN->G`, `ATH->I`. [#64](https://github.com/shenwei356/seqkit/issues/64)
         - new flag `-l/--list-transl-table` to show details of translate table N
         - new flag `-l/--list-transl-table-with-amb-codons` to show details of translate table N (including ambigugous codons)
