@@ -346,7 +346,7 @@ func init() {
 	grepCmd.Flags().StringSliceP("pattern", "p", []string{""}, `search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"'))`)
 	grepCmd.Flags().StringP("pattern-file", "f", "", "pattern file (one record per line)")
 	grepCmd.Flags().BoolP("use-regexp", "r", false, "patterns are regular expression")
-	grepCmd.Flags().BoolP("delete-matched", "", false, "delete matched pattern to speedup")
+	grepCmd.Flags().BoolP("delete-matched", "", false, "delete matched patterns, brings speed improvement when using regular expressions")
 	grepCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")
 	grepCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
 	grepCmd.Flags().BoolP("by-seq", "s", false, "search subseq on seq, mismach allowed using flag -m/--max-mismatch")
