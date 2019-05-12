@@ -1223,7 +1223,7 @@ Flags:
   -n, --by-name               match by full name instead of just id
   -s, --by-seq                match by seq
   -d, --degenerate            pattern/motif contains degenerate base
-      --delete-matched        delete matched patterns, brings speed improvement when using regular expressions
+      --delete-matched        delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions
   -i, --ignore-case           ignore case
   -v, --invert-match          invert the sense of matching, to select non-matching records
   -m, --max-mismatch int      max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)

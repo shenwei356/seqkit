@@ -279,7 +279,7 @@ Examples:
 					for p, re = range patterns {
 						if re.Match(target) {
 							hit = true
-							if deleteMatched {
+							if deleteMatched && !invertMatch {
 								delete(patterns, p)
 							}
 							break
@@ -293,6 +293,9 @@ Examples:
 						for k = range patterns {
 							if bytes.Contains(target, []byte(k)) {
 								hit = true
+								if deleteMatched && !invertMatch {
+									delete(patterns, k)
+								}
 								break
 							}
 						}
@@ -308,6 +311,9 @@ Examples:
 							}
 							if len(locs) > 0 {
 								hit = true
+								if deleteMatched && !invertMatch {
+									delete(patterns, k)
+								}
 								break
 							}
 						}
@@ -319,6 +325,9 @@ Examples:
 					}
 					if _, ok = patterns[k]; ok {
 						hit = true
+						if deleteMatched && !invertMatch {
+							delete(patterns, k)
+						}
 					}
 				}
 
@@ -346,7 +355,7 @@ func init() {
 	grepCmd.Flags().StringSliceP("pattern", "p", []string{""}, `search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"'))`)
 	grepCmd.Flags().StringP("pattern-file", "f", "", "pattern file (one record per line)")
 	grepCmd.Flags().BoolP("use-regexp", "r", false, "patterns are regular expression")
-	grepCmd.Flags().BoolP("delete-matched", "", false, "delete matched patterns, brings speed improvement when using regular expressions")
+	grepCmd.Flags().BoolP("delete-matched", "", false, "delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions")
 	grepCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")
 	grepCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
 	grepCmd.Flags().BoolP("by-seq", "s", false, "search subseq on seq, mismach allowed using flag -m/--max-mismatch")
