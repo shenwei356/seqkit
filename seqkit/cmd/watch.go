@@ -147,7 +147,7 @@ var watchCmd = &cobra.Command{
 			return hc
 		}
 
-		bamReader := NewBamReader(files[0], config.Threads)
+		var bamReader *bam.Reader
 
 		refMap := make(map[string]float64)
 		for _, ref := range bamReader.Header().Refs() {
@@ -389,17 +389,6 @@ var watchCmd = &cobra.Command{
 		outfh.Flush()
 
 	},
-}
-
-// Create new BAM reader from file.
-func NewBamReader(bamFile string, nrProc int) *bam.Reader {
-	fh, err := os.Open(bamFile)
-	checkError(err)
-
-	reader, err := bam.NewReader(bufio.NewReader(fh), nrProc)
-	checkError(err)
-
-	return reader
 }
 
 func init() {

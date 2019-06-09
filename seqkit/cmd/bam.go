@@ -27,6 +27,7 @@ import (
 	"math"
 	"os"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -36,6 +37,181 @@ import (
 	"github.com/bsipos/thist"
 	"github.com/spf13/cobra"
 )
+
+type RefCounts struct {
+	Ref      *sam.Reference
+	Count    float64
+	SecCount float64
+	SupCount float64
+}
+
+type ReadCounts []*RefCounts
+
+func NewReadCounts(refs []*sam.Reference) ReadCounts {
+	res := make(ReadCounts, len(refs))
+	for i, _ := range res {
+		res[i] = &RefCounts{Ref: refs[i]}
+	}
+	return res
+}
+
+type byCountRev ReadCounts
+
+func (s byCountRev) Len() int {
+	return len(s)
+}
+func (s byCountRev) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s byCountRev) Less(i, j int) bool {
+	return s[i].Count > s[j].Count
+}
+
+func (c ReadCounts) Sorted() ReadCounts {
+	sc := make(ReadCounts, len(c))
+	copy(sc, c)
+	sort.Stable(byCountRev(sc))
+	return sc
+}
+
+func reportCounts(readCounts ReadCounts, countFile string, field string, rangeMin float64, rangeMax float64, printLog bool, printBins int, binMode string, printDump bool, title string, printPdf string, count int) {
+
+	outw := os.Stdout
+	if countFile != "-" {
+		tw, err := os.Create(countFile)
+		checkError(err)
+		outw = tw
+	}
+	outfh := bufio.NewWriter(outw)
+
+	prec := 0
+	transform := func(x float64) float64 { return x }
+	if printLog {
+		prec = 6
+		transform = func(x float64) float64 {
+			return math.Log10(x + 1)
+		}
+	}
+	digits := strconv.Itoa(prec)
+
+	sortedCounts := readCounts.Sorted()
+
+	totalCounts := make([]float64, 0, len(sortedCounts))
+	outfh.WriteString("Ref\tCount\tSecCount\tSupCount\n")
+	for _, cr := range sortedCounts {
+		p := transform(cr.Count)
+		if !math.IsNaN(rangeMax) && p >= rangeMax {
+			continue
+		}
+		if !math.IsNaN(rangeMin) && p < rangeMin {
+			break
+		}
+		totalCounts = append(totalCounts, p)
+		outfh.WriteString(fmt.Sprintf("%s\t%."+digits+"f\t%."+digits+"f\t%."+digits+"f\n", cr.Ref.Name(), cr.Count, cr.SecCount, cr.SupCount))
+
+	}
+
+	outfh.Flush()
+	if countFile != "-" {
+		outw.Close()
+	}
+
+	h := thist.NewHist(totalCounts, fmt.Sprintf("%s - records: %d", title, count), binMode, printBins, true)
+	if printDump {
+		os.Stderr.Write([]byte(h.Dump()))
+	} else {
+		os.Stderr.Write([]byte(thist.ClearScreenString()))
+		os.Stderr.Write([]byte(h.Draw()))
+		if printPdf != "" {
+			h.SaveImage(printPdf)
+		}
+
+	}
+}
+
+func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, field string, rangeMin, rangeMax float64, printPass bool, printPrim bool, printLog bool, printBins int, binMode string, mapQual int, printFreq int, printDump bool, printDelay int, printPdf string, execBefore, execAfter string) {
+	readCounts := NewReadCounts(bamReader.Header().Refs())
+	_ = readCounts
+	validFields := []string{"Count", "SecCount", "SupCount"}
+	fields := strings.Split(field, ",")
+	_ = fields
+	if field == "" {
+		fields = validFields
+	}
+
+	title := "Read count distribution"
+
+	var count int
+	var unmapped int
+
+	for {
+		record, err := bamReader.Read()
+
+		if err == io.EOF {
+			break
+		}
+		checkError(err)
+
+		if record.Flags&sam.Unmapped == 0 {
+			if printPrim && record.Flags&sam.Supplementary == 1 {
+				continue
+			}
+			if printPrim && record.Flags&sam.Secondary == 1 {
+				continue
+			}
+
+			if int(record.MapQ) < mapQual {
+				continue
+			}
+
+			count++
+
+			readCounts[record.RefID()].Count++
+			if record.Flags&sam.Supplementary == 1 {
+				readCounts[record.RefID()].SupCount++
+			}
+			if record.Flags&sam.Secondary == 1 {
+				readCounts[record.RefID()].SecCount++
+			}
+
+			if printPass {
+				bamWriter.Write(record)
+			}
+
+			if printFreq > 0 && count%printFreq == 0 {
+				if execBefore != "" {
+					BashExec(execBefore)
+				}
+				reportCounts(readCounts, countFile, field, rangeMin, rangeMax, printLog, printBins, binMode, printDump, title, printPdf, count)
+				time.Sleep(time.Duration(printDelay) * time.Second)
+				if execAfter != "" {
+					BashExec(execAfter)
+				}
+
+			}
+		} else {
+			unmapped++
+			if printPass {
+				bamWriter.Write(record)
+			}
+		}
+	} // records
+
+	if printFreq < 0 || count%printFreq != 0 {
+		if execBefore != "" {
+			BashExec(execBefore)
+		}
+		reportCounts(readCounts, countFile, field, rangeMin, rangeMax, printLog, printBins, binMode, printDump, title, printPdf, count)
+		time.Sleep(time.Duration(printDelay) * time.Second)
+		if execAfter != "" {
+			BashExec(execAfter)
+		}
+	}
+	if printPass {
+		bamWriter.Close()
+	}
+
+}
 
 // bamCmd represents the hist command
 var bamCmd = &cobra.Command{
@@ -56,8 +232,8 @@ var bamCmd = &cobra.Command{
 		printFreq := getFlagInt(cmd, "print-freq")
 		rangeMin := getFlagFloat64(cmd, "range-min")
 		rangeMax := getFlagFloat64(cmd, "range-max")
-		printCount := getFlagBool(cmd, "count")
-		_ = printCount
+		printCount := getFlagString(cmd, "count")
+		printPdf := getFlagString(cmd, "img")
 		printScatter := getFlagString(cmd, "scatter")
 		_ = printScatter
 		printDump := getFlagBool(cmd, "dump")
@@ -76,6 +252,18 @@ var bamCmd = &cobra.Command{
 		printBins := getFlagInt(cmd, "bins")
 		printPass := getFlagBool(cmd, "pass")
 		printPrim := getFlagBool(cmd, "prim-only")
+		execBefore := getFlagString(cmd, "exec-before")
+		execAfter := getFlagString(cmd, "exec-after")
+
+		binMode := "termfit"
+		if printBins > 0 {
+			binMode = "fixed"
+		}
+
+		if printPass && printCount == "-" {
+			fmt.Fprintf(os.Stderr, "Cannot enable pass-through mode when count output is stdout!\n")
+			os.Exit(1)
+		}
 
 		outw := os.Stdout
 		if outFile != "-" {
@@ -90,12 +278,16 @@ var bamCmd = &cobra.Command{
 		transform := func(x float64) float64 { return x }
 		if printLog {
 			transform = func(x float64) float64 {
-				return math.Log10(x + math.Pow(10, -8))
+				return math.Log10(x + 1)
 			}
 		}
 
 		validFields := []string{"Read", "Ref", "MapQual", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "LeftClip", "RightClip"}
-		_ = validFields
+
+		fields := strings.Split(field, ",")
+		if field == "" {
+			fields = validFields
+		}
 
 		type fieldInfo struct {
 			Title    string
@@ -148,18 +340,22 @@ var bamCmd = &cobra.Command{
 		}
 
 		bamReader := NewBamReader(files[0], config.Threads)
-
-		refMap := make(map[string]float64)
-		for _, ref := range bamReader.Header().Refs() {
-			refMap[ref.Name()] = float64(ref.Len())
-		}
+		bamHeader := bamReader.Header()
 
 		var bamWriter *bam.Writer
+
 		if printPass {
-			bw, err := bam.NewWriter(outfh, bamReader.Header(), 1)
+			bw, err := bam.NewWriter(outfh, bamHeader, 1)
 			checkError(err)
 			bamWriter = bw
 			outfh.Flush()
+		}
+
+		if printCount != "" {
+			CountReads(bamReader, bamWriter, printCount, field, rangeMin, rangeMax, printPass, printPrim, printLog, printBins, binMode, mapQual, printFreq, printDump, printDelay, printPdf, execBefore, execAfter)
+			outfh.Flush()
+			outw.Close()
+			return
 		}
 
 		getRead := func(r *sam.Record) string {
@@ -188,7 +384,7 @@ var bamCmd = &cobra.Command{
 		fmap["RefLen"] = fieldInfo{
 			"Aligned read length",
 			func(r *sam.Record) float64 {
-				return refMap[r.Ref.Name()]
+				return float64(r.Ref.Len())
 			},
 		}
 
@@ -269,12 +465,10 @@ var bamCmd = &cobra.Command{
 
 		}
 
-		fields := strings.Split(field, ",")
-		if field == "" {
-			fields = validFields
-		}
-
 		if len(fields) > 1 || field == "Read" || field == "Ref" {
+			if execBefore != "" {
+				BashExec(execBefore)
+			}
 			os.Stderr.Write([]byte(strings.Join(fields, "\t") + "\n"))
 			for {
 				record, err := bamReader.Read()
@@ -306,14 +500,16 @@ var bamCmd = &cobra.Command{
 					bamWriter.Write(record)
 				}
 			}
-			bamWriter.Close()
+			if printPass {
+				bamWriter.Close()
+			}
+			if execAfter != "" {
+				BashExec(execAfter)
+			}
+
 			return
 		}
 
-		binMode := "termfit"
-		if printBins > 0 {
-			binMode = "fixed"
-		}
 		h := thist.NewHist([]float64{}, fmap[field].Title, binMode, printBins, true)
 
 		var count int
@@ -361,6 +557,9 @@ var bamCmd = &cobra.Command{
 				}
 
 				if printFreq > 0 && count%printFreq == 0 {
+					if execBefore != "" {
+						BashExec(execBefore)
+					}
 					if printDump {
 						os.Stderr.Write([]byte(h.Dump()))
 					} else {
@@ -368,24 +567,38 @@ var bamCmd = &cobra.Command{
 						os.Stderr.Write([]byte(h.Draw()))
 					}
 					time.Sleep(time.Duration(printDelay) * time.Second)
+					if execAfter != "" {
+						BashExec(execAfter)
+					}
 					if printReset {
 						h = thist.NewHist([]float64{}, fmap[field].Title, binMode, printBins, true)
 					}
 				}
 			} else {
 				unmapped++
+				if printPass {
+					bamWriter.Write(record)
+				}
 			}
 		} // records
 
 		if printFreq < 0 || count%printFreq != 0 {
+			if execBefore != "" {
+				BashExec(execBefore)
+			}
 			if printDump {
 				os.Stderr.Write([]byte(h.Dump()))
 			} else {
 				os.Stderr.Write([]byte(thist.ClearScreenString()))
 				os.Stderr.Write([]byte(h.Draw()))
 			}
+			if execAfter != "" {
+				BashExec(execAfter)
+			}
 		}
-		bamWriter.Close()
+		if printPass {
+			bamWriter.Close()
+		}
 		outfh.Flush()
 
 	},
@@ -393,8 +606,11 @@ var bamCmd = &cobra.Command{
 
 // Create new BAM reader from file.
 func NewBamReader(bamFile string, nrProc int) *bam.Reader {
-	fh, err := os.Open(bamFile)
-	checkError(err)
+	fh, err := os.Stdin, error(nil)
+	if bamFile != "-" {
+		fh, err = os.Open(bamFile)
+		checkError(err)
+	}
 
 	reader, err := bam.NewReader(bufio.NewReader(fh), nrProc)
 	checkError(err)
@@ -408,18 +624,22 @@ func init() {
 	bamCmd.Flags().IntP("map-qual", "q", 0, "minimum mapping quality")
 	bamCmd.Flags().StringP("field", "f", "", "target field")
 	bamCmd.Flags().StringP("scatter", "S", "", "scatter plot of two fields")
+	bamCmd.Flags().StringP("img", "O", "", "scatter plot of two fields")
 	bamCmd.Flags().IntP("print-freq", "p", -1, "print frequency (-1 for print after parsing)")
-	bamCmd.Flags().IntP("delay", "W", 0, "sleep this many seconds after online plotting")
+	bamCmd.Flags().IntP("delay", "W", 1, "sleep this many seconds after online plotting")
 	bamCmd.Flags().IntP("bins", "B", -1, "number of histogram bins")
 	bamCmd.Flags().Float64P("range-min", "m", math.NaN(), "number of histogram bins")
 	bamCmd.Flags().Float64P("range-max", "M", math.NaN(), "number of histogram bins")
-	bamCmd.Flags().BoolP("dump", "D", false, "dump histogram instead of plotting")
+	bamCmd.Flags().BoolP("dump", "y", false, "dump histogram instead of plotting")
 	bamCmd.Flags().BoolP("stat", "s", false, "dump histogram instead of plotting")
 	bamCmd.Flags().BoolP("idx-stat", "i", false, "dump histogram instead of plotting")
 	bamCmd.Flags().BoolP("idx-count", "C", false, "dump histogram instead of plotting")
-	bamCmd.Flags().BoolP("count", "c", false, "dump histogram instead of plotting")
+	bamCmd.Flags().StringP("count", "c", "", "dump histogram instead of plotting")
 	bamCmd.Flags().BoolP("log", "L", false, "log10 transform numeric values")
 	bamCmd.Flags().BoolP("reset", "R", false, "reset histogram after every print")
-	bamCmd.Flags().BoolP("pass", "T", false, "passthrough mode (print filtered BAM to output)")
+	bamCmd.Flags().BoolP("pass", "x", false, "passthrough mode (print filtered BAM to output)")
 	bamCmd.Flags().BoolP("prim-only", "F", false, "passthrough mode (print filtered BAM to output)")
+	bamCmd.Flags().BoolP("quiet", "Q", false, "supress all output to stderr)")
+	bamCmd.Flags().StringP("exec-after", "e", "", "scatter plot of two fields")
+	bamCmd.Flags().StringP("exec-before", "E", "", "scatter plot of two fields")
 }
