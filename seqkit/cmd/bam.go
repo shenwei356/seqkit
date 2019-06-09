@@ -155,10 +155,10 @@ func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, 
 		checkError(err)
 
 		if record.Flags&sam.Unmapped == 0 {
-			if printPrim && record.Flags&sam.Supplementary == 1 {
+			if printPrim && (record.Flags&sam.Supplementary != 0) {
 				continue
 			}
-			if printPrim && record.Flags&sam.Secondary == 1 {
+			if printPrim && (record.Flags&sam.Secondary != 0) {
 				continue
 			}
 
@@ -169,10 +169,10 @@ func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, 
 			count++
 
 			readCounts[record.RefID()].Count++
-			if record.Flags&sam.Supplementary == 1 {
+			if record.Flags&sam.Supplementary != 0 {
 				readCounts[record.RefID()].SupCount++
 			}
-			if record.Flags&sam.Secondary == 1 {
+			if record.Flags&sam.Secondary != 0 {
 				readCounts[record.RefID()].SecCount++
 			}
 
@@ -214,6 +214,13 @@ func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, 
 	}
 
 }
+
+type topEntry struct {
+	Record *sam.Record
+	Value  float64
+}
+
+type TopBuffer []topEntry
 
 // bamCmd represents the hist command
 var bamCmd = &cobra.Command{
@@ -258,6 +265,8 @@ var bamCmd = &cobra.Command{
 		printQuiet := getFlagBool(cmd, "quiet-mode")
 		execBefore := getFlagString(cmd, "exec-before")
 		execAfter := getFlagString(cmd, "exec-after")
+		printTop := getFlagString(cmd, "top-bam")
+		topSize := getFlagInt(cmd, "top-size")
 
 		binMode := "termfit"
 		if printBins > 0 {
@@ -438,6 +447,14 @@ var bamCmd = &cobra.Command{
 		bamHeader := bamReader.Header()
 
 		var bamWriter *bam.Writer
+		var topBuffer TopBuffer
+
+		if printTop != "" {
+			topBuffer = make(TopBuffer, topSize)
+			for i := range topBuffer {
+				topBuffer[i].Value = math.NaN()
+			}
+		}
 
 		if printPass {
 			bw, err := bam.NewWriter(outfh, bamHeader, 1)
@@ -491,10 +508,10 @@ var bamCmd = &cobra.Command{
 
 				if record.Flags&sam.Unmapped == 0 {
 
-					if printPrim && record.Flags&sam.Supplementary == 1 {
+					if printPrim && (record.Flags&sam.Supplementary != 0) {
 						continue
 					}
-					if printPrim && record.Flags&sam.Secondary == 1 {
+					if printPrim && (record.Flags&sam.Secondary != 0) {
 						continue
 					}
 
@@ -540,10 +557,10 @@ var bamCmd = &cobra.Command{
 			checkError(err)
 
 			if record.Flags&sam.Unmapped == 0 {
-				if printPrim && record.Flags&sam.Supplementary == 1 {
+				if printPrim && (record.Flags&sam.Supplementary != 0) {
 					continue
 				}
-				if printPrim && record.Flags&sam.Secondary == 1 {
+				if printPrim && (record.Flags&sam.Secondary != 0) {
 					continue
 				}
 
@@ -562,6 +579,7 @@ var bamCmd = &cobra.Command{
 
 				count++
 				h.Update(p)
+				topBuffer = updateTop(record, p, topBuffer, printTop)
 
 				if printPass {
 					bamWriter.Write(record)
@@ -579,6 +597,7 @@ var bamCmd = &cobra.Command{
 							os.Stderr.Write([]byte(h.Draw()))
 						}
 					}
+					dumpTop(printTop, bamHeader, topBuffer)
 					time.Sleep(time.Duration(printDelay) * time.Second)
 					if execAfter != "" {
 						BashExec(execAfter)
@@ -607,6 +626,7 @@ var bamCmd = &cobra.Command{
 					os.Stderr.Write([]byte(h.Draw()))
 				}
 			}
+			dumpTop(printTop, bamHeader, topBuffer)
 			if execAfter != "" {
 				BashExec(execAfter)
 			}
@@ -631,6 +651,46 @@ func NewBamReader(bamFile string, nrProc int) *bam.Reader {
 	checkError(err)
 
 	return reader
+}
+
+func dumpTop(printTop string, bamHeader *sam.Header, topBuffer TopBuffer) {
+	if printTop == "" {
+		return
+	}
+	var topBam *bam.Writer
+	var topfh *os.File
+	var err error
+	topfh, err = os.Create(printTop)
+	checkError(err)
+	topbuff := bufio.NewWriter(topfh)
+	topBam, err = bam.NewWriter(topbuff, bamHeader, 1)
+	checkError(err)
+	for _, r := range topBuffer {
+		if r.Record != nil {
+			topBam.Write(r.Record)
+		}
+	}
+
+	topBam.Close()
+	topbuff.Flush()
+	topfh.Close()
+
+}
+
+type byTopValue TopBuffer
+
+func (a byTopValue) Len() int           { return len(a) }
+func (a byTopValue) Less(i, j int) bool { return a[i].Value < a[j].Value }
+func (a byTopValue) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+func updateTop(record *sam.Record, value float64, topBuffer TopBuffer, printTop string) TopBuffer {
+	if printTop == "" {
+		return nil
+	}
+	topBuffer = append(topBuffer, topEntry{record, value})
+	sort.Stable(byTopValue(topBuffer))
+	return topBuffer[1:]
+
 }
 
 func init() {
@@ -658,5 +718,6 @@ func init() {
 	bamCmd.Flags().BoolP("list-fields", "H", false, "supress all output to stderr)")
 	bamCmd.Flags().StringP("exec-after", "e", "", "scatter plot of two fields")
 	bamCmd.Flags().StringP("exec-before", "E", "", "scatter plot of two fields")
-	bamCmd.Flags().IntP("top-mode", "@", 0, "scatter plot of two fields")
+	bamCmd.Flags().StringP("top-bam", "@", "", "scatter plot of two fields")
+	bamCmd.Flags().IntP("top-size", "?", 100, "scatter plot of two fields")
 }
