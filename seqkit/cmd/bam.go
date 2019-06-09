@@ -74,7 +74,7 @@ func (c ReadCounts) Sorted() ReadCounts {
 	return sc
 }
 
-func reportCounts(readCounts ReadCounts, countFile string, field string, rangeMin float64, rangeMax float64, printLog bool, printBins int, binMode string, printDump bool, title string, printPdf string, count int) {
+func reportCounts(readCounts ReadCounts, countFile string, field string, rangeMin float64, rangeMax float64, printLog bool, printBins int, binMode string, printDump bool, title string, printPdf string, count int, printQuiet bool) {
 
 	outw := os.Stdout
 	if countFile != "-" {
@@ -120,8 +120,10 @@ func reportCounts(readCounts ReadCounts, countFile string, field string, rangeMi
 	if printDump {
 		os.Stderr.Write([]byte(h.Dump()))
 	} else {
-		os.Stderr.Write([]byte(thist.ClearScreenString()))
-		os.Stderr.Write([]byte(h.Draw()))
+		if !printQuiet {
+			os.Stderr.Write([]byte(thist.ClearScreenString()))
+			os.Stderr.Write([]byte(h.Draw()))
+		}
 		if printPdf != "" {
 			h.SaveImage(printPdf)
 		}
@@ -129,7 +131,7 @@ func reportCounts(readCounts ReadCounts, countFile string, field string, rangeMi
 	}
 }
 
-func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, field string, rangeMin, rangeMax float64, printPass bool, printPrim bool, printLog bool, printBins int, binMode string, mapQual int, printFreq int, printDump bool, printDelay int, printPdf string, execBefore, execAfter string) {
+func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, field string, rangeMin, rangeMax float64, printPass bool, printPrim bool, printLog bool, printBins int, binMode string, mapQual int, printFreq int, printDump bool, printDelay int, printPdf string, execBefore, execAfter string, printQuiet bool) {
 	readCounts := NewReadCounts(bamReader.Header().Refs())
 	_ = readCounts
 	validFields := []string{"Count", "SecCount", "SupCount"}
@@ -182,7 +184,7 @@ func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, 
 				if execBefore != "" {
 					BashExec(execBefore)
 				}
-				reportCounts(readCounts, countFile, field, rangeMin, rangeMax, printLog, printBins, binMode, printDump, title, printPdf, count)
+				reportCounts(readCounts, countFile, field, rangeMin, rangeMax, printLog, printBins, binMode, printDump, title, printPdf, count, printQuiet)
 				time.Sleep(time.Duration(printDelay) * time.Second)
 				if execAfter != "" {
 					BashExec(execAfter)
@@ -201,7 +203,7 @@ func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, 
 		if execBefore != "" {
 			BashExec(execBefore)
 		}
-		reportCounts(readCounts, countFile, field, rangeMin, rangeMax, printLog, printBins, binMode, printDump, title, printPdf, count)
+		reportCounts(readCounts, countFile, field, rangeMin, rangeMax, printLog, printBins, binMode, printDump, title, printPdf, count, printQuiet)
 		time.Sleep(time.Duration(printDelay) * time.Second)
 		if execAfter != "" {
 			BashExec(execAfter)
@@ -252,6 +254,8 @@ var bamCmd = &cobra.Command{
 		printBins := getFlagInt(cmd, "bins")
 		printPass := getFlagBool(cmd, "pass")
 		printPrim := getFlagBool(cmd, "prim-only")
+		printHelp := getFlagBool(cmd, "list-fields")
+		printQuiet := getFlagBool(cmd, "quiet-mode")
 		execBefore := getFlagString(cmd, "exec-before")
 		execAfter := getFlagString(cmd, "exec-after")
 
@@ -339,25 +343,6 @@ var bamCmd = &cobra.Command{
 			return hc
 		}
 
-		bamReader := NewBamReader(files[0], config.Threads)
-		bamHeader := bamReader.Header()
-
-		var bamWriter *bam.Writer
-
-		if printPass {
-			bw, err := bam.NewWriter(outfh, bamHeader, 1)
-			checkError(err)
-			bamWriter = bw
-			outfh.Flush()
-		}
-
-		if printCount != "" {
-			CountReads(bamReader, bamWriter, printCount, field, rangeMin, rangeMax, printPass, printPrim, printLog, printBins, binMode, mapQual, printFreq, printDump, printDelay, printPdf, execBefore, execAfter)
-			outfh.Flush()
-			outw.Close()
-			return
-		}
-
 		getRead := func(r *sam.Record) string {
 			return r.Name
 		}
@@ -440,6 +425,32 @@ var bamCmd = &cobra.Command{
 				}
 				return 1.0
 			},
+		}
+
+		if printHelp {
+			for _, f := range validFields {
+				fmt.Printf("%-10s\t%s\n", f, fmap[f].Title)
+			}
+			os.Exit(0)
+		}
+
+		bamReader := NewBamReader(files[0], config.Threads)
+		bamHeader := bamReader.Header()
+
+		var bamWriter *bam.Writer
+
+		if printPass {
+			bw, err := bam.NewWriter(outfh, bamHeader, 1)
+			checkError(err)
+			bamWriter = bw
+			outfh.Flush()
+		}
+
+		if printCount != "" {
+			CountReads(bamReader, bamWriter, printCount, field, rangeMin, rangeMax, printPass, printPrim, printLog, printBins, binMode, mapQual, printFreq, printDump, printDelay, printPdf, execBefore, execAfter, printQuiet)
+			outfh.Flush()
+			outw.Close()
+			return
 		}
 
 		marshall := func(r *sam.Record, fields []string) []byte {
@@ -563,8 +574,10 @@ var bamCmd = &cobra.Command{
 					if printDump {
 						os.Stderr.Write([]byte(h.Dump()))
 					} else {
-						os.Stderr.Write([]byte(thist.ClearScreenString()))
-						os.Stderr.Write([]byte(h.Draw()))
+						if !printQuiet {
+							os.Stderr.Write([]byte(thist.ClearScreenString()))
+							os.Stderr.Write([]byte(h.Draw()))
+						}
 					}
 					time.Sleep(time.Duration(printDelay) * time.Second)
 					if execAfter != "" {
@@ -589,8 +602,10 @@ var bamCmd = &cobra.Command{
 			if printDump {
 				os.Stderr.Write([]byte(h.Dump()))
 			} else {
-				os.Stderr.Write([]byte(thist.ClearScreenString()))
-				os.Stderr.Write([]byte(h.Draw()))
+				if !printQuiet {
+					os.Stderr.Write([]byte(thist.ClearScreenString()))
+					os.Stderr.Write([]byte(h.Draw()))
+				}
 			}
 			if execAfter != "" {
 				BashExec(execAfter)
@@ -639,7 +654,9 @@ func init() {
 	bamCmd.Flags().BoolP("reset", "R", false, "reset histogram after every print")
 	bamCmd.Flags().BoolP("pass", "x", false, "passthrough mode (print filtered BAM to output)")
 	bamCmd.Flags().BoolP("prim-only", "F", false, "passthrough mode (print filtered BAM to output)")
-	bamCmd.Flags().BoolP("quiet", "Q", false, "supress all output to stderr)")
+	bamCmd.Flags().BoolP("quiet-mode", "Q", false, "supress all output to stderr)")
+	bamCmd.Flags().BoolP("list-fields", "H", false, "supress all output to stderr)")
 	bamCmd.Flags().StringP("exec-after", "e", "", "scatter plot of two fields")
 	bamCmd.Flags().StringP("exec-before", "E", "", "scatter plot of two fields")
+	bamCmd.Flags().IntP("top-mode", "@", 0, "scatter plot of two fields")
 }
