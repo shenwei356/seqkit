@@ -757,7 +757,7 @@ func init() {
 	bamCmd.Flags().BoolP("pass", "x", false, "passthrough mode (forward filtered BAM to output)")
 	bamCmd.Flags().BoolP("prim-only", "F", false, "filter out non-primary alignment records")
 	bamCmd.Flags().BoolP("quiet-mode", "Q", false, "supress all plotting to stderr")
-	bamCmd.Flags().BoolP("list-fields", "H", false, "supress all output to stderr)")
+	bamCmd.Flags().BoolP("list-fields", "H", false, "list all available BAM record features")
 	bamCmd.Flags().StringP("exec-after", "e", "", "execute command after reporting")
 	bamCmd.Flags().StringP("exec-before", "E", "", "execute command before reporting")
 	bamCmd.Flags().StringP("top-bam", "@", "", "save the top -? records to this bam file")
