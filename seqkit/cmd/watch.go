@@ -41,10 +41,9 @@ import (
 // watchCmd represents the seq command
 var watchCmd = &cobra.Command{
 	Use:   "watch",
-	Short: "transform sequences (revserse, complement, extract ID...)",
-	Long: `transform sequences (revserse, complement, extract ID...)
+	Short: "monitoring and online histograms of sequence features",
+	Long:  "monitoring and online histograms of sequence features",
 
-`,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet

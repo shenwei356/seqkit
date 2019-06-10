@@ -225,8 +225,8 @@ type TopBuffer []topEntry
 // bamCmd represents the hist command
 var bamCmd = &cobra.Command{
 	Use:   "bam",
-	Short: "plot online histograms of average quality/length/GC content/GC skew)",
-	Long:  "plot online histograms of average quality/length/GC content/GC skew)",
+	Short: "monitoring and online histograms of BAM record features",
+	Long:  "monitoring and online histograms of BAM record features",
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
 		idRegexp := config.IDRegexp
