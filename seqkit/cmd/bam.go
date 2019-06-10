@@ -400,9 +400,11 @@ var bamCmd = &cobra.Command{
 						del += op.Len()
 					case sam.CigarSkipped:
 						skip += op.Len()
+					default:
+						//fmt.Println(op)
 					}
 				}
-				return float64(mm-mismatch-ins-del) / float64(r.Len()-skip) * 100
+				return (1.0 - float64(mismatch)/float64(mm+ins+del)) * 100
 			},
 		}
 
