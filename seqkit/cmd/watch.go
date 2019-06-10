@@ -158,6 +158,9 @@ var watchCmd = &cobra.Command{
 		}
 
 		files := getFileList(args)
+		if len(files) == 0 {
+			files = []string{"-"}
+		}
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

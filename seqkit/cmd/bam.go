@@ -263,9 +263,7 @@ var bamCmd = &cobra.Command{
 		printPrim := getFlagBool(cmd, "prim-only")
 		printHelp := getFlagBool(cmd, "list-fields")
 		printQuiet := getFlagBool(cmd, "quiet-mode")
-		if printQuiet {
-			printDelay = 0
-		}
+
 		execBefore := getFlagString(cmd, "exec-before")
 		execAfter := getFlagString(cmd, "exec-after")
 		printTop := getFlagString(cmd, "top-bam")
