@@ -21,395 +21,299 @@
 package cmd
 
 import (
-	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"math"
 	"os"
 	"runtime"
-	"strconv"
 	"strings"
 	"time"
 
-	"github.com/biogo/hts/bam"
-	"github.com/biogo/hts/sam"
 	"github.com/bsipos/thist"
+	"github.com/shenwei356/bio/seq"
+	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/util/byteutil"
+	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
 
-// watchCmd represents the hist command
+// watchCmd represents the seq command
 var watchCmd = &cobra.Command{
-	Use:   "bam",
-	Short: "plot online histograms of average quality/length/GC content/GC skew)",
-	Long:  "plot online histograms of average quality/length/GC content/GC skew)",
+	Use:   "watch",
+	Short: "transform sequences (revserse, complement, extract ID...)",
+	Long: `transform sequences (revserse, complement, extract ID...)
+
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
+		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		_ = idRegexp
+		lineWidth := config.LineWidth
 		outFile := config.OutFile
+
+		printBins := getFlagInt(cmd, "bins")
+		binMode := "termfit"
+		if printBins > 0 {
+			binMode = "fixed"
+		}
+		printFreq := getFlagInt(cmd, "print-freq")
+		printDelay := getFlagInt(cmd, "delay")
+		printQuiet := getFlagBool(cmd, "quiet-mode")
+		printReset := getFlagBool(cmd, "reset")
+		printDump := getFlagBool(cmd, "dump")
+		printHelp := getFlagBool(cmd, "list-fields")
+		printPdf := getFlagString(cmd, "img")
+
+		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileList(args)
+		pass := getFlagBool(cmd, "pass")
+		logMode := getFlagBool(cmd, "log")
+		_ = logMode
+		fieldsText := getFlagString(cmd, "fields")
+		validateSeq := getFlagBool(cmd, "validate-seq")
+		validateSeqLength := getFlagValidateSeqLength(cmd, "validate-seq-length")
+		qBase := getFlagPositiveInt(cmd, "qual-ascii-base")
+		_ = qBase
 
-		mapQual := getFlagInt(cmd, "map-qual")
-		field := getFlagString(cmd, "field")
-		printFreq := getFlagInt(cmd, "print-freq")
-		rangeMin := getFlagFloat64(cmd, "range-min")
-		rangeMax := getFlagFloat64(cmd, "range-max")
-		printCount := getFlagBool(cmd, "count")
-		_ = printCount
-		printScatter := getFlagString(cmd, "scatter")
-		_ = printScatter
-		printDump := getFlagBool(cmd, "dump")
-		printLog := getFlagBool(cmd, "log")
-		printDelay := getFlagInt(cmd, "delay")
-		printStat := getFlagBool(cmd, "stat")
-		_ = printStat
-		printIdxStat := getFlagBool(cmd, "idx-stat")
-		_ = printIdxStat
-		printIdxCount := getFlagBool(cmd, "idx-count")
-		_ = printIdxCount
-		if printDelay < 0 {
-			printDelay = 0
+		fields := strings.Split(fieldsText, ",")
+
+		validFields := []string{"ReadLen", "MeanQual", "GC", "GCSkew"}
+
+		type fieldInfo struct {
+			Title    string
+			Generate func(*fastx.Record) float64
 		}
-		printReset := getFlagBool(cmd, "reset")
-		printBins := getFlagInt(cmd, "bins")
-		printPass := getFlagBool(cmd, "pass")
-		printPrim := getFlagBool(cmd, "prim-only")
 
-		outw := os.Stdout
-		if outFile != "-" {
-			tw, err := os.Create(outFile)
-			checkError(err)
-			outw = tw
+		fmap := make(map[string]fieldInfo)
+
+		fmap["ReadLen"] = fieldInfo{
+			"Read length",
+			func(r *fastx.Record) float64 {
+				return float64(len(r.Seq.Seq))
+			},
 		}
-		outfh := bufio.NewWriter(outw)
 
-		defer outw.Close()
+		fmap["MeanQual"] = fieldInfo{
+			"Mean base quality",
+			func(r *fastx.Record) float64 {
+				return float64(r.Seq.AvgQual(qBase))
+			},
+		}
+
+		fmap["GC"] = fieldInfo{
+			"GC content",
+			func(r *fastx.Record) float64 {
+				g := r.Seq.BaseContent("G")
+				c := r.Seq.BaseContent("C")
+				return (g + c) * 100
+			},
+		}
+
+		fmap["GCSkew"] = fieldInfo{
+			"GC content",
+			func(r *fastx.Record) float64 {
+				g := r.Seq.BaseContent("G")
+				c := r.Seq.BaseContent("C")
+				return (g - c) / (g + c) * 100
+			},
+		}
+
+		if printHelp {
+			for _, f := range validFields {
+				fmt.Printf("%-10s\t%s\n", f, fmap[f].Title)
+			}
+			os.Exit(0)
+		}
+
+		if len(fields) == 0 {
+			fmt.Fprintf(os.Stderr, "No fields specified!")
+			os.Exit(1)
+
+		}
+
+		for _, f := range fields {
+			if fmap[f].Generate == nil {
+				fmt.Fprintf(os.Stderr, "Invalid field: %s\n", f)
+				os.Exit(1)
+			}
+		}
 
 		transform := func(x float64) float64 { return x }
-		if printLog {
+		if logMode {
 			transform = func(x float64) float64 {
 				return math.Log10(x + 1)
 			}
 		}
 
-		validFields := []string{"Read", "Ref", "MapQual", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "LeftClip", "RightClip"}
-		_ = validFields
+		seq.ValidateSeq = validateSeq
+		seq.ValidateWholeSeq = false
+		seq.ValidSeqLengthThreshold = validateSeqLength
+		seq.ValidSeqThreads = config.Threads
+		seq.ComplementThreads = config.Threads
 
-		type fieldInfo struct {
-			Title    string
-			Generate func(*sam.Record) float64
+		if !(alphabet == nil || alphabet == seq.Unlimit) {
+			seq.ValidateSeq = true
 		}
 
-		fmap := make(map[string]fieldInfo)
+		files := getFileList(args)
 
-		getLeftClip := func(r *sam.Record) float64 {
-			if r.Cigar[0].Type() == sam.CigarSoftClipped || r.Cigar[0].Type() == sam.CigarHardClipped {
-				return float64(r.Cigar[0].Len())
-			}
-			return 0
-		}
+		outfh, err := xopen.Wopen(outFile)
+		checkError(err)
+		defer outfh.Close()
 
-		getRightClip := func(r *sam.Record) float64 {
-			last := len(r.Cigar) - 1
-			if r.Cigar[last].Type() == sam.CigarSoftClipped || r.Cigar[last].Type() == sam.CigarHardClipped {
-				return float64(r.Cigar[last].Len())
-			}
-			return 0
-		}
-		getLeftSoftClip := func(r *sam.Record) float64 {
-			if r.Cigar[0].Type() == sam.CigarSoftClipped {
-				return float64(r.Cigar[0].Len())
-			}
-			return 0
-		}
-		_ = getLeftSoftClip
+		var checkSeqType bool
+		var isFastq bool
+		var printQual bool
+		var head []byte
+		var sequence *seq.Seq
+		var text []byte
+		var b *bytes.Buffer
+		var record *fastx.Record
+		var fastxReader *fastx.Reader
+		var count int
 
-		getRightSoftClip := func(r *sam.Record) float64 {
-			last := len(r.Cigar) - 1
-			if r.Cigar[last].Type() == sam.CigarSoftClipped {
-				return float64(r.Cigar[last].Len())
-			}
-			return 0
-		}
-		_ = getRightSoftClip
+		field := fields[0]
 
-		getHardClipped := func(r *sam.Record) float64 {
-			var hc float64
-			last := len(r.Cigar) - 1
-			if r.Cigar[last].Type() == sam.CigarHardClipped {
-				hc += float64(r.Cigar[last].Len())
-			}
-			if r.Cigar[0].Type() == sam.CigarHardClipped {
-				hc += float64(r.Cigar[0].Len())
-			}
-			return hc
-		}
-
-		var bamReader *bam.Reader
-
-		refMap := make(map[string]float64)
-		for _, ref := range bamReader.Header().Refs() {
-			refMap[ref.Name()] = float64(ref.Len())
-		}
-
-		var bamWriter *bam.Writer
-		if printPass {
-			bw, err := bam.NewWriter(outfh, bamReader.Header(), 1)
-			checkError(err)
-			bamWriter = bw
-			outfh.Flush()
-		}
-
-		getRead := func(r *sam.Record) string {
-			return r.Name
-		}
-
-		getRef := func(r *sam.Record) string {
-			return r.Ref.Name()
-		}
-
-		fmap["MapQual"] = fieldInfo{
-			"Mapping quality",
-			func(r *sam.Record) float64 {
-				return float64(int(r.MapQ))
-			},
-		}
-
-		fmap["ReadLen"] = fieldInfo{
-			"Aligned read length",
-			func(r *sam.Record) float64 {
-				sl := float64(len(r.Seq.Seq)) + getHardClipped(r)
-				return float64(sl)
-			},
-		}
-
-		fmap["RefLen"] = fieldInfo{
-			"Aligned read length",
-			func(r *sam.Record) float64 {
-				return refMap[r.Ref.Name()]
-			},
-		}
-
-		fmap["RefAln"] = fieldInfo{
-			"Aligned refence length",
-			func(r *sam.Record) float64 {
-				return float64(r.Len())
-			},
-		}
-
-		fmap["RefCov"] = fieldInfo{
-			"Refence coverage",
-			func(r *sam.Record) float64 {
-				return float64(r.Len()) / float64(r.Ref.Len()) * 100
-			},
-		}
-
-		fmap["ReadAln"] = fieldInfo{
-			"Aligned refence length",
-			func(r *sam.Record) float64 {
-				sl := fmap["ReadLen"].Generate(r)
-				return (float64(sl) - getLeftClip(r) - getRightClip(r))
-			},
-		}
-
-		fmap["ReadCov"] = fieldInfo{
-			"Aligned refence length",
-			func(r *sam.Record) float64 {
-				sl := fmap["ReadLen"].Generate(r)
-				return float64(100 * (float64(sl) - getLeftClip(r) - getRightClip(r)) / float64(sl))
-			},
-		}
-
-		fmap["LeftClip"] = fieldInfo{
-			"Aligned refence length",
-			func(r *sam.Record) float64 {
-				return getLeftClip(r)
-			},
-		}
-
-		fmap["RightClip"] = fieldInfo{
-			"Aligned refence length",
-			func(r *sam.Record) float64 {
-				return getRightClip(r)
-			},
-		}
-
-		fmap["Strand"] = fieldInfo{
-			"Aligned refence length",
-			func(r *sam.Record) float64 {
-				if r.Strand() < int8(0) {
-					return -1.0
-				}
-				return 1.0
-			},
-		}
-
-		marshall := func(r *sam.Record, fields []string) []byte {
-			tmp := make([]string, len(fields))
-			for i, f := range fields {
-				if f == "Read" {
-					tmp[i] = getRead(r)
-					continue
-				}
-				if f == "Ref" {
-					tmp[i] = getRef(r)
-					continue
-				}
-				p := transform(fmap[f].Generate(r))
-				digits := 3
-				if p-float64(int(p)) == 0 {
-					digits = 0
-				}
-				tmp[i] = fmt.Sprintf("%."+strconv.Itoa(digits)+"f", p)
-			}
-
-			return []byte(strings.Join(tmp, "\t") + "\n")
-
-		}
-
-		fields := strings.Split(field, ",")
-		if field == "" {
-			fields = validFields
-		}
-
-		if len(fields) > 1 || field == "Read" || field == "Ref" {
-			os.Stderr.Write([]byte(strings.Join(fields, "\t") + "\n"))
-			for {
-				record, err := bamReader.Read()
-
-				if err == io.EOF {
-					break
-				}
-				checkError(err)
-
-				if record.Flags&sam.Unmapped == 0 {
-
-					if printPrim && record.Flags&sam.Supplementary == 1 {
-						continue
-					}
-					if printPrim && record.Flags&sam.Secondary == 1 {
-						continue
-					}
-
-					if int(record.MapQ) < mapQual {
-						continue
-					}
-					os.Stderr.Write(marshall(record, fields))
-
-				} else {
-
-				}
-
-				if printPass {
-					bamWriter.Write(record)
-				}
-			}
-			bamWriter.Close()
-			return
-		}
-
-		binMode := "termfit"
-		if printBins > 0 {
-			binMode = "fixed"
-		}
 		h := thist.NewHist([]float64{}, fmap[field].Title, binMode, printBins, true)
 
-		var count int
-		var unmapped int
-
-		if files[0] == "-" && h.BinMode != "fixed" {
-			h.BinMode = "fixed"
-			h.MaxBins = 80
-		}
-
-		for {
-			record, err := bamReader.Read()
-
-			if err == io.EOF {
-				break
-			}
+		for _, file := range files {
+			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
-			if record.Flags&sam.Unmapped == 0 {
-				if printPrim && record.Flags&sam.Supplementary == 1 {
-					continue
-				}
-				if printPrim && record.Flags&sam.Secondary == 1 {
-					continue
+			checkSeqType = true
+			printQual = false
+			for {
+				record, err = fastxReader.Read()
+				if err != nil {
+					if err == io.EOF {
+						break
+					}
+					checkError(err)
+					break
 				}
 
-				if int(record.MapQ) < mapQual {
-					continue
+				if checkSeqType {
+					isFastq = fastxReader.IsFastq
+					if isFastq {
+						config.LineWidth = 0
+						printQual = true
+					}
+					checkSeqType = false
 				}
 
 				p := transform(fmap[field].Generate(record))
-
-				if !math.IsNaN(rangeMin) && p < rangeMin {
-					continue
-				}
-				if !math.IsNaN(rangeMax) && p >= rangeMax {
-					continue
-				}
-
 				count++
 				h.Update(p)
-
-				if printPass {
-					bamWriter.Write(record)
-				}
 
 				if printFreq > 0 && count%printFreq == 0 {
 					if printDump {
 						os.Stderr.Write([]byte(h.Dump()))
 					} else {
-						os.Stderr.Write([]byte(thist.ClearScreenString()))
-						os.Stderr.Write([]byte(h.Draw()))
+						if !printQuiet {
+							os.Stderr.Write([]byte(thist.ClearScreenString()))
+							os.Stderr.Write([]byte(h.Draw()))
+						}
+					}
+					if printPdf != "" {
+						h.SaveImage(printPdf)
 					}
 					time.Sleep(time.Duration(printDelay) * time.Second)
 					if printReset {
 						h = thist.NewHist([]float64{}, fmap[field].Title, binMode, printBins, true)
 					}
 				}
-			} else {
-				unmapped++
-			}
-		} // records
+
+				if !pass {
+					continue
+				}
+
+				head = record.Name
+
+				if isFastq {
+					outfh.WriteString("@")
+					outfh.Write(head)
+					outfh.WriteString("\n")
+				} else {
+					outfh.WriteString(">")
+					outfh.Write(head)
+					outfh.WriteString("\n")
+				}
+
+				sequence = record.Seq
+
+				if len(sequence.Seq) <= pageSize {
+					outfh.Write(byteutil.WrapByteSlice(sequence.Seq, config.LineWidth))
+				} else {
+					if bufferedByteSliceWrapper == nil {
+						bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Seq), config.LineWidth)
+					}
+					text, b = bufferedByteSliceWrapper.Wrap(sequence.Seq, config.LineWidth)
+					outfh.Write(text)
+					outfh.Flush()
+					bufferedByteSliceWrapper.Recycle(b)
+				}
+
+				outfh.WriteString("\n")
+
+				if printQual {
+					outfh.WriteString("+\n")
+
+					if len(sequence.Qual) <= pageSize {
+						outfh.Write(byteutil.WrapByteSlice(sequence.Qual, config.LineWidth))
+					} else {
+						if bufferedByteSliceWrapper == nil {
+							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Qual), config.LineWidth)
+						}
+						text, b = bufferedByteSliceWrapper.Wrap(sequence.Qual, config.LineWidth)
+						outfh.Write(text)
+						outfh.Flush()
+						bufferedByteSliceWrapper.Recycle(b)
+					}
+
+					outfh.WriteString("\n")
+				}
+
+			} // record
+			config.LineWidth = lineWidth
+
+		} //file
 
 		if printFreq < 0 || count%printFreq != 0 {
 			if printDump {
 				os.Stderr.Write([]byte(h.Dump()))
 			} else {
-				os.Stderr.Write([]byte(thist.ClearScreenString()))
-				os.Stderr.Write([]byte(h.Draw()))
+				if !printQuiet {
+					os.Stderr.Write([]byte(thist.ClearScreenString()))
+					os.Stderr.Write([]byte(h.Draw()))
+				}
+			}
+			if printPdf != "" {
+				h.SaveImage(printPdf)
 			}
 		}
-		bamWriter.Close()
-		outfh.Flush()
 
+		outfh.Close()
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(watchCmd)
 
-	watchCmd.Flags().IntP("map-qual", "q", 0, "minimum mapping quality")
-	watchCmd.Flags().StringP("field", "f", "", "target field")
-	watchCmd.Flags().StringP("scatter", "S", "", "scatter plot of two fields")
-	watchCmd.Flags().IntP("print-freq", "p", -1, "print frequency (-1 for print after parsing)")
-	watchCmd.Flags().IntP("delay", "W", 0, "sleep this many seconds after online plotting")
+	watchCmd.Flags().BoolP("validate-seq", "v", false, "validate bases according to the alphabet")
+	watchCmd.Flags().BoolP("pass", "x", false, "pass through mode (write input to stdout)")
+	watchCmd.Flags().BoolP("log", "L", false, "pass through mode (write input to stdout)")
+	watchCmd.Flags().StringP("fields", "f", "ReadLen", "fields to watch")
+	watchCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
+	watchCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
 	watchCmd.Flags().IntP("bins", "B", -1, "number of histogram bins")
-	watchCmd.Flags().Float64P("range-min", "m", math.NaN(), "number of histogram bins")
-	watchCmd.Flags().Float64P("range-max", "M", math.NaN(), "number of histogram bins")
-	watchCmd.Flags().BoolP("dump", "y", false, "dump histogram instead of plotting")
-	watchCmd.Flags().BoolP("stat", "s", false, "dump histogram instead of plotting")
-	watchCmd.Flags().BoolP("idx-stat", "i", false, "dump histogram instead of plotting")
-	watchCmd.Flags().BoolP("idx-count", "C", false, "dump histogram instead of plotting")
-	watchCmd.Flags().BoolP("count", "c", false, "dump histogram instead of plotting")
-	watchCmd.Flags().BoolP("log", "L", false, "log10 transform numeric values")
+	watchCmd.Flags().IntP("print-freq", "p", -1, "print frequency (-1 for print after parsing)")
+	watchCmd.Flags().BoolP("quiet-mode", "Q", false, "supress all output to stderr)")
 	watchCmd.Flags().BoolP("reset", "R", false, "reset histogram after every print")
-	watchCmd.Flags().BoolP("pass", "x", false, "passthrough mode (print filtered BAM to output)")
-	watchCmd.Flags().BoolP("prim-only", "F", false, "passthrough mode (print filtered BAM to output)")
-	watchCmd.Flags().BoolP("quiet", "Q", false, "supress all output to stderr)")
+	watchCmd.Flags().BoolP("dump", "y", false, "dump histogram instead of plotting")
+	watchCmd.Flags().BoolP("list-fields", "H", false, "supress all output to stderr)")
+	watchCmd.Flags().IntP("delay", "W", 1, "sleep this many seconds after online plotting")
+	watchCmd.Flags().StringP("img", "O", "", "scatter plot of two fields")
+
 }

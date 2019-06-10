@@ -263,6 +263,9 @@ var bamCmd = &cobra.Command{
 		printPrim := getFlagBool(cmd, "prim-only")
 		printHelp := getFlagBool(cmd, "list-fields")
 		printQuiet := getFlagBool(cmd, "quiet-mode")
+		if printQuiet {
+			printDelay = 0
+		}
 		execBefore := getFlagString(cmd, "exec-before")
 		execAfter := getFlagString(cmd, "exec-after")
 		printTop := getFlagString(cmd, "top-bam")
@@ -543,11 +546,6 @@ var bamCmd = &cobra.Command{
 		var count int
 		var unmapped int
 
-		if files[0] == "-" && h.BinMode != "fixed" {
-			h.BinMode = "fixed"
-			h.MaxBins = 80
-		}
-
 		for {
 			record, err := bamReader.Read()
 
@@ -597,6 +595,9 @@ var bamCmd = &cobra.Command{
 							os.Stderr.Write([]byte(h.Draw()))
 						}
 					}
+					if printPdf != "" {
+						h.SaveImage(printPdf)
+					}
 					dumpTop(printTop, bamHeader, topBuffer)
 					time.Sleep(time.Duration(printDelay) * time.Second)
 					if execAfter != "" {
@@ -625,6 +626,9 @@ var bamCmd = &cobra.Command{
 					os.Stderr.Write([]byte(thist.ClearScreenString()))
 					os.Stderr.Write([]byte(h.Draw()))
 				}
+			}
+			if printPdf != "" {
+				h.SaveImage(printPdf)
 			}
 			dumpTop(printTop, bamHeader, topBuffer)
 			if execAfter != "" {
