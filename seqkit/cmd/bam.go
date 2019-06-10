@@ -296,7 +296,7 @@ var bamCmd = &cobra.Command{
 			}
 		}
 
-		validFields := []string{"Read", "Ref", "MapQual", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "LeftClip", "RightClip"}
+		validFields := []string{"Read", "Ref", "MapQual", "Acc", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "LeftClip", "RightClip"}
 
 		fields := strings.Split(field, ",")
 		if field == "" {
@@ -365,6 +365,44 @@ var bamCmd = &cobra.Command{
 			"Mapping quality",
 			func(r *sam.Record) float64 {
 				return float64(int(r.MapQ))
+			},
+		}
+
+		fmap["Acc"] = fieldInfo{
+			"Alignment accuracy",
+			func(r *sam.Record) float64 {
+				var mismatch int
+				aux, ok := r.Tag([]byte("NM"))
+				if !ok {
+					panic("no NM tag")
+				}
+				var mm int
+				var ins int
+				var del int
+				var skip int
+				switch aux.Value().(type) {
+				case uint8:
+					mismatch = int(aux.Value().(uint8))
+				case uint16:
+					mismatch = int(aux.Value().(uint16))
+				case uint32:
+					mismatch = int(aux.Value().(uint32))
+				case uint64:
+					mismatch = int(aux.Value().(uint64))
+				}
+				for _, op := range r.Cigar {
+					switch op.Type() {
+					case sam.CigarMatch, sam.CigarEqual, sam.CigarMismatch:
+						mm += op.Len()
+					case sam.CigarInsertion:
+						ins += op.Len()
+					case sam.CigarDeletion:
+						del += op.Len()
+					case sam.CigarSkipped:
+						skip += op.Len()
+					}
+				}
+				return float64(mm-mismatch-ins-del) / float64(r.Len()-skip) * 100
 			},
 		}
 
