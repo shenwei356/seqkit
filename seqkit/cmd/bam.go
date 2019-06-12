@@ -177,7 +177,8 @@ func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, 
 			}
 
 			if printPass {
-				bamWriter.Write(record)
+				checkError(bamWriter.Write(record))
+				fmt.Fprintln(os.Stderr, record.AuxFields)
 			}
 
 			if printFreq > 0 && count%printFreq == 0 {
