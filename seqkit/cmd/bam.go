@@ -178,7 +178,6 @@ func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, 
 
 			if printPass {
 				checkError(bamWriter.Write(record))
-				fmt.Fprintln(os.Stderr, record.AuxFields)
 			}
 
 			if printFreq > 0 && count%printFreq == 0 {
@@ -312,6 +311,9 @@ var bamCmd = &cobra.Command{
 		fmap := make(map[string]fieldInfo)
 
 		getLeftClip := func(r *sam.Record) float64 {
+			if r.Flags&sam.Unmapped != 0 {
+				return 0
+			}
 			if r.Cigar[0].Type() == sam.CigarSoftClipped || r.Cigar[0].Type() == sam.CigarHardClipped {
 				return float64(r.Cigar[0].Len())
 			}
@@ -319,6 +321,9 @@ var bamCmd = &cobra.Command{
 		}
 
 		getRightClip := func(r *sam.Record) float64 {
+			if r.Flags&sam.Unmapped != 0 {
+				return 0
+			}
 			last := len(r.Cigar) - 1
 			if r.Cigar[last].Type() == sam.CigarSoftClipped || r.Cigar[last].Type() == sam.CigarHardClipped {
 				return float64(r.Cigar[last].Len())
@@ -410,15 +415,22 @@ var bamCmd = &cobra.Command{
 		}
 
 		fmap["ReadLen"] = fieldInfo{
-			"Aligned read length",
+			"Read length",
 			func(r *sam.Record) float64 {
-				sl := float64(len(r.Seq.Seq)) + getHardClipped(r)
-				return float64(sl)
+				if r.Seq.Length > 0 {
+					sl := float64(r.Seq.Length) + getHardClipped(r)
+					return float64(sl)
+				}
+				var ql int
+				for _, op := range r.Cigar {
+					ql += op.Len() * op.Type().Consumes().Query
+				}
+				return float64(ql)
 			},
 		}
 
 		fmap["RefLen"] = fieldInfo{
-			"Aligned read length",
+			"Reference length",
 			func(r *sam.Record) float64 {
 				return float64(r.Ref.Len())
 			},
@@ -439,15 +451,18 @@ var bamCmd = &cobra.Command{
 		}
 
 		fmap["ReadAln"] = fieldInfo{
-			"Aligned refence length",
+			"Aligned read length",
 			func(r *sam.Record) float64 {
 				sl := fmap["ReadLen"].Generate(r)
+				if r.Flags&sam.Unmapped != 0 {
+					return 0
+				}
 				return (float64(sl) - getLeftClip(r) - getRightClip(r))
 			},
 		}
 
 		fmap["ReadCov"] = fieldInfo{
-			"Aligned refence length",
+			"Read coverage",
 			func(r *sam.Record) float64 {
 				sl := fmap["ReadLen"].Generate(r)
 				return float64(100 * (float64(sl) - getLeftClip(r) - getRightClip(r)) / float64(sl))
@@ -455,21 +470,21 @@ var bamCmd = &cobra.Command{
 		}
 
 		fmap["LeftClip"] = fieldInfo{
-			"Aligned refence length",
+			"Clipped bases on the left (hard and soft)",
 			func(r *sam.Record) float64 {
 				return getLeftClip(r)
 			},
 		}
 
 		fmap["RightClip"] = fieldInfo{
-			"Aligned refence length",
+			"Clipped bases on the right (hard and soft)",
 			func(r *sam.Record) float64 {
 				return getRightClip(r)
 			},
 		}
 
 		fmap["Strand"] = fieldInfo{
-			"Aligned refence length",
+			"Strand",
 			func(r *sam.Record) float64 {
 				if r.Strand() < int8(0) {
 					return -1.0
