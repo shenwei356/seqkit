@@ -645,6 +645,10 @@ var bamCmd = &cobra.Command{
 						os.Stderr.Write([]byte(h.Dump()))
 					} else {
 						if !printQuiet {
+							switch field {
+							case "RefCov", "ReadCov":
+								h.Title = fmt.Sprintf("%s (>= 80: %.1f)", fmap[field].Title, gtThanPerc(h, 80))
+							}
 							os.Stderr.Write([]byte(thist.ClearScreenString()))
 							os.Stderr.Write([]byte(h.Draw()))
 						}
@@ -677,6 +681,10 @@ var bamCmd = &cobra.Command{
 				os.Stderr.Write([]byte(h.Dump()))
 			} else {
 				if !printQuiet {
+					switch field {
+					case "RefCov", "ReadCov":
+						h.Title = fmt.Sprintf("%s (>= 80: %.1f)", fmap[field].Title, gtThanPerc(h, 80))
+					}
 					os.Stderr.Write([]byte(thist.ClearScreenString()))
 					os.Stderr.Write([]byte(h.Draw()))
 				}
@@ -695,6 +703,16 @@ var bamCmd = &cobra.Command{
 		outfh.Flush()
 
 	},
+}
+
+func gtThanPerc(h *thist.Hist, percent float64) float64 {
+	var count float64
+	for v, c := range h.DataMap {
+		if v >= percent {
+			count += c
+		}
+	}
+	return count * 100 / float64(h.DataCount)
 }
 
 // Create new BAM reader from file.
