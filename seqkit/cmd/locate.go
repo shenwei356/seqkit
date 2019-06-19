@@ -445,7 +445,7 @@ func init() {
 	locateCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	locateCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on positive strand")
 	locateCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
-	locateCmd.Flags().BoolP("non-greedy", "G", false, "non-greedy mode, faster but may miss motifs overlaping with others")
+	locateCmd.Flags().BoolP("non-greedy", "G", false, "non-greedy mode, faster but may miss motifs overlapping with others")
 	locateCmd.Flags().BoolP("gtf", "", false, "output in GTF format")
 	locateCmd.Flags().BoolP("bed", "", false, "output in BED6 format")
 	locateCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)")
