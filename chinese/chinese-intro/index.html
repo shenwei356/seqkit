@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation">
+    <meta name="author" content="Wei Shen">
+    
+    <link rel="../../img/favicon.ico">
+
+    
+    <title>Chinese intro - SeqKit - Ultrafast FASTA/Q kit</title>
+    
+
+    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../css/base.min.css" rel="stylesheet">
+    <link href="../../css/cinder.min.css" rel="stylesheet">
+    <link href="../../css/highlight.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+        <![endif]-->
+
+    <script src="//ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+    <script>
+    WebFont.load({
+        google: {
+            families: ['Open Sans', 'PT Sans']
+        }
+    });
+    </script>
+
+    
+    <script>
+    (function(i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function() {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-28948626-9', 'bioinf.shenwei.me/seqkit');
+    ga('send', 'pageview');
+    </script>
+    
+
+     
+</head>
+
+<body>
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+
+            <a class="navbar-brand" href="../..">SeqKit - Ultrafast FASTA/Q kit</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                
+                
+                    <li >
+                        <a href="../..">Home</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../../download/">Download</a>
+                    </li>
+                
+                
+                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Documents <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../../usage/">Usage</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../../faq/">FAQ</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../../tutorial/">Tutorial</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../../benchmark/">Benchmark</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../../note/">Notes</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Links <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../../bioinf/">More tools</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../../yanlilab/">YanLi Lab</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/shenwei356/seqkit/edit/master/docs/chinese/chinese-intro.md"><i class="fab fa-github"></i> Edit on GitHub</a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <div class="container">
+        
+        
+        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="first-level active"><a href="#_1">背景</a></li>
+        <li class="first-level "><a href="#seqkit">SeqKit</a></li>
+        <li class="first-level "><a href="#_2">卖点</a></li>
+        <li class="first-level "><a href="#_3">子命令</a></li>
+        <li class="first-level "><a href="#_4">最后</a></li>
+    </ul>
+</div></div>
+        <div class="col-md-9" role="main">
+
+<p>SeqKit发布2周年了，终于还是决定自己写一篇中文文章来详细介绍一下。</p>
+<p>先前写了一篇csvtk的介绍文章，但可能是因为行文偏x冷淡风，撩不起大家的兴趣。
+所以我争取好好表现，让大家真正兴奋起来。</p>
+<h4 id="_1">背景</h4>
+<p>搞生物信息的亲们一定碰到过处理序列数据，其中FASTA和FASTQ是最简单但又最常见的
+序列格式了。通常大家都会用shell命令或者写一些小脚本来处理，</p>
+<p>当年我刚入行的时候，也是从玩弄FASTA序列开始，比如最简单的看看序列数量，
+或者修改一下序列名称，复杂点的分割一下大文件。说起来也是很丰富（艰辛）的历程：</p>
+<ol>
+<li>
+<p>最开始每遇到一种操作就写个Perl脚本，但<strong>写脚本费时费力</strong>啊，编程水平也不行，
+经常持续写一两个小时的bug。</p>
+<p><img alt="" src="../img/writing-bug.jpeg" /></p>
+</li>
+<li>
+<p>好不容易写好，发现工头，哦是老板<strong>频繁改需求</strong>，
+被虐几次后，我终于把经常要改的参数都写成命令行参数，轻松应对各种场景。</p>
+<p><img alt="" src="../img/change-features.gif" /></p>
+</li>
+<li>
+<p>有时候我想给网友分享我的脚本，但需要他安装Perl，甚至<strong>需要安装一些库</strong>。什么？没安Perl？不会安脚本？</p>
+<p><img alt="" src="../img/helpless.jpg" /></p>
+</li>
+<li>
+<p>后来我终于知道不用什么都自己写脚本，得学会用现成的工具。但，但，一有的是C写点，好吧，自己编译，oh No! 编译失败～～。要么就是要安装库，比如Bioperl，谁试谁知道，<strong>编译过程让人生畏，让人崩溃</strong>。。</p>
+<p><img alt="" src="../img/hopelessness.png" /></p>
+</li>
+<li>
+<p>已有的<strong>工具也良莠不齐</strong>，要么功能太少，不能满足需求，要么性能捉急。。</p>
+<p><img alt="" src="../img/not-good.jpg" /></p>
+</li>
+</ol>
+<p>后来我逐渐攒了很多脚本，都放在 https://github.com/shenwei356/bio_scripts　上面分享，
+多为Perl写的，但正如前面写点，人家难得安装啊。。。</p>
+<p>直到我听说了go语言，我就决定重写所有工具。为什么是go语言呢，当然这是后话了。</p>
+<h4 id="seqkit">SeqKit</h4>
+<p>如果你也有类似的痛苦经历，或者不想经历这些梦魇，那你一定要试一试SeqKit
+-- 处理FASTA/Q序列文件的跨平台且超快的工具！</p>
+<p>用户数说明了一切，目前最新版下载量已经1300+了，还不含Bioconda的下载数据。
+那么多人用，你还在犹豫什么呢？
+<img alt="" src="../img/seqkit-downloads.png" /></p>
+<h4 id="_2">卖点</h4>
+<p>它究竟靠什么吸引为何那么多用户下载，受到用户的一致好评呢？　因为它真的很好用：</p>
+<ul>
+<li><strong>跨平台</strong>, 支持Linux, Mac OS X，Windows，甚至BSD几乎所有的现代操作系统。</li>
+<li><strong>无依赖，免编译，免安装，免配置，下载即用</strong>，下载编译好的压缩包解压就能用了，就那么简单。</li>
+<li><strong>速度超快</strong>，高度优化的序列解析库，速度接近大牛Heng Li写的klib，无缝支持FASTA与FASTQ。</li>
+<li><strong>23个子命令提供丰富的功能，且能通过命令行管道任意组合</strong>。</li>
+<li><strong>易用</strong>，支持bash补全。</li>
+</ul>
+<h4 id="_3">子命令</h4>
+<p>下列的子命令均来自于作者多年的分析经历，以及用户的反馈不断增加改进。
+多数命令都支持STDIN，从而能通过命令行管道任意组合，实现复杂的功能。</p>
+<p><strong>一、序列与子序列</strong></p>
+<ul>
+<li><code>seq</code>        验证序列，显示序列名称/序列，反向互补，去除gap，大小写转换，按长度筛选</li>
+<li><code>subseq</code>     通过自定义区域（异常强大）/gtf/bed提取目标子序列，甚至包括侧翼序列。</li>
+<li><code>sliding</code>    序列滑窗(sliding)</li>
+<li><code>stats</code>      序列统计，数量，碱基数，gap数，最小/最长序列，N50</li>
+<li><code>faidx</code>      创建FASTA index file，并提取序列，比samtools faidx快，且功能多一点</li>
+</ul>
+<p><strong>二、格式转换</strong></p>
+<ul>
+<li><code>fx2tab</code>     转FASTA/Q为表格格式，可附带序列长度，GC含量等信息，非常有用</li>
+<li><code>tab2fx</code>     转表格格式回FASTA/Q</li>
+<li><code>fq2fa</code>      转FASTQ为FASTA</li>
+<li><code>convert</code>    FASTQ质量编码相互转换（Sanger, Solexa and Illumina）</li>
+</ul>
+<p><strong>三、搜索</strong></p>
+<ul>
+<li><code>grep</code>       通过命令/序列/序列motif来搜索序列</li>
+<li><code>locate</code>     定位子序列/motifs</li>
+</ul>
+<p><strong>四、集合操作</strong></p>
+<ul>
+<li><code>head</code>       输出前面N条序列</li>
+<li><code>range</code>      输出任意范围的序列：前面，中间，最后</li>
+<li><code>sample</code>     按比例或数量进行采样</li>
+<li><code>rmdup</code>      按序列ID/名称/序列进行去重</li>
+<li><code>duplicate</code>  重复序列</li>
+<li><code>common</code>     按序列ID/名称/序列寻找多个文件间的共有序列</li>
+<li><code>split</code>      按ID/大小/份数，甚至子序列来分割</li>
+</ul>
+<p><strong>五、编辑</strong></p>
+<ul>
+<li><code>replace</code>    用正则表达式来编辑序列/名称，支持按key-value文件来替换</li>
+<li><code>rename</code>     对重复的序列ID重命名</li>
+<li><code>restart</code>    对环状基因组重新设定序列起始位点。</li>
+<li><code>concat</code>     连接多个文件中具有相同ID的序列</li>
+</ul>
+<p><strong>六、排序</strong></p>
+<ul>
+<li><code>shuffle</code>    打乱顺序</li>
+<li><code>sort</code>       按序列ID/名称/序列/序列长度进行排序</li>
+</ul>
+<p>功能实在太多，就不一一举例了，<a href="http://bioinf.shenwei.me/seqkit/">项目网站</a>提供了丰富的文档供查阅，包括用法和详细的例子，甚至开发文档。</p>
+<h4 id="_4">最后</h4>
+<p>稍微有点遗憾的是，那么多人用，但是目前仍然只有２个引用，或许大家的文章还在审稿吧？
+或许工具太基础了，就像R语言一样，谁会去引用一个大家都在用的人人知道的编程语言呢？</p>
+<p>如果你觉得SeqKit和作者的其它工具有用，请分享给你的同学、同事。如果有Github帐号，也可star该项目以表支持。</p>
+<p>如果有任何疑问或者建议、需求，请在Github项目主页的issue页面新建issue。</p></div>
+        
+        
+    </div>
+
+    <footer class="col-md-12 text-center">
+        
+        <hr>
+        <p>
+        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
+
+        
+        
+    </footer>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="../../js/bootstrap-3.0.3.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script>var base_url = "../.."</script>
+    
+    <script src="../../js/base.js"></script>
+    <script src="../../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+    </body>
+
+</html>
