@@ -28,6 +28,10 @@ type Range struct {
 	End   float64
 }
 
+func (r Range) Len() float64 {
+	return r.End - r.Start
+}
+
 type Ranges []Range
 
 type Reference struct {
@@ -50,16 +54,23 @@ func NewSeqDetector(searchAll bool, stranded bool, nullMode string, cutoff float
 	return &SeqDetector{Queries{}, searchAll, stranded, nullMode, cutoff}
 }
 
-func (d *SeqDetector) Detect(r *Reference) []*AlignedSeq {
+func (d *SeqDetector) Detect(r *Reference, rec bool) []*AlignedSeq {
 	var h []*AlignedSeq
 	for _, rr := range r.Ranges {
-		h = append(h, d.detectOnce(r, rr)...)
+		if rec {
+			h = append(h, d.detectRec(r, rr)...)
+		} else {
+			h = append(h, d.detectOnce(r, rr)...)
+		}
 	}
 	return h
 }
 
 func actualRange(rr Range, l int) Range {
 	s, e := rr.Start, rr.End
+	if s == e {
+		return rr
+	}
 	if math.IsNaN(rr.Start) {
 		s = 0
 	} else if rr.Start < 0 {
@@ -85,12 +96,37 @@ func actualRange(rr Range, l int) Range {
 
 func (d *SeqDetector) detectOnce(r *Reference, rr Range) []*AlignedSeq {
 	var hits []*AlignedSeq
+	if rr.Len() == 0 {
+		return hits
+	}
 	for _, q := range d.Queries {
 		nr := &Reference{r.Name, r.Seq, Ranges{actualRange(rr, len(r.Seq))}}
 		h := PairwiseAlignSW(nr, q)
 		h.Detector = d
 		if (h.Score / q.NullScore) > d.Cutoff {
 			hits = append(hits, h)
+		}
+	}
+	return bestHits(hits, -1)
+}
+
+func (d *SeqDetector) detectRec(r *Reference, rr Range) []*AlignedSeq {
+	var hits []*AlignedSeq
+	if rr.Len() == 0 {
+		return hits
+	}
+	for _, q := range d.Queries {
+		nr := &Reference{r.Name, r.Seq, Ranges{actualRange(rr, len(r.Seq))}}
+		h := PairwiseAlignSW(nr, q)
+		h.Detector = d
+		if (h.Score / q.NullScore) > d.Cutoff {
+			hits = append(hits, h)
+		}
+		if len(hits) > 0 {
+			bh := bestHits(hits, 1)
+			bh = append(bh, d.detectRec(r, Range{rr.Start, float64(bh[0].RefStart)})...)
+			bh = append(bh, d.detectRec(r, Range{float64(bh[0].RefEnd), rr.End})...)
+			hits = bh
 		}
 	}
 	return bestHits(hits, -1)
@@ -263,7 +299,7 @@ func (a *AlignedSeq) String() string {
 		if math.IsInf(mq, 1) {
 			mq = 60
 		}
-		return fmt.Sprintf("%.0f", mq)
+		return fmt.Sprintf("%.2f", mq)
 	}
 	fmap["Acc"] = func(a *AlignedSeq) string {
 		diff := 0
@@ -323,8 +359,8 @@ func AlignInfo(r *Reference, q *Query, f []feat.Pair) *AlignedSeq {
 
 	}
 	res := &AlignedSeq{Ref: r, Query: q}
-	res.RefStart = MinInts(ref_starts)
-	res.RefEnd = MaxInts(ref_ends)
+	res.RefStart = MinInts(ref_starts) + int(r.Ranges[0].Start)
+	res.RefEnd = MaxInts(ref_ends) + int(r.Ranges[0].Start)
 	res.QueryStart = MinInts(query_starts)
 	res.QueryEnd = MaxInts(query_ends)
 	res.Score = float64(SumInts(scores))

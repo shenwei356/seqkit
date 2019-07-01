@@ -191,7 +191,7 @@ var fishCmd = &cobra.Command{
 					refId = strings.Split(refId, " ")[0]
 				}
 
-				hits := detector.Detect(&Reference{refId, string(record.Seq.Seq), ranges})
+				hits := detector.Detect(&Reference{refId, string(record.Seq.Seq), ranges}, flagAll)
 
 				if !flagInvert {
 					for _, h := range hits {
@@ -402,9 +402,6 @@ func NewSAMRecordFromAln(name string, ref *sam.Reference, refStart, refEnd, quer
 
 	switch strand {
 	case "-":
-		for i, j := 0, len(co)-1; i < j; i, j = i+1, j-1 {
-			co[i], co[j] = co[j], co[i]
-		}
 	case "+":
 	default:
 		panic("Invalid strand: " + strand)
