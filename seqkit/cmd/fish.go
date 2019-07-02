@@ -105,7 +105,7 @@ var fishCmd = &cobra.Command{
 		flagSeq := getFlagString(cmd, "query-sequences")
 		flagBam := getFlagString(cmd, "out-bam")
 		flagRange := getFlagString(cmd, "ranges")
-		flagNullMode := getFlagString(cmd, "null-mode")
+		flagNullMode := "self"
 		flagStranded := getFlagBool(cmd, "stranded")
 		flagAll := getFlagBool(cmd, "all")
 		flagDesc := getFlagBool(cmd, "print-desc")
@@ -333,7 +333,6 @@ func init() {
 	fishCmd.Flags().StringP("out-bam", "b", "", "save aligmnets to this BAM file (memory intensive)")
 	fishCmd.Flags().BoolP("stranded", "s", false, "search + strand only")
 	fishCmd.Flags().StringP("ranges", "r", "", "target ranges, for example: \":10,30:40,-20\"")
-	fishCmd.Flags().StringP("null-mode", "z", "self", "null mode")
 	fishCmd.Flags().BoolP("print-desc", "D", false, "print full sequence header")
 	fishCmd.Flags().BoolP("print-aln", "g", false, "print sequence alignments")
 	fishCmd.Flags().BoolP("invert", "i", false, "print out references not matching with any query")
