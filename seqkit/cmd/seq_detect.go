@@ -228,12 +228,12 @@ func PairwiseAlignSW(r *Reference, q *Query) *AlignedSeq {
 	smith := align.SWAffine{
 		Matrix: align.Linear{
 			{0, -1, -1, -1, -1},
-			{-1, 1, -1, -1, -1},
-			{-1, -1, 1, -1, -1},
-			{-1, -1, -1, 1, -1},
-			{-1, -1, -1, -1, 1},
+			{-1, 4, -4, -4, -4},
+			{-1, -4, 4, -4, -4},
+			{-1, -4, -4, 4, -4},
+			{-1, -4, -4, -4, 4},
 		},
-		GapOpen: -1,
+		GapOpen: -2,
 	}
 
 	aln, err := smith.Align(ref, query)
