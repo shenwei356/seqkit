@@ -35,6 +35,7 @@ import (
 	"github.com/biogo/hts/bam"
 	"github.com/biogo/hts/sam"
 	"github.com/bsipos/thist"
+	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
 
@@ -133,7 +134,6 @@ func reportCounts(readCounts ReadCounts, countFile string, field string, rangeMi
 
 func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, field string, rangeMin, rangeMax float64, printPass bool, printPrim bool, printLog bool, printBins int, binMode string, mapQual int, printFreq int, printDump bool, printDelay int, printPdf string, execBefore, execAfter string, printQuiet bool) {
 	readCounts := NewReadCounts(bamReader.Header().Refs())
-	_ = readCounts
 	validFields := []string{"Count", "SecCount", "SupCount"}
 	fields := strings.Split(field, ",")
 	_ = fields
@@ -215,6 +215,125 @@ func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, 
 
 }
 
+type bamStatRec struct {
+	PrimAlnPerc float64
+	PrimAln     int
+	SecAln      int
+	SupAln      int
+	Unmapped    int
+	TotalRec    int
+	File        string
+}
+
+func (r *bamStatRec) String() string {
+	return fmt.Sprintf("%.2f\t%d\t%d\t%d\t%d\t%d\t%s", r.PrimAlnPerc, r.PrimAln, r.SecAln, r.SupAln, r.Unmapped, r.TotalRec, r.File)
+}
+
+func bamIdxStats(file string) *bamStatRec {
+	idx := file + ".bai"
+	var err error
+	_, err = os.Stat(idx)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Index file not found for file %s! Please run samtools index on the sorted file!\n", file)
+		os.Exit(1)
+	}
+	checkError(err)
+	fh, err := xopen.Ropen(idx)
+	checkError(err)
+	i, err := bam.ReadIndex(fh)
+	res := new(bamStatRec)
+	um, ok := i.Unmapped()
+	if !ok {
+		fmt.Fprintf(os.Stderr, "Unmapped counts are invalid in the index of %s!\n", file)
+		os.Exit(1)
+	}
+	res.Unmapped = int(um)
+	for j := 0; j < i.NumRefs(); j++ {
+		st, ok := i.ReferenceStats(j)
+		if !ok {
+			continue
+		}
+		res.PrimAln += int(st.Mapped)
+	}
+	res.File = file
+	return res
+}
+
+func bamIdxCount(file string) {
+	idx := file + ".bai"
+	var err error
+	_, err = os.Stat(idx)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Index file not found for file %s! Please run samtools index on the sorted file!\n", file)
+		os.Exit(1)
+	}
+	checkError(err)
+	fh, err := xopen.Ropen(idx)
+	checkError(err)
+	i, err := bam.ReadIndex(fh)
+	checkError(err)
+	bamReader := NewBamReader(file, 1)
+
+	fmt.Fprintf(os.Stderr, "Ref\tCount\tSecCount\tSupCount\n")
+	for j := 0; j < i.NumRefs(); j++ {
+		st, ok := i.ReferenceStats(j)
+		if !ok {
+			continue
+		}
+		fmt.Fprintf(os.Stderr, "%s\t%d\t\t\n", bamReader.Header().Refs()[j].Name(), int(st.Mapped))
+	}
+}
+
+func bamStatsOnce(f string, mapQual int, threads int) *bamStatRec {
+	bamReader := NewBamReader(f, threads)
+	res := new(bamStatRec)
+	res.File = f
+	for {
+		record, err := bamReader.Read()
+
+		if err == io.EOF {
+			break
+		}
+		checkError(err)
+		res.TotalRec++
+
+		if record.Flags&sam.Unmapped == 0 {
+			if record.Flags&sam.Supplementary != 0 {
+				res.SupAln++
+			}
+			if record.Flags&sam.Secondary != 0 {
+				res.SecAln++
+			}
+
+			if int(record.MapQ) < mapQual {
+				continue
+			}
+			res.PrimAln++
+
+		} else {
+			res.Unmapped++
+		}
+	} // records
+	res.PrimAlnPerc = 100 * float64(res.PrimAln) / float64(res.PrimAln+res.Unmapped)
+	return res
+}
+
+func bamStats(files []string, mapQual int, threads int) {
+	fmt.Fprintf(os.Stderr, "PrimAlnPerc\tPrimAln\tSecAln\tSupAln\tUnmapped\tTotalRec\tFile\n")
+	for _, f := range files {
+		s := bamStatsOnce(f, mapQual, threads)
+		fmt.Fprintf(os.Stderr, "%s\n", s.String())
+	}
+}
+
+func idxStats(files []string) {
+	fmt.Fprintf(os.Stderr, "Aligned\tUnmapped\tTotalRec\tFile\n")
+	for _, f := range files {
+		s := bamIdxStats(f)
+		fmt.Fprintf(os.Stderr, "%d\t%d\t%d\t%s\n", s.PrimAln, s.Unmapped, s.PrimAln+s.Unmapped, s.File)
+	}
+}
+
 type topEntry struct {
 	Record *sam.Record
 	Value  float64
@@ -249,11 +368,8 @@ var bamCmd = &cobra.Command{
 		printLog := getFlagBool(cmd, "log")
 		printDelay := getFlagInt(cmd, "delay")
 		printStat := getFlagBool(cmd, "stat")
-		_ = printStat
 		printIdxStat := getFlagBool(cmd, "idx-stat")
-		_ = printIdxStat
 		printIdxCount := getFlagBool(cmd, "idx-count")
-		_ = printIdxCount
 		if printDelay < 0 {
 			printDelay = 0
 		}
@@ -268,6 +384,21 @@ var bamCmd = &cobra.Command{
 		execAfter := getFlagString(cmd, "exec-after")
 		printTop := getFlagString(cmd, "top-bam")
 		topSize := getFlagInt(cmd, "top-size")
+
+		if printIdxStat {
+			idxStats(files)
+			os.Exit(0)
+		}
+
+		if printStat {
+			bamStats(files, mapQual, config.Threads)
+			os.Exit(0)
+		}
+
+		if printIdxCount {
+			bamIdxCount(files[0])
+			os.Exit(0)
+		}
 
 		binMode := "termfit"
 		if printBins > 0 {
@@ -782,8 +913,8 @@ func init() {
 	bamCmd.Flags().Float64P("range-min", "m", math.NaN(), "discard record with field (-f) value less than this flag")
 	bamCmd.Flags().Float64P("range-max", "M", math.NaN(), "discard record with field (-f) value greater than this flag")
 	bamCmd.Flags().BoolP("dump", "y", false, "print histogram data to stderr instead of plotting")
-	bamCmd.Flags().BoolP("stat", "s", false, "print BAM satistics to this file")
-	bamCmd.Flags().BoolP("idx-stat", "i", false, "dump histogram instead of plotting")
+	bamCmd.Flags().BoolP("stat", "s", false, "print BAM satistics of the input files")
+	bamCmd.Flags().BoolP("idx-stat", "i", false, "fast statistics based on the BAM index")
 	bamCmd.Flags().BoolP("idx-count", "C", false, "fast read per reference counting based on the BAM index")
 	bamCmd.Flags().StringP("count", "c", "", "count reads per reference and save to this file")
 	bamCmd.Flags().BoolP("log", "L", false, "log10(x+1) transform numeric values")
