@@ -111,7 +111,7 @@ Note:
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
-			// alowing finding common records in ONE file
+			// allowing finding common records in ONE file
 			if _, ok = filenames[file]; !ok {
 				filenames[file] = 1
 			} else {
