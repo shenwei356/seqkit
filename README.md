@@ -121,48 +121,48 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 **Sequence and subsequence**
 
-- `seq`        transform sequences (revserse, complement, extract ID...)
-- `subseq`     get subsequences by region/gtf/bed, including flanking sequences
-- `sliding`    sliding sequences, circular genome supported
-- `stats`      simple statistics of FASTA/Q files
-- `faidx`      create FASTA index file and extract subsequence
+- [`seq`](https://bioinf.shenwei.me/seqkit/usage/#seq)          transform sequences (revserse, complement, extract ID...)
+- [`subseq`](https://bioinf.shenwei.me/seqkit/usage/#subseq)    get subsequences by region/gtf/bed, including flanking sequences
+- [`sliding`](https://bioinf.shenwei.me/seqkit/usage/#sliding)  sliding sequences, circular genome supported
+- [`stats`](https://bioinf.shenwei.me/seqkit/usage/#stats)      simple statistics of FASTA/Q files
+- [`faidx`](https://bioinf.shenwei.me/seqkit/usage/#faidx)      create FASTA index file and extract subsequence
 
 **Format conversion**
 
-- `fx2tab`     convert FASTA/Q to tabular format (and length/GC content/GC skew)
-- `tab2fx`     convert tabular format to FASTA/Q format
-- `fq2fa`      convert FASTQ to FASTA
-- `convert`    convert FASTQ quality encoding between Sanger, Solexa and Illumina
-- `translate`  translate DNA/RNA to protein sequence (supporting ambiguous bases)
+- [`fx2tab`](https://bioinf.shenwei.me/seqkit/usage/#fx2tab)        convert FASTA/Q to tabular format (and length/GC content/GC skew)
+- [`tab2fx`](https://bioinf.shenwei.me/seqkit/usage/#tab2fx)        convert tabular format to FASTA/Q format
+- [`fq2fa`](https://bioinf.shenwei.me/seqkit/usage/#fq2fa)          convert FASTQ to FASTA
+- [`convert`](https://bioinf.shenwei.me/seqkit/usage/#convert)      convert FASTQ quality encoding between Sanger, Solexa and Illumina
+- [`translate`](https://bioinf.shenwei.me/seqkit/usage/#translate)  translate DNA/RNA to protein sequence (supporting ambiguous bases)
 
 **Searching**
 
-- `grep`       search sequences by ID/name/sequence/sequence motifs, mismatch allowed
-- `locate`     locate subsequences/motifs
+- [`grep`](https://bioinf.shenwei.me/seqkit/usage/#grep)        search sequences by ID/name/sequence/sequence motifs, mismatch allowed
+- [`locate`](https://bioinf.shenwei.me/seqkit/usage/#locate)    locate subsequences/motifs
 
 **Set operations**
 
-- `head`       print first N FASTA/Q records
-- `range`      print FASTA/Q records in a range (start:end)
-- `sample`     sample sequences by number or proportion
-- `rmdup`      remove duplicated sequences by id/name/sequence
-- `duplicate`  duplicate sequences N times
-- `common`     find common sequences of multiple files by id/name/sequence
-- `split`      split sequences into files by id/seq region/size/parts (mainly for FASTA)
-- `split2`     split sequences into files by size/parts (FASTA, PE/SE FASTQ)
+- [`head`](https://bioinf.shenwei.me/seqkit/usage/#head)            print first N FASTA/Q records
+- [`range`](https://bioinf.shenwei.me/seqkit/usage/#range)          print FASTA/Q records in a range (start:end)
+- [`sample`](https://bioinf.shenwei.me/seqkit/usage/#sample)        sample sequences by number or proportion
+- [`rmdup`](https://bioinf.shenwei.me/seqkit/usage/#rmdup)          remove duplicated sequences by id/name/sequence
+- [`duplicate`](https://bioinf.shenwei.me/seqkit/usage/#duplicate)  duplicate sequences N times
+- [`common`](https://bioinf.shenwei.me/seqkit/usage/#common)        find common sequences of multiple files by id/name/sequence
+- [`split`](https://bioinf.shenwei.me/seqkit/usage/#split)          split sequences into files by id/seq region/size/parts (mainly for FASTA)
+- [`split2`](https://bioinf.shenwei.me/seqkit/usage/#split2)        split sequences into files by size/parts (FASTA, PE/SE FASTQ)
 
 **Edit**
 
-- `replace`    replace name/sequence by regular expression
-- `rename`     rename duplicated IDs
-- `restart`    reset start position for circular genome
-- `concat`     concatenate sequences with same ID from multiple files
-- `mutate`     edit sequence (point mutation, insertion, deletion)
+- [`replace`](https://bioinf.shenwei.me/seqkit/usage/#replace)  replace name/sequence by regular expression
+- [`rename`](https://bioinf.shenwei.me/seqkit/usage/#rename)    rename duplicated IDs
+- [`restart`](https://bioinf.shenwei.me/seqkit/usage/#restart)  reset start position for circular genome
+- [`concat`](https://bioinf.shenwei.me/seqkit/usage/#concat)    concatenate sequences with same ID from multiple files
+- [`mutate`](https://bioinf.shenwei.me/seqkit/usage/#mutate)    edit sequence (point mutation, insertion, deletion)
 
 **Ordering**
 
-- `shuffle`    shuffle sequences
-- `sort`       sort sequences by id/name/sequence
+- [`shuffle`](https://bioinf.shenwei.me/seqkit/usage/#shuffle)  shuffle sequences
+- [`sort`](https://bioinf.shenwei.me/seqkit/usage/#sort)        sort sequences by id/name/sequence
 
 **Misc**
 
