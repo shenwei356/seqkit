@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"io"
 	"math"
-	//"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -142,12 +141,12 @@ func (d *SeqDetector) detectRec(r *Reference, rr Range) []*AlignedSeq {
 		if (h.Score / q.NullScore) > d.Cutoff {
 			hits = append(hits, h)
 		}
-		if len(hits) > 0 {
-			bh := bestHits(hits, 1)
-			bh = append(bh, d.detectRec(r, Range{rr.Start, float64(bh[0].RefStart)})...)
-			bh = append(bh, d.detectRec(r, Range{float64(bh[0].RefEnd), rr.End})...)
-			hits = bh
-		}
+	}
+	if len(hits) > 0 {
+		bh := bestHits(hits, 1)
+		bh = append(bh, d.detectRec(r, Range{rr.Start, float64(bh[0].RefStart)})...)
+		bh = append(bh, d.detectRec(r, Range{float64(bh[0].RefEnd), rr.End})...)
+		hits = bh
 	}
 	return bestHits(hits, -1)
 }
