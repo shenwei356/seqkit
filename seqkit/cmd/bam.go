@@ -35,6 +35,7 @@ import (
 	"github.com/biogo/hts/bam"
 	"github.com/biogo/hts/sam"
 	"github.com/bsipos/thist"
+	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -427,7 +428,7 @@ var bamCmd = &cobra.Command{
 			}
 		}
 
-		validFields := []string{"Read", "Ref", "MapQual", "Acc", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "LeftClip", "RightClip"}
+		validFields := []string{"Read", "Ref", "MapQual", "Acc", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip"}
 
 		fields := strings.Split(field, ",")
 		if field == "" {
@@ -624,6 +625,17 @@ var bamCmd = &cobra.Command{
 			},
 		}
 
+		fmap["MeanQual"] = fieldInfo{
+			"Mean base quality of the read",
+			func(r *sam.Record) float64 {
+				if len(r.Qual) == 0 {
+					return 0.0
+				}
+				s := &seq.Seq{Qual: r.Qual}
+				return s.AvgQual(0)
+			},
+		}
+
 		if printHelp {
 			for _, f := range validFields {
 				fmt.Printf("%-10s\t%s\n", f, fmap[f].Title)
@@ -668,6 +680,10 @@ var bamCmd = &cobra.Command{
 				if f == "Ref" {
 					tmp[i] = getRef(r)
 					continue
+				}
+				if fmap[f].Generate == nil {
+					fmt.Fprintf(os.Stderr, "Invalid field: %s\n", f)
+					os.Exit(1)
 				}
 				p := transform(fmap[f].Generate(r))
 				digits := 3
