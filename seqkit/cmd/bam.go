@@ -556,7 +556,7 @@ var bamCmd = &cobra.Command{
 						//fmt.Println(op)
 					}
 				}
-				return (1.0 - float64(mismatch+ins+del)/float64(mm+ins+del)) * 100
+				return (1.0 - float64(mismatch)/float64(mm+ins+del)) * 100
 			},
 		}
 
