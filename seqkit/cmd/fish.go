@@ -362,11 +362,13 @@ func NewSAMRecordFromAln(name string, ref *sam.Reference, refStart, refEnd, quer
 	for i := range refAln {
 		if queryAln[i] == gap {
 			rawCo = append(rawCo, sam.NewCigarOp(sam.CigarDeletion, 1))
+			nm++
 			continue
 
 		} else if refAln[i] == gap {
 			rawCo = append(rawCo, sam.NewCigarOp(sam.CigarInsertion, 1))
 			consumed++
+			nm++
 			continue
 		} else {
 			rawCo = append(rawCo, sam.NewCigarOp(sam.CigarMatch, 1))
