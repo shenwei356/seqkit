@@ -77,7 +77,8 @@ Custom bases (A, C and A+C):
 This is a frequently used manipulation. Let's create a sample ID list file,
 which may also come from other way like mapping result.
 
-    $ seqkit sample --proportion 0.001  duplicated-reads.fq.gz | seqkit seq --name --only-id > id.txt
+    $ seqkit sample --proportion 0.001  duplicated-reads.fq.gz \
+        | seqkit seq --name --only-id > id.txt
 
 ID list file:
 
@@ -88,7 +89,8 @@ ID list file:
 
 Searching by ID list file:
 
-    $ seqkit grep --pattern-file id.txt duplicated-reads.fq.gz > duplicated-reads.subset.fq.gz
+    $ seqkit grep --pattern-file id.txt duplicated-reads.fq.gz \
+        > duplicated-reads.subset.fq.gz
 
 ## How to find FASTA/Q sequences containing degenerate bases and locate them?
 
@@ -96,26 +98,30 @@ Searching by ID list file:
 alphabet in a new column. And then text searching tools can be used to filter
 the table.
 
-    $ seqkit fx2tab -n -i -a viral.1.1.genomic.fna.gz | csvtk -H -t grep -f 4 -r -i -p "[^ACGT]"
+    $ seqkit fx2tab -n -i -a viral.1.1.genomic.fna.gz \
+        | csvtk -H -t grep -f 4 -r -i -p "[^ACGT]"
     gi|446730228|ref|NC_019782.1|                   ACGNT
     gi|557940284|ref|NC_022800.1|                   ACGKT
     gi|564292828|ref|NC_023009.1|                   ACGNT
 
 Long-option version of the command:
 
-    $ seqkit fx2tab --name --only-id --alphabet  viral.1.1.genomic.fna.gz | csvtk --no-header-row --tabs grep --fields 4 --use-regexp --ignore-case --pattern "[^ACGT]"
+    $ seqkit fx2tab --name --only-id --alphabet  viral.1.1.genomic.fna.gz \
+        | csvtk --no-header-row --tabs grep --fields 4 --use-regexp --ignore-case --pattern "[^ACGT]"
 
 You can then exclude these sequences with `seqkit grep`:
 
     # save the sequenece IDs.
-    $ seqkit fx2tab -n -i -a viral.1.1.genomic.fna.gz | csvtk -H -t grep -f 4 -r -i -p "[^ACGT]" | csvtk -H -t cut -f 1 > id2.txt
+    $ seqkit fx2tab -n -i -a viral.1.1.genomic.fna.gz \
+        | csvtk -H -t grep -f 4 -r -i -p "[^ACGT]" | csvtk -H -t cut -f 1 > id2.txt
 
     # search and exclude.
     $ seqkit grep --pattern-file id2.txt --invert-match viral.1.1.genomic.fna.gz > clean.fa
 
 Or locate the degenerate bases, e.g, `N` and `K`
 
-    $ seqkit grep --pattern-file id2.txt viral.1.1.genomic.fna.gz | seqkit locate --ignore-case --only-positive-strand --pattern K+ --pattern N+
+    $ seqkit grep --pattern-file id2.txt viral.1.1.genomic.fna.gz \
+        | seqkit locate --ignore-case --only-positive-strand --pattern K+ --pattern N+
     seqID   patternName     pattern strand  start   end     matched
     gi|564292828|ref|NC_023009.1|   N+      N+      +       87972   87972   N
     gi|564292828|ref|NC_023009.1|   N+      N+      +       100983  100983  N
@@ -200,14 +206,16 @@ sequence ID (species names) which can be specified by flag `--id-regexp`.
 
 Default ID:
 
-    $ seqkit head -n 3 viral.1.protein.faa.gz | seqkit seq --name --only-id
+    $ seqkit head -n 3 viral.1.protein.faa.gz \
+        | seqkit seq --name --only-id
     gi|526245011|ref|YP_008320337.1|
     gi|526245012|ref|YP_008320338.1|
     gi|526245013|ref|YP_008320339.1|
 
 New ID:
 
-    $ seqkit head -n 3 viral.1.protein.faa.gz | seqkit seq --name --only-id --id-regexp "\[(.+)\]"
+    $ seqkit head -n 3 viral.1.protein.faa.gz \
+        | seqkit seq --name --only-id --id-regexp "\[(.+)\]"
     Paenibacillus phage phiIBB_Pl23
     Paenibacillus phage phiIBB_Pl23
     Paenibacillus phage phiIBB_Pl23
@@ -238,7 +246,8 @@ The replacing rules are listed below in tab-delimited file:
 
 Overview the FASTA headers containing "hypothetical":
 
-    $ seqkit grep --by-name --use-regexp --ignore-case --pattern hypothetical viral.1.protein.faa.gz | seqkit head -n 3 | seqkit seq --name
+    $ seqkit grep --by-name --use-regexp --ignore-case --pattern hypothetical viral.1.protein.faa.gz \
+        | seqkit head -n 3 | seqkit seq --name
     gi|526245016|ref|YP_008320342.1| hypothetical protein IBBPl23_06 [Paenibacillus phage phiIBB_Pl23]
     gi|526245019|ref|YP_008320345.1| hypothetical protein IBBPl23_09 [Paenibacillus phage phiIBB_Pl23]
     gi|526245020|ref|YP_008320346.1| hypothetical protein IBBPl23_10 [Paenibacillus phage phiIBB_Pl23]
@@ -250,14 +259,19 @@ capture variable  `${1}` (robuster than `$1`).
 And flag `-I/--key-capt-idx` (default: 1) is set to 2 because the key `(\w+)`
 is the second captured match. Command:
 
-    $ seqkit replace --kv-file changes.tsv --pattern "^([^ ]+ )(\w+) " --replacement "\${1}{kv} " --key-capt-idx 2 --keep-key viral.1.protein.faa.gz > renamed.fa
+    $ seqkit replace --kv-file changes.tsv --pattern "^([^ ]+ )(\w+) " \
+        --replacement "\${1}{kv} " --key-capt-idx 2 --keep-key viral.1.protein.faa.gz > renamed.fa
 
 ## How to extract paired reads from two paired-end reads file?
 
 Let's create two unbanlanced PE reads file:
 
-    $ seqkit rmdup duplicated-reads.fq.gz | seqkit replace --pattern " .+" --replacement " 1" | seqkit sample --proportion 0.9 --rand-seed 1 --out-file read_1.fq.gz
-    $ seqkit rmdup duplicated-reads.fq.gz | seqkit replace --pattern " .+" --replacement " 2" | seqkit sample --proportion 0.9 --rand-seed 2 --out-file read_2.fq.gz
+    $ seqkit rmdup duplicated-reads.fq.gz \
+        | seqkit replace --pattern " .+" --replacement " 1" \
+        | seqkit sample --proportion 0.9 --rand-seed 1 --out-file read_1.fq.gz
+    $ seqkit rmdup duplicated-reads.fq.gz \
+        | seqkit replace --pattern " .+" --replacement " 2" \
+        | seqkit sample --proportion 0.9 --rand-seed 2 --out-file read_2.fq.gz
 
 Overview:
 
@@ -280,9 +294,10 @@ Overview:
 
 Firstly, extract sequence IDs of two file and compute the intersection:
 
-    $ seqkit seq --name --only-id read_1.fq.gz read_2.fq.gz | sort | uniq -d > id.txt
+    $ seqkit seq --name --only-id read_1.fq.gz read_2.fq.gz \
+        | sort | uniq -d > id.txt
 
-    # number of IDs
+    $ # number of IDs
     wc -l id.txt
     8090 id.txt
 
@@ -305,8 +320,16 @@ same order. If not you can sort them after previous steps. Shell `sort`
 can sort large file using disk, so temporary directory is set as
 current directory by option `-T .`.
 
-    $ gzip -d -c read_1.f.fq.gz | seqkit fx2tab | sort -k1,1 -T . | seqkit tab2fx | gzip -c > read_1.f.sorted.fq.gz
-    $ gzip -d -c read_2.f.fq.gz | seqkit fx2tab | sort -k1,1 -T . | seqkit tab2fx | gzip -c > read_2.f.sorted.fq.gz
+    $ gzip -d -c read_1.f.fq.gz \
+        | seqkit fx2tab \
+        | sort -k1,1 -T . \
+        | seqkit tab2fx \
+        | gzip -c > read_1.f.sorted.fq.gz
+    $ gzip -d -c read_2.f.fq.gz \
+        | seqkit fx2tab \
+        | sort -k1,1 -T . \
+        | seqkit tab2fx \
+        | gzip -c > read_2.f.sorted.fq.gz
 
 ## How to concatenate two FASTA sequences in to one?
 

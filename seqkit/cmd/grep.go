@@ -44,13 +44,14 @@ var grepCmd = &cobra.Command{
 	Long: fmt.Sprintf(`search sequences by ID/name/sequence/sequence motifs, mismatch allowed
 
 Attentions:
-    1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
-       (ID/full header) by default. Please switch "-r/--use-regexp" on
-       for partly matching.
-    2. While when searching by sequences, it's partly matching. And mismatch
-       is allowed using flag "-m/--max-mismatch".
-    3. The order of sequences in result is consistent with that in original
-       file, not the order of the query patterns.
+  1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
+     (ID/full header) by default. Please switch "-r/--use-regexp" on
+     for partly matching.
+  2. While when searching by sequences, only positive strand is searched,
+     and it's partly matching. 
+     Mismatchis are allowed using flag "-m/--max-mismatch".
+  3. The order of sequences in result is consistent with that in original
+     file, not the order of the query patterns.
 
 You can specify the sequence region for searching with flag -R (--region).
 The definition of region is 1-based and with some custom design.
@@ -358,7 +359,7 @@ func init() {
 	grepCmd.Flags().BoolP("delete-matched", "", false, "delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions")
 	grepCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")
 	grepCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
-	grepCmd.Flags().BoolP("by-seq", "s", false, "search subseq on seq, mismach allowed using flag -m/--max-mismatch")
+	grepCmd.Flags().BoolP("by-seq", "s", false, "search subseq on seq, only positive strand is searched, and mismatch allowed using flag -m/--max-mismatch")
 	grepCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)")
 	grepCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	grepCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")

@@ -5,17 +5,15 @@
 ([**Usage**](http://bioinf.shenwei.me/seqkit/usage/),
 [**FAQ**](http://bioinf.shenwei.me/seqkit/faq/),
 [**Tutorial**](http://bioinf.shenwei.me/seqkit/tutorial/),
-[**Benchmark**](http://bioinf.shenwei.me/seqkit/benchmark/)
-and [**Development Notes**](http://bioinf.shenwei.me/seqkit/note/))
+and 
+[**Benchmark**](http://bioinf.shenwei.me/seqkit/benchmark/))
 - **Source code:** [https://github.com/shenwei356/seqkit](https://github.com/shenwei356/seqkit)
 [![GitHub stars](https://img.shields.io/github/stars/shenwei356/seqkit.svg?style=social&label=Star&?maxAge=2592000)](https://github.com/shenwei356/seqkit)
 [![license](https://img.shields.io/github/license/shenwei356/seqkit.svg?maxAge=2592000)](https://github.com/shenwei356/seqkit/blob/master/LICENSE)
-[![Go Report Card](https://goreportcard.com/badge/github.com/shenwei356/seqkit)](https://goreportcard.com/report/github.com/shenwei356/seqkit)
 [![Build Status](https://travis-ci.org/shenwei356/seqkit.svg?branch=master)](https://travis-ci.org/shenwei356/seqkit)
 - **Latest version:** [![Latest Version](https://img.shields.io/github/release/shenwei356/seqkit.svg?style=flat?maxAge=86400)](https://github.com/shenwei356/seqkit/releases)
 [![Github Releases](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/total.svg?maxAge=3600)](http://bioinf.shenwei.me/seqkit/download/)
 [![Cross-platform](https://img.shields.io/badge/platform-any-ec2eb4.svg?style=flat)](http://bioinf.shenwei.me/seqkit/download/)
-[![Install-with-conda](https://anaconda.org/bioconda/seqkit/badges/installer/conda.svg)](http://bioinf.shenwei.me/seqkit/download/)
 [![Anaconda Cloud](https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit)
 - **[Please cite](#citation):** [![doi](https://img.shields.io/badge/doi-10.1371%2Fjournal.pone.0163962-blue.svg?style=flat)](https://doi.org/10.1371/journal.pone.0163962)
 
@@ -68,7 +66,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
   (see [download](http://bioinf.shenwei.me/seqkit/download/))
 - **UltraFast** (see [benchmark](#benchmark)),
   **multiple-CPUs supported**
-- **Practical functions supported by 24 subcommands** (see subcommands and
+- **Practical functions supported by 27 subcommands** (see subcommands and
   [usage](http://bioinf.shenwei.me/seqkit/usage/) )
 - **Supporting [Bash-completion](#bash-completion)**
 - **Well documented** (detailed [usage](http://bioinf.shenwei.me/seqkit/usage/)
@@ -196,7 +194,7 @@ And then:
 
 1. **For windows**, just copy `seqkit.exe` to `C:\WINDOWS\system32`.
 
-#### Method 2: Install via conda  (latest stable version) [![Install-with-conda](https://anaconda.org/bioconda/seqkit/badges/installer/conda.svg)](http://bioinf.shenwei.me/seqkit/download/) [![Anaconda Cloud](https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit) [![downloads](https://anaconda.org/bioconda/seqkit/badges/downloads.svg)](https://anaconda.org/bioconda/seqkit)
+#### Method 2: Install via conda  (latest stable version) [![Anaconda Cloud](https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit) [![downloads](https://anaconda.org/bioconda/seqkit/badges/downloads.svg)](https://anaconda.org/bioconda/seqkit)
 
     conda install -c bioconda seqkit
 
