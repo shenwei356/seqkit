@@ -1,268 +1,1144 @@
+
+
+
+
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation">
-    <meta name="author" content="Wei Shen">
+<html lang="en" class="no-js">
+  <head>
     
-    <link rel="../img/favicon.ico">
-
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+        <meta name="description" content="SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation">
+      
+      
+      
+        <meta name="author" content="Wei Shen">
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../files/favicon.ico">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-ponylang-0.2.5">
     
-    <title>Usage - SeqKit - Ultrafast FASTA/Q kit</title>
     
-
-    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
-    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="../css/base.min.css" rel="stylesheet">
-    <link href="../css/cinder.min.css" rel="stylesheet">
-    <link href="../css/highlight.min.css" rel="stylesheet">
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-        <![endif]-->
-
-    <script src="//ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
-    <script>
-    WebFont.load({
-        google: {
-            families: ['Open Sans', 'PT Sans']
-        }
-    });
-    </script>
-
+      
+        <title>Usage - SeqKit - Ultrafast FASTA/Q kit</title>
+      
     
-    <script>
-    (function(i, s, o, g, r, a, m) {
-        i['GoogleAnalyticsObject'] = r;
-        i[r] = i[r] || function() {
-            (i[r].q = i[r].q || []).push(arguments)
-        }, i[r].l = 1 * new Date();
-        a = s.createElement(o),
-        m = s.getElementsByTagName(o)[0];
-        a.async = 1;
-        a.src = g;
-        m.parentNode.insertBefore(a, m)
-    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-
-    ga('create', 'UA-28948626-9', 'bioinf.shenwei.me/seqkit');
-    ga('send', 'pageview');
-    </script>
     
-
-     
-</head>
-
-<body>
-
-    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="container">
-
-        <!-- Collapsed navigation -->
-        <div class="navbar-header">
-            <!-- Expander button -->
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
+      <link rel="stylesheet" href="../assets/stylesheets/application.dfc6cb0c.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-palette.6079476c.css">
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.6586f7cd.js"></script>
+    
+    
+      <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+      
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="teal" data-md-color-accent="blue-grey">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448"
+    viewBox="0 0 416 448" id="github">
+  <path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19-18.125
+        8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5
+        18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75
+        19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19
+        18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360
+        304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25
+        2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8
+        38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0
+        37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25
+        82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75
+        1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75
+        0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25
+        30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5
+        46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34
+        99.5z" />
+</svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="../#usage-and-examples" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+          <a href=".." title="SeqKit - Ultrafast FASTA/Q kit" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon">school</i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            
+              <span class="md-header-nav__topic">
+                SeqKit - Ultrafast FASTA/Q kit
+              </span>
+              <span class="md-header-nav__topic">
+                Usage
+              </span>
+            
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          
+            <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+            
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+          
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
             
 
-            <!-- Main title -->
 
-            <a class="navbar-brand" href="..">SeqKit - Ultrafast FASTA/Q kit</a>
-        </div>
+  
 
-        <!-- Expanded navigation -->
-        <div class="navbar-collapse collapse">
-                <!-- Main navigation -->
-                <ul class="nav navbar-nav">
-                
-                
-                    <li >
-                        <a href="..">Home</a>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="../download/">Download</a>
-                    </li>
-                
-                
-                
-                    <li class="dropdown active">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Documents <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li class="active">
-    <a href="./">Usage</a>
-</li>
 
-                        
-                            
-<li >
-    <a href="../faq/">FAQ</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../tutorial/">Tutorial</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../benchmark/">Benchmark</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../note/">Notes</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Links <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="../bioinf/">More tools</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../yanlilab/">YanLi Lab</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                </ul>
-
-            <ul class="nav navbar-nav navbar-right">
-                    <li>
-                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                            <i class="fas fa-search"></i> Search
-                        </a>
-                    </li>
-                    <li >
-                        <a rel="prev" href="../download/">
-                            <i class="fas fa-arrow-left"></i> Previous
-                        </a>
-                    </li>
-                    <li >
-                        <a rel="next" href="../faq/">
-                            Next <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://github.com/shenwei356/seqkit/edit/master/docs/usage.md"><i class="fab fa-github"></i> Edit on GitHub</a>
-                    </li>
-            </ul>
-        </div>
+  <a href="https://github.com/shenwei356/seqkit/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
     </div>
-</div>
+  </a>
 
-    <div class="container">
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <span class="md-nav__button md-logo">
+      
+        <i class="md-icon">school</i>
+      
+    </span>
+    SeqKit - Ultrafast FASTA/Q kit
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/shenwei356/seqkit/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../download/" title="Download" class="md-nav__link">
+      Download
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+    
+    <label class="md-nav__link" for="nav-3">
+      Documents
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        Documents
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
         
         
-        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
-    <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#usage-and-examples">Usage and Examples</a></li>
-            <li class="second-level"><a href="#table-of-contents">Table of Contents</a></li>
-                
-            <li class="second-level"><a href="#technical-details-and-guides-for-use">Technical details and guides for use</a></li>
-                
-                <li class="third-level"><a href="#fastaq-format-parsing">FASTA/Q format parsing</a></li>
-                <li class="third-level"><a href="#sequence-formats-and-types">Sequence formats and types</a></li>
-                <li class="third-level"><a href="#sequence-id">Sequence ID</a></li>
-                <li class="third-level"><a href="#fasta-index">FASTA index</a></li>
-                <li class="third-level"><a href="#parallelization-of-cpu-intensive-jobs">Parallelization of CPU intensive jobs</a></li>
-                <li class="third-level"><a href="#memory-occupation">Memory occupation</a></li>
-                <li class="third-level"><a href="#reproducibility">Reproducibility</a></li>
-            <li class="second-level"><a href="#seqkit">seqkit</a></li>
-                
-                <li class="third-level"><a href="#datasets">Datasets</a></li>
-            <li class="second-level"><a href="#seq">seq</a></li>
-                
-            <li class="second-level"><a href="#subseq">subseq</a></li>
-                
-            <li class="second-level"><a href="#sliding">sliding</a></li>
-                
-            <li class="second-level"><a href="#stats">stats</a></li>
-                
-            <li class="second-level"><a href="#faidx">faidx</a></li>
-                
-            <li class="second-level"><a href="#fq2fa">fq2fa</a></li>
-                
-            <li class="second-level"><a href="#fx2tab-tab2fx">fx2tab &amp; tab2fx</a></li>
-                
-            <li class="second-level"><a href="#convert">convert</a></li>
-                
-            <li class="second-level"><a href="#translate">translate</a></li>
-                
-            <li class="second-level"><a href="#grep">grep</a></li>
-                
-            <li class="second-level"><a href="#locate">locate</a></li>
-                
-            <li class="second-level"><a href="#duplicate">duplicate</a></li>
-                
-            <li class="second-level"><a href="#rmdup">rmdup</a></li>
-                
-            <li class="second-level"><a href="#common">common</a></li>
-                
-            <li class="second-level"><a href="#split">split</a></li>
-                
-            <li class="second-level"><a href="#split2">split2</a></li>
-                
-            <li class="second-level"><a href="#sample">sample</a></li>
-                
-            <li class="second-level"><a href="#head">head</a></li>
-                
-            <li class="second-level"><a href="#range">range</a></li>
-                
-            <li class="second-level"><a href="#replace">replace</a></li>
-                
-            <li class="second-level"><a href="#rename">rename</a></li>
-                
-            <li class="second-level"><a href="#restart">restart</a></li>
-                
-            <li class="second-level"><a href="#concat">concat</a></li>
-                
-            <li class="second-level"><a href="#mutate">mutate</a></li>
-                
-            <li class="second-level"><a href="#shuffle">shuffle</a></li>
-                
-            <li class="second-level"><a href="#sort">sort</a></li>
-                
-            <li class="second-level"><a href="#genautocomplete">genautocomplete</a></li>
-                
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Usage
+      </label>
+    
+    <a href="./" title="Usage" class="md-nav__link md-nav__link--active">
+      Usage
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        
+          <li class="md-nav__item">
+    <a href="#table-of-contents" title="Table of Contents" class="md-nav__link">
+    Table of Contents
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#technical-details-and-guides-for-use" title="Technical details and guides for use" class="md-nav__link">
+    Technical details and guides for use
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          
+            <li class="md-nav__item">
+    <a href="#fastaq-format-parsing" title="FASTA/Q format parsing" class="md-nav__link">
+    FASTA/Q format parsing
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#sequence-formats-and-types" title="Sequence formats and types" class="md-nav__link">
+    Sequence formats and types
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#sequence-id" title="Sequence ID" class="md-nav__link">
+    Sequence ID
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#fasta-index" title="FASTA index" class="md-nav__link">
+    FASTA index
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#parallelization-of-cpu-intensive-jobs" title="Parallelization of CPU intensive jobs" class="md-nav__link">
+    Parallelization of CPU intensive jobs
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#memory-occupation" title="Memory occupation" class="md-nav__link">
+    Memory occupation
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#reproducibility" title="Reproducibility" class="md-nav__link">
+    Reproducibility
+  </a>
+  
+</li>
+          
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#seqkit" title="seqkit" class="md-nav__link">
+    seqkit
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          
+            <li class="md-nav__item">
+    <a href="#datasets" title="Datasets" class="md-nav__link">
+    Datasets
+  </a>
+  
+</li>
+          
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#seq" title="seq" class="md-nav__link">
+    seq
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#subseq" title="subseq" class="md-nav__link">
+    subseq
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#sliding" title="sliding" class="md-nav__link">
+    sliding
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#stats" title="stats" class="md-nav__link">
+    stats
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#faidx" title="faidx" class="md-nav__link">
+    faidx
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#fq2fa" title="fq2fa" class="md-nav__link">
+    fq2fa
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#fx2tab-tab2fx" title="fx2tab &amp; tab2fx" class="md-nav__link">
+    fx2tab &amp; tab2fx
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#convert" title="convert" class="md-nav__link">
+    convert
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#translate" title="translate" class="md-nav__link">
+    translate
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#grep" title="grep" class="md-nav__link">
+    grep
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#locate" title="locate" class="md-nav__link">
+    locate
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#duplicate" title="duplicate" class="md-nav__link">
+    duplicate
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#rmdup" title="rmdup" class="md-nav__link">
+    rmdup
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#common" title="common" class="md-nav__link">
+    common
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#split" title="split" class="md-nav__link">
+    split
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#split2" title="split2" class="md-nav__link">
+    split2
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#sample" title="sample" class="md-nav__link">
+    sample
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#head" title="head" class="md-nav__link">
+    head
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#range" title="range" class="md-nav__link">
+    range
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#replace" title="replace" class="md-nav__link">
+    replace
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#rename" title="rename" class="md-nav__link">
+    rename
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#restart" title="restart" class="md-nav__link">
+    restart
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#concat" title="concat" class="md-nav__link">
+    concat
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#mutate" title="mutate" class="md-nav__link">
+    mutate
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#shuffle" title="shuffle" class="md-nav__link">
+    shuffle
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#sort" title="sort" class="md-nav__link">
+    sort
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#genautocomplete" title="genautocomplete" class="md-nav__link">
+    genautocomplete
+  </a>
+  
+</li>
+        
+      
+      
+      
+      
+      
     </ul>
-</div></div>
-        <div class="col-md-9" role="main">
+  
+</nav>
+    
+  </li>
 
-<h1 id="usage-and-examples">Usage and Examples</h1>
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../faq/" title="FAQ" class="md-nav__link">
+      FAQ
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../tutorial/" title="Tutorial" class="md-nav__link">
+      Tutorial
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../benchmark/" title="Benchmark" class="md-nav__link">
+      Benchmark
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../note/" title="Notes" class="md-nav__link">
+      Notes
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="https://github.com/shenwei356" title="More tools" class="md-nav__link">
+      More tools
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        
+          <li class="md-nav__item">
+    <a href="#table-of-contents" title="Table of Contents" class="md-nav__link">
+    Table of Contents
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#technical-details-and-guides-for-use" title="Technical details and guides for use" class="md-nav__link">
+    Technical details and guides for use
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          
+            <li class="md-nav__item">
+    <a href="#fastaq-format-parsing" title="FASTA/Q format parsing" class="md-nav__link">
+    FASTA/Q format parsing
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#sequence-formats-and-types" title="Sequence formats and types" class="md-nav__link">
+    Sequence formats and types
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#sequence-id" title="Sequence ID" class="md-nav__link">
+    Sequence ID
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#fasta-index" title="FASTA index" class="md-nav__link">
+    FASTA index
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#parallelization-of-cpu-intensive-jobs" title="Parallelization of CPU intensive jobs" class="md-nav__link">
+    Parallelization of CPU intensive jobs
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#memory-occupation" title="Memory occupation" class="md-nav__link">
+    Memory occupation
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#reproducibility" title="Reproducibility" class="md-nav__link">
+    Reproducibility
+  </a>
+  
+</li>
+          
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#seqkit" title="seqkit" class="md-nav__link">
+    seqkit
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          
+            <li class="md-nav__item">
+    <a href="#datasets" title="Datasets" class="md-nav__link">
+    Datasets
+  </a>
+  
+</li>
+          
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#seq" title="seq" class="md-nav__link">
+    seq
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#subseq" title="subseq" class="md-nav__link">
+    subseq
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#sliding" title="sliding" class="md-nav__link">
+    sliding
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#stats" title="stats" class="md-nav__link">
+    stats
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#faidx" title="faidx" class="md-nav__link">
+    faidx
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#fq2fa" title="fq2fa" class="md-nav__link">
+    fq2fa
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#fx2tab-tab2fx" title="fx2tab &amp; tab2fx" class="md-nav__link">
+    fx2tab &amp; tab2fx
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#convert" title="convert" class="md-nav__link">
+    convert
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#translate" title="translate" class="md-nav__link">
+    translate
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#grep" title="grep" class="md-nav__link">
+    grep
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#locate" title="locate" class="md-nav__link">
+    locate
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#duplicate" title="duplicate" class="md-nav__link">
+    duplicate
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#rmdup" title="rmdup" class="md-nav__link">
+    rmdup
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#common" title="common" class="md-nav__link">
+    common
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#split" title="split" class="md-nav__link">
+    split
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#split2" title="split2" class="md-nav__link">
+    split2
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#sample" title="sample" class="md-nav__link">
+    sample
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#head" title="head" class="md-nav__link">
+    head
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#range" title="range" class="md-nav__link">
+    range
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#replace" title="replace" class="md-nav__link">
+    replace
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#rename" title="rename" class="md-nav__link">
+    rename
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#restart" title="restart" class="md-nav__link">
+    restart
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#concat" title="concat" class="md-nav__link">
+    concat
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#mutate" title="mutate" class="md-nav__link">
+    mutate
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#shuffle" title="shuffle" class="md-nav__link">
+    shuffle
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#sort" title="sort" class="md-nav__link">
+    sort
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#genautocomplete" title="genautocomplete" class="md-nav__link">
+    genautocomplete
+  </a>
+  
+</li>
+        
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/shenwei356/seqkit/edit/master/docs/usage.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                <h1 id="usage-and-examples">Usage and Examples</h1>
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -413,9 +1289,9 @@ They use FASTA index for rapid acccess of sequences and reducing memory occupati
 given by flag <code>-s</code> (<code>--rand-seed</code>). This makes sure that sampling result could be
 reproduced in different environments with same random seed.</p>
 <h2 id="seqkit">seqkit</h2>
-<pre><code>SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
+<pre><code class="text">SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.10.1
+Version: 0.10.2
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -462,7 +1338,7 @@ Flags:
       --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
   -h, --help                            help for seqkit
       --id-ncbi                         FASTA head is NCBI-style, e.g. &gt;gi|110645304|ref|NC_002516.2| Pseud...
-      --id-regexp string                regular expression for parsing ID (default &quot;^([^\\s]+)\\s?&quot;)
+      --id-regexp string                regular expression for parsing ID (default &quot;^(\\S+)\\s?&quot;)
   -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
   -o, --out-file string                 out file (&quot;-&quot; for stdout, suffix .gz for gzipped out) (default &quot;-&quot;)
       --quiet                           be quiet and do not show extra information
@@ -485,7 +1361,9 @@ Flags:
 <li><a href="ftp://ftp.ensembl.org/pub/release-84/gtf/homo_sapiens/Homo_sapiens.GRCh38.84.gtf.gz"><code>Homo_sapiens.GRCh38.84.gtf.gz</code></a></li>
 <li><code>Homo_sapiens.GRCh38.84.bed.gz</code> is converted from <code>Homo_sapiens.GRCh38.84.gtf.gz</code>
 by <a href="http://bedops.readthedocs.org/en/latest/content/reference/file-management/conversion/gtf2bed.html?highlight=gtf2bed"><code>gtf2bed</code></a>
-with command<pre><code>zcat Homo_sapiens.GRCh38.84.gtf.gz | gtf2bed --do-not-sort | gzip -c &gt; Homo_sapiens.GRCh38.84.bed.gz
+with command<pre><code>zcat Homo_sapiens.GRCh38.84.gtf.gz \
+    | gtf2bed --do-not-sort \
+    | gzip -c &gt; Homo_sapiens.GRCh38.84.bed.gz
 </code></pre>
 </li>
 </ul>
@@ -509,7 +1387,7 @@ with command<pre><code>zcat Homo_sapiens.GRCh38.84.gtf.gz | gtf2bed --do-not-sor
 </ul>
 <h2 id="seq">seq</h2>
 <p>Usage</p>
-<pre><code>transform sequences (revserse, complement, extract ID...)
+<pre><code class="text">transform sequences (revserse, complement, extract ID...)
 
 Usage:
   seqkit seq [flags]
@@ -623,7 +1501,7 @@ MI0000003
 </ul>
 </li>
 <li>
-<p>Only print seq (global flag <code>-w</code> defines the output line width, 0 for no wrap)</p>
+<p>Only print seq (global flag <code>-w</code> defines the output line width, <code>0</code> for no wrap)</p>
 <pre><code>$ seqkit seq hairpin.fa.gz -s -w 0
 UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAACUAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGAGUGUACUAUUGAUGCUUCACACCUGGGCUCUCCGGGUACCAGGACGGUUUGAGCAGAU
@@ -675,7 +1553,7 @@ file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
 </ol>
 <h2 id="subseq">subseq</h2>
 <p>Usage</p>
-<pre><code>get subsequences by region/gtf/bed, including flanking sequences.
+<pre><code class="text">get subsequences by region/gtf/bed, including flanking sequences.
 
 Recommendation: use plain FASTA file, so seqkit could utilize FASTA index.
 
@@ -779,10 +1657,12 @@ agt
 <p>Get subsequences by BED file.</p>
 <p><strong><em>AVOID loading all data from Homo_sapiens.GRCh38.84.gtf.gz,
 the uncompressed data are so big and may exhaust your RAM.</em></strong></p>
-<pre><code>$  seqkit subseq --bed Homo_sapiens.GRCh38.84.bed.gz --chr 1 hsa.fa &gt;  chr1.bed.gz.fa
+<pre><code>$ seqkit subseq --bed Homo_sapiens.GRCh38.84.bed.gz --chr 1 hsa.fa \
+    &gt;  chr1.bed.gz.fa
 </code></pre>
 <p>We may need to remove duplicated sequences</p>
-<pre><code>$ seqkit subseq --bed Homo_sapiens.GRCh38.84.bed.gz --chr 1 hsa.fa | seqkit rmdup &gt; chr1.bed.rmdup.fa
+<pre><code>$ seqkit subseq --bed Homo_sapiens.GRCh38.84.bed.gz --chr 1 hsa.fa \
+    | seqkit rmdup &gt; chr1.bed.rmdup.fa
 [INFO] 141060 duplicated records removed
 </code></pre>
 <p>Summary:</p>
@@ -795,7 +1675,7 @@ chr1.gz.rmdup.fa   FASTA        DNA          90,914         1   6,455.8   1,551,
 </ol>
 <h2 id="sliding">sliding</h2>
 <p>Usage</p>
-<pre><code>sliding sequences, circular genome supported
+<pre><code class="text">sliding sequences, circular genome supported
 
 Usage:
   seqkit sliding [flags]
@@ -847,7 +1727,9 @@ NACGTa
 </li>
 <li>
 <p>Generate GC content for ploting</p>
-<pre><code>$ zcat hairpin.fa.gz | seqkit fx2tab | head -n 1 | seqkit tab2fx | seqkit sliding -s 5 -W 30 | seqkit fx2tab -n -g
+<pre><code>$ zcat hairpin.fa.gz \
+    | seqkit sliding -s 5 -W 30 \
+    | seqkit fx2tab -n -g
 cel-let-7_sliding:1-30          50.00
 cel-let-7_sliding:6-35          46.67
 cel-let-7_sliding:11-40         43.33
@@ -860,7 +1742,7 @@ cel-let-7_sliding:26-55         40.00
 </ol>
 <h2 id="stats">stats</h2>
 <p>Usage</p>
-<pre><code>simple statistics of FASTA/Q files
+<pre><code class="text">simple statistics of FASTA/Q files
 
 Tips:
   1. For lots of small files (especially on SDD), use big value of '-j' to
@@ -874,6 +1756,8 @@ Aliases:
 
 Flags:
   -a, --all                  all statistics, including quartiles of seq length, sum_gap, N50
+  -b, --basename             only output basename of files
+  -E, --fq-encoding string   fastq quality encoding. available values: 'sanger', 'solexa', 'illumina-1.3+', 'illumina-1.5+', 'illumina-1.8+'. (default &quot;sanger&quot;)
   -G, --gap-letters string   gap letters (default &quot;- .&quot;)
   -h, --help                 help for stats
   -e, --skip-err             skip error, only show warning message
@@ -902,7 +1786,7 @@ Illimina1.8.fq.gz       FASTQ   DNA     10000   1500000 150     150.0   150
 reads_1.fq.gz   FASTQ   DNA     2500    567516  226     227.0   229
 reads_2.fq.gz   FASTQ   DNA     2500    560002  223     224.0   225
 
-# So you can process the result with tools like [csvtk](http://bioinf.shenwei.me/csvtk)
+# So you can process the result with tools like csvtk: http://bioinf.shenwei.me/csvtk
 
 $ seqkit stats *.f{a,q}.gz -T | csvtk pretty -t
 file                format   type   num_seqs   sum_len   min_len   avg_len   max_len
@@ -1027,10 +1911,13 @@ tests/mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8    
 tests/reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225
 </code></pre>
 </li>
+<li>
+<p>Output basename instead of full path (<code>-b/--basename</code>)</p>
+</li>
 </ol>
 <h2 id="faidx">faidx</h2>
 <p>Usage</p>
-<pre><code>create FASTA index file and extract subsequence
+<pre><code class="text">create FASTA index file and extract subsequence
 
 This command is similar with &quot;samtools faidx&quot; but has some extra features:
 
@@ -1051,7 +1938,7 @@ Flags:
 <p>Example</p>
 <ol>
 <li>
-<p>common usage</p>
+<p>common usage like <code>samtools faidx</code></p>
 <pre><code>$ seqkit faidx tests/hairpin.fa hsa-let-7a-1 hsa-let-7a-2
 &gt;hsa-let-7a-1
 UGGGAUGAGGUAGUAGGUUGUAUAGUUUUAGGGUCACACCCACCACUGGGAGAUAACUAU
@@ -1062,7 +1949,7 @@ CCUAGCUUUCCU
 </code></pre>
 </li>
 <li>
-<p>output full header</p>
+<p>output full header, not supported by <code>samtools faidx</code></p>
 <pre><code>$ seqkit faidx tests/hairpin.fa hsa-let-7a-1 hsa-let-7a-2 -f
 &gt;hsa-let-7a-1 MI0000060 Homo sapiens let-7a-1 stem-loop
 UGGGAUGAGGUAGUAGGUUGUAUAGUUUUAGGGUCACACCCACCACUGGGAGAUAACUAU
@@ -1097,7 +1984,7 @@ file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
 </ol>
 <h2 id="fq2fa">fq2fa</h2>
 <p>Usage</p>
-<pre><code>convert FASTQ to FASTA
+<pre><code class="text">convert FASTQ to FASTA
 
 Usage:
   seqkit fq2fa [flags]
@@ -1105,11 +1992,11 @@ Usage:
 </code></pre>
 
 <p>Examples</p>
-<pre><code>seqkit fq2fa reads_1.fq.gz -o reads1_.fa.gz
+<pre><code>seqkit fq2fa reads_1.fq.gz -o reads_1.fa.gz
 </code></pre>
 <h2 id="fx2tab-tab2fx">fx2tab &amp; tab2fx</h2>
 <p>Usage (fx2tab)</p>
-<pre><code>convert FASTA/Q to tabular format, and provide various information,
+<pre><code class="text">convert FASTA/Q to tabular format, and provide various information,
 like sequence length, GC content/GC skew.
 
 Usage:
@@ -1127,14 +2014,13 @@ Flags:
 </code></pre>
 
 <p>Usage (tab2fx)</p>
-<pre><code>convert tabular format (first two/three columns) to FASTA/Q format
+<pre><code class="text">convert tabular format (first two/three columns) to FASTA/Q format
 
 Usage:
   seqkit tab2fx [flags]
 
 Flags:
   -p, --comment-line-prefix value   comment line prefix (default [#,//])
-
 
 </code></pre>
 
@@ -1149,7 +2035,7 @@ cel-lin-4 MI0000002 Caenorhabditis elegans lin-4 stem-loop      AUGCUUCCGGCCUGUU
 </li>
 <li>
 <p>Print sequence length, GC content, and only print names (no sequences),
-we could also print title line by flag <code>-T</code>.</p>
+we could also print title line by flag <code>-H</code>.</p>
 <pre><code>$ seqkit fx2tab hairpin.fa.gz -l -g -n -i -H | head -n 4 | csvtk -t -C '&amp;' pretty
 #name       seq   qual   length   GC
 cel-let-7                99       43.43
@@ -1166,7 +2052,10 @@ $ zcat reads_1.fq.gz | seqkit fx2tab | seqkit tab2fx
 </li>
 <li>
 <p>Sort sequences by length (use <code>seqkit sort -l</code>)</p>
-<pre><code>$ zcat hairpin.fa.gz | seqkit fx2tab -l | sort -t"`echo -e '\t'`" -n -k4,4 | seqkit tab2fx
+<pre><code>$ zcat hairpin.fa.gz \
+    | seqkit fx2tab -l \
+    | sort -t"`echo -e '\t'`" -n -k4,4 \
+    | seqkit tab2fx
 &gt;cin-mir-4129 MI0015684 Ciona intestinalis miR-4129 stem-loop
 UUCGUUAUUGGAAGACCUUAGUCCGUUAAUAAAGGCAUC
 &gt;mmu-mir-7228 MI0023723 Mus musculus miR-7228 stem-loop
@@ -1201,7 +2090,7 @@ provides melt function, could be used in preparation of data for ploting.</li>
 </ul>
 <h2 id="convert">convert</h2>
 <p>Usage</p>
-<pre><code>convert FASTQ quality encoding between Sanger, Solexa and Illumina
+<pre><code class="text">convert FASTQ quality encoding between Sanger, Solexa and Illumina
 
 Usage:
   seqkit convert [flags]
@@ -1301,7 +2190,7 @@ FGDGGGGGDGFFGGGDGGGGGGEEGAGFFE&gt;A&gt;@!B@?@@&lt;:!!!!!!!!!!355=&gt;&gt;&lt;&gt
 
 <h2 id="translate">translate</h2>
 <p>Usage</p>
-<pre><code>translate DNA/RNA to protein sequence (supporting ambiguous bases)
+<pre><code class="text">translate DNA/RNA to protein sequence (supporting ambiguous bases)
 
 Note:
 
@@ -1381,7 +2270,7 @@ AHSSYLKTKKGQSTSRHKKTMVKKVGPDSD*
 </code></pre>
 </li>
 <li>
-<p>trim the '*'</p>
+<p>trim the <code>*</code></p>
 <pre><code>$ seqkit translate tests/mouse-p53-cds.fna --trim
 &gt;lcl|AB021961.1_cds_BAA82344.1_1 [gene=p53] [protein=P53] [protein_id=BAA82344.1] [location=101..1273] [gbkey=CDS]
 MTAMEESQSDISLELPLSQETFSGLWKLLPPEDILPSPHCMDDLLLPQDVEEFFEGPSEA
@@ -1395,7 +2284,8 @@ AHSSYLKTKKGQSTSRHKKTMVKKVGPDSD
 </li>
 <li>
 <p>different translate table</p>
-<pre><code>$ seqkit translate tests/Lactococcus-lactis-phage-BK5-T-ORF25.fasta -T 11 --trim
+<pre><code>$ cat tests/Lactococcus-lactis-phage-BK5-T-ORF25.fasta \
+    | seqkit translate -T 11 --trim
 &gt;CAC80166.1 hypothetical protein [Lactococcus phage BK5-T]
 MEEQAWREVLERLARIETKLDNYETVRDKAERALLIAQSNAKLIEKMEANNKWAWGFMLT
 LAVTVIGYLFTKIRF
@@ -1493,16 +2383,17 @@ Stranslate Table:
 </ol>
 <h2 id="grep">grep</h2>
 <p>Usage</p>
-<pre><code>search sequences by pattern(s) of name or sequence motifs
+<pre><code class="text">search sequences by pattern(s) of name or sequence motifs
 
 Attentions:
-    1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
-       (ID/full header) by default. Please switch &quot;-r/--use-regexp&quot; on
-       for partly matching.
-    2. While when searching by sequences, it's partly matching. And mismatch
-       is allowed using flag &quot;-m/--max-mismatch&quot;.
-    3. The order of sequences in result is consistent with that in original
-       file, not the order of the query patterns.
+  1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
+     (ID/full header) by default. Please switch &quot;-r/--use-regexp&quot; on
+     for partly matching.
+  2. While when searching by sequences, only positive strand is searched,
+     and it's partly matching. 
+     Mismatchis are allowed using flag &quot;-m/--max-mismatch&quot;.
+  3. The order of sequences in result is consistent with that in original
+     file, not the order of the query patterns.
 
 You can specify the sequence region for searching with flag -R (--region).
 The definition of region is 1-based and with some custom design.
@@ -1527,14 +2418,15 @@ Usage:
 
 Flags:
   -n, --by-name               match by full name instead of just id
-  -s, --by-seq                match by seq
+  -s, --by-seq                search subseq on seq, only positive strand is searched, and mismatch allowed using flag -m/--max-mismatch
   -d, --degenerate            pattern/motif contains degenerate base
       --delete-matched        delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions
+  -h, --help                  help for grep
   -i, --ignore-case           ignore case
   -v, --invert-match          invert the sense of matching, to select non-matching records
   -m, --max-mismatch int      max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)
-  -p, --pattern stringSlice   search pattern (multiple values supported)
-  -f, --pattern-file string   pattern file
+  -p, --pattern strings       search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '&quot;A{2,}&quot;'))
+  -f, --pattern-file string   pattern file (one record per line)
   -R, --region string         specify sequence region for searching. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases
   -r, --use-regexp            patterns are regular expression
 
@@ -1577,27 +2469,29 @@ pmi-let-7
 </li>
 </ol>
 </li>
-</ol>
-<p>1  Extract sequences containing AGGCG</p>
-<pre><code>    $ cat hairpin.fa.gz | seqkit grep -s -i -p aggcg
+<li>
+<p>Extract sequences containing AGGCG</p>
+<pre><code>$ cat hairpin.fa.gz | seqkit grep -s -i -p aggcg
 </code></pre>
-<p>1  Extract sequences containing AGGCG (allow mismatch, <strong>only for short (&lt;50kb) sequences now</strong>)</p>
-<pre><code>    $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg | seqkit stats
-    file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
-    -     FASTA   RNA      1,181  145,789       49    123.4    2,354
+</li>
+<li>
+<p>Extract sequences containing AGGCG (allow mismatch, <strong>only for short (&lt;50kb) sequences now</strong>)</p>
+<pre><code>$ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg | seqkit stats
+file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+-     FASTA   RNA      1,181  145,789       49    123.4    2,354
 
-    real    0m0.070s
-    user    0m0.107s
-    sys     0m0.017s
+real    0m0.070s
+user    0m0.107s
+sys     0m0.017s
 
-    $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg -m 1 | seqkit stats
-    file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
-    -     FASTA   RNA     17,168  1,881,005       39    109.6    2,354
+$ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg -m 1 | seqkit stats
+file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
+-     FASTA   RNA     17,168  1,881,005       39    109.6    2,354
 
-    real    0m4.655s
-    user    0m4.753s
+real    0m4.655s
+user    0m4.753s
 </code></pre>
-<ol>
+</li>
 <li>
 <p>Extract sequences starting with AGGCG</p>
 <pre><code>$ zcat hairpin.fa.gz | seqkit grep -s -r -i -p ^aggcg
@@ -1619,7 +2513,7 @@ pmi-let-7
 </ol>
 <h2 id="locate">locate</h2>
 <p>Usage</p>
-<pre><code>locate subsequences/motifs, mismatch allowed
+<pre><code class="text">locate subsequences/motifs, mismatch allowed
 
 Motifs could be EITHER plain sequence containing &quot;ACTGN&quot; OR regular
 expression like &quot;A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)&quot; for ORFs.
@@ -1654,51 +2548,59 @@ Flags:
 &gt;seq
 agctggagctacc
 
-$ cat t.fa | seqkit locate -p agc
-seqID   patternName     pattern strand  start   end     matched
-seq     agc     agc     +       1       3       agc
-seq     agc     agc     +       7       9       agc
-seq     agc     agc     -       8       10      agc
-seq     agc     agc     -       2       4       agc
+$ cat t.fa | seqkit locate -p agc | csvtk pretty -t
+seqID   patternName   pattern   strand   start   end   matched
+seq     agc           agc       +        1       3     agc
+seq     agc           agc       +        7       9     agc
+seq     agc           agc       -        8       10    agc
+seq     agc           agc       -        2       4     agc
 
-$ cat t.fa | seqkit locate -p agc -m 1
+$ cat t.fa | seqkit locate -p agc -m 1 | csvtk pretty -t
 seqID   patternName     pattern strand  start   end     matched
-seq     agc     agc     +       1       3       agc
-seq     agc     agc     +       7       9       agc
-seq     agc     agc     +       11      13      acc
-seq     agc     agc     -       8       10      agc
-seq     agc     agc     -       2       4       agc
+seq     agc           agc       +        1       3     agc
+seq     agc           agc       +        7       9     agc
+seq     agc           agc       +        11      13    acc
+seq     agc           agc       -        8       10    agc
+seq     agc           agc       -        2       4     agc
 
-$ cat t.fa | seqkit locate -p agc -m 2
-seqID   patternName     pattern strand  start   end     matched
-seq     agc     agc     +       1       3       agc
-seq     agc     agc     +       4       6       tgg
-seq     agc     agc     +       5       7       gga
-seq     agc     agc     +       7       9       agc
-seq     agc     agc     +       10      12      tac
-seq     agc     agc     +       11      13      acc
-seq     agc     agc     -       11      13      ggt
-seq     agc     agc     -       8       10      agc
-seq     agc     agc     -       6       8       ctc
-seq     agc     agc     -       5       7       tcc
-seq     agc     agc     -       2       4       agc
+$ cat t.fa | seqkit locate -p agc -m 2 | csvtk pretty -t
+seqID   patternName   pattern   strand   start   end   matched
+seq     agc           agc       +        1       3     agc
+seq     agc           agc       +        4       6     tgg
+seq     agc           agc       +        5       7     gga
+seq     agc           agc       +        7       9     agc
+seq     agc           agc       +        10      12    tac
+seq     agc           agc       +        11      13    acc
+seq     agc           agc       -        11      13    ggt
+seq     agc           agc       -        8       10    agc
+seq     agc           agc       -        6       8     ctc
+seq     agc           agc       -        5       7     tcc
+seq     agc           agc       -        2       4     agc
 </code></pre>
 </li>
 <li>
 <p>Locate ORFs.</p>
-<pre><code>$ zcat hairpin.fa.gz | seqkit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)"
-seqID   patternName     pattern strand  start   end     matched
-cel-lin-4       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        +  136      AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGA
-cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        +  54       95      AUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAG
-cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        -  43       51      AUGAUAUAG
+<pre><code>$ zcat hairpin.fa.gz \
+    | seqkit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" \
+    | head -n 4 \
+    | csvtk pretty -t
+seqID       patternName                        pattern                            strand   start   end   matched
+cel-lin-4   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   +        1       36    AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGA
+cel-mir-1   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   +        54      95    AUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAG
+cel-mir-1   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   -        43      51    AUGAUAUAG
+cel-mir-1   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   -        30      41    AUGGGCAUGUAA
 </code></pre>
 </li>
 <li>
 <p>Locate Motif.</p>
-<pre><code>$ zcat hairpin.fa.gz | seqkit locate -i -d -p AUGGACUN
+<pre><code>$ zcat hairpin.fa.gz \
+    | seqkit locate -i -d -p AUGGACUN \
+    | head -n 4 \
+    | csvtk pretty -t 
 seqID         patternName   pattern    strand   start   end   matched
 cel-mir-58a   AUGGACUN      AUGGACUN   +        81      88    AUGGACUG
 ath-MIR163    AUGGACUN      AUGGACUN   -        122     129   AUGGACUC
+cel-mir-270   AUGGACUN      AUGGACUN   +        84      91    AUGGACUG
 </code></pre>
 <p>Notice that <code>seqkit grep</code> only searches in positive strand, but <code>seqkit loate</code> could recognize both strand.</p>
 </li>
@@ -1733,7 +2635,7 @@ seq     ACGA          ACGA      +        7       10    ACGA
 </ol>
 <h2 id="duplicate">duplicate</h2>
 <p>Usage</p>
-<pre><code>duplicate sequences N times
+<pre><code class="text">duplicate sequences N times
 
 You may need &quot;seqkit rename&quot; to make the the sequence IDs unique.
 
@@ -1761,7 +2663,8 @@ UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 </li>
 <li>
 <p>Duplicate 2 times</p>
-<pre><code>$ cat tests/hairpin.fa | seqkit head -n 1 | seqkit duplicate -n 2
+<pre><code>$ cat tests/hairpin.fa | seqkit head -n 1 \
+    | seqkit duplicate -n 2
 &gt;cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
 UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
 UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
@@ -1772,7 +2675,8 @@ UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 </li>
 <li>
 <p>use <code>seqkit rename</code> to make the the sequence IDs unique.</p>
-<pre><code>$ cat tests/hairpin.fa | seqkit head -n 1 | seqkit duplicate -n 2 | seqkit rename
+<pre><code>$ cat tests/hairpin.fa | seqkit head -n 1 \
+    | seqkit duplicate -n 2 | seqkit rename
 &gt;cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
 UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
 UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
@@ -1784,18 +2688,18 @@ UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 </ol>
 <h2 id="rmdup">rmdup</h2>
 <p>Usage</p>
-<pre><code>remove duplicated sequences by id/name/sequence
+<pre><code class="text">remove duplicated sequences by id/name/sequence
 
 Usage:
   seqkit rmdup [flags]
 
 Flags:
-    -n, --by-name                by full name instead of just id
-    -s, --by-seq                 by seq
-    -D, --dup-num-file string    file to save number and list of duplicated seqs
-    -d, --dup-seqs-file string   file to save duplicated seqs
-    -i, --ignore-case            ignore case
-    -m, --md5                    use MD5 instead of original seqs to reduce memory usage when comparing by seqs
+  -n, --by-name                by full name instead of just id
+  -s, --by-seq                 by seq
+  -D, --dup-num-file string    file to save number and list of duplicated seqs
+  -d, --dup-seqs-file string   file to save duplicated seqs
+  -h, --help                   help for rmdup
+  -i, --ignore-case            ignore case
 
 </code></pre>
 
@@ -1813,7 +2717,8 @@ $ zcat reads_1.fq.gz | seqkit rmdup -s -o clean.fa.gz
 </li>
 <li>
 <p>Save duplicated sequences to file</p>
-<pre><code>$ zcat hairpin.fa.gz | seqkit rmdup -s -i -m -o clean.fa.gz -d duplicated.fa.gz -D duplicated.detail.txt
+<pre><code>$ zcat hairpin.fa.gz \
+    | seqkit rmdup -s -i -o clean.fa.gz -d duplicated.fa.gz -D duplicated.detail.txt
 
 $ cat duplicated.detail.txt   # here is not the entire list
 3   hsa-mir-424, mml-mir-424, ppy-mir-424
@@ -1825,7 +2730,7 @@ $ cat duplicated.detail.txt   # here is not the entire list
 </ol>
 <h2 id="common">common</h2>
 <p>Usage</p>
-<pre><code>find common sequences of multiple files by id/name/sequence
+<pre><code class="text">find common sequences of multiple files by id/name/sequence
 
 Note:
     1. 'seqkit common' is designed to support 2 and MORE files.
@@ -1844,7 +2749,6 @@ Flags:
   -s, --by-seq        match by sequence
   -h, --help          help for common
   -i, --ignore-case   ignore case
-  -m, --md5           use MD5 instead of original seqs to reduce memory usage when comparing by seqs
 
 </code></pre>
 
@@ -1865,15 +2769,10 @@ Flags:
 <pre><code>seqkit common file*.fa -s -i -o common.fasta
 </code></pre>
 </li>
-<li>
-<p>By sequence (<strong><em>for large sequences</em></strong>)</p>
-<pre><code>seqkit common file*.fa -s -i -o common.fasta --md5
-</code></pre>
-</li>
 </ol>
 <h2 id="split">split</h2>
 <p>Usage</p>
-<pre><code>split sequences into files by name ID, subsequence of given region,
+<pre><code class="text">split sequences into files by name ID, subsequence of given region,
 part size or number of parts.
 
 Please use &quot;seqkit split2&quot; for paired- and single-end FASTQ.
@@ -1907,7 +2806,6 @@ Flags:
   -f, --force              overwrite output directory
   -h, --help               help for split
   -k, --keep-temp          keep tempory FASTA and .fai file when using 2-pass mode
-  -m, --md5                use MD5 instead of region sequence in output file when using flag -r (--by-region)
   -O, --out-dir string     output directory (default value is $infile.split)
   -2, --two-pass           two-pass mode read files twice to lower memory usage. (only for FASTA format)
 
@@ -1975,14 +2873,12 @@ Flags:
 [INFO] write 349 sequences to file: hairpin.region_1:3_ACU.fa.gz
 [INFO] write 311 sequences to file: hairpin.region_1:3_CGG.fa.gz
 </code></pre>
-<p><strong>If region is too long, we could use falg <code>--md5</code></strong>,
-i.e. use MD5 instead of region sequence in output file.</p>
 <p>Sequence suffix could be defined as <code>-r -12:-1</code></p>
 </li>
 </ol>
 <h2 id="split2">split2</h2>
 <p>Usage</p>
-<pre><code>split sequences into files by part size or number of parts
+<pre><code class="text">split sequences into files by part size or number of parts
 
 This command supports FASTA and paired- or single-end FASTQ with low memory
 occupation and fast speed.
@@ -2056,7 +2952,7 @@ $ seqkit split2 reads_1.fq.gz -p 2 -O out -f
 </ol>
 <h2 id="sample">sample</h2>
 <p>Usage</p>
-<pre><code>sample sequences by number or proportion.
+<pre><code class="text">sample sequences by number or proportion.
 
 Usage:
   seqkit sample [flags]
@@ -2087,17 +2983,22 @@ Flags:
 <p>949 != 1000 ??? see <a href="http:bioinf.shenwei.me/seqkit/note/#effect-of-random-seed-on-results-of-seqkit-sample">Effect of random seed on results of <code>seqkit sample</code></a></p>
 <p><strong><em>To reduce memory usage when spliting big file, we could use flag <code>--two-pass</code></em></strong></p>
 <p><strong><em>We can also use <code>seqkit sample -p</code> followed with <code>seqkit head -n</code>:</em></strong></p>
-<pre><code>$ zcat hairpin.fa.gz | seqkit sample -p 0.1 | seqkit head -n 1000 -o sample.fa.gz
+<pre><code>$ zcat hairpin.fa.gz \
+    | seqkit sample -p 0.1 \
+    | seqkit head -n 1000 -o sample.fa.gz
 </code></pre>
 </li>
 <li>
 <p>Set rand seed to reproduce the result</p>
-<pre><code>$ zcat hairpin.fa.gz | seqkit sample -p 0.1 -s 11
+<pre><code>$ zcat hairpin.fa.gz \
+    | seqkit sample -p 0.1 -s 11
 </code></pre>
 </li>
 <li>
 <p>Most of the time, we could shuffle after sampling</p>
-<pre><code>$ zcat hairpin.fa.gz | seqkit sample -p 0.1 | seqkit shuffle -o sample.fa.gz
+<pre><code>$ zcat hairpin.fa.gz \
+    | seqkit sample -p 0.1 \
+    | seqkit shuffle -o sample.fa.gz
 </code></pre>
 </li>
 </ol>
@@ -2105,7 +3006,7 @@ Flags:
 flag <code>-s</code> (<code>--rand-seed</code>)</p>
 <h2 id="head">head</h2>
 <p>Usage</p>
-<pre><code>print first N FASTA/Q records
+<pre><code class="text">print first N FASTA/Q records
 
 Usage:
   seqkit head [flags]
@@ -2137,7 +3038,7 @@ HIHIIIIIHIIHGHHIHHIIIIIIIIIIIIIIIHHIIIIIHHIHIIIIIGIHIIIIHHHHHHGHIHIIIIIIIII
 </ol>
 <h2 id="range">range</h2>
 <p>Usage</p>
-<pre><code>print FASTA/Q records in a range (start:end)
+<pre><code class="text">print FASTA/Q records in a range (start:end)
 
 Usage:
   seqkit range [flags]
@@ -2178,7 +3079,7 @@ file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
 </ol>
 <h2 id="replace">replace</h2>
 <p>Usage</p>
-<pre><code>replace name/sequence by regular expression.
+<pre><code class="text">replace name/sequence by regular expression.
 
 Note that the replacement supports capture variables.
 e.g. $1 represents the text of the first submatch.
@@ -2196,9 +3097,9 @@ more on: http://bioinf.shenwei.me/seqkit/usage/#replace
 
 Special replacement symbols (only for replacing name not sequence):
 
-        {nr}    Record number, starting from 1
-        {kv}    Corresponding value of the key (captured variable $n) by key-value file,
-                n can be specified by flag -I (--key-capt-idx) (default: 1)
+    {nr}    Record number, starting from 1
+    {kv}    Corresponding value of the key (captured variable $n) by key-value file,
+            n can be specified by flag -I (--key-capt-idx) (default: 1)
 
 Usage:
   seqkit replace [flags]
@@ -2221,35 +3122,47 @@ Flags:
 <ol>
 <li>
 <p>Remove descriptions</p>
-<pre><code>$ echo -e "&gt;seq1 abc-123\nACGT-ACGT" | seqkit replace -p " .+"
+<pre><code>$ echo -e "&gt;seq1 abc-123\nACGT-ACGT"
+&gt;seq1 abc-123
+ACGT-ACGT
+
+$ echo -e "&gt;seq1 abc-123\nACGT-ACGT" \
+    | seqkit replace -p "\s.+"
 &gt;seq1
 ACGT-ACGT
 </code></pre>
 </li>
 <li>
 <p>Replace "-" with "="</p>
-<pre><code>$ echo -e "&gt;seq1 abc-123\nACGT-ACGT" | seqkit replace -p "\-" -r '='
+<pre><code>$ echo -e "&gt;seq1 abc-123\nACGT-ACGT" \
+    | seqkit replace -p "\-" -r '='
 &gt;seq1 abc=123
 ACGT-ACGT
 </code></pre>
 </li>
 <li>
 <p>Remove gaps in sequences.</p>
-<pre><code>$ echo -e "&gt;seq1 abc-123\nACGT-ACGT" | seqkit replace -p " |-" -s
+<pre><code>$ echo -e "&gt;seq1 abc-123\nACGT-ACGT" \
+    | seqkit replace -p " |-" -s
 &gt;seq1 abc-123
 ACGTACGT
 </code></pre>
 </li>
 <li>
 <p>Add space to every base. <strong>ATTENTION: use SINGLE quote NOT double quotes in *nix OS</strong></p>
-<pre><code>$ echo -e "&gt;seq1 abc-123\nACGT-ACGT" | seqkit replace -p "(.)" -r '$1 ' -s
+<pre><code>$ echo -e "&gt;seq1 abc-123\nACGT-ACGT" \
+    | seqkit replace -p "(.)" -r '$1 ' -s
 &gt;seq1 abc-123
 A C G T - A C G T
 </code></pre>
 </li>
 <li>
 <p>Transpose sequence with <a href="https://github.com/shenwei356/csvtk">csvtk</a></p>
-<pre><code>$ echo -e "&gt;seq1\nACTGACGT\n&gt;seq2\nactgccgt" | seqkit replace -p "(.)" -r     "\$1 " -s | seqkit seq -s -u | csvtk space2tab | csvtk -t transpose
+<pre><code>$ echo -e "&gt;seq1\nACTGACGT\n&gt;seq2\nactgccgt" \
+    | seqkit replace -p "(.)" -r     "\$1 " -s \
+    | seqkit seq -s -u \
+    | csvtk space2tab \
+    | csvtk -t transpose
 A       A
 C       C
 T       T
@@ -2262,13 +3175,15 @@ T       T
 </li>
 <li>
 <p>Rename with number of record</p>
-<pre><code>$ echo -e "&gt;abc\nACTG\n&gt;123\nATTT" |  seqkit replace -p .+ -r "seq_{nr}"
+<pre><code>$ echo -e "&gt;abc\nACTG\n&gt;123\nATTT" \
+    |  seqkit replace -p .+ -r "seq_{nr}"
 &gt;seq_1
 ACTG
 &gt;seq_2
 ATTT
 
-$ echo -e "&gt;abc\nACTG\n&gt;123\nATTT" |  seqkit replace -p .+ -r "seq_{nr}" --nr-width 5
+$ echo -e "&gt;abc\nACTG\n&gt;123\nATTT" \
+    |  seqkit replace -p .+ -r "seq_{nr}" --nr-width 5
 &gt;seq_00001
 ACTG
 &gt;seq_00002
@@ -2314,7 +3229,8 @@ CCCCAAAACCCCATGTTGCTACTAG
 </li>
 <li>
 <p>convert fasta to genbank style</p>
-<pre><code>&gt;seq1
+<pre><code>$ cat seq.fa
+&gt;seq1
 TTTAAAGAGACCGGCGATTCTAGTGAAATCGAACGGGCAGGTCAATTTCCAACCAGCGAT
 GACGTAATAGATAGATACAAGGAAGTCATTTTTCTTTTAAAGGATAGAAACGGTTAATGC
 TCTTGGGACGGCGCTTTTCTGTGCATAACT
@@ -2340,7 +3256,7 @@ $ cat seq.fa \
 </ol>
 <h2 id="rename">rename</h2>
 <p>Usage</p>
-<pre><code>rename duplicated IDs
+<pre><code class="text">rename duplicated IDs
 
 Usage:
   seqkit rename [flags]
@@ -2351,14 +3267,16 @@ Flags:
 </code></pre>
 
 <p>Examples</p>
-<pre><code>$ echo -e &quot;&gt;a comment\nacgt\n&gt;b comment of b\nACTG\n&gt;a comment\naaaa&quot;
+<pre><code class="sh">$ echo -e &quot;&gt;a comment\nacgt\n&gt;b comment of b\nACTG\n&gt;a comment\naaaa&quot;
 &gt;a comment
 acgt
 &gt;b comment of b
 ACTG
 &gt;a comment
 aaaa
-$ echo -e &quot;&gt;a comment\nacgt\n&gt;b comment of b\nACTG\n&gt;a comment\naaaa&quot; | seqkit rename
+
+$ echo -e &quot;&gt;a comment\nacgt\n&gt;b comment of b\nACTG\n&gt;a comment\naaaa&quot; \
+    | seqkit rename
 &gt;a comment
 acgt
 &gt;b comment of b
@@ -2369,7 +3287,7 @@ aaaa
 
 <h2 id="restart">restart</h2>
 <p>Usage</p>
-<pre><code>reset start position for circular genome
+<pre><code class="text">reset start position for circular genome
 
 Examples
 
@@ -2395,7 +3313,7 @@ Flags:
 
 <h2 id="concat">concat</h2>
 <p>Usage</p>
-<pre><code>concatenate sequences with same ID from multiple files
+<pre><code class="text">concatenate sequences with same ID from multiple files
 
 Example: concatenating leading 2 bases and last 2 bases
 
@@ -2417,12 +3335,11 @@ Usage:
 Flags:
   -h, --help   help for concat
 
-
 </code></pre>
 
 <h2 id="mutate">mutate</h2>
 <p>Usage</p>
-<pre><code>edit sequence (point mutation, insertion, deletion)
+<pre><code class="text">edit sequence (point mutation, insertion, deletion)
 
 Attentions:
 
@@ -2480,7 +3397,8 @@ ACTGNactgn
 actgnACTGN
 
 # first base
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -p 1:x
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" \
+    | seqkit mutate -p 1:x
 [INFO] edit seq: 1
 [INFO] edit seq: 2
 &gt;1
@@ -2489,14 +3407,16 @@ xCTGNactgn
 xctgnACTGN
 
 # 5th base
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -p 5:x --quiet
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" \
+    | seqkit mutate -p 5:x --quiet
 &gt;1
 ACTGxactgn
 &gt;2
 actgxACTGN
 
 # last base
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -p -1:x --quiet
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" \
+    | seqkit mutate -p -1:x --quiet
 &gt;1
 ACTGNactgx
 &gt;2
@@ -2504,7 +3424,8 @@ actgnACTGx
 
 # mutiple locations:
 
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -p 1:x -p -1:x --quiet
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" \
+    | seqkit mutate -p 1:x -p -1:x --quiet
 &gt;1
 xCTGNactgx
 &gt;2
@@ -2514,14 +3435,16 @@ xctgnACTGx
 <li>
 <p>Deletion</p>
 <pre><code># first base
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -d 1:1 --quiet
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" \
+    | seqkit mutate -d 1:1 --quiet
 &gt;1
 CTGNactgn
 &gt;2
 ctgnACTGN
 
 # last 3 bases
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -d -3:-1 --quiet
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" \
+    | seqkit mutate -d -3:-1 --quiet
 &gt;1
 ACTGNac
 &gt;2
@@ -2531,21 +3454,24 @@ actgnAC
 <li>
 <p>Insertion: inserting bases <strong>behind</strong> of given position</p>
 <pre><code># at the beginning
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -i 0:xx --quiet
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" \
+    | seqkit mutate -i 0:xx --quiet
 &gt;1
 xxACTGNactgn
 &gt;2
 xxactgnACTGN
 
 # at the end
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -i -1:xx --quiet
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" \
+    | seqkit mutate -i -1:xx --quiet
 &gt;1
 ACTGNactgnxx
 &gt;2
 actgnACTGNxx
 
 # behind of 5th base
-$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" | seqkit mutate -i 5:x --quiet
+$ echo -ne "&gt;1\nACTGNactgn\n&gt;2\nactgnACTGN\n" \
+    | seqkit mutate -i 5:x --quiet
 &gt;1
 ACTGNxactgn
 &gt;2
@@ -2565,8 +3491,9 @@ ACTGNACTGN
 actgnactgn
 
 # only edit chr1 and chr2
-$    cat tests/hsa.fa | seqkit mutate -p -1:X -s chr1,chr2
 # or cat tests/hsa.fa | seqkit mutate -p -1:X -s chr1 -s chr2
+$ cat tests/hsa.fa \
+    | seqkit mutate -p -1:X -s chr1,chr2
 [INFO] edit seq: chr1 1th seq
 [INFO] edit seq: chr2 2nd seq
 &gt;chr1 1th seq
@@ -2580,7 +3507,8 @@ actgnactgn
 
 # using regular expression to match.
 # e,g., editing all chrosomes:
-$ cat tests/hsa.fa | seqkit mutate -p -1:X -r -s chr
+$ cat tests/hsa.fa \
+    | seqkit mutate -p -1:X -r -s chr
 [INFO] edit seq: chr1 1th seq
 [INFO] edit seq: chr2 2nd seq
 [INFO] edit seq: chr11 11th seq
@@ -2594,7 +3522,8 @@ ACTGNACTGX
 actgnactgn
 
 # excluding seqs
-$ cat tests/hsa.fa | seqkit mutate -p -1:X -s chr1 -s chr2 -v 
+$ cat tests/hsa.fa \
+    | seqkit mutate -p -1:X -s chr1 -s chr2 -v 
 [INFO] edit seq: chr11 11th seq
 [INFO] edit seq: MT mitochondrial seq
 &gt;chr1 1th seq
@@ -2610,7 +3539,7 @@ actgnactgX
 </ol>
 <h2 id="shuffle">shuffle</h2>
 <p>Usage</p>
-<pre><code>shuffle sequences.
+<pre><code class="text">shuffle sequences.
 
 By default, all records will be readed into memory.
 For FASTA format, use flag -2 (--two-pass) to reduce memory usage. FASTQ not
@@ -2663,7 +3592,7 @@ sys     0m3.411s
 flag <code>-s</code> (<code>--rand-seed</code>) for read 1 and 2 files.</p>
 <h2 id="sort">sort</h2>
 <p>Usage</p>
-<pre><code>sort sequences by id/name/sequence/length.
+<pre><code class="text">sort sequences by id/name/sequence/length.
 
 By default, all records will be readed into memory.
 For FASTA format, use flag -2 (--two-pass) to reduce memory usage. FASTQ not
@@ -2697,7 +3626,8 @@ Flags:
 <ol>
 <li>
 <p>sort by ID</p>
-<pre><code>$ echo -e "&gt;seq1\nACGTNcccc\n&gt;SEQ2\nacgtnAAAA" | seqkit sort --quiet
+<pre><code>$ echo -e "&gt;seq1\nACGTNcccc\n&gt;SEQ2\nacgtnAAAA" \
+    | seqkit sort --quiet
 &gt;SEQ2
 acgtnAAAA
 &gt;seq1
@@ -2706,42 +3636,32 @@ ACGTNcccc
 </li>
 <li>
 <p>sort by ID and in natural order</p>
-<pre><code>$ echo -e "&gt;3\na\n&gt;1\na\n&gt;Y\na\n&gt;x\na\n&gt;Mt\na\n&gt;11\na\n&gt;2\na\n"
-&gt;3
-a
-&gt;1
-a
-&gt;Y
-a
-&gt;x
-a
-&gt;Mt
-a
-&gt;11
-a
-&gt;2
-a
+<pre><code>$ echo -e "&gt;3\na\n&gt;1\na\n&gt;Y\na\n&gt;x\na\n&gt;Mt\na\n&gt;11\na\n&gt;2\na\n" \
+    | seqkit seq -n -i
+3
+1
+Y
+x
+Mt
+11
+2
 
-$ echo -e "&gt;3\na\n&gt;1\na\n&gt;Y\na\n&gt;x\na\n&gt;Mt\na\n&gt;11\na\n&gt;2\na\n" | seqkit sort -N -i -2
-&gt;1
-a
-&gt;2
-a
-&gt;3
-a
-&gt;11
-a
-&gt;Mt
-a
-&gt;x
-a
-&gt;Y
-a
+$ echo -e "&gt;3\na\n&gt;1\na\n&gt;Y\na\n&gt;x\na\n&gt;Mt\na\n&gt;11\na\n&gt;2\na\n" \
+    | seqkit sort -N -i -2 \
+    | seqkit seq -n -i
+1
+2
+3
+11
+Mt
+x
+Y
 </code></pre>
 </li>
 <li>
 <p>sort by ID, ignoring case.</p>
-<pre><code>$ echo -e "&gt;seq1\nACGTNcccc\n&gt;SEQ2\nacgtnAAAA" | seqkit sort --quiet -i
+<pre><code>$ echo -e "&gt;seq1\nACGTNcccc\n&gt;SEQ2\nacgtnAAAA" \
+    | seqkit sort --quiet -i
 &gt;seq1
 ACGTNcccc
 &gt;SEQ2
@@ -2750,7 +3670,8 @@ acgtnAAAA
 </li>
 <li>
 <p>sort by seq, ignoring case.</p>
-<pre><code>$ echo -e "&gt;seq1\nACGTNcccc\n&gt;SEQ2\nacgtnAAAA" | seqkit sort --quiet -s -i
+<pre><code>$ echo -e "&gt;seq1\nACGTNcccc\n&gt;SEQ2\nacgtnAAAA" \
+    | seqkit sort --quiet -s -i
 &gt;SEQ2
 acgtnAAAA
 &gt;seq1
@@ -2759,7 +3680,8 @@ ACGTNcccc
 </li>
 <li>
 <p>sort by sequence length</p>
-<pre><code>$ echo -e "&gt;seq1\nACGTNcccc\n&gt;SEQ2\nacgtnAAAAnnn\n&gt;seq3\nacgt" | seqkit sort --quiet -l
+<pre><code>$ echo -e "&gt;seq1\nACGTNcccc\n&gt;SEQ2\nacgtnAAAAnnn\n&gt;seq3\nacgt" \
+    | seqkit sort --quiet -l
 &gt;seq3
 acgt
 &gt;seq1
@@ -2771,7 +3693,7 @@ acgtnAAAAnnn
 </ol>
 <h2 id="genautocomplete">genautocomplete</h2>
 <p>Usage</p>
-<pre><code>generate shell autocompletion script
+<pre><code class="text">generate shell autocompletion script
 
 Note: The current version supports Bash only.
 This should work for *nix systems with Bash installed.
@@ -2821,92 +3743,87 @@ s.setAttribute('data-timestamp', +new Date());
 })();
 </script>
 
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../download/" title="Download" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Download
+              </span>
+            </div>
+          </a>
         
         
+          <a href="../faq/" title="FAQ" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                FAQ
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
     </div>
-
-    <footer class="col-md-12 text-center">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
         
-        <hr>
-        <p>
-        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
-
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
         
-        
-    </footer>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="../js/bootstrap-3.0.3.min.js"></script>
-    <script src="../js/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <script>var base_url = ".."</script>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
     
-    <script src="../js/base.js"></script>
-    <script src="../search/main.js"></script>
-
-    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="searchModalLabel">Search</h4>
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            </div>
-            <div class="modal-body">
-                <p>
-                    From here you can search these documents. Enter
-                    your search terms below.
-                </p>
-                <form>
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
-                    </div>
-                </form>
-                <div id="mkdocs-search-results"></div>
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
-    </div>
-</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            </div>
-            <div class="modal-body">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th style="width: 20%;">Keys</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="help shortcut"><kbd>?</kbd></td>
-                    <td>Open this help</td>
-                  </tr>
-                  <tr>
-                    <td class="next shortcut"><kbd>n</kbd></td>
-                    <td>Next page</td>
-                  </tr>
-                  <tr>
-                    <td class="prev shortcut"><kbd>p</kbd></td>
-                    <td>Previous page</td>
-                  </tr>
-                  <tr>
-                    <td class="search shortcut"><kbd>s</kbd></td>
-                    <td>Search</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
-    </div>
-</div>
-    </body>
-
+    <script src="../assets/javascripts/application.6f02ae1b.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+    
+    
+      
+        <script>!function(e,a,t,n,o,c,i){e.GoogleAnalyticsObject=o,e.ga=e.ga||function(){(e.ga.q=e.ga.q||[]).push(arguments)},e.ga.l=1*new Date,c=a.createElement(t),i=a.getElementsByTagName(t)[0],c.async=1,c.src="https://www.google-analytics.com/analytics.js",i.parentNode.insertBefore(c,i)}(window,document,"script",0,"ga"),ga("create","UA-28948626-9","bioinf.shenwei.me/seqkit"),ga("set","anonymizeIp",!0),ga("send","pageview");var links=document.getElementsByTagName("a");if(Array.prototype.map.call(links,function(e){e.host!=document.location.host&&e.addEventListener("click",function(){var a=e.getAttribute("data-md-action")||"follow";ga("send","event","outbound",a,e.href)})}),document.forms.search){var query=document.forms.search.query;query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}</script>
+      
+    
+  </body>
 </html>

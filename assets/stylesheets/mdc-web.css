@@ -1,0 +1,397 @@
+.gitbook-link {
+    display: none !important;
+}
+.md-typeset a {
+    color: #1f5380 !important;
+}
+hr {
+  clear: both;
+}
+.green{
+  color: green
+}
+.red{
+  color: #b50000
+}
+.yellow{
+  color: yellow
+}
+
+.md-nav--secondary > .md-nav__list > .md-nav__item > .md-nav__link{
+  font-weight: 600;
+}
+
+
+/** remove defaults on admonitions **/
+/*.admonition:before{
+  content: ""
+}*/
+/*.admonition.note:before {
+    content: "edit";
+}
+.admonition.summary{
+    border-color: rgba(0,176,255,.15);
+    background-color: rgba(152,223,255,.1);
+}*/
+
+.admonition pre, .admonition code,
+.md-typeset__table pre, .md-typeset__table code{
+  font-size: 100%
+}
+
+/*****Icons*******/
+em.icon{
+  font-family: Material Icons;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 400;
+  line-height: inherit;
+  text-transform: none;
+  white-space: nowrap;
+  speak: none;
+  word-wrap: normal;
+  direction: ltr;
+  vertical-align: middle;
+}
+
+/**** columns ****/
+div.two-column {
+  float:left;
+  width:47%;
+  margin: 4px 3% 0px 0px;
+}
+div.two-column :first-child {
+    margin-top: 0;
+}
+
+div.three-column {
+  float:left;
+  width:30%;
+  margin: 4px 3% 0px 0px;
+}
+div.three-column :first-child {
+    margin-top: 0;
+}
+
+/**** cards ****/
+.card {
+  border-radius: 2px;
+  box-shadow: 0 1px 5px rgba(0,0,0,.16), 0 1px 2px rgba(0,0,0,.14);
+  vertical-align: top;
+  margin: 1.5625em 0;
+  padding: 8px 12px;
+
+}
+.card > div:first-child,
+.card > div:last-child {
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+.card.flat {
+  box-shadow: none;
+}
+.card > :first-child {
+    margin-top: 0;
+}
+.card > :last-child {
+    margin-bottom: 0;
+}
+/** clear fix hack so floated images inside don't overflow **/
+.card::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+/** fix table margins when in card **/
+.card .md-typeset__scrollwrap{
+  margin: 0;
+}
+.card .md-typeset__table table{
+  background-color: white; /** this should be set with scss **/
+}
+
+
+/** don't give padding if its a code block **/
+.card .highlight{
+  margin-top: 0;
+  margin-bottom: .5em;
+}
+
+/************* Common *************/
+
+.card.float-left,
+blockquote.float-left {
+  float:left;
+  width:33%;
+  margin: 4px 16px 2px 0px;
+}
+
+.card.float-right,
+blockquote.float-right {
+  float:right;
+  width:33%;
+  margin: 4px 0pc 2px 16px;
+}
+
+.card.admonition.float-left {
+  float:left;
+  width:50%;
+  margin: 4px 16px 8px 0px;
+}
+
+.card.admonition.float-right  {
+  float:right;
+  width:50%;
+  margin: 4px 0px 8px 16px;
+}
+
+blockquote.float-right :first-child, blockquote.float-left :first-child {
+  margin-top: 0;
+}
+blockquote.float-right :last-child, blockquote.float-left :last-child {
+  margin-bottom: 0;
+}
+
+/*********** figures ***********/
+.figure{
+  background-color: transparent;
+  padding: 0;
+  border: none;
+  position:relative;
+  font-size: inherit;
+}
+.figure img{
+  vertical-align: middle;
+}
+
+.figure .admonition-title {
+  /*position:absolute;
+  bottom:-12px;*/
+  margin-top: 0;
+  font-weight: 400;
+  text-align: center;
+  width: 100%;
+  font-size: 0.8rem;
+  line-height: 1rem;
+}
+/* fix tables */
+.figure .md-typeset__table{
+  padding: 2px;
+  margin-bottom: 0px
+}
+.figure div.md-typeset__scrollwrap{
+  overflow-x: inherit;
+}
+
+.figure > :first-child{
+  margin-bottom: 2px;
+}
+
+/** sidebars and figures shrink to fit **/
+.card.sidebar,
+.figure {
+  /*display: inline-block;*/
+  margin-top: 0;
+  /*margin-bottom: 1em;*/
+}
+
+.card.sidebar{
+/*  border: solid rgba(204,204,180,.5);
+  border-width:1px 1px 1px 1px;*/
+  background-color: rgba(255,255,238,.15);
+  padding-top: 4px;
+}
+
+.card.sidebar .admonition-title {
+  text-align: center;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #3f4358
+}
+
+/************* callouts *************/
+.callout{
+  background-color: transparent;
+  padding: 8px 0px 8px 0px;
+  font-size: 1.125rem;
+  font-family: 'Ubuntu',sans-serif;
+  border-top: 1px solid #e7e7e7;
+  border-bottom: 1px solid #e7e7e7;
+  border-right: none;
+  border-left: none;
+}
+
+/********** overrides *********/
+
+/*.admonition.tip {
+    border-color: rgba(124, 179, 66,.4);
+    background-color: rgba(245, 249, 241, 0.5);
+}*/
+
+/************* size overrides ************/
+.card.tiny,img.tiny { width:35px !important}
+.card.xsmall,img.xsmall { width:80px !important}
+.card.small,img.small { width:150px !important}
+.card.medium,img.medium { width:210px !important}
+.card.large,img.large { width:300px !important}
+.card.xlarge,img.xlarge { width:450px !important}
+.card.big,img.big { width:600px !important}
+div.pct100, .card.pct100,img.pct100 { width:100% !important}
+div.pct20,.card.pct20,img.pct20 { width:20% !important}
+div.pct33,.card.pct33,img.pct33 { width:33% !important}
+div.pct45,.card.pct45,img.pct45 { width:45% !important}
+div.pct50,.card.pct50,img.pct50 { width:50% !important}
+div.pct66,.card.pct66,img.pct66 { width:66% !important}
+div.pct80,.card.pct80,img.pct80 { width:80% !important}
+/************* END size overrides ************/
+
+.center{
+  /*margin-left: auto;
+  margin-right: auto;
+  display: block;*/
+  display:table;
+	margin:0 auto;
+}
+.center-all{
+  /*margin-left: auto;
+  margin-right: auto;
+  display: block;*/
+  display:table;
+  margin:0 auto;
+  text-align: center;
+}
+.center-content > p{
+  text-align: center;
+}
+.center-content > div:not(.highlight):not(.admonition):not(.codehilite){
+  text-align: center;
+}
+.center-content ul{
+  display:table;
+	margin-right:auto;
+  margin-left:auto;
+}
+.center-content li{
+  text-align: left;
+}
+/*div.center{
+  margin: 0 auto;
+}*/
+/************* rows *************/
+.row {
+  display: flex;
+  flex-direction: row;
+}
+.row > .codehilite{
+  margin-top: 0;
+}
+.row > div, .row > blockquote {
+  flex-basis: 100%;
+  margin-right: 10px;
+  margin-left: 0px;
+  margin-top: 0;
+}
+.row > div:last-child, .row > blockquote:last-child {
+  margin-right: 0px
+}
+/* fix tables */
+.row > div .md-typeset__table, .row > div .md-typeset__table{
+  padding: 2px;
+  margin-bottom: 0px
+}
+/*
+.row > div.md-typeset__scrollwrap{
+  overflow-x: inherit;
+}*/
+
+
+img[align="left"]{ padding-right:10px }
+img[align="right"]{ padding-left:10px }
+
+/** make emojis less aggressive **/
+.md-typeset img.emojione, .md-typeset img.gemoji {
+    width: 1rem;
+    filter: grayscale(60%);
+    vertical-align: text-top;
+}
+
+/************ EXCEL *************************/
+div.excel-embed{
+  height: 600px;
+}
+
+/*https://collaboration133.com/how-to-scale-iframe-content-in-ie-chrome-firefox-and-safari/2717/*/
+div.excel-zoom { width: 133%; height: 600px; padding: 0; overflow: hidden; }
+div.excel-zoom iframe { width: 1200px; height: 800px; border: 0px; }
+div.excel-zoom iframe {
+    zoom: 0.75;
+    -moz-transform: scale(0.75);
+    -moz-transform-origin: 0 0;
+    -o-transform: scale(0.75);
+    -o-transform-origin: 0 0;
+    -webkit-transform: scale(0.75);
+    -webkit-transform-origin: 0 0;
+    transform: scale(0.75);
+    transform-origin: 0 0;
+}
+
+/************** MDC Stuff ************/
+.mdc-toolbar.transparent{
+  background: none;
+  color: var(--mdc-theme-text-primary-on-background,#333);
+}
+.mdc-toolbar .mdc-toolbar__title{
+  color: var(--mdc-theme-text-primary-on-background,#333);
+}
+.mdc-toolbar.transparent .mdc-toolbar__icon, .mdc-toolbar__icon--menu{
+  /*color: inherit;*/
+}
+.mdc-toolbar.small .mdc-toolbar__row{
+  min-height: 36px;
+}
+.mdc-toolbar.small .mdc-toolbar__icon, .mdc-toolbar.small .mdc-toolbar__title{
+  padding-top: 4px;
+  padding-bottom: 4px;
+  /*font-size: 22px;*/
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  iframe.excel-frame { zoom: 1;  }
+}
+
+@media only screen and (max-width: 38em){
+
+  .admonition.float-left , .admonition.float-right  {
+    float:none;
+    width:auto;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .admonition.figure.float-left {
+    width:18rem;
+  }
+
+  .admonition.figure.float-right {
+    width:18rem;
+  }
+
+  .row {
+    flex-direction: column;
+  }
+}
+
+
+
+
+/*****Headroom ******/
+.headroom {
+    will-change: transform;
+    transition: transform 200ms linear;
+}
+.headroom--pinned {
+    transform: translateY(0%);
+}
+.headroom--unpinned {
+    transform: translateY(-3.25rem);
+}

@@ -1,255 +1,952 @@
+
+
+
+
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation">
-    <meta name="author" content="Wei Shen">
+<html lang="en" class="no-js">
+  <head>
     
-    <link rel="img/favicon.ico">
-
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+        <meta name="description" content="SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation">
+      
+      
+      
+        <meta name="author" content="Wei Shen">
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="files/favicon.ico">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-ponylang-0.2.5">
     
-    <title>Home - SeqKit - Ultrafast FASTA/Q kit</title>
     
-
-    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
-    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="css/base.min.css" rel="stylesheet">
-    <link href="css/cinder.min.css" rel="stylesheet">
-    <link href="css/highlight.min.css" rel="stylesheet">
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-        <![endif]-->
-
-    <script src="//ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
-    <script>
-    WebFont.load({
-        google: {
-            families: ['Open Sans', 'PT Sans']
-        }
-    });
-    </script>
-
+      
+        <title>SeqKit - Ultrafast FASTA/Q kit</title>
+      
     
-    <script>
-    (function(i, s, o, g, r, a, m) {
-        i['GoogleAnalyticsObject'] = r;
-        i[r] = i[r] || function() {
-            (i[r].q = i[r].q || []).push(arguments)
-        }, i[r].l = 1 * new Date();
-        a = s.createElement(o),
-        m = s.getElementsByTagName(o)[0];
-        a.async = 1;
-        a.src = g;
-        m.parentNode.insertBefore(a, m)
-    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-
-    ga('create', 'UA-28948626-9', 'bioinf.shenwei.me/seqkit');
-    ga('send', 'pageview');
-    </script>
     
-
-     
-</head>
-
-<body class="homepage" >
-
-    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="container">
-
-        <!-- Collapsed navigation -->
-        <div class="navbar-header">
-            <!-- Expander button -->
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
+      <link rel="stylesheet" href="assets/stylesheets/application.dfc6cb0c.css">
+      
+        <link rel="stylesheet" href="assets/stylesheets/application-palette.6079476c.css">
+      
+    
+    
+      <script src="assets/javascripts/modernizr.6586f7cd.js"></script>
+    
+    
+      <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+      
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="teal" data-md-color-accent="blue-grey">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448"
+    viewBox="0 0 416 448" id="github">
+  <path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19-18.125
+        8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5
+        18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75
+        19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19
+        18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360
+        304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25
+        2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8
+        38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0
+        37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25
+        82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75
+        1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75
+        0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25
+        30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5
+        46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34
+        99.5z" />
+</svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#seqkit-a-cross-platform-and-ultrafast-toolkit-for-fastaq-file-manipulation" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+          <a href="." title="SeqKit - Ultrafast FASTA/Q kit" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon">school</i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            
+              <span class="md-header-nav__topic">
+                SeqKit - Ultrafast FASTA/Q kit
+              </span>
+              <span class="md-header-nav__topic">
+                Home
+              </span>
+            
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          
+            <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+            
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+          
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
             
 
-            <!-- Main title -->
 
-            <a class="navbar-brand" href=".">SeqKit - Ultrafast FASTA/Q kit</a>
-        </div>
+  
 
-        <!-- Expanded navigation -->
-        <div class="navbar-collapse collapse">
-                <!-- Main navigation -->
-                <ul class="nav navbar-nav">
-                
-                
-                    <li class="active">
-                        <a href=".">Home</a>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="download/">Download</a>
-                    </li>
-                
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Documents <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="usage/">Usage</a>
-</li>
 
-                        
-                            
-<li >
-    <a href="faq/">FAQ</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="tutorial/">Tutorial</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="benchmark/">Benchmark</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="note/">Notes</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Links <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="bioinf/">More tools</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="yanlilab/">YanLi Lab</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                </ul>
-
-            <ul class="nav navbar-nav navbar-right">
-                    <li>
-                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                            <i class="fas fa-search"></i> Search
-                        </a>
-                    </li>
-                    <li class="disabled">
-                        <a rel="prev" >
-                            <i class="fas fa-arrow-left"></i> Previous
-                        </a>
-                    </li>
-                    <li >
-                        <a rel="next" href="download/">
-                            Next <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://github.com/shenwei356/seqkit/edit/master/docs/index.md"><i class="fab fa-github"></i> Edit on GitHub</a>
-                    </li>
-            </ul>
-        </div>
+  <a href="https://github.com/shenwei356/seqkit/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
     </div>
-</div>
+  </a>
 
-    <div class="container">
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
         
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <span class="md-nav__button md-logo">
+      
+        <i class="md-icon">school</i>
+      
+    </span>
+    SeqKit - Ultrafast FASTA/Q kit
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/shenwei356/seqkit/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Home
+      </label>
+    
+    <a href="." title="Home" class="md-nav__link md-nav__link--active">
+      Home
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
         
-        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
-    <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#seqkit-a-cross-platform-and-ultrafast-toolkit-for-fastaq-file-manipulation">SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation</a></li>
-            <li class="second-level"><a href="#introduction">Introduction</a></li>
-                
-            <li class="second-level"><a href="#table-of-contents">Table of Contents</a></li>
-                
-            <li class="second-level"><a href="#features">Features</a></li>
-                
-                <li class="third-level"><a href="#features-comparison">Features comparison</a></li>
-            <li class="second-level"><a href="#subcommands">Subcommands</a></li>
-                
-            <li class="second-level"><a href="#installation">Installation</a></li>
-                
-                <li class="third-level"><a href="#method-1-download-binaries-latest-stabledev-version">Method 1: Download binaries (latest stable/dev version)</a></li>
-                <li class="third-level"><a href="#method-2-install-via-conda-latest-stable-version">Method 2: Install via conda  (latest stable version)</a></li>
-                <li class="third-level"><a href="#method-3-install-via-homebrew-latest-stable-version">Method 3: Install via homebrew  (latest stable version)</a></li>
-                <li class="third-level"><a href="#method-4-for-go-developer-latest-stabledev-version">Method 4: For Go developer (latest stable/dev version)</a></li>
-                <li class="third-level"><a href="#method-5-docker-based-installation-latest-stabledev-version">Method 5: Docker based installation (latest stable/dev version)</a></li>
-            <li class="second-level"><a href="#bash-completion">Bash-completion</a></li>
-                
-            <li class="second-level"><a href="#technical-details-and-guides-for-use">Technical details and guides for use</a></li>
-                
-                <li class="third-level"><a href="#fastaq-format-parsing">FASTA/Q format parsing</a></li>
-                <li class="third-level"><a href="#sequence-formats-and-types">Sequence formats and types</a></li>
-                <li class="third-level"><a href="#sequence-id">Sequence ID</a></li>
-                <li class="third-level"><a href="#fasta-index">FASTA index</a></li>
-                <li class="third-level"><a href="#parallelization-of-cpu-intensive-jobs">Parallelization of CPU intensive jobs</a></li>
-                <li class="third-level"><a href="#memory-occupation">Memory occupation</a></li>
-                <li class="third-level"><a href="#reproducibility">Reproducibility</a></li>
-            <li class="second-level"><a href="#usage-examples">Usage &amp;&amp; Examples</a></li>
-                
-            <li class="second-level"><a href="#benchmark">Benchmark</a></li>
-                
-            <li class="second-level"><a href="#citation">Citation</a></li>
-                
-            <li class="second-level"><a href="#acknowledgements">Acknowledgements</a></li>
-                
-            <li class="second-level"><a href="#contact">Contact</a></li>
-                
-            <li class="second-level"><a href="#license">License</a></li>
-                
+          <li class="md-nav__item">
+    <a href="#introduction" title="Introduction" class="md-nav__link">
+    Introduction
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#table-of-contents" title="Table of Contents" class="md-nav__link">
+    Table of Contents
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#features" title="Features" class="md-nav__link">
+    Features
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          
+            <li class="md-nav__item">
+    <a href="#features-comparison" title="Features comparison" class="md-nav__link">
+    Features comparison
+  </a>
+  
+</li>
+          
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#subcommands" title="Subcommands" class="md-nav__link">
+    Subcommands
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#installation" title="Installation" class="md-nav__link">
+    Installation
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          
+            <li class="md-nav__item">
+    <a href="#method-1-download-binaries-latest-stabledev-version" title="Method 1: Download binaries (latest stable/dev version)" class="md-nav__link">
+    Method 1: Download binaries (latest stable/dev version)
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#method-2-install-via-conda-latest-stable-version" title="Method 2: Install via conda  (latest stable version)" class="md-nav__link">
+    Method 2: Install via conda  (latest stable version)
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#method-3-install-via-homebrew-latest-stable-version" title="Method 3: Install via homebrew  (latest stable version)" class="md-nav__link">
+    Method 3: Install via homebrew  (latest stable version)
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#method-4-for-go-developer-latest-stabledev-version" title="Method 4: For Go developer (latest stable/dev version)" class="md-nav__link">
+    Method 4: For Go developer (latest stable/dev version)
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#method-5-docker-based-installation-latest-stabledev-version" title="Method 5: Docker based installation (latest stable/dev version)" class="md-nav__link">
+    Method 5: Docker based installation (latest stable/dev version)
+  </a>
+  
+</li>
+          
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#bash-completion" title="Bash-completion" class="md-nav__link">
+    Bash-completion
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#technical-details-and-guides-for-use" title="Technical details and guides for use" class="md-nav__link">
+    Technical details and guides for use
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          
+            <li class="md-nav__item">
+    <a href="#fastaq-format-parsing" title="FASTA/Q format parsing" class="md-nav__link">
+    FASTA/Q format parsing
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#sequence-formats-and-types" title="Sequence formats and types" class="md-nav__link">
+    Sequence formats and types
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#sequence-id" title="Sequence ID" class="md-nav__link">
+    Sequence ID
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#fasta-index" title="FASTA index" class="md-nav__link">
+    FASTA index
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#parallelization-of-cpu-intensive-jobs" title="Parallelization of CPU intensive jobs" class="md-nav__link">
+    Parallelization of CPU intensive jobs
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#memory-occupation" title="Memory occupation" class="md-nav__link">
+    Memory occupation
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#reproducibility" title="Reproducibility" class="md-nav__link">
+    Reproducibility
+  </a>
+  
+</li>
+          
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#usage-examples" title="Usage &amp;&amp; Examples" class="md-nav__link">
+    Usage &amp;&amp; Examples
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#benchmark" title="Benchmark" class="md-nav__link">
+    Benchmark
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#citation" title="Citation" class="md-nav__link">
+    Citation
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#acknowledgements" title="Acknowledgements" class="md-nav__link">
+    Acknowledgements
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#contact" title="Contact" class="md-nav__link">
+    Contact
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#license" title="License" class="md-nav__link">
+    License
+  </a>
+  
+</li>
+        
+      
+      
+      
+      
+      
     </ul>
-</div></div>
-        <div class="col-md-9" role="main">
+  
+</nav>
+    
+  </li>
 
-<h1 id="seqkit-a-cross-platform-and-ultrafast-toolkit-for-fastaq-file-manipulation">SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation</h1>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="download/" title="Download" class="md-nav__link">
+      Download
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
+    
+    <label class="md-nav__link" for="nav-3">
+      Documents
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        Documents
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="usage/" title="Usage" class="md-nav__link">
+      Usage
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="faq/" title="FAQ" class="md-nav__link">
+      FAQ
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="tutorial/" title="Tutorial" class="md-nav__link">
+      Tutorial
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="benchmark/" title="Benchmark" class="md-nav__link">
+      Benchmark
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="note/" title="Notes" class="md-nav__link">
+      Notes
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="https://github.com/shenwei356" title="More tools" class="md-nav__link">
+      More tools
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        
+          <li class="md-nav__item">
+    <a href="#introduction" title="Introduction" class="md-nav__link">
+    Introduction
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#table-of-contents" title="Table of Contents" class="md-nav__link">
+    Table of Contents
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#features" title="Features" class="md-nav__link">
+    Features
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          
+            <li class="md-nav__item">
+    <a href="#features-comparison" title="Features comparison" class="md-nav__link">
+    Features comparison
+  </a>
+  
+</li>
+          
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#subcommands" title="Subcommands" class="md-nav__link">
+    Subcommands
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#installation" title="Installation" class="md-nav__link">
+    Installation
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          
+            <li class="md-nav__item">
+    <a href="#method-1-download-binaries-latest-stabledev-version" title="Method 1: Download binaries (latest stable/dev version)" class="md-nav__link">
+    Method 1: Download binaries (latest stable/dev version)
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#method-2-install-via-conda-latest-stable-version" title="Method 2: Install via conda  (latest stable version)" class="md-nav__link">
+    Method 2: Install via conda  (latest stable version)
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#method-3-install-via-homebrew-latest-stable-version" title="Method 3: Install via homebrew  (latest stable version)" class="md-nav__link">
+    Method 3: Install via homebrew  (latest stable version)
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#method-4-for-go-developer-latest-stabledev-version" title="Method 4: For Go developer (latest stable/dev version)" class="md-nav__link">
+    Method 4: For Go developer (latest stable/dev version)
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#method-5-docker-based-installation-latest-stabledev-version" title="Method 5: Docker based installation (latest stable/dev version)" class="md-nav__link">
+    Method 5: Docker based installation (latest stable/dev version)
+  </a>
+  
+</li>
+          
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#bash-completion" title="Bash-completion" class="md-nav__link">
+    Bash-completion
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#technical-details-and-guides-for-use" title="Technical details and guides for use" class="md-nav__link">
+    Technical details and guides for use
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          
+            <li class="md-nav__item">
+    <a href="#fastaq-format-parsing" title="FASTA/Q format parsing" class="md-nav__link">
+    FASTA/Q format parsing
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#sequence-formats-and-types" title="Sequence formats and types" class="md-nav__link">
+    Sequence formats and types
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#sequence-id" title="Sequence ID" class="md-nav__link">
+    Sequence ID
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#fasta-index" title="FASTA index" class="md-nav__link">
+    FASTA index
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#parallelization-of-cpu-intensive-jobs" title="Parallelization of CPU intensive jobs" class="md-nav__link">
+    Parallelization of CPU intensive jobs
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#memory-occupation" title="Memory occupation" class="md-nav__link">
+    Memory occupation
+  </a>
+  
+</li>
+          
+        
+          
+            <li class="md-nav__item">
+    <a href="#reproducibility" title="Reproducibility" class="md-nav__link">
+    Reproducibility
+  </a>
+  
+</li>
+          
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#usage-examples" title="Usage &amp;&amp; Examples" class="md-nav__link">
+    Usage &amp;&amp; Examples
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#benchmark" title="Benchmark" class="md-nav__link">
+    Benchmark
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#citation" title="Citation" class="md-nav__link">
+    Citation
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#acknowledgements" title="Acknowledgements" class="md-nav__link">
+    Acknowledgements
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#contact" title="Contact" class="md-nav__link">
+    Contact
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#license" title="License" class="md-nav__link">
+    License
+  </a>
+  
+</li>
+        
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/shenwei356/seqkit/edit/master/docs/index.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                <h1 id="seqkit-a-cross-platform-and-ultrafast-toolkit-for-fastaq-file-manipulation">SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation</h1>
 <ul>
 <li><strong>Documents:</strong> <a href="http://bioinf.shenwei.me/seqkit">http://bioinf.shenwei.me/seqkit</a>
 (<a href="http://bioinf.shenwei.me/seqkit/usage/"><strong>Usage</strong></a>,
 <a href="http://bioinf.shenwei.me/seqkit/faq/"><strong>FAQ</strong></a>,
 <a href="http://bioinf.shenwei.me/seqkit/tutorial/"><strong>Tutorial</strong></a>,
-<a href="http://bioinf.shenwei.me/seqkit/benchmark/"><strong>Benchmark</strong></a>
-and <a href="http://bioinf.shenwei.me/seqkit/note/"><strong>Development Notes</strong></a>)</li>
+and 
+<a href="http://bioinf.shenwei.me/seqkit/benchmark/"><strong>Benchmark</strong></a>)</li>
 <li><strong>Source code:</strong> <a href="https://github.com/shenwei356/seqkit">https://github.com/shenwei356/seqkit</a>
 <a href="https://github.com/shenwei356/seqkit"><img alt="GitHub stars" src="https://img.shields.io/github/stars/shenwei356/seqkit.svg?style=social&amp;label=Star&amp;?maxAge=2592000" /></a>
 <a href="https://github.com/shenwei356/seqkit/blob/master/LICENSE"><img alt="license" src="https://img.shields.io/github/license/shenwei356/seqkit.svg?maxAge=2592000" /></a>
-<a href="https://goreportcard.com/report/github.com/shenwei356/seqkit"><img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/shenwei356/seqkit" /></a>
 <a href="https://travis-ci.org/shenwei356/seqkit"><img alt="Build Status" src="https://travis-ci.org/shenwei356/seqkit.svg?branch=master" /></a></li>
 <li><strong>Latest version:</strong> <a href="https://github.com/shenwei356/seqkit/releases"><img alt="Latest Version" src="https://img.shields.io/github/release/shenwei356/seqkit.svg?style=flat?maxAge=86400" /></a>
 <a href="http://bioinf.shenwei.me/seqkit/download/"><img alt="Github Releases" src="https://img.shields.io/github/downloads/shenwei356/seqkit/latest/total.svg?maxAge=3600" /></a>
 <a href="http://bioinf.shenwei.me/seqkit/download/"><img alt="Cross-platform" src="https://img.shields.io/badge/platform-any-ec2eb4.svg?style=flat" /></a>
-<a href="http://bioinf.shenwei.me/seqkit/download/"><img alt="Install-with-conda" src="https://anaconda.org/bioconda/seqkit/badges/installer/conda.svg" /></a>
 <a href="https://anaconda.org/bioconda/seqkit"><img alt="Anaconda Cloud" src="https://anaconda.org/bioconda/seqkit/badges/version.svg" /></a></li>
 <li><strong><a href="#citation">Please cite</a>:</strong> <a href="https://doi.org/10.1371/journal.pone.0163962"><img alt="doi" src="https://img.shields.io/badge/doi-10.1371%2Fjournal.pone.0163962-blue.svg?style=flat" /></a></li>
 </ul>
@@ -297,7 +994,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
   (see <a href="http://bioinf.shenwei.me/seqkit/download/">download</a>)</li>
 <li><strong>UltraFast</strong> (see <a href="#benchmark">benchmark</a>),
   <strong>multiple-CPUs supported</strong></li>
-<li><strong>Practical functions supported by 24 subcommands</strong> (see subcommands and
+<li><strong>Practical functions supported by 27 subcommands</strong> (see subcommands and
   <a href="http://bioinf.shenwei.me/seqkit/usage/">usage</a> )</li>
 <li><strong>Supporting <a href="#bash-completion">Bash-completion</a></strong></li>
 <li><strong>Well documented</strong> (detailed <a href="http://bioinf.shenwei.me/seqkit/usage/">usage</a>
@@ -573,48 +1270,48 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <p>27 functional subcommands in total.</p>
 <p><strong>Sequence and subsequence</strong></p>
 <ul>
-<li><code>seq</code>        transform sequences (revserse, complement, extract ID...)</li>
-<li><code>subseq</code>     get subsequences by region/gtf/bed, including flanking sequences</li>
-<li><code>sliding</code>    sliding sequences, circular genome supported</li>
-<li><code>stats</code>      simple statistics of FASTA/Q files</li>
-<li><code>faidx</code>      create FASTA index file and extract subsequence</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#seq"><code>seq</code></a>          transform sequences (revserse, complement, extract ID...)</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#subseq"><code>subseq</code></a>    get subsequences by region/gtf/bed, including flanking sequences</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#sliding"><code>sliding</code></a>  sliding sequences, circular genome supported</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#stats"><code>stats</code></a>      simple statistics of FASTA/Q files</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#faidx"><code>faidx</code></a>      create FASTA index file and extract subsequence</li>
 </ul>
 <p><strong>Format conversion</strong></p>
 <ul>
-<li><code>fx2tab</code>     convert FASTA/Q to tabular format (and length/GC content/GC skew)</li>
-<li><code>tab2fx</code>     convert tabular format to FASTA/Q format</li>
-<li><code>fq2fa</code>      convert FASTQ to FASTA</li>
-<li><code>convert</code>    convert FASTQ quality encoding between Sanger, Solexa and Illumina</li>
-<li><code>translate</code>  translate DNA/RNA to protein sequence (supporting ambiguous bases)</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#fx2tab"><code>fx2tab</code></a>        convert FASTA/Q to tabular format (and length/GC content/GC skew)</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#tab2fx"><code>tab2fx</code></a>        convert tabular format to FASTA/Q format</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#fq2fa"><code>fq2fa</code></a>          convert FASTQ to FASTA</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#convert"><code>convert</code></a>      convert FASTQ quality encoding between Sanger, Solexa and Illumina</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#translate"><code>translate</code></a>  translate DNA/RNA to protein sequence (supporting ambiguous bases)</li>
 </ul>
 <p><strong>Searching</strong></p>
 <ul>
-<li><code>grep</code>       search sequences by ID/name/sequence/sequence motifs, mismatch allowed</li>
-<li><code>locate</code>     locate subsequences/motifs</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#grep"><code>grep</code></a>        search sequences by ID/name/sequence/sequence motifs, mismatch allowed</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#locate"><code>locate</code></a>    locate subsequences/motifs</li>
 </ul>
 <p><strong>Set operations</strong></p>
 <ul>
-<li><code>head</code>       print first N FASTA/Q records</li>
-<li><code>range</code>      print FASTA/Q records in a range (start:end)</li>
-<li><code>sample</code>     sample sequences by number or proportion</li>
-<li><code>rmdup</code>      remove duplicated sequences by id/name/sequence</li>
-<li><code>duplicate</code>  duplicate sequences N times</li>
-<li><code>common</code>     find common sequences of multiple files by id/name/sequence</li>
-<li><code>split</code>      split sequences into files by id/seq region/size/parts (mainly for FASTA)</li>
-<li><code>split2</code>     split sequences into files by size/parts (FASTA, PE/SE FASTQ)</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#head"><code>head</code></a>            print first N FASTA/Q records</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#range"><code>range</code></a>          print FASTA/Q records in a range (start:end)</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#sample"><code>sample</code></a>        sample sequences by number or proportion</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#rmdup"><code>rmdup</code></a>          remove duplicated sequences by id/name/sequence</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#duplicate"><code>duplicate</code></a>  duplicate sequences N times</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#common"><code>common</code></a>        find common sequences of multiple files by id/name/sequence</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#split"><code>split</code></a>          split sequences into files by id/seq region/size/parts (mainly for FASTA)</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#split2"><code>split2</code></a>        split sequences into files by size/parts (FASTA, PE/SE FASTQ)</li>
 </ul>
 <p><strong>Edit</strong></p>
 <ul>
-<li><code>replace</code>    replace name/sequence by regular expression</li>
-<li><code>rename</code>     rename duplicated IDs</li>
-<li><code>restart</code>    reset start position for circular genome</li>
-<li><code>concat</code>     concatenate sequences with same ID from multiple files</li>
-<li><code>mutate</code>     edit sequence (point mutation, insertion, deletion)</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#replace"><code>replace</code></a>  replace name/sequence by regular expression</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#rename"><code>rename</code></a>    rename duplicated IDs</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#restart"><code>restart</code></a>  reset start position for circular genome</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#concat"><code>concat</code></a>    concatenate sequences with same ID from multiple files</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#mutate"><code>mutate</code></a>    edit sequence (point mutation, insertion, deletion)</li>
 </ul>
 <p><strong>Ordering</strong></p>
 <ul>
-<li><code>shuffle</code>    shuffle sequences</li>
-<li><code>sort</code>       sort sequences by id/name/sequence</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#shuffle"><code>shuffle</code></a>  shuffle sequences</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#sort"><code>sort</code></a>        sort sequences by id/name/sequence</li>
 </ul>
 <p><strong>Misc</strong></p>
 <ul>
@@ -651,7 +1348,7 @@ And then:</p>
 <p><strong>For windows</strong>, just copy <code>seqkit.exe</code> to <code>C:\WINDOWS\system32</code>.</p>
 </li>
 </ol>
-<h4 id="method-2-install-via-conda-latest-stable-version">Method 2: Install via conda  (latest stable version) <a href="http://bioinf.shenwei.me/seqkit/download/"><img alt="Install-with-conda" src="https://anaconda.org/bioconda/seqkit/badges/installer/conda.svg" /></a> <a href="https://anaconda.org/bioconda/seqkit"><img alt="Anaconda Cloud" src="https://anaconda.org/bioconda/seqkit/badges/version.svg" /></a> <a href="https://anaconda.org/bioconda/seqkit"><img alt="downloads" src="https://anaconda.org/bioconda/seqkit/badges/downloads.svg" /></a></h4>
+<h4 id="method-2-install-via-conda-latest-stable-version">Method 2: Install via conda  (latest stable version) <a href="https://anaconda.org/bioconda/seqkit"><img alt="Anaconda Cloud" src="https://anaconda.org/bioconda/seqkit/badges/version.svg" /></a> <a href="https://anaconda.org/bioconda/seqkit"><img alt="downloads" src="https://anaconda.org/bioconda/seqkit/badges/downloads.svg" /></a></h4>
 <pre><code>conda install -c bioconda seqkit
 </code></pre>
 <h4 id="method-3-install-via-homebrew-latest-stable-version">Method 3: Install via homebrew  (latest stable version)</h4>
@@ -818,97 +1515,73 @@ The University of Hong Kong, HK for advice on the manuscript.</p>
 <p><a href="https://github.com/shenwei356/seqkit/issues">Create an issue</a> to report bugs,
 propose new functions or ask for help.</p>
 <h2 id="license">License</h2>
-<p><a href="https://github.com/shenwei356/seqkit/blob/master/LICENSE">MIT License</a></p></div>
+<p><a href="https://github.com/shenwei356/seqkit/blob/master/LICENSE">MIT License</a></p>
+                
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
         
         
+          <a href="download/" title="Download" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Download
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
     </div>
-
-    <footer class="col-md-12 text-center">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
         
-        <hr>
-        <p>
-        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
-
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
         
-        
-    </footer>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="js/bootstrap-3.0.3.min.js"></script>
-    <script src="js/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <script>var base_url = "."</script>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
     
-    <script src="js/base.js"></script>
-    <script src="search/main.js"></script>
-
-    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="searchModalLabel">Search</h4>
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            </div>
-            <div class="modal-body">
-                <p>
-                    From here you can search these documents. Enter
-                    your search terms below.
-                </p>
-                <form>
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
-                    </div>
-                </form>
-                <div id="mkdocs-search-results"></div>
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
-    </div>
-</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            </div>
-            <div class="modal-body">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th style="width: 20%;">Keys</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="help shortcut"><kbd>?</kbd></td>
-                    <td>Open this help</td>
-                  </tr>
-                  <tr>
-                    <td class="next shortcut"><kbd>n</kbd></td>
-                    <td>Next page</td>
-                  </tr>
-                  <tr>
-                    <td class="prev shortcut"><kbd>p</kbd></td>
-                    <td>Previous page</td>
-                  </tr>
-                  <tr>
-                    <td class="search shortcut"><kbd>s</kbd></td>
-                    <td>Search</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
-    </div>
-</div>
-    </body>
-
+    <script src="assets/javascripts/application.6f02ae1b.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:"."}})</script>
+      
+    
+    
+      
+        <script>!function(e,a,t,n,o,c,i){e.GoogleAnalyticsObject=o,e.ga=e.ga||function(){(e.ga.q=e.ga.q||[]).push(arguments)},e.ga.l=1*new Date,c=a.createElement(t),i=a.getElementsByTagName(t)[0],c.async=1,c.src="https://www.google-analytics.com/analytics.js",i.parentNode.insertBefore(c,i)}(window,document,"script",0,"ga"),ga("create","UA-28948626-9","bioinf.shenwei.me/seqkit"),ga("set","anonymizeIp",!0),ga("send","pageview");var links=document.getElementsByTagName("a");if(Array.prototype.map.call(links,function(e){e.host!=document.location.host&&e.addEventListener("click",function(){var a=e.getAttribute("data-md-action")||"follow";ga("send","event","outbound",a,e.href)})}),document.forms.search){var query=document.forms.search.query;query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}</script>
+      
+    
+  </body>
 </html>
-
-<!--
-MkDocs version : 1.0.4
-Build Date UTC : 2019-06-19 02:40:37
--->

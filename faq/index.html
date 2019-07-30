@@ -1,224 +1,652 @@
+
+
+
+
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation">
-    <meta name="author" content="Wei Shen">
+<html lang="en" class="no-js">
+  <head>
     
-    <link rel="../img/favicon.ico">
-
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+        <meta name="description" content="SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation">
+      
+      
+      
+        <meta name="author" content="Wei Shen">
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../files/favicon.ico">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-ponylang-0.2.5">
     
-    <title>FAQ - SeqKit - Ultrafast FASTA/Q kit</title>
     
-
-    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
-    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="../css/base.min.css" rel="stylesheet">
-    <link href="../css/cinder.min.css" rel="stylesheet">
-    <link href="../css/highlight.min.css" rel="stylesheet">
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-        <![endif]-->
-
-    <script src="//ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
-    <script>
-    WebFont.load({
-        google: {
-            families: ['Open Sans', 'PT Sans']
-        }
-    });
-    </script>
-
+      
+        <title>FAQ - SeqKit - Ultrafast FASTA/Q kit</title>
+      
     
-    <script>
-    (function(i, s, o, g, r, a, m) {
-        i['GoogleAnalyticsObject'] = r;
-        i[r] = i[r] || function() {
-            (i[r].q = i[r].q || []).push(arguments)
-        }, i[r].l = 1 * new Date();
-        a = s.createElement(o),
-        m = s.getElementsByTagName(o)[0];
-        a.async = 1;
-        a.src = g;
-        m.parentNode.insertBefore(a, m)
-    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-
-    ga('create', 'UA-28948626-9', 'bioinf.shenwei.me/seqkit');
-    ga('send', 'pageview');
-    </script>
     
-
-     
-</head>
-
-<body>
-
-    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="container">
-
-        <!-- Collapsed navigation -->
-        <div class="navbar-header">
-            <!-- Expander button -->
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
+      <link rel="stylesheet" href="../assets/stylesheets/application.dfc6cb0c.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-palette.6079476c.css">
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.6586f7cd.js"></script>
+    
+    
+      <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+      
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="teal" data-md-color-accent="blue-grey">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448"
+    viewBox="0 0 416 448" id="github">
+  <path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19-18.125
+        8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5
+        18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75
+        19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19
+        18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360
+        304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25
+        2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8
+        38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0
+        37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25
+        82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75
+        1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75
+        0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25
+        30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5
+        46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34
+        99.5z" />
+</svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="../#faq-on-fastaq-manipulations" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+          <a href=".." title="SeqKit - Ultrafast FASTA/Q kit" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon">school</i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            
+              <span class="md-header-nav__topic">
+                SeqKit - Ultrafast FASTA/Q kit
+              </span>
+              <span class="md-header-nav__topic">
+                FAQ
+              </span>
+            
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          
+            <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+            
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+          
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
             
 
-            <!-- Main title -->
 
-            <a class="navbar-brand" href="..">SeqKit - Ultrafast FASTA/Q kit</a>
-        </div>
+  
 
-        <!-- Expanded navigation -->
-        <div class="navbar-collapse collapse">
-                <!-- Main navigation -->
-                <ul class="nav navbar-nav">
-                
-                
-                    <li >
-                        <a href="..">Home</a>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="../download/">Download</a>
-                    </li>
-                
-                
-                
-                    <li class="dropdown active">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Documents <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="../usage/">Usage</a>
-</li>
 
-                        
-                            
-<li class="active">
-    <a href="./">FAQ</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../tutorial/">Tutorial</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../benchmark/">Benchmark</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../note/">Notes</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Links <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="../bioinf/">More tools</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../yanlilab/">YanLi Lab</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                </ul>
-
-            <ul class="nav navbar-nav navbar-right">
-                    <li>
-                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                            <i class="fas fa-search"></i> Search
-                        </a>
-                    </li>
-                    <li >
-                        <a rel="prev" href="../usage/">
-                            <i class="fas fa-arrow-left"></i> Previous
-                        </a>
-                    </li>
-                    <li >
-                        <a rel="next" href="../tutorial/">
-                            Next <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://github.com/shenwei356/seqkit/edit/master/docs/faq.md"><i class="fab fa-github"></i> Edit on GitHub</a>
-                    </li>
-            </ul>
-        </div>
+  <a href="https://github.com/shenwei356/seqkit/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
     </div>
-</div>
+  </a>
 
-    <div class="container">
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <span class="md-nav__button md-logo">
+      
+        <i class="md-icon">school</i>
+      
+    </span>
+    SeqKit - Ultrafast FASTA/Q kit
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/shenwei356/seqkit/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../download/" title="Download" class="md-nav__link">
+      Download
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+    
+    <label class="md-nav__link" for="nav-3">
+      Documents
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        Documents
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
         
         
-        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
-    <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#faq-on-fastaq-manipulations">FAQ on FASTA/Q manipulations</a></li>
-            <li class="second-level"><a href="#example-data">Example data</a></li>
-                
-            <li class="second-level"><a href="#how-to-produce-an-overview-of-fastq-files">How to produce an overview of FASTQ files?</a></li>
-                
-            <li class="second-level"><a href="#how-to-get-gc-content-of-every-sequence-in-fastaq-file">How to get GC content of every sequence in FASTA/Q file?</a></li>
-                
-            <li class="second-level"><a href="#how-to-extract-sequences-subset-from-fastaq-file-with-nameid-list-file">How to extract sequences subset from FASTA/Q file with name/ID list file?</a></li>
-                
-            <li class="second-level"><a href="#how-to-find-fastaq-sequences-containing-degenerate-bases-and-locate-them">How to find FASTA/Q sequences containing degenerate bases and locate them?</a></li>
-                
-            <li class="second-level"><a href="#how-to-remove-duplicated-fastaq-records-with-same-sequences">How to remove duplicated FASTA/Q records with same sequences?</a></li>
-                
-            <li class="second-level"><a href="#how-to-locate-motifsubsequenceenzyme-digest-site-in-fastaq-sequence">How to locate motif/subsequence/enzyme digest site in FASTA/Q sequence?</a></li>
-                
-            <li class="second-level"><a href="#how-to-sort-huge-number-of-fasta-sequences-by-length">How to sort huge number of FASTA sequences by length?</a></li>
-                
-            <li class="second-level"><a href="#how-to-split-fasta-sequences-according-to-information-in-header">How to split FASTA sequences according to information in header?</a></li>
-                
-            <li class="second-level"><a href="#how-to-search-and-replace-fasta-header-with-known-character-strings-from-a-text-file">How to search and replace FASTA header with known character strings from a text file?</a></li>
-                
-            <li class="second-level"><a href="#how-to-extract-paired-reads-from-two-paired-end-reads-file">How to extract paired reads from two paired-end reads file?</a></li>
-                
-            <li class="second-level"><a href="#how-to-concatenate-two-fasta-sequences-in-to-one">How to concatenate two FASTA sequences in to one?</a></li>
-                
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../usage/" title="Usage" class="md-nav__link">
+      Usage
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        FAQ
+      </label>
+    
+    <a href="./" title="FAQ" class="md-nav__link md-nav__link--active">
+      FAQ
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        
+          <li class="md-nav__item">
+    <a href="#example-data" title="Example data" class="md-nav__link">
+    Example data
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-produce-an-overview-of-fastq-files" title="How to produce an overview of FASTQ files?" class="md-nav__link">
+    How to produce an overview of FASTQ files?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-get-gc-content-of-every-sequence-in-fastaq-file" title="How to get GC content of every sequence in FASTA/Q file?" class="md-nav__link">
+    How to get GC content of every sequence in FASTA/Q file?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-extract-sequences-subset-from-fastaq-file-with-nameid-list-file" title="How to extract sequences subset from FASTA/Q file with name/ID list file?" class="md-nav__link">
+    How to extract sequences subset from FASTA/Q file with name/ID list file?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-find-fastaq-sequences-containing-degenerate-bases-and-locate-them" title="How to find FASTA/Q sequences containing degenerate bases and locate them?" class="md-nav__link">
+    How to find FASTA/Q sequences containing degenerate bases and locate them?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-remove-duplicated-fastaq-records-with-same-sequences" title="How to remove duplicated FASTA/Q records with same sequences?" class="md-nav__link">
+    How to remove duplicated FASTA/Q records with same sequences?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-locate-motifsubsequenceenzyme-digest-site-in-fastaq-sequence" title="How to locate motif/subsequence/enzyme digest site in FASTA/Q sequence?" class="md-nav__link">
+    How to locate motif/subsequence/enzyme digest site in FASTA/Q sequence?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-sort-huge-number-of-fasta-sequences-by-length" title="How to sort huge number of FASTA sequences by length?" class="md-nav__link">
+    How to sort huge number of FASTA sequences by length?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-split-fasta-sequences-according-to-information-in-header" title="How to split FASTA sequences according to information in header?" class="md-nav__link">
+    How to split FASTA sequences according to information in header?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-search-and-replace-fasta-header-with-known-character-strings-from-a-text-file" title="How to search and replace FASTA header with known character strings from a text file?" class="md-nav__link">
+    How to search and replace FASTA header with known character strings from a text file?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-extract-paired-reads-from-two-paired-end-reads-file" title="How to extract paired reads from two paired-end reads file?" class="md-nav__link">
+    How to extract paired reads from two paired-end reads file?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-concatenate-two-fasta-sequences-in-to-one" title="How to concatenate two FASTA sequences in to one?" class="md-nav__link">
+    How to concatenate two FASTA sequences in to one?
+  </a>
+  
+</li>
+        
+      
+      
+      
+      
+      
     </ul>
-</div></div>
-        <div class="col-md-9" role="main">
+  
+</nav>
+    
+  </li>
 
-<h1 id="faq-on-fastaq-manipulations">FAQ on FASTA/Q manipulations</h1>
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../tutorial/" title="Tutorial" class="md-nav__link">
+      Tutorial
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../benchmark/" title="Benchmark" class="md-nav__link">
+      Benchmark
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../note/" title="Notes" class="md-nav__link">
+      Notes
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="https://github.com/shenwei356" title="More tools" class="md-nav__link">
+      More tools
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        
+          <li class="md-nav__item">
+    <a href="#example-data" title="Example data" class="md-nav__link">
+    Example data
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-produce-an-overview-of-fastq-files" title="How to produce an overview of FASTQ files?" class="md-nav__link">
+    How to produce an overview of FASTQ files?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-get-gc-content-of-every-sequence-in-fastaq-file" title="How to get GC content of every sequence in FASTA/Q file?" class="md-nav__link">
+    How to get GC content of every sequence in FASTA/Q file?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-extract-sequences-subset-from-fastaq-file-with-nameid-list-file" title="How to extract sequences subset from FASTA/Q file with name/ID list file?" class="md-nav__link">
+    How to extract sequences subset from FASTA/Q file with name/ID list file?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-find-fastaq-sequences-containing-degenerate-bases-and-locate-them" title="How to find FASTA/Q sequences containing degenerate bases and locate them?" class="md-nav__link">
+    How to find FASTA/Q sequences containing degenerate bases and locate them?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-remove-duplicated-fastaq-records-with-same-sequences" title="How to remove duplicated FASTA/Q records with same sequences?" class="md-nav__link">
+    How to remove duplicated FASTA/Q records with same sequences?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-locate-motifsubsequenceenzyme-digest-site-in-fastaq-sequence" title="How to locate motif/subsequence/enzyme digest site in FASTA/Q sequence?" class="md-nav__link">
+    How to locate motif/subsequence/enzyme digest site in FASTA/Q sequence?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-sort-huge-number-of-fasta-sequences-by-length" title="How to sort huge number of FASTA sequences by length?" class="md-nav__link">
+    How to sort huge number of FASTA sequences by length?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-split-fasta-sequences-according-to-information-in-header" title="How to split FASTA sequences according to information in header?" class="md-nav__link">
+    How to split FASTA sequences according to information in header?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-search-and-replace-fasta-header-with-known-character-strings-from-a-text-file" title="How to search and replace FASTA header with known character strings from a text file?" class="md-nav__link">
+    How to search and replace FASTA header with known character strings from a text file?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-extract-paired-reads-from-two-paired-end-reads-file" title="How to extract paired reads from two paired-end reads file?" class="md-nav__link">
+    How to extract paired reads from two paired-end reads file?
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#how-to-concatenate-two-fasta-sequences-in-to-one" title="How to concatenate two FASTA sequences in to one?" class="md-nav__link">
+    How to concatenate two FASTA sequences in to one?
+  </a>
+  
+</li>
+        
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/shenwei356/seqkit/edit/master/docs/faq.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                <h1 id="faq-on-fastaq-manipulations">FAQ on FASTA/Q manipulations</h1>
 <p><strong>This page was originally written as the section <a href="https://read.biostarhandbook.com/data/fastq-manipulation.html">FASTA/Q manipulations</a> of <a href="https://read.biostarhandbook.com/">The Biostar Handbook: A Beginner's Guide to Bioinformatics</a> (<a href="https://www.biostars.org/p/225812/">discussion on Biostars.org</a>)</strong>.</p>
 <hr />
 <p>This page illustrates common FASTA/Q manipulations using
@@ -282,7 +710,8 @@ gi|526244636|ref|NC_021857.1|                   25.52   23.06   48.59
 <h2 id="how-to-extract-sequences-subset-from-fastaq-file-with-nameid-list-file">How to extract sequences subset from FASTA/Q file with name/ID list file?</h2>
 <p>This is a frequently used manipulation. Let's create a sample ID list file,
 which may also come from other way like mapping result.</p>
-<pre><code>$ seqkit sample --proportion 0.001  duplicated-reads.fq.gz | seqkit seq --name --only-id &gt; id.txt
+<pre><code>$ seqkit sample --proportion 0.001  duplicated-reads.fq.gz \
+    | seqkit seq --name --only-id &gt; id.txt
 </code></pre>
 <p>ID list file:</p>
 <pre><code>$ head id.txt
@@ -291,29 +720,34 @@ SRR1972739.3044
 SRR1972739.3562
 </code></pre>
 <p>Searching by ID list file:</p>
-<pre><code>$ seqkit grep --pattern-file id.txt duplicated-reads.fq.gz &gt; duplicated-reads.subset.fq.gz
+<pre><code>$ seqkit grep --pattern-file id.txt duplicated-reads.fq.gz \
+    &gt; duplicated-reads.subset.fq.gz
 </code></pre>
 <h2 id="how-to-find-fastaq-sequences-containing-degenerate-bases-and-locate-them">How to find FASTA/Q sequences containing degenerate bases and locate them?</h2>
 <p><code>seqkit fx2tab</code> converts FASTA/Q to tabular format and can output the sequence
 alphabet in a new column. And then text searching tools can be used to filter
 the table.</p>
-<pre><code>$ seqkit fx2tab -n -i -a viral.1.1.genomic.fna.gz | csvtk -H -t grep -f 4 -r -i -p "[^ACGT]"
+<pre><code>$ seqkit fx2tab -n -i -a viral.1.1.genomic.fna.gz \
+    | csvtk -H -t grep -f 4 -r -i -p "[^ACGT]"
 gi|446730228|ref|NC_019782.1|                   ACGNT
 gi|557940284|ref|NC_022800.1|                   ACGKT
 gi|564292828|ref|NC_023009.1|                   ACGNT
 </code></pre>
 <p>Long-option version of the command:</p>
-<pre><code>$ seqkit fx2tab --name --only-id --alphabet  viral.1.1.genomic.fna.gz | csvtk --no-header-row --tabs grep --fields 4 --use-regexp --ignore-case --pattern "[^ACGT]"
+<pre><code>$ seqkit fx2tab --name --only-id --alphabet  viral.1.1.genomic.fna.gz \
+    | csvtk --no-header-row --tabs grep --fields 4 --use-regexp --ignore-case --pattern "[^ACGT]"
 </code></pre>
 <p>You can then exclude these sequences with <code>seqkit grep</code>:</p>
 <pre><code># save the sequenece IDs.
-$ seqkit fx2tab -n -i -a viral.1.1.genomic.fna.gz | csvtk -H -t grep -f 4 -r -i -p "[^ACGT]" | csvtk -H -t cut -f 1 &gt; id2.txt
+$ seqkit fx2tab -n -i -a viral.1.1.genomic.fna.gz \
+    | csvtk -H -t grep -f 4 -r -i -p "[^ACGT]" | csvtk -H -t cut -f 1 &gt; id2.txt
 
 # search and exclude.
 $ seqkit grep --pattern-file id2.txt --invert-match viral.1.1.genomic.fna.gz &gt; clean.fa
 </code></pre>
 <p>Or locate the degenerate bases, e.g, <code>N</code> and <code>K</code></p>
-<pre><code>$ seqkit grep --pattern-file id2.txt viral.1.1.genomic.fna.gz | seqkit locate --ignore-case --only-positive-strand --pattern K+ --pattern N+
+<pre><code>$ seqkit grep --pattern-file id2.txt viral.1.1.genomic.fna.gz \
+    | seqkit locate --ignore-case --only-positive-strand --pattern K+ --pattern N+
 seqID   patternName     pattern strand  start   end     matched
 gi|564292828|ref|NC_023009.1|   N+      N+      +       87972   87972   N
 gi|564292828|ref|NC_023009.1|   N+      N+      +       100983  100983  N
@@ -380,13 +814,15 @@ gi|526245013|ref|YP_008320339.1| portal protein [Paenibacillus phage phiIBB_Pl23
 of every parts, and sequence region. In this case, we'll split according to
 sequence ID (species names) which can be specified by flag <code>--id-regexp</code>.</p>
 <p>Default ID:</p>
-<pre><code>$ seqkit head -n 3 viral.1.protein.faa.gz | seqkit seq --name --only-id
+<pre><code>$ seqkit head -n 3 viral.1.protein.faa.gz \
+    | seqkit seq --name --only-id
 gi|526245011|ref|YP_008320337.1|
 gi|526245012|ref|YP_008320338.1|
 gi|526245013|ref|YP_008320339.1|
 </code></pre>
 <p>New ID:</p>
-<pre><code>$ seqkit head -n 3 viral.1.protein.faa.gz | seqkit seq --name --only-id --id-regexp "\[(.+)\]"
+<pre><code>$ seqkit head -n 3 viral.1.protein.faa.gz \
+    | seqkit seq --name --only-id --id-regexp "\[(.+)\]"
 Paenibacillus phage phiIBB_Pl23
 Paenibacillus phage phiIBB_Pl23
 Paenibacillus phage phiIBB_Pl23
@@ -411,7 +847,8 @@ hypothetical    putative
 Putative        putative
 </code></pre>
 <p>Overview the FASTA headers containing "hypothetical":</p>
-<pre><code>$ seqkit grep --by-name --use-regexp --ignore-case --pattern hypothetical viral.1.protein.faa.gz | seqkit head -n 3 | seqkit seq --name
+<pre><code>$ seqkit grep --by-name --use-regexp --ignore-case --pattern hypothetical viral.1.protein.faa.gz \
+    | seqkit head -n 3 | seqkit seq --name
 gi|526245016|ref|YP_008320342.1| hypothetical protein IBBPl23_06 [Paenibacillus phage phiIBB_Pl23]
 gi|526245019|ref|YP_008320345.1| hypothetical protein IBBPl23_09 [Paenibacillus phage phiIBB_Pl23]
 gi|526245020|ref|YP_008320346.1| hypothetical protein IBBPl23_10 [Paenibacillus phage phiIBB_Pl23]
@@ -422,12 +859,17 @@ capture the ID (<code>^([^ ]+ )</code>) so we can restore it in "replacement" wi
 capture variable  <code>${1}</code> (robuster than <code>$1</code>).
 And flag <code>-I/--key-capt-idx</code> (default: 1) is set to 2 because the key <code>(\w+)</code>
 is the second captured match. Command:</p>
-<pre><code>$ seqkit replace --kv-file changes.tsv --pattern "^([^ ]+ )(\w+) " --replacement "\${1}{kv} " --key-capt-idx 2 --keep-key viral.1.protein.faa.gz &gt; renamed.fa
+<pre><code>$ seqkit replace --kv-file changes.tsv --pattern "^([^ ]+ )(\w+) " \
+    --replacement "\${1}{kv} " --key-capt-idx 2 --keep-key viral.1.protein.faa.gz &gt; renamed.fa
 </code></pre>
 <h2 id="how-to-extract-paired-reads-from-two-paired-end-reads-file">How to extract paired reads from two paired-end reads file?</h2>
 <p>Let's create two unbanlanced PE reads file:</p>
-<pre><code>$ seqkit rmdup duplicated-reads.fq.gz | seqkit replace --pattern " .+" --replacement " 1" | seqkit sample --proportion 0.9 --rand-seed 1 --out-file read_1.fq.gz
-$ seqkit rmdup duplicated-reads.fq.gz | seqkit replace --pattern " .+" --replacement " 2" | seqkit sample --proportion 0.9 --rand-seed 2 --out-file read_2.fq.gz
+<pre><code>$ seqkit rmdup duplicated-reads.fq.gz \
+    | seqkit replace --pattern " .+" --replacement " 1" \
+    | seqkit sample --proportion 0.9 --rand-seed 1 --out-file read_1.fq.gz
+$ seqkit rmdup duplicated-reads.fq.gz \
+    | seqkit replace --pattern " .+" --replacement " 2" \
+    | seqkit sample --proportion 0.9 --rand-seed 2 --out-file read_2.fq.gz
 </code></pre>
 <p>Overview:</p>
 <pre><code># number of records
@@ -448,9 +890,10 @@ SRR1972739.2 2
 SRR1972739.3 2
 </code></pre>
 <p>Firstly, extract sequence IDs of two file and compute the intersection:</p>
-<pre><code>$ seqkit seq --name --only-id read_1.fq.gz read_2.fq.gz | sort | uniq -d &gt; id.txt
+<pre><code>$ seqkit seq --name --only-id read_1.fq.gz read_2.fq.gz \
+    | sort | uniq -d &gt; id.txt
 
-# number of IDs
+$ # number of IDs
 wc -l id.txt
 8090 id.txt
 </code></pre>
@@ -470,8 +913,16 @@ $ md5sum read_*.f.fq.gz.id.txt
 same order. If not you can sort them after previous steps. Shell <code>sort</code>
 can sort large file using disk, so temporary directory is set as
 current directory by option <code>-T .</code>.</p>
-<pre><code>$ gzip -d -c read_1.f.fq.gz | seqkit fx2tab | sort -k1,1 -T . | seqkit tab2fx | gzip -c &gt; read_1.f.sorted.fq.gz
-$ gzip -d -c read_2.f.fq.gz | seqkit fx2tab | sort -k1,1 -T . | seqkit tab2fx | gzip -c &gt; read_2.f.sorted.fq.gz
+<pre><code>$ gzip -d -c read_1.f.fq.gz \
+    | seqkit fx2tab \
+    | sort -k1,1 -T . \
+    | seqkit tab2fx \
+    | gzip -c &gt; read_1.f.sorted.fq.gz
+$ gzip -d -c read_2.f.fq.gz \
+    | seqkit fx2tab \
+    | sort -k1,1 -T . \
+    | seqkit tab2fx \
+    | gzip -c &gt; read_2.f.sorted.fq.gz
 </code></pre>
 <h2 id="how-to-concatenate-two-fasta-sequences-in-to-one">How to concatenate two FASTA sequences in to one?</h2>
 <p>Related posts: <a href="https://www.biostars.org/p/231806/">Combining two fasta sequences into one</a></p>
@@ -500,92 +951,87 @@ aaaaaCCCCC
 cccccGGGGG
 &gt;seq3
 gggggTTTTT
-</code></pre></div>
+</code></pre>
+                
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../usage/" title="Usage" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Usage
+              </span>
+            </div>
+          </a>
         
         
+          <a href="../tutorial/" title="Tutorial" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Tutorial
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
     </div>
-
-    <footer class="col-md-12 text-center">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
         
-        <hr>
-        <p>
-        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
-
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
         
-        
-    </footer>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="../js/bootstrap-3.0.3.min.js"></script>
-    <script src="../js/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <script>var base_url = ".."</script>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
     
-    <script src="../js/base.js"></script>
-    <script src="../search/main.js"></script>
-
-    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="searchModalLabel">Search</h4>
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            </div>
-            <div class="modal-body">
-                <p>
-                    From here you can search these documents. Enter
-                    your search terms below.
-                </p>
-                <form>
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
-                    </div>
-                </form>
-                <div id="mkdocs-search-results"></div>
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
-    </div>
-</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            </div>
-            <div class="modal-body">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th style="width: 20%;">Keys</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="help shortcut"><kbd>?</kbd></td>
-                    <td>Open this help</td>
-                  </tr>
-                  <tr>
-                    <td class="next shortcut"><kbd>n</kbd></td>
-                    <td>Next page</td>
-                  </tr>
-                  <tr>
-                    <td class="prev shortcut"><kbd>p</kbd></td>
-                    <td>Previous page</td>
-                  </tr>
-                  <tr>
-                    <td class="search shortcut"><kbd>s</kbd></td>
-                    <td>Search</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
-    </div>
-</div>
-    </body>
-
+    <script src="../assets/javascripts/application.6f02ae1b.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+    
+    
+      
+        <script>!function(e,a,t,n,o,c,i){e.GoogleAnalyticsObject=o,e.ga=e.ga||function(){(e.ga.q=e.ga.q||[]).push(arguments)},e.ga.l=1*new Date,c=a.createElement(t),i=a.getElementsByTagName(t)[0],c.async=1,c.src="https://www.google-analytics.com/analytics.js",i.parentNode.insertBefore(c,i)}(window,document,"script",0,"ga"),ga("create","UA-28948626-9","bioinf.shenwei.me/seqkit"),ga("set","anonymizeIp",!0),ga("send","pageview");var links=document.getElementsByTagName("a");if(Array.prototype.map.call(links,function(e){e.host!=document.location.host&&e.addEventListener("click",function(){var a=e.getAttribute("data-md-action")||"follow";ga("send","event","outbound",a,e.href)})}),document.forms.search){var query=document.forms.search.query;query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}</script>
+      
+    
+  </body>
 </html>
