@@ -29,6 +29,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/shenwei356/bwt"
+
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/breader"
@@ -49,7 +51,9 @@ Attentions:
      for partly matching.
   2. While when searching by sequences, only positive strand is searched,
      and it's partly matching. 
-     Mismatchis are allowed using flag "-m/--max-mismatch".
+     Mismatch is allowed using flag "-m/--max-mismatch",
+     but it's not fast enough for large genome like human genome.
+     Though, it's fast enough for microbial genomes.
   3. The order of sequences in result is consistent with that in original
      file, not the order of the query patterns.
 
@@ -68,6 +72,8 @@ Examples:
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
+
+		bwt.CheckEndSymbol = false
 
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
@@ -301,7 +307,7 @@ Examples:
 							}
 						}
 					} else {
-						_, err = sfmi.TransformForLocate(target)
+						_, err = sfmi.Transform(target)
 						if err != nil {
 							checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
 						}
@@ -360,7 +366,7 @@ func init() {
 	grepCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")
 	grepCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
 	grepCmd.Flags().BoolP("by-seq", "s", false, "search subseq on seq, only positive strand is searched, and mismatch allowed using flag -m/--max-mismatch")
-	grepCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)")
+	grepCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq. Please use mapping tools like bwa or bowtie1/2 for large genomes")
 	grepCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	grepCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
 	grepCmd.Flags().StringP("region", "R", "", "specify sequence region for searching. "+

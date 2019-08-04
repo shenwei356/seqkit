@@ -29,6 +29,7 @@ import (
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/bwt"
 	"github.com/shenwei356/bwt/fmi"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
@@ -47,6 +48,11 @@ Degenerate bases like "RYMM.." are also supported by flag -d.
 By default, motifs are treated as regular expression.
 When flag -d given, regular expression may be wrong.
 For example: "\w" will be wrongly converted to "\[AT]".
+
+Mismatch is allowed using flag "-m/--max-mismatch",
+but it's not fast enough for large genome like human genome.
+Though, it's fast enough for microbial genomes.
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -61,6 +67,8 @@ For example: "\w" will be wrongly converted to "\[AT]".
 		seq.ComplementThreads = config.Threads
 		quiet := config.Quiet
 		runtime.GOMAXPROCS(config.Threads)
+
+		bwt.CheckEndSymbol = false
 
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
@@ -199,7 +207,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 				}
 
 				if mismatches > 0 {
-					_, err = sfmi.TransformForLocate(record.Seq.Seq)
+					_, err = sfmi.Transform(record.Seq.Seq)
 					if err != nil {
 						checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
 					}
@@ -251,7 +259,7 @@ For example: "\w" will be wrongly converted to "\[AT]".
 						continue
 					}
 
-					_, err = sfmi.TransformForLocate(seqRP.Seq)
+					_, err = sfmi.Transform(seqRP.Seq)
 					if err != nil {
 						checkError(fmt.Errorf("fail to build FMIndex for reverse complement sequence: %s", record.Name))
 					}
@@ -448,5 +456,5 @@ func init() {
 	locateCmd.Flags().BoolP("non-greedy", "G", false, "non-greedy mode, faster but may miss motifs overlapping with others")
 	locateCmd.Flags().BoolP("gtf", "", false, "output in GTF format")
 	locateCmd.Flags().BoolP("bed", "", false, "output in BED6 format")
-	locateCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)")
+	locateCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq. Please use mapping tools like bwa or bowtie1/2 for large genomes")
 }

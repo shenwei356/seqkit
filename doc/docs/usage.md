@@ -1201,7 +1201,7 @@ Examples
 Usage
 
 ``` text
-search sequences by pattern(s) of name or sequence motifs
+search sequences by ID/name/sequence/sequence motifs, mismatch allowed
 
 Attentions:
   1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
@@ -1209,7 +1209,9 @@ Attentions:
      for partly matching.
   2. While when searching by sequences, only positive strand is searched,
      and it's partly matching. 
-     Mismatchis are allowed using flag "-m/--max-mismatch".
+     Mismatch is allowed using flag "-m/--max-mismatch",
+     but it's not fast enough for large genome like human genome.
+     Though, it's fast enough for microbial genomes.
   3. The order of sequences in result is consistent with that in original
      file, not the order of the query patterns.
 
@@ -1242,7 +1244,7 @@ Flags:
   -h, --help                  help for grep
   -i, --ignore-case           ignore case
   -v, --invert-match          invert the sense of matching, to select non-matching records
-  -m, --max-mismatch int      max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)
+  -m, --max-mismatch int      max mismatch when matching by seq. Please use mapping tools like bwa or bowtie1/2 for large genomes
   -p, --pattern strings       search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"'))
   -f, --pattern-file string   pattern file (one record per line)
   -R, --region string         specify sequence region for searching. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases
@@ -1292,16 +1294,17 @@ Examples
         file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
         -     FASTA   RNA      1,181  145,789       49    123.4    2,354
 
-        real    0m0.070s
-        user    0m0.107s
+        real    0m0.058s
+        user    0m0.100s
         sys     0m0.017s
 
         $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg -m 1 | seqkit stats
         file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
         -     FASTA   RNA     17,168  1,881,005       39    109.6    2,354
 
-        real    0m4.655s
-        user    0m4.753s
+        real    0m2.479s
+        user    0m2.570s
+        sys     0m0.015s
 
 1. Extract sequences starting with AGGCG
 
@@ -1334,6 +1337,10 @@ By default, motifs are treated as regular expression.
 When flag -d given, regular expression may be wrong.
 For example: "\w" will be wrongly converted to "\[AT]".
 
+Mismatch is allowed using flag "-m/--max-mismatch",
+but it's not fast enough for large genome like human genome.
+Though, it's fast enough for microbial genomes.
+
 Usage:
   seqkit locate [flags]
 
@@ -1343,12 +1350,13 @@ Flags:
       --gtf                       output in GTF format
   -h, --help                      help for locate
   -i, --ignore-case               ignore case
-  -m, --max-mismatch int          max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)
-  -G, --non-greedy                non-greedy mode, faster but may miss motifs overlaping with others
+  -m, --max-mismatch int          max mismatch when matching by seq. Please use mapping tools like bwa or bowtie1/2 for large genomes
+  -G, --non-greedy                non-greedy mode, faster but may miss motifs overlapping with others
   -P, --only-positive-strand      only search on positive strand
   -p, --pattern strings           pattern/motif (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
   -f, --pattern-file string       pattern/motif file (FASTA format)
   -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+
 ```
 
 Examples
