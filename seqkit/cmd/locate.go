@@ -456,5 +456,5 @@ func init() {
 	locateCmd.Flags().BoolP("non-greedy", "G", false, "non-greedy mode, faster but may miss motifs overlapping with others")
 	locateCmd.Flags().BoolP("gtf", "", false, "output in GTF format")
 	locateCmd.Flags().BoolP("bed", "", false, "output in BED6 format")
-	locateCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq. Please use mapping tools like bwa or bowtie1/2 for large genomes")
+	locateCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster")
 }

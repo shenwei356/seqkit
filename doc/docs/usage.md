@@ -1244,7 +1244,7 @@ Flags:
   -h, --help                  help for grep
   -i, --ignore-case           ignore case
   -v, --invert-match          invert the sense of matching, to select non-matching records
-  -m, --max-mismatch int      max mismatch when matching by seq. Please use mapping tools like bwa or bowtie1/2 for large genomes
+  -m, --max-mismatch int      max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster
   -p, --pattern strings       search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"'))
   -f, --pattern-file string   pattern file (one record per line)
   -R, --region string         specify sequence region for searching. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases
@@ -1350,7 +1350,7 @@ Flags:
       --gtf                       output in GTF format
   -h, --help                      help for locate
   -i, --ignore-case               ignore case
-  -m, --max-mismatch int          max mismatch when matching by seq. Please use mapping tools like bwa or bowtie1/2 for large genomes
+  -m, --max-mismatch int          max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster
   -G, --non-greedy                non-greedy mode, faster but may miss motifs overlapping with others
   -P, --only-positive-strand      only search on positive strand
   -p, --pattern strings           pattern/motif (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')

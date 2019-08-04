@@ -366,7 +366,7 @@ func init() {
 	grepCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")
 	grepCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
 	grepCmd.Flags().BoolP("by-seq", "s", false, "search subseq on seq, only positive strand is searched, and mismatch allowed using flag -m/--max-mismatch")
-	grepCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq. Please use mapping tools like bwa or bowtie1/2 for large genomes")
+	grepCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster")
 	grepCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	grepCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
 	grepCmd.Flags().StringP("region", "R", "", "specify sequence region for searching. "+
