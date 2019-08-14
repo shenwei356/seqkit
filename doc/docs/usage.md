@@ -2510,6 +2510,14 @@ Examples
         >SEQ2
         acgtnAAAAnnn
 
+## bam
+
+## fish
+
+## sana
+
+## watch
+
 ## genautocomplete
 
 Usage

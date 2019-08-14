@@ -379,8 +379,8 @@ var bamCmd = &cobra.Command{
 		rangeMax := getFlagFloat64(cmd, "range-max")
 		printCount := getFlagString(cmd, "count")
 		printPdf := getFlagString(cmd, "img")
-		printScatter := getFlagString(cmd, "scatter")
-		_ = printScatter
+		//printScatter := getFlagString(cmd, "scatter")
+		//_ = printScatter
 		printDump := getFlagBool(cmd, "dump")
 		printLog := getFlagBool(cmd, "log")
 		printDelay := getFlagInt(cmd, "delay")
@@ -981,7 +981,7 @@ func init() {
 
 	bamCmd.Flags().IntP("map-qual", "q", 0, "minimum mapping quality")
 	bamCmd.Flags().StringP("field", "f", "", "target fields")
-	bamCmd.Flags().StringP("scatter", "S", "", "scatter plot of two numerical fields")
+	//bamCmd.Flags().StringP("scatter", "S", "", "scatter plot of two numerical fields")
 	bamCmd.Flags().StringP("img", "O", "", "save histogram to this PDF/image file")
 	bamCmd.Flags().IntP("print-freq", "p", -1, "print/report after this many records (-1 for print after EOF)")
 	bamCmd.Flags().IntP("delay", "W", 1, "sleep this many seconds after plotting")
