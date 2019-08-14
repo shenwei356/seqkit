@@ -1,7 +1,12 @@
+- [SeqKit v0.10.3](https://github.com/shenwei356/seqkit/releases/tag/v0.10.3)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.10.3/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.10.3)
+    - `seqkit grep/locate`: reduce memory occupation when using flag `-m/--max-mismatch`.
 - [SeqKit v0.10.2](https://github.com/shenwei356/seqkit/releases/tag/v0.10.2)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.10.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.10.2)
+    - `seqkit`: fix bug of parsing sequence ID delimited by tab (`\t`). [#78](https://github.com/shenwei356/seqkit/issues/78)
     - `seqkit grep`: better logic of `--delete-matched`.
-
+    - `seqkit common/rmdup/split`: use xxhash to replace MD5 when comparing with sequence, discard flag `-m/--md5`.
+    - `seqkit stats`: new flag `-b/--basename` for outputting basename instead of full path.
 - [SeqKit v0.10.1](https://github.com/shenwei356/seqkit/releases/tag/v0.10.1)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.10.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.10.1)
     - `seqkit fx2tab`: new option `-q/--avg-qual` for outputting average read quality. [#60](https://github.com/shenwei356/seqkit/issues/60)

@@ -21,8 +21,6 @@
 package cmd
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"io"
 	"os"
@@ -209,13 +207,6 @@ func sortRecordChunkMapID(chunks map[uint64]fastx.RecordChunk) sortutil.Uint64Sl
 	}
 	sort.Sort(ids)
 	return ids
-}
-
-// MD5 of a slice
-func MD5(s []byte) string {
-	h := md5.New()
-	h.Write(s)
-	return hex.EncodeToString(h.Sum(nil))
 }
 
 func filepathTrimExtension(file string) (string, string) {

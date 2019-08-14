@@ -56,6 +56,7 @@ func main() {
 	cmd.Execute()
 
 	// go tool pprof --alloc_space /usr/local/bin/seqkit mprof
+	// go tool pprof --inuse_space /usr/local/bin/seqkit mprof
 	// f2, _ := os.Create("mprof")
 	// pprof.WriteHeapProfile(f2)
 	// defer f2.Close()
