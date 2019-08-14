@@ -444,7 +444,7 @@ var bamCmd = &cobra.Command{
 			}
 		}
 
-		validFields := []string{"Read", "Ref", "MapQual", "Acc", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip"}
+		validFields := []string{"Read", "Ref", "MapQual", "Acc", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "IsSup"}
 
 		fields := strings.Split(field, ",")
 		if field == "" {
@@ -652,6 +652,33 @@ var bamCmd = &cobra.Command{
 					return -1.0
 				}
 				return 1.0
+			},
+		}
+
+		fmap["Flags"] = fieldInfo{
+			"SAM record flags as an integer",
+			func(r *sam.Record) float64 {
+				return float64(r.Flags)
+			},
+		}
+
+		fmap["IsSec"] = fieldInfo{
+			"One if alignment is secondary, zero otherwise",
+			func(r *sam.Record) float64 {
+				if r.Flags&sam.Secondary != 0 {
+					return 1
+				}
+				return 0
+			},
+		}
+
+		fmap["IsSup"] = fieldInfo{
+			"One if alignment is supplementary, zero otherwise",
+			func(r *sam.Record) float64 {
+				if r.Flags&sam.Supplementary != 0 {
+					return 1
+				}
+				return 0
 			},
 		}
 
