@@ -67,10 +67,11 @@ type SeqDetector struct {
 	Stranded  bool
 	NullMode  string
 	Cutoff    float64
+	AlnParams *AlnParams
 }
 
-func NewSeqDetector(searchAll bool, stranded bool, nullMode string, cutoff float64) *SeqDetector {
-	return &SeqDetector{Queries{}, searchAll, stranded, nullMode, cutoff}
+func NewSeqDetector(searchAll bool, stranded bool, nullMode string, cutoff float64, alnParams *AlnParams) *SeqDetector {
+	return &SeqDetector{Queries{}, searchAll, stranded, nullMode, cutoff, alnParams}
 }
 
 func (d *SeqDetector) Detect(r *Reference, rec bool) []*AlignedSeq {
@@ -120,7 +121,7 @@ func (d *SeqDetector) detectOnce(r *Reference, rr Range) []*AlignedSeq {
 	}
 	for _, q := range d.Queries {
 		nr := &Reference{r.Name, r.Seq, Ranges{actualRange(rr, len(r.Seq))}}
-		h := PairwiseAlignSW(nr, q)
+		h := PairwiseAlignSW(nr, q, d.AlnParams)
 		h.Detector = d
 		if (h.Score / q.NullScore) > d.Cutoff {
 			hits = append(hits, h)
@@ -136,7 +137,7 @@ func (d *SeqDetector) detectRec(r *Reference, rr Range) []*AlignedSeq {
 	}
 	for _, q := range d.Queries {
 		nr := &Reference{r.Name, r.Seq, Ranges{actualRange(rr, len(r.Seq))}}
-		h := PairwiseAlignSW(nr, q)
+		h := PairwiseAlignSW(nr, q, d.AlnParams)
 		h.Detector = d
 		if (h.Score / q.NullScore) > d.Cutoff {
 			hits = append(hits, h)
@@ -222,7 +223,7 @@ func (d *SeqDetector) AddAnonQueries(qrs []string) {
 func (d *SeqDetector) nullScore(q string) float64 {
 	switch d.NullMode {
 	case "self":
-		return PairwiseAlignSW(&Reference{Name: "Ref", Seq: q, Ranges: Ranges{Range{0, float64(len(q))}}}, &Query{Name: "Query", Seq: q}).Score
+		return PairwiseAlignSW(&Reference{Name: "Ref", Seq: q, Ranges: Ranges{Range{0, float64(len(q))}}}, &Query{Name: "Query", Seq: q}, d.AlnParams).Score
 	}
 	return math.NaN()
 }
@@ -238,21 +239,26 @@ func NewAnonLinearSeq(s string) *linear.Seq {
 }
 
 //Pairwise alignment of two sequences by biogo.
-func PairwiseAlignSW(r *Reference, q *Query) *AlignedSeq {
+func PairwiseAlignSW(r *Reference, q *Query, alnParams *AlnParams) *AlignedSeq {
 	ref := NewAnonLinearSeq(r.Seq[int(r.Ranges[0].Start):int(r.Ranges[0].End)])
 	ref.Alpha = alphabet.DNAgapped
 	query := NewAnonLinearSeq(q.Seq)
 	query.Alpha = alphabet.DNAgapped
 
+	m := alnParams.Match
+	s := alnParams.Mismatch
+	o := alnParams.GapOpen
+	e := alnParams.GapExtend
+
 	smith := align.SWAffine{
 		Matrix: align.Linear{
-			{0, -1, -1, -1, -1},
-			{-1, 4, -4, -4, -4},
-			{-1, -4, 4, -4, -4},
-			{-1, -4, -4, 4, -4},
-			{-1, -4, -4, -4, 4},
+			{0, e, e, e, e},
+			{e, m, s, s, s},
+			{e, s, m, s, s},
+			{e, s, s, m, s},
+			{e, s, s, s, m},
 		},
-		GapOpen: -2,
+		GapOpen: o,
 	}
 
 	aln, err := smith.Align(ref, query)

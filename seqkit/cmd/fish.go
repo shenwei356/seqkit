@@ -39,6 +39,34 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type AlnParams struct {
+	Match     int
+	Mismatch  int
+	GapOpen   int
+	GapExtend int
+}
+
+func parseAlnParams(s string) *AlnParams {
+	p := new(AlnParams)
+	sp := strings.Split(s, ",")
+	if len(sp) != 4 {
+		panic("Invalid alignment parameters: " + s)
+	}
+	for i, tok := range sp {
+		sp[i] = strings.TrimSpace(tok)
+	}
+	var err error
+	p.Match, err = strconv.Atoi(sp[0])
+	checkError(err)
+	p.Mismatch, err = strconv.Atoi(sp[1])
+	checkError(err)
+	p.GapOpen, err = strconv.Atoi(sp[2])
+	checkError(err)
+	p.GapExtend, err = strconv.Atoi(sp[3])
+	checkError(err)
+	return p
+}
+
 func parseRanges(rf string) Ranges {
 	res := Ranges{}
 	if len(rf) == 0 {
@@ -101,6 +129,7 @@ var fishCmd = &cobra.Command{
 
 		flagPass := getFlagBool(cmd, "pass")
 		flagAln := getFlagBool(cmd, "print-aln")
+		flagAlnParams := getFlagString(cmd, "aln-params")
 		queryFastx := getFlagString(cmd, "query-fastx")
 		flagSeq := getFlagString(cmd, "query-sequences")
 		flagBam := getFlagString(cmd, "out-bam")
@@ -112,6 +141,7 @@ var fishCmd = &cobra.Command{
 		flagInvert := getFlagBool(cmd, "invert")
 
 		ranges := parseRanges(flagRange)
+		alnParams := parseAlnParams(flagAlnParams)
 
 		validateSeq := getFlagBool(cmd, "validate-seq")
 		validateSeqLength := getFlagValidateSeqLength(cmd, "validate-seq-length")
@@ -131,7 +161,7 @@ var fishCmd = &cobra.Command{
 			files = []string{"-"}
 		}
 
-		detector := NewSeqDetector(flagAll, flagStranded, flagNullMode, flagCutoff)
+		detector := NewSeqDetector(flagAll, flagStranded, flagNullMode, flagCutoff, alnParams)
 		if queryFastx != "" {
 			detector.LoadQueries(queryFastx)
 		}
@@ -329,6 +359,7 @@ func init() {
 	fishCmd.Flags().BoolP("pass", "x", false, "pass through mode (write input to stdout)")
 	fishCmd.Flags().BoolP("all", "a", false, "search all")
 	fishCmd.Flags().StringP("query-fastx", "f", "", "query fasta")
+	fishCmd.Flags().StringP("aln-params", "p", "4,-4,-2,-1", "alignment parameters in format \"<match>,<mismatch>,<gap_open>,<gap_extend>\"")
 	fishCmd.Flags().StringP("query-sequences", "F", "", "query sequences")
 	fishCmd.Flags().StringP("out-bam", "b", "", "save aligmnets to this BAM file (memory intensive)")
 	fishCmd.Flags().BoolP("stranded", "s", false, "search + strand only")
