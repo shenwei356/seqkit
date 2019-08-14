@@ -38,7 +38,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// watchCmd represents the seq command
+// watchCmd represents the watch command
 var watchCmd = &cobra.Command{
 	Use:   "watch",
 	Short: "monitoring and online histograms of sequence features",

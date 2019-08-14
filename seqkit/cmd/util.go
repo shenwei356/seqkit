@@ -21,14 +21,13 @@
 package cmd
 
 import (
-	//	"gopkg.in/cheggaaa/pb.v2"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
 )
 
-// Execute commands via bash.
+// BashExec executes a command via bash.
 func BashExec(command string) {
 	cmd := exec.Command("bash", "-c", command)
 	cmd.Stdout = os.Stdout
@@ -41,7 +40,7 @@ func BashExec(command string) {
 
 }
 
-// Get size of a file.
+// FileSize gets size of a file by calling os.Stat.
 func FileSize(file string) int {
 	info, err := os.Stat(file)
 	if err != nil {
@@ -51,7 +50,7 @@ func FileSize(file string) int {
 	return int(info.Size())
 }
 
-// Reverse integer slice.
+// ReverseInt revsrees a slice of integers.
 func ReverseInt(d []int) []int {
 	s := make([]int, len(d))
 	copy(d, s)
@@ -61,7 +60,7 @@ func ReverseInt(d []int) []int {
 	return s
 }
 
-// Check if file exists.
+// FileExists checks if a file exists by calling os.Stat.
 func FileExists(fn string) bool {
 	_, err := os.Stat(fn)
 	if err == nil {
@@ -70,7 +69,7 @@ func FileExists(fn string) bool {
 	return false
 }
 
-// Get minimum of int slice.
+// MinInts calculates the minimum of a slice of integers.
 func MinInts(s []int) (m int) {
 	m = s[0]
 	for _, e := range s {
@@ -81,7 +80,7 @@ func MinInts(s []int) (m int) {
 	return
 }
 
-// Get maximum of int slice.
+// MaxInts calculates the maximum of a slice of integers.
 func MaxInts(s []int) (m int) {
 	for _, e := range s {
 		if e > m {
@@ -91,7 +90,7 @@ func MaxInts(s []int) (m int) {
 	return
 }
 
-// Calculate sum of int slice.
+// SumInts calculates the sum of a slice of integers.
 func SumInts(s []int) (r int) {
 	for _, e := range s {
 		r += e
@@ -99,7 +98,7 @@ func SumInts(s []int) (r int) {
 	return
 }
 
-// Reverse complement DNA sequence.
+// RevCompDNA reverse complements a DNA sequence string.
 func RevCompDNA(s string) string {
 	size := len(s)
 	s = strings.ToUpper(s)

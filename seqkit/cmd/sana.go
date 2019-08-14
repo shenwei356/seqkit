@@ -32,7 +32,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// sanaCmd represents the concatenate command
+// sanaCmd represents the sana command
 var sanaCmd = &cobra.Command{
 	Use:   "sana",
 	Short: "sanitize broken single line fastq files",
@@ -73,6 +73,7 @@ func init() {
 	sanaCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
 }
 
+// simpleSeq is a structure holding basic sequnce information with qualities.
 type simpleSeq struct {
 	Id    string
 	Seq   string
@@ -80,6 +81,7 @@ type simpleSeq struct {
 	QBase int
 }
 
+// String generates a string representation of a pointer to simpleSeq.
 func (s *simpleSeq) String() string {
 	qs := make([]string, len(s.Qual))
 	for i, qq := range s.Qual {
@@ -88,6 +90,7 @@ func (s *simpleSeq) String() string {
 	return fmt.Sprintf("@%s\n%s\n+\n%s", s.Id, s.Seq, strings.Join(qs, ""))
 }
 
+// IUPACBases is a map of valid IUPAC bases.
 var IUPACBases map[rune]bool
 
 func init() {
@@ -112,7 +115,7 @@ func init() {
 
 }
 
-// Validate sequence:
+// validateSeqString check for illegal bases.
 func validateSeqString(dna string) error {
 	for i, base := range dna {
 		if !IUPACBases[base] {
@@ -122,7 +125,7 @@ func validateSeqString(dna string) error {
 	return nil
 }
 
-// Validate quality string:
+// validateQuals checks for negative quality values.
 func validateQuals(quals []int) error {
 	for i, qual := range quals {
 		if qual < 0 {
@@ -132,7 +135,7 @@ func validateQuals(quals []int) error {
 	return nil
 }
 
-// Validate Seq object:
+// ValidateSeq validates simpleSeq objects.
 func ValidateSeq(seq *simpleSeq) error {
 	if len(seq.Seq) != len(seq.Qual) {
 		return errors.New(fmt.Sprintf("Sequence (%d) and quality (%d) length mismatch", len(seq.Seq), len(seq.Qual)))
@@ -146,7 +149,7 @@ func ValidateSeq(seq *simpleSeq) error {
 	return nil
 }
 
-// Robust parsing of single line fastqs:
+// NewRawSeqStream initializes a new channel for reading fastq records in a robust way.
 func NewRawSeqStream(inFastq string, chanSize int, qBase int) chan *simpleSeq {
 	seqChan := make(chan *simpleSeq, chanSize)
 	r, err := xopen.Ropen(inFastq)
@@ -208,7 +211,7 @@ func NewRawSeqStream(inFastq string, chanSize int, qBase int) chan *simpleSeq {
 	return seqChan
 }
 
-// Parse quality string into a slice of integers.
+// parseQuals parses quality string into a slice of integers.
 func parseQuals(qualString string, qBase int) []int {
 	quals := make([]int, len(qualString))
 	for i, char := range qualString {

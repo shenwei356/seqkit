@@ -35,6 +35,7 @@ import (
 	"github.com/shenwei356/bio/seqio/fastx"
 )
 
+// Query holds information about a query sequence.
 type Query struct {
 	Name      string
 	Seq       string
@@ -42,25 +43,31 @@ type Query struct {
 	NullScore float64
 }
 
+// Range defines a  half-open slice over a sequence [Start, End).
 type Range struct {
 	Start float64
 	End   float64
 }
 
+// Range returns the length of a range.
 func (r Range) Len() float64 {
 	return r.End - r.Start
 }
 
+// Ranges is a slice of ranges.
 type Ranges []Range
 
+// Reference holds information about a reference sequence along with the target ranges.
 type Reference struct {
 	Name   string
 	Seq    string
 	Ranges Ranges
 }
 
+// Queries is a slice of pointers to Query.
 type Queries []*Query
 
+// SeqDetector holds paramters for sequence detection.
 type SeqDetector struct {
 	Queries   Queries
 	SearchAll bool
@@ -70,10 +77,12 @@ type SeqDetector struct {
 	AlnParams *AlnParams
 }
 
+// NewSeqDetector initilizes a SeqDetector object.
 func NewSeqDetector(searchAll bool, stranded bool, nullMode string, cutoff float64, alnParams *AlnParams) *SeqDetector {
 	return &SeqDetector{Queries{}, searchAll, stranded, nullMode, cutoff, alnParams}
 }
 
+// Detect performs an optinally recursive alignments of the queries of a given reference sequence.
 func (d *SeqDetector) Detect(r *Reference, rec bool) []*AlignedSeq {
 	var h []*AlignedSeq
 	for _, rr := range r.Ranges {
@@ -86,6 +95,7 @@ func (d *SeqDetector) Detect(r *Reference, rec bool) []*AlignedSeq {
 	return h
 }
 
+// actualRange applies a range to a sequence with a given length.
 func actualRange(rr Range, l int) Range {
 	s, e := rr.Start, rr.End
 	if s == e {
@@ -114,6 +124,7 @@ func actualRange(rr Range, l int) Range {
 	return Range{s, e}
 }
 
+// detectOnce aligns queries to the reference sequence at specified ranges.
 func (d *SeqDetector) detectOnce(r *Reference, rr Range) []*AlignedSeq {
 	var hits []*AlignedSeq
 	if rr.Len() == 0 {
@@ -130,6 +141,8 @@ func (d *SeqDetector) detectOnce(r *Reference, rr Range) []*AlignedSeq {
 	return bestHits(hits, -1)
 }
 
+// detectRec aligns queries to the reference sequence ranges in a recursive fashion in order
+// to return all matches above the threshold.
 func (d *SeqDetector) detectRec(r *Reference, rr Range) []*AlignedSeq {
 	var hits []*AlignedSeq
 	if rr.Len() == 0 {
@@ -152,6 +165,7 @@ func (d *SeqDetector) detectRec(r *Reference, rr Range) []*AlignedSeq {
 	return bestHits(hits, -1)
 }
 
+// byScore is a utility type for sorting []*AlignedSeq.
 type byScore []*AlignedSeq
 
 func (a byScore) Len() int           { return len(a) }
@@ -176,6 +190,7 @@ func bestHits(h []*AlignedSeq, n int) []*AlignedSeq {
 	return res[:i]
 }
 
+// LoadQueries loads queries from a fasta file and calculates null scores for each.
 func (d *SeqDetector) LoadQueries(fx string) {
 	var record *fastx.Record
 	var fastxReader *fastx.Reader
@@ -208,6 +223,7 @@ func (d *SeqDetector) LoadQueries(fx string) {
 	}
 }
 
+// AddAnonQueries adds anonymous queries from a list of comma separated strings.
 func (d *SeqDetector) AddAnonQueries(qrs []string) {
 	for i, q := range qrs {
 		name := fmt.Sprintf("q%d", i)
@@ -220,6 +236,7 @@ func (d *SeqDetector) AddAnonQueries(qrs []string) {
 
 }
 
+// nullScore calculates null score for a given query. Currently uses self-alignment.
 func (d *SeqDetector) nullScore(q string) float64 {
 	switch d.NullMode {
 	case "self":
@@ -228,17 +245,17 @@ func (d *SeqDetector) nullScore(q string) float64 {
 	return math.NaN()
 }
 
-//Interface for getting alignment score.
+// Scorer is an interface for getting alignment score.
 type Scorer interface {
 	Score() int
 }
 
-// Make a new anonymous linear.Seq.
+// NewAnonLinearSeq makes  a new anonymous linear.Seq.
 func NewAnonLinearSeq(s string) *linear.Seq {
 	return &linear.Seq{Seq: alphabet.BytesToLetters([]byte(s))}
 }
 
-//Pairwise alignment of two sequences by biogo.
+// PairwiseAlignSW performs pairwise local alignment of two sequences using the biogo implementation of the Smith-Waterman algorithm.
 func PairwiseAlignSW(r *Reference, q *Query, alnParams *AlnParams) *AlignedSeq {
 	ref := NewAnonLinearSeq(r.Seq[int(r.Ranges[0].Start):int(r.Ranges[0].End)])
 	ref.Alpha = alphabet.DNAgapped
@@ -274,6 +291,7 @@ func PairwiseAlignSW(r *Reference, q *Query, alnParams *AlnParams) *AlignedSeq {
 	return res
 }
 
+// AlignedSeq holds alignment results.
 type AlignedSeq struct {
 	Ref        *Reference
 	Query      *Query
@@ -288,10 +306,13 @@ type AlignedSeq struct {
 	Detector   *SeqDetector
 }
 
+// Fields returns the fields of AlignedSeq in a defined order.
 func (a *AlignedSeq) Fields() []string {
 	validFields := []string{"Ref", "RefStart", "RefEnd", "Query", "QueryStart", "QueryEnd", "Strand", "MapQual", "RawScore", "Acc", "ClipAcc", "QueryCov"}
 	return validFields
 }
+
+// String generates string represenattion of a *AlignedSeq.
 func (a *AlignedSeq) String() string {
 	validFields := []string{"Ref", "RefStart", "RefEnd", "Query", "QueryStart", "QueryEnd", "Strand", "MapQual", "RawScore", "Acc", "ClipAcc", "QueryCov"}
 	fmap := make(map[string]func(*AlignedSeq) string)
@@ -365,7 +386,7 @@ func (a *AlignedSeq) AlnString() string {
 	return fmt.Sprintf("@\t%s\t+\t%d\t%d\t%s\n@\t%s\t%s\t%d\t%d\t%s", a.RefAln, a.RefStart, a.RefEnd, a.Ref.Name, a.QueryAln, a.Query.Strand, a.QueryStart, a.QueryEnd, a.Query.Name)
 }
 
-//Construct AlignedSeq structure based on raw alignment results.
+// AlignInfo constructs an *AlignedSeq structure based on raw alignment results.
 func AlignInfo(r *Reference, q *Query, f []feat.Pair) *AlignedSeq {
 	ref_starts := make([]int, 0)
 	ref_ends := make([]int, 0)

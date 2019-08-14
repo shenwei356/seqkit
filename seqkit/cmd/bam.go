@@ -40,6 +40,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// RefCounts is a structure holding read count information for a given reference.
 type RefCounts struct {
 	Ref      *sam.Reference
 	Count    float64
@@ -47,8 +48,10 @@ type RefCounts struct {
 	SupCount float64
 }
 
+// ReadCounts holds read counts for all references.
 type ReadCounts []*RefCounts
 
+// NewReadCounts initializes a new read count slice.
 func NewReadCounts(refs []*sam.Reference) ReadCounts {
 	res := make(ReadCounts, len(refs))
 	for i, _ := range res {
@@ -57,6 +60,7 @@ func NewReadCounts(refs []*sam.Reference) ReadCounts {
 	return res
 }
 
+// byCountRev is a utility type for sorting count structures in a decreasing order.
 type byCountRev ReadCounts
 
 func (s byCountRev) Len() int {
@@ -69,6 +73,7 @@ func (s byCountRev) Less(i, j int) bool {
 	return s[i].Count > s[j].Count
 }
 
+// Sorted created a sorted copy of a read counts slice.
 func (c ReadCounts) Sorted() ReadCounts {
 	sc := make(ReadCounts, len(c))
 	copy(sc, c)
@@ -76,6 +81,7 @@ func (c ReadCounts) Sorted() ReadCounts {
 	return sc
 }
 
+// reportCounts prints per referecne count information.
 func reportCounts(readCounts ReadCounts, countFile string, field string, rangeMin float64, rangeMax float64, printLog bool, printBins int, binMode string, printDump bool, title string, printPdf string, count int, printQuiet bool) {
 
 	outw := os.Stdout
@@ -133,6 +139,7 @@ func reportCounts(readCounts ReadCounts, countFile string, field string, rangeMi
 	}
 }
 
+// CountReads counts total, secondary and supplementary reads mapped to each reference.
 func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, field string, rangeMin, rangeMax float64, printPass bool, printPrim bool, printLog bool, printBins int, binMode string, mapQual int, printFreq int, printDump bool, printDelay int, printPdf string, execBefore, execAfter string, printQuiet bool) {
 	readCounts := NewReadCounts(bamReader.Header().Refs())
 	validFields := []string{"Count", "SecCount", "SupCount"}
@@ -216,6 +223,7 @@ func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, 
 
 }
 
+// bamStatRec is a structure holding BAM statistics.
 type bamStatRec struct {
 	PrimAlnPerc float64
 	PrimAln     int
@@ -226,10 +234,12 @@ type bamStatRec struct {
 	File        string
 }
 
+// String generates string representatION for a pointer to bamStatRec.
 func (r *bamStatRec) String() string {
 	return fmt.Sprintf("%.2f\t%d\t%d\t%d\t%d\t%d\t%s", r.PrimAlnPerc, r.PrimAln, r.SecAln, r.SupAln, r.Unmapped, r.TotalRec, r.File)
 }
 
+// bamIdxStats extracts rough statistics form the BAM index.
 func bamIdxStats(file string) *bamStatRec {
 	idx := file + ".bai"
 	var err error
@@ -260,6 +270,7 @@ func bamIdxStats(file string) *bamStatRec {
 	return res
 }
 
+// bamIdxCount extracts rough count information from the BAM index. Secondary and supplementary alignments are not mapped.
 func bamIdxCount(file string) {
 	idx := file + ".bai"
 	var err error
@@ -285,6 +296,7 @@ func bamIdxCount(file string) {
 	}
 }
 
+// bamStatsOnce calculates detailed statistics for a single BAM file.
 func bamStatsOnce(f string, mapQual int, threads int) *bamStatRec {
 	bamReader := NewBamReader(f, threads)
 	res := new(bamStatRec)
@@ -319,6 +331,7 @@ func bamStatsOnce(f string, mapQual int, threads int) *bamStatRec {
 	return res
 }
 
+// bamStats calculates detailed statistics for multiple BAM files and prints to stderr.
 func bamStats(files []string, mapQual int, threads int) {
 	fmt.Fprintf(os.Stderr, "PrimAlnPerc\tPrimAln\tSecAln\tSupAln\tUnmapped\tTotalRec\tFile\n")
 	for _, f := range files {
@@ -327,6 +340,7 @@ func bamStats(files []string, mapQual int, threads int) {
 	}
 }
 
+// idxStats print rough statistics for multiple BAM files to stderr.
 func idxStats(files []string) {
 	fmt.Fprintf(os.Stderr, "Aligned\tUnmapped\tTotalRec\tFile\n")
 	for _, f := range files {
@@ -335,14 +349,16 @@ func idxStats(files []string) {
 	}
 }
 
+// topEntry is a struct holding a SAM rcord along with a calculated field.
 type topEntry struct {
 	Record *sam.Record
 	Value  float64
 }
 
+// TopBuffer is a slice of topEntries.
 type TopBuffer []topEntry
 
-// bamCmd represents the hist command
+// bamCmd represents the bam command
 var bamCmd = &cobra.Command{
 	Use:   "bam",
 	Short: "monitoring and online histograms of BAM record features",
@@ -866,6 +882,7 @@ var bamCmd = &cobra.Command{
 	},
 }
 
+// gtThanPerc calculates the number of elements in a slice greater than a specified value.
 func gtThanPerc(h *thist.Hist, percent float64) float64 {
 	var count float64
 	for v, c := range h.DataMap {
@@ -876,7 +893,7 @@ func gtThanPerc(h *thist.Hist, percent float64) float64 {
 	return count * 100 / float64(h.DataCount)
 }
 
-// Create new BAM reader from file.
+// NewBamReader creates a new BAM reader from file.
 func NewBamReader(bamFile string, nrProc int) *bam.Reader {
 	fh, err := os.Stdin, error(nil)
 	if bamFile != "-" {
@@ -890,6 +907,7 @@ func NewBamReader(bamFile string, nrProc int) *bam.Reader {
 	return reader
 }
 
+// dumpTop saves to entries to a BAM files.
 func dumpTop(printTop string, bamHeader *sam.Header, topBuffer TopBuffer) {
 	if printTop == "" {
 		return
@@ -914,6 +932,7 @@ func dumpTop(printTop string, bamHeader *sam.Header, topBuffer TopBuffer) {
 
 }
 
+// byTopValue is a utility type for sorting top entries.
 type byTopValue TopBuffer
 
 func (a byTopValue) Len() int           { return len(a) }

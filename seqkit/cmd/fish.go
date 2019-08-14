@@ -39,6 +39,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// AlnParams holds the alignment parameters.
 type AlnParams struct {
 	Match     int
 	Mismatch  int
@@ -46,6 +47,7 @@ type AlnParams struct {
 	GapExtend int
 }
 
+// parseAlnParams parses alignment parameter string.
 func parseAlnParams(s string) *AlnParams {
 	p := new(AlnParams)
 	sp := strings.Split(s, ",")
@@ -67,6 +69,7 @@ func parseAlnParams(s string) *AlnParams {
 	return p
 }
 
+// parseRanges parses ranges string into a slice of ranges.
 func parseRanges(rf string) Ranges {
 	res := Ranges{}
 	if len(rf) == 0 {
@@ -107,7 +110,7 @@ func parseRanges(rf string) Ranges {
 	return res
 }
 
-// fishCmd represents the seq command
+// fishCmd represents the fish command
 var fishCmd = &cobra.Command{
 	Use:   "fish",
 	Short: "look for short sequences in larger sequences using local alignment",
@@ -314,6 +317,7 @@ var fishCmd = &cobra.Command{
 	},
 }
 
+// saveBam writes alignment records to a BAM file.
 func saveBam(bamFile string, refs []*sam.Reference, refMap map[string]int, alns []*AlignedSeq) {
 	var err error
 	var bamWriter *bam.Writer
@@ -371,7 +375,7 @@ func init() {
 	fishCmd.Flags().Float64P("min-qual", "q", 5.0, "minimum mapping quality")
 }
 
-// NewRecordFromAln build a new SAM record based on the provided local alignment and its reference/query coordinates.
+// NewRecordFromAln builds a new SAM record based on the provided local alignment and its reference/query coordinates.
 func NewSAMRecordFromAln(name string, ref *sam.Reference, refStart, refEnd, queryStart, queryEnd int, refAln, queryAln string, strand string, mapQ byte, seq string, qual []byte, aux []sam.Aux) (*sam.Record, error) {
 	if len(refAln) != len(queryAln) {
 		panic("alignment length mismatch")
