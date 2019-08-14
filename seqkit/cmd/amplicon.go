@@ -21,9 +21,11 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -31,6 +33,7 @@ import (
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/bwt/fmi"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -88,6 +91,13 @@ Examples:
 
 		region := getFlagString(cmd, "region")
 
+		forward0 := getFlagString(cmd, "forward")
+		reverse0 := getFlagString(cmd, "reverse")
+		maxMismatch := getFlagNonNegativeInt(cmd, "max-mismatch")
+
+		forward := []byte(forward0)
+		reverse := []byte(reverse0)
+
 		var start, end int
 
 		if region != "" {
@@ -131,6 +141,15 @@ Examples:
 				if region != "" {
 
 				}
+				finder, err := NewAmpliconFinder(record.Seq.Seq, forward, reverse, maxMismatch)
+				checkError(err)
+
+				loc, err := finder.Locate()
+				checkError(err)
+				if loc == nil {
+					continue
+				}
+				record.Seq.SubSeqInplace(loc[0], loc[1])
 				record.FormatToWriter(outfh, config.LineWidth)
 			}
 
@@ -142,9 +161,110 @@ Examples:
 func init() {
 	RootCmd.AddCommand(ampliconCmd)
 
-	ampliconCmd.Flags().StringP("forward", "f", "", "forward primer")
-	ampliconCmd.Flags().StringP("reverse", "r", "", "reverse primer")
+	ampliconCmd.Flags().StringP("forward", "F", "", "forward primer")
+	ampliconCmd.Flags().StringP("reverse", "R", "", "reverse primer")
 	ampliconCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching primers")
 
 	ampliconCmd.Flags().StringP("region", "r", "", "region")
+}
+
+type AmpliconFinder struct {
+	Seq []byte
+	F   []byte
+	R   []byte
+	Rrc []byte
+
+	MaxMismatch int
+	FMindex     *fmi.FMIndex
+}
+
+func NewAmpliconFinder(sequence, forwardPrimer, reversePrimer []byte, maxMismatch int) (*AmpliconFinder, error) {
+	if len(sequence) == 0 {
+		return nil, fmt.Errorf("non-blank sequence needed")
+	}
+	if len(forwardPrimer) == 0 && len(reversePrimer) == 0 {
+		return nil, fmt.Errorf("at least one primer needed")
+	}
+
+	if len(forwardPrimer) == 0 {
+		s, err := seq.NewSeq(seq.DNAredundant, reversePrimer)
+		if err != nil {
+			return nil, err
+		}
+
+		forwardPrimer = s.RevComInplace().Seq
+		reversePrimer = nil
+	}
+
+	finder := &AmpliconFinder{
+		Seq: bytes.ToUpper(sequence),
+		F:   bytes.ToUpper(forwardPrimer),
+		R:   bytes.ToUpper(reversePrimer),
+	}
+
+	if len(reversePrimer) > 0 {
+		s, err := seq.NewSeq(seq.DNAredundant, finder.R)
+		if err != nil {
+			return nil, err
+		}
+		finder.Rrc = s.RevComInplace().Seq
+	}
+
+	if maxMismatch > 0 {
+		index := fmi.NewFMIndex()
+		_, err := index.Transform(finder.Seq)
+		if err != nil {
+			return nil, err
+		}
+		finder.MaxMismatch = maxMismatch
+		finder.FMindex = index
+	}
+	return finder, nil
+}
+
+func (finder AmpliconFinder) Locate() ([]int, error) {
+	if finder.MaxMismatch <= 0 {
+		i := bytes.Index(finder.Seq, finder.F)
+		if i < 0 {
+			return nil, nil
+		}
+		if len(finder.Rrc) == 0 { // only forward primer
+			return []int{i + 1, i + len(finder.F)}, nil
+		}
+
+		j := bytes.Index(finder.Seq, finder.Rrc)
+		if j < 0 {
+			return nil, nil
+		}
+		if j < i {
+			return nil, nil
+		}
+		return []int{i + 1, j + len(finder.Rrc)}, nil
+	}
+
+	locsI, err := finder.FMindex.Locate(finder.F, finder.MaxMismatch)
+	if err != nil {
+		return nil, err
+	}
+	if len(locsI) == 0 {
+		return nil, nil
+	}
+	if len(finder.Rrc) == 0 {
+		sort.Ints(locsI)
+		return []int{locsI[0] + 1, locsI[0] + len(finder.F)}, nil
+	}
+	locsJ, err := finder.FMindex.Locate(finder.Rrc, finder.MaxMismatch)
+	if err != nil {
+		return nil, err
+	}
+	if len(locsJ) == 0 {
+		return nil, nil
+	}
+	sort.Ints(locsI)
+	sort.Ints(locsJ)
+	return []int{locsI[0] + 1, locsJ[len(locsJ)-1] + len(finder.Rrc)}, nil
+}
+
+func (finder AmpliconFinder) Range(begin, end int) []byte {
+	return nil
 }
