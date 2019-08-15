@@ -365,6 +365,25 @@ assert_equal $(cat $file | $app stat -a | md5sum | cut -d" " -f 1) $(cat t.sort.
 assert_equal $(cat $file | $app stat -a | md5sum | cut -d" " -f 1) $(cat t.sort.s | $app stat -a | md5sum | cut -d" " -f 1)
 rm t.sort.*
 
+#-------------------------------------------------------------
+#                       bam
+#-------------------------------------------------------------
+BAM=tests/pcs109_5k.bam
+PRIM_BAM=tests/pcs109_5k_prim.bam
+PRIM_NANOPLOT=tests/pcs109_5k_bam_NanoPplot.tsv
+
+# accuracy
+fun(){
+    $app bam -f Read,Acc $PRIM_BAM 2> seqkit_acc.tsv
+    paste seqkit_acc.tsv $PRIM_NANOPLOT > joint.tsv
+    csvtk corr -t -f Acc,percentIdentity joint.tsv 2> corr.tsv
+}
+run bam_acc fun
+R=$(cut -f 3 corr.tsv)
+(( $(echo "$R > 0.99" | bc -l) ))
+assert_exit_code
+rm corr.tsv seqkit_acc.tsv
+
 # ------------------------------------------------------------
 #                       faidx
 # ------------------------------------------------------------
