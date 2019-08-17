@@ -1,6 +1,7 @@
-- [SeqKit v0.10.3](https://github.com/shenwei356/seqkit/releases/tag/v0.10.3)
+- [SeqKit v0.11.0](https://github.com/shenwei356/seqkit/releases/tag/v0.10.3)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.10.3/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.10.3)
     - `seqkit grep/locate`: reduce memory occupation when using flag `-m/--max-mismatch`.
+    - new command: `seqkit amplicon`: retrieve amplicon (or specific region around it) via primer(s)
 - [SeqKit v0.10.2](https://github.com/shenwei356/seqkit/releases/tag/v0.10.2)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.10.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.10.2)
     - `seqkit`: fix bug of parsing sequence ID delimited by tab (`\t`). [#78](https://github.com/shenwei356/seqkit/issues/78)

@@ -26,6 +26,7 @@
 
 - [grep](#grep)
 - [locate](#locate)
+- [amplicon](#amplicon)
 
 **Set operations**
 
@@ -1447,6 +1448,70 @@ Examples
         seq     ACGA          ACGA      +        1       4     ACGA
         seq     ACGA          ACGA      +        7       10    ACGA
 
+## amplicon
+
+Usage
+
+``` text
+
+retrieve amplicon (or specific region around it) via primer(s).
+
+Examples:
+  0. no region given.
+  
+                    F
+        -----===============-----
+             F             R
+        -----=====-----=====-----
+             
+             ===============         amplicon
+
+  1. inner region (-r x:y).
+
+                    F
+        -----===============-----
+             1 3 5                    x/y
+                      -5-3-1          x/y
+             F             R
+        -----=====-----=====-----     x:y
+        
+             ===============          1:-1
+             =======                  1:7
+               =====                  3:7
+                  =====               6:10
+                  =====             -10:-6
+                     =====           -7:-3
+                                     -x:y (invalid)
+                    
+  2. flanking region (-r x:y -f)
+        
+                    F
+        -----===============-----
+         -3-1                        x/y
+                            1 3 5    x/y
+             F             R
+        -----=====-----=====-----
+        
+        =====                        -5:-1
+        ===                          -5:-3
+                            =====     1:5
+                              ===     3:5
+            =================        -1:1
+        =========================    -5:5
+                                      x:-y (invalid)
+
+Usage:
+  seqkit amplicon [flags]
+
+Flags:
+  -f, --flanking-region    region is flanking region
+  -F, --forward string     forward primer
+  -h, --help               help for amplicon
+  -m, --max-mismatch int   max mismatch when matching primers
+  -r, --region string      specify region to return. type "seqkit amplicon -h" for detail
+  -R, --reverse string     reverse primer
+```
+        
 ## duplicate
 
 Usage
