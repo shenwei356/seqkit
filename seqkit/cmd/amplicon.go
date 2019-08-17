@@ -33,6 +33,7 @@ import (
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/bwt"
 	"github.com/shenwei356/bwt/fmi"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
@@ -41,33 +42,52 @@ import (
 // ampliconCmd represents the amplicon command
 var ampliconCmd = &cobra.Command{
 	Use:   "amplicon",
-	Short: "extact amplicon via primer(s)",
-	Long: `extact amplicon via primer(s).
+	Short: "retrieve amplicon (or specific region around it) via primer(s)",
+	Long: `retrieve amplicon (or specific region around it) via primer(s).
 
 Examples:
-  1. Typical two primers:
-
-        F                R
-        =====--------=====
-        1 >>>>>>>>>>>>> -1      1:-1
-            a >>>>>>>> -b       a:-b
-            a >>>>> b           a:b
-
-  2. Sequence around one primer:
+  0. no region given.
   
-        F
-        ======---------
-        1 >>>>>>>>>>> b         1:b
-            a >>>>>>> b         a:b
+                    F
+        -----===============-----
+             F             R
+        -----=====-----=====-----
+             
+             ===============         amplicon
 
-                      F
-        ---------======
-        -a <<<<<<<<< -1         -a:-1
-        -a <<<<<<< -b           -a:-b
+  1. inner region (-r x:y).
 
-               F
-        -----=======---
-        -a >>>>>>>>>> b         -a:b
+                    F
+        -----===============-----
+             1 3 5                    x/y
+                      -5-3-1          x/y
+             F             R
+        -----=====-----=====-----     x:y
+        
+             ===============          1:-1
+             =======                  1:7
+               =====                  3:7
+                  =====               6:10
+                  =====             -10:-6
+                     =====           -7:-3
+                                     -x:y (invalid)
+                    
+  2. flanking region (-r x:y -f)
+        
+                    F
+        -----===============-----
+         -3-1                        x/y
+                            1 3 5    x/y
+             F             R
+        -----=====-----=====-----
+        
+        =====                        -5:-1
+        ===                          -5:-3
+                            =====     1:5
+                              ===     3:5
+            =================        -1:1
+        =========================    -5:5
+                                      x:-y (invalid)
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -82,6 +102,7 @@ Examples:
 		fai.MapWholeFile = false
 		Threads = config.Threads
 		runtime.GOMAXPROCS(config.Threads)
+		bwt.CheckEndSymbol = false
 
 		files := getFileList(args)
 
@@ -90,13 +111,25 @@ Examples:
 		defer outfh.Close()
 
 		region := getFlagString(cmd, "region")
+		fregion := getFlagBool(cmd, "flanking-region")
 
 		forward0 := getFlagString(cmd, "forward")
 		reverse0 := getFlagString(cmd, "reverse")
 		maxMismatch := getFlagNonNegativeInt(cmd, "max-mismatch")
 
 		forward := []byte(forward0)
+		if seq.DNAredundant.IsValid(forward) != nil {
+			checkError(fmt.Errorf("invalid primer sequence: %s", forward))
+		}
+
 		reverse := []byte(reverse0)
+		if seq.DNAredundant.IsValid(reverse) != nil {
+			checkError(fmt.Errorf("invalid primer sequence: %s", reverse))
+		}
+
+		// compute revcom of reverse
+		s, _ := seq.NewSeq(seq.DNAredundant, reverse)
+		reverse = s.RevCom().Seq
 
 		var begin, end int
 
@@ -112,7 +145,17 @@ Examples:
 			checkError(err)
 
 			if begin == 0 || end == 0 {
-				checkError(fmt.Errorf("both begin and end should not be 0"))
+				checkError(fmt.Errorf("both begin and end in region should not be 0"))
+			}
+
+			if fregion {
+				if begin > 0 && end < 0 {
+					checkError(fmt.Errorf("invalid flanking region (x:-y): %d:%d", begin, end))
+				}
+			} else {
+				if begin < 0 && end > 0 {
+					checkError(fmt.Errorf("invalid inner region (-x:y): %d:%d", begin, end))
+				}
 			}
 			usingRegion = true
 		}
@@ -145,13 +188,12 @@ Examples:
 				checkError(err)
 
 				if usingRegion {
-					loc, err = finder.LocateRange(begin, end)
+					loc, err = finder.LocateRange(begin, end, fregion)
 				} else {
 					loc, err = finder.Locate()
 				}
 				checkError(err)
 
-				fmt.Printf("found loc: %v\n", loc)
 				if loc == nil {
 					continue
 				}
@@ -172,15 +214,15 @@ func init() {
 	ampliconCmd.Flags().StringP("reverse", "R", "", "reverse primer")
 	ampliconCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching primers")
 
-	ampliconCmd.Flags().StringP("region", "r", "", "region")
+	ampliconCmd.Flags().StringP("region", "r", "", `specify region to return. type "seqkit amplicon -h" for detail`)
+	ampliconCmd.Flags().BoolP("flanking-region", "f", false, "region is flanking region")
 }
 
 // AmpliconFinder is a struct for locating amplicon via primer(s).
 type AmpliconFinder struct {
 	Seq []byte
-	F   []byte
-	R   []byte
-	Rrc []byte
+	F   []byte // Forward primer
+	R   []byte // R should be reverse complementary sequence of reverse primer
 
 	MaxMismatch int
 	FMindex     *fmi.FMIndex
@@ -190,36 +232,23 @@ type AmpliconFinder struct {
 }
 
 // NewAmpliconFinder returns a AmpliconFinder struct.
-func NewAmpliconFinder(sequence, forwardPrimer, reversePrimer []byte, maxMismatch int) (*AmpliconFinder, error) {
+func NewAmpliconFinder(sequence, forwardPrimer, reversePrimerRC []byte, maxMismatch int) (*AmpliconFinder, error) {
 	if len(sequence) == 0 {
 		return nil, fmt.Errorf("non-blank sequence needed")
 	}
-	if len(forwardPrimer) == 0 && len(reversePrimer) == 0 {
+	if len(forwardPrimer) == 0 && len(reversePrimerRC) == 0 {
 		return nil, fmt.Errorf("at least one primer needed")
 	}
 
 	if len(forwardPrimer) == 0 { // F = R.revcom()
-		s, err := seq.NewSeq(seq.DNAredundant, reversePrimer)
-		if err != nil {
-			return nil, err
-		}
-
-		forwardPrimer = s.RevComInplace().Seq
-		reversePrimer = nil
+		forwardPrimer = reversePrimerRC
+		reversePrimerRC = nil
 	}
 
 	finder := &AmpliconFinder{
 		Seq: bytes.ToUpper(sequence), // to upper case
 		F:   bytes.ToUpper(forwardPrimer),
-		R:   bytes.ToUpper(reversePrimer),
-	}
-
-	if len(reversePrimer) > 0 { // R.revcom()
-		s, err := seq.NewSeq(seq.DNAredundant, finder.R)
-		if err != nil {
-			return nil, err
-		}
-		finder.Rrc = s.RevComInplace().Seq
+		R:   bytes.ToUpper(reversePrimerRC),
 	}
 
 	if maxMismatch > 0 { // using FM-index
@@ -235,9 +264,9 @@ func NewAmpliconFinder(sequence, forwardPrimer, reversePrimer []byte, maxMismatc
 }
 
 // LocateRange returns location of the range (begin:end, 1-based).
-func (finder *AmpliconFinder) LocateRange(begin, end int) ([]int, error) {
+func (finder *AmpliconFinder) LocateRange(begin, end int, flanking bool) ([]int, error) {
 	if begin == 0 || end == 0 {
-		checkError(fmt.Errorf("both begin and end should not be 0"))
+		checkError(fmt.Errorf("both begin and end in region should not be 0"))
 	}
 
 	if !finder.searched {
@@ -250,56 +279,148 @@ func (finder *AmpliconFinder) LocateRange(begin, end int) ([]int, error) {
 		return nil, nil
 	}
 
-	length := finder.iEnd - finder.iBegin + 1
-	fmt.Printf("length: %d\n", length)
-	if len(finder.Rrc) > 0 { // two primers given
-		b, e, ok := SubLocation(length, begin, end)
-		fmt.Println(b, e, ok)
-		if ok {
-			return []int{finder.iBegin + b, finder.iBegin + e}, nil
-		}
-		return nil, nil
+	var b, e int
+	var ok bool
+	if flanking {
+		b, e, ok = SubLocationFlanking(len(finder.Seq), finder.iBegin, finder.iEnd, begin, end)
+	} else {
+		b, e, ok = SubLocationInner(len(finder.Seq), finder.iBegin, finder.iEnd, begin, end)
+	}
+
+	if ok {
+		return []int{b, e}, nil
 	}
 
 	return nil, nil
 }
 
-func SubLocation(length, start, end int) (int, int, bool) {
-	if length == 0 {
+// SubLocationInner returns location of a range (begin:end, relative to amplicon).
+// B/E: 0-based, location of amplicon.
+// begin/end: 1-based, begin: relative location to 5' end of amplicon,
+// end: relative location to 3' end of amplicon.
+// Returned locations are 1-based.
+//
+//                     F
+//         -----===============-----
+//              1 3 5                    x/y
+//                       -5-3-1          x/y
+//              F             R
+//         -----=====-----=====-----     x:y
+//
+//              ===============          1:-1
+//              =======                  1:7
+//                =====                  3:7
+//                   =====               6:10
+//                   =====             -10:-6
+//                      =====           -7:-3
+//                                      -x:y (invalid)
+//
+func SubLocationInner(length, B, E, begin, end int) (int, int, bool) {
+	if begin == 0 || end == 0 {
 		return 0, 0, false
 	}
-	if start < 1 {
-		if start == 0 {
-			start = 1
-		} else if start < 0 {
-			if end < 0 && start > end {
-				return start, end, false
-			}
 
-			if -start > length {
-				return start, end, false
-			}
-			start = length + start + 1
-		}
-	}
-	if start > length {
-		return start, end, false
+	if begin < 0 && end > 0 {
+		checkError(fmt.Errorf("invalid inner region (-x:y): %d:%d", begin, end))
 	}
 
-	if end > length {
-		end = length
-	}
-	if end < 1 {
-		if end == 0 {
-			end = -1
-		}
-		end = length + end + 1
+	if length == 0 || B < 0 || B > length-1 || E < 0 || E > length-1 {
+		return 0, 0, false
 	}
 
-	if start-1 > end {
-		return start - 1, end, false
+	var b, e int
+
+	if begin > 0 {
+		b = B + begin
+	} else {
+		b = E + begin + 2
 	}
-	return start, end, true
+	if b > length {
+		b = length
+	} else if b < 1 {
+		b = 1
+	}
+
+	if end > 0 {
+		e = B + end
+	} else {
+		e = E + end + 2
+	}
+	if e > length {
+		e = length
+	} else if e < 1 {
+		e = 1
+	}
+
+	if b > e {
+		return b, e, false
+	}
+
+	return b, e, true
+}
+
+// SubLocationFlanking returns location of a flanking range (begin:end, relative to amplicon).
+// B/E: 0-based, location of amplicon.
+// begin/end: 1-based, begin: relative location to 5' end of amplicon,
+// end: relative location to 3' end of amplicon.
+// Returned locations are 1-based.
+//
+//                     F
+//         -----===============-----
+//          -3-1                        x/y
+//                             1 3 5    x/y
+//              F             R
+//         -----=====-----=====-----
+//         =====                        -5:-1
+//         ===                          -5:-3
+//                             =====     1:5
+//                               ===     3:5
+//             =================        -1:1
+//         =========================    -5:5
+//                                       x:-y (invalid)
+//
+func SubLocationFlanking(length, B, E, begin, end int) (int, int, bool) {
+	if begin == 0 || end == 0 {
+		return 0, 0, false
+	}
+
+	if begin > 0 && end < 0 {
+		checkError(fmt.Errorf("invalid flanking region (x:-y): %d:%d", begin, end))
+	}
+
+	if length == 0 || B < 0 || B > length-1 || E < 0 || E > length-1 {
+		return 0, 0, false
+	}
+
+	var b, e int
+
+	if begin > 0 {
+		b = E + begin + 1
+	} else {
+		b = B + begin + 1
+	}
+	if b > length {
+		b = length
+	} else if b < 1 {
+		b = 1
+	}
+
+	if end > 0 {
+		e = E + end + 1
+	} else {
+		e = B + end + 1
+	}
+	if e > length {
+		e = length
+	} else if e < 1 {
+		e = 1
+	}
+
+	if b > e {
+		return b, e, false
+	}
+
+	return b, e, true
 }
 
 // Locate returns location of amplicon.
@@ -319,14 +440,14 @@ func (finder *AmpliconFinder) Locate() ([]int, error) {
 			finder.searched, finder.found = true, false
 			return nil, nil
 		}
-		if len(finder.Rrc) == 0 { // only forward primer, returns location of F
+		if len(finder.R) == 0 { // only forward primer, returns location of F
 			finder.searched, finder.found = true, true
 			finder.iBegin, finder.iEnd = i, i+len(finder.F)-1
 			return []int{i + 1, i + len(finder.F)}, nil
 		}
 
 		// two primers given, need to search R
-		j := bytes.Index(finder.Seq, finder.Rrc)
+		j := bytes.Index(finder.Seq, finder.R)
 		if j < 0 {
 			finder.searched, finder.found = true, false
 			return nil, nil
@@ -337,8 +458,8 @@ func (finder *AmpliconFinder) Locate() ([]int, error) {
 			return nil, nil
 		}
 		finder.searched, finder.found = true, true
-		finder.iBegin, finder.iEnd = i, j+len(finder.Rrc)-1
-		return []int{i + 1, j + len(finder.Rrc)}, nil
+		finder.iBegin, finder.iEnd = i, j+len(finder.R)-1
+		return []int{i + 1, j + len(finder.R)}, nil
 	}
 
 	// search F
@@ -350,7 +471,7 @@ func (finder *AmpliconFinder) Locate() ([]int, error) {
 		finder.searched, finder.found = true, false
 		return nil, nil
 	}
-	if len(finder.Rrc) == 0 { // returns location of F
+	if len(finder.R) == 0 { // returns location of F
 		sort.Ints(locsI) // remain the first location
 		finder.searched, finder.found = true, true
 		finder.iBegin, finder.iEnd = locsI[0], locsI[0]+len(finder.F)-1
@@ -358,7 +479,7 @@ func (finder *AmpliconFinder) Locate() ([]int, error) {
 	}
 
 	// search R
-	locsJ, err := finder.FMindex.Locate(finder.Rrc, finder.MaxMismatch)
+	locsJ, err := finder.FMindex.Locate(finder.R, finder.MaxMismatch)
 	if err != nil {
 		return nil, err
 	}
@@ -369,6 +490,6 @@ func (finder *AmpliconFinder) Locate() ([]int, error) {
 	sort.Ints(locsI) // to remain the FIRST location
 	sort.Ints(locsJ) // to remain the LAST location
 	finder.searched, finder.found = true, true
-	finder.iBegin, finder.iEnd = locsI[0], locsI[0]+len(finder.Rrc)-1
-	return []int{locsI[0] + 1, locsJ[len(locsJ)-1] + len(finder.Rrc)}, nil
+	finder.iBegin, finder.iEnd = locsI[0], locsI[0]+len(finder.R)-1
+	return []int{locsI[0] + 1, locsJ[len(locsJ)-1] + len(finder.R)}, nil
 }
