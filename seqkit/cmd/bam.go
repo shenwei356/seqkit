@@ -316,12 +316,13 @@ func bamStatsOnce(f string, mapQual int, threads int) *bamStatRec {
 			}
 			if record.Flags&sam.Secondary != 0 {
 				res.SecAln++
-			}
+			} else {
 
-			if int(record.MapQ) < mapQual {
-				continue
+				if int(record.MapQ) < mapQual {
+					continue
+				}
+				res.PrimAln++
 			}
-			res.PrimAln++
 
 		} else {
 			res.Unmapped++
