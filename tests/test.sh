@@ -370,7 +370,7 @@ rm t.sort.*
 #-------------------------------------------------------------
 BAM=tests/pcs109_5k.bam
 PRIM_BAM=tests/pcs109_5k_prim.bam
-PRIM_NANOPLOT=tests/pcs109_5k_bam_NanoPplot.tsv
+PRIM_NANOPLOT=tests/pcs109_5k_prim_bam_NanoPplot.tsv
 
 # accuracy
 fun(){
