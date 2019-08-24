@@ -1,4 +1,4 @@
-// Copyright © 2016 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -318,7 +318,7 @@ Examples:
 func init() {
 	RootCmd.AddCommand(mutateCmd)
 
-	mutateCmd.Flags().StringSliceP("point", "p", []string{}, `point mutation: changing base at given postion. e.g., -p 2:C for setting 2nd base as C, -p -1:A for change last base as A`)
+	mutateCmd.Flags().StringSliceP("point", "p", []string{}, `point mutation: changing base at given position. e.g., -p 2:C for setting 2nd base as C, -p -1:A for change last base as A`)
 	mutateCmd.Flags().StringP("deletion", "d", "", `deletion mutation: deleting subsequence in a range. e.g., -d 1:2 for deleting leading two bases, -d -3:-1 for removing last 3 bases`)
 	mutateCmd.Flags().StringP("insertion", "i", "", `insertion mutation: inserting bases behind of given position, e.g., -i 0:ACGT for inserting ACGT at the beginning, -1:* for add * to the end`)
 
