@@ -1,4 +1,4 @@
-// Copyright © 2016 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,8 @@ import (
 	"fmt"
 	"io"
 	"runtime"
-	"strings"
 
+	"github.com/cespare/xxhash"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/xopen"
@@ -41,13 +41,13 @@ var commonCmd = &cobra.Command{
 	Long: `find common sequences of multiple files by id/name/sequence
 
 Note:
-    1. 'seqkit common' is designed to support 2 and MORE files.
-    2. For 2 files, 'seqkit grep' is much faster and consumes lesser memory:
-         seqkit grep -f <(seqkit seq -n -i small.fq.gz) big.fq.gz # by seq ID
-         seqkit grep -s -f <(seqkit seq -s small.fq.gz) big.fq.gz # by seq
-    3. Some records in one file may have same sequences/IDs. They will ALL be
-       retrieved if the sequence/ID was shared in multiple files.
-       So the records number may be larger than that of the smallest file.
+  1. 'seqkit common' is designed to support 2 and MORE files.
+  2. For 2 files, 'seqkit grep' is much faster and consumes lesser memory:
+     seqkit grep -f <(seqkit seq -n -i small.fq.gz) big.fq.gz # by seq ID
+     seqkit grep -s -f <(seqkit seq -s small.fq.gz) big.fq.gz # by seq
+  3. Some records in one file may have same sequences/IDs. They will ALL be
+     retrieved if the sequence/ID was shared in multiple files.
+     So the records number may be larger than that of the smallest file.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -64,13 +64,9 @@ Note:
 		bySeq := getFlagBool(cmd, "by-seq")
 		byName := getFlagBool(cmd, "by-name")
 		ignoreCase := getFlagBool(cmd, "ignore-case")
-		usingMD5 := getFlagBool(cmd, "md5")
 
 		if bySeq && byName {
 			checkError(fmt.Errorf("only one/none of the flags -s (--by-seq) and -n (--by-name) is allowed"))
-		}
-		if usingMD5 && !bySeq {
-			checkError(fmt.Errorf("flag -m (--md5) must be used with flag -s (--by-seq)"))
 		}
 
 		files := getFileList(args)
@@ -83,17 +79,17 @@ Note:
 		defer outfh.Close()
 
 		// target -> file -> struct{}
-		counter := make(map[string]map[string]struct{}, 1000)
+		counter := make(map[uint64]map[string]struct{}, 1000)
 
 		// target -> seqnames in firstFile
 		// note that it's []string, i.e., records may have same sequences
-		names := make(map[string][]string, 1000)
+		names := make(map[uint64][]string, 1000)
 
 		var fastxReader *fastx.Reader
 		var record *fastx.Record
 
 		// read all files
-		var subject string
+		var subject uint64
 		var checkFirstFile = true
 		var isFirstFile = true
 		var firstFile string
@@ -111,7 +107,7 @@ Note:
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
-			// alowing finding common records in ONE file
+			// allowing finding common records in ONE file
 			if _, ok = filenames[file]; !ok {
 				filenames[file] = 1
 			} else {
@@ -131,29 +127,21 @@ Note:
 
 				if bySeq {
 					if ignoreCase {
-						if usingMD5 {
-							subject = MD5(bytes.ToLower(record.Seq.Seq))
-						} else {
-							subject = string(bytes.ToLower(record.Seq.Seq))
-						}
+						subject = xxhash.Sum64(bytes.ToLower(record.Seq.Seq))
 					} else {
-						if usingMD5 {
-							subject = MD5(record.Seq.Seq)
-						} else {
-							subject = string(record.Seq.Seq)
-						}
+						subject = xxhash.Sum64(record.Seq.Seq)
 					}
 				} else if byName {
 					if ignoreCase {
-						subject = strings.ToLower(string(record.Name))
+						subject = xxhash.Sum64(bytes.ToLower(record.Name))
 					} else {
-						subject = string(record.Name)
+						subject = xxhash.Sum64(record.Name)
 					}
 				} else { // byID
 					if ignoreCase {
-						subject = strings.ToLower(string(record.ID))
+						subject = xxhash.Sum64(bytes.ToLower(record.ID))
 					} else {
-						subject = string(record.ID)
+						subject = xxhash.Sum64(record.ID)
 					}
 				}
 
@@ -244,6 +232,5 @@ func init() {
 
 	commonCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
 	commonCmd.Flags().BoolP("by-seq", "s", false, "match by sequence")
-	commonCmd.Flags().BoolP("md5", "m", false, "use MD5 instead of original seqs to reduce memory usage when comparing by seqs")
 	commonCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 }

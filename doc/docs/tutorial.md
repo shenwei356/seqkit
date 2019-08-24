@@ -240,7 +240,11 @@ from [The miRBase Sequence Database -- Release 21](ftp://mirbase.org/pub/mirbase
 
 1. First 10 bases
 
-        $ zcat hairpin.fa.gz | seqkit subseq -r 1:10 | seqkit sort -s | seqkit seq -s | head -n 10
+        $ zcat hairpin.fa.gz \
+            | seqkit subseq -r 1:10 \
+            | seqkit sort -s
+            | seqkit seq -s \
+            | head -n 10
         AAAAAAAAAA
         AAAAAAAAAA
         AAAAAAAAAG
@@ -315,7 +319,11 @@ A custom ID parsing regular expression is used, `^([\w]+)\-`.
 2. Species with most miRNA hairpins. Third column is the sequences number.
 
         $ cd hairpin.fa.gz.split/;
-        $ seqkit stat hairpin.id_* | csvtk space2tab | csvtk -t sort -k num_seqs:nr | csvtk -t pretty| more
+        $ seqkit stat hairpin.id_* \
+            | csvtk space2tab \
+            | csvtk -t sort -k num_seqs:nr \
+            | csvtk -t pretty \
+            | more
         file                     format   type   num_seqs   sum_len   min_len   avg_len   max_len
         hairpin.id_hsa.fasta     FASTA    RNA    1,881      154,242   82        82        82
         hairpin.id_mmu.fasta     FASTA    RNA    1,193      107,370   90        90        90
@@ -333,11 +341,17 @@ For human miRNA hairpins
  `seqkit fx2tab` could show extra information like sequence length, GC content.
  [`csvtk`](http://bioinf.shenwei.me/csvtk/) is used to plot.
 
-        $ seqkit grep -r -p '^hsa' hairpin.fa.gz  | seqkit fx2tab -l | cut -f 4 | csvtk -H plot hist --xlab Length --title "Human pre-miRNA length distribution"
+        $ seqkit grep -r -p '^hsa' hairpin.fa.gz  \
+            | seqkit fx2tab -l \
+            | cut -f 4  \
+            | csvtk -H plot hist --xlab Length --title "Human pre-miRNA length distribution"
 
     ![hairpin.id_hsa.fa.gz.lendist.png](/files/hairpin/hairpin.id_hsa.fa.gz.lendist.png)
 
-        $ seqkit grep -r -p '^hsa' hairpin.fa.gz  | seqkit fx2tab -l | cut -f 4 | csvtk -H plot box --xlab Length --horiz --height 1.5
+        $ seqkit grep -r -p '^hsa' hairpin.fa.gz \
+            | seqkit fx2tab -l \
+            | cut -f 4 \
+            | csvtk -H plot box --xlab Length --horiz --height 1.5
         
     ![hairpin.id_hsa.fa.gz.lenbox.png](/files/hairpin/hairpin.id_hsa.fa.gz.lenbox.png)
 
@@ -369,7 +383,8 @@ Motifs
   By the way, do not be scared by the long flag `--circle-genome`, `--step`
   and so on. They have short ones, `-c`, `-s`
 
-        $ seqkit sliding --id-ncbi --circular-genome --step 20000 --window 200000 PAO1.fasta -o PAO1.fasta.sliding.fa
+        $ seqkit sliding --id-ncbi --circular-genome \
+            --step 20000 --window 200000 PAO1.fasta -o PAO1.fasta.sliding.fa
 
         $ seqkit stat PAO1.fasta.sliding.fa
         file                   format  type  num_seqs     sum_len  min_len  avg_len  max_len
@@ -377,7 +392,8 @@ Motifs
 
 1. Locating motifs
 
-        $ seqkit locate --id-ncbi --ignore-case --degenerate --pattern-file motifs.fa  PAO1.fasta.sliding.fa -o  PAO1.fasta.sliding.fa.motifs.tsv
+        $ seqkit locate --id-ncbi --ignore-case --degenerate \
+            --pattern-file motifs.fa  PAO1.fasta.sliding.fa -o  PAO1.fasta.sliding.fa.motifs.tsv
 
 1. Ploting distribution ([plot_motif_distribution.R](/files/PAO1/plot_motif_distribution.R))
 
@@ -405,7 +421,8 @@ Motifs
 
 1. Get duplicated sequences
 
-        $ seqkit rmdup --by-seq --ignore-case PAO1.cds.fasta -o PAO1.cds.uniq.fasta --dup-seqs-file PAO1.cds.dup.fasta --dup-num-file PAO1.cds.dup.text
+        $ seqkit rmdup --by-seq --ignore-case PAO1.cds.fasta -o PAO1.cds.uniq.fasta \
+            --dup-seqs-file PAO1.cds.dup.fasta --dup-num-file PAO1.cds.dup.text
 
         $ cat PAO1.cds.dup.text
         6       NC_002516.2_500104:501120:-, NC_002516.2_2556948:2557964:+, NC_002516.2_3043750:3044766:-, NC_002516.2_3842274:3843290:-, NC_002516.2_4473623:4474639:+, NC_002516.2_5382796:5383812:-
@@ -417,11 +434,13 @@ Motifs
 
 1. Get CDS and 1000 bp upstream sequence
 
-        $ seqkit subseq --id-ncbi --gtf PAO1.gtf --feature cds PAO1.fasta --up-stream 1000
+        $ seqkit subseq --id-ncbi --gtf PAO1.gtf \
+            --feature cds PAO1.fasta --up-stream 1000
 
 1. Get 1000 bp upstream sequence of CDS, *NOT* including CDS.
 
-        $ seqkit subseq --id-ncbi --gtf PAO1.gtf --feature cds PAO1.fasta --up-stream 1000 --only-flank
+        $ seqkit subseq --id-ncbi --gtf PAO1.gtf \
+            --feature cds PAO1.fasta --up-stream 1000 --only-flank
 
 <div id="disqus_thread"></div>
 <script>

@@ -1,4 +1,4 @@
-// Copyright © 2016 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -82,10 +82,6 @@ Examples:
 		keepTemp := getFlagBool(cmd, "keep-temp")
 		if keepTemp && !twoPass {
 			checkError(fmt.Errorf("flag -k (--keep-temp) must be used with flag -2 (--two-pass)"))
-		}
-		usingMD5 := getFlagBool(cmd, "md5")
-		if usingMD5 && region == "" {
-			checkError(fmt.Errorf("flag -m (--md5) must be used with flag -r (--region)"))
 		}
 		dryRun := getFlagBool(cmd, "dry-run")
 
@@ -687,11 +683,7 @@ Examples:
 					if !ok {
 						checkError(fmt.Errorf("region (%s) not match sequence (%s) with length of %d", region, record.Name, len(record.Seq.Seq)))
 					}
-					if usingMD5 {
-						subseq = string(MD5(record.Seq.SubSeq(s, e).Seq))
-					} else {
-						subseq = string(record.Seq.SubSeq(s, e).Seq)
-					}
+					subseq = string(record.Seq.SubSeq(s, e).Seq)
 					if _, ok := recordsBySeqs[subseq]; !ok {
 						recordsBySeqs[subseq] = []*fastx.Record{}
 					}
@@ -771,11 +763,7 @@ Examples:
 				if !ok {
 					checkError(fmt.Errorf("region (%s) not match sequence (%s) with length of %d", region, record.Name, len(record.Seq.Seq)))
 				}
-				if usingMD5 {
-					subseq = string(MD5(record.Seq.SubSeq(s, e).Seq))
-				} else {
-					subseq = string(record.Seq.SubSeq(s, e).Seq)
-				}
+				subseq = string(record.Seq.SubSeq(s, e).Seq)
 				name = string(record.Name)
 				if _, ok := region2name[subseq]; !ok {
 					region2name[subseq] = []string{}
@@ -837,7 +825,6 @@ func init() {
 	splitCmd.Flags().BoolP("by-id", "i", false, "split squences according to sequence ID")
 	splitCmd.Flags().StringP("by-region", "r", "", "split squences according to subsequence of given region. "+
 		`e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type "seqkit split -h" for more examples`)
-	splitCmd.Flags().BoolP("md5", "m", false, "use MD5 instead of region sequence in output file when using flag -r (--by-region)")
 	splitCmd.Flags().BoolP("two-pass", "2", false, "two-pass mode read files twice to lower memory usage. (only for FASTA format)")
 	splitCmd.Flags().BoolP("dry-run", "d", false, "dry run, just print message and no files will be created.")
 	splitCmd.Flags().BoolP("keep-temp", "k", false, "keep tempory FASTA and .fai file when using 2-pass mode")

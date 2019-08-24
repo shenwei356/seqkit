@@ -5,17 +5,15 @@
 ([**Usage**](http://bioinf.shenwei.me/seqkit/usage/),
 [**FAQ**](http://bioinf.shenwei.me/seqkit/faq/),
 [**Tutorial**](http://bioinf.shenwei.me/seqkit/tutorial/),
-[**Benchmark**](http://bioinf.shenwei.me/seqkit/benchmark/)
-and [**Development Notes**](http://bioinf.shenwei.me/seqkit/note/))
+and 
+[**Benchmark**](http://bioinf.shenwei.me/seqkit/benchmark/))
 - **Source code:** [https://github.com/shenwei356/seqkit](https://github.com/shenwei356/seqkit)
 [![GitHub stars](https://img.shields.io/github/stars/shenwei356/seqkit.svg?style=social&label=Star&?maxAge=2592000)](https://github.com/shenwei356/seqkit)
 [![license](https://img.shields.io/github/license/shenwei356/seqkit.svg?maxAge=2592000)](https://github.com/shenwei356/seqkit/blob/master/LICENSE)
-[![Go Report Card](https://goreportcard.com/badge/github.com/shenwei356/seqkit)](https://goreportcard.com/report/github.com/shenwei356/seqkit)
 [![Build Status](https://travis-ci.org/shenwei356/seqkit.svg?branch=master)](https://travis-ci.org/shenwei356/seqkit)
 - **Latest version:** [![Latest Version](https://img.shields.io/github/release/shenwei356/seqkit.svg?style=flat?maxAge=86400)](https://github.com/shenwei356/seqkit/releases)
 [![Github Releases](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/total.svg?maxAge=3600)](http://bioinf.shenwei.me/seqkit/download/)
 [![Cross-platform](https://img.shields.io/badge/platform-any-ec2eb4.svg?style=flat)](http://bioinf.shenwei.me/seqkit/download/)
-[![Install-with-conda](https://anaconda.org/bioconda/seqkit/badges/installer/conda.svg)](http://bioinf.shenwei.me/seqkit/download/)
 [![Anaconda Cloud](https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit)
 - **[Please cite](#citation):** [![doi](https://img.shields.io/badge/doi-10.1371%2Fjournal.pone.0163962-blue.svg?style=flat)](https://doi.org/10.1371/journal.pone.0163962)
 
@@ -68,7 +66,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
   (see [download](http://bioinf.shenwei.me/seqkit/download/))
 - **UltraFast** (see [benchmark](#benchmark)),
   **multiple-CPUs supported**
-- **Practical functions supported by 24 subcommands** (see subcommands and
+- **Practical functions supported by 28 subcommands** (see subcommands and
   [usage](http://bioinf.shenwei.me/seqkit/usage/) )
 - **Supporting [Bash-completion](#bash-completion)**
 - **Well documented** (detailed [usage](http://bioinf.shenwei.me/seqkit/usage/)
@@ -117,52 +115,53 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 ## Subcommands
 
-27 functional subcommands in total.
+28 functional subcommands in total.
 
 **Sequence and subsequence**
 
-- `seq`        transform sequences (revserse, complement, extract ID...)
-- `subseq`     get subsequences by region/gtf/bed, including flanking sequences
-- `sliding`    sliding sequences, circular genome supported
-- `stats`      simple statistics of FASTA/Q files
-- `faidx`      create FASTA index file and extract subsequence
+- [`seq`](https://bioinf.shenwei.me/seqkit/usage/#seq)          transform sequences (revserse, complement, extract ID...)
+- [`subseq`](https://bioinf.shenwei.me/seqkit/usage/#subseq)    get subsequences by region/gtf/bed, including flanking sequences
+- [`sliding`](https://bioinf.shenwei.me/seqkit/usage/#sliding)  sliding sequences, circular genome supported
+- [`stats`](https://bioinf.shenwei.me/seqkit/usage/#stats)      simple statistics of FASTA/Q files
+- [`faidx`](https://bioinf.shenwei.me/seqkit/usage/#faidx)      create FASTA index file and extract subsequence
 
 **Format conversion**
 
-- `fx2tab`     convert FASTA/Q to tabular format (and length/GC content/GC skew)
-- `tab2fx`     convert tabular format to FASTA/Q format
-- `fq2fa`      convert FASTQ to FASTA
-- `convert`    convert FASTQ quality encoding between Sanger, Solexa and Illumina
-- `translate`  translate DNA/RNA to protein sequence (supporting ambiguous bases)
+- [`fx2tab`](https://bioinf.shenwei.me/seqkit/usage/#fx2tab)        convert FASTA/Q to tabular format (and length/GC content/GC skew)
+- [`tab2fx`](https://bioinf.shenwei.me/seqkit/usage/#tab2fx)        convert tabular format to FASTA/Q format
+- [`fq2fa`](https://bioinf.shenwei.me/seqkit/usage/#fq2fa)          convert FASTQ to FASTA
+- [`convert`](https://bioinf.shenwei.me/seqkit/usage/#convert)      convert FASTQ quality encoding between Sanger, Solexa and Illumina
+- [`translate`](https://bioinf.shenwei.me/seqkit/usage/#translate)  translate DNA/RNA to protein sequence (supporting ambiguous bases)
 
 **Searching**
 
-- `grep`       search sequences by ID/name/sequence/sequence motifs, mismatch allowed
-- `locate`     locate subsequences/motifs
+- [`grep`](https://bioinf.shenwei.me/seqkit/usage/#grep)        search sequences by ID/name/sequence/sequence motifs, mismatch allowed
+- [`locate`](https://bioinf.shenwei.me/seqkit/usage/#locate)    locate subsequences/motifs
+- [`amplicon`](https://bioinf.shenwei.me/seqkit/usage/#amplicon) retrieve amplicon (or specific region around it) via primer(s)
 
 **Set operations**
 
-- `head`       print first N FASTA/Q records
-- `range`      print FASTA/Q records in a range (start:end)
-- `sample`     sample sequences by number or proportion
-- `rmdup`      remove duplicated sequences by id/name/sequence
-- `duplicate`  duplicate sequences N times
-- `common`     find common sequences of multiple files by id/name/sequence
-- `split`      split sequences into files by id/seq region/size/parts (mainly for FASTA)
-- `split2`     split sequences into files by size/parts (FASTA, PE/SE FASTQ)
+- [`head`](https://bioinf.shenwei.me/seqkit/usage/#head)            print first N FASTA/Q records
+- [`range`](https://bioinf.shenwei.me/seqkit/usage/#range)          print FASTA/Q records in a range (start:end)
+- [`sample`](https://bioinf.shenwei.me/seqkit/usage/#sample)        sample sequences by number or proportion
+- [`rmdup`](https://bioinf.shenwei.me/seqkit/usage/#rmdup)          remove duplicated sequences by id/name/sequence
+- [`duplicate`](https://bioinf.shenwei.me/seqkit/usage/#duplicate)  duplicate sequences N times
+- [`common`](https://bioinf.shenwei.me/seqkit/usage/#common)        find common sequences of multiple files by id/name/sequence
+- [`split`](https://bioinf.shenwei.me/seqkit/usage/#split)          split sequences into files by id/seq region/size/parts (mainly for FASTA)
+- [`split2`](https://bioinf.shenwei.me/seqkit/usage/#split2)        split sequences into files by size/parts (FASTA, PE/SE FASTQ)
 
 **Edit**
 
-- `replace`    replace name/sequence by regular expression
-- `rename`     rename duplicated IDs
-- `restart`    reset start position for circular genome
-- `concat`     concatenate sequences with same ID from multiple files
-- `mutate`     edit sequence (point mutation, insertion, deletion)
+- [`replace`](https://bioinf.shenwei.me/seqkit/usage/#replace)  replace name/sequence by regular expression
+- [`rename`](https://bioinf.shenwei.me/seqkit/usage/#rename)    rename duplicated IDs
+- [`restart`](https://bioinf.shenwei.me/seqkit/usage/#restart)  reset start position for circular genome
+- [`concat`](https://bioinf.shenwei.me/seqkit/usage/#concat)    concatenate sequences with same ID from multiple files
+- [`mutate`](https://bioinf.shenwei.me/seqkit/usage/#mutate)    edit sequence (point mutation, insertion, deletion)
 
 **Ordering**
 
-- `shuffle`    shuffle sequences
-- `sort`       sort sequences by id/name/sequence
+- [`shuffle`](https://bioinf.shenwei.me/seqkit/usage/#shuffle)  shuffle sequences
+- [`sort`](https://bioinf.shenwei.me/seqkit/usage/#sort)        sort sequences by id/name/sequence
 
 **Misc**
 
@@ -196,7 +195,7 @@ And then:
 
 1. **For windows**, just copy `seqkit.exe` to `C:\WINDOWS\system32`.
 
-#### Method 2: Install via conda  (latest stable version) [![Install-with-conda](https://anaconda.org/bioconda/seqkit/badges/installer/conda.svg)](http://bioinf.shenwei.me/seqkit/download/) [![Anaconda Cloud](https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit) [![downloads](https://anaconda.org/bioconda/seqkit/badges/downloads.svg)](https://anaconda.org/bioconda/seqkit)
+#### Method 2: Install via conda  (latest stable version) [![Anaconda Cloud](https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit) [![downloads](https://anaconda.org/bioconda/seqkit/badges/downloads.svg)](https://anaconda.org/bioconda/seqkit)
 
     conda install -c bioconda seqkit
 

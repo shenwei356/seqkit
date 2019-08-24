@@ -1,4 +1,4 @@
-// Copyright © 2016 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -55,9 +55,9 @@ more on: http://bioinf.shenwei.me/seqkit/usage/#replace
 
 Special replacement symbols (only for replacing name not sequence):
 
-	{nr}	Record number, starting from 1
-	{kv}	Corresponding value of the key (captured variable $n) by key-value file,
-	        n can be specified by flag -I (--key-capt-idx) (default: 1)
+    {nr}    Record number, starting from 1
+    {kv}    Corresponding value of the key (captured variable $n) by key-value file,
+            n can be specified by flag -I (--key-capt-idx) (default: 1)
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {

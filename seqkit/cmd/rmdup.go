@@ -1,4 +1,4 @@
-// Copyright © 2016 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/cespare/xxhash"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/xopen"
@@ -57,15 +58,10 @@ var rmdupCmd = &cobra.Command{
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		dupFile := getFlagString(cmd, "dup-seqs-file")
 		numFile := getFlagString(cmd, "dup-num-file")
-		usingMD5 := getFlagBool(cmd, "md5")
 
 		if bySeq && byName {
 			checkError(fmt.Errorf("only one/none of the flags -s (--by-seq) and -n (--by-name) is allowed"))
 		}
-		if usingMD5 && !bySeq {
-			checkError(fmt.Errorf("flag -m (--md5) must be used with flag -s (--by-seq)"))
-		}
-
 		files := getFileList(args)
 
 		outfh, err := xopen.Wopen(outFile)
@@ -79,10 +75,10 @@ var rmdupCmd = &cobra.Command{
 			defer outfhDup.Close()
 		}
 
-		counter := make(map[string]int)
-		names := make(map[string][]string)
+		counter := make(map[uint64]int)
+		names := make(map[uint64][]string)
 
-		var subject string
+		var subject uint64
 		var removed int
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
@@ -105,22 +101,22 @@ var rmdupCmd = &cobra.Command{
 
 				if bySeq {
 					if ignoreCase {
-						if usingMD5 {
-							subject = MD5(bytes.ToLower(record.Seq.Seq))
-						} else {
-							subject = string(bytes.ToLower(record.Seq.Seq))
-						}
+						subject = xxhash.Sum64(bytes.ToLower(record.Seq.Seq))
 					} else {
-						if usingMD5 {
-							subject = MD5(record.Seq.Seq)
-						} else {
-							subject = string(record.Seq.Seq)
-						}
+						subject = xxhash.Sum64(record.Seq.Seq)
 					}
 				} else if byName {
-					subject = string(record.Name)
+					if ignoreCase {
+						subject = xxhash.Sum64(bytes.ToLower(record.Name))
+					} else {
+						subject = xxhash.Sum64(record.Name)
+					}
 				} else { // byID
-					subject = string(record.ID)
+					if ignoreCase {
+						subject = xxhash.Sum64(bytes.ToLower(record.ID))
+					} else {
+						subject = xxhash.Sum64(record.ID)
+					}
 				}
 
 				if _, ok := counter[subject]; ok { // duplicated
@@ -137,8 +133,7 @@ var rmdupCmd = &cobra.Command{
 					counter[subject]++
 
 					if len(numFile) > 0 {
-						names[subject] = []string{}
-						names[subject] = append(names[subject], string(record.ID))
+						names[subject] = []string{string(record.ID)}
 					}
 				}
 			}
@@ -173,7 +168,6 @@ func init() {
 
 	rmdupCmd.Flags().BoolP("by-name", "n", false, "by full name instead of just id")
 	rmdupCmd.Flags().BoolP("by-seq", "s", false, "by seq")
-	rmdupCmd.Flags().BoolP("md5", "m", false, "use MD5 instead of original seqs to reduce memory usage when comparing by seqs")
 	rmdupCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	rmdupCmd.Flags().StringP("dup-seqs-file", "d", "", "file to save duplicated seqs")
 	rmdupCmd.Flags().StringP("dup-num-file", "D", "", "file to save number and list of duplicated seqs")

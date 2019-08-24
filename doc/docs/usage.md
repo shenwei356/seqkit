@@ -26,6 +26,7 @@
 
 - [grep](#grep)
 - [locate](#locate)
+- [amplicon](#amplicon)
 
 **Set operations**
 
@@ -161,10 +162,10 @@ reproduced in different environments with same random seed.
 
 ## seqkit
 
-```
+``` text
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.10.1
+Version: 0.10.2
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -211,7 +212,7 @@ Flags:
       --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
   -h, --help                            help for seqkit
       --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
-      --id-regexp string                regular expression for parsing ID (default "^([^\\s]+)\\s?")
+      --id-regexp string                regular expression for parsing ID (default "^(\\S+)\\s?")
   -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
   -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
       --quiet                           be quiet and do not show extra information
@@ -237,7 +238,9 @@ Human genome from [ensembl](http://uswest.ensembl.org/info/data/ftp/index.html)
 by [`gtf2bed`](http://bedops.readthedocs.org/en/latest/content/reference/file-management/conversion/gtf2bed.html?highlight=gtf2bed)
 with command
 
-        zcat Homo_sapiens.GRCh38.84.gtf.gz | gtf2bed --do-not-sort | gzip -c > Homo_sapiens.GRCh38.84.bed.gz
+        zcat Homo_sapiens.GRCh38.84.gtf.gz \
+            | gtf2bed --do-not-sort \
+            | gzip -c > Homo_sapiens.GRCh38.84.bed.gz
 
 Only DNA and gtf/bed data of Chr1 were used:
 
@@ -258,7 +261,7 @@ Only DNA and gtf/bed data of Chr1 were used:
 
 Usage
 
-```
+``` text
 transform sequences (revserse, complement, extract ID...)
 
 Usage:
@@ -358,7 +361,7 @@ Examples
             MI0000002
             MI0000003
 
-1. Only print seq (global flag `-w` defines the output line width, 0 for no wrap)
+1. Only print seq (global flag `-w` defines the output line width, `0` for no wrap)
 
         $ seqkit seq hairpin.fa.gz -s -w 0
         UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAACUAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
@@ -407,7 +410,7 @@ Examples
 
 Usage
 
-```
+``` text
 get subsequences by region/gtf/bed, including flanking sequences.
 
 Recommendation: use plain FASTA file, so seqkit could utilize FASTA index.
@@ -511,11 +514,13 @@ Examples
     ***AVOID loading all data from Homo_sapiens.GRCh38.84.gtf.gz,
     the uncompressed data are so big and may exhaust your RAM.***
 
-        $  seqkit subseq --bed Homo_sapiens.GRCh38.84.bed.gz --chr 1 hsa.fa >  chr1.bed.gz.fa
+        $ seqkit subseq --bed Homo_sapiens.GRCh38.84.bed.gz --chr 1 hsa.fa \
+            >  chr1.bed.gz.fa
 
     We may need to remove duplicated sequences
 
-        $ seqkit subseq --bed Homo_sapiens.GRCh38.84.bed.gz --chr 1 hsa.fa | seqkit rmdup > chr1.bed.rmdup.fa
+        $ seqkit subseq --bed Homo_sapiens.GRCh38.84.bed.gz --chr 1 hsa.fa \
+            | seqkit rmdup > chr1.bed.rmdup.fa
         [INFO] 141060 duplicated records removed
 
     Summary:
@@ -530,7 +535,7 @@ Examples
 
 Usage
 
-```
+``` text
 sliding sequences, circular genome supported
 
 Usage:
@@ -580,7 +585,9 @@ Examples
 
 3. Generate GC content for ploting
 
-        $ zcat hairpin.fa.gz | seqkit fx2tab | head -n 1 | seqkit tab2fx | seqkit sliding -s 5 -W 30 | seqkit fx2tab -n -g
+        $ zcat hairpin.fa.gz \
+            | seqkit sliding -s 5 -W 30 \
+            | seqkit fx2tab -n -g
         cel-let-7_sliding:1-30          50.00
         cel-let-7_sliding:6-35          46.67
         cel-let-7_sliding:11-40         43.33
@@ -593,7 +600,7 @@ Examples
 
 Usage
 
-```
+``` text
 simple statistics of FASTA/Q files
 
 Tips:
@@ -608,6 +615,8 @@ Aliases:
 
 Flags:
   -a, --all                  all statistics, including quartiles of seq length, sum_gap, N50
+  -b, --basename             only output basename of files
+  -E, --fq-encoding string   fastq quality encoding. available values: 'sanger', 'solexa', 'illumina-1.3+', 'illumina-1.5+', 'illumina-1.8+'. (default "sanger")
   -G, --gap-letters string   gap letters (default "- .")
   -h, --help                 help for stats
   -e, --skip-err             skip error, only show warning message
@@ -635,7 +644,7 @@ Eexamples
         reads_1.fq.gz   FASTQ   DNA     2500    567516  226     227.0   229
         reads_2.fq.gz   FASTQ   DNA     2500    560002  223     224.0   225
 
-        # So you can process the result with tools like [csvtk](http://bioinf.shenwei.me/csvtk)
+        # So you can process the result with tools like csvtk: http://bioinf.shenwei.me/csvtk
 
         $ seqkit stats *.f{a,q}.gz -T | csvtk pretty -t
         file                format   type   num_seqs   sum_len   min_len   avg_len   max_len
@@ -698,12 +707,15 @@ Eexamples
         tests/reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229
         tests/mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34
         tests/reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225
+        
+1. Output basename instead of full path (`-b/--basename`)
+    
 
 ## faidx
 
 Usage
 
-```
+``` text
 create FASTA index file and extract subsequence
 
 This command is similar with "samtools faidx" but has some extra features:
@@ -724,7 +736,7 @@ Flags:
 
 Example
 
-1. common usage
+1. common usage like `samtools faidx`
 
         $ seqkit faidx tests/hairpin.fa hsa-let-7a-1 hsa-let-7a-2
         >hsa-let-7a-1
@@ -734,7 +746,7 @@ Example
         AGGUUGAGGUAGUAGGUUGUAUAGUUUAGAAUUACAUCAAGGGAGAUAACUGUACAGCCU
         CCUAGCUUUCCU
 
-2. output full header
+2. output full header, not supported by `samtools faidx`
 
         $ seqkit faidx tests/hairpin.fa hsa-let-7a-1 hsa-let-7a-2 -f
         >hsa-let-7a-1 MI0000060 Homo sapiens let-7a-1 stem-loop
@@ -768,7 +780,7 @@ Example
 
 Usage
 
-```
+``` text
 convert FASTQ to FASTA
 
 Usage:
@@ -778,14 +790,14 @@ Usage:
 
 Examples
 
-    seqkit fq2fa reads_1.fq.gz -o reads1_.fa.gz
+    seqkit fq2fa reads_1.fq.gz -o reads_1.fa.gz
 
 
 ## fx2tab & tab2fx
 
 Usage (fx2tab)
 
-```
+``` text
 convert FASTA/Q to tabular format, and provide various information,
 like sequence length, GC content/GC skew.
 
@@ -805,7 +817,7 @@ Flags:
 
 Usage (tab2fx)
 
-```
+``` text
 convert tabular format (first two/three columns) to FASTA/Q format
 
 Usage:
@@ -813,7 +825,6 @@ Usage:
 
 Flags:
   -p, --comment-line-prefix value   comment line prefix (default [#,//])
-
 
 ```
 
@@ -827,7 +838,7 @@ Examples
 
 
 1. Print sequence length, GC content, and only print names (no sequences),
-we could also print title line by flag `-T`.
+we could also print title line by flag `-H`.
 
         $ seqkit fx2tab hairpin.fa.gz -l -g -n -i -H | head -n 4 | csvtk -t -C '&' pretty
         #name       seq   qual   length   GC
@@ -843,7 +854,10 @@ we could also print title line by flag `-T`.
 
 1. Sort sequences by length (use `seqkit sort -l`)
 
-        $ zcat hairpin.fa.gz | seqkit fx2tab -l | sort -t"`echo -e '\t'`" -n -k4,4 | seqkit tab2fx
+        $ zcat hairpin.fa.gz \
+            | seqkit fx2tab -l \
+            | sort -t"`echo -e '\t'`" -n -k4,4 \
+            | seqkit tab2fx
         >cin-mir-4129 MI0015684 Ciona intestinalis miR-4129 stem-loop
         UUCGUUAUUGGAAGACCUUAGUCCGUUAAUAAAGGCAUC
         >mmu-mir-7228 MI0023723 Mus musculus miR-7228 stem-loop
@@ -879,7 +893,7 @@ provides melt function, could be used in preparation of data for ploting.
 
 Usage
 
-```
+``` text
 convert FASTQ quality encoding between Sanger, Solexa and Illumina
 
 Usage:
@@ -998,7 +1012,7 @@ FGDGGGGGDGFFGGGDGGGGGGEEGAGFFE>A>@!B@?@@<:!!!!!!!!!!355=>><>EEEEAEEE?EEEBEE?!!!!
 
 Usage
 
-```
+``` text
 translate DNA/RNA to protein sequence (supporting ambiguous bases)
 
 Note:
@@ -1077,7 +1091,7 @@ Examples
         AKRALPTCTSASPPQKKKPLDGEYFTLKIRGRKRFEMFRELNEALELKDAHATEESGDSR
         AHSSYLKTKKGQSTSRHKKTMVKKVGPDSD*
 
-1. trim the '*'
+1. trim the `*`
 
         $ seqkit translate tests/mouse-p53-cds.fna --trim
         >lcl|AB021961.1_cds_BAA82344.1_1 [gene=p53] [protein=P53] [protein_id=BAA82344.1] [location=101..1273] [gbkey=CDS]
@@ -1091,7 +1105,8 @@ Examples
 
 1. different translate table
 
-        $ seqkit translate tests/Lactococcus-lactis-phage-BK5-T-ORF25.fasta -T 11 --trim
+        $ cat tests/Lactococcus-lactis-phage-BK5-T-ORF25.fasta \
+            | seqkit translate -T 11 --trim
         >CAC80166.1 hypothetical protein [Lactococcus phage BK5-T]
         MEEQAWREVLERLARIETKLDNYETVRDKAERALLIAQSNAKLIEKMEANNKWAWGFMLT
         LAVTVIGYLFTKIRF
@@ -1186,17 +1201,20 @@ Examples
 
 Usage
 
-```
-search sequences by pattern(s) of name or sequence motifs
+``` text
+search sequences by ID/name/sequence/sequence motifs, mismatch allowed
 
 Attentions:
-    1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
-       (ID/full header) by default. Please switch "-r/--use-regexp" on
-       for partly matching.
-    2. While when searching by sequences, it's partly matching. And mismatch
-       is allowed using flag "-m/--max-mismatch".
-    3. The order of sequences in result is consistent with that in original
-       file, not the order of the query patterns.
+  1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
+     (ID/full header) by default. Please switch "-r/--use-regexp" on
+     for partly matching.
+  2. While when searching by sequences, only positive strand is searched,
+     and it's partly matching. 
+     Mismatch is allowed using flag "-m/--max-mismatch",
+     but it's not fast enough for large genome like human genome.
+     Though, it's fast enough for microbial genomes.
+  3. The order of sequences in result is consistent with that in original
+     file, not the order of the query patterns.
 
 You can specify the sequence region for searching with flag -R (--region).
 The definition of region is 1-based and with some custom design.
@@ -1221,14 +1239,15 @@ Usage:
 
 Flags:
   -n, --by-name               match by full name instead of just id
-  -s, --by-seq                match by seq
+  -s, --by-seq                search subseq on seq, only positive strand is searched, and mismatch allowed using flag -m/--max-mismatch
   -d, --degenerate            pattern/motif contains degenerate base
       --delete-matched        delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions
+  -h, --help                  help for grep
   -i, --ignore-case           ignore case
   -v, --invert-match          invert the sense of matching, to select non-matching records
-  -m, --max-mismatch int      max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)
-  -p, --pattern stringSlice   search pattern (multiple values supported)
-  -f, --pattern-file string   pattern file
+  -m, --max-mismatch int      max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster
+  -p, --pattern strings       search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"'))
+  -f, --pattern-file string   pattern file (one record per line)
   -R, --region string         specify sequence region for searching. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases
   -r, --use-regexp            patterns are regular expression
 
@@ -1265,27 +1284,28 @@ Examples
 
             $ zcat hairpin.fa.gz | seqkit grep -f list > new.fa
 
-1  Extract sequences containing AGGCG
+1. Extract sequences containing AGGCG
 
         $ cat hairpin.fa.gz | seqkit grep -s -i -p aggcg
 
 
-1  Extract sequences containing AGGCG (allow mismatch, **only for short (<50kb) sequences now**)
+1. Extract sequences containing AGGCG (allow mismatch, **only for short (<50kb) sequences now**)
 
         $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg | seqkit stats
         file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
         -     FASTA   RNA      1,181  145,789       49    123.4    2,354
 
-        real    0m0.070s
-        user    0m0.107s
+        real    0m0.058s
+        user    0m0.100s
         sys     0m0.017s
 
         $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg -m 1 | seqkit stats
         file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
         -     FASTA   RNA     17,168  1,881,005       39    109.6    2,354
 
-        real    0m4.655s
-        user    0m4.753s
+        real    0m2.479s
+        user    0m2.570s
+        sys     0m0.015s
 
 1. Extract sequences starting with AGGCG
 
@@ -1307,7 +1327,7 @@ Examples
 
 Usage
 
-```
+``` text
 locate subsequences/motifs, mismatch allowed
 
 Motifs could be EITHER plain sequence containing "ACTGN" OR regular
@@ -1318,6 +1338,10 @@ By default, motifs are treated as regular expression.
 When flag -d given, regular expression may be wrong.
 For example: "\w" will be wrongly converted to "\[AT]".
 
+Mismatch is allowed using flag "-m/--max-mismatch",
+but it's not fast enough for large genome like human genome.
+Though, it's fast enough for microbial genomes.
+
 Usage:
   seqkit locate [flags]
 
@@ -1327,12 +1351,13 @@ Flags:
       --gtf                       output in GTF format
   -h, --help                      help for locate
   -i, --ignore-case               ignore case
-  -m, --max-mismatch int          max mismatch when matching by seq (experimental, costs too much RAM for large genome, 8G for 50Kb sequence)
-  -G, --non-greedy                non-greedy mode, faster but may miss motifs overlaping with others
+  -m, --max-mismatch int          max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster
+  -G, --non-greedy                non-greedy mode, faster but may miss motifs overlapping with others
   -P, --only-positive-strand      only search on positive strand
   -p, --pattern strings           pattern/motif (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
   -f, --pattern-file string       pattern/motif file (FASTA format)
   -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+
 ```
 
 Examples
@@ -1343,53 +1368,60 @@ Examples
         >seq
         agctggagctacc
 
-        $ cat t.fa | seqkit locate -p agc
-        seqID   patternName     pattern strand  start   end     matched
-        seq     agc     agc     +       1       3       agc
-        seq     agc     agc     +       7       9       agc
-        seq     agc     agc     -       8       10      agc
-        seq     agc     agc     -       2       4       agc
+        $ cat t.fa | seqkit locate -p agc | csvtk pretty -t
+        seqID   patternName   pattern   strand   start   end   matched
+        seq     agc           agc       +        1       3     agc
+        seq     agc           agc       +        7       9     agc
+        seq     agc           agc       -        8       10    agc
+        seq     agc           agc       -        2       4     agc
 
-        $ cat t.fa | seqkit locate -p agc -m 1
+        $ cat t.fa | seqkit locate -p agc -m 1 | csvtk pretty -t
         seqID   patternName     pattern strand  start   end     matched
-        seq     agc     agc     +       1       3       agc
-        seq     agc     agc     +       7       9       agc
-        seq     agc     agc     +       11      13      acc
-        seq     agc     agc     -       8       10      agc
-        seq     agc     agc     -       2       4       agc
+        seq     agc           agc       +        1       3     agc
+        seq     agc           agc       +        7       9     agc
+        seq     agc           agc       +        11      13    acc
+        seq     agc           agc       -        8       10    agc
+        seq     agc           agc       -        2       4     agc
 
 
-        $ cat t.fa | seqkit locate -p agc -m 2
-        seqID   patternName     pattern strand  start   end     matched
-        seq     agc     agc     +       1       3       agc
-        seq     agc     agc     +       4       6       tgg
-        seq     agc     agc     +       5       7       gga
-        seq     agc     agc     +       7       9       agc
-        seq     agc     agc     +       10      12      tac
-        seq     agc     agc     +       11      13      acc
-        seq     agc     agc     -       11      13      ggt
-        seq     agc     agc     -       8       10      agc
-        seq     agc     agc     -       6       8       ctc
-        seq     agc     agc     -       5       7       tcc
-        seq     agc     agc     -       2       4       agc
+        $ cat t.fa | seqkit locate -p agc -m 2 | csvtk pretty -t
+        seqID   patternName   pattern   strand   start   end   matched
+        seq     agc           agc       +        1       3     agc
+        seq     agc           agc       +        4       6     tgg
+        seq     agc           agc       +        5       7     gga
+        seq     agc           agc       +        7       9     agc
+        seq     agc           agc       +        10      12    tac
+        seq     agc           agc       +        11      13    acc
+        seq     agc           agc       -        11      13    ggt
+        seq     agc           agc       -        8       10    agc
+        seq     agc           agc       -        6       8     ctc
+        seq     agc           agc       -        5       7     tcc
+        seq     agc           agc       -        2       4     agc
 
 1. Locate ORFs.
 
-        $ zcat hairpin.fa.gz | seqkit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)"
-        seqID   patternName     pattern strand  start   end     matched
-        cel-lin-4       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        +  136      AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGA
-        cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        +  54       95      AUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAG
-        cel-mir-1       A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)        -  43       51      AUGAUAUAG
+        $ zcat hairpin.fa.gz \
+            | seqkit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" \
+            | head -n 4 \
+            | csvtk pretty -t
+        seqID       patternName                        pattern                            strand   start   end   matched
+        cel-lin-4   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   +        1       36    AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGA
+        cel-mir-1   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   +        54      95    AUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAG
+        cel-mir-1   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   -        43      51    AUGAUAUAG
+        cel-mir-1   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   -        30      41    AUGGGCAUGUAA
 
 1. Locate Motif.
 
-        $ zcat hairpin.fa.gz | seqkit locate -i -d -p AUGGACUN
+        $ zcat hairpin.fa.gz \
+            | seqkit locate -i -d -p AUGGACUN \
+            | head -n 4 \
+            | csvtk pretty -t 
         seqID         patternName   pattern    strand   start   end   matched
         cel-mir-58a   AUGGACUN      AUGGACUN   +        81      88    AUGGACUG
         ath-MIR163    AUGGACUN      AUGGACUN   -        122     129   AUGGACUC
+        cel-mir-270   AUGGACUN      AUGGACUN   +        84      91    AUGGACUG
 
     Notice that `seqkit grep` only searches in positive strand, but `seqkit loate` could recognize both strand.
-
 
 1. Output in `GTF` or `BED6` format, which you can use in `seqkit subseq`
 
@@ -1416,11 +1448,75 @@ Examples
         seq     ACGA          ACGA      +        1       4     ACGA
         seq     ACGA          ACGA      +        7       10    ACGA
 
+## amplicon
+
+Usage
+
+``` text
+
+retrieve amplicon (or specific region around it) via primer(s).
+
+Examples:
+  0. no region given.
+  
+                    F
+        -----===============-----
+             F             R
+        -----=====-----=====-----
+             
+             ===============         amplicon
+
+  1. inner region (-r x:y).
+
+                    F
+        -----===============-----
+             1 3 5                    x/y
+                      -5-3-1          x/y
+             F             R
+        -----=====-----=====-----     x:y
+        
+             ===============          1:-1
+             =======                  1:7
+               =====                  3:7
+                  =====               6:10
+                  =====             -10:-6
+                     =====           -7:-3
+                                     -x:y (invalid)
+                    
+  2. flanking region (-r x:y -f)
+        
+                    F
+        -----===============-----
+         -3-1                        x/y
+                            1 3 5    x/y
+             F             R
+        -----=====-----=====-----
+        
+        =====                        -5:-1
+        ===                          -5:-3
+                            =====     1:5
+                              ===     3:5
+            =================        -1:1
+        =========================    -5:5
+                                      x:-y (invalid)
+
+Usage:
+  seqkit amplicon [flags]
+
+Flags:
+  -f, --flanking-region    region is flanking region
+  -F, --forward string     forward primer
+  -h, --help               help for amplicon
+  -m, --max-mismatch int   max mismatch when matching primers
+  -r, --region string      specify region to return. type "seqkit amplicon -h" for detail
+  -R, --reverse string     reverse primer
+```
+        
 ## duplicate
 
 Usage
 
-```
+``` text
 duplicate sequences N times
 
 You may need "seqkit rename" to make the the sequence IDs unique.
@@ -1448,7 +1544,8 @@ Examples
 
 1. Duplicate 2 times
 
-        $ cat tests/hairpin.fa | seqkit head -n 1 | seqkit duplicate -n 2
+        $ cat tests/hairpin.fa | seqkit head -n 1 \
+            | seqkit duplicate -n 2
         >cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
         UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
         UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
@@ -1458,7 +1555,8 @@ Examples
 
 1. use `seqkit rename` to make the the sequence IDs unique.
 
-        $ cat tests/hairpin.fa | seqkit head -n 1 | seqkit duplicate -n 2 | seqkit rename
+        $ cat tests/hairpin.fa | seqkit head -n 1 \
+            | seqkit duplicate -n 2 | seqkit rename
         >cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
         UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
         UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
@@ -1470,19 +1568,19 @@ Examples
 
 Usage
 
-```
+``` text
 remove duplicated sequences by id/name/sequence
 
 Usage:
   seqkit rmdup [flags]
 
 Flags:
-    -n, --by-name                by full name instead of just id
-    -s, --by-seq                 by seq
-    -D, --dup-num-file string    file to save number and list of duplicated seqs
-    -d, --dup-seqs-file string   file to save duplicated seqs
-    -i, --ignore-case            ignore case
-    -m, --md5                    use MD5 instead of original seqs to reduce memory usage when comparing by seqs
+  -n, --by-name                by full name instead of just id
+  -s, --by-seq                 by seq
+  -D, --dup-num-file string    file to save number and list of duplicated seqs
+  -d, --dup-seqs-file string   file to save duplicated seqs
+  -h, --help                   help for rmdup
+  -i, --ignore-case            ignore case
 
 ```
 
@@ -1500,7 +1598,8 @@ Similar to `common`.
 
 1. Save duplicated sequences to file
 
-        $ zcat hairpin.fa.gz | seqkit rmdup -s -i -m -o clean.fa.gz -d duplicated.fa.gz -D duplicated.detail.txt
+        $ zcat hairpin.fa.gz \
+            | seqkit rmdup -s -i -o clean.fa.gz -d duplicated.fa.gz -D duplicated.detail.txt
 
         $ cat duplicated.detail.txt   # here is not the entire list
         3	hsa-mir-424, mml-mir-424, ppy-mir-424
@@ -1512,7 +1611,7 @@ Similar to `common`.
 
 Usage
 
-```
+``` text
 find common sequences of multiple files by id/name/sequence
 
 Note:
@@ -1532,7 +1631,6 @@ Flags:
   -s, --by-seq        match by sequence
   -h, --help          help for common
   -i, --ignore-case   ignore case
-  -m, --md5           use MD5 instead of original seqs to reduce memory usage when comparing by seqs
 
 ```
 
@@ -1550,16 +1648,12 @@ Examples
 
         seqkit common file*.fa -s -i -o common.fasta
 
-1. By sequence (***for large sequences***)
-
-        seqkit common file*.fa -s -i -o common.fasta --md5
-
 
 ## split
 
 Usage
 
-```
+``` text
 split sequences into files by name ID, subsequence of given region,
 part size or number of parts.
 
@@ -1594,7 +1688,6 @@ Flags:
   -f, --force              overwrite output directory
   -h, --help               help for split
   -k, --keep-temp          keep tempory FASTA and .fai file when using 2-pass mode
-  -m, --md5                use MD5 instead of region sequence in output file when using flag -r (--by-region)
   -O, --out-dir string     output directory (default value is $infile.split)
   -2, --two-pass           two-pass mode read files twice to lower memory usage. (only for FASTA format)
 
@@ -1661,16 +1754,13 @@ Examples
         [INFO] write 349 sequences to file: hairpin.region_1:3_ACU.fa.gz
         [INFO] write 311 sequences to file: hairpin.region_1:3_CGG.fa.gz
 
-    **If region is too long, we could use falg `--md5`**,
-    i.e. use MD5 instead of region sequence in output file.
-
     Sequence suffix could be defined as `-r -12:-1`
 
 ## split2
 
 Usage
 
-```
+``` text
 split sequences into files by part size or number of parts
 
 This command supports FASTA and paired- or single-end FASTQ with low memory
@@ -1732,7 +1822,6 @@ Examples
         [INFO] write 1250 sequences to file: out/reads_1.part_001.fq.gz
         [INFO] write 1250 sequences to file: out/reads_1.part_002.fq.gz
 
-
         $ seqkit split2 reads_1.fq.gz -p 2 -O out -f
         [INFO] split seqs from reads_1.fq.gz
         [INFO] split into 2 parts
@@ -1744,7 +1833,7 @@ Examples
 
 Usage
 
-```
+``` text
 sample sequences by number or proportion.
 
 Usage:
@@ -1778,15 +1867,20 @@ Examples
 
     ***We can also use `seqkit sample -p` followed with `seqkit head -n`:***
 
-        $ zcat hairpin.fa.gz | seqkit sample -p 0.1 | seqkit head -n 1000 -o sample.fa.gz
+        $ zcat hairpin.fa.gz \
+            | seqkit sample -p 0.1 \
+            | seqkit head -n 1000 -o sample.fa.gz
 
 1. Set rand seed to reproduce the result
 
-        $ zcat hairpin.fa.gz | seqkit sample -p 0.1 -s 11
+        $ zcat hairpin.fa.gz \
+            | seqkit sample -p 0.1 -s 11
 
 1. Most of the time, we could shuffle after sampling
 
-        $ zcat hairpin.fa.gz | seqkit sample -p 0.1 | seqkit shuffle -o sample.fa.gz
+        $ zcat hairpin.fa.gz \
+            | seqkit sample -p 0.1 \
+            | seqkit shuffle -o sample.fa.gz
 
 Note that when sampling on FASTQ files, make sure using same random seed by
 flag `-s` (`--rand-seed`)
@@ -1795,7 +1889,7 @@ flag `-s` (`--rand-seed`)
 
 Usage
 
-```
+``` text
 print first N FASTA/Q records
 
 Usage:
@@ -1828,7 +1922,7 @@ Examples
 
 Usage
 
-```
+``` text
 print FASTA/Q records in a range (start:end)
 
 Usage:
@@ -1869,7 +1963,7 @@ Examples
 
 Usage
 
-```
+``` text
 replace name/sequence by regular expression.
 
 Note that the replacement supports capture variables.
@@ -1888,9 +1982,9 @@ more on: http://bioinf.shenwei.me/seqkit/usage/#replace
 
 Special replacement symbols (only for replacing name not sequence):
 
-        {nr}    Record number, starting from 1
-        {kv}    Corresponding value of the key (captured variable $n) by key-value file,
-                n can be specified by flag -I (--key-capt-idx) (default: 1)
+    {nr}    Record number, starting from 1
+    {kv}    Corresponding value of the key (captured variable $n) by key-value file,
+            n can be specified by flag -I (--key-capt-idx) (default: 1)
 
 Usage:
   seqkit replace [flags]
@@ -1913,31 +2007,43 @@ Examples
 
 1. Remove descriptions
 
-        $ echo -e ">seq1 abc-123\nACGT-ACGT" | seqkit replace -p " .+"
+        $ echo -e ">seq1 abc-123\nACGT-ACGT"
+        >seq1 abc-123
+        ACGT-ACGT
+        
+        $ echo -e ">seq1 abc-123\nACGT-ACGT" \
+            | seqkit replace -p "\s.+"
         >seq1
         ACGT-ACGT
 
 1. Replace "-" with "="
 
-        $ echo -e ">seq1 abc-123\nACGT-ACGT" | seqkit replace -p "\-" -r '='
+        $ echo -e ">seq1 abc-123\nACGT-ACGT" \
+            | seqkit replace -p "\-" -r '='
         >seq1 abc=123
         ACGT-ACGT
 
 1. Remove gaps in sequences.
 
-        $ echo -e ">seq1 abc-123\nACGT-ACGT" | seqkit replace -p " |-" -s
+        $ echo -e ">seq1 abc-123\nACGT-ACGT" \
+            | seqkit replace -p " |-" -s
         >seq1 abc-123
         ACGTACGT
 
 1. Add space to every base. **ATTENTION: use SINGLE quote NOT double quotes in *nix OS**
 
-        $ echo -e ">seq1 abc-123\nACGT-ACGT" | seqkit replace -p "(.)" -r '$1 ' -s
+        $ echo -e ">seq1 abc-123\nACGT-ACGT" \
+            | seqkit replace -p "(.)" -r '$1 ' -s
         >seq1 abc-123
         A C G T - A C G T
 
 1. Transpose sequence with [csvtk](https://github.com/shenwei356/csvtk)
 
-        $ echo -e ">seq1\nACTGACGT\n>seq2\nactgccgt" | seqkit replace -p "(.)" -r     "\$1 " -s | seqkit seq -s -u | csvtk space2tab | csvtk -t transpose
+        $ echo -e ">seq1\nACTGACGT\n>seq2\nactgccgt" \
+            | seqkit replace -p "(.)" -r     "\$1 " -s \
+            | seqkit seq -s -u \
+            | csvtk space2tab \
+            | csvtk -t transpose
         A       A
         C       C
         T       T
@@ -1949,13 +2055,15 @@ Examples
 
 1. Rename with number of record
 
-        $ echo -e ">abc\nACTG\n>123\nATTT" |  seqkit replace -p .+ -r "seq_{nr}"
+        $ echo -e ">abc\nACTG\n>123\nATTT" \
+            |  seqkit replace -p .+ -r "seq_{nr}"
         >seq_1
         ACTG
         >seq_2
         ATTT
 
-        $ echo -e ">abc\nACTG\n>123\nATTT" |  seqkit replace -p .+ -r "seq_{nr}" --nr-width 5
+        $ echo -e ">abc\nACTG\n>123\nATTT" \
+            |  seqkit replace -p .+ -r "seq_{nr}" --nr-width 5
         >seq_00001
         ACTG
         >seq_00002
@@ -1998,8 +2106,8 @@ Examples
         CCCCAAAACCCCATGTTGCTACTAG
 
 1. convert fasta to genbank style
-
-
+        
+        $ cat seq.fa
         >seq1
         TTTAAAGAGACCGGCGATTCTAGTGAAATCGAACGGGCAGGTCAATTTCCAACCAGCGAT
         GACGTAATAGATAGATACAAGGAAGTCATTTTTCTTTTAAAGGATAGAAACGGTTAATGC
@@ -2026,7 +2134,7 @@ Examples
 
 Usage
 
-```
+``` text
 rename duplicated IDs
 
 Usage:
@@ -2039,7 +2147,7 @@ Flags:
 
 Examples
 
-```
+``` sh
 $ echo -e ">a comment\nacgt\n>b comment of b\nACTG\n>a comment\naaaa"
 >a comment
 acgt
@@ -2047,7 +2155,9 @@ acgt
 ACTG
 >a comment
 aaaa
-$ echo -e ">a comment\nacgt\n>b comment of b\nACTG\n>a comment\naaaa" | seqkit rename
+
+$ echo -e ">a comment\nacgt\n>b comment of b\nACTG\n>a comment\naaaa" \
+    | seqkit rename
 >a comment
 acgt
 >b comment of b
@@ -2060,7 +2170,7 @@ aaaa
 
 Usage
 
-```
+``` text
 reset start position for circular genome
 
 Examples
@@ -2089,7 +2199,7 @@ Flags:
 
 Usage
 
-```
+``` text
 concatenate sequences with same ID from multiple files
 
 Example: concatenating leading 2 bases and last 2 bases
@@ -2112,14 +2222,13 @@ Usage:
 Flags:
   -h, --help   help for concat
 
-
 ```
 
 ## mutate
 
 Usage
 
-```
+``` text
 edit sequence (point mutation, insertion, deletion)
 
 Attentions:
@@ -2178,7 +2287,8 @@ Examples:
         actgnACTGN
 
         # first base
-        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" | seqkit mutate -p 1:x
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" \
+            | seqkit mutate -p 1:x
         [INFO] edit seq: 1
         [INFO] edit seq: 2
         >1
@@ -2187,14 +2297,16 @@ Examples:
         xctgnACTGN
 
         # 5th base
-        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" | seqkit mutate -p 5:x --quiet
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" \
+            | seqkit mutate -p 5:x --quiet
         >1
         ACTGxactgn
         >2
         actgxACTGN
 
         # last base
-        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" | seqkit mutate -p -1:x --quiet
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" \
+            | seqkit mutate -p -1:x --quiet
         >1
         ACTGNactgx
         >2
@@ -2202,7 +2314,8 @@ Examples:
 
         # mutiple locations:
 
-        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" | seqkit mutate -p 1:x -p -1:x --quiet
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" \
+            | seqkit mutate -p 1:x -p -1:x --quiet
         >1
         xCTGNactgx
         >2
@@ -2211,14 +2324,16 @@ Examples:
 1. Deletion
 
         # first base
-        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" | seqkit mutate -d 1:1 --quiet
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" \
+            | seqkit mutate -d 1:1 --quiet
         >1
         CTGNactgn
         >2
         ctgnACTGN
 
         # last 3 bases
-        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" | seqkit mutate -d -3:-1 --quiet
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" \
+            | seqkit mutate -d -3:-1 --quiet
         >1
         ACTGNac
         >2
@@ -2227,21 +2342,24 @@ Examples:
 1. Insertion: inserting bases **behind** of given position
 
         # at the beginning
-        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" | seqkit mutate -i 0:xx --quiet
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" \
+            | seqkit mutate -i 0:xx --quiet
         >1
         xxACTGNactgn
         >2
         xxactgnACTGN
 
         # at the end
-        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" | seqkit mutate -i -1:xx --quiet
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" \
+            | seqkit mutate -i -1:xx --quiet
         >1
         ACTGNactgnxx
         >2
         actgnACTGNxx
 
         # behind of 5th base
-        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" | seqkit mutate -i 5:x --quiet
+        $ echo -ne ">1\nACTGNactgn\n>2\nactgnACTGN\n" \
+            | seqkit mutate -i 5:x --quiet
         >1
         ACTGNxactgn
         >2
@@ -2260,8 +2378,9 @@ Examples:
         actgnactgn
 
         # only edit chr1 and chr2
-        $    cat tests/hsa.fa | seqkit mutate -p -1:X -s chr1,chr2
         # or cat tests/hsa.fa | seqkit mutate -p -1:X -s chr1 -s chr2
+        $ cat tests/hsa.fa \
+            | seqkit mutate -p -1:X -s chr1,chr2
         [INFO] edit seq: chr1 1th seq
         [INFO] edit seq: chr2 2nd seq
         >chr1 1th seq
@@ -2275,7 +2394,8 @@ Examples:
 
         # using regular expression to match.
         # e,g., editing all chrosomes:
-        $ cat tests/hsa.fa | seqkit mutate -p -1:X -r -s chr
+        $ cat tests/hsa.fa \
+            | seqkit mutate -p -1:X -r -s chr
         [INFO] edit seq: chr1 1th seq
         [INFO] edit seq: chr2 2nd seq
         [INFO] edit seq: chr11 11th seq
@@ -2289,7 +2409,8 @@ Examples:
         actgnactgn
 
         # excluding seqs
-        $ cat tests/hsa.fa | seqkit mutate -p -1:X -s chr1 -s chr2 -v 
+        $ cat tests/hsa.fa \
+            | seqkit mutate -p -1:X -s chr1 -s chr2 -v 
         [INFO] edit seq: chr11 11th seq
         [INFO] edit seq: MT mitochondrial seq
         >chr1 1th seq
@@ -2305,7 +2426,7 @@ Examples:
 
 Usage
 
-```
+``` text
 shuffle sequences.
 
 By default, all records will be readed into memory.
@@ -2359,7 +2480,7 @@ flag `-s` (`--rand-seed`) for read 1 and 2 files.
 
 Usage
 
-```
+``` text
 sort sequences by id/name/sequence/length.
 
 By default, all records will be readed into memory.
@@ -2395,7 +2516,8 @@ Examples
 
 1. sort by ID
 
-        $ echo -e ">seq1\nACGTNcccc\n>SEQ2\nacgtnAAAA" | seqkit sort --quiet
+        $ echo -e ">seq1\nACGTNcccc\n>SEQ2\nacgtnAAAA" \
+            | seqkit sort --quiet
         >SEQ2
         acgtnAAAA
         >seq1
@@ -2403,41 +2525,31 @@ Examples
 
 1. sort by ID and in natural order
 
-        $ echo -e ">3\na\n>1\na\n>Y\na\n>x\na\n>Mt\na\n>11\na\n>2\na\n"
-        >3
-        a
-        >1
-        a
-        >Y
-        a
-        >x
-        a
-        >Mt
-        a
-        >11
-        a
-        >2
-        a
+        $ echo -e ">3\na\n>1\na\n>Y\na\n>x\na\n>Mt\na\n>11\na\n>2\na\n" \
+            | seqkit seq -n -i
+        3
+        1
+        Y
+        x
+        Mt
+        11
+        2
 
-        $ echo -e ">3\na\n>1\na\n>Y\na\n>x\na\n>Mt\na\n>11\na\n>2\na\n" | seqkit sort -N -i -2
-        >1
-        a
-        >2
-        a
-        >3
-        a
-        >11
-        a
-        >Mt
-        a
-        >x
-        a
-        >Y
-        a
+        $ echo -e ">3\na\n>1\na\n>Y\na\n>x\na\n>Mt\na\n>11\na\n>2\na\n" \
+            | seqkit sort -N -i -2 \
+            | seqkit seq -n -i
+        1
+        2
+        3
+        11
+        Mt
+        x
+        Y
 
 1. sort by ID, ignoring case.
 
-        $ echo -e ">seq1\nACGTNcccc\n>SEQ2\nacgtnAAAA" | seqkit sort --quiet -i
+        $ echo -e ">seq1\nACGTNcccc\n>SEQ2\nacgtnAAAA" \
+            | seqkit sort --quiet -i
         >seq1
         ACGTNcccc
         >SEQ2
@@ -2445,7 +2557,8 @@ Examples
 
 1. sort by seq, ignoring case.
 
-        $ echo -e ">seq1\nACGTNcccc\n>SEQ2\nacgtnAAAA" | seqkit sort --quiet -s -i
+        $ echo -e ">seq1\nACGTNcccc\n>SEQ2\nacgtnAAAA" \
+            | seqkit sort --quiet -s -i
         >SEQ2
         acgtnAAAA
         >seq1
@@ -2453,7 +2566,8 @@ Examples
 
 1. sort by sequence length
 
-        $ echo -e ">seq1\nACGTNcccc\n>SEQ2\nacgtnAAAAnnn\n>seq3\nacgt" | seqkit sort --quiet -l
+        $ echo -e ">seq1\nACGTNcccc\n>SEQ2\nacgtnAAAAnnn\n>seq3\nacgt" \
+            | seqkit sort --quiet -l
         >seq3
         acgt
         >seq1
@@ -2465,7 +2579,7 @@ Examples
 
 Usage
 
-```
+``` text
 generate shell autocompletion script
 
 Note: The current version supports Bash only.

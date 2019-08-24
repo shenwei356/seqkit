@@ -8,16 +8,21 @@ pages:
     - Tutorial: tutorial.md
     - Benchmark: benchmark.md
     - Notes: note.md
-- Links:
-    - More tools: bioinf.md
-    - YanLi Lab: yanlilab.md
-theme: cinder
+- More tools: https://github.com/shenwei356
+# theme: cinder
 
-# cluster
-# tamerdocs
-# cinder
-# unidata
-# yeti
+theme:
+    name: 'material'
+    palette:
+        primary: 'teal'
+        accent: 'blue grey'
+    logo:
+        icon: 'school'
+    favicon: 'files/favicon.ico'
+    feature:
+        tabs: false
+extra:
+  manifest: 'manifest.webmanifest'
 
 repo_url: https://github.com/shenwei356/seqkit
 site_description: SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation

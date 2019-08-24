@@ -1,4 +1,4 @@
-// Copyright © 2016 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
@@ -75,6 +76,7 @@ Tips:
 		tabular := getFlagBool(cmd, "tabular")
 		skipErr := getFlagBool(cmd, "skip-err")
 		fqEncoding := parseQualityEncoding(getFlagString(cmd, "fq-encoding"))
+		basename := getFlagBool(cmd, "basename")
 
 		files := getFileList(args)
 
@@ -396,6 +398,9 @@ Tips:
 				default:
 				}
 				if num == 0 {
+					if basename {
+						file = filepath.Base(file)
+					}
 					ch <- statInfo{file, seqFormat, t,
 						0, 0, 0, 0,
 						0, lenMax, 0, 0,
@@ -403,6 +408,9 @@ Tips:
 						0, 0,
 						nil, id}
 				} else {
+					if basename {
+						file = filepath.Base(file)
+					}
 					ch <- statInfo{file, seqFormat, t,
 						num, lenSum, gapSum, lenMin,
 						math.Round(float64(lenSum)/float64(num), 1), lenMax, n50, l50,
@@ -523,6 +531,7 @@ func init() {
 	statCmd.Flags().BoolP("all", "a", false, "all statistics, including quartiles of seq length, sum_gap, N50")
 	statCmd.Flags().BoolP("skip-err", "e", false, "skip error, only show warning message")
 	statCmd.Flags().StringP("fq-encoding", "E", "sanger", `fastq quality encoding. available values: 'sanger', 'solexa', 'illumina-1.3+', 'illumina-1.5+', 'illumina-1.8+'.`)
+	statCmd.Flags().BoolP("basename", "b", false, "only output basename of files")
 }
 
 func median(sorted []int64) int64 {
