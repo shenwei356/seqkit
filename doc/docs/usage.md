@@ -819,18 +819,21 @@ Usage (fx2tab)
 convert FASTA/Q to tabular format, and provide various information,
 like sequence length, GC content/GC skew.
 
-Usage:
+age:
   seqkit fx2tab [flags]
 
 Flags:
-  -B, --base-content value   print base content. (case ignored, multiple values supported) e.g. -B AT -B N (default [])
-  -g, --gc                   print GC content
-  -G, --gc-skew              print GC-Skew
-  -H, --header-line          print header line
-  -l, --length               print sequence length
-  -n, --name                 only print names (no sequences and qualities)
-  -i, --only-id              print ID instead of full head
-
+  -a, --alphabet               print alphabet letters
+  -q, --avg-qual               print average quality of a read
+  -B, --base-content strings   print base content. (case ignored, multiple values supported) e.g. -B AT -B N
+  -g, --gc                     print GC content
+  -G, --gc-skew                print GC-Skew
+  -H, --header-line            print header line
+  -h, --help                   help for fx2tab
+  -l, --length                 print sequence length
+  -n, --name                   only print names (no sequences and qualities)
+  -i, --only-id                print ID instead of full head
+  -b, --qual-ascii-base int    ASCII BASE, 33 for Phred+33 (default 33)
 ```
 
 Usage (tab2fx)
