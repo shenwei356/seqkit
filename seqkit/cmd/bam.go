@@ -225,18 +225,19 @@ func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, 
 
 // bamStatRec is a structure holding BAM statistics.
 type bamStatRec struct {
-	PrimAlnPerc float64
-	PrimAln     int
-	SecAln      int
-	SupAln      int
-	Unmapped    int
-	TotalRec    int
-	File        string
+	PrimAlnPerc  float64
+	MultimapPerc float64
+	PrimAln      int
+	SecAln       int
+	SupAln       int
+	Unmapped     int
+	TotalRec     int
+	File         string
 }
 
 // String generates string representatION for a pointer to bamStatRec.
 func (r *bamStatRec) String() string {
-	return fmt.Sprintf("%.2f\t%d\t%d\t%d\t%d\t%d\t%s", r.PrimAlnPerc, r.PrimAln, r.SecAln, r.SupAln, r.Unmapped, r.TotalRec, r.File)
+	return fmt.Sprintf("%.2f\t%d\t%d\t%d\t%d\t%.2f\t%d\t%s", r.PrimAlnPerc, r.PrimAln, r.SecAln, r.SupAln, r.Unmapped, r.MultimapPerc, r.TotalRec, r.File)
 }
 
 // bamIdxStats extracts rough statistics form the BAM index.
@@ -317,7 +318,9 @@ func bamStatsOnce(f string, mapQual int, threads int) *bamStatRec {
 			if record.Flags&sam.Secondary != 0 {
 				res.SecAln++
 			} else {
-
+				if record.MapQ == 0 {
+					res.MultimapPerc++
+				}
 				if int(record.MapQ) < mapQual {
 					continue
 				}
@@ -329,12 +332,13 @@ func bamStatsOnce(f string, mapQual int, threads int) *bamStatRec {
 		}
 	} // records
 	res.PrimAlnPerc = 100 * float64(res.PrimAln) / float64(res.PrimAln+res.Unmapped)
+	res.MultimapPerc = 100 * res.MultimapPerc / float64(res.PrimAln)
 	return res
 }
 
 // bamStats calculates detailed statistics for multiple BAM files and prints to stderr.
 func bamStats(files []string, mapQual int, threads int) {
-	fmt.Fprintf(os.Stderr, "PrimAlnPerc\tPrimAln\tSecAln\tSupAln\tUnmapped\tTotalRec\tFile\n")
+	fmt.Fprintf(os.Stderr, "PrimAlnPerc\tPrimAln\tSecAln\tSupAln\tUnmapped\tMultimapPerc\tTotalRec\tFile\n")
 	for _, f := range files {
 		s := bamStatsOnce(f, mapQual, threads)
 		fmt.Fprintf(os.Stderr, "%s\n", s.String())
