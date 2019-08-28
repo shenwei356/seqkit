@@ -123,6 +123,8 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - [`subseq`](https://bioinf.shenwei.me/seqkit/usage/#subseq)    get subsequences by region/gtf/bed, including flanking sequences
 - [`sliding`](https://bioinf.shenwei.me/seqkit/usage/#sliding)  sliding sequences, circular genome supported
 - [`stats`](https://bioinf.shenwei.me/seqkit/usage/#stats)      simple statistics of FASTA/Q files
+- [`watch`](https://bioinf.shenwei.me/seqkit/usage/#watch)      monitoring and online histograms of sequence features
+- [`sana`](https://bioinf.shenwei.me/seqkit/usage/#sana)	sanitize broken single line fastq files
 - [`faidx`](https://bioinf.shenwei.me/seqkit/usage/#faidx)      create FASTA index file and extract subsequence
 
 **Format conversion**
@@ -137,7 +139,13 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 - [`grep`](https://bioinf.shenwei.me/seqkit/usage/#grep)        search sequences by ID/name/sequence/sequence motifs, mismatch allowed
 - [`locate`](https://bioinf.shenwei.me/seqkit/usage/#locate)    locate subsequences/motifs
+- [`fish`](https://bioinf.shenwei.me/seqkit/usage/#fish)	look for short sequences in larger sequences using local alignment
 - [`amplicon`](https://bioinf.shenwei.me/seqkit/usage/#amplicon) retrieve amplicon (or specific region around it) via primer(s)
+
+**BAM processing and monitoring**
+
+- [`bam`](https://bioinf.shenwei.me/seqkit/usage/#bam)	monitoring and online histograms of BAM record features
+=======
 
 **Set operations**
 

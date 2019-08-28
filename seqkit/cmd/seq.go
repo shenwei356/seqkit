@@ -69,6 +69,9 @@ var seqCmd = &cobra.Command{
 		validateSeqLength := getFlagValidateSeqLength(cmd, "validate-seq-length")
 		minLen := getFlagInt(cmd, "min-len")
 		maxLen := getFlagInt(cmd, "max-len")
+		qBase := getFlagPositiveInt(cmd, "qual-ascii-base")
+		minQual := getFlagFloat64(cmd, "min-qual")
+		maxQual := getFlagFloat64(cmd, "max-qual")
 
 		if gapLetters == "" {
 			checkError(fmt.Errorf("value of flag -G (--gap-letters) should not be empty"))
@@ -81,6 +84,9 @@ var seqCmd = &cobra.Command{
 
 		if minLen >= 0 && maxLen >= 0 && minLen > maxLen {
 			checkError(fmt.Errorf("value of flag -m (--min-len) should be >= value of flag -M (--max-len)"))
+		}
+		if minQual >= 0 && maxQual >= 0 && minQual > maxQual {
+			checkError(fmt.Errorf("value of flag -Q (--min-qual) should be <= value of flag -R (--max-qual)"))
 		}
 		if minLen >= 0 || maxLen >= 0 {
 			removeGaps = true
@@ -154,8 +160,19 @@ var seqCmd = &cobra.Command{
 				if minLen >= 0 && len(record.Seq.Seq) < minLen {
 					continue
 				}
+
 				if maxLen >= 0 && len(record.Seq.Seq) > maxLen {
 					continue
+				}
+
+				if minQual > 0 || maxQual > 0 {
+					avgQual := record.Seq.AvgQual(qBase)
+					if minQual > 0 && avgQual < minQual {
+						continue
+					}
+					if maxQual > 0 && avgQual >= maxQual {
+						continue
+					}
 				}
 
 				printName, printSeq = true, true
@@ -312,4 +329,7 @@ func init() {
 	seqCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
 	seqCmd.Flags().IntP("min-len", "m", -1, "only print sequences longer than the minimum length (-1 for no limit)")
 	seqCmd.Flags().IntP("max-len", "M", -1, "only print sequences shorter than the maximum length (-1 for no limit)")
+	seqCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
+	seqCmd.Flags().Float64P("min-qual", "Q", -1, "only print sequences with average quality qreater or equal than this limit (-1 for no limit)")
+	seqCmd.Flags().Float64P("max-qual", "R", -1, "only print sequences with average quality less than this limit (-1 for no limit)")
 }
