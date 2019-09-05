@@ -382,7 +382,7 @@ run bam_acc fun
 R=$(cut -f 3 corr.tsv)
 (( $(echo "$R > 0.99" | bc -l) ))
 assert_exit_code
-rm corr.tsv seqkit_acc.tsv
+rm corr.tsv seqkit_acc.tsv joint.tsv
 
 # ------------------------------------------------------------
 #                       faidx

@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,6 @@ import (
 	"os"
 	"runtime"
 
-	// "runtime/pprof"
-
 	colorable "github.com/mattn/go-colorable"
 	"github.com/shenwei356/go-logging"
 	"github.com/shenwei356/seqkit/seqkit/cmd"
@@ -48,16 +46,15 @@ func init() {
 }
 
 func main() {
-	// go tool pprof /usr/local/bin/seqkit pprof
-	// f, _ := os.Create("pprof")
-	// pprof.StartCPUProfile(f)
-	// defer pprof.StopCPUProfile()
+	// go tool pprof -http=:8080 cpu.pprof
+	// defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+
+	// go tool trace -http=:8080 trace.out
+	// defer profile.Start(profile.TraceProfile, profile.ProfilePath(".")).Stop()
+
+	// go tool pprof -http=:8080 mem.pprof
+	// defer profile.Start(profile.MemProfile, profile.MemProfileRate(1), profile.ProfilePath(".")).Stop()
 
 	cmd.Execute()
 
-	// go tool pprof --alloc_space /usr/local/bin/seqkit mprof
-	// go tool pprof --inuse_space /usr/local/bin/seqkit mprof
-	// f2, _ := os.Create("mprof")
-	// pprof.WriteHeapProfile(f2)
-	// defer f2.Close()
 }
