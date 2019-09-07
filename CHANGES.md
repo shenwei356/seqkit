@@ -6,8 +6,9 @@
         - `seqkit watch`: monitoring and online histograms of sequence features.
         - `seqkit sana`: sanitize broken single line fastq files.
         - `seqkit fish`: look for short sequences in larger sequences using local alignment.
-        - `seqkit bam`: monitoring and online histograms of BAM record features    .    
+        - `seqkit bam`: monitoring and online histograms of BAM record features.
     - `seqkit grep/locate`: reduce memory occupation when using flag `-m/--max-mismatch`.
+    - `seqkit seq`: fix panic of computing complement sequence for long sequences containing illegal letters without flag `-v` on. [#84](https://github.com/shenwei356/seqkit/issues/84)
 - [SeqKit v0.10.2](https://github.com/shenwei356/seqkit/releases/tag/v0.10.2)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.10.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.10.2)
     - `seqkit`: fix bug of parsing sequence ID delimited by tab (`\t`). [#78](https://github.com/shenwei356/seqkit/issues/78)

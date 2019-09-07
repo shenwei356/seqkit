@@ -268,16 +268,19 @@ Usage:
   seqkit seq [flags]
 
 Flags:
-  -p, --complement                complement sequence (blank for Protein sequence)
+  -p, --complement                complement sequence, flag '-v' is recommended to switch on
       --dna2rna                   DNA to RNA
   -G, --gap-letters string        gap letters (default "- \t.")
   -h, --help                      help for seq
   -l, --lower-case                print sequences in lower case
   -M, --max-len int               only print sequences shorter than the maximum length (-1 for no limit) (default -1)
+  -R, --max-qual float            only print sequences with average quality less than this limit (-1 for no limit) (default -1)
   -m, --min-len int               only print sequences longer than the minimum length (-1 for no limit) (default -1)
+  -Q, --min-qual float            only print sequences with average quality qreater or equal than this limit (-1 for no limit) (default -1)
   -n, --name                      only print names
   -i, --only-id                   print ID instead of full head
   -q, --qual                      only print qualities
+  -b, --qual-ascii-base int       ASCII BASE, 33 for Phred+33 (default 33)
   -g, --remove-gaps               remove gaps
   -r, --reverse                   reverse sequence
       --rna2dna                   RNA to DNA
@@ -285,6 +288,7 @@ Flags:
   -u, --upper-case                print sequences in upper case
   -v, --validate-seq              validate bases according to the alphabet
   -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+
 
 ```
 
