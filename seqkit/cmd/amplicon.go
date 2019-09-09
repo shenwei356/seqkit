@@ -116,7 +116,7 @@ Examples:
 		forward0 := getFlagString(cmd, "forward")
 		reverse0 := getFlagString(cmd, "reverse")
 		maxMismatch := getFlagNonNegativeInt(cmd, "max-mismatch")
-		strict := getFlagBool(cmd, "strict")
+		strict := getFlagBool(cmd, "strict-mode")
 
 		forward := []byte(forward0)
 		if seq.DNAredundant.IsValid(forward) != nil {
