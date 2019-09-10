@@ -145,7 +145,6 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 **BAM processing and monitoring**
 
 - [`bam`](https://bioinf.shenwei.me/seqkit/usage/#bam)	monitoring and online histograms of BAM record features
-=======
 
 **Set operations**
 

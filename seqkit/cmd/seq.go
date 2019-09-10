@@ -108,6 +108,10 @@ var seqCmd = &cobra.Command{
 			seq.ValidateSeq = true
 		}
 
+		if complement && !validateSeq {
+			log.Warningf("flag -v (--validate-seq) is recommended to switch on for computing complement sequences")
+		}
+
 		if lowerCase && upperCase {
 			checkError(fmt.Errorf("could not give both flags -l (--lower-case) and -u (--upper-case)"))
 		}
@@ -217,7 +221,7 @@ var seqCmd = &cobra.Command{
 				}
 				if complement {
 					if !config.Quiet && record.Seq.Alphabet == seq.Protein || record.Seq.Alphabet == seq.Unlimit {
-						log.Warning("Complement does no take effect on protein/unlimit sequence")
+						log.Warning("complement does no take effect on protein/unlimit sequence")
 					}
 					sequence = sequence.ComplementInplace()
 				}
@@ -314,7 +318,7 @@ func init() {
 	RootCmd.AddCommand(seqCmd)
 
 	seqCmd.Flags().BoolP("reverse", "r", false, "reverse sequence")
-	seqCmd.Flags().BoolP("complement", "p", false, "complement sequence (blank for Protein sequence)")
+	seqCmd.Flags().BoolP("complement", "p", false, "complement sequence, flag '-v' is recommended to switch on")
 	seqCmd.Flags().BoolP("name", "n", false, "only print names")
 	seqCmd.Flags().BoolP("seq", "s", false, "only print sequences")
 	seqCmd.Flags().BoolP("qual", "q", false, "only print qualities")

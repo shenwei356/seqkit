@@ -1,7 +1,14 @@
-- [SeqKit v0.11.0](https://github.com/shenwei356/seqkit/releases/tag/v0.10.3)
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.10.3/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.10.3)
+- [SeqKit v0.11.0](https://github.com/shenwei356/seqkit/releases/tag/v0.11.0)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.11.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.11.0)
+    - new commands:
+        - `seqkit amplicon`: retrieve amplicon (or specific region around it) via primer(s).
+    - [new commands by @bsipos](https://github.com/shenwei356/seqkit/pull/81):
+        - `seqkit watch`: monitoring and online histograms of sequence features.
+        - `seqkit sana`: sanitize broken single line fastq files.
+        - `seqkit fish`: look for short sequences in larger sequences using local alignment.
+        - `seqkit bam`: monitoring and online histograms of BAM record features.
     - `seqkit grep/locate`: reduce memory occupation when using flag `-m/--max-mismatch`.
-    - new command: `seqkit amplicon`: retrieve amplicon (or specific region around it) via primer(s)
+    - `seqkit seq`: fix panic of computing complement sequence for long sequences containing illegal letters without flag `-v` on. [#84](https://github.com/shenwei356/seqkit/issues/84)
 - [SeqKit v0.10.2](https://github.com/shenwei356/seqkit/releases/tag/v0.10.2)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.10.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.10.2)
     - `seqkit`: fix bug of parsing sequence ID delimited by tab (`\t`). [#78](https://github.com/shenwei356/seqkit/issues/78)

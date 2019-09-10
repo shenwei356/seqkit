@@ -528,7 +528,6 @@ cmp seqkit_fish.tsv tests/pcs109_5k_fish_regression.tsv
 assert_exit_code 0
 rm seqkit_fish.tsv
 
-
 # ------------------------------------------------------------
 #                       faidx
 # ------------------------------------------------------------

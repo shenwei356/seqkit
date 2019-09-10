@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -116,6 +116,7 @@ Examples:
 		forward0 := getFlagString(cmd, "forward")
 		reverse0 := getFlagString(cmd, "reverse")
 		maxMismatch := getFlagNonNegativeInt(cmd, "max-mismatch")
+		strict := getFlagBool(cmd, "strict-mode")
 
 		forward := []byte(forward0)
 		if seq.DNAredundant.IsValid(forward) != nil {
@@ -151,6 +152,9 @@ Examples:
 			if fregion {
 				if begin > 0 && end < 0 {
 					checkError(fmt.Errorf("invalid flanking region (x:-y): %d:%d", begin, end))
+				}
+				if begin > end {
+					checkError(fmt.Errorf("invalid flanking region (x should be smaller than y): %d:%d", begin, end))
 				}
 			} else {
 				if begin < 0 && end > 0 {
@@ -188,7 +192,7 @@ Examples:
 				checkError(err)
 
 				if usingRegion {
-					loc, err = finder.LocateRange(begin, end, fregion)
+					loc, err = finder.LocateRange(begin, end, fregion, strict)
 				} else {
 					loc, err = finder.Locate()
 				}
@@ -216,6 +220,7 @@ func init() {
 
 	ampliconCmd.Flags().StringP("region", "r", "", `specify region to return. type "seqkit amplicon -h" for detail`)
 	ampliconCmd.Flags().BoolP("flanking-region", "f", false, "region is flanking region")
+	ampliconCmd.Flags().BoolP("strict-mode", "s", false, "strict mode, i.e., discarding seqs not fully matching (shorter) given region range")
 }
 
 // AmpliconFinder is a struct for locating amplicon via primer(s).
@@ -264,7 +269,7 @@ func NewAmpliconFinder(sequence, forwardPrimer, reversePrimerRC []byte, maxMisma
 }
 
 // LocateRange returns location of the range (begin:end, 1-based).
-func (finder *AmpliconFinder) LocateRange(begin, end int, flanking bool) ([]int, error) {
+func (finder *AmpliconFinder) LocateRange(begin, end int, flanking bool, strictMode bool) ([]int, error) {
 	if begin == 0 || end == 0 {
 		checkError(fmt.Errorf("both begin and end in region should not be 0"))
 	}
@@ -282,9 +287,9 @@ func (finder *AmpliconFinder) LocateRange(begin, end int, flanking bool) ([]int,
 	var b, e int
 	var ok bool
 	if flanking {
-		b, e, ok = SubLocationFlanking(len(finder.Seq), finder.iBegin, finder.iEnd, begin, end)
+		b, e, ok = SubLocationFlanking(len(finder.Seq), finder.iBegin, finder.iEnd, begin, end, strictMode)
 	} else {
-		b, e, ok = SubLocationInner(len(finder.Seq), finder.iBegin, finder.iEnd, begin, end)
+		b, e, ok = SubLocationInner(len(finder.Seq), finder.iBegin, finder.iEnd, begin, end, strictMode)
 	}
 
 	if ok {
@@ -315,7 +320,7 @@ func (finder *AmpliconFinder) LocateRange(begin, end int, flanking bool) ([]int,
 //                      =====           -7:-3
 //                                      -x:y (invalid)
 //
-func SubLocationInner(length, B, E, begin, end int) (int, int, bool) {
+func SubLocationInner(length, B, E, begin, end int, strictMode bool) (int, int, bool) {
 	if begin == 0 || end == 0 {
 		return 0, 0, false
 	}
@@ -336,8 +341,14 @@ func SubLocationInner(length, B, E, begin, end int) (int, int, bool) {
 		b = E + begin + 2
 	}
 	if b > length {
+		if strictMode {
+			return 0, 0, false
+		}
 		b = length
 	} else if b < 1 {
+		if strictMode {
+			return 0, 0, false
+		}
 		b = 1
 	}
 
@@ -347,8 +358,14 @@ func SubLocationInner(length, B, E, begin, end int) (int, int, bool) {
 		e = E + end + 2
 	}
 	if e > length {
+		if strictMode {
+			return 0, 0, false
+		}
 		e = length
 	} else if e < 1 {
+		if strictMode {
+			return 0, 0, false
+		}
 		e = 1
 	}
 
@@ -379,7 +396,7 @@ func SubLocationInner(length, B, E, begin, end int) (int, int, bool) {
 //         =========================    -5:5
 //                                       x:-y (invalid)
 //
-func SubLocationFlanking(length, B, E, begin, end int) (int, int, bool) {
+func SubLocationFlanking(length, B, E, begin, end int, strictMode bool) (int, int, bool) {
 	if begin == 0 || end == 0 {
 		return 0, 0, false
 	}
@@ -393,6 +410,7 @@ func SubLocationFlanking(length, B, E, begin, end int) (int, int, bool) {
 	}
 
 	var b, e int
+	var flag bool // 5' flanking is shorter than -begin
 
 	if begin > 0 {
 		b = E + begin + 1
@@ -400,9 +418,15 @@ func SubLocationFlanking(length, B, E, begin, end int) (int, int, bool) {
 		b = B + begin + 1
 	}
 	if b > length {
-		b = length
+		// b = length
+		return 0, 0, false
 	} else if b < 1 {
+		if strictMode {
+			return 0, 0, false
+		}
 		b = 1
+		flag = true
+		// return 0, 0, false
 	}
 
 	if end > 0 {
@@ -411,8 +435,17 @@ func SubLocationFlanking(length, B, E, begin, end int) (int, int, bool) {
 		e = B + end + 1
 	}
 	if e > length {
+		if strictMode {
+			return 0, 0, false
+		}
 		e = length
 	} else if e < 1 {
+		if strictMode {
+			return 0, 0, false
+		}
+		if flag {
+			return 0, 0, false
+		}
 		e = 1
 	}
 
