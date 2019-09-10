@@ -8,11 +8,11 @@ set -e
 cd seqkit; go build; cd ..;
 app=./seqkit/seqkit
 
+set +e
+
 which csvtk || (git clone https://github.com/shenwei356/csvtk; cd ./csvtk/csvtk; go get -v ... ; go build)
 CSVTK=csvtk
-which csvtk || CSVTK=./csvtk/csvtk
-
-set +e
+which csvtk || CSVTK=./csvtk/csvtk; true
 
 STOP_ON_FAIL=1
 
