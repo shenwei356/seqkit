@@ -197,6 +197,38 @@ file=tests/reads_1.fq.gz
 run fq2fa $app fq2fa $file
 assert_equal $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1) $($app fx2tab $file | cut -f 1,2 | $app tab2fx | md5sum | cut -d" " -f 1)
 
+READS_FQ=tests/pcs109_5k.fq
+NANO_FQ_TSV=tests/pcs109_5k_fq_NanoPlot.tsv
+
+float_gt(){
+	CODE=$(awk 'BEGIN {PREC="double"; print ("'$1'" >= "'$2'")}')
+	return $CODE
+}
+
+fun () {
+    echo -e "Len\tQual" > seqkit.tsv
+    $app fx2tab -q -l $READS_FQ | cut -f 4,5 >> seqkit.tsv
+    paste seqkit.tsv $NANO_FQ_TSV > joint.tsv
+    csvtk corr -t -f Len,lengths joint.tsv 2> corr_len.tsv
+    csvtk corr -t -f Qual,quals joint.tsv 2> corr_qual.tsv
+}
+run fx2tab_qual_len fun
+RL=$(cut -f 3 corr_len.tsv)
+echo Length correlation: $RL
+float_gt $RL 0.99
+assert_equal $? 1
+
+RL=$(cut -f 3 corr_len.tsv)
+echo Length correlation: $RL
+float_gt $RL 0.99
+assert_equal $? 1
+
+RQ=$(cut -f 3 corr_len.tsv)
+echo Qual correlation: $RQ
+float_gt $RQ 0.99
+assert_equal $? 1
+rm seqkit.tsv corr_len.tsv corr_qual.tsv
+
 # ------------------------------------------------------------
 #                       grep
 # ------------------------------------------------------------
