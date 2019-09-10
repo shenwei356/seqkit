@@ -8,6 +8,10 @@ set -e
 cd seqkit; go build; cd ..;
 app=./seqkit/seqkit
 
+which csvtk || (git clone https://github.com/shenwei356/csvtk; cd ./csvtk/csvtk; go build)
+CSVTK=csvtk
+which csvtk || CSVTK=./csvtk/csvtk
+
 set +e
 
 STOP_ON_FAIL=1
@@ -209,8 +213,8 @@ fun () {
     echo -e "Len\tQual" > seqkit.tsv
     $app fx2tab -q -l $READS_FQ | cut -f 4,5 >> seqkit.tsv
     paste seqkit.tsv $NANO_FQ_TSV > joint.tsv
-    csvtk corr -t -f Len,lengths joint.tsv 2> corr_len.tsv
-    csvtk corr -t -f Qual,quals joint.tsv 2> corr_qual.tsv
+    $CSVTK corr -t -f Len,lengths joint.tsv 2> corr_len.tsv
+    $CSVTK corr -t -f Qual,quals joint.tsv 2> corr_qual.tsv
 }
 run fx2tab_qual_len fun
 RL=$(cut -f 3 corr_len.tsv)
@@ -416,7 +420,7 @@ return $CODE
 fun(){
     $app bam -f Read,Acc $PRIM_BAM 2> seqkit_acc.tsv
     paste seqkit_acc.tsv $PRIM_NANOPLOT > joint.tsv
-    csvtk corr -t -f Acc,percentIdentity joint.tsv 2> corr.tsv
+    $CSVTK corr -t -f Acc,percentIdentity joint.tsv 2> corr.tsv
 }
 run bam_acc fun
 R=$(cut -f 3 corr.tsv)
@@ -429,7 +433,7 @@ rm corr.tsv seqkit_acc.tsv joint.tsv
 fun(){
     $app bam -f Read,MeanQual $PRIM_BAM 2> seqkit.tsv
     paste seqkit.tsv $PRIM_NANOPLOT > joint.tsv
-    csvtk corr -t -f MeanQual,quals joint.tsv 2> corr.tsv
+    $CSVTK corr -t -f MeanQual,quals joint.tsv 2> corr.tsv
 }
 run bam_mean_qual fun
 R=$(cut -f 3 corr.tsv)
@@ -442,7 +446,7 @@ rm corr.tsv seqkit.tsv joint.tsv
 fun(){
     $app bam -f Read,MapQual $PRIM_BAM 2> seqkit.tsv
     paste seqkit.tsv $PRIM_NANOPLOT > joint.tsv
-    csvtk corr -t -f MapQual,mapQ joint.tsv 2> corr.tsv
+    $CSVTK corr -t -f MapQual,mapQ joint.tsv 2> corr.tsv
 }
 run bam_map_qual fun
 R=$(cut -f 3 corr.tsv)
@@ -455,7 +459,7 @@ rm corr.tsv seqkit.tsv joint.tsv
 fun(){
     $app bam -f Read,ReadLen $PRIM_BAM 2> seqkit.tsv
     paste seqkit.tsv $PRIM_NANOPLOT > joint.tsv
-    csvtk corr -t -f ReadLen,lengths joint.tsv 2> corr.tsv
+    $CSVTK corr -t -f ReadLen,lengths joint.tsv 2> corr.tsv
 }
 run bam_read_len fun
 R=$(cut -f 3 corr.tsv)
@@ -468,7 +472,7 @@ rm corr.tsv seqkit.tsv joint.tsv
 fun(){
     $app bam -f Read,ReadAln $PRIM_BAM 2> seqkit.tsv
     paste seqkit.tsv $PRIM_NANOPLOT > joint.tsv
-    csvtk corr -t -f ReadAln,aligned_lengths joint.tsv 2> corr.tsv
+    $CSVTK corr -t -f ReadAln,aligned_lengths joint.tsv 2> corr.tsv
 }
 run bam_read_aln fun
 R=$(cut -f 3 corr.tsv)
@@ -484,7 +488,7 @@ fun(){
     head -1 joint.tsv > TMP
     grep "\+" joint.tsv >> TMP
     mv TMP joint.tsv
-    csvtk corr -t -f LeftClip,ClipStart joint.tsv 2> corr.tsv
+    $CSVTK corr -t -f LeftClip,ClipStart joint.tsv 2> corr.tsv
 }
 run bam_left_clip fun
 R=$(cut -f 3 corr.tsv)
@@ -500,7 +504,7 @@ fun(){
     head -1 joint.tsv > TMP
     grep "\+" joint.tsv >> TMP
     mv TMP joint.tsv
-    csvtk corr -t -f RightClip,ClipEnd joint.tsv 2> corr.tsv
+    $CSVTK corr -t -f RightClip,ClipEnd joint.tsv 2> corr.tsv
 }
 run bam_right_clip fun
 R=$(cut -f 3 corr.tsv)
