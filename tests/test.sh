@@ -372,7 +372,13 @@ BAM=tests/pcs109_5k.bam
 PRIM_BAM=tests/pcs109_5k_prim.bam
 PRIM_NANOPLOT=tests/pcs109_5k_prim_bam_NanoPplot.tsv
 PRIM_WUB=tests/pcs109_5k_bam_alignment_length.tsv
-PRIM_WUB_CLIP=tests/pcs109_5k_bam_soft_clips_tab.tsv
+WUB_CLIP=tests/pcs109_5k_bam_soft_clips_tab.tsv
+PCS_FQ=tests/pcs109_5k.fq
+
+float_gt(){
+CODE=$(awk 'BEGIN {PREC="double"; print ("'$1'" >= "'$2'")}')
+return $CODE
+}
 
 # accuracy
 fun(){
@@ -382,9 +388,10 @@ fun(){
 }
 run bam_acc fun
 R=$(cut -f 3 corr.tsv)
-(( $(echo "$R > 0.99" | bc -l) ))
-assert_exit_code
-rm corr.tsv seqkit_acc.tsv
+echo Correlation: $R
+float_gt $R 0.99
+assert_equal $? 1
+rm corr.tsv seqkit_acc.tsv joint.tsv
 
 # MeanQual
 fun(){
@@ -394,9 +401,10 @@ fun(){
 }
 run bam_mean_qual fun
 R=$(cut -f 3 corr.tsv)
-(( $(echo "$R > 0.99" | bc -l) ))
-assert_exit_code
-rm corr.tsv seqkit.tsv
+echo Correlation: $R
+float_gt $R 0.99
+assert_equal $? 1
+rm corr.tsv seqkit.tsv joint.tsv
 
 # MapQual
 fun(){
@@ -406,9 +414,10 @@ fun(){
 }
 run bam_map_qual fun
 R=$(cut -f 3 corr.tsv)
-(( $(echo "$R > 0.99" | bc -l) ))
-assert_exit_code
-rm corr.tsv seqkit.tsv
+echo Correlation: $R
+float_gt $R 0.99
+assert_equal $? 1
+rm corr.tsv seqkit.tsv joint.tsv
 
 # ReadLen
 fun(){
@@ -418,9 +427,10 @@ fun(){
 }
 run bam_read_len fun
 R=$(cut -f 3 corr.tsv)
-(( $(echo "$R > 0.99" | bc -l) ))
-assert_exit_code
-rm corr.tsv seqkit.tsv
+echo Correlation: $R
+float_gt $R 0.99
+assert_equal $? 1
+rm corr.tsv seqkit.tsv joint.tsv
 
 # ReadAln
 fun(){
@@ -430,36 +440,61 @@ fun(){
 }
 run bam_read_aln fun
 R=$(cut -f 3 corr.tsv)
-(( $(echo "$R > 0.99" | bc -l) ))
-assert_exit_code
-rm corr.tsv seqkit.tsv
-
-# RefAln
-fun(){
-    $app bam -f Read,RefAln $PRIM_BAM 2> seqkit.tsv
-    paste seqkit.tsv $PRIM_WUB > joint.tsv
-    csvtk corr -t -f RefAln,aligned_ref_bases joint.tsv 2> corr.tsv
-}
-run bam_ref_aln fun
-R=$(cut -f 3 corr.tsv)
-echo $R
-(( $(echo "$R > 0.99" | bc -l) ))
-assert_exit_code
-rm corr.tsv seqkit.tsv
+echo Correlation: $R
+float_gt $R 0.99
+assert_equal $? 1
+rm corr.tsv seqkit.tsv joint.tsv
 
 # LeftClip
 fun(){
-    $app bam -f Read,LeftClip $BAM 2> seqkit.tsv
-    paste seqkit.tsv $PRIM_WUB_CLIP > joint.tsv
+    $app bam -f Read,LeftClip $PRIM_BAM 2> seqkit.tsv
+    paste seqkit.tsv $WUB_CLIP > joint.tsv
+    head -1 joint.tsv > TMP
+    grep "\+" joint.tsv >> TMP
+    mv TMP joint.tsv
     csvtk corr -t -f LeftClip,ClipStart joint.tsv 2> corr.tsv
 }
 run bam_left_clip fun
 R=$(cut -f 3 corr.tsv)
-(( $(echo "$R > 0.99" | bc -l) ))
-assert_exit_code
-rm corr.tsv seqkit.tsv
+echo Correlation: $R
+float_gt $R 0.99
+assert_equal $? 1
+rm corr.tsv seqkit.tsv joint.tsv
 
+# RightClip
+fun(){
+    $app bam -f Read,RightClip $PRIM_BAM 2> seqkit.tsv
+    paste seqkit.tsv $WUB_CLIP > joint.tsv
+    head -1 joint.tsv > TMP
+    grep "\+" joint.tsv >> TMP
+    mv TMP joint.tsv
+    csvtk corr -t -f RightClip,ClipEnd joint.tsv 2> corr.tsv
+}
+run bam_right_clip fun
+R=$(cut -f 3 corr.tsv)
+echo Correlation: $R
+float_gt $R 0.99
+assert_equal $? 1
+rm corr.tsv seqkit.tsv joint.tsv
 
+# ------------------------------------------------------------
+#                       fish
+# ------------------------------------------------------------
+
+# Regression test for fish
+fun(){
+    Q1="GTTGTTATGGAGGATACTTTCCTACCGTGACAAGAAAGTTGT"
+    Q2="GCCAGTAGACAAGTTTCTCCATCTCCGGCCTTTT"
+    Q3="CAGTATGCTTCGTTTCAATTTCGGGTTTGGAGTGTTTG"
+    Q4="TTTTATCAAAAGAAAAAAAAGAAGATAGAGCGACAGGCAAGTCACAAAGACACCGACAACTTTCTTGTCATC"
+    head -n 40 $PCS_FQ > TMP.fq
+    $app fish -q 40 -g -F "$Q1,$Q2,$Q3,$Q4" TMP.fq 2> seqkit_fish.tsv
+    rm TMP.fq
+}
+run bam_fish_regression fun
+cmp seqkit_fish.tsv tests/pcs109_5k_fish_regression.tsv
+assert_exit_code 0
+rm seqkit_fish.tsv
 
 
 # ------------------------------------------------------------
