@@ -371,6 +371,8 @@ rm t.sort.*
 BAM=tests/pcs109_5k.bam
 PRIM_BAM=tests/pcs109_5k_prim.bam
 PRIM_NANOPLOT=tests/pcs109_5k_prim_bam_NanoPplot.tsv
+PRIM_WUB=tests/pcs109_5k_bam_alignment_length.tsv
+PRIM_WUB_CLIP=tests/pcs109_5k_bam_soft_clips_tab.tsv
 
 # accuracy
 fun(){
@@ -383,6 +385,82 @@ R=$(cut -f 3 corr.tsv)
 (( $(echo "$R > 0.99" | bc -l) ))
 assert_exit_code
 rm corr.tsv seqkit_acc.tsv
+
+# MeanQual
+fun(){
+    $app bam -f Read,MeanQual $PRIM_BAM 2> seqkit.tsv
+    paste seqkit.tsv $PRIM_NANOPLOT > joint.tsv
+    csvtk corr -t -f MeanQual,quals joint.tsv 2> corr.tsv
+}
+run bam_mean_qual fun
+R=$(cut -f 3 corr.tsv)
+(( $(echo "$R > 0.99" | bc -l) ))
+assert_exit_code
+rm corr.tsv seqkit.tsv
+
+# MapQual
+fun(){
+    $app bam -f Read,MapQual $PRIM_BAM 2> seqkit.tsv
+    paste seqkit.tsv $PRIM_NANOPLOT > joint.tsv
+    csvtk corr -t -f MapQual,mapQ joint.tsv 2> corr.tsv
+}
+run bam_map_qual fun
+R=$(cut -f 3 corr.tsv)
+(( $(echo "$R > 0.99" | bc -l) ))
+assert_exit_code
+rm corr.tsv seqkit.tsv
+
+# ReadLen
+fun(){
+    $app bam -f Read,ReadLen $PRIM_BAM 2> seqkit.tsv
+    paste seqkit.tsv $PRIM_NANOPLOT > joint.tsv
+    csvtk corr -t -f ReadLen,lengths joint.tsv 2> corr.tsv
+}
+run bam_read_len fun
+R=$(cut -f 3 corr.tsv)
+(( $(echo "$R > 0.99" | bc -l) ))
+assert_exit_code
+rm corr.tsv seqkit.tsv
+
+# ReadAln
+fun(){
+    $app bam -f Read,ReadAln $PRIM_BAM 2> seqkit.tsv
+    paste seqkit.tsv $PRIM_NANOPLOT > joint.tsv
+    csvtk corr -t -f ReadAln,aligned_lengths joint.tsv 2> corr.tsv
+}
+run bam_read_aln fun
+R=$(cut -f 3 corr.tsv)
+(( $(echo "$R > 0.99" | bc -l) ))
+assert_exit_code
+rm corr.tsv seqkit.tsv
+
+# RefAln
+fun(){
+    $app bam -f Read,RefAln $PRIM_BAM 2> seqkit.tsv
+    paste seqkit.tsv $PRIM_WUB > joint.tsv
+    csvtk corr -t -f RefAln,aligned_ref_bases joint.tsv 2> corr.tsv
+}
+run bam_ref_aln fun
+R=$(cut -f 3 corr.tsv)
+echo $R
+(( $(echo "$R > 0.99" | bc -l) ))
+assert_exit_code
+rm corr.tsv seqkit.tsv
+
+# LeftClip
+fun(){
+    $app bam -f Read,LeftClip $BAM 2> seqkit.tsv
+    paste seqkit.tsv $PRIM_WUB_CLIP > joint.tsv
+    csvtk corr -t -f LeftClip,ClipStart joint.tsv 2> corr.tsv
+}
+run bam_left_clip fun
+R=$(cut -f 3 corr.tsv)
+(( $(echo "$R > 0.99" | bc -l) ))
+assert_exit_code
+rm corr.tsv seqkit.tsv
+
+
+
 
 # ------------------------------------------------------------
 #                       faidx
