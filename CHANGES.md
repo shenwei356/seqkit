@@ -1,5 +1,6 @@
 - [SeqKit v0.11.0](https://github.com/shenwei356/seqkit/releases/tag/v0.11.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.11.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.11.0)
+    - `seqkit`: fix hanging when reading from truncated gzip file.
     - new commands:
         - `seqkit amplicon`: retrieve amplicon (or specific region around it) via primer(s).
     - [new commands by @bsipos](https://github.com/shenwei356/seqkit/pull/81):
