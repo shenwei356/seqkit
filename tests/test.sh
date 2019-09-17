@@ -10,6 +10,10 @@ app=./seqkit/seqkit
 
 set +e
 
+which csvtk || (git clone https://github.com/shenwei356/csvtk; cd ./csvtk/csvtk; go get -v ... ; go build)
+CSVTK=csvtk
+which csvtk || CSVTK=./csvtk/csvtk/csvtk; true
+
 STOP_ON_FAIL=1
 
 # ------------------------------------------------------------
@@ -197,6 +201,38 @@ file=tests/reads_1.fq.gz
 run fq2fa $app fq2fa $file
 assert_equal $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1) $($app fx2tab $file | cut -f 1,2 | $app tab2fx | md5sum | cut -d" " -f 1)
 
+READS_FQ=tests/pcs109_5k.fq
+NANO_FQ_TSV=tests/pcs109_5k_fq_NanoPlot.tsv
+
+float_gt(){
+	CODE=$(awk 'BEGIN {PREC="double"; print ("'$1'" >= "'$2'")}')
+	return $CODE
+}
+
+fun () {
+    echo -e "Len\tQual" > seqkit.tsv
+    $app fx2tab -q -l $READS_FQ | cut -f 4,5 >> seqkit.tsv
+    paste seqkit.tsv $NANO_FQ_TSV > joint.tsv
+    $CSVTK corr -t -f Len,lengths joint.tsv 2> corr_len.tsv
+    $CSVTK corr -t -f Qual,quals joint.tsv 2> corr_qual.tsv
+}
+run fx2tab_qual_len fun
+RL=$(cut -f 3 corr_len.tsv)
+echo Length correlation: $RL
+float_gt $RL 0.99
+assert_equal $? 1
+
+RL=$(cut -f 3 corr_len.tsv)
+echo Length correlation: $RL
+float_gt $RL 0.99
+assert_equal $? 1
+
+RQ=$(cut -f 3 corr_len.tsv)
+echo Qual correlation: $RQ
+float_gt $RQ 0.99
+assert_equal $? 1
+rm seqkit.tsv corr_len.tsv corr_qual.tsv
+
 # ------------------------------------------------------------
 #                       grep
 # ------------------------------------------------------------
@@ -371,18 +407,130 @@ rm t.sort.*
 BAM=tests/pcs109_5k.bam
 PRIM_BAM=tests/pcs109_5k_prim.bam
 PRIM_NANOPLOT=tests/pcs109_5k_prim_bam_NanoPplot.tsv
+PRIM_WUB=tests/pcs109_5k_bam_alignment_length.tsv
+WUB_CLIP=tests/pcs109_5k_bam_soft_clips_tab.tsv
+PCS_FQ=tests/pcs109_5k.fq
+
+float_gt(){
+CODE=$(awk 'BEGIN {PREC="double"; print ("'$1'" >= "'$2'")}')
+return $CODE
+}
 
 # accuracy
 fun(){
     $app bam -f Read,Acc $PRIM_BAM 2> seqkit_acc.tsv
     paste seqkit_acc.tsv $PRIM_NANOPLOT > joint.tsv
-    csvtk corr -t -f Acc,percentIdentity joint.tsv 2> corr.tsv
+    $CSVTK corr -t -f Acc,percentIdentity joint.tsv 2> corr.tsv
 }
 run bam_acc fun
 R=$(cut -f 3 corr.tsv)
-(( $(echo "$R > 0.99" | bc -l) ))
-assert_exit_code
+echo Correlation: $R
+float_gt $R 0.99
+assert_equal $? 1
 rm corr.tsv seqkit_acc.tsv joint.tsv
+
+# MeanQual
+fun(){
+    $app bam -f Read,MeanQual $PRIM_BAM 2> seqkit.tsv
+    paste seqkit.tsv $PRIM_NANOPLOT > joint.tsv
+    $CSVTK corr -t -f MeanQual,quals joint.tsv 2> corr.tsv
+}
+run bam_mean_qual fun
+R=$(cut -f 3 corr.tsv)
+echo Correlation: $R
+float_gt $R 0.99
+assert_equal $? 1
+rm corr.tsv seqkit.tsv joint.tsv
+
+# MapQual
+fun(){
+    $app bam -f Read,MapQual $PRIM_BAM 2> seqkit.tsv
+    paste seqkit.tsv $PRIM_NANOPLOT > joint.tsv
+    $CSVTK corr -t -f MapQual,mapQ joint.tsv 2> corr.tsv
+}
+run bam_map_qual fun
+R=$(cut -f 3 corr.tsv)
+echo Correlation: $R
+float_gt $R 0.99
+assert_equal $? 1
+rm corr.tsv seqkit.tsv joint.tsv
+
+# ReadLen
+fun(){
+    $app bam -f Read,ReadLen $PRIM_BAM 2> seqkit.tsv
+    paste seqkit.tsv $PRIM_NANOPLOT > joint.tsv
+    $CSVTK corr -t -f ReadLen,lengths joint.tsv 2> corr.tsv
+}
+run bam_read_len fun
+R=$(cut -f 3 corr.tsv)
+echo Correlation: $R
+float_gt $R 0.99
+assert_equal $? 1
+rm corr.tsv seqkit.tsv joint.tsv
+
+# ReadAln
+fun(){
+    $app bam -f Read,ReadAln $PRIM_BAM 2> seqkit.tsv
+    paste seqkit.tsv $PRIM_NANOPLOT > joint.tsv
+    $CSVTK corr -t -f ReadAln,aligned_lengths joint.tsv 2> corr.tsv
+}
+run bam_read_aln fun
+R=$(cut -f 3 corr.tsv)
+echo Correlation: $R
+float_gt $R 0.99
+assert_equal $? 1
+rm corr.tsv seqkit.tsv joint.tsv
+
+# LeftClip
+fun(){
+    $app bam -f Read,LeftClip $PRIM_BAM 2> seqkit.tsv
+    paste seqkit.tsv $WUB_CLIP > joint.tsv
+    head -1 joint.tsv > TMP
+    grep "\+" joint.tsv >> TMP
+    mv TMP joint.tsv
+    $CSVTK corr -t -f LeftClip,ClipStart joint.tsv 2> corr.tsv
+}
+run bam_left_clip fun
+R=$(cut -f 3 corr.tsv)
+echo Correlation: $R
+float_gt $R 0.99
+assert_equal $? 1
+rm corr.tsv seqkit.tsv joint.tsv
+
+# RightClip
+fun(){
+    $app bam -f Read,RightClip $PRIM_BAM 2> seqkit.tsv
+    paste seqkit.tsv $WUB_CLIP > joint.tsv
+    head -1 joint.tsv > TMP
+    grep "\+" joint.tsv >> TMP
+    mv TMP joint.tsv
+    $CSVTK corr -t -f RightClip,ClipEnd joint.tsv 2> corr.tsv
+}
+run bam_right_clip fun
+R=$(cut -f 3 corr.tsv)
+echo Correlation: $R
+float_gt $R 0.99
+assert_equal $? 1
+rm corr.tsv seqkit.tsv joint.tsv
+
+# ------------------------------------------------------------
+#                       fish
+# ------------------------------------------------------------
+
+# Regression test for fish
+fun(){
+    Q1="GTTGTTATGGAGGATACTTTCCTACCGTGACAAGAAAGTTGT"
+    Q2="GCCAGTAGACAAGTTTCTCCATCTCCGGCCTTTT"
+    Q3="CAGTATGCTTCGTTTCAATTTCGGGTTTGGAGTGTTTG"
+    Q4="TTTTATCAAAAGAAAAAAAAGAAGATAGAGCGACAGGCAAGTCACAAAGACACCGACAACTTTCTTGTCATC"
+    head -n 40 $PCS_FQ > TMP.fq
+    $app fish -q 40 -g -F "$Q1,$Q2,$Q3,$Q4" TMP.fq 2> seqkit_fish.tsv
+    rm TMP.fq
+}
+run bam_fish_regression fun
+cmp seqkit_fish.tsv tests/pcs109_5k_fish_regression.tsv
+assert_exit_code 0
+rm seqkit_fish.tsv
 
 # ------------------------------------------------------------
 #                       faidx
