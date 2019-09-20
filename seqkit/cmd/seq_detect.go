@@ -286,7 +286,7 @@ func PairwiseAlignSW(r *Reference, q *Query, alnParams *AlnParams) *AlignedSeq {
 		res.RefAln = fmt.Sprintf("%s", fa[0])
 		res.QueryAln = fmt.Sprintf("%s", fa[1])
 	} else {
-		panic("Could not align sequences!")
+		panic(fmt.Sprintf("Could not align sequences: %ss", err))
 	}
 	return res
 }
