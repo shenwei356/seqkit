@@ -13,9 +13,9 @@
 - [subseq](#subseq)
 - [sliding](#sliding)
 - [stats](#stats)
+- [faidx](#faidx)
 - [watch](#watch)
 - [sana](#sana)
-- [faidx](#faidx)
 
 **Format conversion**
 
@@ -29,6 +29,7 @@
 - [grep](#grep)
 - [locate](#locate)
 - [fish](#fish)
+- [amplicon](#amplicon)
 
 **BAM processing and monitoring**
 
@@ -171,7 +172,7 @@ reproduced in different environments with same random seed.
 ``` text
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.10.2
+Version: 0.11.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -183,11 +184,14 @@ Usage:
   seqkit [command]
 
 Available Commands:
+  amplicon        retrieve amplicon (or specific region around it) via primer(s)
+  bam             monitoring and online histograms of BAM record features
   common          find common sequences of multiple files by id/name/sequence
   concat          concatenate sequences with same ID from multiple files
   convert         convert FASTQ quality encoding between Sanger, Solexa and Illumina
   duplicate       duplicate sequences N times
   faidx           create FASTA index file and extract subsequence
+  fish            look for short sequences in larger sequences using local alignment
   fq2fa           convert FASTQ to FASTA
   fx2tab          convert FASTA/Q to tabular format (with length/GC content/GC skew)
   genautocomplete generate shell autocompletion script
@@ -202,6 +206,7 @@ Available Commands:
   restart         reset start position for circular genome
   rmdup           remove duplicated sequences by id/name/sequence
   sample          sample sequences by number or proportion
+  sana            sanitize broken single line fastq files
   seq             transform sequences (revserse, complement, extract ID...)
   shuffle         shuffle sequences
   sliding         sliding sequences, circular genome supported
@@ -213,6 +218,7 @@ Available Commands:
   tab2fx          convert tabular format to FASTA/Q format
   translate       translate DNA/RNA to protein sequence (supporting ambiguous bases)
   version         print version information and check for update
+  watch           monitoring and online histograms of sequence features
 
 Flags:
       --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
@@ -794,6 +800,60 @@ Example
         file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
         -     FASTA   RNA      1,881  154,002       41     81.9      180
 
+        
+## watch
+
+Usage
+
+``` text
+monitoring and online histograms of sequence features
+
+Usage:
+  seqkit watch [flags]
+
+Flags:
+  -B, --bins int                  number of histogram bins (default -1)
+  -W, --delay int                 sleep this many seconds after online plotting (default 1)
+  -y, --dump                      print histogram data to stderr instead of plotting
+  -f, --fields string             target fields (default "ReadLen")
+  -h, --help                      help for watch
+  -O, --img string                save histogram to this PDF/image file
+  -H, --list-fields               print out a list of available fields
+  -L, --log                       log10(x+1) transform numeric values
+  -x, --pass                      pass through mode (write input to stdout)
+  -p, --print-freq int            print/report after this many records (-1 for print after EOF) (default -1)
+  -b, --qual-ascii-base int       ASCII BASE, 33 for Phred+33 (default 33)
+  -Q, --quiet-mode                supress all plotting to stderr
+  -R, --reset                     reset histogram after every report
+  -v, --validate-seq              validate bases according to the alphabet
+  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+
+```
+
+Examples
+
+
+
+## sana
+
+Usage
+
+``` text
+sanitize broken single line fastq files
+
+Usage:
+  seqkit sana [flags]
+
+Flags:
+  -h, --help                  help for sana
+  -b, --qual-ascii-base int   ASCII BASE, 33 for Phred+33 (default 33)
+
+```
+
+Examples
+
+
+        
 ## fq2fa
 
 Usage
@@ -1465,6 +1525,152 @@ Examples
         seqID   patternName   pattern   strand   start   end   matched
         seq     ACGA          ACGA      +        1       4     ACGA
         seq     ACGA          ACGA      +        7       10    ACGA
+
+        
+## fish
+
+Usage
+
+``` text
+look for short sequences in larger sequences using local alignment
+
+Usage:
+  seqkit fish [flags]
+
+Flags:
+  -a, --all                       search all
+  -p, --aln-params string         alignment parameters in format "<match>,<mismatch>,<gap_open>,<gap_extend>" (default "4,-4,-2,-1")
+  -h, --help                      help for fish
+  -i, --invert                    print out references not matching with any query
+  -q, --min-qual float            minimum mapping quality (default 5)
+  -b, --out-bam string            save aligmnets to this BAM file (memory intensive)
+  -x, --pass                      pass through mode (write input to stdout)
+  -g, --print-aln                 print sequence alignments
+  -D, --print-desc                print full sequence header
+  -f, --query-fastx string        query fasta
+  -F, --query-sequences string    query sequences
+  -r, --ranges string             target ranges, for example: ":10,30:40,-20:"
+  -s, --stranded                  search + strand only
+  -v, --validate-seq              validate bases according to the alphabet
+  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+
+```
+
+Examples
+
+
+        
+## amplicon
+
+Usage
+
+``` text
+
+retrieve amplicon (or specific region around it) via primer(s).
+
+Examples:
+  0. no region given.
+  
+                    F
+        -----===============-----
+             F             R
+        -----=====-----=====-----
+             
+             ===============         amplicon
+
+  1. inner region (-r x:y).
+
+                    F
+        -----===============-----
+             1 3 5                    x/y
+                      -5-3-1          x/y
+             F             R
+        -----=====-----=====-----     x:y
+        
+             ===============          1:-1
+             =======                  1:7
+               =====                  3:7
+                  =====               6:10
+                  =====             -10:-6
+                     =====           -7:-3
+                                     -x:y (invalid)
+                    
+  2. flanking region (-r x:y -f)
+        
+                    F
+        -----===============-----
+         -3-1                        x/y
+                            1 3 5    x/y
+             F             R
+        -----=====-----=====-----
+        
+        =====                        -5:-1
+        ===                          -5:-3
+                            =====     1:5
+                              ===     3:5
+            =================        -1:1
+        =========================    -5:5
+                                      x:-y (invalid)
+
+Usage:
+  seqkit amplicon [flags]
+
+Flags:
+  -f, --flanking-region    region is flanking region
+  -F, --forward string     forward primer
+  -h, --help               help for amplicon
+  -m, --max-mismatch int   max mismatch when matching primers
+  -r, --region string      specify region to return. type "seqkit amplicon -h" for detail
+  -R, --reverse string     reverse primer
+  -s, --strict             strict mode, i.e., discarding seqs not fully matching (shorter) given region range
+```
+
+Examples
+
+1. No region given.
+
+        $ echo -ne ">seq\nacgcccactgaaatga\n" 
+        >seq
+        acgcccactgaaatga
+
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F ccc -R ttt
+        >seq
+        cccactgaaa
+
+1. Inner region
+
+        # region right behind forward primer
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F ccc -R ttt -r 4:7
+        >seq
+        actg
+        
+        # more common case is triming primers
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F ccc -R ttt -r 4:-4
+        >seq
+        actg
+        
+1. flanking region
+
+        # in one of my sequencing data, I only care about 
+        # region downstream of forward primer
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F ccc -f -r 3:6
+        >seq
+        tgaa
+        
+        # if given region if out scope of sequence. e.g,
+        # 2-5bp downstream of aaa, we can get part of region (2-4) by default
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F aaa -f -r 2:5
+        >seq
+        ga
+        
+        # you can also use strict mode to discard those cases
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F aaa -f -r 2:5 -s
 
 ## duplicate
 

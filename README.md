@@ -51,6 +51,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - [Usage && Examples](#usage--examples)
 - [Benchmark](#benchmark)
 - [Citation](#citation)
+- [Contributors](#contributors)
 - [Acknowledgements](#acknowledgements)
 - [Contact](#contact)
 - [License](#license)
@@ -115,7 +116,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 ## Subcommands
 
-28 functional subcommands in total.
+32 functional subcommands in total.
 
 **Sequence and subsequence**
 
@@ -123,9 +124,9 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - [`subseq`](https://bioinf.shenwei.me/seqkit/usage/#subseq)    get subsequences by region/gtf/bed, including flanking sequences
 - [`sliding`](https://bioinf.shenwei.me/seqkit/usage/#sliding)  sliding sequences, circular genome supported
 - [`stats`](https://bioinf.shenwei.me/seqkit/usage/#stats)      simple statistics of FASTA/Q files
-- [`watch`](https://bioinf.shenwei.me/seqkit/usage/#watch)      monitoring and online histograms of sequence features
-- [`sana`](https://bioinf.shenwei.me/seqkit/usage/#sana)	sanitize broken single line fastq files
 - [`faidx`](https://bioinf.shenwei.me/seqkit/usage/#faidx)      create FASTA index file and extract subsequence
+- [`watch`](https://bioinf.shenwei.me/seqkit/usage/#watch)      monitoring and online histograms of sequence features
+- [`sana`](https://bioinf.shenwei.me/seqkit/usage/#sana)        sanitize broken single line fastq files
 
 **Format conversion**
 
@@ -381,6 +382,12 @@ FASTQ:
 
 **W Shen**, S Le, Y Li\*, F Hu\*. SeqKit: a cross-platform and ultrafast toolkit for FASTA/Q file manipulation.
 ***PLOS ONE***. [doi:10.1371/journal.pone.0163962](https://doi.org/10.1371/journal.pone.0163962).
+
+## Contributors
+
+- [Wei Shen](https://github.com/shenwei356)
+- [Botond Sipos](https://github.com/bsipos) for commands: bam, fish, sana, watch.
+- [others](https://github.com/shenwei356/seqkit/graphs/contributors)
 
 ## Acknowledgements
 
