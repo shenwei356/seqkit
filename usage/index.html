@@ -471,6 +471,24 @@
       
         
           <li class="md-nav__item">
+    <a href="#watch" title="watch" class="md-nav__link">
+    watch
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#sana" title="sana" class="md-nav__link">
+    sana
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
     <a href="#fq2fa" title="fq2fa" class="md-nav__link">
     fq2fa
   </a>
@@ -525,8 +543,26 @@
       
         
           <li class="md-nav__item">
+    <a href="#fish" title="fish" class="md-nav__link">
+    fish
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
     <a href="#amplicon" title="amplicon" class="md-nav__link">
     amplicon
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#bam" title="bam" class="md-nav__link">
+    bam
   </a>
   
 </li>
@@ -932,6 +968,24 @@
       
         
           <li class="md-nav__item">
+    <a href="#watch" title="watch" class="md-nav__link">
+    watch
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#sana" title="sana" class="md-nav__link">
+    sana
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
     <a href="#fq2fa" title="fq2fa" class="md-nav__link">
     fq2fa
   </a>
@@ -986,8 +1040,26 @@
       
         
           <li class="md-nav__item">
+    <a href="#fish" title="fish" class="md-nav__link">
+    fish
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
     <a href="#amplicon" title="amplicon" class="md-nav__link">
     amplicon
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
+    <a href="#bam" title="bam" class="md-nav__link">
+    bam
   </a>
   
 </li>
@@ -1173,6 +1245,8 @@
 <li><a href="#sliding">sliding</a></li>
 <li><a href="#stats">stats</a></li>
 <li><a href="#faidx">faidx</a></li>
+<li><a href="#watch">watch</a></li>
+<li><a href="#sana">sana</a></li>
 </ul>
 <p><strong>Format conversion</strong></p>
 <ul>
@@ -1185,7 +1259,12 @@
 <ul>
 <li><a href="#grep">grep</a></li>
 <li><a href="#locate">locate</a></li>
+<li><a href="#fish">fish</a></li>
 <li><a href="#amplicon">amplicon</a></li>
+</ul>
+<p><strong>BAM processing and monitoring</strong></p>
+<ul>
+<li><a href="#bam">bam</a></li>
 </ul>
 <p><strong>Set operations</strong></p>
 <ul>
@@ -1310,7 +1389,7 @@ reproduced in different environments with same random seed.</p>
 <h2 id="seqkit">seqkit</h2>
 <pre><code class="text">SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.10.2
+Version: 0.11.0
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -1322,11 +1401,14 @@ Usage:
   seqkit [command]
 
 Available Commands:
+  amplicon        retrieve amplicon (or specific region around it) via primer(s)
+  bam             monitoring and online histograms of BAM record features
   common          find common sequences of multiple files by id/name/sequence
   concat          concatenate sequences with same ID from multiple files
   convert         convert FASTQ quality encoding between Sanger, Solexa and Illumina
   duplicate       duplicate sequences N times
   faidx           create FASTA index file and extract subsequence
+  fish            look for short sequences in larger sequences using local alignment
   fq2fa           convert FASTQ to FASTA
   fx2tab          convert FASTA/Q to tabular format (with length/GC content/GC skew)
   genautocomplete generate shell autocompletion script
@@ -1341,6 +1423,7 @@ Available Commands:
   restart         reset start position for circular genome
   rmdup           remove duplicated sequences by id/name/sequence
   sample          sample sequences by number or proportion
+  sana            sanitize broken single line fastq files
   seq             transform sequences (revserse, complement, extract ID...)
   shuffle         shuffle sequences
   sliding         sliding sequences, circular genome supported
@@ -1352,6 +1435,7 @@ Available Commands:
   tab2fx          convert tabular format to FASTA/Q format
   translate       translate DNA/RNA to protein sequence (supporting ambiguous bases)
   version         print version information and check for update
+  watch           monitoring and online histograms of sequence features
 
 Flags:
       --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
@@ -1412,16 +1496,19 @@ Usage:
   seqkit seq [flags]
 
 Flags:
-  -p, --complement                complement sequence (blank for Protein sequence)
+  -p, --complement                complement sequence, flag '-v' is recommended to switch on
       --dna2rna                   DNA to RNA
   -G, --gap-letters string        gap letters (default &quot;- \t.&quot;)
   -h, --help                      help for seq
   -l, --lower-case                print sequences in lower case
   -M, --max-len int               only print sequences shorter than the maximum length (-1 for no limit) (default -1)
+  -R, --max-qual float            only print sequences with average quality less than this limit (-1 for no limit) (default -1)
   -m, --min-len int               only print sequences longer than the minimum length (-1 for no limit) (default -1)
+  -Q, --min-qual float            only print sequences with average quality qreater or equal than this limit (-1 for no limit) (default -1)
   -n, --name                      only print names
   -i, --only-id                   print ID instead of full head
   -q, --qual                      only print qualities
+  -b, --qual-ascii-base int       ASCII BASE, 33 for Phred+33 (default 33)
   -g, --remove-gaps               remove gaps
   -r, --reverse                   reverse sequence
       --rna2dna                   RNA to DNA
@@ -1429,6 +1516,7 @@ Flags:
   -u, --upper-case                print sequences in upper case
   -v, --validate-seq              validate bases according to the alphabet
   -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+
 
 </code></pre>
 
@@ -1998,6 +2086,64 @@ U
 <pre><code>$ seqkit faidx tests/hairpin.fa hsa -r | seqkit stats
 file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
 -     FASTA   RNA      1,881  154,002       41     81.9      180
+</code></pre>
+</li>
+</ol>
+<h2 id="watch">watch</h2>
+<p>Usage</p>
+<pre><code class="text">monitoring and online histograms of sequence features
+
+Usage:
+  seqkit watch [flags]
+
+Flags:
+  -B, --bins int                  number of histogram bins (default -1)
+  -W, --delay int                 sleep this many seconds after online plotting (default 1)
+  -y, --dump                      print histogram data to stderr instead of plotting
+  -f, --fields string             target fields (default &quot;ReadLen&quot;)
+  -h, --help                      help for watch
+  -O, --img string                save histogram to this PDF/image file
+  -H, --list-fields               print out a list of available fields
+  -L, --log                       log10(x+1) transform numeric values
+  -x, --pass                      pass through mode (write input to stdout)
+  -p, --print-freq int            print/report after this many records (-1 for print after EOF) (default -1)
+  -b, --qual-ascii-base int       ASCII BASE, 33 for Phred+33 (default 33)
+  -Q, --quiet-mode                supress all plotting to stderr
+  -R, --reset                     reset histogram after every report
+  -v, --validate-seq              validate bases according to the alphabet
+  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>Histogram of log sequence length</p>
+<pre><code>seqkit watch -L -f ReadLen hairpin.fa
+</code></pre>
+</li>
+<li>
+<p>Histogram of mean base qualities every 500 record, also saved as PDF</p>
+<pre><code>seqkit watch -p 500 -O qhist.pdf -f MeanQual reads_1.fq.gz
+</code></pre>
+</li>
+</ol>
+<h2 id="sana">sana</h2>
+<p>Usage</p>
+<pre><code class="text">sanitize broken single line fastq files
+
+Usage:
+  seqkit sana [flags]
+
+Flags:
+  -h, --help                  help for sana
+  -b, --qual-ascii-base int   ASCII BASE, 33 for Phred+33 (default 33)
+
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>Rescue usable reads from fastq file with malformed records.<pre><code>seqkit sana broken.fq.gz -o rescued.fq.gz
 </code></pre>
 </li>
 </ol>
@@ -2660,6 +2806,64 @@ seq     ACGA          ACGA      +        7       10    ACGA
 </code></pre>
 </li>
 </ol>
+<h2 id="fish">fish</h2>
+<p>Usage</p>
+<pre><code class="text">look for short sequences in larger sequences using local alignment
+
+Attention:
+  1. output coordinates are BED-like 0-based, left-close and right-open.
+  2. alignment information are printed to STDERR.
+
+Usage:
+  seqkit fish [flags]
+
+Flags:
+  -a, --all                       search all
+  -p, --aln-params string         alignment parameters in format &quot;&lt;match&gt;,&lt;mismatch&gt;,&lt;gap_open&gt;,&lt;gap_extend&gt;&quot; (default &quot;4,-4,-2,-1&quot;)
+  -h, --help                      help for fish
+  -i, --invert                    print out references not matching with any query
+  -q, --min-qual float            minimum mapping quality (default 5)
+  -b, --out-bam string            save aligmnets to this BAM file (memory intensive)
+  -x, --pass                      pass through mode (write input to stdout)
+  -g, --print-aln                 print sequence alignments
+  -D, --print-desc                print full sequence header
+  -f, --query-fastx string        query fasta
+  -F, --query-sequences string    query sequences
+  -r, --ranges string             target ranges, for example: &quot;:10,30:40,-20:&quot;
+  -s, --stranded                  search + strand only
+  -v, --validate-seq              validate bases according to the alphabet
+  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>Find best local alignment of a short sequence in reads in a fasta file, print results as tabular</p>
+<pre><code>$ seqkit fish -q 4.7 -F GGCGGCTGTGACC -g mouse-p53-cds.fna
+</code></pre>
+</li>
+<li>
+<p>Compare to <code>seqkit locate</code>:</p>
+<pre><code>$ echo -e '&gt;seq\nACGACGACGA' \
+    | seqkit locate -p ACGA -G | csvtk -t pretty
+seqID   patternName   pattern   strand   start   end   matched
+seq     ACGA          ACGA      +        1       4     ACGA
+seq     ACGA          ACGA      +        7       10    ACGA
+
+$ echo -e '&gt;seq\nACGACGACGA' \
+    | seqkit fish -F ACGA -a 2&gt;&amp;1 | csvtk -t pretty 
+Ref   RefStart   RefEnd   Query   QueryStart   QueryEnd   Strand   MapQual   RawScore   Acc      ClipAcc   QueryCov
+seq   6          10       q0      0            4          +        60.00     16         100.00   100.00    100.00
+seq   0          4        q0      0            4          +        60.00     16         100.00   100.00    100.00
+</code></pre>
+</li>
+<li>
+<p>Find all local alignment of a short sequences in reads in a fasta file, print results as tabular and save as BAM</p>
+<pre><code>seqkit fish -a -q 4.67 -f query.fas -b alignments.bam -g mouse-p53-cds.fna
+</code></pre>
+</li>
+</ol>
 <h2 id="amplicon">amplicon</h2>
 <p>Usage</p>
 <pre><code class="text">
@@ -2770,6 +2974,79 @@ ga
 # you can also use strict mode to discard those cases
 $ echo -ne "&gt;seq\nacgcccactgaaatga\n" \
     | seqkit amplicon -F aaa -f -r 2:5 -s
+</code></pre>
+</li>
+</ol>
+<h2 id="bam">bam</h2>
+<p>Usage</p>
+<pre><code class="text">monitoring and online histograms of BAM record features
+
+Usage:
+  seqkit bam [flags]
+
+Flags:
+  -B, --bins int             number of histogram bins (default -1)
+  -c, --count string         count reads per reference and save to this file
+  -W, --delay int            sleep this many seconds after plotting (default 1)
+  -y, --dump                 print histogram data to stderr instead of plotting
+  -e, --exec-after string    execute command after reporting
+  -E, --exec-before string   execute command before reporting
+  -f, --field string         target fields
+  -h, --help                 help for bam
+  -C, --idx-count            fast read per reference counting based on the BAM index
+  -i, --idx-stat             fast statistics based on the BAM index
+  -O, --img string           save histogram to this PDF/image file
+  -H, --list-fields          list all available BAM record features
+  -L, --log                  log10(x+1) transform numeric values
+  -q, --map-qual int         minimum mapping quality
+  -x, --pass                 passthrough mode (forward filtered BAM to output)
+  -F, --prim-only            filter out non-primary alignment records
+  -p, --print-freq int       print/report after this many records (-1 for print after EOF) (default -1)
+  -Q, --quiet-mode           supress all plotting to stderr
+  -M, --range-max float      discard record with field (-f) value greater than this flag (default NaN)
+  -m, --range-min float      discard record with field (-f) value less than this flag (default NaN)
+  -R, --reset                reset histogram after every report
+  -s, --stat                 print BAM satistics of the input files
+  -@, --top-bam string       save the top -? records to this bam file
+  -?, --top-size int         size of the top-mode buffer (default 100)
+
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>Get detailed statistics from multiple BAM files.</p>
+<pre><code>seqkit bam -s *.bam
+</code></pre>
+</li>
+<li>
+<p>Get rough statistics from multiple indexed BAM files.</p>
+<pre><code>seqkit bam -i *.bam
+</code></pre>
+</li>
+<li>
+<p>Count reads mapped to references from a BAM stream.</p>
+<pre><code>cat sample.bam | seqkit bam -c counts.tsv  -
+</code></pre>
+</li>
+<li>
+<p>Count reads mapped to references using the BAM index.</p>
+<pre><code>seqkit bam -C sorted_indexed.bam
+</code></pre>
+</li>
+<li>
+<p>Monitor alignment accuracy from a bam stream and report after every 1000 records, use 20 bins.</p>
+<pre><code>cat sample.bam | seqkit bam -B -f Acc -p 1000 -
+</code></pre>
+</li>
+<li>
+<p>Dump selected fields to TSV.</p>
+<pre><code>seqkit bam -f Ref,Acc,RefCov,Strand sample.bam
+</code></pre>
+</li>
+<li>
+<p>Save the best 100 records in terms of alignment accuracy to a BAM file.</p>
+<pre><code>seqkit bam -f Acc -@ top_acc_100.bam -? 100 -Q sample.bam
 </code></pre>
 </li>
 </ol>

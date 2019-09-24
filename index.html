@@ -495,6 +495,15 @@
       
         
           <li class="md-nav__item">
+    <a href="#contributors" title="Contributors" class="md-nav__link">
+    Contributors
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
     <a href="#acknowledgements" title="Acknowledgements" class="md-nav__link">
     Acknowledgements
   </a>
@@ -888,6 +897,15 @@
       
         
           <li class="md-nav__item">
+    <a href="#contributors" title="Contributors" class="md-nav__link">
+    Contributors
+  </a>
+  
+</li>
+        
+      
+        
+          <li class="md-nav__item">
     <a href="#acknowledgements" title="Acknowledgements" class="md-nav__link">
     Acknowledgements
   </a>
@@ -980,6 +998,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <li><a href="#usage--examples">Usage &amp;&amp; Examples</a></li>
 <li><a href="#benchmark">Benchmark</a></li>
 <li><a href="#citation">Citation</a></li>
+<li><a href="#contributors">Contributors</a></li>
 <li><a href="#acknowledgements">Acknowledgements</a></li>
 <li><a href="#contact">Contact</a></li>
 <li><a href="#license">License</a></li>
@@ -994,7 +1013,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
   (see <a href="http://bioinf.shenwei.me/seqkit/download/">download</a>)</li>
 <li><strong>UltraFast</strong> (see <a href="#benchmark">benchmark</a>),
   <strong>multiple-CPUs supported</strong></li>
-<li><strong>Practical functions supported by 27 subcommands</strong> (see subcommands and
+<li><strong>Practical functions supported by 28 subcommands</strong> (see subcommands and
   <a href="http://bioinf.shenwei.me/seqkit/usage/">usage</a> )</li>
 <li><strong>Supporting <a href="#bash-completion">Bash-completion</a></strong></li>
 <li><strong>Well documented</strong> (detailed <a href="http://bioinf.shenwei.me/seqkit/usage/">usage</a>
@@ -1267,7 +1286,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <p><strong>Note 1</strong>: See <a href="http://bioinf.shenwei.me/seqkit/benchmark/#softwares">version information</a> of the softwares.</p>
 <p><strong>Note 2</strong>: See <a href="http://bioinf.shenwei.me/seqkit/usage/">usage</a> for detailed options of seqkit.</p>
 <h2 id="subcommands">Subcommands</h2>
-<p>27 functional subcommands in total.</p>
+<p>32 functional subcommands in total.</p>
 <p><strong>Sequence and subsequence</strong></p>
 <ul>
 <li><a href="https://bioinf.shenwei.me/seqkit/usage/#seq"><code>seq</code></a>          transform sequences (revserse, complement, extract ID...)</li>
@@ -1275,6 +1294,8 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <li><a href="https://bioinf.shenwei.me/seqkit/usage/#sliding"><code>sliding</code></a>  sliding sequences, circular genome supported</li>
 <li><a href="https://bioinf.shenwei.me/seqkit/usage/#stats"><code>stats</code></a>      simple statistics of FASTA/Q files</li>
 <li><a href="https://bioinf.shenwei.me/seqkit/usage/#faidx"><code>faidx</code></a>      create FASTA index file and extract subsequence</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#watch"><code>watch</code></a>      monitoring and online histograms of sequence features</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#sana"><code>sana</code></a>        sanitize broken single line fastq files</li>
 </ul>
 <p><strong>Format conversion</strong></p>
 <ul>
@@ -1288,7 +1309,12 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <ul>
 <li><a href="https://bioinf.shenwei.me/seqkit/usage/#grep"><code>grep</code></a>        search sequences by ID/name/sequence/sequence motifs, mismatch allowed</li>
 <li><a href="https://bioinf.shenwei.me/seqkit/usage/#locate"><code>locate</code></a>    locate subsequences/motifs</li>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#fish"><code>fish</code></a>    look for short sequences in larger sequences using local alignment</li>
 <li><a href="https://bioinf.shenwei.me/seqkit/usage/#amplicon"><code>amplicon</code></a> retrieve amplicon (or specific region around it) via primer(s)</li>
+</ul>
+<p><strong>BAM processing and monitoring</strong></p>
+<ul>
+<li><a href="https://bioinf.shenwei.me/seqkit/usage/#bam"><code>bam</code></a>  monitoring and online histograms of BAM record features</li>
 </ul>
 <p><strong>Set operations</strong></p>
 <ul>
@@ -1497,6 +1523,12 @@ dataset_C.fq  FASTQ   DNA   9,186,045    918,604,500      100           100     
 <h2 id="citation">Citation</h2>
 <p><strong>W Shen</strong>, S Le, Y Li*, F Hu*. SeqKit: a cross-platform and ultrafast toolkit for FASTA/Q file manipulation.
 <strong><em>PLOS ONE</em></strong>. <a href="https://doi.org/10.1371/journal.pone.0163962">doi:10.1371/journal.pone.0163962</a>.</p>
+<h2 id="contributors">Contributors</h2>
+<ul>
+<li><a href="https://github.com/shenwei356">Wei Shen</a></li>
+<li><a href="https://github.com/bsipos">Botond Sipos</a> for commands: bam, fish, sana, watch.</li>
+<li><a href="https://github.com/shenwei356/seqkit/graphs/contributors">others</a></li>
+</ul>
 <h2 id="acknowledgements">Acknowledgements</h2>
 <p>We thank <a href="https://github.com/jameslz">Lei Zhang</a> for testing of SeqKit,
 and also thank <a href="https://github.com/jimhester/">Jim Hester</a>,
