@@ -114,7 +114,13 @@ func parseRanges(rf string) Ranges {
 var fishCmd = &cobra.Command{
 	Use:   "fish",
 	Short: "look for short sequences in larger sequences using local alignment",
-	Long:  "look for short sequences in larger sequences using local alignment",
+	Long:  `look for short sequences in larger sequences using local alignment
+
+Attention:
+  1. output coordinates are BED-like 0-based, left-close and right-open.
+  2. alignment information are printed to STDERR.
+
+`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)

@@ -824,6 +824,13 @@ Flags:
 
 Examples
 
+1. Histogram of log sequence length
+    
+        seqkit watch -L -f ReadLen hairpin.fa
+
+2. Histogram of mean base qualities every 500 record, also saved as PDF
+
+        seqkit watch -p 500 -O qhist.pdf -f MeanQual reads_1.fq.gz
 
 
 ## sana
@@ -845,7 +852,10 @@ Flags:
 Examples
 
 
-        
+1. Rescue usable reads from fastq file with malformed records.
+    
+        seqkit sana broken.fq.gz -o rescued.fq.gz
+
 ## fq2fa
 
 Usage
@@ -1550,6 +1560,29 @@ Flags:
 
 Examples
 
+1. Find best local alignment of a short sequence in reads in a fasta file, print results as tabular
+
+        $ seqkit fish -q 4.7 -F GGCGGCTGTGACC -g mouse-p53-cds.fna
+        
+        
+1. Compare to `seqkit locate`:
+
+        $ echo -e '>seq\nACGACGACGA' \
+            | seqkit locate -p ACGA -G | csvtk -t pretty
+        seqID   patternName   pattern   strand   start   end   matched
+        seq     ACGA          ACGA      +        1       4     ACGA
+        seq     ACGA          ACGA      +        7       10    ACGA
+        
+        $ echo -e '>seq\nACGACGACGA' \
+            | seqkit fish -F ACGA -a 2>&1 | csvtk -t pretty 
+        Ref   RefStart   RefEnd   Query   QueryStart   QueryEnd   Strand   MapQual   RawScore   Acc      ClipAcc   QueryCov
+        seq   6          10       q0      0            4          +        60.00     16         100.00   100.00    100.00
+        seq   0          4        q0      0            4          +        60.00     16         100.00   100.00    100.00
+
+   
+1. Find all local alignment of a short sequences in reads in a fasta file, print results as tabular and save as BAM
+
+        seqkit fish -a -q 4.67 -f query.fas -b alignments.bam -g mouse-p53-cds.fna
 
         
 ## amplicon
@@ -1704,6 +1737,33 @@ Flags:
 
 Examples
 
+1. Get detailed statistics from multiple BAM files.
+
+        seqkit bam -s *.bam
+
+2. Get rough statistics from multiple indexed BAM files.
+
+        seqkit bam -i *.bam
+
+3. Count reads mapped to references from a BAM stream.
+
+        cat sample.bam | seqkit bam -c counts.tsv  -
+
+4. Count reads mapped to references using the BAM index.
+
+        seqkit bam -C sorted_indexed.bam
+
+5. Monitor alignment accuracy from a bam stream and report after every 1000 records, use 20 bins.
+
+        cat sample.bam | seqkit bam -B -f Acc -p 1000 - 
+
+6. Dump selected fields to TSV.
+
+        seqkit bam -f Ref,Acc,RefCov,Strand sample.bam
+
+7. Save the best 100 records in terms of alignment accuracy to a BAM file.
+
+        seqkit bam -f Acc -@ top_acc_100.bam -? 100 -Q sample.bam
 
             
 ## duplicate
