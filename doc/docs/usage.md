@@ -14,6 +14,8 @@
 - [sliding](#sliding)
 - [stats](#stats)
 - [faidx](#faidx)
+- [watch](#watch)
+- [sana](#sana)
 
 **Format conversion**
 
@@ -26,7 +28,12 @@
 
 - [grep](#grep)
 - [locate](#locate)
+- [fish](#fish)
 - [amplicon](#amplicon)
+
+**BAM processing and monitoring**
+
+- [bam](#bam)
 
 **Set operations**
 
@@ -165,7 +172,7 @@ reproduced in different environments with same random seed.
 ``` text
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.10.2
+Version: 0.11.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -177,11 +184,14 @@ Usage:
   seqkit [command]
 
 Available Commands:
+  amplicon        retrieve amplicon (or specific region around it) via primer(s)
+  bam             monitoring and online histograms of BAM record features
   common          find common sequences of multiple files by id/name/sequence
   concat          concatenate sequences with same ID from multiple files
   convert         convert FASTQ quality encoding between Sanger, Solexa and Illumina
   duplicate       duplicate sequences N times
   faidx           create FASTA index file and extract subsequence
+  fish            look for short sequences in larger sequences using local alignment
   fq2fa           convert FASTQ to FASTA
   fx2tab          convert FASTA/Q to tabular format (with length/GC content/GC skew)
   genautocomplete generate shell autocompletion script
@@ -196,6 +206,7 @@ Available Commands:
   restart         reset start position for circular genome
   rmdup           remove duplicated sequences by id/name/sequence
   sample          sample sequences by number or proportion
+  sana            sanitize broken single line fastq files
   seq             transform sequences (revserse, complement, extract ID...)
   shuffle         shuffle sequences
   sliding         sliding sequences, circular genome supported
@@ -207,6 +218,7 @@ Available Commands:
   tab2fx          convert tabular format to FASTA/Q format
   translate       translate DNA/RNA to protein sequence (supporting ambiguous bases)
   version         print version information and check for update
+  watch           monitoring and online histograms of sequence features
 
 Flags:
       --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
@@ -780,6 +792,60 @@ Example
         file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
         -     FASTA   RNA      1,881  154,002       41     81.9      180
 
+        
+## watch
+
+Usage
+
+``` text
+monitoring and online histograms of sequence features
+
+Usage:
+  seqkit watch [flags]
+
+Flags:
+  -B, --bins int                  number of histogram bins (default -1)
+  -W, --delay int                 sleep this many seconds after online plotting (default 1)
+  -y, --dump                      print histogram data to stderr instead of plotting
+  -f, --fields string             target fields (default "ReadLen")
+  -h, --help                      help for watch
+  -O, --img string                save histogram to this PDF/image file
+  -H, --list-fields               print out a list of available fields
+  -L, --log                       log10(x+1) transform numeric values
+  -x, --pass                      pass through mode (write input to stdout)
+  -p, --print-freq int            print/report after this many records (-1 for print after EOF) (default -1)
+  -b, --qual-ascii-base int       ASCII BASE, 33 for Phred+33 (default 33)
+  -Q, --quiet-mode                supress all plotting to stderr
+  -R, --reset                     reset histogram after every report
+  -v, --validate-seq              validate bases according to the alphabet
+  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+
+```
+
+Examples
+
+
+
+## sana
+
+Usage
+
+``` text
+sanitize broken single line fastq files
+
+Usage:
+  seqkit sana [flags]
+
+Flags:
+  -h, --help                  help for sana
+  -b, --qual-ascii-base int   ASCII BASE, 33 for Phred+33 (default 33)
+
+```
+
+Examples
+
+
+        
 ## fq2fa
 
 Usage
@@ -1452,6 +1518,40 @@ Examples
         seq     ACGA          ACGA      +        1       4     ACGA
         seq     ACGA          ACGA      +        7       10    ACGA
 
+        
+## fish
+
+Usage
+
+``` text
+look for short sequences in larger sequences using local alignment
+
+Usage:
+  seqkit fish [flags]
+
+Flags:
+  -a, --all                       search all
+  -p, --aln-params string         alignment parameters in format "<match>,<mismatch>,<gap_open>,<gap_extend>" (default "4,-4,-2,-1")
+  -h, --help                      help for fish
+  -i, --invert                    print out references not matching with any query
+  -q, --min-qual float            minimum mapping quality (default 5)
+  -b, --out-bam string            save aligmnets to this BAM file (memory intensive)
+  -x, --pass                      pass through mode (write input to stdout)
+  -g, --print-aln                 print sequence alignments
+  -D, --print-desc                print full sequence header
+  -f, --query-fastx string        query fasta
+  -F, --query-sequences string    query sequences
+  -r, --ranges string             target ranges, for example: ":10,30:40,-20:"
+  -s, --stranded                  search + strand only
+  -v, --validate-seq              validate bases according to the alphabet
+  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+
+```
+
+Examples
+
+
+        
 ## amplicon
 
 Usage
@@ -1564,6 +1664,48 @@ Examples
         $ echo -ne ">seq\nacgcccactgaaatga\n" \
             | seqkit amplicon -F aaa -f -r 2:5 -s
 
+## bam
+
+Usage
+
+``` text
+monitoring and online histograms of BAM record features
+
+Usage:
+  seqkit bam [flags]
+
+Flags:
+  -B, --bins int             number of histogram bins (default -1)
+  -c, --count string         count reads per reference and save to this file
+  -W, --delay int            sleep this many seconds after plotting (default 1)
+  -y, --dump                 print histogram data to stderr instead of plotting
+  -e, --exec-after string    execute command after reporting
+  -E, --exec-before string   execute command before reporting
+  -f, --field string         target fields
+  -h, --help                 help for bam
+  -C, --idx-count            fast read per reference counting based on the BAM index
+  -i, --idx-stat             fast statistics based on the BAM index
+  -O, --img string           save histogram to this PDF/image file
+  -H, --list-fields          list all available BAM record features
+  -L, --log                  log10(x+1) transform numeric values
+  -q, --map-qual int         minimum mapping quality
+  -x, --pass                 passthrough mode (forward filtered BAM to output)
+  -F, --prim-only            filter out non-primary alignment records
+  -p, --print-freq int       print/report after this many records (-1 for print after EOF) (default -1)
+  -Q, --quiet-mode           supress all plotting to stderr
+  -M, --range-max float      discard record with field (-f) value greater than this flag (default NaN)
+  -m, --range-min float      discard record with field (-f) value less than this flag (default NaN)
+  -R, --reset                reset histogram after every report
+  -s, --stat                 print BAM satistics of the input files
+  -@, --top-bam string       save the top -? records to this bam file
+  -?, --top-size int         size of the top-mode buffer (default 100)
+
+```
+
+Examples
+
+
+            
 ## duplicate
 
 Usage
