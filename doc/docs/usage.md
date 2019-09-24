@@ -13,6 +13,8 @@
 - [subseq](#subseq)
 - [sliding](#sliding)
 - [stats](#stats)
+- [watch](#watch)
+- [sana](#sana)
 - [faidx](#faidx)
 
 **Format conversion**
@@ -26,7 +28,11 @@
 
 - [grep](#grep)
 - [locate](#locate)
-- [amplicon](#amplicon)
+- [fish](#fish)
+
+**BAM processing and monitoring**
+
+- [bam](#bam)
 
 **Set operations**
 
@@ -268,7 +274,7 @@ Usage:
   seqkit seq [flags]
 
 Flags:
-  -p, --complement                complement sequence, flag '-v' is recommended to switch on
+  -p, --complement                complement sequence (blank for Protein sequence)
       --dna2rna                   DNA to RNA
   -G, --gap-letters string        gap letters (default "- \t.")
   -h, --help                      help for seq
@@ -289,7 +295,15 @@ Flags:
   -v, --validate-seq              validate bases according to the alphabet
   -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
 
-
+Global Flags:
+      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
+      --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
+      --id-regexp string                regular expression for parsing ID (default "^(\\S+)\\s?")
+  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
+  -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
+      --quiet                           be quiet and do not show extra information
+  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
+  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
 ```
 
 Examples
@@ -1452,118 +1466,6 @@ Examples
         seq     ACGA          ACGA      +        1       4     ACGA
         seq     ACGA          ACGA      +        7       10    ACGA
 
-## amplicon
-
-Usage
-
-``` text
-
-retrieve amplicon (or specific region around it) via primer(s).
-
-Examples:
-  0. no region given.
-  
-                    F
-        -----===============-----
-             F             R
-        -----=====-----=====-----
-             
-             ===============         amplicon
-
-  1. inner region (-r x:y).
-
-                    F
-        -----===============-----
-             1 3 5                    x/y
-                      -5-3-1          x/y
-             F             R
-        -----=====-----=====-----     x:y
-        
-             ===============          1:-1
-             =======                  1:7
-               =====                  3:7
-                  =====               6:10
-                  =====             -10:-6
-                     =====           -7:-3
-                                     -x:y (invalid)
-                    
-  2. flanking region (-r x:y -f)
-        
-                    F
-        -----===============-----
-         -3-1                        x/y
-                            1 3 5    x/y
-             F             R
-        -----=====-----=====-----
-        
-        =====                        -5:-1
-        ===                          -5:-3
-                            =====     1:5
-                              ===     3:5
-            =================        -1:1
-        =========================    -5:5
-                                      x:-y (invalid)
-
-Usage:
-  seqkit amplicon [flags]
-
-Flags:
-  -f, --flanking-region    region is flanking region
-  -F, --forward string     forward primer
-  -h, --help               help for amplicon
-  -m, --max-mismatch int   max mismatch when matching primers
-  -r, --region string      specify region to return. type "seqkit amplicon -h" for detail
-  -R, --reverse string     reverse primer
-  -s, --strict             strict mode, i.e., discarding seqs not fully matching (shorter) given region range
-```
-
-Examples
-
-1. No region given.
-
-        $ echo -ne ">seq\nacgcccactgaaatga\n" 
-        >seq
-        acgcccactgaaatga
-
-        $ echo -ne ">seq\nacgcccactgaaatga\n" \
-            | seqkit amplicon -F ccc -R ttt
-        >seq
-        cccactgaaa
-
-1. Inner region
-
-        # region right behind forward primer
-        $ echo -ne ">seq\nacgcccactgaaatga\n" \
-            | seqkit amplicon -F ccc -R ttt -r 4:7
-        >seq
-        actg
-        
-        # more common case is triming primers
-        $ echo -ne ">seq\nacgcccactgaaatga\n" \
-            | seqkit amplicon -F ccc -R ttt -r 4:-4
-        >seq
-        actg
-        
-1. flanking region
-
-        # in one of my sequencing data, I only care about 
-        # region downstream of forward primer
-        $ echo -ne ">seq\nacgcccactgaaatga\n" \
-            | seqkit amplicon -F ccc -f -r 3:6
-        >seq
-        tgaa
-        
-        # if given region if out scope of sequence. e.g,
-        # 2-5bp downstream of aaa, we can get part of region (2-4) by default
-        $ echo -ne ">seq\nacgcccactgaaatga\n" \
-            | seqkit amplicon -F aaa -f -r 2:5
-        >seq
-        ga
-        
-        # you can also use strict mode to discard those cases
-        $ echo -ne ">seq\nacgcccactgaaatga\n" \
-            | seqkit amplicon -F aaa -f -r 2:5 -s
-
 ## duplicate
 
 Usage
@@ -2626,6 +2528,202 @@ Examples
         ACGTNcccc
         >SEQ2
         acgtnAAAAnnn
+
+## bam
+
+``` text
+monitoring and online histograms of BAM record features
+
+Usage:
+  seqkit bam [flags]
+
+Flags:
+  -B, --bins int             number of histogram bins (default -1)
+  -c, --count string         count reads per reference and save to this file
+  -W, --delay int            sleep this many seconds after plotting (default 1)
+  -y, --dump                 print histogram data to stderr instead of plotting
+  -e, --exec-after string    execute command after reporting
+  -E, --exec-before string   execute command before reporting
+  -f, --field string         target fields
+  -h, --help                 help for bam
+  -C, --idx-count            fast read per reference counting based on the BAM index
+  -i, --idx-stat             fast statistics based on the BAM index
+  -O, --img string           save histogram to this PDF/image file
+  -H, --list-fields          list all available BAM record features
+  -L, --log                  log10(x+1) transform numeric values
+  -q, --map-qual int         minimum mapping quality
+  -x, --pass                 passthrough mode (forward filtered BAM to output)
+  -F, --prim-only            filter out non-primary alignment records
+  -p, --print-freq int       print/report after this many records (-1 for print after EOF) (default -1)
+  -Q, --quiet-mode           supress all plotting to stderr
+  -M, --range-max float      discard record with field (-f) value greater than this flag (default NaN)
+  -m, --range-min float      discard record with field (-f) value less than this flag (default NaN)
+  -R, --reset                reset histogram after every report
+  -s, --stat                 print BAM satistics of the input files
+  -@, --top-bam string       save the top -? records to this bam file
+  -?, --top-size int         size of the top-mode buffer (default 100)
+
+Global Flags:
+      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
+      --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
+      --id-regexp string                regular expression for parsing ID (default "^(\\S+)\\s?")
+  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
+  -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
+      --quiet                           be quiet and do not show extra information
+  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
+  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
+```
+
+Examples
+
+1. Get detailed statistics from multiple BAM files.
+
+    seqkit bam -s *.bam
+
+2. Get rough statistics from multiple indexed BAM files.
+
+    seqkit bam -i *.bam
+
+3. Count reads mapped to references from a BAM stream.
+
+    cat sample.bam | seqkit bam -c counts.tsv  -
+
+4. Count reads mapped to references using the BAM index.
+
+    seqkit bam -C sorted_indexed.bam
+
+5. Monitor alignment accuracy from a bam stream and report after every 1000 records, use 20 bins.
+
+    cat sample.bam | seqkit bam -B -f Acc -p 1000 - 
+
+6. Dump selected fields to TSV.
+
+    seqkit bam -f Ref,Acc,RefCov,Strand sample.bam
+
+7. Save the best 100 records in terms of alignment accuracy to a BAM file.
+
+    seqkit bam -f Acc -@ top_acc_100.bam -? 100 -Q sample.bam
+
+## fish
+
+``` text
+look for short sequences in larger sequences using local alignment
+
+Usage:
+  seqkit fish [flags]
+
+Flags:
+  -a, --all                       search all
+  -p, --aln-params string         alignment parameters in format "<match>,<mismatch>,<gap_open>,<gap_extend>" (default "4,-4,-2,-1")
+  -h, --help                      help for fish
+  -i, --invert                    print out references not matching with any query
+  -q, --min-qual float            minimum mapping quality (default 5)
+  -b, --out-bam string            save aligmnets to this BAM file (memory intensive)
+  -x, --pass                      pass through mode (write input to stdout)
+  -g, --print-aln                 print sequence alignments
+  -D, --print-desc                print full sequence header
+  -f, --query-fastx string        query fasta
+  -F, --query-sequences string    query sequences
+  -r, --ranges string             target ranges, for example: ":10,30:40,-20:"
+  -s, --stranded                  search + strand only
+  -v, --validate-seq              validate bases according to the alphabet
+  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+
+Global Flags:
+      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
+      --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
+      --id-regexp string                regular expression for parsing ID (default "^(\\S+)\\s?")
+  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
+  -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
+      --quiet                           be quiet and do not show extra information
+  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
+  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
+```
+
+Examples
+
+1. Find best local alignment of a short sequence in reads in a fasta file, print results as tabular
+
+   seqkit fish -q 4.7 -F "GGCGGCTGTGACC" -g mouse-p53-cds.fna
+
+1. Find all local alignment of a short sequences in reads in a fasta file, print results as tabular and save as BAM
+
+   seqkit fish -a -q 4.67 -f query.fas -b alignments.bam -g mouse-p53-cds.fna
+
+## sana
+
+``` text
+sanitize broken single line fastq files
+
+Usage:
+  seqkit sana [flags]
+
+Flags:
+  -h, --help                  help for sana
+  -b, --qual-ascii-base int   ASCII BASE, 33 for Phred+33 (default 33)
+
+Global Flags:
+      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
+      --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
+      --id-regexp string                regular expression for parsing ID (default "^(\\S+)\\s?")
+  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
+  -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
+      --quiet                           be quiet and do not show extra information
+  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
+  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
+```
+
+Examples
+
+1. Rescue usable reads from fastq file with malformed records.
+
+    seqkit sana broken.fq > rescued.fq
+
+## watch
+
+``` text
+monitoring and online histograms of sequence features
+
+Usage:
+  seqkit watch [flags]
+
+Flags:
+  -B, --bins int                  number of histogram bins (default -1)
+  -W, --delay int                 sleep this many seconds after online plotting (default 1)
+  -y, --dump                      print histogram data to stderr instead of plotting
+  -f, --fields string             target fields (default "ReadLen")
+  -h, --help                      help for watch
+  -O, --img string                save histogram to this PDF/image file
+  -H, --list-fields               print out a list of available fields
+  -L, --log                       log10(x+1) transform numeric values
+  -x, --pass                      pass through mode (write input to stdout)
+  -p, --print-freq int            print/report after this many records (-1 for print after EOF) (default -1)
+  -b, --qual-ascii-base int       ASCII BASE, 33 for Phred+33 (default 33)
+  -Q, --quiet-mode                supress all plotting to stderr
+  -R, --reset                     reset histogram after every report
+  -v, --validate-seq              validate bases according to the alphabet
+  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+
+Global Flags:
+      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
+      --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
+      --id-regexp string                regular expression for parsing ID (default "^(\\S+)\\s?")
+  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
+  -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
+      --quiet                           be quiet and do not show extra information
+  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
+  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
+```
+
+Examples
+
+1. Histogram of log sequence length
+    
+    seqkit watch -L -f ReadLen hairpin.fa 
+
+2. Histogram of mean base qualities every 500 record, also saved as PDF
+
+    seqkit watch -p 500 -O qhist.pdf -f MeanQual reads_1.fq.gz
 
 ## genautocomplete
 
