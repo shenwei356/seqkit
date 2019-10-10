@@ -1,6 +1,7 @@
 - [SeqKit v0.11.1](https://github.com/shenwei356/seqkit/releases/tag/v0.11.1)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.11.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.11.1)
-    - `seqkit version`: makeing checking update optional
+    - `seqkit`: fix checking input file existence.
+    - `seqkit version`: makeing checking update optional.
 - [SeqKit v0.11.0](https://github.com/shenwei356/seqkit/releases/tag/v0.11.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.11.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.11.0)
     - `seqkit`: fix hanging when reading from truncated gzip file.

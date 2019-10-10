@@ -52,7 +52,7 @@ func getFileList(args []string) []string {
 	if len(args) == 0 {
 		files = append(files, "-")
 	} else {
-		for _, file := range files {
+		for _, file := range args {
 			if isStdin(file) {
 				continue
 			}

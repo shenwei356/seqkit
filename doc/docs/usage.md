@@ -1536,6 +1536,10 @@ Usage
 ``` text
 look for short sequences in larger sequences using local alignment
 
+Attention:
+  1. output coordinates are BED-like 0-based, left-close and right-open.
+  2. alignment information are printed to STDERR.
+
 Usage:
   seqkit fish [flags]
 
