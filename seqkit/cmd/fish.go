@@ -164,7 +164,7 @@ Attention:
 			seq.ValidateSeq = true
 		}
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 		var alns []*AlignedSeq
 		if len(files) == 0 {
 			files = []string{"-"}

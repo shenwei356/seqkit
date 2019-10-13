@@ -68,7 +68,7 @@ Examples:
 		runtime.GOMAXPROCS(config.Threads)
 		quiet := config.Quiet
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 
 		mPoints := []_mutatePoint{}
 		for _, val := range getFlagStringSlice(cmd, "point") {

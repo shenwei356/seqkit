@@ -49,7 +49,7 @@ var headCmd = &cobra.Command{
 
 		number := getFlagPositiveInt(cmd, "number")
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

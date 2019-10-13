@@ -78,7 +78,7 @@ Tips:
 		fqEncoding := parseQualityEncoding(getFlagString(cmd, "fq-encoding"))
 		basename := getFlagBool(cmd, "basename")
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

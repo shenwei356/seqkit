@@ -140,7 +140,7 @@ Examples:
 			}
 		}
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 
 		// prepare pattern
 		patterns := make(map[string]*regexp.Regexp)

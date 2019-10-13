@@ -156,7 +156,7 @@ var watchCmd = &cobra.Command{
 			seq.ValidateSeq = true
 		}
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 		if len(files) == 0 {
 			files = []string{"-"}
 		}

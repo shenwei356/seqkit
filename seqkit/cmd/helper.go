@@ -47,13 +47,16 @@ func checkError(err error) {
 	}
 }
 
-func getFileList(args []string) []string {
+func getFileList(args []string, checkFile bool) []string {
 	files := []string{}
 	if len(args) == 0 {
 		files = append(files, "-")
 	} else {
 		for _, file := range args {
 			if isStdin(file) {
+				continue
+			}
+			if !checkFile {
 				continue
 			}
 			if _, err := os.Stat(file); os.IsNotExist(err) {
