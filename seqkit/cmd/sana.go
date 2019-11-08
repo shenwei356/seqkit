@@ -49,7 +49,7 @@ var sanaCmd = &cobra.Command{
 		defer outfh.Flush()
 		defer outfh.Close()
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 
 		for _, file := range files {
 			rawSeqChan := NewRawSeqStream(file, 1000, qBase)

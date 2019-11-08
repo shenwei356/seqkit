@@ -832,6 +832,13 @@ Flags:
 
 Examples
 
+1. Histogram of log sequence length
+    
+        seqkit watch -L -f ReadLen hairpin.fa
+
+2. Histogram of mean base qualities every 500 record, also saved as PDF
+
+        seqkit watch -p 500 -O qhist.pdf -f MeanQual reads_1.fq.gz
 
 
 ## sana
@@ -853,7 +860,10 @@ Flags:
 Examples
 
 
-        
+1. Rescue usable reads from fastq file with malformed records.
+    
+        seqkit sana broken.fq.gz -o rescued.fq.gz
+
 ## fq2fa
 
 Usage
@@ -1534,6 +1544,10 @@ Usage
 ``` text
 look for short sequences in larger sequences using local alignment
 
+Attention:
+  1. output coordinates are BED-like 0-based, left-close and right-open.
+  2. alignment information are printed to STDERR.
+
 Usage:
   seqkit fish [flags]
 
@@ -1558,6 +1572,29 @@ Flags:
 
 Examples
 
+1. Find best local alignment of a short sequence in reads in a fasta file, print results as tabular
+
+        $ seqkit fish -q 4.7 -F GGCGGCTGTGACC -g mouse-p53-cds.fna
+        
+        
+1. Compare to `seqkit locate`:
+
+        $ echo -e '>seq\nACGACGACGA' \
+            | seqkit locate -p ACGA -G | csvtk -t pretty
+        seqID   patternName   pattern   strand   start   end   matched
+        seq     ACGA          ACGA      +        1       4     ACGA
+        seq     ACGA          ACGA      +        7       10    ACGA
+        
+        $ echo -e '>seq\nACGACGACGA' \
+            | seqkit fish -F ACGA -a 2>&1 | csvtk -t pretty 
+        Ref   RefStart   RefEnd   Query   QueryStart   QueryEnd   Strand   MapQual   RawScore   Acc      ClipAcc   QueryCov
+        seq   6          10       q0      0            4          +        60.00     16         100.00   100.00    100.00
+        seq   0          4        q0      0            4          +        60.00     16         100.00   100.00    100.00
+
+   
+1. Find all local alignment of a short sequences in reads in a fasta file, print results as tabular and save as BAM
+
+        seqkit fish -a -q 4.67 -f query.fas -b alignments.bam -g mouse-p53-cds.fna
 
         
 ## amplicon

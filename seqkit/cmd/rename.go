@@ -48,7 +48,7 @@ var renameCmd = &cobra.Command{
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 		byName := getFlagBool(cmd, "by-name")
 
 		outfh, err := xopen.Wopen(outFile)

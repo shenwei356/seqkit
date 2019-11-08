@@ -98,7 +98,7 @@ Though, it's fast enough for microbial genomes.
 			}
 		}
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 
 		// prepare pattern
 		regexps := make(map[string]*regexp.Regexp)

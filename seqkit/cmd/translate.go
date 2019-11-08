@@ -138,7 +138,7 @@ Translate Tables/Genetic Codes:
 			return
 		}
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 
 		var record *fastx.Record
 		var fastxReader *fastx.Reader

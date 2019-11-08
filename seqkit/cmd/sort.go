@@ -68,7 +68,7 @@ and extracts sequences by FASTA index.
 		fai.MapWholeFile = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 
 		inNaturalOrder := getFlagBool(cmd, "natural-order")
 		bySeq := getFlagBool(cmd, "by-seq")

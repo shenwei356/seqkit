@@ -54,7 +54,7 @@ var sampleCmd = &cobra.Command{
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 
 		seed := getFlagInt64(cmd, "rand-seed")
 		twoPass := getFlagBool(cmd, "two-pass")
