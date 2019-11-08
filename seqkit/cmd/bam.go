@@ -690,7 +690,7 @@ var bamCmd = &cobra.Command{
 		fmap["MeanQual"] = fieldInfo{
 			"Mean base quality of the read",
 			func(r *sam.Record) float64 {
-				if len(r.Qual) == 0 {
+				if len(r.Qual) != r.Seq.Length {
 					return 0.0
 				}
 				s := &seq.Seq{Qual: r.Qual}
@@ -745,6 +745,10 @@ var bamCmd = &cobra.Command{
 				}
 				if fmap[f].Generate == nil {
 					fmt.Fprintf(os.Stderr, "Invalid field: %s\n", f)
+					fmt.Fprintf(os.Stderr, "The valid fields are:\n")
+					for _, ff := range validFields {
+						fmt.Printf("%-10s\t%s\n", ff, fmap[ff].Title)
+					}
 					os.Exit(1)
 				}
 				p := transform(fmap[f].Generate(r))
@@ -804,6 +808,14 @@ var bamCmd = &cobra.Command{
 			return
 		}
 
+		if fmap[field].Generate == nil {
+			fmt.Fprintf(os.Stderr, "Invalid field: %s\n", field)
+			fmt.Fprintf(os.Stderr, "The valid fields are:\n")
+			for _, ff := range validFields {
+				fmt.Printf("%-10s\t%s\n", ff, fmap[ff].Title)
+			}
+			os.Exit(1)
+		}
 		h := thist.NewHist([]float64{}, fmap[field].Title, binMode, printBins, true)
 
 		var count int
