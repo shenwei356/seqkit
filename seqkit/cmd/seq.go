@@ -94,6 +94,9 @@ var seqCmd = &cobra.Command{
 		// 		log.Infof("flag -g (--remove-gaps) is switched on when using -m (--min-len) or -M (--max-len)")
 		// 	}
 		// }
+		if minLen >= 0 || maxLen >= 0 {
+			log.Warning("you may switch on flag -g/--remove-gaps to remove spaces")
+		}
 
 		seq.ValidateSeq = validateSeq
 		seq.ValidateWholeSeq = false

@@ -71,6 +71,7 @@ Examples:
 		lineWidth := config.LineWidth
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
+		quiet := config.Quiet
 		runtime.GOMAXPROCS(config.Threads)
 
 		bwt.CheckEndSymbol = false
@@ -157,6 +158,11 @@ Examples:
 					if p == "" {
 						continue
 					}
+
+					if !quiet && strings.IndexAny(p, "\t ") >= 0 {
+						log.Warningf("space found in pattern: %s", p)
+					}
+
 					if degenerate || useRegexp {
 						if degenerate {
 							pattern2seq, err = seq.NewSeq(alphabet, []byte(p))
@@ -198,6 +204,9 @@ Examples:
 			}
 		} else {
 			for _, p := range pattern {
+				if !quiet && strings.IndexAny(p, "\t ") >= 0 {
+					log.Warningf("space found in pattern: '%s'", p)
+				}
 				if degenerate || useRegexp {
 					if degenerate {
 						pattern2seq, err = seq.NewSeq(alphabet, []byte(p))

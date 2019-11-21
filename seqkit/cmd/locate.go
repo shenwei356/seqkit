@@ -109,6 +109,9 @@ Though, it's fast enough for microbial genomes.
 			checkError(err)
 			for name, record := range records {
 				patterns[name] = record.Seq.Seq
+				if !quiet && bytes.IndexAny(record.Seq.Seq, "\t ") >= 0 {
+					log.Warningf("space found in sequence: %s", name)
+				}
 
 				if degenerate {
 					s = record.Seq.Degenerate2Regexp()
@@ -135,6 +138,10 @@ Though, it's fast enough for microbial genomes.
 		} else {
 			for _, p := range pattern {
 				patterns[p] = []byte(p)
+
+				if !quiet && bytes.IndexAny(patterns[p], " \t") >= 0 {
+					log.Warningf("space found in sequence: '%s'", p)
+				}
 
 				if degenerate {
 					pattern2seq, err := seq.NewSeq(alphabet, []byte(p))
