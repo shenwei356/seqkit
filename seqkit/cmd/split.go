@@ -255,7 +255,7 @@ Examples:
 					}
 
 					sequence := subseqByFaix(faidx, chr, r, 1, -1)
-					record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), sequence)
+					record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), []byte{}, sequence)
 					checkError(err)
 
 					record.FormatToWriter(outfh, config.LineWidth)
@@ -433,7 +433,7 @@ Examples:
 					}
 
 					sequence := subseqByFaix(faidx, chr, r, 1, -1)
-					record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), sequence)
+					record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), []byte{}, sequence)
 					checkError(err)
 
 					record.FormatToWriter(outfh, config.LineWidth)
@@ -609,7 +609,7 @@ Examples:
 						}
 
 						sequence := subseqByFaix(faidx, chr, r, 1, -1)
-						record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), sequence)
+						record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), []byte{}, sequence)
 						checkError(err)
 
 						record.FormatToWriter(outfh, config.LineWidth)
@@ -796,7 +796,7 @@ Examples:
 						}
 
 						sequence := subseqByFaix(faidx, chr, r, 1, -1)
-						record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), sequence)
+						record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), []byte{}, sequence)
 						checkError(err)
 
 						record.FormatToWriter(outfh, config.LineWidth)

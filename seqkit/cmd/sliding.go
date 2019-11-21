@@ -127,10 +127,10 @@ var slidingCmd = &cobra.Command{
 
 					if len(qual) > 0 {
 						r, _ = fastx.NewRecordWithQualWithoutValidation(record.Seq.Alphabet,
-							[]byte{}, []byte(fmt.Sprintf("%s_sliding:%d-%d", record.ID, i+1, e)), s, q)
+							[]byte{}, []byte(fmt.Sprintf("%s_sliding:%d-%d", record.ID, i+1, e)), []byte{}, s, q)
 					} else {
 						r, _ = fastx.NewRecordWithoutValidation(record.Seq.Alphabet,
-							[]byte{}, []byte(fmt.Sprintf("%s_sliding:%d-%d", record.ID, i+1, e)), s)
+							[]byte{}, []byte(fmt.Sprintf("%s_sliding:%d-%d", record.ID, i+1, e)), []byte{}, s)
 					}
 					r.FormatToWriter(outfh, config.LineWidth)
 				}
