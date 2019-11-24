@@ -63,7 +63,7 @@ var sanaCmd = &cobra.Command{
 		files := getFileList(args, true)
 
 		for _, file := range files {
-			rawSeqChan := NewRawSeqStreamFromFile(file, 1000, qBase, "fasta")
+			rawSeqChan := NewRawSeqStreamFromFile(file, 1000, qBase, "fastq")
 
 			for rawSeq := range rawSeqChan {
 				switch rawSeq.Err {
@@ -351,7 +351,7 @@ func streamFastq(r *bufio.Reader, sbuff FqLines, out chan *simpleSeq, ctrlChan c
 						h = len(sbuff)
 					}
 					for j := 0; j < h; j++ {
-						serr := &simpleSeq{StartLine: *lineCounter - j, Err: errors.New("Discarded line"), Seq: sbuff[j].Line}
+						serr := &simpleSeq{StartLine: (*lineCounter - h + j + 1), Err: errors.New("Discarded line"), Seq: sbuff[j].Line}
 						out <- serr
 					}
 					sbuff = sbuff[h:]
