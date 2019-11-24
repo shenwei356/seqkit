@@ -64,7 +64,7 @@ Examples:
 		Threads = config.Threads
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 
 		chrs := getFlagStringSlice(cmd, "chr")
 		chrs2 := make([]string, len(chrs))
@@ -257,7 +257,7 @@ Examples:
 							}
 
 							subseq := subseqByFaix(faidx, chr, r, 1, -1)
-							record, err := fastx.NewRecord(alphabet2, fastx.ParseHeadID(idRe, []byte(chr)), []byte(chr), subseq)
+							record, err := fastx.NewRecord(alphabet2, fastx.ParseHeadID(idRe, []byte(chr)), []byte(chr), []byte{}, subseq)
 							checkError(err)
 
 							subseqByGTFFile(outfh, record, config.LineWidth,
@@ -283,7 +283,7 @@ Examples:
 							}
 
 							subseq := subseqByFaix(faidx, chr, r, 1, -1)
-							record, err := fastx.NewRecord(alphabet2, fastx.ParseHeadID(idRe, []byte(chr)), []byte(chr), subseq)
+							record, err := fastx.NewRecord(alphabet2, fastx.ParseHeadID(idRe, []byte(chr)), []byte(chr), []byte{}, subseq)
 							checkError(err)
 
 							subSeqByBEDFile(outfh, record, config.LineWidth,
@@ -455,9 +455,9 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 			var newRecord *fastx.Record
 			var err error
 			if len(subseq.Qual) > 0 {
-				newRecord, err = fastx.NewRecordWithQualWithoutValidation(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq, subseq.Qual)
+				newRecord, err = fastx.NewRecordWithQualWithoutValidation(record.Seq.Alphabet, []byte(outname), []byte(outname), []byte{}, subseq.Seq, subseq.Qual)
 			} else {
-				newRecord, err = fastx.NewRecordWithoutValidation(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq)
+				newRecord, err = fastx.NewRecordWithoutValidation(record.Seq.Alphabet, []byte(outname), []byte(outname), []byte{}, subseq.Seq)
 			}
 			checkError(err)
 			outfh.Write(newRecord.Format(lineWidth))
@@ -549,9 +549,9 @@ func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 		var newRecord *fastx.Record
 		var err error
 		if len(subseq.Qual) > 0 {
-			newRecord, err = fastx.NewRecordWithQualWithoutValidation(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq, subseq.Qual)
+			newRecord, err = fastx.NewRecordWithQualWithoutValidation(record.Seq.Alphabet, []byte(outname), []byte(outname), []byte{}, subseq.Seq, subseq.Qual)
 		} else {
-			newRecord, err = fastx.NewRecordWithoutValidation(record.Seq.Alphabet, []byte(outname), []byte(outname), subseq.Seq)
+			newRecord, err = fastx.NewRecordWithoutValidation(record.Seq.Alphabet, []byte(outname), []byte(outname), []byte{}, subseq.Seq)
 		}
 		checkError(err)
 		outfh.Write(newRecord.Format(lineWidth))

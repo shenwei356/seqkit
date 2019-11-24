@@ -48,7 +48,7 @@ var slidingCmd = &cobra.Command{
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.BufferSize)
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 
 		greedy := getFlagBool(cmd, "greedy")
 		circular := getFlagBool(cmd, "circular-genome")
@@ -127,10 +127,10 @@ var slidingCmd = &cobra.Command{
 
 					if len(qual) > 0 {
 						r, _ = fastx.NewRecordWithQualWithoutValidation(record.Seq.Alphabet,
-							[]byte{}, []byte(fmt.Sprintf("%s_sliding:%d-%d", record.ID, i+1, e)), s, q)
+							[]byte{}, []byte(fmt.Sprintf("%s_sliding:%d-%d", record.ID, i+1, e)), []byte{}, s, q)
 					} else {
 						r, _ = fastx.NewRecordWithoutValidation(record.Seq.Alphabet,
-							[]byte{}, []byte(fmt.Sprintf("%s_sliding:%d-%d", record.ID, i+1, e)), s)
+							[]byte{}, []byte(fmt.Sprintf("%s_sliding:%d-%d", record.ID, i+1, e)), []byte{}, s)
 					}
 					r.FormatToWriter(outfh, config.LineWidth)
 				}

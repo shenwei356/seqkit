@@ -66,7 +66,7 @@ Example: concatenating leading 2 bases and last 2 bases
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 		if len(files) < 2 {
 			checkError(errors.New("at least 2 files needed"))
 		}
@@ -155,11 +155,11 @@ Example: concatenating leading 2 bases and last 2 bases
 					bufQ.Write(q)
 				}
 				record, err = fastx.NewRecordWithQualWithoutValidation(seq.Unlimit,
-					[]byte(id), []byte(id), []byte(buf.String()), []byte(bufQ.String()))
+					[]byte(id), []byte(id), []byte{}, []byte(buf.String()), []byte(bufQ.String()))
 
 			} else {
 				record, err = fastx.NewRecordWithoutValidation(seq.Unlimit,
-					[]byte(id), []byte(id), []byte(buf.String()))
+					[]byte(id), []byte(id), []byte{}, []byte(buf.String()))
 			}
 			checkError(err)
 

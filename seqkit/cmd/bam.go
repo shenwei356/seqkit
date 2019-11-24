@@ -375,7 +375,7 @@ var bamCmd = &cobra.Command{
 		outFile := config.OutFile
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 
 		mapQual := getFlagInt(cmd, "map-qual")
 		field := getFlagString(cmd, "field")
@@ -449,7 +449,7 @@ var bamCmd = &cobra.Command{
 			}
 		}
 
-		validFields := []string{"Read", "Ref", "MapQual", "Acc", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "IsSup"}
+		validFields := []string{"Read", "Ref", "Pos", "MapQual", "Acc", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "IsSup"}
 
 		fields := strings.Split(field, ",")
 		if field == "" {
@@ -690,11 +690,18 @@ var bamCmd = &cobra.Command{
 		fmap["MeanQual"] = fieldInfo{
 			"Mean base quality of the read",
 			func(r *sam.Record) float64 {
-				if len(r.Qual) == 0 {
+				if len(r.Qual) != r.Seq.Length {
 					return 0.0
 				}
 				s := &seq.Seq{Qual: r.Qual}
 				return s.AvgQual(0)
+			},
+		}
+
+		fmap["Pos"] = fieldInfo{
+			"Leftmost reference position (zero-based)",
+			func(r *sam.Record) float64 {
+				return float64(r.Pos)
 			},
 		}
 
@@ -745,6 +752,10 @@ var bamCmd = &cobra.Command{
 				}
 				if fmap[f].Generate == nil {
 					fmt.Fprintf(os.Stderr, "Invalid field: %s\n", f)
+					fmt.Fprintf(os.Stderr, "The valid fields are:\n")
+					for _, ff := range validFields {
+						fmt.Printf("%-10s\t%s\n", ff, fmap[ff].Title)
+					}
 					os.Exit(1)
 				}
 				p := transform(fmap[f].Generate(r))
@@ -804,6 +815,14 @@ var bamCmd = &cobra.Command{
 			return
 		}
 
+		if fmap[field].Generate == nil {
+			fmt.Fprintf(os.Stderr, "Invalid field: %s\n", field)
+			fmt.Fprintf(os.Stderr, "The valid fields are:\n")
+			for _, ff := range validFields {
+				fmt.Printf("%-10s\t%s\n", ff, fmap[ff].Title)
+			}
+			os.Exit(1)
+		}
 		h := thist.NewHist([]float64{}, fmap[field].Title, binMode, printBins, true)
 
 		var count int

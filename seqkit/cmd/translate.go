@@ -26,9 +26,11 @@ import (
 	"os"
 	"runtime"
 	"sort"
+	"strconv"
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/util/byteutil"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -99,9 +101,22 @@ Translate Tables/Genetic Codes:
 		if _, ok := seq.CodonTables[translTable]; !ok {
 			checkError(fmt.Errorf("invalid translate table: %d", translTable))
 		}
-		frame := getFlagInt(cmd, "frame")
-		if !(frame == 1 || frame == 2 || frame == 3 || frame == -1 || frame == -2 || frame == -3) {
-			checkError(fmt.Errorf("invalid frame: %d. available: 1, 2, 3, -1, -2, -3", frame))
+		_frames := getFlagStringSlice(cmd, "frame")
+		frames := make([]int, 0, len(_frames))
+		for _, _frame := range _frames {
+			frame, err := strconv.Atoi(_frame)
+			if err != nil {
+				checkError(fmt.Errorf("invalid frame(s): %s. available: 1, 2, 3, -1, -2, -3, and 6 for all. multiple frames should be separated by comma", _frame))
+			}
+			fmt.Println(_frame, frame)
+			if !(frame == 1 || frame == 2 || frame == 3 || frame == -1 || frame == -2 || frame == -3 || frame == 6) {
+				checkError(fmt.Errorf("invalid frame: %d. available: 1, 2, 3, -1, -2, -3, and 6 for all", frame))
+			}
+			if frame == 6 {
+				frames = []int{1, 2, 3, -1, -2, -3}
+				break
+			}
+			frames = append(frames, frame)
 		}
 		trim := getFlagBool(cmd, "trim")
 		clean := getFlagBool(cmd, "clean")
@@ -138,10 +153,12 @@ Translate Tables/Genetic Codes:
 			return
 		}
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
+		var _seq *seq.Seq
+		var frame int
 		once := true
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
@@ -165,17 +182,21 @@ Translate Tables/Genetic Codes:
 					once = false
 				}
 
-				record.Seq, err = record.Seq.Translate(translTable, frame, trim, clean, allowUnknownCodon, markInitCodonAsM)
-				if err != nil {
-					if err == seq.ErrUnknownCodon {
-						log.Error("unknown codon detected, you can use flag -x/--allow-unknown-codon to translate it to 'X'.")
-						os.Exit(-1)
+				for _, frame = range frames {
+					_seq, err = record.Seq.Translate(translTable, frame, trim, clean, allowUnknownCodon, markInitCodonAsM)
+					if err != nil {
+						if err == seq.ErrUnknownCodon {
+							log.Error("unknown codon detected, you can use flag -x/--allow-unknown-codon to translate it to 'X'.")
+							os.Exit(-1)
+						}
+						checkError(err)
 					}
 					checkError(err)
-				}
-				checkError(err)
 
-				record.FormatToWriter(outfh, config.LineWidth)
+					outfh.WriteString(fmt.Sprintf(">%s_frame=%d %s\n", record.ID, frame, record.Desc))
+					outfh.Write(byteutil.WrapByteSlice(_seq.Seq, config.LineWidth))
+					outfh.WriteString("\n")
+				}
 
 			}
 
@@ -186,7 +207,7 @@ Translate Tables/Genetic Codes:
 func init() {
 	RootCmd.AddCommand(translateCmd)
 	translateCmd.Flags().IntP("transl-table", "T", 1, `translate table/genetic code, type 'seqkit translate --help' for more details`)
-	translateCmd.Flags().IntP("frame", "f", 1, "frame to translate, available value: 1, 2, 3, -1, -2, -3")
+	translateCmd.Flags().StringSliceP("frame", "f", []string{"1"}, "frame(s) to translate, available value: 1, 2, 3, -1, -2, -3, and 6 for all six frames")
 	translateCmd.Flags().BoolP("trim", "", false, "remove all 'X' and '*' characters from the right end of the translation")
 	translateCmd.Flags().BoolP("clean", "", false, "change all STOP codon positions from the '*' character to 'X' (an unknown residue)")
 	translateCmd.Flags().BoolP("allow-unknown-codon", "x", false, "translate unknown code to 'X'. And you may not use flag --trim which removes 'X'")

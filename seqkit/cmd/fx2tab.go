@@ -51,7 +51,7 @@ like sequence length, GC content/GC skew.
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 
 		onlyID := getFlagBool(cmd, "only-id")
 		printLength := getFlagBool(cmd, "length")

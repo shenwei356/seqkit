@@ -88,11 +88,14 @@ var seqCmd = &cobra.Command{
 		if minQual >= 0 && maxQual >= 0 && minQual > maxQual {
 			checkError(fmt.Errorf("value of flag -Q (--min-qual) should be <= value of flag -R (--max-qual)"))
 		}
+		// if minLen >= 0 || maxLen >= 0 {
+		// 	removeGaps = true
+		// 	if !quiet {
+		// 		log.Infof("flag -g (--remove-gaps) is switched on when using -m (--min-len) or -M (--max-len)")
+		// 	}
+		// }
 		if minLen >= 0 || maxLen >= 0 {
-			removeGaps = true
-			if !quiet {
-				log.Infof("flag -g (--remove-gaps) is switched on when using -m (--min-len) or -M (--max-len)")
-			}
+			log.Warning("you may switch on flag -g/--remove-gaps to remove spaces")
 		}
 
 		seq.ValidateSeq = validateSeq
@@ -116,7 +119,7 @@ var seqCmd = &cobra.Command{
 			checkError(fmt.Errorf("could not give both flags -l (--lower-case) and -u (--upper-case)"))
 		}
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

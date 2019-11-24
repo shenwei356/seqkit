@@ -134,7 +134,7 @@ Special replacement symbols (only for replacing name not sequence):
 			}
 		}
 
-		files := getFileList(args)
+		files := getFileList(args, true)
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

@@ -29,7 +29,7 @@ import (
 )
 
 // VERSION of seqkit
-const VERSION = "0.11.0"
+const VERSION = "0.11.1"
 
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
@@ -41,6 +41,11 @@ var versionCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		app := "seqkit"
 		fmt.Printf("%s v%s\n", app, VERSION)
+
+		if !getFlagBool(cmd, "check-update") {
+			return
+		}
+
 		fmt.Println("\nChecking new version...")
 
 		resp, err := http.Get(fmt.Sprintf("https://github.com/shenwei356/%s/releases/latest", app))
@@ -64,4 +69,6 @@ var versionCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(versionCmd)
+
+	versionCmd.Flags().BoolP("check-update", "u", false, `check update`)
 }
