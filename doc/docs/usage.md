@@ -1377,7 +1377,7 @@ Examples
         $ cat hairpin.fa.gz | seqkit grep -s -i -p aggcg
 
 
-1. Extract sequences containing AGGCG (allow mismatch, **only for short (<50kb) sequences now**)
+1. Extract sequences containing AGGCG (allow mismatch)
 
         $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg | seqkit stats
         file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
@@ -1391,9 +1391,9 @@ Examples
         file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
         -     FASTA   RNA     17,168  1,881,005       39    109.6    2,354
 
-        real    0m2.479s
-        user    0m2.570s
-        sys     0m0.015s
+        real    0m0.864s
+        user    0m0.941s
+        sys     0m0.014s
 
 1. Extract sequences starting with AGGCG
 

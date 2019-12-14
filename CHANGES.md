@@ -3,7 +3,9 @@
     - `seqkit`: fix checking input file existence.
     - `seqkit seq`: do not force switch on `-g` when using `-m/-M`.
     - `seqkit translate`: supporting multiple frames. [#96](https://github.com/shenwei356/seqkit/issues/96)
-    - `seqkit grep/locate`: add detection and warning for space existing in search pattern/sequence.
+    - `seqkit grep/locate`:
+        - add detection and warning for space existing in search pattern/sequence.
+        - speed improvement (2X) for `-m/--max-mismatch` [shenwei356/bwt/issues/3](https://github.com/shenwei356/bwt/issues/3)
     - `seqkit version`: makeing checking update optional.
 - [SeqKit v0.11.0](https://github.com/shenwei356/seqkit/releases/tag/v0.11.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.11.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.11.0)
