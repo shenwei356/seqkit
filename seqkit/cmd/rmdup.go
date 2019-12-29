@@ -62,7 +62,16 @@ var rmdupCmd = &cobra.Command{
 		if bySeq && byName {
 			checkError(fmt.Errorf("only one/none of the flags -s (--by-seq) and -n (--by-name) is allowed"))
 		}
-		files := getFileList(args, true)
+
+		var err error
+		var files []string
+		infileList := getFlagString(cmd, "infile-list")
+		if infileList != "" {
+			files, err = getListFromFile(infileList, true)
+			checkError(err)
+		} else {
+			files = getFileList(args, true)
+		}
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

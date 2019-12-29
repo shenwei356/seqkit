@@ -67,7 +67,15 @@ Examples:
 		fai.MapWholeFile = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileList(args, true)
+		var err error
+		var files []string
+		infileList := getFlagString(cmd, "infile-list")
+		if infileList != "" {
+			files, err = getListFromFile(infileList, true)
+			checkError(err)
+		} else {
+			files = getFileList(args, true)
+		}
 
 		if len(files) > 1 {
 			checkError(fmt.Errorf("no more than one file should be given"))
@@ -108,7 +116,6 @@ Examples:
 		var outfile string
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
-		var err error
 
 		if !dryRun {
 			existed, err := pathutil.DirExists(outdir)

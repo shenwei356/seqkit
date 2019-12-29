@@ -63,7 +63,15 @@ var convertCmd = &cobra.Command{
 		seq.NMostCommonThreshold = getFlagPositiveInt(cmd, "thresh-B-in-n-most-common")
 		threshIllumina1p5Frac := getFlagFloat64(cmd, "thresh-illumina1.5-frac")
 
-		files := getFileList(args, true)
+		var err error
+		var files []string
+		infileList := getFlagString(cmd, "infile-list")
+		if infileList != "" {
+			files, err = getListFromFile(infileList, true)
+			checkError(err)
+		} else {
+			files = getFileList(args, true)
+		}
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

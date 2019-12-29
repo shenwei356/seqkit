@@ -99,7 +99,15 @@ Though, it's fast enough for microbial genomes.
 			}
 		}
 
-		files := getFileList(args, true)
+		var err error
+		var files []string
+		infileList := getFlagString(cmd, "infile-list")
+		if infileList != "" {
+			files, err = getListFromFile(infileList, true)
+			checkError(err)
+		} else {
+			files = getFileList(args, true)
+		}
 
 		// prepare pattern
 		regexps := make(map[string]*regexp.Regexp)

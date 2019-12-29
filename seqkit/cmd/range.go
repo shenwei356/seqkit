@@ -78,7 +78,14 @@ var rangeCmd = &cobra.Command{
 			checkError(fmt.Errorf("not supported range: %d:%d", start, end))
 		}
 
-		files := getFileList(args, true)
+		var files []string
+		infileList := getFlagString(cmd, "infile-list")
+		if infileList != "" {
+			files, err = getListFromFile(infileList, true)
+			checkError(err)
+		} else {
+			files = getFileList(args, true)
+		}
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

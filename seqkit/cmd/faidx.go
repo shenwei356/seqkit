@@ -57,7 +57,15 @@ This command is similar with "samtools faidx" but has some extra features:
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		useRegexp := getFlagBool(cmd, "use-regexp")
 
-		files := getFileList(args, false)
+		var err error
+		var files []string
+		infileList := getFlagString(cmd, "infile-list")
+		if infileList != "" {
+			files, err = getListFromFile(infileList, false)
+			checkError(err)
+		} else {
+			files = getFileList(args, false)
+		}
 
 		file := files[0]
 

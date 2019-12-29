@@ -66,7 +66,16 @@ Example: concatenating leading 2 bases and last 2 bases
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileList(args, true)
+		var err error
+		var files []string
+		infileList := getFlagString(cmd, "infile-list")
+		if infileList != "" {
+			files, err = getListFromFile(infileList, true)
+			checkError(err)
+		} else {
+			files = getFileList(args, true)
+		}
+
 		if len(files) < 2 {
 			checkError(errors.New("at least 2 files needed"))
 		}

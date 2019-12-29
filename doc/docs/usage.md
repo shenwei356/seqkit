@@ -225,6 +225,7 @@ Flags:
   -h, --help                            help for seqkit
       --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
       --id-regexp string                regular expression for parsing ID (default "^(\\S+)\\s?")
+      --infile-list string              file of input files list (one file per line), if given, files from cli arguments are ignored
   -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
   -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
       --quiet                           be quiet and do not show extra information

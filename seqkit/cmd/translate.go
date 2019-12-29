@@ -153,7 +153,14 @@ Translate Tables/Genetic Codes:
 			return
 		}
 
-		files := getFileList(args, true)
+		var files []string
+		infileList := getFlagString(cmd, "infile-list")
+		if infileList != "" {
+			files, err = getListFromFile(infileList, true)
+			checkError(err)
+		} else {
+			files = getFileList(args, true)
+		}
 
 		var record *fastx.Record
 		var fastxReader *fastx.Reader

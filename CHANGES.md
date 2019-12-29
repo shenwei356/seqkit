@@ -1,6 +1,8 @@
 - [SeqKit v0.11.1](https://github.com/shenwei356/seqkit/releases/tag/v0.11.1)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.11.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.11.1)
-    - `seqkit`: fix checking input file existence.
+    - `seqkit`:
+        - fix checking input file existence.
+        - new global flag `--infile-list` for long list of input files
     - `seqkit seq`: do not force switch on `-g` when using `-m/-M`.
     - `seqkit translate`: supporting multiple frames. [#96](https://github.com/shenwei356/seqkit/issues/96)
     - `seqkit grep/locate`:

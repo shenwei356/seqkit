@@ -21,6 +21,7 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -66,6 +67,31 @@ func getFileList(args []string, checkFile bool) []string {
 		files = args
 	}
 	return files
+}
+
+func getListFromFile(file string, checkFile bool) ([]string, error) {
+	fh, err := os.Open(file)
+	if err != nil {
+		return nil, fmt.Errorf("read files list from '%s': %s", file, err)
+	}
+
+	var _file string
+	lists := make([]string, 0, 1000)
+	scanner := bufio.NewScanner(fh)
+	for scanner.Scan() {
+		_file = scanner.Text()
+		if checkFile && !isStdin(_file) {
+			if _, err = os.Stat(_file); os.IsNotExist(err) {
+				return lists, fmt.Errorf("check file '%s': %s", file, err)
+			}
+		}
+		lists = append(lists, _file)
+	}
+	if err = scanner.Err(); err != nil {
+		return nil, fmt.Errorf("read files list from '%s': %s", file, err)
+	}
+
+	return lists, nil
 }
 
 func getFlagInt(cmd *cobra.Command, flag string) int {
