@@ -79,6 +79,7 @@ Though, it's fast enough for microbial genomes.
 		outFmtGTF := getFlagBool(cmd, "gtf")
 		outFmtBED := getFlagBool(cmd, "bed")
 		mismatches := getFlagNonNegativeInt(cmd, "max-mismatch")
+		hideMatched := getFlagBool(cmd, "hide-matched")
 
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
@@ -179,7 +180,11 @@ Though, it's fast enough for microbial genomes.
 		defer outfh.Close()
 
 		if !(outFmtGTF || outFmtBED) {
-			outfh.WriteString("seqID\tpatternName\tpattern\tstrand\tstart\tend\tmatched\n")
+			if hideMatched {
+				outfh.WriteString("seqID\tpatternName\tpattern\tstrand\tstart\tend\n")
+			} else {
+				outfh.WriteString("seqID\tpatternName\tpattern\tstrand\tstart\tend\tmatched\n")
+			}
 		}
 		var seqRP *seq.Seq
 		var offset, l int
@@ -250,14 +255,24 @@ Though, it's fast enough for microbial genomes.
 									0,
 									"+"))
 							} else {
-								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-									record.ID,
-									pName,
-									patterns[pName],
-									"+",
-									begin,
-									end,
-									record.Seq.Seq[i:i+len(pSeq)]))
+								if hideMatched {
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
+										record.ID,
+										pName,
+										patterns[pName],
+										"+",
+										begin,
+										end))
+								} else {
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+										record.ID,
+										pName,
+										patterns[pName],
+										"+",
+										begin,
+										end,
+										record.Seq.Seq[i:i+len(pSeq)]))
+								}
 							}
 						}
 					}
@@ -301,14 +316,24 @@ Though, it's fast enough for microbial genomes.
 									0,
 									"-"))
 							} else {
-								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-									record.ID,
-									pName,
-									patterns[pName],
-									"-",
-									begin,
-									end,
-									seqRP.Seq[i:i+len(pSeq)]))
+								if hideMatched {
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
+										record.ID,
+										pName,
+										patterns[pName],
+										"-",
+										begin,
+										end))
+								} else {
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+										record.ID,
+										pName,
+										patterns[pName],
+										"-",
+										begin,
+										end,
+										seqRP.Seq[i:i+len(pSeq)]))
+								}
 							}
 						}
 					}
@@ -357,14 +382,24 @@ Though, it's fast enough for microbial genomes.
 									0,
 									"+"))
 							} else {
-								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-									record.ID,
-									pName,
-									patterns[pName],
-									"+",
-									begin,
-									end,
-									record.Seq.Seq[offset+loc[0]:offset+loc[1]]))
+								if hideMatched {
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
+										record.ID,
+										pName,
+										patterns[pName],
+										"+",
+										begin,
+										end))
+								} else {
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+										record.ID,
+										pName,
+										patterns[pName],
+										"+",
+										begin,
+										end,
+										record.Seq.Seq[offset+loc[0]:offset+loc[1]]))
+								}
 							}
 							locs = append(locs, [2]int{begin, end})
 						}
@@ -424,14 +459,24 @@ Though, it's fast enough for microbial genomes.
 									0,
 									"-"))
 							} else {
-								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-									record.ID,
-									pName,
-									patterns[pName],
-									"-",
-									begin,
-									end,
-									record.Seq.SubSeq(l-offset-loc[1]+1, l-offset-loc[0]).RevCom().Seq))
+								if hideMatched {
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
+										record.ID,
+										pName,
+										patterns[pName],
+										"-",
+										begin,
+										end))
+								} else {
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+										record.ID,
+										pName,
+										patterns[pName],
+										"-",
+										begin,
+										end,
+										record.Seq.SubSeq(l-offset-loc[1]+1, l-offset-loc[0]).RevCom().Seq))
+								}
 							}
 							locsNeg = append(locsNeg, [2]int{begin, end})
 						}
@@ -464,4 +509,5 @@ func init() {
 	locateCmd.Flags().BoolP("gtf", "", false, "output in GTF format")
 	locateCmd.Flags().BoolP("bed", "", false, "output in BED6 format")
 	locateCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster")
+	locateCmd.Flags().BoolP("hide-matched", "M", false, "do not show matched sequences")
 }

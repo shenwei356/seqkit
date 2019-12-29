@@ -6,7 +6,8 @@
     - `seqkit grep/locate`:
         - add detection and warning for space existing in search pattern/sequence.
         - speed improvement (2X) for `-m/--max-mismatch` [shenwei356/bwt/issues/3](https://github.com/shenwei356/bwt/issues/3)
-    - `seqkit version`: makeing checking update optional.
+    - `seqkit locate`: new flag `-M/--hide-matched` for hiding matched sequences. [#98](https://github.com/shenwei356/seqkit/issues/98)
+    - `seqkit version`: checking update optional is optional (`-u`)
 - [SeqKit v0.11.0](https://github.com/shenwei356/seqkit/releases/tag/v0.11.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.11.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.11.0)
     - `seqkit`: fix hanging when reading from truncated gzip file.

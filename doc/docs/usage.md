@@ -1438,6 +1438,7 @@ Flags:
   -d, --degenerate                pattern/motif contains degenerate base
       --gtf                       output in GTF format
   -h, --help                      help for locate
+  -M, --hide-matched              do not show matched sequences
   -i, --ignore-case               ignore case
   -m, --max-mismatch int          max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster
   -G, --non-greedy                non-greedy mode, faster but may miss motifs overlapping with others
@@ -1456,23 +1457,40 @@ Examples
         >seq
         agctggagctacc
 
-        $ cat t.fa | seqkit locate -p agc | csvtk pretty -t
+        $ cat t.fa \
+          | seqkit locate -p agc \
+          | csvtk pretty -t
         seqID   patternName   pattern   strand   start   end   matched
         seq     agc           agc       +        1       3     agc
         seq     agc           agc       +        7       9     agc
         seq     agc           agc       -        8       10    agc
         seq     agc           agc       -        2       4     agc
 
-        $ cat t.fa | seqkit locate -p agc -m 1 | csvtk pretty -t
-        seqID   patternName     pattern strand  start   end     matched
+        # do not show matched sequences
+        $ cat t.fa \
+          | seqkit locate -p agc -M \
+          | csvtk pretty -t
+        seqID   patternName   pattern   strand   start   end
+        seq     agc           agc       +        1       3
+        seq     agc           agc       +        7       9
+        seq     agc           agc       -        8       10
+        seq     agc           agc       -        2       4
+
+        # max mismatch: 1
+        $ cat t.fa \
+          | seqkit locate -p agc -m 1 \
+          | csvtk pretty -t
+        seqID   patternName     pattern strand  start   end    matched
         seq     agc           agc       +        1       3     agc
         seq     agc           agc       +        7       9     agc
         seq     agc           agc       +        11      13    acc
         seq     agc           agc       -        8       10    agc
         seq     agc           agc       -        2       4     agc
 
-
-        $ cat t.fa | seqkit locate -p agc -m 2 | csvtk pretty -t
+        # max mismatch: 2
+        $ cat t.fa \
+          | seqkit locate -p agc -m 2 \
+          | csvtk pretty -t
         seqID   patternName   pattern   strand   start   end   matched
         seq     agc           agc       +        1       3     agc
         seq     agc           agc       +        4       6     tgg
