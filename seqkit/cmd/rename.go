@@ -70,9 +70,8 @@ var renameCmd = &cobra.Command{
 		var k string
 		var ok bool
 		var numbers map[string]int
+		numbers = make(map[string]int)
 		for _, file := range files {
-			numbers = make(map[string]int)
-
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 			for {
