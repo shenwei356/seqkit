@@ -10,7 +10,9 @@
         - speed improvement (2X) for `-m/--max-mismatch` [shenwei356/bwt/issues/3](https://github.com/shenwei356/bwt/issues/3)
     - `seqkit locate`:
         - new flag `-M/--hide-matched` for hiding matched sequences. [#98](https://github.com/shenwei356/seqkit/issues/98)
-        - new flag `-r/--use-regexp` for explicitly using regular expression, so improve speed of default `index` operation. [101](https://github.com/shenwei356/seqkit/issues/101)
+        - new flag `-r/--use-regexp` for explicitly using regular expression, so improve speed of default `index` operation. 
+        [101](https://github.com/shenwei356/seqkit/issues/101)
+        - new flag `-F/--use-fmi` for improve search speed for lots of patterns.
     - `seqkit rename`: making unique IDs across multiple files
     - `seqkit version`: checking update optional is optional (`-u`)
 - [SeqKit v0.11.0](https://github.com/shenwei356/seqkit/releases/tag/v0.11.0)

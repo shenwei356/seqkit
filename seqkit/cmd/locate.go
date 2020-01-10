@@ -74,6 +74,7 @@ Though, it's fast enough for microbial genomes.
 		patternFile := getFlagString(cmd, "pattern-file")
 		degenerate := getFlagBool(cmd, "degenerate")
 		useRegexp := getFlagBool(cmd, "use-regexp")
+		useFMI := getFlagBool(cmd, "use-fmi")
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
 		nonGreedy := getFlagBool(cmd, "non-greedy")
@@ -92,15 +93,21 @@ Though, it's fast enough for microbial genomes.
 				checkError(fmt.Errorf("flag -d (--degenerate) not allowed when giving flag -m (--max-mismatch)"))
 			}
 			if useRegexp {
-				checkError(fmt.Errorf("flag -r (--use-regexp) not allowed when giving flag -m (--max-mismatch)"))
+				checkError(fmt.Errorf("flag -r (--use-regexp) not allowed when giving flag -m (--use-regexp)"))
 			}
 			if nonGreedy && !quiet {
 				log.Infof("flag -G (--non-greedy) ignored when giving flag -m (--max-mismatch)")
 			}
 			sfmi = fmi.NewFMIndex()
-			if mismatches > 4 {
-				log.Warningf("large value flag -m/--max-mismatch will slow down the search")
+		}
+		if useFMI {
+			if degenerate {
+				checkError(fmt.Errorf("flag -d (--degenerate) ignored when giving flag -F (--use-fmi)"))
 			}
+			if useRegexp {
+				checkError(fmt.Errorf("flag -r (--use-regexp) ignored when giving flag -F (--use-fmi)"))
+			}
+			sfmi = fmi.NewFMIndex()
 		}
 
 		var err error
@@ -261,7 +268,7 @@ Though, it's fast enough for microbial genomes.
 					seqRP = record.Seq.RevCom()
 				}
 
-				if mismatches > 0 {
+				if mismatches > 0 || useFMI {
 					_, err = sfmi.Transform(record.Seq.Seq)
 					if err != nil {
 						checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
@@ -574,6 +581,7 @@ func init() {
 	locateCmd.Flags().StringP("pattern-file", "f", "", "pattern/motif file (FASTA format)")
 	locateCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
 	locateCmd.Flags().BoolP("use-regexp", "r", false, "patterns/motifs are regular expression")
+	locateCmd.Flags().BoolP("use-fmi", "F", false, "use FM-index for much faster searching of lots of patterns")
 	locateCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	locateCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on positive strand")
 	locateCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
