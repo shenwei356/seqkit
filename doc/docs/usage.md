@@ -1446,6 +1446,7 @@ Flags:
   -P, --only-positive-strand      only search on positive strand
   -p, --pattern strings           pattern/motif (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
   -f, --pattern-file string       pattern/motif file (FASTA format)
+  -r, --use-regexp                patterns/motifs are regular expression
   -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
 
 ```
@@ -1508,7 +1509,7 @@ Examples
 1. Locate ORFs.
 
         $ zcat hairpin.fa.gz \
-            | seqkit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" \
+            | seqkit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" -r \
             | head -n 4 \
             | csvtk pretty -t
         seqID       patternName                        pattern                            strand   start   end   matched
