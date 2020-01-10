@@ -2359,7 +2359,11 @@ Usage:
   seqkit rename [flags]
 
 Flags:
-  -n, --by-name   check duplication by full name instead of just id
+  -n, --by-name             check duplication by full name instead of just id
+  -f, --force               overwrite output directory
+  -h, --help                help for rename
+  -m, --multiple-outfiles   write results into separated files for multiple input files
+  -O, --out-dir string      output directory (default "renamed")
 
 ```
 

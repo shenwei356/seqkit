@@ -23,10 +23,13 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/util/pathutil"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -59,10 +62,43 @@ var renameCmd = &cobra.Command{
 		}
 
 		byName := getFlagBool(cmd, "by-name")
+		mOutputs := getFlagBool(cmd, "multiple-outfiles")
+		outdir := getFlagString(cmd, "out-dir")
+		force := getFlagBool(cmd, "force")
 
-		outfh, err := xopen.Wopen(outFile)
-		checkError(err)
-		defer outfh.Close()
+		var outfh *xopen.Writer
+
+		if !mOutputs {
+			outfh, err = xopen.Wopen(outFile)
+			checkError(err)
+			defer outfh.Close()
+		} else {
+			if outdir == "" {
+				checkError(fmt.Errorf("out dir should not be empty"))
+			}
+			for _, file := range files {
+				if isStdin(file) {
+					checkError(fmt.Errorf("stdin detected, should not use -m/--mutliple-outfiles"))
+				}
+			}
+
+			existed, err := pathutil.DirExists(outdir)
+			checkError(err)
+			if existed {
+				empty, err := pathutil.IsEmpty(outdir)
+				checkError(err)
+				if !empty {
+					if force {
+						checkError(os.RemoveAll(outdir))
+					} else {
+						checkError(fmt.Errorf("outdir not empty: %s, use -f (--force) to overwrite", outdir))
+					}
+				} else {
+					checkError(os.RemoveAll(outdir))
+				}
+			}
+			checkError(os.MkdirAll(outdir, 0777))
+		}
 
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
@@ -72,40 +108,48 @@ var renameCmd = &cobra.Command{
 		var numbers map[string]int
 		numbers = make(map[string]int)
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
-			checkError(err)
-			for {
-				record, err = fastxReader.Read()
-				if err != nil {
-					if err == io.EOF {
+			func(file string) {
+				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+				checkError(err)
+
+				if mOutputs {
+					outfh, err = xopen.Wopen(filepath.Join(outdir, filepath.Base(file)))
+					checkError(err)
+					defer outfh.Close()
+				}
+
+				for {
+					record, err = fastxReader.Read()
+					if err != nil {
+						if err == io.EOF {
+							break
+						}
+						checkError(err)
 						break
 					}
-					checkError(err)
-					break
-				}
-				if fastxReader.IsFastq {
-					config.LineWidth = 0
-					fastx.ForcelyOutputFastq = true
-				}
+					if fastxReader.IsFastq {
+						config.LineWidth = 0
+						fastx.ForcelyOutputFastq = true
+					}
 
-				if byName {
-					k = string(record.Name)
-				} else {
-					k = string(record.ID)
+					if byName {
+						k = string(record.Name)
+					} else {
+						k = string(record.ID)
+					}
+
+					if _, ok = numbers[k]; ok {
+						numbers[k]++
+						newID = fmt.Sprintf("%s_%d", record.ID, numbers[k])
+						record.Name = []byte(fmt.Sprintf("%s %s", newID, record.Name))
+					} else {
+						numbers[k] = 1
+					}
+
+					record.FormatToWriter(outfh, config.LineWidth)
 				}
-
-				if _, ok = numbers[k]; ok {
-					numbers[k]++
-					newID = fmt.Sprintf("%s_%d", record.ID, numbers[k])
-					record.Name = []byte(fmt.Sprintf("%s %s", newID, record.Name))
-				} else {
-					numbers[k] = 1
-				}
-
-				record.FormatToWriter(outfh, config.LineWidth)
-			}
-
-			config.LineWidth = lineWidth
+				config.LineWidth = lineWidth
+			}(file)
 		}
 	},
 }
@@ -114,4 +158,7 @@ func init() {
 	RootCmd.AddCommand(renameCmd)
 
 	renameCmd.Flags().BoolP("by-name", "n", false, "check duplication by full name instead of just id")
+	renameCmd.Flags().BoolP("multiple-outfiles", "m", false, "write results into separated files for multiple input files")
+	renameCmd.Flags().StringP("out-dir", "O", "renamed", "output directory")
+	renameCmd.Flags().BoolP("force", "f", false, "overwrite output directory")
 }
