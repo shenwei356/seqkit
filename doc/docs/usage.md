@@ -1446,7 +1446,7 @@ Flags:
   -P, --only-positive-strand      only search on positive strand
   -p, --pattern strings           pattern/motif (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
   -f, --pattern-file string       pattern/motif file (FASTA format)
-  -F, --use-fmi                   use FM-index for much faster searching of lots of patterns
+  -F, --use-fmi                   use FM-index for much faster search of lots of sequence patterns
   -r, --use-regexp                patterns/motifs are regular expression
   -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
 

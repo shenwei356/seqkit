@@ -581,7 +581,7 @@ func init() {
 	locateCmd.Flags().StringP("pattern-file", "f", "", "pattern/motif file (FASTA format)")
 	locateCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
 	locateCmd.Flags().BoolP("use-regexp", "r", false, "patterns/motifs are regular expression")
-	locateCmd.Flags().BoolP("use-fmi", "F", false, "use FM-index for much faster searching of lots of patterns")
+	locateCmd.Flags().BoolP("use-fmi", "F", false, "use FM-index for much faster search of lots of sequence patterns")
 	locateCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	locateCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on positive strand")
 	locateCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
