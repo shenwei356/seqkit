@@ -29,6 +29,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
@@ -42,6 +43,9 @@ const (
 	StreamEOF
 	StreamExited
 )
+
+const NAP_SLEEP = 10
+const BIG_SLEEP = 100
 
 // sanaCmd represents the sana command
 var sanaCmd = &cobra.Command{
@@ -66,9 +70,29 @@ var sanaCmd = &cobra.Command{
 		files := getFileList(args, true)
 
 		for _, file := range files {
-			rawSeqChan := NewRawSeqStreamFromFile(file, 1000, qBase, inFmt, allowGaps)
+			rawSeqChan, ctrlChan := NewRawSeqStreamFromFile(file, 1000, qBase, inFmt, allowGaps)
+			go func() {
+				for {
+					select {
+					case i := <-ctrlChan:
+						if i == StreamEOF {
+							ctrlChan <- StreamQuit
+							i = <-ctrlChan
+							if i == StreamExited {
+								return
+							}
+						} else {
+							ctrlChan <- i
+							time.Sleep(time.Microsecond * NAP_SLEEP)
+						}
+					default:
+						time.Sleep(time.Millisecond * BIG_SLEEP)
+					}
+				}
+			}()
 
 			pass, fail := 0, 0
+			ctrlChan <- StreamTry
 			for rawSeq := range rawSeqChan {
 				switch rawSeq.Err {
 				case nil:
@@ -231,34 +255,21 @@ func ValidateSeq(seq *simpleSeq, gaps bool) error {
 }
 
 // NewRawSeqStream initializes a new channel for reading fastq records from a file in a robust way.
-func NewRawSeqStreamFromFile(inFastq string, chanSize int, qBase int, format string, allowGaps bool) chan *simpleSeq {
-	r, err := xopen.Ropen(inFastq)
+func NewRawSeqStreamFromFile(inFastq string, chanSize int, qBase int, format string, allowGaps bool) (chan *simpleSeq, chan SeqStreamCtrl) {
+	rio, err := os.Open(inFastq)
 	checkError(err)
 	buffSize := 100 * 1024
+	bio := bufio.NewReaderSize(rio, buffSize)
 	ctrlChan := make(chan SeqStreamCtrl, 0)
-	go func() {
-		for {
-			select {
-			case i := <-ctrlChan:
-				if i == StreamEOF {
-					ctrlChan <- StreamQuit
-					i = <-ctrlChan
-					if i == StreamExited {
-						return
-					}
-				}
-			case ctrlChan <- StreamTry:
-			default:
-			}
-		}
-	}()
+
 	switch format {
 	case "fastq":
-		return NewRawFastqStream(bufio.NewReaderSize(r, buffSize), chanSize, qBase, inFastq, ctrlChan, allowGaps)
+		return NewRawFastqStream(bio, chanSize, qBase, inFastq, ctrlChan, allowGaps), ctrlChan
 	case "fasta":
-		return NewRawFastaStream(bufio.NewReaderSize(r, buffSize), chanSize, inFastq, ctrlChan, allowGaps)
+		return NewRawFastaStream(bio, chanSize, inFastq, ctrlChan, allowGaps), ctrlChan
 	}
-	return nil
+
+	return nil, nil
 }
 
 type FqlState struct {
@@ -358,6 +369,9 @@ func streamFastq(r *bufio.Reader, sbuff FqLines, out chan *simpleSeq, ctrlChan c
 	}
 	var err error
 	for {
+		if r == nil {
+			log.Fatal("Buffered reader is nil!", err)
+		}
 		line, err = r.ReadBytes('\n')
 		switch err {
 		case nil:
@@ -381,6 +395,9 @@ func streamFastq(r *bufio.Reader, sbuff FqLines, out chan *simpleSeq, ctrlChan c
 				seq, err := FqLinesToSimpleSeq(sbuff, qBase, gaps)
 				if err == nil {
 					seq.StartLine = *lineCounter + spaceShift - 4
+					if seq == nil {
+						panic("Sequence is nil!")
+					}
 					out <- seq
 					sbuff = sbuff[:0]
 				} else {
@@ -457,7 +474,6 @@ func streamFasta(r *bufio.Reader, sbuff FqLines, out chan *simpleSeq, ctrlChan c
 						for j := 0; j < len(sbuff)-1; j++ {
 							ems := fmt.Sprintf("Discarded line: %s", err)
 							serr := &simpleSeq{StartLine: spaceShift + *lineCounter - len(sbuff) - 1 + j, Err: errors.New(ems), Seq: sbuff[j].Line}
-							//serr := &simpleSeq{StartLine: spaceShift + *lineCounter - len(sbuff) - 1 + j, Err: err, Seq: sbuff[j].Line}
 							out <- serr
 						}
 					}
@@ -489,7 +505,6 @@ func streamFasta(r *bufio.Reader, sbuff FqLines, out chan *simpleSeq, ctrlChan c
 					for j := 0; j < len(sbuff)-1; j++ {
 						ems := fmt.Sprintf("Discarded line: %s", err)
 						serr := &simpleSeq{StartLine: spaceShift + *lineCounter - len(sbuff) - 1 + j, Err: errors.New(ems), Seq: sbuff[j].Line}
-						//serr := &simpleSeq{StartLine: spaceShift + *lineCounter - len(sbuff) - 1 + j, Err: err, Seq: sbuff[j].Line}
 						out <- serr
 					}
 				}
@@ -531,11 +546,13 @@ func NewRawFastqStream(inReader *bufio.Reader, chanSize int, qBase int, id strin
 						serr := &simpleSeq{Err: errors.New(ems), StartLine: -1, Seq: l.Line}
 						seqChan <- serr
 					}
-					close(seqChan)
 					ctrlChan <- StreamExited
+					close(seqChan)
+					close(ctrlChan)
 					return
 				} else {
-					panic("Invalid stream control command!")
+					time.Sleep(time.Millisecond * BIG_SLEEP)
+					ctrlChan <- cmd
 				}
 			}
 		}
@@ -547,36 +564,38 @@ func NewRawFastqStream(inReader *bufio.Reader, chanSize int, qBase int, id strin
 // NewRawSeqStream initializes a new channel for reading fastq records in a robust way.
 func NewRawFastaStream(inReader *bufio.Reader, chanSize int, id string, ctrlChan chan SeqStreamCtrl, gaps bool) chan *simpleSeq {
 	seqChan := make(chan *simpleSeq, chanSize)
-	lineCounter := 0
 
 	go func() {
 		sbuff := make(FqLines, 0, 100)
 		var err error
 		_ = err
+		lineCounter := new(int)
 
 		for {
 			select {
 			case cmd := <-ctrlChan:
 				if cmd == StreamTry {
-					sbuff, err = streamFasta(inReader, sbuff, seqChan, ctrlChan, &lineCounter, gaps, false)
+					sbuff, err = streamFasta(inReader, sbuff, seqChan, ctrlChan, lineCounter, gaps, false)
 					if err != nil {
-						panic(err)
+						log.Fatal(err)
 					}
 
 				} else if cmd == StreamQuit {
-					sbuff, err = streamFasta(inReader, sbuff, seqChan, ctrlChan, &lineCounter, gaps, true)
+					sbuff, err = streamFasta(inReader, sbuff, seqChan, ctrlChan, lineCounter, gaps, true)
 					for i, l := range sbuff {
 						ems := fmt.Sprintf("Discarded line: %s", err)
-						serr := &simpleSeq{Err: errors.New(ems), StartLine: lineCounter - i, Seq: l.Line}
-						//serr := &simpleSeq{Err: err, StartLine: lineCounter - i, Seq: l.Line}
+						serr := &simpleSeq{Err: errors.New(ems), StartLine: *lineCounter - i, Seq: l.Line}
 						seqChan <- serr
 					}
 					close(seqChan)
 					ctrlChan <- StreamExited
+					close(ctrlChan)
 					return
 				} else {
 					panic("Invalid stream control command!")
 				}
+			default:
+				time.Sleep(time.Millisecond * NAP_SLEEP)
 			}
 		}
 	}()

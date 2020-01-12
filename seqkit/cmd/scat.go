@@ -21,18 +21,23 @@
 package cmd
 
 import (
-	//"bytes"
 	"fmt"
-	//"io"
-	//"math"
-	//"os"
-	"runtime"
-	//"github.com/shenwei356/bio/seqio/fastx"
-	//"github.com/shenwei356/util/byteutil"
 	"github.com/fsnotify/fsnotify"
+	"github.com/iafan/cwalk"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
+	"os"
+	"os/signal"
+	//"path"
+	//"path/filepath"
+	"runtime"
+	"sync"
+	"time"
 )
+
+type WatchCtrl int
+
+type WatchCtrlChan chan WatchCtrl
 
 // scatCmd represents the fish command
 var scatCmd = &cobra.Command{
@@ -44,66 +49,267 @@ var scatCmd = &cobra.Command{
 		config := getConfigs(cmd)
 		outFile := config.OutFile
 		runtime.GOMAXPROCS(config.Threads)
+
 		qBase := getFlagPositiveInt(cmd, "qual-ascii-base")
+		inFmt := getFlagString(cmd, "in-format")
+		outFmt := getFlagString(cmd, "out-format")
+		allowGaps := getFlagBool(cmd, "allow-gaps")
+		timeLimit := getFlagFloat64(cmd, "time-limit")
+		waitPid := getFlagInt(cmd, "wait-pid")
+		regexp := getFlagString(cmd, "regexp")
 
 		dirs := getFileList(args, true)
+		var err error
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Close()
-		_ = outFile
-		_ = qBase
-		fmt.Println(dirs, outFile)
-		LauchWatchers(dirs, "")
+		ctrlChan := make(WatchCtrlChan)
+		ndirs := []string{}
+		for _, d := range dirs {
+			if d != "-" {
+				ndirs = append(ndirs, d)
+			}
+		}
+		if len(ndirs) == 0 {
+			log.Info("No directories given to watch! Exiting.")
+			os.Exit(1)
+		}
+		LaunchFxWatchers(dirs, ctrlChan, regexp, inFmt, outFmt, qBase, allowGaps, timeLimit, waitPid)
 
 	},
 }
 
-func LauchWatchers(dirs []string, rexp string) {
+func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, regexp string, inFmt, outFmt string, qBase int, allowGaps bool, timeLimit float64, waitPid int) {
 	for _, dir := range dirs {
-		NewFxWatcher(dir, rexp)
+		go NewFxWatcher(dir, ctrlChan, regexp, inFmt, outFmt, qBase, allowGaps)
+	}
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt)
+
+EVER:
+	for {
+		select {
+		case <-sigChan:
+			for i, _ := range dirs {
+				ctrlChan <- WatchCtrl(i)
+				<-ctrlChan
+			}
+			close(sigChan)
+			return
+			break EVER
+		default:
+			time.Sleep(time.Millisecond * NAP_SLEEP)
+		}
 	}
 }
 
-func NewFxWatcher(dir, rexp string) {
+type WatchedFx struct {
+	Name      string
+	LastSize  int64
+	BytesRead int64
+	IsDir     bool
+	SeqChan   chan *simpleSeq
+	CtrlChan  chan SeqStreamCtrl
+}
+
+type WatchedFxPool map[string]*WatchedFx
+
+type FxWatcher struct {
+	Base  string
+	Pool  WatchedFxPool
+	Mutex sync.RWMutex
+}
+
+func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outFmt string, qBase int, allowGaps bool) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("fsnotify error:", err)
 	}
 	defer watcher.Close()
+	self := new(FxWatcher)
+	self.Base = dir
+	self.Pool = make(WatchedFxPool)
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt)
 
-	done := make(chan bool)
 	go func() {
 		for {
 			select {
+			case <-ctrlChan:
+				self.Mutex.Lock()
+				for ePath, w := range self.Pool {
+					watcher.Remove(ePath)
+					if w.IsDir {
+						delete(self.Pool, ePath)
+						continue
+					}
+					log.Info("Stopped watching: ", ePath)
+					w.CtrlChan <- StreamQuit
+					for c := range w.CtrlChan {
+						_ = c
+					}
+				}
+				self.Mutex.Unlock()
+				log.Info("Exiting.")
+				ctrlChan <- WatchCtrl(-9)
+				return
 			case event, ok := <-watcher.Events:
 				if !ok {
 					return
 				}
-				fmt.Println("event:", event)
+				ePath := event.Name
+				if event.Op&fsnotify.Remove == fsnotify.Remove {
+					self.Mutex.Lock()
+					di := self.Pool[ePath]
+					if di == nil {
+						self.Mutex.Unlock()
+						continue
+					}
+					if di.IsDir {
+						log.Info("removed directory:", event.Name)
+						watcher.Remove(event.Name)
+						delete(self.Pool, ePath)
+						self.Mutex.Unlock()
+						continue
+					}
+					log.Info("removed file:", event.Name)
+					di.CtrlChan <- StreamQuit
+					<-di.CtrlChan
+					delete(self.Pool, ePath)
+					self.Mutex.Unlock()
+					continue
+				}
 				if event.Op&fsnotify.Write == fsnotify.Write {
-					fmt.Println("modified file:", event.Name)
+					fi, err := os.Stat(ePath)
+					checkError(err)
+					if self.Pool[ePath] == nil {
+						continue
+					}
+					self.Mutex.RLock()
+					if self.Pool[ePath].LastSize == fi.Size() {
+						self.Mutex.RUnlock()
+						continue
+					}
+					delta := fi.Size() - self.Pool[ePath].LastSize
+					if delta < 0 {
+						log.Info("Stopped watching truncated file:", ePath)
+						self.Pool[ePath].CtrlChan <- StreamQuit
+						<-self.Pool[ePath].CtrlChan
+						delete(self.Pool, ePath)
+						self.Mutex.RUnlock()
+						continue
+					}
+					if delta < 5000 {
+						self.Mutex.RUnlock()
+						continue
+					}
+					log.Info("modified file:", ePath)
+					time.Sleep(time.Millisecond * BIG_SLEEP / 2)
+					self.Pool[ePath].CtrlChan <- StreamTry
+					self.Mutex.RUnlock()
+				} else if event.Op&fsnotify.Create == fsnotify.Create {
+					fi, err := os.Stat(ePath)
+					checkError(err)
+					self.Mutex.Lock()
+					if fi.IsDir() {
+						log.Info("new directory:", event.Name)
+						watcher.Add(ePath)
+						self.Pool[ePath] = &WatchedFx{Name: ePath, IsDir: true}
+						self.Mutex.Unlock()
+						continue
+					}
+					log.Info("new file:", ePath)
+
+					sc, ctrl := NewRawSeqStreamFromFile(ePath, 1000, qBase, inFmt, allowGaps)
+
+					ctrl <- StreamTry
+					self.Pool[ePath] = &WatchedFx{Name: ePath, IsDir: false, SeqChan: sc, CtrlChan: ctrl, LastSize: fi.Size()}
+					watcher.Add(ePath)
+					self.Mutex.Unlock()
+				}
+				if event.Op&fsnotify.Rename == fsnotify.Rename {
+					log.Info("Stopped watching renamed file:", ePath)
+					self.Pool[ePath].CtrlChan <- StreamQuit
+					<-self.Pool[ePath].CtrlChan
+					delete(self.Pool, ePath)
 				}
 			case err, ok := <-watcher.Errors:
 				if !ok {
 					return
 				}
-				fmt.Println("error:", err)
+				log.Fatalf("fsnotify error:", err)
+			default:
+				time.Sleep(time.Microsecond * 10)
 			}
 		}
 	}()
 
+	self.Mutex.Lock()
 	err = watcher.Add(dir)
-	if err != nil {
-		fmt.Println(err)
+	self.Pool[dir] = &WatchedFx{Name: dir, IsDir: true}
+	checkError(err)
+	log.Info(fmt.Sprintf("Watcher (%s) launched on root: %s", inFmt, dir))
+	self.Mutex.Unlock()
+
+	for {
+		time.Sleep(time.Millisecond * BIG_SLEEP)
+		self.Mutex.RLock()
+		for ePath, w := range self.Pool {
+		CHAN:
+			for {
+				select {
+				case seq, ok := <-w.SeqChan:
+					if !ok {
+						break CHAN
+					}
+					fmt.Println(seq)
+				case e, ok := <-w.CtrlChan:
+					if !ok {
+						break CHAN
+					}
+					if e == StreamEOF {
+						break CHAN
+					}
+					if e == StreamExited {
+						self.Mutex.RUnlock()
+						self.Mutex.Lock()
+						delete(self.Pool, ePath)
+						self.Mutex.Unlock()
+						self.Mutex.RLock()
+					}
+					if e == StreamTry {
+						self.Mutex.RUnlock()
+						time.Sleep(time.Second)
+						w.CtrlChan <- e
+					}
+				default:
+					break CHAN
+				}
+			}
+			fi, err := os.Stat(ePath)
+			if err != nil {
+				w.LastSize = fi.Size()
+			}
+		}
+		self.Mutex.RUnlock()
+		if len(self.Pool) == 0 {
+			ctrlChan <- -1
+			return
+		}
+		time.Sleep(time.Millisecond * NAP_SLEEP)
 	}
-	<-done
+
+	_ = cwalk.NumWorkers
 }
 
 func init() {
 	RootCmd.AddCommand(scatCmd)
 
 	scatCmd.Flags().StringP("regexp", "r", ".*\\.(fastq|fq)", "output format: auto, fq, fas")
-	scatCmd.Flags().StringP("out-format", "f", "auto", "output format: auto, fq, fas")
+	scatCmd.Flags().StringP("in-format", "I", "fastq", "input format: fastq or fasta (fastq)")
+	scatCmd.Flags().StringP("out-format", "O", "fastq", "output format: fastq or fasta (fastq)")
+	scatCmd.Flags().BoolP("allow-gaps", "A", false, "allow gap character (-) in sequences")
 	scatCmd.Flags().Float64P("time-limit", "T", -1, "quit after inactive for this many hours")
-	scatCmd.Flags().Float64P("wait-pid", "p", -1, "after process with this PID exited")
+	scatCmd.Flags().IntP("wait-pid", "p", -1, "after process with this PID exited")
+	scatCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
 }
