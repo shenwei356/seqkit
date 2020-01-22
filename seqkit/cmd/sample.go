@@ -69,6 +69,12 @@ var sampleCmd = &cobra.Command{
 		number := getFlagInt64(cmd, "number")
 		proportion := getFlagFloat64(cmd, "proportion")
 
+		file := files[0]
+
+		if twoPass && isStdin(file) {
+			checkError(fmt.Errorf("two-pass mode (-2) will failed when reading from stdin. please disable flag: -2"))
+		}
+
 		if number == 0 && proportion == 0 {
 			checkError(fmt.Errorf("one of flags -n (--number) and -p (--proportion) needed"))
 		}
@@ -77,7 +83,7 @@ var sampleCmd = &cobra.Command{
 			checkError(fmt.Errorf("value of -n (--number) and should be greater than 0"))
 		}
 		if proportion < 0 || proportion > 1 {
-			checkError(fmt.Errorf("value of -p (--proportion) (%f) should be in range of [0, 1]", proportion))
+			checkError(fmt.Errorf("value of -p (--proportion) (%f) should be in range of (0, 1]", proportion))
 		}
 
 		outfh, err := xopen.Wopen(outFile)
@@ -85,8 +91,6 @@ var sampleCmd = &cobra.Command{
 		defer outfh.Close()
 
 		rand.Seed(seed)
-
-		file := files[0]
 
 		n := int64(0)
 		var record *fastx.Record
@@ -97,9 +101,6 @@ var sampleCmd = &cobra.Command{
 			}
 
 			if twoPass {
-				if xopen.IsStdin() {
-					checkError(fmt.Errorf("two-pass mode (-2) will failed when reading from stdin. please disable flag: -2"))
-				}
 				// first pass, get seq number
 				if !quiet {
 					log.Info("first pass: counting seq number")
