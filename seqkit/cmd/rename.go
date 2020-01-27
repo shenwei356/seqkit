@@ -81,22 +81,25 @@ var renameCmd = &cobra.Command{
 				}
 			}
 
-			existed, err := pathutil.DirExists(outdir)
-			checkError(err)
-			if existed {
-				empty, err := pathutil.IsEmpty(outdir)
+			pwd, _ := os.Getwd()
+			if outdir != "./" && outdir != "." && pwd != filepath.Clean(outdir) {
+				existed, err := pathutil.DirExists(outdir)
 				checkError(err)
-				if !empty {
-					if force {
-						checkError(os.RemoveAll(outdir))
+				if existed {
+					empty, err := pathutil.IsEmpty(outdir)
+					checkError(err)
+					if !empty {
+						if force {
+							checkError(os.RemoveAll(outdir))
+						} else {
+							checkError(fmt.Errorf("outdir not empty: %s, use -f (--force) to overwrite", outdir))
+						}
 					} else {
-						checkError(fmt.Errorf("outdir not empty: %s, use -f (--force) to overwrite", outdir))
+						checkError(os.RemoveAll(outdir))
 					}
-				} else {
-					checkError(os.RemoveAll(outdir))
 				}
+				checkError(os.MkdirAll(outdir, 0777))
 			}
-			checkError(os.MkdirAll(outdir, 0777))
 		}
 
 		var record *fastx.Record
