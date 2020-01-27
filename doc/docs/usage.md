@@ -747,6 +747,8 @@ This command is similar with "samtools faidx" but has some extra features:
 
   1. output full header line with flag -f
   2. support regular expression as sequence ID with flag -r
+  3. if you have large number of IDs, you can use:
+        seqkit faidx seqs.fasta --infile-list IDs.txt
 
 Usage:
   seqkit faidx [flags] <fasta-file> [regions...]
@@ -1303,7 +1305,9 @@ Attentions:
      but it's not fast enough for large genome like human genome.
      Though, it's fast enough for microbial genomes.
   3. The order of sequences in result is consistent with that in original
-     file, not the order of the query patterns.
+     file, not the order of the query patterns. 
+     But for FASTA file, you can use:
+        seqkit faidx seqs.fasta --infile-list IDs.txt
 
 You can specify the sequence region for searching with flag -R (--region).
 The definition of region is 1-based and with some custom design.

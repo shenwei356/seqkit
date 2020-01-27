@@ -67,14 +67,12 @@ Examples:
 		fai.MapWholeFile = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		var err error
-		var files []string
 		infileList := getFlagString(cmd, "infile-list")
+		files := getFileList(args, true)
 		if infileList != "" {
-			files, err = getListFromFile(infileList, true)
+			_files, err := getListFromFile(infileList, true)
 			checkError(err)
-		} else {
-			files = getFileList(args, true)
+			files = append(files, _files...)
 		}
 
 		if len(files) > 1 {
@@ -137,6 +135,7 @@ Examples:
 		}
 
 		var outfh *xopen.Writer
+		var err error
 
 		if size > 0 {
 			if !twoPass {

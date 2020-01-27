@@ -45,6 +45,8 @@ This command is similar with "samtools faidx" but has some extra features:
 
   1. output full header line with flag -f
   2. support regular expression as sequence ID with flag -r
+  3. if you have large number of IDs, you can use:
+        seqkit faidx seqs.fasta --infile-list IDs.txt
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -57,14 +59,12 @@ This command is similar with "samtools faidx" but has some extra features:
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		useRegexp := getFlagBool(cmd, "use-regexp")
 
-		var err error
-		var files []string
 		infileList := getFlagString(cmd, "infile-list")
+		files := getFileList(args, false)
 		if infileList != "" {
-			files, err = getListFromFile(infileList, false)
+			_files, err := getListFromFile(infileList, false)
 			checkError(err)
-		} else {
-			files = getFileList(args, false)
+			files = append(files, _files...)
 		}
 
 		file := files[0]

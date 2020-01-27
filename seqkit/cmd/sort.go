@@ -68,14 +68,12 @@ and extracts sequences by FASTA index.
 		fai.MapWholeFile = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		var err error
-		var files []string
 		infileList := getFlagString(cmd, "infile-list")
+		files := getFileList(args, true)
 		if infileList != "" {
-			files, err = getListFromFile(infileList, true)
+			_files, err := getListFromFile(infileList, true)
 			checkError(err)
-		} else {
-			files = getFileList(args, true)
+			files = append(files, _files...)
 		}
 
 		inNaturalOrder := getFlagBool(cmd, "natural-order")
@@ -125,6 +123,7 @@ and extracts sequences by FASTA index.
 		id2name := make(map[string][]byte)
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
+		var err error
 
 		if !twoPass { // read all records into memory
 			sequences := make(map[string]*fastx.Record)

@@ -70,6 +70,14 @@ Though, it's fast enough for microbial genomes.
 
 		bwt.CheckEndSymbol = false
 
+		infileList := getFlagString(cmd, "infile-list")
+		files := getFileList(args, true)
+		if infileList != "" {
+			_files, err := getListFromFile(infileList, true)
+			checkError(err)
+			files = append(files, _files...)
+		}
+
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
 		degenerate := getFlagBool(cmd, "degenerate")
@@ -108,16 +116,6 @@ Though, it's fast enough for microbial genomes.
 				checkError(fmt.Errorf("flag -r (--use-regexp) ignored when giving flag -F (--use-fmi)"))
 			}
 			sfmi = fmi.NewFMIndex()
-		}
-
-		var err error
-		var files []string
-		infileList := getFlagString(cmd, "infile-list")
-		if infileList != "" {
-			files, err = getListFromFile(infileList, true)
-			checkError(err)
-		} else {
-			files = getFileList(args, true)
 		}
 
 		// prepare pattern

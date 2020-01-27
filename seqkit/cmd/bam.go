@@ -375,14 +375,12 @@ var bamCmd = &cobra.Command{
 		outFile := config.OutFile
 		runtime.GOMAXPROCS(config.Threads)
 
-		var err error
-		var files []string
 		infileList := getFlagString(cmd, "infile-list")
+		files := getFileList(args, true)
 		if infileList != "" {
-			files, err = getListFromFile(infileList, true)
+			_files, err := getListFromFile(infileList, true)
 			checkError(err)
-		} else {
-			files = getFileList(args, true)
+			files = append(files, _files...)
 		}
 
 		mapQual := getFlagInt(cmd, "map-qual")

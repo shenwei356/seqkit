@@ -64,16 +64,13 @@ Examples:
 		Threads = config.Threads
 		runtime.GOMAXPROCS(config.Threads)
 
-		var err error
-		var files []string
 		infileList := getFlagString(cmd, "infile-list")
+		files := getFileList(args, true)
 		if infileList != "" {
-			files, err = getListFromFile(infileList, true)
+			_files, err := getListFromFile(infileList, true)
 			checkError(err)
-		} else {
-			files = getFileList(args, true)
+			files = append(files, _files...)
 		}
-
 		chrs := getFlagStringSlice(cmd, "chr")
 		chrs2 := make([]string, len(chrs))
 		for i, chr := range chrs {

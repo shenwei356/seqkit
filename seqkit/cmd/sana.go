@@ -44,12 +44,18 @@ var sanaCmd = &cobra.Command{
 		qBase := getFlagPositiveInt(cmd, "qual-ascii-base")
 		runtime.GOMAXPROCS(config.Threads)
 
+		infileList := getFlagString(cmd, "infile-list")
+		files := getFileList(args, true)
+		if infileList != "" {
+			_files, err := getListFromFile(infileList, true)
+			checkError(err)
+			files = append(files, _files...)
+		}
+
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Flush()
 		defer outfh.Close()
-
-		files := getFileList(args, true)
 
 		for _, file := range files {
 			rawSeqChan := NewRawSeqStream(file, 1000, qBase)

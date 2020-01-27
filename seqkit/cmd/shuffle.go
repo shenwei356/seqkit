@@ -63,14 +63,12 @@ Secondly, seqkit shuffles sequence IDs and extract sequences by FASTA index.
 		fai.MapWholeFile = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		var err error
-		var files []string
 		infileList := getFlagString(cmd, "infile-list")
+		files := getFileList(args, true)
 		if infileList != "" {
-			files, err = getListFromFile(infileList, true)
+			_files, err := getListFromFile(infileList, true)
 			checkError(err)
-		} else {
-			files = getFileList(args, true)
+			files = append(files, _files...)
 		}
 
 		seed := getFlagInt64(cmd, "rand-seed")
@@ -83,6 +81,7 @@ Secondly, seqkit shuffles sequence IDs and extract sequences by FASTA index.
 		index2name := make(map[int]string)
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
+		var err error
 
 		if !twoPass { // read all records into memory
 			sequences := make(map[string]*fastx.Record)

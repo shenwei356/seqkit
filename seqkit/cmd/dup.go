@@ -52,14 +52,12 @@ You may need "seqkit rename" to make the the sequence IDs unique.
 
 		times := getFlagPositiveInt(cmd, "times")
 
-		var err error
-		var files []string
 		infileList := getFlagString(cmd, "infile-list")
+		files := getFileList(args, true)
 		if infileList != "" {
-			files, err = getListFromFile(infileList, true)
+			_files, err := getListFromFile(infileList, true)
 			checkError(err)
-		} else {
-			files = getFileList(args, true)
+			files = append(files, _files...)
 		}
 
 		outfh, err := xopen.Wopen(outFile)
