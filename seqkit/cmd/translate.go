@@ -153,13 +153,7 @@ Translate Tables/Genetic Codes:
 			return
 		}
 
-		infileList := getFlagString(cmd, "infile-list")
-		files := getFileList(args, true)
-		if infileList != "" {
-			_files, err := getListFromFile(infileList, true)
-			checkError(err)
-			files = append(files, _files...)
-		}
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		var record *fastx.Record
 		var fastxReader *fastx.Reader

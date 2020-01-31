@@ -119,13 +119,7 @@ var seqCmd = &cobra.Command{
 			checkError(fmt.Errorf("could not give both flags -l (--lower-case) and -u (--upper-case)"))
 		}
 
-		infileList := getFlagString(cmd, "infile-list")
-		files := getFileList(args, true)
-		if infileList != "" {
-			_files, err := getListFromFile(infileList, true)
-			checkError(err)
-			files = append(files, _files...)
-		}
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

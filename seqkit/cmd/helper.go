@@ -69,10 +69,10 @@ func getFileList(args []string, checkFile bool) []string {
 	return files
 }
 
-func getListFromFile(file string, checkFile bool) ([]string, error) {
+func getFileListFromFile(file string, checkFile bool) ([]string, error) {
 	fh, err := os.Open(file)
 	if err != nil {
-		return nil, fmt.Errorf("read files list from '%s': %s", file, err)
+		return nil, fmt.Errorf("read file list from '%s': %s", file, err)
 	}
 
 	var _file string
@@ -80,18 +80,40 @@ func getListFromFile(file string, checkFile bool) ([]string, error) {
 	scanner := bufio.NewScanner(fh)
 	for scanner.Scan() {
 		_file = scanner.Text()
+		if strings.TrimSpace(_file) == "" {
+			continue
+		}
 		if checkFile && !isStdin(_file) {
 			if _, err = os.Stat(_file); os.IsNotExist(err) {
-				return lists, fmt.Errorf("check file '%s': %s", file, err)
+				return lists, fmt.Errorf("check file '%s': %s", _file, err)
 			}
 		}
 		lists = append(lists, _file)
 	}
 	if err = scanner.Err(); err != nil {
-		return nil, fmt.Errorf("read files list from '%s': %s", file, err)
+		return nil, fmt.Errorf("read file list from '%s': %s", file, err)
 	}
 
 	return lists, nil
+}
+
+func getFileListFromArgsAndFile(cmd *cobra.Command, args []string, checkFileFromArgs bool, flag string, checkFileFromFile bool) []string {
+	infileList := getFlagString(cmd, flag)
+	files := getFileList(args, checkFileFromArgs)
+	if infileList != "" {
+		_files, err := getFileListFromFile(infileList, checkFileFromFile)
+		checkError(err)
+		if len(_files) == 0 {
+			log.Warningf("no files found in file list: %s", infileList)
+			return files
+		}
+
+		if len(files) == 1 && isStdin(files[0]) {
+			return _files
+		}
+		files = append(files, _files...)
+	}
+	return files
 }
 
 func getFlagInt(cmd *cobra.Command, flag string) int {

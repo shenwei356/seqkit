@@ -69,13 +69,7 @@ Note:
 			checkError(fmt.Errorf("only one/none of the flags -s (--by-seq) and -n (--by-name) is allowed"))
 		}
 
-		infileList := getFlagString(cmd, "infile-list")
-		files := getFileList(args, true)
-		if infileList != "" {
-			_files, err := getListFromFile(infileList, true)
-			checkError(err)
-			files = append(files, _files...)
-		}
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		if len(files) < 2 {
 			checkError(errors.New("at least 2 files needed"))

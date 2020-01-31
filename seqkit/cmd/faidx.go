@@ -59,13 +59,7 @@ This command is similar with "samtools faidx" but has some extra features:
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		useRegexp := getFlagBool(cmd, "use-regexp")
 
-		infileList := getFlagString(cmd, "infile-list")
-		files := getFileList(args, false)
-		if infileList != "" {
-			_files, err := getListFromFile(infileList, false)
-			checkError(err)
-			files = append(files, _files...)
-		}
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", false)
 
 		file := files[0]
 
