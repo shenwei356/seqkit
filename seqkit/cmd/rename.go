@@ -67,7 +67,7 @@ var renameCmd = &cobra.Command{
 			defer outfh.Close()
 		} else {
 			if outdir == "" {
-				checkError(fmt.Errorf("out dir should not be empty"))
+				checkError(fmt.Errorf("out dir (flag -O/--out-dir) should not be empty"))
 			}
 			for _, file := range files {
 				if isStdin(file) {

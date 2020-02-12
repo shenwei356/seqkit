@@ -4,7 +4,9 @@
         - fix checking input file existence.
         - new global flag `--infile-list` for long list of input files, if given, they are appended to files from cli arguments.
     - `seqkit faidx`: supporting "truncated" (no ending newline charactor) file.
-    - **`seqkit seq`: do not force switching on `-g` when using `-m/-M`**.
+    - `seqkit seq`:
+        - **do not force switching on `-g` when using `-m/-M`**.
+        - show recommendation if flag `-t/--seq-type` is not DNA/RNA when computing complement sequence. [#103](https://github.com/shenwei356/seqkit/issues/103)
     - `seqkit translate`: supporting multiple frames. [#96](https://github.com/shenwei356/seqkit/issues/96)
     - `seqkit grep/locate`:
         - add detection and warning for space existing in search pattern/sequence.

@@ -104,15 +104,16 @@ var seqCmd = &cobra.Command{
 		seq.ValidSeqThreads = config.Threads
 		seq.ComplementThreads = config.Threads
 
-		if !(alphabet == nil || alphabet == seq.Unlimit) {
+		if complement && (alphabet == nil || alphabet == seq.Protein) {
+			log.Warningf("flag -t (--seq-type) (DNA/RNA) is recommended for computing complement sequences")
+		}
+
+		if !validateSeq && !(alphabet == nil || alphabet == seq.Unlimit) {
 			if !quiet {
 				log.Info("when flag -t (--seq-type) given, flag -v (--validate-seq) is automatically switched on")
 			}
+			validateSeq = true
 			seq.ValidateSeq = true
-		}
-
-		if complement && !validateSeq {
-			log.Warningf("flag -v (--validate-seq) is recommended to switch on for computing complement sequences")
 		}
 
 		if lowerCase && upperCase {

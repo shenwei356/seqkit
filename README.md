@@ -139,7 +139,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 **Searching**
 
 - [`grep`](https://bioinf.shenwei.me/seqkit/usage/#grep)        search sequences by ID/name/sequence/sequence motifs, mismatch allowed
-- [`locate`](https://bioinf.shenwei.me/seqkit/usage/#locate)    locate subsequences/motifs
+- [`locate`](https://bioinf.shenwei.me/seqkit/usage/#locate)    locate subsequences/motifs, mismatch allowed
 - [`fish`](https://bioinf.shenwei.me/seqkit/usage/#fish)	look for short sequences in larger sequences using local alignment
 - [`amplicon`](https://bioinf.shenwei.me/seqkit/usage/#amplicon) retrieve amplicon (or specific region around it) via primer(s)
 
