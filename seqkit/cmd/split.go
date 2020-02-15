@@ -121,13 +121,12 @@ Examples:
 						if force {
 							checkError(os.RemoveAll(outdir))
 						} else {
-							checkError(fmt.Errorf("outdir not empty: %s, use -f (--force) to overwrite", outdir))
+							log.Warningf("outdir not empty: %s, you can use --force to overwrite", outdir)
 						}
-					} else {
-						checkError(os.RemoveAll(outdir))
 					}
+				} else {
+					checkError(os.MkdirAll(outdir, 0777))
 				}
-				checkError(os.MkdirAll(outdir, 0777))
 			}
 		}
 

@@ -19,7 +19,7 @@
     - `seqkit rename`: making IDs unique across multiple files, and can write into multiple files. [#100](https://github.com/shenwei356/seqkit/issues/100)
     - `seqkit sample`: fix stdin check for flag `-2`. [#102](https://github.com/shenwei356/seqkit/issues/102).
     - `seqkit rename/split/split2`: fix detection of existed outdir.
-    - `seqkit version`: checking update optional is optional (`-u`).
+    - `seqkit version`: checking update is optional (`-u`).
 - [SeqKit v0.11.0](https://github.com/shenwei356/seqkit/releases/tag/v0.11.0).
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.11.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.11.0)
     - `seqkit`: fix hanging when reading from truncated gzip file.
