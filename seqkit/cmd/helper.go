@@ -236,9 +236,14 @@ type Config struct {
 }
 
 func getConfigs(cmd *cobra.Command) Config {
+	threads := getFlagPositiveInt(cmd, "threads")
+	if threads >= 1000 {
+		checkError(fmt.Errorf("are your seriously? %d threads? It will exhaust your RAM", threads))
+	}
+
 	return Config{
 		Alphabet:               getAlphabet(cmd, "seq-type"),
-		Threads:                getFlagPositiveInt(cmd, "threads"),
+		Threads:                threads,
 		LineWidth:              getFlagNonNegativeInt(cmd, "line-width"),
 		IDRegexp:               getIDRegexp(cmd, "id-regexp"),
 		IDNCBI:                 getFlagBool(cmd, "id-ncbi"),
