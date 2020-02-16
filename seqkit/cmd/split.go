@@ -29,6 +29,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
@@ -45,7 +46,8 @@ var splitCmd = &cobra.Command{
 	Long: fmt.Sprintf(`split sequences into files by name ID, subsequence of given region,
 part size or number of parts.
 
-Please use "seqkit split2" for paired- and single-end FASTQ.
+If you just want to split by parts or sizes, please use "seqkit split2",
+which also apply for paired- and single-end FASTQ.
 
 The definition of region is 1-based and with some custom design.
 
@@ -580,51 +582,59 @@ Examples:
 			}
 
 			idsMap := make(map[string][]string)
-			id2name := make(map[string]string)
 			for _, ID := range IDs {
 				id := string(fastx.ParseHeadID(idRe, []byte(ID)))
 				if _, ok := idsMap[id]; !ok {
 					idsMap[id] = []string{}
 				}
-				idsMap[id] = append(idsMap[id], id)
-				id2name[id] = ID
+				idsMap[id] = append(idsMap[id], ID)
 			}
 
-			var outfile string
+			var wg sync.WaitGroup
+			tokens := make(chan int, config.Threads)
+
 			var record *fastx.Record
-			for id, ids := range idsMap {
+			for id, _IDs := range idsMap {
+				wg.Add(1)
+				tokens <- 1
 
-				outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s",
-					filepath.Base(fileName),
-					pathutil.RemoveInvalidPathChars(id, "__"), fileExt))
-				if !dryRun {
-					outfh, err = xopen.Wopen(outfile)
-					checkError(err)
-				}
+				func(id string, _IDs []string) {
+					defer func() {
+						wg.Done()
+						<-tokens
+					}()
+					var outfh *xopen.Writer
+					var err error
+					outfile := filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s",
+						filepath.Base(fileName),
+						pathutil.RemoveInvalidPathChars(id, "__"), fileExt))
 
-				for _, chr := range ids {
 					if !dryRun {
-						chr = id2name[chr]
-						r, ok := faidx.Index[chr]
-						if !ok {
-							checkError(fmt.Errorf(`sequence (%s) not found in file: %s`, chr, newFile))
-						}
-
-						sequence := subseqByFaix(faidx, chr, r, 1, -1)
-						record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), []byte{}, sequence)
+						outfh, err = xopen.Wopen(outfile)
 						checkError(err)
+						for _, chr := range _IDs {
+							r, ok := faidx.Index[chr]
+							if !ok {
+								checkError(fmt.Errorf(`sequence (%s) not found in file: %s`, chr, newFile))
+							}
 
-						record.FormatToWriter(outfh, config.LineWidth)
+							sequence := subseqByFaix(faidx, chr, r, 1, -1)
+							record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), []byte{}, sequence)
+							checkError(err)
+
+							record.FormatToWriter(outfh, config.LineWidth)
+						}
 					}
-				}
 
-				if !quiet {
-					log.Infof("write %d sequences to file: %s\n", len(ids), outfile)
-				}
-				if !dryRun {
-					outfh.Close()
-				}
+					if !quiet {
+						log.Infof("write %d sequences to file: %s\n", len(_IDs), outfile)
+					}
+					if !dryRun {
+						outfh.Close()
+					}
+				}(id, _IDs)
 			}
+			wg.Wait()
 
 			if (isstdin || !isPlainFile(file)) && !keepTemp {
 				checkError(os.Remove(newFile))
@@ -781,37 +791,51 @@ Examples:
 				checkError(faidx.Close())
 			}()
 
-			var outfile string
+			var wg sync.WaitGroup
+			tokens := make(chan int, config.Threads)
+
 			var record *fastx.Record
 			for subseq, chrs := range region2name {
-				outfile = filepath.Join(outdir, fmt.Sprintf("%s.region_%d:%d_%s%s", filepath.Base(fileName), start, end, subseq, fileExt))
-				if !dryRun {
-					outfh, err = xopen.Wopen(outfile)
-					checkError(err)
-				}
+				wg.Add(1)
+				tokens <- 1
+				go func(subseq string, chrs []string) {
+					defer func() {
+						wg.Done()
+						<-tokens
+					}()
 
-				for _, chr := range chrs {
+					var outfh *xopen.Writer
+					var err error
+
+					outfile := filepath.Join(outdir, fmt.Sprintf("%s.region_%d:%d_%s%s", filepath.Base(fileName), start, end, subseq, fileExt))
+
 					if !dryRun {
-						r, ok := faidx.Index[chr]
-						if !ok {
-							checkError(fmt.Errorf(`sequence (%s) not found in file: %s`, chr, newFile))
-						}
-
-						sequence := subseqByFaix(faidx, chr, r, 1, -1)
-						record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), []byte{}, sequence)
+						outfh, err = xopen.Wopen(outfile)
 						checkError(err)
 
-						record.FormatToWriter(outfh, config.LineWidth)
-					}
-				}
+						for _, chr := range chrs {
+							r, ok := faidx.Index[chr]
+							if !ok {
+								checkError(fmt.Errorf(`sequence (%s) not found in file: %s`, chr, newFile))
+							}
 
-				if !quiet {
-					log.Infof("write %d sequences to file: %s\n", len(chrs), outfile)
-				}
-				if !dryRun {
-					outfh.Close()
-				}
+							sequence := subseqByFaix(faidx, chr, r, 1, -1)
+							record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), []byte{}, sequence)
+							checkError(err)
+
+							record.FormatToWriter(outfh, config.LineWidth)
+						}
+					}
+					if !quiet {
+						log.Infof("write %d sequences to file: %s\n", len(chrs), outfile)
+					}
+					if !dryRun {
+						outfh.Close()
+					}
+				}(subseq, chrs)
 			}
+			wg.Wait()
+
 			return
 		}
 
