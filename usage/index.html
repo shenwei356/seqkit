@@ -2,7 +2,7 @@
 
 
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="no-js">
   <head>
     
@@ -36,7 +36,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../files/favicon.ico">
-      <meta name="generator" content="mkdocs-1.0.4, mkdocs-ponylang-0.2.5">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.6.3">
     
     
       
@@ -44,22 +44,58 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/application.dfc6cb0c.css">
+      <link rel="stylesheet" href="../assets/stylesheets/application.adb8469c.css">
       
-        <link rel="stylesheet" href="../assets/stylesheets/application-palette.6079476c.css">
+        <link rel="stylesheet" href="../assets/stylesheets/application-palette.a8b3c06d.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="#009688">
       
     
     
-      <script src="../assets/javascripts/modernizr.6586f7cd.js"></script>
+      <script src="../assets/javascripts/modernizr.86422ebf.js"></script>
     
     
-      <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
       
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
         <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
       
-      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+      <link rel="manifest" type="application/manifest+json" href="../manifest.webmanifest" crossorigin="use-credentials">
+    
+    
+    
+      
+        
+<script>
+  window.ga = window.ga || function() {
+    (ga.q = ga.q || []).push(arguments)
+  }
+  ga.l = +new Date
+  /* Setup integration and send page view */
+  ga("create", "UA-28948626-9", "bioinf.shenwei.me/seqkit")
+  ga("set", "anonymizeIp", true)
+  ga("send", "pageview")
+  /* Register handler to log search on blur */
+  document.addEventListener("DOMContentLoaded", () => {
+    if (document.forms.search) {
+      var query = document.forms.search.query
+      query.addEventListener("blur", function() {
+        if (this.value) {
+          var path = document.location.pathname;
+          ga("send", "pageview", path + "?q=" + this.value)
+        }
+      })
+    }
+  })
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
     
     
   </head>
@@ -72,24 +108,7 @@
       <defs>
         
         
-          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448"
-    viewBox="0 0 416 448" id="github">
-  <path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19-18.125
-        8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5
-        18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75
-        19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19
-        18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360
-        304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25
-        2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8
-        38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0
-        37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25
-        82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75
-        1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75
-        0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25
-        30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5
-        46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34
-        99.5z" />
-</svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
         
       </defs>
     </svg>
@@ -97,7 +116,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="../#usage-and-examples" tabindex="1" class="md-skip">
+      <a href="#usage-and-examples" tabindex="0" class="md-skip">
         Skip to content
       </a>
     
@@ -106,7 +125,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-          <a href=".." title="SeqKit - Ultrafast FASTA/Q kit" class="md-header-nav__button md-logo">
+        <a href=".." title="SeqKit - Ultrafast FASTA/Q kit" aria-label="SeqKit - Ultrafast FASTA/Q kit" class="md-header-nav__button md-logo">
           
             <i class="md-icon">school</i>
           
@@ -118,27 +137,26 @@
       <div class="md-flex__cell md-flex__cell--stretch">
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           
-            
-              <span class="md-header-nav__topic">
-                SeqKit - Ultrafast FASTA/Q kit
-              </span>
-              <span class="md-header-nav__topic">
+            <span class="md-header-nav__topic">
+              SeqKit - Ultrafast FASTA/Q kit
+            </span>
+            <span class="md-header-nav__topic">
+              
                 Usage
-              </span>
-            
+              
+            </span>
           
         </div>
       </div>
       <div class="md-flex__cell md-flex__cell--shrink">
         
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
           
-            <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
-            
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <input type="text" class="md-search__input" aria-label="search" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
       <label class="md-icon md-search__icon" for="__search"></label>
       <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
         &#xE5CD;
@@ -156,7 +174,6 @@
     </div>
   </div>
 </div>
-          
         
       </div>
       
@@ -167,20 +184,18 @@
 
   
 
-
-  <a href="https://github.com/shenwei356/seqkit/" title="Go to repository" class="md-source" data-md-source="github">
-    
-      <div class="md-source__icon">
-        <svg viewBox="0 0 24 24" width="24" height="24">
-          <use xlink:href="#github" width="24" height="24"></use>
-        </svg>
-      </div>
-    
-    <div class="md-source__repository">
-      GitHub
+<a href="https://github.com/shenwei356/seqkit/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
     </div>
-  </a>
-
+  
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
           </div>
         </div>
       
@@ -193,7 +208,7 @@
         
       
       
-      <main class="md-main">
+      <main class="md-main" role="main">
         <div class="md-main__inner md-grid" data-md-component="container">
           
             
@@ -202,11 +217,11 @@
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <span class="md-nav__button md-logo">
+    <a href=".." title="SeqKit - Ultrafast FASTA/Q kit" class="md-nav__button md-logo">
       
         <i class="md-icon">school</i>
       
-    </span>
+    </a>
     SeqKit - Ultrafast FASTA/Q kit
   </label>
   
@@ -216,20 +231,18 @@
 
   
 
-
-  <a href="https://github.com/shenwei356/seqkit/" title="Go to repository" class="md-source" data-md-source="github">
-    
-      <div class="md-source__icon">
-        <svg viewBox="0 0 24 24" width="24" height="24">
-          <use xlink:href="#github" width="24" height="24"></use>
-        </svg>
-      </div>
-    
-    <div class="md-source__repository">
-      GitHub
+<a href="https://github.com/shenwei356/seqkit/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
     </div>
-  </a>
-
+  
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
     </div>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -308,409 +321,342 @@
     
   
   
-  
-  
     <label class="md-nav__title" for="__toc">Table of contents</label>
     <ul class="md-nav__list" data-md-scrollfix>
       
-        
-          <li class="md-nav__item">
-    <a href="#table-of-contents" title="Table of Contents" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
     Table of Contents
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#technical-details-and-guides-for-use" title="Technical details and guides for use" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#technical-details-and-guides-for-use" class="md-nav__link">
     Technical details and guides for use
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
         
-          
-            <li class="md-nav__item">
-    <a href="#fastaq-format-parsing" title="FASTA/Q format parsing" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#fastaq-format-parsing" class="md-nav__link">
     FASTA/Q format parsing
   </a>
   
 </li>
-          
         
-          
-            <li class="md-nav__item">
-    <a href="#sequence-formats-and-types" title="Sequence formats and types" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#sequence-formats-and-types" class="md-nav__link">
     Sequence formats and types
   </a>
   
 </li>
-          
         
-          
-            <li class="md-nav__item">
-    <a href="#sequence-id" title="Sequence ID" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#sequence-id" class="md-nav__link">
     Sequence ID
   </a>
   
 </li>
-          
         
-          
-            <li class="md-nav__item">
-    <a href="#fasta-index" title="FASTA index" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#fasta-index" class="md-nav__link">
     FASTA index
   </a>
   
 </li>
-          
         
-          
-            <li class="md-nav__item">
-    <a href="#parallelization-of-cpu-intensive-jobs" title="Parallelization of CPU intensive jobs" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#parallelization-of-cpu-intensive-jobs" class="md-nav__link">
     Parallelization of CPU intensive jobs
   </a>
   
 </li>
-          
         
-          
-            <li class="md-nav__item">
-    <a href="#memory-occupation" title="Memory occupation" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#memory-occupation" class="md-nav__link">
     Memory occupation
   </a>
   
 </li>
-          
         
-          
-            <li class="md-nav__item">
-    <a href="#reproducibility" title="Reproducibility" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#reproducibility" class="md-nav__link">
     Reproducibility
   </a>
   
 </li>
-          
         
       </ul>
     </nav>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#seqkit" title="seqkit" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#seqkit" class="md-nav__link">
     seqkit
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
         
-          
-            <li class="md-nav__item">
-    <a href="#datasets" title="Datasets" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#datasets" class="md-nav__link">
     Datasets
   </a>
   
 </li>
-          
         
       </ul>
     </nav>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#seq" title="seq" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#seq" class="md-nav__link">
     seq
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#subseq" title="subseq" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#subseq" class="md-nav__link">
     subseq
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#sliding" title="sliding" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#sliding" class="md-nav__link">
     sliding
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#stats" title="stats" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#stats" class="md-nav__link">
     stats
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#faidx" title="faidx" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#faidx" class="md-nav__link">
     faidx
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#watch" title="watch" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#watch" class="md-nav__link">
     watch
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#sana" title="sana" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#sana" class="md-nav__link">
     sana
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#fq2fa" title="fq2fa" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#fq2fa" class="md-nav__link">
     fq2fa
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#fx2tab-tab2fx" title="fx2tab &amp; tab2fx" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#fx2tab-tab2fx" class="md-nav__link">
     fx2tab &amp; tab2fx
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#convert" title="convert" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#convert" class="md-nav__link">
     convert
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#translate" title="translate" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#translate" class="md-nav__link">
     translate
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#grep" title="grep" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#grep" class="md-nav__link">
     grep
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#locate" title="locate" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#locate" class="md-nav__link">
     locate
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#fish" title="fish" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#fish" class="md-nav__link">
     fish
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#amplicon" title="amplicon" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#amplicon" class="md-nav__link">
     amplicon
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#bam" title="bam" class="md-nav__link">
-    bam
-  </a>
-  
-</li>
-        
-      
-        
-          <li class="md-nav__item">
-    <a href="#duplicate" title="duplicate" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#duplicate" class="md-nav__link">
     duplicate
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#rmdup" title="rmdup" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#rmdup" class="md-nav__link">
     rmdup
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#common" title="common" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#common" class="md-nav__link">
     common
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#split" title="split" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#split" class="md-nav__link">
     split
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#split2" title="split2" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#split2" class="md-nav__link">
     split2
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#sample" title="sample" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#sample" class="md-nav__link">
     sample
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#head" title="head" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#head" class="md-nav__link">
     head
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#range" title="range" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#range" class="md-nav__link">
     range
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#replace" title="replace" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#replace" class="md-nav__link">
     replace
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#rename" title="rename" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#rename" class="md-nav__link">
     rename
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#restart" title="restart" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#restart" class="md-nav__link">
     restart
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#concat" title="concat" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#concat" class="md-nav__link">
     concat
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#mutate" title="mutate" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#mutate" class="md-nav__link">
     mutate
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#shuffle" title="shuffle" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#shuffle" class="md-nav__link">
     shuffle
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#sort" title="sort" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#sort" class="md-nav__link">
     sort
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#genautocomplete" title="genautocomplete" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#bam" class="md-nav__link">
+    bam
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fish_1" class="md-nav__link">
+    fish
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sana_1" class="md-nav__link">
+    sana
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#watch_1" class="md-nav__link">
+    watch
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#genautocomplete" class="md-nav__link">
     genautocomplete
   </a>
   
 </li>
-        
       
       
       
@@ -805,409 +751,342 @@
     
   
   
-  
-  
     <label class="md-nav__title" for="__toc">Table of contents</label>
     <ul class="md-nav__list" data-md-scrollfix>
       
-        
-          <li class="md-nav__item">
-    <a href="#table-of-contents" title="Table of Contents" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
     Table of Contents
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#technical-details-and-guides-for-use" title="Technical details and guides for use" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#technical-details-and-guides-for-use" class="md-nav__link">
     Technical details and guides for use
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
         
-          
-            <li class="md-nav__item">
-    <a href="#fastaq-format-parsing" title="FASTA/Q format parsing" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#fastaq-format-parsing" class="md-nav__link">
     FASTA/Q format parsing
   </a>
   
 </li>
-          
         
-          
-            <li class="md-nav__item">
-    <a href="#sequence-formats-and-types" title="Sequence formats and types" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#sequence-formats-and-types" class="md-nav__link">
     Sequence formats and types
   </a>
   
 </li>
-          
         
-          
-            <li class="md-nav__item">
-    <a href="#sequence-id" title="Sequence ID" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#sequence-id" class="md-nav__link">
     Sequence ID
   </a>
   
 </li>
-          
         
-          
-            <li class="md-nav__item">
-    <a href="#fasta-index" title="FASTA index" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#fasta-index" class="md-nav__link">
     FASTA index
   </a>
   
 </li>
-          
         
-          
-            <li class="md-nav__item">
-    <a href="#parallelization-of-cpu-intensive-jobs" title="Parallelization of CPU intensive jobs" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#parallelization-of-cpu-intensive-jobs" class="md-nav__link">
     Parallelization of CPU intensive jobs
   </a>
   
 </li>
-          
         
-          
-            <li class="md-nav__item">
-    <a href="#memory-occupation" title="Memory occupation" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#memory-occupation" class="md-nav__link">
     Memory occupation
   </a>
   
 </li>
-          
         
-          
-            <li class="md-nav__item">
-    <a href="#reproducibility" title="Reproducibility" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#reproducibility" class="md-nav__link">
     Reproducibility
   </a>
   
 </li>
-          
         
       </ul>
     </nav>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#seqkit" title="seqkit" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#seqkit" class="md-nav__link">
     seqkit
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
         
-          
-            <li class="md-nav__item">
-    <a href="#datasets" title="Datasets" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#datasets" class="md-nav__link">
     Datasets
   </a>
   
 </li>
-          
         
       </ul>
     </nav>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#seq" title="seq" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#seq" class="md-nav__link">
     seq
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#subseq" title="subseq" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#subseq" class="md-nav__link">
     subseq
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#sliding" title="sliding" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#sliding" class="md-nav__link">
     sliding
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#stats" title="stats" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#stats" class="md-nav__link">
     stats
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#faidx" title="faidx" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#faidx" class="md-nav__link">
     faidx
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#watch" title="watch" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#watch" class="md-nav__link">
     watch
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#sana" title="sana" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#sana" class="md-nav__link">
     sana
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#fq2fa" title="fq2fa" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#fq2fa" class="md-nav__link">
     fq2fa
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#fx2tab-tab2fx" title="fx2tab &amp; tab2fx" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#fx2tab-tab2fx" class="md-nav__link">
     fx2tab &amp; tab2fx
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#convert" title="convert" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#convert" class="md-nav__link">
     convert
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#translate" title="translate" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#translate" class="md-nav__link">
     translate
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#grep" title="grep" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#grep" class="md-nav__link">
     grep
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#locate" title="locate" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#locate" class="md-nav__link">
     locate
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#fish" title="fish" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#fish" class="md-nav__link">
     fish
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#amplicon" title="amplicon" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#amplicon" class="md-nav__link">
     amplicon
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#bam" title="bam" class="md-nav__link">
-    bam
-  </a>
-  
-</li>
-        
-      
-        
-          <li class="md-nav__item">
-    <a href="#duplicate" title="duplicate" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#duplicate" class="md-nav__link">
     duplicate
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#rmdup" title="rmdup" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#rmdup" class="md-nav__link">
     rmdup
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#common" title="common" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#common" class="md-nav__link">
     common
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#split" title="split" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#split" class="md-nav__link">
     split
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#split2" title="split2" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#split2" class="md-nav__link">
     split2
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#sample" title="sample" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#sample" class="md-nav__link">
     sample
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#head" title="head" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#head" class="md-nav__link">
     head
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#range" title="range" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#range" class="md-nav__link">
     range
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#replace" title="replace" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#replace" class="md-nav__link">
     replace
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#rename" title="rename" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#rename" class="md-nav__link">
     rename
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#restart" title="restart" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#restart" class="md-nav__link">
     restart
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#concat" title="concat" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#concat" class="md-nav__link">
     concat
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#mutate" title="mutate" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#mutate" class="md-nav__link">
     mutate
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#shuffle" title="shuffle" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#shuffle" class="md-nav__link">
     shuffle
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#sort" title="sort" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#sort" class="md-nav__link">
     sort
   </a>
   
 </li>
-        
       
-        
-          <li class="md-nav__item">
-    <a href="#genautocomplete" title="genautocomplete" class="md-nav__link">
+        <li class="md-nav__item">
+  <a href="#bam" class="md-nav__link">
+    bam
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fish_1" class="md-nav__link">
+    fish
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sana_1" class="md-nav__link">
+    sana
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#watch_1" class="md-nav__link">
+    watch
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#genautocomplete" class="md-nav__link">
     genautocomplete
   </a>
   
 </li>
-        
       
       
       
@@ -1389,7 +1268,7 @@ reproduced in different environments with same random seed.</p>
 <h2 id="seqkit">seqkit</h2>
 <pre><code class="text">SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.11.0
+Version: 0.12.0
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -1442,6 +1321,7 @@ Flags:
   -h, --help                            help for seqkit
       --id-ncbi                         FASTA head is NCBI-style, e.g. &gt;gi|110645304|ref|NC_002516.2| Pseud...
       --id-regexp string                regular expression for parsing ID (default &quot;^(\\S+)\\s?&quot;)
+      --infile-list string              file of input files list (one file per line), if given, they are appended to files from cli arguments
   -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
   -o, --out-file string                 out file (&quot;-&quot; for stdout, suffix .gz for gzipped out) (default &quot;-&quot;)
       --quiet                           be quiet and do not show extra information
@@ -1516,8 +1396,6 @@ Flags:
   -u, --upper-case                print sequences in upper case
   -v, --validate-seq              validate bases according to the alphabet
   -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
-
-
 </code></pre>
 
 <p>Examples</p>
@@ -2030,6 +1908,8 @@ This command is similar with &quot;samtools faidx&quot; but has some extra featu
 
   1. output full header line with flag -f
   2. support regular expression as sequence ID with flag -r
+  3. if you have large number of IDs, you can use:
+        seqkit faidx seqs.fasta --infile-list IDs.txt
 
 Usage:
   seqkit faidx [flags] &lt;fasta-file&gt; [regions...]
@@ -2409,7 +2289,7 @@ Usage:
 Flags:
   -x, --allow-unknown-codon                     translate unknown code to 'X'. And you may not use flag --trim which removes 'X'
       --clean                                   change all STOP codon positions from the '*' character to 'X' (an unknown residue)
-  -f, --frame int                               frame to translate, available value: 1, 2, 3, -1, -2, -3 (default 1)
+  -f, --frame strings                           frame(s) to translate, available value: 1, 2, 3, -1, -2, -3, and 6 for all six frames (default [1])
   -h, --help                                    help for translate
   -M, --init-codon-as-M                         translate initial codon at beginning to 'M'
   -l, --list-transl-table int                   show details of translate table N, 0 for all (default -1)
@@ -2560,7 +2440,9 @@ Attentions:
      but it's not fast enough for large genome like human genome.
      Though, it's fast enough for microbial genomes.
   3. The order of sequences in result is consistent with that in original
-     file, not the order of the query patterns.
+     file, not the order of the query patterns. 
+     But for FASTA file, you can use:
+        seqkit faidx seqs.fasta --infile-list IDs.txt
 
 You can specify the sequence region for searching with flag -R (--region).
 The definition of region is 1-based and with some custom design.
@@ -2642,7 +2524,7 @@ pmi-let-7
 </code></pre>
 </li>
 <li>
-<p>Extract sequences containing AGGCG (allow mismatch, <strong>only for short (&lt;50kb) sequences now</strong>)</p>
+<p>Extract sequences containing AGGCG (allow mismatch)</p>
 <pre><code>$ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg | seqkit stats
 file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
 -     FASTA   RNA      1,181  145,789       49    123.4    2,354
@@ -2655,9 +2537,9 @@ $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg -m 1 | seqkit stats
 file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
 -     FASTA   RNA     17,168  1,881,005       39    109.6    2,354
 
-real    0m2.479s
-user    0m2.570s
-sys     0m0.015s
+real    0m0.864s
+user    0m0.941s
+sys     0m0.014s
 </code></pre>
 </li>
 <li>
@@ -2703,12 +2585,15 @@ Flags:
   -d, --degenerate                pattern/motif contains degenerate base
       --gtf                       output in GTF format
   -h, --help                      help for locate
+  -M, --hide-matched              do not show matched sequences
   -i, --ignore-case               ignore case
   -m, --max-mismatch int          max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster
   -G, --non-greedy                non-greedy mode, faster but may miss motifs overlapping with others
   -P, --only-positive-strand      only search on positive strand
   -p, --pattern strings           pattern/motif (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '&quot;A{2,}&quot;')
   -f, --pattern-file string       pattern/motif file (FASTA format)
+  -F, --use-fmi                   use FM-index for much faster search of lots of sequence patterns
+  -r, --use-regexp                patterns/motifs are regular expression
   -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
 
 </code></pre>
@@ -2721,22 +2606,40 @@ Flags:
 &gt;seq
 agctggagctacc
 
-$ cat t.fa | seqkit locate -p agc | csvtk pretty -t
+$ cat t.fa \
+  | seqkit locate -p agc \
+  | csvtk pretty -t
 seqID   patternName   pattern   strand   start   end   matched
 seq     agc           agc       +        1       3     agc
 seq     agc           agc       +        7       9     agc
 seq     agc           agc       -        8       10    agc
 seq     agc           agc       -        2       4     agc
 
-$ cat t.fa | seqkit locate -p agc -m 1 | csvtk pretty -t
-seqID   patternName     pattern strand  start   end     matched
+# do not show matched sequences
+$ cat t.fa \
+  | seqkit locate -p agc -M \
+  | csvtk pretty -t
+seqID   patternName   pattern   strand   start   end
+seq     agc           agc       +        1       3
+seq     agc           agc       +        7       9
+seq     agc           agc       -        8       10
+seq     agc           agc       -        2       4
+
+# max mismatch: 1
+$ cat t.fa \
+  | seqkit locate -p agc -m 1 \
+  | csvtk pretty -t
+seqID   patternName     pattern strand  start   end    matched
 seq     agc           agc       +        1       3     agc
 seq     agc           agc       +        7       9     agc
 seq     agc           agc       +        11      13    acc
 seq     agc           agc       -        8       10    agc
 seq     agc           agc       -        2       4     agc
 
-$ cat t.fa | seqkit locate -p agc -m 2 | csvtk pretty -t
+# max mismatch: 2
+$ cat t.fa \
+  | seqkit locate -p agc -m 2 \
+  | csvtk pretty -t
 seqID   patternName   pattern   strand   start   end   matched
 seq     agc           agc       +        1       3     agc
 seq     agc           agc       +        4       6     tgg
@@ -2754,7 +2657,7 @@ seq     agc           agc       -        2       4     agc
 <li>
 <p>Locate ORFs.</p>
 <pre><code>$ zcat hairpin.fa.gz \
-    | seqkit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" \
+    | seqkit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" -r \
     | head -n 4 \
     | csvtk pretty -t
 seqID       patternName                        pattern                            strand   start   end   matched
@@ -2974,79 +2877,6 @@ ga
 # you can also use strict mode to discard those cases
 $ echo -ne "&gt;seq\nacgcccactgaaatga\n" \
     | seqkit amplicon -F aaa -f -r 2:5 -s
-</code></pre>
-</li>
-</ol>
-<h2 id="bam">bam</h2>
-<p>Usage</p>
-<pre><code class="text">monitoring and online histograms of BAM record features
-
-Usage:
-  seqkit bam [flags]
-
-Flags:
-  -B, --bins int             number of histogram bins (default -1)
-  -c, --count string         count reads per reference and save to this file
-  -W, --delay int            sleep this many seconds after plotting (default 1)
-  -y, --dump                 print histogram data to stderr instead of plotting
-  -e, --exec-after string    execute command after reporting
-  -E, --exec-before string   execute command before reporting
-  -f, --field string         target fields
-  -h, --help                 help for bam
-  -C, --idx-count            fast read per reference counting based on the BAM index
-  -i, --idx-stat             fast statistics based on the BAM index
-  -O, --img string           save histogram to this PDF/image file
-  -H, --list-fields          list all available BAM record features
-  -L, --log                  log10(x+1) transform numeric values
-  -q, --map-qual int         minimum mapping quality
-  -x, --pass                 passthrough mode (forward filtered BAM to output)
-  -F, --prim-only            filter out non-primary alignment records
-  -p, --print-freq int       print/report after this many records (-1 for print after EOF) (default -1)
-  -Q, --quiet-mode           supress all plotting to stderr
-  -M, --range-max float      discard record with field (-f) value greater than this flag (default NaN)
-  -m, --range-min float      discard record with field (-f) value less than this flag (default NaN)
-  -R, --reset                reset histogram after every report
-  -s, --stat                 print BAM satistics of the input files
-  -@, --top-bam string       save the top -? records to this bam file
-  -?, --top-size int         size of the top-mode buffer (default 100)
-
-</code></pre>
-
-<p>Examples</p>
-<ol>
-<li>
-<p>Get detailed statistics from multiple BAM files.</p>
-<pre><code>seqkit bam -s *.bam
-</code></pre>
-</li>
-<li>
-<p>Get rough statistics from multiple indexed BAM files.</p>
-<pre><code>seqkit bam -i *.bam
-</code></pre>
-</li>
-<li>
-<p>Count reads mapped to references from a BAM stream.</p>
-<pre><code>cat sample.bam | seqkit bam -c counts.tsv  -
-</code></pre>
-</li>
-<li>
-<p>Count reads mapped to references using the BAM index.</p>
-<pre><code>seqkit bam -C sorted_indexed.bam
-</code></pre>
-</li>
-<li>
-<p>Monitor alignment accuracy from a bam stream and report after every 1000 records, use 20 bins.</p>
-<pre><code>cat sample.bam | seqkit bam -B -f Acc -p 1000 -
-</code></pre>
-</li>
-<li>
-<p>Dump selected fields to TSV.</p>
-<pre><code>seqkit bam -f Ref,Acc,RefCov,Strand sample.bam
-</code></pre>
-</li>
-<li>
-<p>Save the best 100 records in terms of alignment accuracy to a BAM file.</p>
-<pre><code>seqkit bam -f Acc -@ top_acc_100.bam -? 100 -Q sample.bam
 </code></pre>
 </li>
 </ol>
@@ -3679,7 +3509,11 @@ Usage:
   seqkit rename [flags]
 
 Flags:
-  -n, --by-name   check duplication by full name instead of just id
+  -n, --by-name             check duplication by full name instead of just id
+  -f, --force               overwrite output directory
+  -h, --help                help for rename
+  -m, --multiple-outfiles   write results into separated files for multiple input files
+  -O, --out-dir string      output directory (default &quot;renamed&quot;)
 
 </code></pre>
 
@@ -4108,6 +3942,196 @@ acgtnAAAAnnn
 </code></pre>
 </li>
 </ol>
+<h2 id="bam">bam</h2>
+<pre><code class="text">monitoring and online histograms of BAM record features
+
+Usage:
+  seqkit bam [flags]
+
+Flags:
+  -B, --bins int             number of histogram bins (default -1)
+  -c, --count string         count reads per reference and save to this file
+  -W, --delay int            sleep this many seconds after plotting (default 1)
+  -y, --dump                 print histogram data to stderr instead of plotting
+  -e, --exec-after string    execute command after reporting
+  -E, --exec-before string   execute command before reporting
+  -f, --field string         target fields
+  -h, --help                 help for bam
+  -C, --idx-count            fast read per reference counting based on the BAM index
+  -i, --idx-stat             fast statistics based on the BAM index
+  -O, --img string           save histogram to this PDF/image file
+  -H, --list-fields          list all available BAM record features
+  -L, --log                  log10(x+1) transform numeric values
+  -q, --map-qual int         minimum mapping quality
+  -x, --pass                 passthrough mode (forward filtered BAM to output)
+  -F, --prim-only            filter out non-primary alignment records
+  -p, --print-freq int       print/report after this many records (-1 for print after EOF) (default -1)
+  -Q, --quiet-mode           supress all plotting to stderr
+  -M, --range-max float      discard record with field (-f) value greater than this flag (default NaN)
+  -m, --range-min float      discard record with field (-f) value less than this flag (default NaN)
+  -R, --reset                reset histogram after every report
+  -s, --stat                 print BAM satistics of the input files
+  -@, --top-bam string       save the top -? records to this bam file
+  -?, --top-size int         size of the top-mode buffer (default 100)
+
+Global Flags:
+      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
+      --id-ncbi                         FASTA head is NCBI-style, e.g. &gt;gi|110645304|ref|NC_002516.2| Pseud...
+      --id-regexp string                regular expression for parsing ID (default &quot;^(\\S+)\\s?&quot;)
+  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
+  -o, --out-file string                 out file (&quot;-&quot; for stdout, suffix .gz for gzipped out) (default &quot;-&quot;)
+      --quiet                           be quiet and do not show extra information
+  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default &quot;auto&quot;)
+  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>Get detailed statistics from multiple BAM files.</p>
+<p>seqkit bam -s *.bam</p>
+</li>
+<li>
+<p>Get rough statistics from multiple indexed BAM files.</p>
+<p>seqkit bam -i *.bam</p>
+</li>
+<li>
+<p>Count reads mapped to references from a BAM stream.</p>
+<p>cat sample.bam | seqkit bam -c counts.tsv  -</p>
+</li>
+<li>
+<p>Count reads mapped to references using the BAM index.</p>
+<p>seqkit bam -C sorted_indexed.bam</p>
+</li>
+<li>
+<p>Monitor alignment accuracy from a bam stream and report after every 1000 records, use 20 bins.</p>
+<p>cat sample.bam | seqkit bam -B -f Acc -p 1000 - </p>
+</li>
+<li>
+<p>Dump selected fields to TSV.</p>
+<p>seqkit bam -f Ref,Acc,RefCov,Strand sample.bam</p>
+</li>
+<li>
+<p>Save the best 100 records in terms of alignment accuracy to a BAM file.</p>
+<p>seqkit bam -f Acc -@ top_acc_100.bam -? 100 -Q sample.bam</p>
+</li>
+</ol>
+<h2 id="fish_1">fish</h2>
+<pre><code class="text">look for short sequences in larger sequences using local alignment
+
+Usage:
+  seqkit fish [flags]
+
+Flags:
+  -a, --all                       search all
+  -p, --aln-params string         alignment parameters in format &quot;&lt;match&gt;,&lt;mismatch&gt;,&lt;gap_open&gt;,&lt;gap_extend&gt;&quot; (default &quot;4,-4,-2,-1&quot;)
+  -h, --help                      help for fish
+  -i, --invert                    print out references not matching with any query
+  -q, --min-qual float            minimum mapping quality (default 5)
+  -b, --out-bam string            save aligmnets to this BAM file (memory intensive)
+  -x, --pass                      pass through mode (write input to stdout)
+  -g, --print-aln                 print sequence alignments
+  -D, --print-desc                print full sequence header
+  -f, --query-fastx string        query fasta
+  -F, --query-sequences string    query sequences
+  -r, --ranges string             target ranges, for example: &quot;:10,30:40,-20:&quot;
+  -s, --stranded                  search + strand only
+  -v, --validate-seq              validate bases according to the alphabet
+  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+
+Global Flags:
+      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
+      --id-ncbi                         FASTA head is NCBI-style, e.g. &gt;gi|110645304|ref|NC_002516.2| Pseud...
+      --id-regexp string                regular expression for parsing ID (default &quot;^(\\S+)\\s?&quot;)
+  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
+  -o, --out-file string                 out file (&quot;-&quot; for stdout, suffix .gz for gzipped out) (default &quot;-&quot;)
+      --quiet                           be quiet and do not show extra information
+  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default &quot;auto&quot;)
+  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>Find best local alignment of a short sequence in reads in a fasta file, print results as tabular</li>
+</ol>
+<p>seqkit fish -q 4.7 -F "GGCGGCTGTGACC" -g mouse-p53-cds.fna</p>
+<ol>
+<li>Find all local alignment of a short sequences in reads in a fasta file, print results as tabular and save as BAM</li>
+</ol>
+<p>seqkit fish -a -q 4.67 -f query.fas -b alignments.bam -g mouse-p53-cds.fna</p>
+<h2 id="sana_1">sana</h2>
+<pre><code class="text">sanitize broken single line fastq files
+
+Usage:
+  seqkit sana [flags]
+
+Flags:
+  -h, --help                  help for sana
+  -b, --qual-ascii-base int   ASCII BASE, 33 for Phred+33 (default 33)
+
+Global Flags:
+      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
+      --id-ncbi                         FASTA head is NCBI-style, e.g. &gt;gi|110645304|ref|NC_002516.2| Pseud...
+      --id-regexp string                regular expression for parsing ID (default &quot;^(\\S+)\\s?&quot;)
+  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
+  -o, --out-file string                 out file (&quot;-&quot; for stdout, suffix .gz for gzipped out) (default &quot;-&quot;)
+      --quiet                           be quiet and do not show extra information
+  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default &quot;auto&quot;)
+  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>Rescue usable reads from fastq file with malformed records.</p>
+<p>seqkit sana broken.fq &gt; rescued.fq</p>
+</li>
+</ol>
+<h2 id="watch_1">watch</h2>
+<pre><code class="text">monitoring and online histograms of sequence features
+
+Usage:
+  seqkit watch [flags]
+
+Flags:
+  -B, --bins int                  number of histogram bins (default -1)
+  -W, --delay int                 sleep this many seconds after online plotting (default 1)
+  -y, --dump                      print histogram data to stderr instead of plotting
+  -f, --fields string             target fields (default &quot;ReadLen&quot;)
+  -h, --help                      help for watch
+  -O, --img string                save histogram to this PDF/image file
+  -H, --list-fields               print out a list of available fields
+  -L, --log                       log10(x+1) transform numeric values
+  -x, --pass                      pass through mode (write input to stdout)
+  -p, --print-freq int            print/report after this many records (-1 for print after EOF) (default -1)
+  -b, --qual-ascii-base int       ASCII BASE, 33 for Phred+33 (default 33)
+  -Q, --quiet-mode                supress all plotting to stderr
+  -R, --reset                     reset histogram after every report
+  -v, --validate-seq              validate bases according to the alphabet
+  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+
+Global Flags:
+      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
+      --id-ncbi                         FASTA head is NCBI-style, e.g. &gt;gi|110645304|ref|NC_002516.2| Pseud...
+      --id-regexp string                regular expression for parsing ID (default &quot;^(\\S+)\\s?&quot;)
+  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
+  -o, --out-file string                 out file (&quot;-&quot; for stdout, suffix .gz for gzipped out) (default &quot;-&quot;)
+      --quiet                           be quiet and do not show extra information
+  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default &quot;auto&quot;)
+  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>Histogram of log sequence length</p>
+<p>seqkit watch -L -f ReadLen hairpin.fa </p>
+</li>
+<li>
+<p>Histogram of mean base qualities every 500 record, also saved as PDF</p>
+<p>seqkit watch -p 500 -O qhist.pdf -f MeanQual reads_1.fq.gz</p>
+</li>
+</ol>
 <h2 id="genautocomplete">genautocomplete</h2>
 <p>Usage</p>
 <pre><code class="text">generate shell autocompletion script
@@ -4164,6 +4188,7 @@ s.setAttribute('data-timestamp', +new Date());
                 
                   
                 
+                
               
               
                 
@@ -4218,13 +4243,11 @@ s.setAttribute('data-timestamp', +new Date());
       <div class="md-footer-copyright">
         
         powered by
-        <a href="https://www.mkdocs.org">MkDocs</a>
+        <a href="https://www.mkdocs.org" target="_blank" rel="noopener">MkDocs</a>
         and
-        <a href="https://squidfunk.github.io/mkdocs-material/">
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs</a>
       </div>
-      
-        
       
     </div>
   </div>
@@ -4232,14 +4255,9 @@ s.setAttribute('data-timestamp', +new Date());
       
     </div>
     
-    <script src="../assets/javascripts/application.6f02ae1b.js"></script>
+      <script src="../assets/javascripts/application.c33a9706.js"></script>
       
       <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
-      
-    
-    
-      
-        <script>!function(e,a,t,n,o,c,i){e.GoogleAnalyticsObject=o,e.ga=e.ga||function(){(e.ga.q=e.ga.q||[]).push(arguments)},e.ga.l=1*new Date,c=a.createElement(t),i=a.getElementsByTagName(t)[0],c.async=1,c.src="https://www.google-analytics.com/analytics.js",i.parentNode.insertBefore(c,i)}(window,document,"script",0,"ga"),ga("create","UA-28948626-9","bioinf.shenwei.me/seqkit"),ga("set","anonymizeIp",!0),ga("send","pageview");var links=document.getElementsByTagName("a");if(Array.prototype.map.call(links,function(e){e.host!=document.location.host&&e.addEventListener("click",function(){var a=e.getAttribute("data-md-action")||"follow";ga("send","event","outbound",a,e.href)})}),document.forms.search){var query=document.forms.search.query;query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}</script>
       
     
   </body>
