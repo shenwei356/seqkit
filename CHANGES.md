@@ -17,7 +17,7 @@
         [#101](https://github.com/shenwei356/seqkit/issues/101)
         - **new flag `-F/--use-fmi` for improving search speed for lots of sequence patterns**.
     - `seqkit rename`: making IDs unique across multiple files, and can write into multiple files. [#100](https://github.com/shenwei356/seqkit/issues/100)
-    - `seqkit sample`: fix stdin check for flag `-2`. [#102](https://github.com/shenwei356/seqkit/issues/102).
+    - `seqkit sample`: fix stdin checking for flag `-2`. [#102](https://github.com/shenwei356/seqkit/issues/102).
     - `seqkit rename/split/split2`: fix detection of existed outdir.
     - `split split`: fix bug of `seqkit split -i -2` and parallizing it.
     - `seqkit version`: checking update is optional (`-u`).

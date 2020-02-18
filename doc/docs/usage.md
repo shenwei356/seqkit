@@ -172,7 +172,7 @@ reproduced in different environments with same random seed.
 ``` text
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.11.0
+Version: 0.12.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -225,7 +225,7 @@ Flags:
   -h, --help                            help for seqkit
       --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
       --id-regexp string                regular expression for parsing ID (default "^(\\S+)\\s?")
-      --infile-list string              file of input files list (one file per line), if given, files from cli arguments are ignored
+      --infile-list string              file of input files list (one file per line), if given, they are appended to files from cli arguments
   -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
   -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
       --quiet                           be quiet and do not show extra information
@@ -281,7 +281,7 @@ Usage:
   seqkit seq [flags]
 
 Flags:
-  -p, --complement                complement sequence (blank for Protein sequence)
+  -p, --complement                complement sequence, flag '-v' is recommended to switch on
       --dna2rna                   DNA to RNA
   -G, --gap-letters string        gap letters (default "- \t.")
   -h, --help                      help for seq
@@ -301,16 +301,6 @@ Flags:
   -u, --upper-case                print sequences in upper case
   -v, --validate-seq              validate bases according to the alphabet
   -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
-
-Global Flags:
-      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
-      --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
-      --id-regexp string                regular expression for parsing ID (default "^(\\S+)\\s?")
-  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
-  -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
-      --quiet                           be quiet and do not show extra information
-  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
-  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
 ```
 
 Examples
