@@ -1,3 +1,6 @@
+- [SeqKit v0.12.1](https://github.com/shenwei356/seqkit/releases/tag/v0.12.1)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.12.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.12.1)
+  - `seqkit split2: new flag `-l/--by-length` for splitting into chunks of N bases.
 - [SeqKit v0.12.0](https://github.com/shenwei356/seqkit/releases/tag/v0.12.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.12.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.12.0)
     - `seqkit`:
