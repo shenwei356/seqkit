@@ -445,6 +445,7 @@ var bamCmd = &cobra.Command{
 		printPrim := getFlagBool(cmd, "prim-only")
 		printHelp := getFlagBool(cmd, "list-fields")
 		printQuiet := getFlagBool(cmd, "quiet-mode")
+		silentMode := getFlagBool(cmd, "silent-mode")
 
 		execBefore := getFlagString(cmd, "exec-before")
 		execAfter := getFlagString(cmd, "exec-after")
@@ -838,7 +839,9 @@ var bamCmd = &cobra.Command{
 			if execBefore != "" {
 				BashExec(execBefore)
 			}
-			os.Stderr.Write([]byte(strings.Join(fields, "\t") + "\n"))
+			if !silentMode {
+				os.Stderr.Write([]byte(strings.Join(fields, "\t") + "\n"))
+			}
 			for {
 				record, err := bamReader.Read()
 
@@ -863,7 +866,9 @@ var bamCmd = &cobra.Command{
 					if int(record.MapQ) < mapQual {
 						continue
 					}
-					os.Stderr.Write(marshall(record, fields))
+					if !silentMode {
+						os.Stderr.Write(marshall(record, fields))
+					}
 
 				} else {
 
@@ -1094,6 +1099,7 @@ func init() {
 	bamCmd.Flags().BoolP("pass", "x", false, "passthrough mode (forward filtered BAM to output)")
 	bamCmd.Flags().BoolP("prim-only", "F", false, "filter out non-primary alignment records")
 	bamCmd.Flags().BoolP("quiet-mode", "Q", false, "supress all plotting to stderr")
+	bamCmd.Flags().BoolP("silent-mode", "Z", false, "supress TSV output to stderr")
 	bamCmd.Flags().BoolP("list-fields", "H", false, "list all available BAM record features")
 	bamCmd.Flags().StringP("exec-after", "e", "", "execute command after reporting")
 	bamCmd.Flags().StringP("exec-before", "E", "", "execute command before reporting")
