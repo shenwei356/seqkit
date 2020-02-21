@@ -449,7 +449,7 @@ var bamCmd = &cobra.Command{
 			}
 		}
 
-		validFields := []string{"Read", "Ref", "Pos", "MapQual", "Acc", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "IsSup"}
+		validFields := []string{"Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "IsSup"}
 
 		fields := strings.Split(field, ",")
 		if field == "" {
@@ -702,6 +702,13 @@ var bamCmd = &cobra.Command{
 			"Leftmost reference position (zero-based)",
 			func(r *sam.Record) float64 {
 				return float64(r.Pos)
+			},
+		}
+
+		fmap["EndPos"] = fieldInfo{
+			"Rightmost reference position (zero-based)",
+			func(r *sam.Record) float64 {
+				return float64(r.Pos + r.Len())
 			},
 		}
 
