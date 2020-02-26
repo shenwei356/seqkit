@@ -81,6 +81,41 @@ func (c ReadCounts) Sorted() ReadCounts {
 	return sc
 }
 
+// load list of IDs from file
+func loadIdList(f string) map[string]bool {
+	fh, err := os.Open(f)
+	checkError(err)
+	r := bufio.NewReader(fh)
+	res := make(map[string]bool)
+
+	for {
+		b, err := r.ReadBytes(byte('\n'))
+		if err == nil {
+			res[strings.TrimRight(string(b), "\n")] = true
+		} else if err == io.EOF {
+			break
+		} else {
+			checkError(err)
+		}
+	}
+	return res
+}
+
+// filter records by ID
+func filterById(id string, include map[string]bool, exclude map[string]bool) bool {
+	if include != nil {
+		if !include[id] {
+			return true
+		}
+	}
+	if exclude != nil {
+		if exclude[id] {
+			return true
+		}
+	}
+	return false
+}
+
 // reportCounts prints per referecne count information.
 func reportCounts(readCounts ReadCounts, countFile string, field string, rangeMin float64, rangeMax float64, printLog bool, printBins int, binMode string, printDump bool, title string, printPdf string, count int, printQuiet bool) {
 
@@ -140,7 +175,7 @@ func reportCounts(readCounts ReadCounts, countFile string, field string, rangeMi
 }
 
 // CountReads counts total, secondary and supplementary reads mapped to each reference.
-func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, field string, rangeMin, rangeMax float64, printPass bool, printPrim bool, printLog bool, printBins int, binMode string, mapQual int, printFreq int, printDump bool, printDelay int, printPdf string, execBefore, execAfter string, printQuiet bool) {
+func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, field string, rangeMin, rangeMax float64, printPass bool, printPrim bool, printLog bool, printBins int, binMode string, mapQual int, printFreq int, printDump bool, printDelay int, printPdf string, execBefore, execAfter string, includeIds map[string]bool, excludeIds map[string]bool, printQuiet bool) {
 	readCounts := NewReadCounts(bamReader.Header().Refs())
 	validFields := []string{"Count", "SecCount", "SupCount"}
 	fields := strings.Split(field, ",")
@@ -161,6 +196,10 @@ func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, 
 			break
 		}
 		checkError(err)
+
+		if filterById(record.Name, includeIds, excludeIds) {
+			continue
+		}
 
 		if record.Flags&sam.Unmapped == 0 {
 			if printPrim && (record.Flags&sam.Supplementary != 0) {
@@ -298,7 +337,7 @@ func bamIdxCount(file string) {
 }
 
 // bamStatsOnce calculates detailed statistics for a single BAM file.
-func bamStatsOnce(f string, mapQual int, threads int) *bamStatRec {
+func bamStatsOnce(f string, mapQual int, includeIds map[string]bool, excludeIds map[string]bool, threads int) *bamStatRec {
 	bamReader := NewBamReader(f, threads)
 	res := new(bamStatRec)
 	res.File = f
@@ -309,6 +348,11 @@ func bamStatsOnce(f string, mapQual int, threads int) *bamStatRec {
 			break
 		}
 		checkError(err)
+
+		if filterById(record.Name, includeIds, excludeIds) {
+			continue
+		}
+
 		res.TotalRec++
 
 		if record.Flags&sam.Unmapped == 0 {
@@ -337,10 +381,10 @@ func bamStatsOnce(f string, mapQual int, threads int) *bamStatRec {
 }
 
 // bamStats calculates detailed statistics for multiple BAM files and prints to stderr.
-func bamStats(files []string, mapQual int, threads int) {
+func bamStats(files []string, mapQual int, includeIds map[string]bool, excludeIds map[string]bool, threads int) {
 	fmt.Fprintf(os.Stderr, "PrimAlnPerc\tPrimAln\tSecAln\tSupAln\tUnmapped\tMultimapPerc\tTotalRec\tFile\n")
 	for _, f := range files {
-		s := bamStatsOnce(f, mapQual, threads)
+		s := bamStatsOnce(f, mapQual, includeIds, excludeIds, threads)
 		fmt.Fprintf(os.Stderr, "%s\n", s.String())
 	}
 }
@@ -401,11 +445,25 @@ var bamCmd = &cobra.Command{
 		printPrim := getFlagBool(cmd, "prim-only")
 		printHelp := getFlagBool(cmd, "list-fields")
 		printQuiet := getFlagBool(cmd, "quiet-mode")
+		silentMode := getFlagBool(cmd, "silent-mode")
 
 		execBefore := getFlagString(cmd, "exec-before")
 		execAfter := getFlagString(cmd, "exec-after")
 		printTop := getFlagString(cmd, "top-bam")
 		topSize := getFlagInt(cmd, "top-size")
+		includeIdList := getFlagString(cmd, "grep-ids")
+		excludeIdList := getFlagString(cmd, "exclude-ids")
+
+		var includeIds map[string]bool
+		var excludeIds map[string]bool
+
+		if includeIdList != "" {
+			includeIds = loadIdList(includeIdList)
+		}
+
+		if excludeIdList != "" {
+			excludeIds = loadIdList(excludeIdList)
+		}
 
 		if printIdxStat {
 			idxStats(files)
@@ -413,7 +471,7 @@ var bamCmd = &cobra.Command{
 		}
 
 		if printStat {
-			bamStats(files, mapQual, config.Threads)
+			bamStats(files, mapQual, includeIds, excludeIds, config.Threads)
 			os.Exit(0)
 		}
 
@@ -740,7 +798,7 @@ var bamCmd = &cobra.Command{
 		}
 
 		if printCount != "" {
-			CountReads(bamReader, bamWriter, printCount, field, rangeMin, rangeMax, printPass, printPrim, printLog, printBins, binMode, mapQual, printFreq, printDump, printDelay, printPdf, execBefore, execAfter, printQuiet)
+			CountReads(bamReader, bamWriter, printCount, field, rangeMin, rangeMax, printPass, printPrim, printLog, printBins, binMode, mapQual, printFreq, printDump, printDelay, printPdf, execBefore, execAfter, includeIds, excludeIds, printQuiet)
 			outfh.Flush()
 			outw.Close()
 			return
@@ -781,7 +839,9 @@ var bamCmd = &cobra.Command{
 			if execBefore != "" {
 				BashExec(execBefore)
 			}
-			os.Stderr.Write([]byte(strings.Join(fields, "\t") + "\n"))
+			if !silentMode {
+				os.Stderr.Write([]byte(strings.Join(fields, "\t") + "\n"))
+			}
 			for {
 				record, err := bamReader.Read()
 
@@ -789,6 +849,10 @@ var bamCmd = &cobra.Command{
 					break
 				}
 				checkError(err)
+
+				if filterById(record.Name, includeIds, excludeIds) {
+					continue
+				}
 
 				if record.Flags&sam.Unmapped == 0 {
 
@@ -802,7 +866,9 @@ var bamCmd = &cobra.Command{
 					if int(record.MapQ) < mapQual {
 						continue
 					}
-					os.Stderr.Write(marshall(record, fields))
+					if !silentMode {
+						os.Stderr.Write(marshall(record, fields))
+					}
 
 				} else {
 
@@ -842,6 +908,10 @@ var bamCmd = &cobra.Command{
 				break
 			}
 			checkError(err)
+
+			if filterById(record.Name, includeIds, excludeIds) {
+				continue
+			}
 
 			if record.Flags&sam.Unmapped == 0 {
 				if printPrim && (record.Flags&sam.Supplementary != 0) {
@@ -1029,9 +1099,12 @@ func init() {
 	bamCmd.Flags().BoolP("pass", "x", false, "passthrough mode (forward filtered BAM to output)")
 	bamCmd.Flags().BoolP("prim-only", "F", false, "filter out non-primary alignment records")
 	bamCmd.Flags().BoolP("quiet-mode", "Q", false, "supress all plotting to stderr")
+	bamCmd.Flags().BoolP("silent-mode", "Z", false, "supress TSV output to stderr")
 	bamCmd.Flags().BoolP("list-fields", "H", false, "list all available BAM record features")
 	bamCmd.Flags().StringP("exec-after", "e", "", "execute command after reporting")
 	bamCmd.Flags().StringP("exec-before", "E", "", "execute command before reporting")
 	bamCmd.Flags().StringP("top-bam", "@", "", "save the top -? records to this bam file")
+	bamCmd.Flags().StringP("grep-ids", "g", "", "only keep records with IDs contained in this file")
+	bamCmd.Flags().StringP("exclude-ids", "G", "", "exclude records with IDs contained in this file")
 	bamCmd.Flags().IntP("top-size", "?", 100, "size of the top-mode buffer")
 }
