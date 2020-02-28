@@ -262,6 +262,14 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outF
 	self.Pool[dir] = &WatchedFx{Name: dir, IsDir: true}
 	checkError(err)
 	log.Info(fmt.Sprintf("Watcher (%s) launched on root: %s", inFmt, dir))
+
+	walkFunc := func(path string, info os.FileInfo, err error) error {
+		log.Info("New entry:", path)
+		return nil
+	}
+	err = cwalk.Walk(dir, walkFunc)
+	checkError(err)
+
 	self.Mutex.Unlock()
 
 	for {
@@ -308,12 +316,6 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outF
 		}
 	}
 
-	walkFunc := func(path string, info os.FileInfo, err error) error {
-		log.Info(path)
-		return nil
-	}
-	err = cwalk.Walk(dir, walkFunc)
-	checkError(err)
 }
 
 func init() {
