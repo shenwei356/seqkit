@@ -81,9 +81,11 @@ var sanaCmd = &cobra.Command{
 							if i == StreamExited {
 								return
 							}
-						} else {
+						} else if i != StreamExited {
 							ctrlChan <- i
 							time.Sleep(time.Microsecond * NAP_SLEEP)
+						} else {
+							return
 						}
 					default:
 						time.Sleep(time.Millisecond * BIG_SLEEP)

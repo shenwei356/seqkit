@@ -53,9 +53,11 @@ var scatCmd = &cobra.Command{
 		qBase := getFlagPositiveInt(cmd, "qual-ascii-base")
 		inFmt := getFlagString(cmd, "in-format")
 		outFmt := getFlagString(cmd, "out-format")
+		dropString := getFlagString(cmd, "drop-time")
 		allowGaps := getFlagBool(cmd, "allow-gaps")
 		timeLimit := getFlagFloat64(cmd, "time-limit")
 		waitPid := getFlagInt(cmd, "wait-pid")
+		delta := getFlagInt(cmd, "delta") * 1024
 		regexp := getFlagString(cmd, "regexp")
 
 		dirs := getFileList(args, true)
@@ -74,16 +76,16 @@ var scatCmd = &cobra.Command{
 			log.Info("No directories given to watch! Exiting.")
 			os.Exit(1)
 		}
-		LaunchFxWatchers(dirs, ctrlChan, regexp, inFmt, outFmt, qBase, allowGaps, timeLimit, waitPid)
+		LaunchFxWatchers(dirs, ctrlChan, regexp, inFmt, outFmt, qBase, allowGaps, delta, dropString, timeLimit, waitPid)
 
 	},
 }
 
-func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, regexp string, inFmt, outFmt string, qBase int, allowGaps bool, timeLimit float64, waitPid int) {
+func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, regexp string, inFmt, outFmt string, qBase int, allowGaps bool, delta int, dropString string, timeLimit float64, waitPid int) {
 	for _, dir := range dirs {
-		go NewFxWatcher(dir, ctrlChan, regexp, inFmt, outFmt, qBase, allowGaps)
+		go NewFxWatcher(dir, ctrlChan, regexp, inFmt, outFmt, qBase, allowGaps, delta, dropString)
 	}
-	sigChan := make(chan os.Signal, 1)
+	sigChan := make(chan os.Signal, 10)
 	signal.Notify(sigChan, os.Interrupt)
 
 EVER:
@@ -98,7 +100,7 @@ EVER:
 			return
 			break EVER
 		default:
-			time.Sleep(time.Millisecond * NAP_SLEEP)
+			time.Sleep(time.Millisecond * BIG_SLEEP)
 		}
 	}
 }
@@ -106,6 +108,7 @@ EVER:
 type WatchedFx struct {
 	Name      string
 	LastSize  int64
+	LastTry   time.Time
 	BytesRead int64
 	IsDir     bool
 	SeqChan   chan *simpleSeq
@@ -120,7 +123,7 @@ type FxWatcher struct {
 	Mutex sync.RWMutex
 }
 
-func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outFmt string, qBase int, allowGaps bool) {
+func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outFmt string, qBase int, allowGaps bool, minDelta int, dropString string) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatalf("fsnotify error:", err)
@@ -129,8 +132,8 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outF
 	self := new(FxWatcher)
 	self.Base = dir
 	self.Pool = make(WatchedFxPool)
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt)
+	dropDuration, err := time.ParseDuration(dropString)
+	checkError(err)
 
 	go func() {
 		for {
@@ -182,10 +185,15 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outF
 				if event.Op&fsnotify.Write == fsnotify.Write {
 					fi, err := os.Stat(ePath)
 					checkError(err)
+					self.Mutex.RLock()
 					if self.Pool[ePath] == nil {
+						self.Mutex.RUnlock()
 						continue
 					}
-					self.Mutex.RLock()
+					if time.Now().Sub(self.Pool[ePath].LastTry) < dropDuration {
+						self.Mutex.RUnlock()
+						continue
+					}
 					if self.Pool[ePath].LastSize == fi.Size() {
 						self.Mutex.RUnlock()
 						continue
@@ -199,14 +207,17 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outF
 						self.Mutex.RUnlock()
 						continue
 					}
-					if delta < 5000 {
+					if delta < int64(minDelta) {
 						self.Mutex.RUnlock()
 						continue
 					}
 					log.Info("modified file:", ePath)
-					time.Sleep(time.Millisecond * BIG_SLEEP / 2)
+					time.Sleep(time.Millisecond * BIG_SLEEP)
 					self.Pool[ePath].CtrlChan <- StreamTry
+					self.Pool[ePath].LastTry = time.Now()
+					time.Sleep(time.Millisecond * BIG_SLEEP)
 					self.Mutex.RUnlock()
+
 				} else if event.Op&fsnotify.Create == fsnotify.Create {
 					fi, err := os.Stat(ePath)
 					checkError(err)
@@ -218,12 +229,14 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outF
 						self.Mutex.Unlock()
 						continue
 					}
+					created := time.Now()
 					log.Info("new file:", ePath)
 
 					sc, ctrl := NewRawSeqStreamFromFile(ePath, 1000, qBase, inFmt, allowGaps)
 
 					ctrl <- StreamTry
-					self.Pool[ePath] = &WatchedFx{Name: ePath, IsDir: false, SeqChan: sc, CtrlChan: ctrl, LastSize: fi.Size()}
+					time.Sleep(time.Millisecond * BIG_SLEEP)
+					self.Pool[ePath] = &WatchedFx{Name: ePath, IsDir: false, SeqChan: sc, CtrlChan: ctrl, LastSize: fi.Size(), LastTry: created}
 					watcher.Add(ePath)
 					self.Mutex.Unlock()
 				}
@@ -239,7 +252,7 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outF
 				}
 				log.Fatalf("fsnotify error:", err)
 			default:
-				time.Sleep(time.Microsecond * 10)
+				time.Sleep(time.Microsecond * BIG_SLEEP)
 			}
 		}
 	}()
@@ -299,7 +312,12 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outF
 		time.Sleep(time.Millisecond * NAP_SLEEP)
 	}
 
-	_ = cwalk.NumWorkers
+	walkFunc := func(path string, info os.FileInfo, err error) error {
+		log.Info(path)
+		return nil
+	}
+	err = cwalk.Walk(dir, walkFunc)
+	checkError(err)
 }
 
 func init() {
@@ -311,5 +329,7 @@ func init() {
 	scatCmd.Flags().BoolP("allow-gaps", "A", false, "allow gap character (-) in sequences")
 	scatCmd.Flags().Float64P("time-limit", "T", -1, "quit after inactive for this many hours")
 	scatCmd.Flags().IntP("wait-pid", "p", -1, "after process with this PID exited")
+	scatCmd.Flags().IntP("delta", "d", 5, "minimum size increase to trigger parsing (10 kilobytes)")
+	scatCmd.Flags().StringP("drop-time", "D", "1s", "Notification drop interval (500ms)")
 	scatCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
 }
