@@ -63,7 +63,7 @@ Examples
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.BufferSize)
 
-		files := getFileList(args, true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		newstart := getFlagInt(cmd, "new-start")
 		if newstart == 0 {

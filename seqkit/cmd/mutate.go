@@ -68,7 +68,8 @@ Examples:
 		runtime.GOMAXPROCS(config.Threads)
 		quiet := config.Quiet
 
-		files := getFileList(args, true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		var err error
 
 		mPoints := []_mutatePoint{}
 		for _, val := range getFlagStringSlice(cmd, "point") {
@@ -133,8 +134,6 @@ Examples:
 		// if len(pattern) == 0 && patternFile == "" {
 		// 	checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
 		// }
-
-		var err error
 
 		// prepare pattern
 		patterns := make(map[string]*regexp.Regexp)

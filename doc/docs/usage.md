@@ -172,7 +172,7 @@ reproduced in different environments with same random seed.
 ``` text
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.11.0
+Version: 0.12.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -225,6 +225,7 @@ Flags:
   -h, --help                            help for seqkit
       --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
       --id-regexp string                regular expression for parsing ID (default "^(\\S+)\\s?")
+      --infile-list string              file of input files list (one file per line), if given, they are appended to files from cli arguments
   -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
   -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
       --quiet                           be quiet and do not show extra information
@@ -280,7 +281,7 @@ Usage:
   seqkit seq [flags]
 
 Flags:
-  -p, --complement                complement sequence (blank for Protein sequence)
+  -p, --complement                complement sequence, flag '-v' is recommended to switch on
       --dna2rna                   DNA to RNA
   -G, --gap-letters string        gap letters (default "- \t.")
   -h, --help                      help for seq
@@ -300,16 +301,6 @@ Flags:
   -u, --upper-case                print sequences in upper case
   -v, --validate-seq              validate bases according to the alphabet
   -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
-
-Global Flags:
-      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
-      --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
-      --id-regexp string                regular expression for parsing ID (default "^(\\S+)\\s?")
-  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
-  -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
-      --quiet                           be quiet and do not show extra information
-  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
-  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
 ```
 
 Examples
@@ -746,6 +737,8 @@ This command is similar with "samtools faidx" but has some extra features:
 
   1. output full header line with flag -f
   2. support regular expression as sequence ID with flag -r
+  3. if you have large number of IDs, you can use:
+        seqkit faidx seqs.fasta --infile-list IDs.txt
 
 Usage:
   seqkit faidx [flags] <fasta-file> [regions...]
@@ -1302,7 +1295,9 @@ Attentions:
      but it's not fast enough for large genome like human genome.
      Though, it's fast enough for microbial genomes.
   3. The order of sequences in result is consistent with that in original
-     file, not the order of the query patterns.
+     file, not the order of the query patterns. 
+     But for FASTA file, you can use:
+        seqkit faidx seqs.fasta --infile-list IDs.txt
 
 You can specify the sequence region for searching with flag -R (--region).
 The definition of region is 1-based and with some custom design.
@@ -1377,7 +1372,7 @@ Examples
         $ cat hairpin.fa.gz | seqkit grep -s -i -p aggcg
 
 
-1. Extract sequences containing AGGCG (allow mismatch, **only for short (<50kb) sequences now**)
+1. Extract sequences containing AGGCG (allow mismatch)
 
         $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg | seqkit stats
         file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
@@ -1391,9 +1386,9 @@ Examples
         file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
         -     FASTA   RNA     17,168  1,881,005       39    109.6    2,354
 
-        real    0m2.479s
-        user    0m2.570s
-        sys     0m0.015s
+        real    0m0.864s
+        user    0m0.941s
+        sys     0m0.014s
 
 1. Extract sequences starting with AGGCG
 
@@ -1438,12 +1433,15 @@ Flags:
   -d, --degenerate                pattern/motif contains degenerate base
       --gtf                       output in GTF format
   -h, --help                      help for locate
+  -M, --hide-matched              do not show matched sequences
   -i, --ignore-case               ignore case
   -m, --max-mismatch int          max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster
   -G, --non-greedy                non-greedy mode, faster but may miss motifs overlapping with others
   -P, --only-positive-strand      only search on positive strand
   -p, --pattern strings           pattern/motif (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
   -f, --pattern-file string       pattern/motif file (FASTA format)
+  -F, --use-fmi                   use FM-index for much faster search of lots of sequence patterns
+  -r, --use-regexp                patterns/motifs are regular expression
   -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
 
 ```
@@ -1456,23 +1454,40 @@ Examples
         >seq
         agctggagctacc
 
-        $ cat t.fa | seqkit locate -p agc | csvtk pretty -t
+        $ cat t.fa \
+          | seqkit locate -p agc \
+          | csvtk pretty -t
         seqID   patternName   pattern   strand   start   end   matched
         seq     agc           agc       +        1       3     agc
         seq     agc           agc       +        7       9     agc
         seq     agc           agc       -        8       10    agc
         seq     agc           agc       -        2       4     agc
 
-        $ cat t.fa | seqkit locate -p agc -m 1 | csvtk pretty -t
-        seqID   patternName     pattern strand  start   end     matched
+        # do not show matched sequences
+        $ cat t.fa \
+          | seqkit locate -p agc -M \
+          | csvtk pretty -t
+        seqID   patternName   pattern   strand   start   end
+        seq     agc           agc       +        1       3
+        seq     agc           agc       +        7       9
+        seq     agc           agc       -        8       10
+        seq     agc           agc       -        2       4
+
+        # max mismatch: 1
+        $ cat t.fa \
+          | seqkit locate -p agc -m 1 \
+          | csvtk pretty -t
+        seqID   patternName     pattern strand  start   end    matched
         seq     agc           agc       +        1       3     agc
         seq     agc           agc       +        7       9     agc
         seq     agc           agc       +        11      13    acc
         seq     agc           agc       -        8       10    agc
         seq     agc           agc       -        2       4     agc
 
-
-        $ cat t.fa | seqkit locate -p agc -m 2 | csvtk pretty -t
+        # max mismatch: 2
+        $ cat t.fa \
+          | seqkit locate -p agc -m 2 \
+          | csvtk pretty -t
         seqID   patternName   pattern   strand   start   end   matched
         seq     agc           agc       +        1       3     agc
         seq     agc           agc       +        4       6     tgg
@@ -1489,7 +1504,7 @@ Examples
 1. Locate ORFs.
 
         $ zcat hairpin.fa.gz \
-            | seqkit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" \
+            | seqkit locate -i -p "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" -r \
             | head -n 4 \
             | csvtk pretty -t
         seqID       patternName                        pattern                            strand   start   end   matched
@@ -2338,7 +2353,11 @@ Usage:
   seqkit rename [flags]
 
 Flags:
-  -n, --by-name   check duplication by full name instead of just id
+  -n, --by-name             check duplication by full name instead of just id
+  -f, --force               overwrite output directory
+  -h, --help                help for rename
+  -m, --multiple-outfiles   write results into separated files for multiple input files
+  -O, --out-dir string      output directory (default "renamed")
 
 ```
 

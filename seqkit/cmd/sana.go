@@ -62,12 +62,12 @@ var sanaCmd = &cobra.Command{
 		allowGaps := getFlagBool(cmd, "allow-gaps")
 		runtime.GOMAXPROCS(config.Threads)
 
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Flush()
 		defer outfh.Close()
-
-		files := getFileList(args, true)
 
 		for _, file := range files {
 			rawSeqChan, ctrlChan := NewRawSeqStreamFromFile(file, 1000, qBase, inFmt, allowGaps)

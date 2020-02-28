@@ -66,7 +66,7 @@ according to the input files.
 		fai.MapWholeFile = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileList(args, true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		if len(files) > 1 {
 			checkError(fmt.Errorf("no more than one file should be given"))
@@ -77,11 +77,20 @@ according to the input files.
 
 		size := getFlagNonNegativeInt(cmd, "by-size")
 		parts := getFlagNonNegativeInt(cmd, "by-part")
+		lengthS := getFlagString(cmd, "by-length")
+		var length int64
+		var err error
+		if lengthS != "" {
+			length, err = ParseByteSize(lengthS)
+			if err != nil {
+				checkError(fmt.Errorf("parsing sequence length: %s", lengthS))
+			}
+		}
 
 		outdir := getFlagString(cmd, "out-dir")
 		force := getFlagBool(cmd, "force")
 
-		if size == 0 && parts == 0 {
+		if size == 0 && parts == 0 && length == 0 {
 			checkError(fmt.Errorf(`one of flags should be given: -s/-p. type "seqkit split2 -h" for help`))
 		}
 
@@ -128,8 +137,10 @@ according to the input files.
 			log.Infof("split seqs from %s", source)
 			if size > 0 {
 				log.Infof("split into %d seqs per file", size)
-			} else {
+			} else if parts > 0 {
 				log.Infof("split into %d parts", parts)
+			} else {
+				log.Infof("split by sequence length: %s", lengthS)
 			}
 		}
 
@@ -149,22 +160,24 @@ according to the input files.
 				}
 			}
 
-			existed, err := pathutil.DirExists(outdir)
-			checkError(err)
-			if existed {
-				empty, err := pathutil.IsEmpty(outdir)
+			pwd, _ := os.Getwd()
+			if outdir != "./" && outdir != "." && pwd != filepath.Clean(outdir) {
+				existed, err := pathutil.DirExists(outdir)
 				checkError(err)
-				if !empty {
-					if force {
-						checkError(os.RemoveAll(outdir))
-					} else {
-						checkError(fmt.Errorf("outdir not empty: %s, use -f (--force) to overwrite", outdir))
+				if existed {
+					empty, err := pathutil.IsEmpty(outdir)
+					checkError(err)
+					if !empty {
+						if force {
+							checkError(os.RemoveAll(outdir))
+						} else {
+							log.Warningf("outdir not empty: %s, you can use --force to overwrite", outdir)
+						}
 					}
 				} else {
-					checkError(os.RemoveAll(outdir))
+					checkError(os.MkdirAll(outdir, 0777))
 				}
 			}
-			checkError(os.MkdirAll(outdir, 0777))
 
 			wg.Add(1)
 			go func(file string) {
@@ -184,7 +197,7 @@ according to the input files.
 					outfhs[0] = nil
 					counts = make(map[int]int, 10)
 					outfiles = make(map[int]string, 10)
-				} else {
+				} else if parts > 0 {
 					outfhs = make(map[int]*xopen.Writer, parts)
 					counts = make(map[int]int, parts)
 					outfiles = make(map[int]string, parts)
@@ -192,13 +205,19 @@ according to the input files.
 						outfhs[i] = nil
 						counts[i] = 0
 					}
+				} else {
+					outfhs = make(map[int]*xopen.Writer, 10)
+					outfhs[0] = nil
+					counts = make(map[int]int, 10)
+					outfiles = make(map[int]string, 10)
 				}
 
 				var outfh *xopen.Writer
 				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
-				i := 0 // nth part
-				j := 0 // nth record
+				i := 0      // nth part
+				j := 0      // nth record
+				var n int64 // length sum
 				for {
 					record, err = fastxReader.Read()
 					if err != nil {
@@ -221,6 +240,7 @@ according to the input files.
 						}
 						renameFileExt = false
 					}
+					n += int64(len(record.Seq.Seq))
 
 					if size > 0 {
 						if j == size {
@@ -240,6 +260,24 @@ according to the input files.
 
 							j = 0
 						}
+					} else if length > 0 {
+						if n >= length {
+							outfhs[i].Close()
+							if !quiet {
+								log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
+							}
+							delete(outfhs, i)
+
+							i++
+							var outfh2 *xopen.Writer
+							outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
+							outfh2, err = xopen.Wopen(outfile)
+							checkError(err)
+							outfhs[i] = outfh2
+							outfiles[i] = outfile
+
+							n = 0
+						}
 					}
 
 					if outfhs[i] == nil {
@@ -258,11 +296,13 @@ according to the input files.
 
 					if size > 0 {
 						j++
-					} else {
+					} else if parts > 0 {
 						i++
 						if i == parts {
 							i = 0
 						}
+					} else {
+
 					}
 				}
 
@@ -298,6 +338,7 @@ func init() {
 	split2Cmd.Flags().StringP("read2", "2", "", "read2 file")
 	split2Cmd.Flags().IntP("by-size", "s", 0, "split sequences into multi parts with N sequences")
 	split2Cmd.Flags().IntP("by-part", "p", 0, "split sequences into N parts")
+	split2Cmd.Flags().StringP("by-length", "l", "", "split sequences into chunks of N bases, supports K/M/G suffix")
 	split2Cmd.Flags().StringP("out-dir", "O", "", "output directory (default value is $infile.split)")
 	split2Cmd.Flags().BoolP("force", "f", false, "overwrite output directory")
 }

@@ -64,8 +64,7 @@ Examples:
 		Threads = config.Threads
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileList(args, true)
-
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 		chrs := getFlagStringSlice(cmd, "chr")
 		chrs2 := make([]string, len(chrs))
 		for i, chr := range chrs {

@@ -153,7 +153,7 @@ Translate Tables/Genetic Codes:
 			return
 		}
 
-		files := getFileList(args, true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		var record *fastx.Record
 		var fastxReader *fastx.Reader

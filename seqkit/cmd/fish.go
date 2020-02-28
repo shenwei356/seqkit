@@ -114,7 +114,7 @@ func parseRanges(rf string) Ranges {
 var fishCmd = &cobra.Command{
 	Use:   "fish",
 	Short: "look for short sequences in larger sequences using local alignment",
-	Long:  `look for short sequences in larger sequences using local alignment
+	Long: `look for short sequences in larger sequences using local alignment
 
 Attention:
   1. output coordinates are BED-like 0-based, left-close and right-open.
@@ -164,7 +164,8 @@ Attention:
 			seq.ValidateSeq = true
 		}
 
-		files := getFileList(args, true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+
 		var alns []*AlignedSeq
 		if len(files) == 0 {
 			files = []string{"-"}

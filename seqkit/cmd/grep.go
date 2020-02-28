@@ -55,7 +55,9 @@ Attentions:
      but it's not fast enough for large genome like human genome.
      Though, it's fast enough for microbial genomes.
   3. The order of sequences in result is consistent with that in original
-     file, not the order of the query patterns.
+     file, not the order of the query patterns. 
+     But for FASTA file, you can use:
+        seqkit faidx seqs.fasta --infile-list IDs.txt
 
 You can specify the sequence region for searching with flag -R (--region).
 The definition of region is 1-based and with some custom design.
@@ -75,6 +77,8 @@ Examples:
 		runtime.GOMAXPROCS(config.Threads)
 
 		bwt.CheckEndSymbol = false
+
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
@@ -140,8 +144,6 @@ Examples:
 				checkError(fmt.Errorf("when start < 0, end should not > 0"))
 			}
 		}
-
-		files := getFileList(args, true)
 
 		// prepare pattern
 		patterns := make(map[string]*regexp.Regexp)

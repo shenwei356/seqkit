@@ -94,7 +94,7 @@ var seqCmd = &cobra.Command{
 		// 		log.Infof("flag -g (--remove-gaps) is switched on when using -m (--min-len) or -M (--max-len)")
 		// 	}
 		// }
-		if minLen >= 0 || maxLen >= 0 {
+		if (minLen >= 0 || maxLen >= 0) && !removeGaps {
 			log.Warning("you may switch on flag -g/--remove-gaps to remove spaces")
 		}
 
@@ -104,22 +104,23 @@ var seqCmd = &cobra.Command{
 		seq.ValidSeqThreads = config.Threads
 		seq.ComplementThreads = config.Threads
 
-		if !(alphabet == nil || alphabet == seq.Unlimit) {
+		if complement && (alphabet == nil || alphabet == seq.Protein) {
+			log.Warningf("flag -t (--seq-type) (DNA/RNA) is recommended for computing complement sequences")
+		}
+
+		if !validateSeq && !(alphabet == nil || alphabet == seq.Unlimit) {
 			if !quiet {
 				log.Info("when flag -t (--seq-type) given, flag -v (--validate-seq) is automatically switched on")
 			}
+			validateSeq = true
 			seq.ValidateSeq = true
-		}
-
-		if complement && !validateSeq {
-			log.Warningf("flag -v (--validate-seq) is recommended to switch on for computing complement sequences")
 		}
 
 		if lowerCase && upperCase {
 			checkError(fmt.Errorf("could not give both flags -l (--lower-case) and -u (--upper-case)"))
 		}
 
-		files := getFileList(args, true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

@@ -38,6 +38,10 @@ var sampleCmd = &cobra.Command{
 	Short: "sample sequences by number or proportion",
 	Long: `sample sequences by number or proportion.
 
+Attention:
+1. Do not use '-n' on large FASTQ files, it loads all seqs into memory!
+   use 'seqkit sample -p 0.1 seqs.fq.gz | seqkit head -n N' instead!
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
@@ -54,12 +58,18 @@ var sampleCmd = &cobra.Command{
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileList(args, true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		seed := getFlagInt64(cmd, "rand-seed")
 		twoPass := getFlagBool(cmd, "two-pass")
 		number := getFlagInt64(cmd, "number")
 		proportion := getFlagFloat64(cmd, "proportion")
+
+		file := files[0]
+
+		if twoPass && isStdin(file) {
+			checkError(fmt.Errorf("two-pass mode (-2) will failed when reading from stdin. please disable flag: -2"))
+		}
 
 		if number == 0 && proportion == 0 {
 			checkError(fmt.Errorf("one of flags -n (--number) and -p (--proportion) needed"))
@@ -69,7 +79,7 @@ var sampleCmd = &cobra.Command{
 			checkError(fmt.Errorf("value of -n (--number) and should be greater than 0"))
 		}
 		if proportion < 0 || proportion > 1 {
-			checkError(fmt.Errorf("value of -p (--proportion) (%f) should be in range of [0, 1]", proportion))
+			checkError(fmt.Errorf("value of -p (--proportion) (%f) should be in range of (0, 1]", proportion))
 		}
 
 		outfh, err := xopen.Wopen(outFile)
@@ -77,8 +87,6 @@ var sampleCmd = &cobra.Command{
 		defer outfh.Close()
 
 		rand.Seed(seed)
-
-		file := files[0]
 
 		n := int64(0)
 		var record *fastx.Record
@@ -89,9 +97,6 @@ var sampleCmd = &cobra.Command{
 			}
 
 			if twoPass {
-				if xopen.IsStdin() {
-					checkError(fmt.Errorf("two-pass mode (-2) will failed when reading from stdin. please disable flag: -2"))
-				}
 				// first pass, get seq number
 				if !quiet {
 					log.Info("first pass: counting seq number")
@@ -135,6 +140,9 @@ var sampleCmd = &cobra.Command{
 					}
 				}
 			} else {
+				if !quiet {
+					log.Info("loading all sequences into memory...")
+				}
 				records, err := fastx.GetSeqs(file, alphabet, config.Threads, 10, idRegexp)
 				checkError(err)
 
@@ -192,7 +200,7 @@ func init() {
 	RootCmd.AddCommand(sampleCmd)
 
 	sampleCmd.Flags().Int64P("rand-seed", "s", 11, "rand seed")
-	sampleCmd.Flags().Int64P("number", "n", 0, "sample by number (result may not exactly match)")
+	sampleCmd.Flags().Int64P("number", "n", 0, "sample by number (result may not exactly match), DO NOT use on large FASTQ files.")
 	sampleCmd.Flags().Float64P("proportion", "p", 0, "sample by proportion")
 	sampleCmd.Flags().BoolP("two-pass", "2", false, "2-pass mode read files twice to lower memory usage. Not allowed when reading from stdin")
 }

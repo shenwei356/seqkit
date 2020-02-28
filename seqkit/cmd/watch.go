@@ -156,10 +156,7 @@ var watchCmd = &cobra.Command{
 			seq.ValidateSeq = true
 		}
 
-		files := getFileList(args, true)
-		if len(files) == 0 {
-			files = []string{"-"}
-		}
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

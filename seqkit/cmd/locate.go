@@ -70,15 +70,20 @@ Though, it's fast enough for microbial genomes.
 
 		bwt.CheckEndSymbol = false
 
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
 		degenerate := getFlagBool(cmd, "degenerate")
+		useRegexp := getFlagBool(cmd, "use-regexp")
+		useFMI := getFlagBool(cmd, "use-fmi")
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
 		nonGreedy := getFlagBool(cmd, "non-greedy")
 		outFmtGTF := getFlagBool(cmd, "gtf")
 		outFmtBED := getFlagBool(cmd, "bed")
 		mismatches := getFlagNonNegativeInt(cmd, "max-mismatch")
+		hideMatched := getFlagBool(cmd, "hide-matched")
 
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
@@ -89,16 +94,23 @@ Though, it's fast enough for microbial genomes.
 			if degenerate {
 				checkError(fmt.Errorf("flag -d (--degenerate) not allowed when giving flag -m (--max-mismatch)"))
 			}
+			if useRegexp {
+				checkError(fmt.Errorf("flag -r (--use-regexp) not allowed when giving flag -m (--use-regexp)"))
+			}
 			if nonGreedy && !quiet {
 				log.Infof("flag -G (--non-greedy) ignored when giving flag -m (--max-mismatch)")
 			}
 			sfmi = fmi.NewFMIndex()
-			if mismatches > 4 {
-				log.Warningf("large value flag -m/--max-mismatch will slow down the search")
-			}
 		}
-
-		files := getFileList(args, true)
+		if useFMI {
+			if degenerate {
+				checkError(fmt.Errorf("flag -d (--degenerate) ignored when giving flag -F (--use-fmi)"))
+			}
+			if useRegexp {
+				checkError(fmt.Errorf("flag -r (--use-regexp) ignored when giving flag -F (--use-fmi)"))
+			}
+			sfmi = fmi.NewFMIndex()
+		}
 
 		// prepare pattern
 		regexps := make(map[string]*regexp.Regexp)
@@ -107,6 +119,9 @@ Though, it's fast enough for microbial genomes.
 		if patternFile != "" {
 			records, err := fastx.GetSeqsMap(patternFile, seq.Unlimit, config.Threads, 10, "")
 			checkError(err)
+			if len(records) == 0 {
+				checkError(fmt.Errorf("no FASTA sequences found in pattern file: %s", patternFile))
+			}
 			for name, record := range records {
 				patterns[name] = record.Seq.Seq
 				if !quiet && bytes.IndexAny(record.Seq.Seq, "\t ") >= 0 {
@@ -115,11 +130,19 @@ Though, it's fast enough for microbial genomes.
 
 				if degenerate {
 					s = record.Seq.Degenerate2Regexp()
-				} else {
+				} else if useRegexp {
 					s = string(record.Seq.Seq)
+				} else {
+					if ignoreCase {
+						patterns[name] = bytes.ToLower(record.Seq.Seq)
+					}
 				}
 
+				// check pattern
 				if mismatches > 0 {
+					if mismatches > len(record.Seq.Seq) {
+						checkError(fmt.Errorf("mismatch should be <= length of sequence: %s", record.Seq.Seq))
+					}
 					if seq.DNAredundant.IsValid(record.Seq.Seq) == nil ||
 						seq.RNAredundant.IsValid(record.Seq.Seq) == nil ||
 						seq.Protein.IsValid(record.Seq.Seq) == nil { // legal sequence
@@ -127,12 +150,19 @@ Though, it's fast enough for microbial genomes.
 						checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", record.Name))
 					}
 				} else {
-					if ignoreCase {
-						s = "(?i)" + s
+					if degenerate || useRegexp {
+						if ignoreCase {
+							s = "(?i)" + s
+						}
+						re, err := regexp.Compile(s)
+						checkError(err)
+						regexps[name] = re
+					} else if bytes.Index(record.Seq.Seq, []byte(".")) >= 0 ||
+						!(seq.DNAredundant.IsValid(record.Seq.Seq) == nil ||
+							seq.RNAredundant.IsValid(record.Seq.Seq) == nil ||
+							seq.Protein.IsValid(record.Seq.Seq) == nil) {
+						checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s, you may switch on -d/--degenerate or -r/--use-regexp", record.Name))
 					}
-					re, err := regexp.Compile(s)
-					checkError(err)
-					regexps[name] = re
 				}
 			}
 		} else {
@@ -149,10 +179,15 @@ Though, it's fast enough for microbial genomes.
 						checkError(fmt.Errorf("it seems that flag -d is given, but you provide regular expression instead of available %s sequence", alphabet.String()))
 					}
 					s = pattern2seq.Degenerate2Regexp()
-				} else {
+				} else if useRegexp {
 					s = p
+				} else {
+					if ignoreCase {
+						patterns[p] = bytes.ToLower(patterns[p])
+					}
 				}
 
+				// check pattern
 				if mismatches > 0 {
 					if mismatches > len(patterns[p]) {
 						checkError(fmt.Errorf("mismatch should be <= length of sequence: %s", p))
@@ -164,12 +199,19 @@ Though, it's fast enough for microbial genomes.
 						checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", p))
 					}
 				} else {
-					if ignoreCase {
-						s = "(?i)" + s
+					if degenerate || useRegexp {
+						if ignoreCase {
+							s = "(?i)" + s
+						}
+						re, err := regexp.Compile(s)
+						checkError(err)
+						regexps[p] = re
+					} else if bytes.Index(patterns[p], []byte(".")) >= 0 ||
+						!(seq.DNAredundant.IsValid(patterns[p]) == nil ||
+							seq.RNAredundant.IsValid(patterns[p]) == nil ||
+							seq.Protein.IsValid(patterns[p]) == nil) {
+						checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s, you may switch on -d/--degenerate or -r/--use-regexp", p))
 					}
-					re, err := regexp.Compile(s)
-					checkError(err)
-					regexps[p] = re
 				}
 			}
 		}
@@ -179,18 +221,23 @@ Though, it's fast enough for microbial genomes.
 		defer outfh.Close()
 
 		if !(outFmtGTF || outFmtBED) {
-			outfh.WriteString("seqID\tpatternName\tpattern\tstrand\tstart\tend\tmatched\n")
+			if hideMatched {
+				outfh.WriteString("seqID\tpatternName\tpattern\tstrand\tstart\tend\n")
+			} else {
+				outfh.WriteString("seqID\tpatternName\tpattern\tstrand\tstart\tend\tmatched\n")
+			}
 		}
 		var seqRP *seq.Seq
-		var offset, l int
+		var offset, l, lpatten int
 		var loc []int
 		var locs, locsNeg [][2]int
 		var i, begin, end int
 		var flag bool
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
-		var pSeq []byte
+		var pSeq, p []byte
 		var pName string
+		var re *regexp.Regexp
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -204,7 +251,7 @@ Though, it's fast enough for microbial genomes.
 					break
 				}
 
-				if mismatches > 0 && ignoreCase {
+				if !(degenerate || useRegexp) && ignoreCase {
 					record.Seq.Seq = bytes.ToLower(record.Seq.Seq)
 				}
 
@@ -213,7 +260,7 @@ Though, it's fast enough for microbial genomes.
 					seqRP = record.Seq.RevCom()
 				}
 
-				if mismatches > 0 {
+				if mismatches > 0 || useFMI {
 					_, err = sfmi.Transform(record.Seq.Seq)
 					if err != nil {
 						checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
@@ -250,14 +297,24 @@ Though, it's fast enough for microbial genomes.
 									0,
 									"+"))
 							} else {
-								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-									record.ID,
-									pName,
-									patterns[pName],
-									"+",
-									begin,
-									end,
-									record.Seq.Seq[i:i+len(pSeq)]))
+								if hideMatched {
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
+										record.ID,
+										pName,
+										patterns[pName],
+										"+",
+										begin,
+										end))
+								} else {
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+										record.ID,
+										pName,
+										patterns[pName],
+										"+",
+										begin,
+										end,
+										record.Seq.Seq[i:i+len(pSeq)]))
+								}
 							}
 						}
 					}
@@ -301,14 +358,24 @@ Though, it's fast enough for microbial genomes.
 									0,
 									"-"))
 							} else {
-								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-									record.ID,
-									pName,
-									patterns[pName],
-									"-",
-									begin,
-									end,
-									seqRP.Seq[i:i+len(pSeq)]))
+								if hideMatched {
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
+										record.ID,
+										pName,
+										patterns[pName],
+										"-",
+										begin,
+										end))
+								} else {
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+										record.ID,
+										pName,
+										patterns[pName],
+										"-",
+										begin,
+										end,
+										seqRP.Seq[i:i+len(pSeq)]))
+								}
 							}
 						}
 					}
@@ -316,23 +383,39 @@ Though, it's fast enough for microbial genomes.
 					continue
 				}
 
-				for pName, re := range regexps {
+				for pName = range patterns {
 					locs = make([][2]int, 0, 1000)
 
 					offset = 0
+					if !(useRegexp || degenerate) {
+						p = patterns[pName]
+						lpatten = len(p)
+					}
 					for {
-						loc = re.FindSubmatchIndex(record.Seq.Seq[offset:])
-						if loc == nil {
-							break
+						if useRegexp || degenerate {
+							re = regexps[pName]
+							loc = re.FindSubmatchIndex(record.Seq.Seq[offset:])
+							if loc == nil {
+								break
+							}
+
+						} else {
+							i = bytes.Index(record.Seq.Seq[offset:], p)
+							if i < 0 {
+								break
+							}
+							loc = []int{i, i + lpatten}
 						}
 						begin = offset + loc[0] + 1
 						end = offset + loc[1]
 
-						flag = true
-						for i = len(locs) - 1; i >= 0; i-- {
-							if locs[i][0] <= begin && locs[i][1] >= end {
-								flag = false
-								break
+						flag = true // check "duplicated" region
+						if useRegexp || degenerate {
+							for i = len(locs) - 1; i >= 0; i-- {
+								if locs[i][0] <= begin && locs[i][1] >= end {
+									flag = false
+									break
+								}
 							}
 						}
 
@@ -357,14 +440,24 @@ Though, it's fast enough for microbial genomes.
 									0,
 									"+"))
 							} else {
-								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-									record.ID,
-									pName,
-									patterns[pName],
-									"+",
-									begin,
-									end,
-									record.Seq.Seq[offset+loc[0]:offset+loc[1]]))
+								if hideMatched {
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
+										record.ID,
+										pName,
+										patterns[pName],
+										"+",
+										begin,
+										end))
+								} else {
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+										record.ID,
+										pName,
+										patterns[pName],
+										"+",
+										begin,
+										end,
+										record.Seq.Seq[begin-1:end]))
+								}
 							}
 							locs = append(locs, [2]int{begin, end})
 						}
@@ -388,18 +481,30 @@ Though, it's fast enough for microbial genomes.
 					offset = 0
 
 					for {
-						loc = re.FindSubmatchIndex(seqRP.Seq[offset:])
-						if loc == nil {
-							break
+						if useRegexp || degenerate {
+							re = regexps[pName]
+							loc = re.FindSubmatchIndex(seqRP.Seq[offset:])
+							if loc == nil {
+								break
+							}
+						} else {
+							i = bytes.Index(seqRP.Seq[offset:], p)
+							if i < 0 {
+								break
+							}
+							loc = []int{i, i + lpatten}
 						}
+
 						begin = l - offset - loc[1] + 1
 						end = l - offset - loc[0]
 
 						flag = true
-						for i = len(locsNeg) - 1; i >= 0; i-- {
-							if locsNeg[i][0] <= begin && locsNeg[i][1] >= end {
-								flag = false
-								break
+						if useRegexp || degenerate {
+							for i = len(locsNeg) - 1; i >= 0; i-- {
+								if locsNeg[i][0] <= begin && locsNeg[i][1] >= end {
+									flag = false
+									break
+								}
 							}
 						}
 
@@ -424,14 +529,24 @@ Though, it's fast enough for microbial genomes.
 									0,
 									"-"))
 							} else {
-								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-									record.ID,
-									pName,
-									patterns[pName],
-									"-",
-									begin,
-									end,
-									record.Seq.SubSeq(l-offset-loc[1]+1, l-offset-loc[0]).RevCom().Seq))
+								if hideMatched {
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
+										record.ID,
+										pName,
+										patterns[pName],
+										"-",
+										begin,
+										end))
+								} else {
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+										record.ID,
+										pName,
+										patterns[pName],
+										"-",
+										begin,
+										end,
+										seqRP.Seq[offset+loc[0]:offset+loc[1]]))
+								}
 							}
 							locsNeg = append(locsNeg, [2]int{begin, end})
 						}
@@ -457,6 +572,8 @@ func init() {
 	locateCmd.Flags().StringSliceP("pattern", "p", []string{""}, `pattern/motif (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')`)
 	locateCmd.Flags().StringP("pattern-file", "f", "", "pattern/motif file (FASTA format)")
 	locateCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
+	locateCmd.Flags().BoolP("use-regexp", "r", false, "patterns/motifs are regular expression")
+	locateCmd.Flags().BoolP("use-fmi", "F", false, "use FM-index for much faster search of lots of sequence patterns")
 	locateCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	locateCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on positive strand")
 	locateCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
@@ -464,4 +581,5 @@ func init() {
 	locateCmd.Flags().BoolP("gtf", "", false, "output in GTF format")
 	locateCmd.Flags().BoolP("bed", "", false, "output in BED6 format")
 	locateCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster")
+	locateCmd.Flags().BoolP("hide-matched", "M", false, "do not show matched sequences")
 }

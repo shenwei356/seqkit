@@ -104,7 +104,7 @@ Examples:
 		runtime.GOMAXPROCS(config.Threads)
 		bwt.CheckEndSymbol = false
 
-		files := getFileList(args, true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
