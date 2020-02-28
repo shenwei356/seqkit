@@ -85,22 +85,20 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, regexp string, inFm
 	for _, dir := range dirs {
 		go NewFxWatcher(dir, ctrlChan, regexp, inFmt, outFmt, qBase, allowGaps, delta, dropString)
 	}
-	sigChan := make(chan os.Signal, 10)
+	sigChan := make(chan os.Signal, 5)
 	signal.Notify(sigChan, os.Interrupt)
 
-EVER:
 	for {
 		select {
 		case <-sigChan:
+			signal.Stop(sigChan)
 			for i, _ := range dirs {
 				ctrlChan <- WatchCtrl(i)
 				<-ctrlChan
 			}
-			close(sigChan)
 			return
-			break EVER
 		default:
-			time.Sleep(time.Millisecond * BIG_SLEEP)
+			time.Sleep(BIG_SLEEP)
 		}
 	}
 }
@@ -120,10 +118,12 @@ type WatchedFxPool map[string]*WatchedFx
 type FxWatcher struct {
 	Base  string
 	Pool  WatchedFxPool
-	Mutex sync.RWMutex
+	Mutex sync.Mutex
 }
 
 func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outFmt string, qBase int, allowGaps bool, minDelta int, dropString string) {
+	sigChan := make(chan os.Signal, 5)
+	signal.Notify(sigChan, os.Interrupt)
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatalf("fsnotify error:", err)
@@ -136,20 +136,22 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outF
 	checkError(err)
 
 	go func() {
+	SFOR:
 		for {
 			select {
 			case <-ctrlChan:
 				self.Mutex.Lock()
-				for ePath, w := range self.Pool {
-					watcher.Remove(ePath)
-					if w.IsDir {
+				if len(self.Pool) > 0 {
+					for ePath, w := range self.Pool {
+						watcher.Remove(ePath)
+						if w.IsDir {
+							delete(self.Pool, ePath)
+							continue
+						}
+						log.Info("Stopped watching: ", ePath)
+						w.CtrlChan <- StreamQuit
+						<-w.CtrlChan
 						delete(self.Pool, ePath)
-						continue
-					}
-					log.Info("Stopped watching: ", ePath)
-					w.CtrlChan <- StreamQuit
-					for c := range w.CtrlChan {
-						_ = c
 					}
 				}
 				self.Mutex.Unlock()
@@ -166,37 +168,37 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outF
 					di := self.Pool[ePath]
 					if di == nil {
 						self.Mutex.Unlock()
-						continue
+						continue SFOR
 					}
 					if di.IsDir {
-						log.Info("removed directory:", event.Name)
+						log.Info("Removed directory:", event.Name)
 						watcher.Remove(event.Name)
 						delete(self.Pool, ePath)
 						self.Mutex.Unlock()
-						continue
+						continue SFOR
 					}
-					log.Info("removed file:", event.Name)
+					log.Info("Removed file:", event.Name)
 					di.CtrlChan <- StreamQuit
 					<-di.CtrlChan
 					delete(self.Pool, ePath)
 					self.Mutex.Unlock()
-					continue
+					continue SFOR
 				}
 				if event.Op&fsnotify.Write == fsnotify.Write {
 					fi, err := os.Stat(ePath)
 					checkError(err)
-					self.Mutex.RLock()
+					self.Mutex.Lock()
 					if self.Pool[ePath] == nil {
-						self.Mutex.RUnlock()
-						continue
+						self.Mutex.Unlock()
+						continue SFOR
 					}
 					if time.Now().Sub(self.Pool[ePath].LastTry) < dropDuration {
-						self.Mutex.RUnlock()
-						continue
+						self.Mutex.Unlock()
+						continue SFOR
 					}
 					if self.Pool[ePath].LastSize == fi.Size() {
-						self.Mutex.RUnlock()
-						continue
+						self.Mutex.Unlock()
+						continue SFOR
 					}
 					delta := fi.Size() - self.Pool[ePath].LastSize
 					if delta < 0 {
@@ -204,38 +206,36 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outF
 						self.Pool[ePath].CtrlChan <- StreamQuit
 						<-self.Pool[ePath].CtrlChan
 						delete(self.Pool, ePath)
-						self.Mutex.RUnlock()
-						continue
+						self.Mutex.Unlock()
+						continue SFOR
 					}
 					if delta < int64(minDelta) {
-						self.Mutex.RUnlock()
-						continue
+						self.Mutex.Unlock()
+						continue SFOR
 					}
-					log.Info("modified file:", ePath)
-					time.Sleep(time.Millisecond * BIG_SLEEP)
+					time.Sleep(NAP_SLEEP)
 					self.Pool[ePath].CtrlChan <- StreamTry
 					self.Pool[ePath].LastTry = time.Now()
-					time.Sleep(time.Millisecond * BIG_SLEEP)
-					self.Mutex.RUnlock()
+					self.Mutex.Unlock()
 
 				} else if event.Op&fsnotify.Create == fsnotify.Create {
 					fi, err := os.Stat(ePath)
 					checkError(err)
 					self.Mutex.Lock()
 					if fi.IsDir() {
-						log.Info("new directory:", event.Name)
+						log.Info("New directory:", event.Name)
 						watcher.Add(ePath)
 						self.Pool[ePath] = &WatchedFx{Name: ePath, IsDir: true}
 						self.Mutex.Unlock()
-						continue
+						continue SFOR
 					}
 					created := time.Now()
 					log.Info("new file:", ePath)
 
 					sc, ctrl := NewRawSeqStreamFromFile(ePath, 1000, qBase, inFmt, allowGaps)
 
+					time.Sleep(NAP_SLEEP)
 					ctrl <- StreamTry
-					time.Sleep(time.Millisecond * BIG_SLEEP)
 					self.Pool[ePath] = &WatchedFx{Name: ePath, IsDir: false, SeqChan: sc, CtrlChan: ctrl, LastSize: fi.Size(), LastTry: created}
 					watcher.Add(ePath)
 					self.Mutex.Unlock()
@@ -252,7 +252,7 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outF
 				}
 				log.Fatalf("fsnotify error:", err)
 			default:
-				time.Sleep(time.Microsecond * BIG_SLEEP)
+
 			}
 		}
 	}()
@@ -265,9 +265,8 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outF
 	self.Mutex.Unlock()
 
 	for {
-		time.Sleep(time.Millisecond * BIG_SLEEP)
-		self.Mutex.RLock()
 		for ePath, w := range self.Pool {
+			self.Mutex.Lock()
 		CHAN:
 			for {
 				select {
@@ -284,32 +283,29 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outF
 						break CHAN
 					}
 					if e == StreamExited {
-						self.Mutex.RUnlock()
-						self.Mutex.Lock()
 						delete(self.Pool, ePath)
-						self.Mutex.Unlock()
-						self.Mutex.RLock()
+						break CHAN
 					}
 					if e == StreamTry {
-						self.Mutex.RUnlock()
-						time.Sleep(time.Second)
 						w.CtrlChan <- e
+						time.Sleep(BIG_SLEEP)
+						break CHAN
 					}
 				default:
 					break CHAN
 				}
 			}
+			self.Mutex.Unlock()
 			fi, err := os.Stat(ePath)
 			if err != nil {
 				w.LastSize = fi.Size()
 			}
 		}
-		self.Mutex.RUnlock()
+
 		if len(self.Pool) == 0 {
 			ctrlChan <- -1
 			return
 		}
-		time.Sleep(time.Millisecond * NAP_SLEEP)
 	}
 
 	walkFunc := func(path string, info os.FileInfo, err error) error {
@@ -329,7 +325,7 @@ func init() {
 	scatCmd.Flags().BoolP("allow-gaps", "A", false, "allow gap character (-) in sequences")
 	scatCmd.Flags().Float64P("time-limit", "T", -1, "quit after inactive for this many hours")
 	scatCmd.Flags().IntP("wait-pid", "p", -1, "after process with this PID exited")
-	scatCmd.Flags().IntP("delta", "d", 5, "minimum size increase to trigger parsing (10 kilobytes)")
-	scatCmd.Flags().StringP("drop-time", "D", "1s", "Notification drop interval (500ms)")
+	scatCmd.Flags().IntP("delta", "d", 2, "minimum size increase to trigger parsing (5 kilobytes)")
+	scatCmd.Flags().StringP("drop-time", "D", "500ms", "Notification drop interval (500ms)")
 	scatCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
 }

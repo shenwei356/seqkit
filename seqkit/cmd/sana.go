@@ -44,8 +44,8 @@ const (
 	StreamExited
 )
 
-const NAP_SLEEP = 10
-const BIG_SLEEP = 100
+const NAP_SLEEP = 10 * time.Millisecond
+const BIG_SLEEP = 100 * time.Millisecond
 
 // sanaCmd represents the sana command
 var sanaCmd = &cobra.Command{
@@ -70,7 +70,7 @@ var sanaCmd = &cobra.Command{
 		defer outfh.Close()
 
 		for _, file := range files {
-			rawSeqChan, ctrlChan := NewRawSeqStreamFromFile(file, 1000, qBase, inFmt, allowGaps)
+			rawSeqChan, ctrlChan := NewRawSeqStreamFromFile(file, 10000, qBase, inFmt, allowGaps)
 			go func() {
 				for {
 					select {
@@ -82,13 +82,14 @@ var sanaCmd = &cobra.Command{
 								return
 							}
 						} else if i != StreamExited {
+							time.Sleep(BIG_SLEEP)
 							ctrlChan <- i
-							time.Sleep(time.Microsecond * NAP_SLEEP)
 						} else {
 							return
 						}
 					default:
-						time.Sleep(time.Millisecond * BIG_SLEEP)
+						time.Sleep(BIG_SLEEP)
+						ctrlChan <- StreamTry
 					}
 				}
 			}()
@@ -260,9 +261,9 @@ func ValidateSeq(seq *simpleSeq, gaps bool) error {
 func NewRawSeqStreamFromFile(inFastq string, chanSize int, qBase int, format string, allowGaps bool) (chan *simpleSeq, chan SeqStreamCtrl) {
 	rio, err := os.Open(inFastq)
 	checkError(err)
-	buffSize := 100 * 1024
+	buffSize := 128 * 1024
 	bio := bufio.NewReaderSize(rio, buffSize)
-	ctrlChan := make(chan SeqStreamCtrl, 0)
+	ctrlChan := make(chan SeqStreamCtrl, 10000)
 
 	switch format {
 	case "fastq":
@@ -533,6 +534,7 @@ func NewRawFastqStream(inReader *bufio.Reader, chanSize int, qBase int, id strin
 		_ = err
 
 		for {
+			time.Sleep(NAP_SLEEP)
 			select {
 			case cmd := <-ctrlChan:
 				if cmd == StreamTry {
@@ -549,11 +551,10 @@ func NewRawFastqStream(inReader *bufio.Reader, chanSize int, qBase int, id strin
 						seqChan <- serr
 					}
 					ctrlChan <- StreamExited
-					close(seqChan)
 					close(ctrlChan)
+					close(seqChan)
 					return
 				} else {
-					time.Sleep(time.Millisecond * BIG_SLEEP)
 					ctrlChan <- cmd
 				}
 			}
@@ -594,10 +595,11 @@ func NewRawFastaStream(inReader *bufio.Reader, chanSize int, id string, ctrlChan
 					close(ctrlChan)
 					return
 				} else {
-					panic("Invalid stream control command!")
+					ctrlChan <- cmd
+					time.Sleep(BIG_SLEEP)
 				}
 			default:
-				time.Sleep(time.Millisecond * NAP_SLEEP)
+				time.Sleep(NAP_SLEEP)
 			}
 		}
 	}()
