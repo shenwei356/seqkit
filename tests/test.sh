@@ -533,6 +533,31 @@ assert_exit_code 0
 rm seqkit_fish.tsv
 
 # ------------------------------------------------------------
+#                       sana
+# ------------------------------------------------------------
+
+# Regression test for sana/fasta
+fun(){
+	awk '{print ">" $1 "\n" $2}' tests/scat_test.tsv > tests/sana_test_input.fas
+	seqkit sana -I fasta -O fasta tests/sana_test_input.fas > tests/sana_output.fas
+}
+run sana_fasta_regression fun
+cmp tests/sana_output.fas tests/sana_ground.fas
+assert_exit_code 0
+rm -f tests/sana_output.fas tests/sana_test_input.fas
+
+# Regression test for sana/fastq
+fun(){
+	awk '{print "@" $1 "\n" $2 "\n+\n" $3}' tests/scat_test.tsv > tests/sana_test_input.fq
+	seqkit sana -I fastq -O fastq tests/sana_test_input.fq > tests/sana_output.fq
+}
+run sana_fasta_regression fun
+cmp tests/sana_output.fq tests/sana_ground.fq
+assert_exit_code 0
+rm -f tests/sana_output.fq tests/sana_test_input.fq
+
+
+# ------------------------------------------------------------
 #                       faidx
 # ------------------------------------------------------------
 
