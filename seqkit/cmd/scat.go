@@ -32,6 +32,7 @@ import (
 	"regexp"
 	"runtime"
 	"sync"
+	"syscall"
 	"time"
 )
 
@@ -89,16 +90,22 @@ var scatCmd = &cobra.Command{
 			log.Info("No directories given to watch! Exiting.")
 			os.Exit(1)
 		}
-		LaunchFxWatchers(dirs, ctrlChan, reFilter, inFmt, outFmt, qBase, allowGaps, delta, dropString, &ticker, waitPid)
+		LaunchFxWatchers(dirs, ctrlChan, reFilter, inFmt, outFmt, qBase, allowGaps, delta, &ticker, dropString, waitPid)
 
 	},
 }
 
-func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, dropString string, ticker *time.Timer, waitPid int) {
+func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, ticker *time.Timer, dropString string, waitPid int) {
 	for _, dir := range dirs {
-		go NewFxWatcher(dir, ctrlChan, re, inFmt, outFmt, qBase, allowGaps, delta, ticker, dropString)
+		go NewFxWatcher(dir, ctrlChan, re, inFmt, outFmt, qBase, allowGaps, delta, dropString)
 	}
 	sigChan := make(chan os.Signal, 5)
+	pidTimer := *time.NewTicker(time.Second * 2)
+	if waitPid < 0 {
+		pidTimer.C = nil
+	} else {
+		log.Info("Running until process with PID", waitPid, "exits.")
+	}
 	signal.Notify(sigChan, os.Interrupt)
 
 	for {
@@ -110,6 +117,16 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 				<-ctrlChan
 			}
 			return
+		case <-pidTimer.C:
+			killErr := syscall.Kill(waitPid, syscall.Signal(0))
+			if killErr != nil {
+				log.Info("Watched process with PID", waitPid, "exited.")
+				for i, _ := range dirs {
+					ctrlChan <- WatchCtrl(i)
+					<-ctrlChan
+				}
+				return
+			}
 		default:
 			time.Sleep(BIG_SLEEP)
 		}
@@ -135,7 +152,7 @@ type FxWatcher struct {
 	Mutex sync.Mutex
 }
 
-func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, minDelta int, ticker *time.Timer, dropString string) {
+func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, minDelta int, dropString string) {
 	sigChan := make(chan os.Signal, 5)
 	signal.Notify(sigChan, os.Interrupt)
 	watcher, err := fsnotify.NewWatcher()
@@ -239,7 +256,6 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, 
 						self.Mutex.Unlock()
 						continue SFOR
 					}
-					time.Sleep(NAP_SLEEP)
 					self.Pool[ePath].CtrlChanIn <- StreamTry
 					self.Pool[ePath].LastTry = time.Now()
 					self.Mutex.Unlock()
@@ -267,7 +283,6 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, 
 					created := time.Now()
 
 					sc, ctrlIn, ctrlOut := NewRawSeqStreamFromFile(ePath, 10000, qBase, inFmt, allowGaps)
-					time.Sleep(NAP_SLEEP)
 					self.Pool[ePath] = &WatchedFx{Name: ePath, IsDir: false, SeqChan: sc, CtrlChanIn: ctrlIn, CtrlChanOut: ctrlOut, LastSize: fi.Size(), LastTry: created}
 					err = watcher.Add(ePath)
 					checkError(err)
@@ -317,7 +332,6 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, 
 			}
 			created := time.Now()
 			sc, ctrlIn, ctrlOut := NewRawSeqStreamFromFile(path, 10000, qBase, inFmt, allowGaps)
-			time.Sleep(NAP_SLEEP)
 			err := watcher.Add(path)
 			checkError(err)
 			fi, err := os.Stat(path)
@@ -386,7 +400,7 @@ func init() {
 	scatCmd.Flags().BoolP("allow-gaps", "A", false, "allow gap character (-) in sequences")
 	scatCmd.Flags().StringP("time-limit", "T", "", "quit after inactive for this time period")
 	scatCmd.Flags().IntP("wait-pid", "p", -1, "after process with this PID exited")
-	scatCmd.Flags().IntP("delta", "d", 10, "minimum size increase in kilobytes to trigger parsing")
+	scatCmd.Flags().IntP("delta", "d", 5, "minimum size increase in kilobytes to trigger parsing")
 	scatCmd.Flags().StringP("drop-time", "D", "500ms", "Notification drop interval")
 	scatCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
 }

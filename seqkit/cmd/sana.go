@@ -538,7 +538,6 @@ func NewRawFastqStream(inReader *bufio.Reader, chanSize int, qBase int, id strin
 		_ = err
 
 		for {
-			time.Sleep(NAP_SLEEP)
 			select {
 			case cmd := <-ctrlChanIn:
 				if cmd == StreamTry {
@@ -604,7 +603,6 @@ func NewRawFastaStream(inReader *bufio.Reader, chanSize int, id string, ctrlChan
 					log.Fatal("Invalid command:", int(cmd))
 				}
 			default:
-				time.Sleep(NAP_SLEEP)
 			}
 		}
 	}()
