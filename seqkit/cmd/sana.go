@@ -80,13 +80,15 @@ var sanaCmd = &cobra.Command{
 							ctrlChanIn <- StreamQuit
 							for j := range ctrlChanOut {
 								if j == StreamExited {
-									return
+									break
 								} else if j == StreamEOF {
 									continue
 								} else {
 									log.Fatal("Invalid command when exiting:", int(j))
 								}
 							}
+							close(rawSeqChan)
+							return
 						} else if i != StreamExited {
 							log.Fatal("Invalid command when trying to exit:", int(i))
 						} else {
