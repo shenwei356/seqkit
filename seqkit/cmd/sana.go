@@ -83,15 +83,16 @@ var sanaCmd = &cobra.Command{
 								} else if j == StreamEOF {
 									continue
 								} else {
-									panic(int(i))
+									log.Fatal("Invalid command when exiting:", int(j))
 								}
 							}
 						} else if i != StreamExited {
-							panic(i)
+							log.Fatal("Invalid command when trying to exit:", int(i))
 						} else {
 							return
 						}
 					default:
+						time.Sleep(NAP_SLEEP)
 						ctrlChanIn <- StreamTry
 					}
 				}
@@ -559,7 +560,7 @@ func NewRawFastqStream(inReader *bufio.Reader, chanSize int, qBase int, id strin
 					close(ctrlChanIn)
 					return
 				} else {
-					panic(cmd)
+					log.Fatal("Invalid command:", int(cmd))
 				}
 			}
 		}
@@ -600,7 +601,7 @@ func NewRawFastaStream(inReader *bufio.Reader, chanSize int, id string, ctrlChan
 					close(ctrlChanIn)
 					return
 				} else {
-					panic(cmd)
+					log.Fatal("Invalid command:", int(cmd))
 				}
 			default:
 				time.Sleep(NAP_SLEEP)

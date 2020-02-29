@@ -168,7 +168,7 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, 
 							if j == StreamExited {
 								break
 							} else if j != StreamEOF {
-								panic(int(j))
+								log.Fatal("Invalid command:", int(j))
 							}
 						}
 						delete(self.Pool, ePath)
@@ -201,7 +201,7 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, 
 					di.CtrlChanIn <- StreamQuit
 					fb := <-di.CtrlChanOut
 					if fb != StreamExited {
-						panic(fb)
+						log.Fatal("Invalid command:", int(fb))
 					}
 					delete(self.Pool, ePath)
 					self.Mutex.Unlock()
@@ -229,7 +229,7 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, 
 						self.Pool[ePath].CtrlChanIn <- StreamQuit
 						fb := <-self.Pool[ePath].CtrlChanOut
 						if fb != StreamExited {
-							panic(fb)
+							log.Fatal("Invalid command:", int(fb))
 						}
 						delete(self.Pool, ePath)
 						self.Mutex.Unlock()
@@ -280,7 +280,7 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, 
 					self.Pool[ePath].CtrlChanIn <- StreamQuit
 					fb := <-self.Pool[ePath].CtrlChanOut
 					if fb != StreamExited {
-						panic(fb)
+						log.Fatal("Invalid command:", int(fb))
 					}
 					delete(self.Pool, ePath)
 				}
@@ -356,7 +356,7 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, 
 						delete(self.Pool, ePath)
 						break CHAN
 					} else {
-						panic(e)
+						log.Fatal("Invalid command:", int(e))
 					}
 				default:
 					break CHAN
