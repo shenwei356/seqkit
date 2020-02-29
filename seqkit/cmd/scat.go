@@ -28,7 +28,7 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	"os/signal"
-	//"path"
+	ospath "path"
 	//"path/filepath"
 	"runtime"
 	"sync"
@@ -219,25 +219,30 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outF
 					self.Mutex.Unlock()
 
 				} else if event.Op&fsnotify.Create == fsnotify.Create {
+					if self.Pool[ePath] != nil {
+						log.Fatal("Already watching newly created file: ", ePath)
+					}
 					fi, err := os.Stat(ePath)
 					checkError(err)
 					self.Mutex.Lock()
 					if fi.IsDir() {
-						log.Info("New directory:", event.Name)
-						watcher.Add(ePath)
+						log.Info("Watching new directory:", event.Name)
+						err := watcher.Add(ePath)
+						checkError(err)
 						self.Pool[ePath] = &WatchedFx{Name: ePath, IsDir: true}
 						self.Mutex.Unlock()
 						continue SFOR
+
 					}
 					created := time.Now()
-					log.Info("new file:", ePath)
 
-					sc, ctrl := NewRawSeqStreamFromFile(ePath, 1000, qBase, inFmt, allowGaps)
-
+					sc, ctrl := NewRawSeqStreamFromFile(ePath, 10000, qBase, inFmt, allowGaps)
 					time.Sleep(NAP_SLEEP)
-					ctrl <- StreamTry
 					self.Pool[ePath] = &WatchedFx{Name: ePath, IsDir: false, SeqChan: sc, CtrlChan: ctrl, LastSize: fi.Size(), LastTry: created}
-					watcher.Add(ePath)
+					err = watcher.Add(ePath)
+					checkError(err)
+					ctrl <- StreamTry
+					log.Info("Watching new file:", event.Name)
 					self.Mutex.Unlock()
 				}
 				if event.Op&fsnotify.Rename == fsnotify.Rename {
@@ -264,7 +269,25 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, regexp string, inFmt, outF
 	log.Info(fmt.Sprintf("Watcher (%s) launched on root: %s", inFmt, dir))
 
 	walkFunc := func(path string, info os.FileInfo, err error) error {
-		log.Info("New entry:", path)
+		path = ospath.Join(dir, path)
+		if info.IsDir() {
+			err = watcher.Add(path)
+			checkError(err)
+			self.Pool[path] = &WatchedFx{Name: path, IsDir: true}
+			log.Info("Watching existing directory:", path)
+		} else {
+			created := time.Now()
+			sc, ctrl := NewRawSeqStreamFromFile(path, 10000, qBase, inFmt, allowGaps)
+			time.Sleep(NAP_SLEEP)
+			err := watcher.Add(path)
+			checkError(err)
+			fi, err := os.Stat(path)
+			checkError(err)
+			self.Pool[path] = &WatchedFx{Name: path, IsDir: false, SeqChan: sc, CtrlChan: ctrl, LastSize: fi.Size(), LastTry: created}
+
+			ctrl <- StreamTry
+			log.Info("Watching existing file:", path)
+		}
 		return nil
 	}
 	err = cwalk.Walk(dir, walkFunc)
