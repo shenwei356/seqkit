@@ -100,7 +100,7 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 	sigChan := make(chan os.Signal, 5)
 	signal.Notify(sigChan, os.Interrupt)
 
-	pidTimer := *time.NewTicker(time.Second * 2)
+	pidTimer := *time.NewTicker(time.Millisecond * 500)
 	if waitPid < 0 {
 		pidTimer.C = nil
 	} else {
