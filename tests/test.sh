@@ -551,10 +551,51 @@ fun(){
 	awk '{print "@" $1 "\n" $2 "\n+\n" $3}' tests/scat_test.tsv > tests/sana_test_input.fq
 	seqkit sana -I fastq -O fastq tests/sana_test_input.fq > tests/sana_output.fq
 }
-run sana_fasta_regression fun
+run sana_fastq_regression fun
 cmp tests/sana_output.fq tests/sana_ground.fq
 assert_exit_code 0
 rm -f tests/sana_output.fq tests/sana_test_input.fq
+
+# ------------------------------------------------------------
+#                       scat
+# ------------------------------------------------------------
+
+# Regression test for scat/fasta
+fun(){
+	BASE=tests/scat_test_fasta
+	rm -fr $BASE tests/scat_test_all.fas tests/scat_output.fas
+        mkdir -p $BASE
+	(seqkit scat -j 4 -I fasta -O fasta $BASE > tests/scat_output.fas)&
+	SCAT_PID=$!
+        BAK=$IFS
+        IFS=$'\n'
+        for i in `seq 0 0`;
+        do
+                for j in `seq 0 0`;
+                do
+                        D=$BASE/$RANDOM/$RANDOM
+                        mkdir -p $D
+                        F=$D/${RANDOM}.fas
+                        for l in `cat tests/scat_test.tsv`;
+                        do
+                                PRE="${RANDOM}_${i}_${j}"
+                                echo -n $l | awk -v pre="$PRE" '{print ">" $1 pre  "\n" $2}' tests/scat_test.tsv >> $F
+                                echo -n $l | awk -v pre="$PRE" '{print ">" $1 pre  "\n" $2}' tests/scat_test.tsv >> tests/scat_test_all.fas
+                        done;
+		done;
+        done;
+        IFS=$BAK
+	kill -s TERM $SCAT_PID
+	rm -fr $BASE
+	(seqkit sana -I fasta -O fasta tests/scat_test_all.fas 2>/dev/null) | seqkit sort -n -j 4 - > tests/sorted_scat_test_all.fas
+	#rm -f tests/scat_test_all.fas
+	seqkit sort -n -j 4 tests/scat_output.fas 2>/dev/null > tests/sorted_scat_output.fas
+}
+
+run scat_fasta fun
+cmp tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas
+assert_exit_code 0
+rm -f tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas
 
 
 # ------------------------------------------------------------
