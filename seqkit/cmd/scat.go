@@ -61,13 +61,6 @@ var scatCmd = &cobra.Command{
 		dropString := getFlagString(cmd, "drop-time")
 		allowGaps := getFlagBool(cmd, "allow-gaps")
 		timeLimit := getFlagString(cmd, "time-limit")
-		var ticker time.Timer
-		if timeLimit != "" {
-			timeout, err := time.ParseDuration(timeLimit)
-			checkError(err)
-			tmp := time.NewTimer(timeout)
-			ticker = *tmp
-		}
 		waitPid := getFlagInt(cmd, "wait-pid")
 		delta := getFlagInt(cmd, "delta") * 1024
 		reStr := getFlagString(cmd, "regexp")
@@ -90,12 +83,12 @@ var scatCmd = &cobra.Command{
 			log.Info("No directories given to watch! Exiting.")
 			os.Exit(1)
 		}
-		LaunchFxWatchers(dirs, ctrlChan, reFilter, inFmt, outFmt, qBase, allowGaps, delta, &ticker, dropString, waitPid)
+		LaunchFxWatchers(dirs, ctrlChan, reFilter, inFmt, outFmt, qBase, allowGaps, delta, timeLimit, dropString, waitPid)
 
 	},
 }
 
-func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, ticker *time.Timer, dropString string, waitPid int) {
+func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, timeout string, dropString string, waitPid int) {
 	allSeqChans := make([]chan *simpleSeq, len(dirs))
 	allCtrlChans := make([]WatchCtrlChan, len(dirs))
 	for i, dir := range dirs {
@@ -104,13 +97,24 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 		go NewFxWatcher(dir, allSeqChans[i], allCtrlChans[i], re, inFmt, outFmt, qBase, allowGaps, delta, dropString)
 	}
 	sigChan := make(chan os.Signal, 5)
+	signal.Notify(sigChan, os.Interrupt)
+
 	pidTimer := *time.NewTicker(time.Second * 2)
 	if waitPid < 0 {
 		pidTimer.C = nil
 	} else {
 		log.Info("Running until process with PID", waitPid, "exits.")
 	}
-	signal.Notify(sigChan, os.Interrupt)
+	ticker := time.NewTimer(time.Minute)
+	ticker.Stop()
+	td := time.Duration(0)
+	if timeout != "" {
+		var err error
+		td, err = time.ParseDuration(timeout)
+		checkError(err)
+		ticker = time.NewTimer(td)
+		log.Info("Will exit after being inactive for", timeout)
+	}
 
 	for {
 		select {
@@ -149,12 +153,27 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 					select {
 					case seq := <-sc:
 						fmt.Println(seq)
+						if timeout != "" {
+							ticker.Stop()
+							ticker = time.NewTimer(td)
+						}
 					case fb := <-allCtrlChans[j]:
 						if fb != WatchCtrl(-9) {
 							log.Fatal("Invalid command:", fb)
 						}
 						allSeqChans[j] = nil
 						allCtrlChans[j] = nil
+					case <-ticker.C:
+						ticker.Stop()
+						log.Info("Inactivity limit of", timeout, "reached!")
+						for i, cc := range allCtrlChans {
+							if cc == nil || allSeqChans[i] == nil {
+								continue
+							}
+							cc <- WatchCtrl(i)
+							<-cc
+						}
+						return
 					default:
 						break PULL
 					}
