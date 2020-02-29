@@ -26,6 +26,7 @@ import (
 	"github.com/iafan/cwalk"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
+	"io"
 	"os"
 	"os/signal"
 	ospath "path"
@@ -83,12 +84,12 @@ var scatCmd = &cobra.Command{
 			log.Info("No directories given to watch! Exiting.")
 			os.Exit(1)
 		}
-		LaunchFxWatchers(dirs, ctrlChan, reFilter, inFmt, outFmt, qBase, allowGaps, delta, timeLimit, dropString, waitPid)
+		LaunchFxWatchers(dirs, ctrlChan, reFilter, inFmt, outFmt, qBase, allowGaps, delta, timeLimit, dropString, waitPid, outfh)
 
 	},
 }
 
-func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, timeout string, dropString string, waitPid int) {
+func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, timeout string, dropString string, waitPid int, outw io.Writer) {
 	allSeqChans := make([]chan *simpleSeq, len(dirs))
 	allCtrlChans := make([]WatchCtrlChan, len(dirs))
 	for i, dir := range dirs {
@@ -115,6 +116,8 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 		ticker = time.NewTimer(td)
 		log.Info("Will exit after being inactive for", timeout)
 	}
+
+	pass, fail := 0, 0
 
 	for {
 		select {
@@ -151,8 +154,15 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 			PULL:
 				for {
 					select {
-					case seq := <-sc:
-						fmt.Println(seq)
+					case rawSeq := <-sc:
+						switch rawSeq.Err {
+						case nil:
+							pass++
+							outw.Write([]byte(rawSeq.Format(outFmt) + "\n"))
+						default:
+							fail++
+							os.Stderr.WriteString("From file: " + rawSeq.File + "\t" + rawSeq.String() + "\n")
+						}
 						if timeout != "" {
 							ticker.Stop()
 							ticker = time.NewTimer(td)
@@ -426,7 +436,7 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 					if !ok {
 						break CHAN
 					}
-					fmt.Println(seq)
+					seqChan <- seq
 				case e, ok := <-w.CtrlChanOut:
 					if !ok {
 						break CHAN
@@ -457,7 +467,7 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 func init() {
 	RootCmd.AddCommand(scatCmd)
 
-	scatCmd.Flags().StringP("regexp", "r", ".*\\.(fastq|fq)", "regexp for waxtched files')")
+	scatCmd.Flags().StringP("regexp", "r", ".*\\.(fastq|fq|fas|fa)", "regexp for waxtched files)")
 	scatCmd.Flags().StringP("in-format", "I", "fastq", "input format: fastq or fasta (fastq)")
 	scatCmd.Flags().StringP("out-format", "O", "fastq", "output format: fastq or fasta")
 	scatCmd.Flags().BoolP("allow-gaps", "A", false, "allow gap character (-) in sequences")
