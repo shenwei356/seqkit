@@ -176,10 +176,11 @@ func NewFxWatcher(dir string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, 
 					for ePath, w := range self.Pool {
 						watcher.Remove(ePath)
 						if w.IsDir {
+							log.Info("Stopped watching directory: ", ePath)
 							delete(self.Pool, ePath)
 							continue
 						}
-						log.Info("Stopped watching: ", ePath)
+						log.Info("Stopped watching file: ", ePath)
 						w.CtrlChanIn <- StreamQuit
 						for j := range w.CtrlChanOut {
 							if j == StreamExited {
