@@ -70,7 +70,8 @@ var sanaCmd = &cobra.Command{
 		defer outfh.Close()
 
 		for _, file := range files {
-			rawSeqChan, ctrlChanIn, ctrlChanOut := NewRawSeqStreamFromFile(file, 10000, qBase, inFmt, allowGaps)
+			rawSeqChan := make(chan *simpleSeq, 10000)
+			ctrlChanIn, ctrlChanOut := NewRawSeqStreamFromFile(file, rawSeqChan, qBase, inFmt, allowGaps)
 			go func() {
 				for {
 					select {
@@ -262,7 +263,7 @@ func ValidateSeq(seq *simpleSeq, gaps bool) error {
 }
 
 // NewRawSeqStream initializes a new channel for reading fastq records from a file in a robust way.
-func NewRawSeqStreamFromFile(inFastq string, chanSize int, qBase int, format string, allowGaps bool) (chan *simpleSeq, chan SeqStreamCtrl, chan SeqStreamCtrl) {
+func NewRawSeqStreamFromFile(inFastq string, seqChan chan *simpleSeq, qBase int, format string, allowGaps bool) (chan SeqStreamCtrl, chan SeqStreamCtrl) {
 	rio, err := os.Open(inFastq)
 	checkError(err)
 	buffSize := 128 * 1024
@@ -272,11 +273,13 @@ func NewRawSeqStreamFromFile(inFastq string, chanSize int, qBase int, format str
 
 	switch format {
 	case "fastq":
-		return NewRawFastqStream(bio, chanSize, qBase, inFastq, ctrlChanIn, ctrlChanOut, allowGaps), ctrlChanIn, ctrlChanOut
+		NewRawFastqStream(bio, seqChan, qBase, inFastq, ctrlChanIn, ctrlChanOut, allowGaps)
+		return ctrlChanIn, ctrlChanOut
 	case "fasta":
-		return NewRawFastaStream(bio, chanSize, inFastq, ctrlChanIn, ctrlChanOut, allowGaps), ctrlChanIn, ctrlChanOut
+		NewRawFastaStream(bio, seqChan, inFastq, ctrlChanIn, ctrlChanOut, allowGaps)
+		return ctrlChanIn, ctrlChanOut
 	}
-	return nil, nil, nil
+	return nil, nil
 }
 
 type FqlState struct {
@@ -528,8 +531,7 @@ func streamFasta(r *bufio.Reader, sbuff FqLines, out chan *simpleSeq, ctrlChanIn
 }
 
 // NewRawSeqStream initializes a new channel for reading fastq records in a robust way.
-func NewRawFastqStream(inReader *bufio.Reader, chanSize int, qBase int, id string, ctrlChanIn, ctrlChanOut chan SeqStreamCtrl, gaps bool) chan *simpleSeq {
-	seqChan := make(chan *simpleSeq, chanSize)
+func NewRawFastqStream(inReader *bufio.Reader, seqChan chan *simpleSeq, qBase int, id string, ctrlChanIn, ctrlChanOut chan SeqStreamCtrl, gaps bool) chan *simpleSeq {
 	lineCounter := 0
 
 	go func() {
@@ -553,10 +555,9 @@ func NewRawFastqStream(inReader *bufio.Reader, chanSize int, qBase int, id strin
 						serr := &simpleSeq{Err: errors.New(ems), StartLine: -1, Seq: l.Line}
 						seqChan <- serr
 					}
-					close(seqChan)
+					close(ctrlChanIn)
 					ctrlChanOut <- StreamExited
 					close(ctrlChanOut)
-					close(ctrlChanIn)
 					return
 				} else {
 					log.Fatal("Invalid command:", int(cmd))
@@ -569,9 +570,7 @@ func NewRawFastqStream(inReader *bufio.Reader, chanSize int, qBase int, id strin
 }
 
 // NewRawSeqStream initializes a new channel for reading fastq records in a robust way.
-func NewRawFastaStream(inReader *bufio.Reader, chanSize int, id string, ctrlChanIn, ctrlChanOut chan SeqStreamCtrl, gaps bool) chan *simpleSeq {
-	seqChan := make(chan *simpleSeq, chanSize)
-
+func NewRawFastaStream(inReader *bufio.Reader, seqChan chan *simpleSeq, id string, ctrlChanIn, ctrlChanOut chan SeqStreamCtrl, gaps bool) chan *simpleSeq {
 	go func() {
 		sbuff := make(FqLines, 0, 500)
 		var err error
@@ -594,10 +593,9 @@ func NewRawFastaStream(inReader *bufio.Reader, chanSize int, id string, ctrlChan
 						serr := &simpleSeq{Err: errors.New(ems), StartLine: *lineCounter - i, Seq: l.Line}
 						seqChan <- serr
 					}
-					close(seqChan)
+					close(ctrlChanIn)
 					ctrlChanOut <- StreamExited
 					close(ctrlChanOut)
-					close(ctrlChanIn)
 					return
 				} else {
 					log.Fatal("Invalid command:", int(cmd))
