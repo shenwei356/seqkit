@@ -26,7 +26,6 @@ import (
 	"github.com/iafan/cwalk"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
-	"io"
 	"os"
 	"os/signal"
 	ospath "path"
@@ -72,6 +71,7 @@ var scatCmd = &cobra.Command{
 		dirs := getFileList(args, true)
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
+		defer outfh.Flush()
 		defer outfh.Close()
 		ctrlChan := make(WatchCtrlChan)
 		ndirs := []string{}
@@ -89,7 +89,7 @@ var scatCmd = &cobra.Command{
 	},
 }
 
-func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, timeout string, dropString string, waitPid int, outw io.Writer) {
+func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, timeout string, dropString string, waitPid int, outw *xopen.Writer) {
 	allSeqChans := make([]chan *simpleSeq, len(dirs))
 	allCtrlChans := make([]WatchCtrlChan, len(dirs))
 	for i, dir := range dirs {
@@ -118,7 +118,10 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 	}
 
 	pass, fail := 0, 0
+	defer outw.Flush()
+	defer outw.Close()
 
+MAIN:
 	for {
 		select {
 		case <-sigChan:
@@ -130,7 +133,6 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 				cc <- WatchCtrl(i)
 				<-cc
 			}
-			return
 		case <-pidTimer.C:
 			killErr := syscall.Kill(waitPid, syscall.Signal(0))
 			if killErr != nil {
@@ -142,19 +144,19 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 					cc <- WatchCtrl(i)
 					<-cc
 				}
-				return
 			}
 		default:
 			active := 0
+		CHAN:
 			for j, sc := range allSeqChans {
 				if sc == nil {
-					continue
+					continue CHAN
 				}
 				active++
-			PULL:
 				for {
 					select {
 					case rawSeq := <-sc:
+						log.Info(rawSeq)
 						switch rawSeq.Err {
 						case nil:
 							pass++
@@ -173,6 +175,7 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 						}
 						allSeqChans[j] = nil
 						allCtrlChans[j] = nil
+						break CHAN
 					case <-ticker.C:
 						ticker.Stop()
 						log.Info("Inactivity limit of", timeout, "reached!")
@@ -183,21 +186,19 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 							cc <- WatchCtrl(i)
 							<-cc
 						}
-						return
+						break CHAN
 					default:
-						break PULL
+						log.Info(active)
+						if active == 0 {
+							break MAIN
+						}
+						break CHAN
 					}
 				}
 			}
+			log.Info(active)
 			if active == 0 {
-				for i, cc := range allCtrlChans {
-					if cc == nil || allSeqChans[i] == nil {
-						continue
-					}
-					cc <- WatchCtrl(i)
-					<-cc
-				}
-				return
+				break MAIN
 			}
 		}
 	}
@@ -272,6 +273,8 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 	SFOR:
 		for {
 			select {
+			case <-sigChan:
+				continue SFOR
 			case <-ctrlChan:
 				self.Mutex.Lock()
 				for ePath, w := range self.Pool {
@@ -283,14 +286,12 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 					}
 					log.Info("Stopped watching file: ", ePath)
 					w.CtrlChanIn <- StreamQuit
-					for j := range w.CtrlChanOut {
-						if j == StreamExited {
-							break
-						} else if j != StreamEOF {
-							log.Fatal("Invalid command:", int(j))
-						}
+					fb := <-w.CtrlChanOut
+					if fb == StreamExited {
+						delete(self.Pool, ePath)
+					} else {
+						log.Fatal("Invalid feedback when trying to quit:", int(fb))
 					}
-					delete(self.Pool, ePath)
 				}
 				self.Mutex.Unlock()
 				log.Info("Exiting.")
@@ -406,12 +407,11 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 
 				}
 			case err, ok := <-watcher.Errors:
-				if !ok {
-					return
+				if ok {
+					log.Fatalf("fsnotify error:", err)
 				}
-				log.Fatalf("fsnotify error:", err)
 			default:
-
+				time.Sleep(time.Microsecond)
 			}
 		}
 	}()
@@ -427,26 +427,16 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 	checkError(err)
 
 	for {
+		self.Mutex.Lock()
 		for ePath, w := range self.Pool {
-			self.Mutex.Lock()
 		CHAN:
 			for {
 				select {
-				case seq, ok := <-w.SeqChan:
-					if !ok {
-						break CHAN
-					}
+				case seq := <-w.SeqChan:
 					seqChan <- seq
-				case e, ok := <-w.CtrlChanOut:
-					if !ok {
-						break CHAN
-					}
+				case e := <-w.CtrlChanOut:
 					if e == StreamEOF {
-						break CHAN
-					}
-					if e == StreamExited {
-						delete(self.Pool, ePath)
-						break CHAN
+						continue CHAN
 					} else {
 						log.Fatal("Invalid command:", int(e))
 					}
@@ -458,8 +448,8 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 			if err != nil {
 				w.LastSize = fi.Size()
 			}
-			self.Mutex.Unlock()
 		}
+		self.Mutex.Unlock()
 	}
 
 }
@@ -467,7 +457,7 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 func init() {
 	RootCmd.AddCommand(scatCmd)
 
-	scatCmd.Flags().StringP("regexp", "r", ".*\\.(fastq|fq|fas|fa)", "regexp for waxtched files)")
+	scatCmd.Flags().StringP("regexp", "r", ".*\\.(fastq|fq|fas|fa)$", "regexp for waxtched files)")
 	scatCmd.Flags().StringP("in-format", "I", "fastq", "input format: fastq or fasta (fastq)")
 	scatCmd.Flags().StringP("out-format", "O", "fastq", "output format: fastq or fasta")
 	scatCmd.Flags().BoolP("allow-gaps", "A", false, "allow gap character (-) in sequences")
