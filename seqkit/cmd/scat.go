@@ -118,45 +118,51 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 	}
 
 	pass, fail := 0, 0
-	defer outw.Flush()
-	defer outw.Close()
+
+	sendQuitCmds := func() {
+		for i, cc := range allCtrlChans {
+			if cc == nil || allSeqChans[i] == nil {
+				continue
+			}
+			cc <- WatchCtrl(i)
+		}
+	}
+
+	activeCount := 0
 
 MAIN:
 	for {
 		select {
 		case <-sigChan:
 			signal.Stop(sigChan)
-			for i, cc := range allCtrlChans {
-				if cc == nil {
-					continue
-				}
-				cc <- WatchCtrl(i)
-				<-cc
-			}
+			sendQuitCmds()
 		case <-pidTimer.C:
 			killErr := syscall.Kill(waitPid, syscall.Signal(0))
 			if killErr != nil {
 				log.Info("Watched process with PID", waitPid, "exited.")
-				for i, cc := range allCtrlChans {
-					if cc == nil {
-						continue
-					}
-					cc <- WatchCtrl(i)
-					<-cc
-				}
+				sendQuitCmds()
 			}
+		case <-ticker.C:
+			ticker.Stop()
+			log.Info("Inactivity limit of", timeout, "reached!")
+			sendQuitCmds()
 		default:
-			active := 0
+			activeCount = 0
 		CHAN:
 			for j, sc := range allSeqChans {
-				if sc == nil {
+				if sc == nil || allCtrlChans[j] == nil {
 					continue CHAN
 				}
-				active++
+				activeCount++
 				for {
 					select {
-					case rawSeq := <-sc:
-						log.Info(rawSeq)
+					case rawSeq, ok := <-sc:
+						if !ok {
+							continue
+						}
+						if rawSeq == nil {
+							log.Fatal("Trying to print nil sequence!")
+						}
 						switch rawSeq.Err {
 						case nil:
 							pass++
@@ -173,35 +179,22 @@ MAIN:
 						if fb != WatchCtrl(-9) {
 							log.Fatal("Invalid command:", fb)
 						}
+						close(allSeqChans[j])
+						close(allCtrlChans[j])
 						allSeqChans[j] = nil
 						allCtrlChans[j] = nil
-						break CHAN
-					case <-ticker.C:
-						ticker.Stop()
-						log.Info("Inactivity limit of", timeout, "reached!")
-						for i, cc := range allCtrlChans {
-							if cc == nil || allSeqChans[i] == nil {
-								continue
-							}
-							cc <- WatchCtrl(i)
-							<-cc
-						}
-						break CHAN
+						continue CHAN
 					default:
-						log.Info(active)
-						if active == 0 {
-							break MAIN
-						}
-						break CHAN
+						continue CHAN
 					}
-				}
-			}
-			log.Info(active)
-			if active == 0 {
+				} // select 1
+			} // for chan
+			if activeCount == 0 {
+				outw.Flush()
 				break MAIN
 			}
-		}
-	}
+		} // select 2
+	} //for ever
 }
 
 type WatchedFx struct {
@@ -224,8 +217,6 @@ type FxWatcher struct {
 }
 
 func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, minDelta int, dropString string) {
-	sigChan := make(chan os.Signal, 5)
-	signal.Notify(sigChan, os.Interrupt)
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatalf("fsnotify error:", err)
@@ -273,8 +264,6 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 	SFOR:
 		for {
 			select {
-			case <-sigChan:
-				continue SFOR
 			case <-ctrlChan:
 				self.Mutex.Lock()
 				for ePath, w := range self.Pool {
@@ -458,9 +447,11 @@ func init() {
 	RootCmd.AddCommand(scatCmd)
 
 	scatCmd.Flags().StringP("regexp", "r", ".*\\.(fastq|fq|fas|fa)$", "regexp for waxtched files)")
+	scatCmd.Flags().StringP("format", "i", "fastq", "input and output format: fastq or fasta (fastq)")
 	scatCmd.Flags().StringP("in-format", "I", "fastq", "input format: fastq or fasta (fastq)")
 	scatCmd.Flags().StringP("out-format", "O", "fastq", "output format: fastq or fasta")
 	scatCmd.Flags().BoolP("allow-gaps", "A", false, "allow gap character (-) in sequences")
+	scatCmd.Flags().BoolP("find-only", "f", false, "concatenate exisiting files and quit")
 	scatCmd.Flags().StringP("time-limit", "T", "", "quit after inactive for this time period")
 	scatCmd.Flags().IntP("wait-pid", "p", -1, "after process with this PID exited")
 	scatCmd.Flags().IntP("delta", "d", 5, "minimum size increase in kilobytes to trigger parsing")
