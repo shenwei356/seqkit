@@ -358,9 +358,10 @@ func bamStatsOnce(f string, mapQual int, includeIds map[string]bool, excludeIds 
 		if record.Flags&sam.Unmapped == 0 {
 			if record.Flags&sam.Supplementary != 0 {
 				res.SupAln++
-			}
-			if record.Flags&sam.Secondary != 0 {
+				continue
+			} else if record.Flags&sam.Secondary != 0 {
 				res.SecAln++
+				continue
 			} else {
 				if record.MapQ == 0 {
 					res.MultimapPerc++
