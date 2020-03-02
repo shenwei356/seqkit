@@ -563,7 +563,8 @@ rm -f tests/sana_output.fq tests/sana_test_input.fq
 # Regression test for scat/fasta
 fun(){
 	BASE=tests/scat_test_fasta
-	rm -fr $BASE tests/scat_test_all.fas tests/scat_output.fas
+	rm -fr $BASE 
+	rm -f tests/scat_test_all.fas tests/scat_output.fas
         mkdir -p $BASE
 	(seqkit scat -I fasta -O fasta $BASE > tests/scat_output.fas)&
 	SCAT_PID=$!
@@ -574,7 +575,7 @@ fun(){
         do
                 for j in `seq 0 $SIZE`;
                 do
-			D=$BASE/$RANDOM
+			D=$BASE/$RANDOM/$RANDOM
 			mkdir -p $D
                         F=$D/${RANDOM}.fas
                         for l in `cat tests/scat_test.tsv`;
@@ -592,18 +593,20 @@ fun(){
 	sync
 	seqkit sana -j 4 -I fasta -O fasta tests/scat_test_all.fas | seqkit sort -n -j 4 - > tests/sorted_scat_test_all.fas
 	seqkit sort -n -j 4 tests/scat_output.fas > tests/sorted_scat_output.fas
+	rm -fr $BASE
+	rm -f tests/scat_test_all.fas tests/scat_output.fas
 }
 
 run scat_fasta fun
 cmp tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas
 assert_equal $? 0
-rm -fr tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas $BASE
-rm -f tests/scat_test_all.fas
+rm -f tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas
 
 # Regression test for scat/fastq
 fun(){
 	BASE=tests/scat_test_fastq
-	rm -fr $BASE tests/scat_test_all.fq tests/scat_output.fq
+	rm -fr $BASE 
+	rm -f tests/scat_test_all.fq tests/scat_output.fq
         mkdir -p $BASE
 	(seqkit scat -j 4 -I fastq -O fastq $BASE > tests/scat_output.fq)&
 	SCAT_PID=$!
@@ -629,16 +632,18 @@ fun(){
 	sync
 	kill -s INT $SCAT_PID
 	wait $SCAT_PID
+	sync
 	seqkit sana -j 4 -I fastq -O fastq tests/scat_test_all.fq > tests/scat_test_all_sana.fq
 	seqkit sort -n -j 4 tests/scat_test_all_sana.fq > tests/sorted_scat_test_all.fq
-	rm -f tests/scat_test_all.fq
 	seqkit sort -n -j 4 tests/scat_output.fq > tests/sorted_scat_output.fq
+	rm -fr $BASE
+	rm -f tests/scat_test_all.fq tests/scat_output.fq
 }
 
 run scat_fastq fun
 cmp tests/sorted_scat_output.fq tests/sorted_scat_test_all.fq
 assert_equal $? 0
-rm -fr tests/sorted_scat_output.fq tests/sorted_scat_test_all.fq $BASE
+rm -f tests/sorted_scat_output.fq tests/sorted_scat_test_all.fq
 
 # ------------------------------------------------------------
 #                       faidx
