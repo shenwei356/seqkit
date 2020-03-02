@@ -44,6 +44,16 @@ func reFilterName(name string, re *regexp.Regexp) bool {
 	return re.MatchString(name)
 }
 
+func checkFileFormat(format string) {
+	switch format {
+	case "fasta":
+	case "fastq":
+	case "":
+	default:
+		log.Fatal("Invalid format specified:", format)
+	}
+}
+
 // scatCmd represents the fish command
 var scatCmd = &cobra.Command{
 	Use:   "scat",
@@ -57,7 +67,18 @@ var scatCmd = &cobra.Command{
 
 		qBase := getFlagPositiveInt(cmd, "qual-ascii-base")
 		inFmt := getFlagString(cmd, "in-format")
+		checkFileFormat(inFmt)
 		outFmt := getFlagString(cmd, "out-format")
+		checkFileFormat(outFmt)
+		inOutFmt := getFlagString(cmd, "format")
+		checkFileFormat(inOutFmt)
+		if inFmt == "" {
+			inFmt = inOutFmt
+		}
+		if outFmt == "" {
+			outFmt = inOutFmt
+		}
+
 		dropString := getFlagString(cmd, "drop-time")
 		allowGaps := getFlagBool(cmd, "allow-gaps")
 		timeLimit := getFlagString(cmd, "time-limit")
@@ -65,6 +86,18 @@ var scatCmd = &cobra.Command{
 		delta := getFlagInt(cmd, "delta") * 1024
 		reStr := getFlagString(cmd, "regexp")
 		var err error
+		FASTA_REGEXP := ".*\\.(fas|fa|fasta)$"
+		FASTQ_REGEXP := ".*\\.(fastq|fq)$"
+		if reStr == "" {
+			switch inFmt {
+			case "fasta":
+				reStr = FASTA_REGEXP
+			case "fastq":
+				reStr = FASTQ_REGEXP
+			default:
+				log.Fatal("Impossible input format:", inFmt)
+			}
+		}
 		reFilter, err := regexp.Compile(reStr)
 		checkError(err)
 
@@ -446,15 +479,15 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 func init() {
 	RootCmd.AddCommand(scatCmd)
 
-	scatCmd.Flags().StringP("regexp", "r", ".*\\.(fastq|fq|fas|fa)$", "regexp for waxtched files)")
+	scatCmd.Flags().StringP("regexp", "r", "", "regexp for watched files, by default guessed from the input format")
 	scatCmd.Flags().StringP("format", "i", "fastq", "input and output format: fastq or fasta (fastq)")
-	scatCmd.Flags().StringP("in-format", "I", "fastq", "input format: fastq or fasta (fastq)")
-	scatCmd.Flags().StringP("out-format", "O", "fastq", "output format: fastq or fasta")
+	scatCmd.Flags().StringP("in-format", "I", "", "input format: fastq or fasta (fastq)")
+	scatCmd.Flags().StringP("out-format", "O", "", "output format: fastq or fasta")
 	scatCmd.Flags().BoolP("allow-gaps", "A", false, "allow gap character (-) in sequences")
 	scatCmd.Flags().BoolP("find-only", "f", false, "concatenate exisiting files and quit")
 	scatCmd.Flags().StringP("time-limit", "T", "", "quit after inactive for this time period")
 	scatCmd.Flags().IntP("wait-pid", "p", -1, "after process with this PID exited")
 	scatCmd.Flags().IntP("delta", "d", 5, "minimum size increase in kilobytes to trigger parsing")
-	scatCmd.Flags().StringP("drop-time", "D", "500ms", "Notification drop interval")
+	scatCmd.Flags().StringP("drop-time", "D", "50ms", "Notification drop interval")
 	scatCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
 }

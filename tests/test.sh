@@ -539,7 +539,7 @@ rm seqkit_fish.tsv
 # Regression test for sana/fasta
 fun(){
 	awk '{print ">" $1 "\n" $2}' tests/scat_test.tsv > tests/sana_test_input.fas
-	seqkit sana -I fasta -O fasta tests/sana_test_input.fas > tests/sana_output.fas
+	seqkit sana -i fasta tests/sana_test_input.fas > tests/sana_output.fas
 }
 run sana_fasta_regression fun
 cmp tests/sana_output.fas tests/sana_ground.fas
@@ -549,7 +549,7 @@ rm -f tests/sana_output.fas tests/sana_test_input.fas
 # Regression test for sana/fastq
 fun(){
 	awk '{print "@" $1 "\n" $2 "\n+\n" $3}' tests/scat_test.tsv > tests/sana_test_input.fq
-	seqkit sana -I fastq -O fastq tests/sana_test_input.fq > tests/sana_output.fq
+	seqkit sana -i fastq tests/sana_test_input.fq > tests/sana_output.fq
 }
 run sana_fastq_regression fun
 cmp tests/sana_output.fq tests/sana_ground.fq
@@ -566,7 +566,7 @@ fun(){
 	rm -fr $BASE 
 	rm -f tests/scat_test_all.fas tests/scat_output.fas
         mkdir -p $BASE
-	(seqkit scat -I fasta -O fasta $BASE > tests/scat_output.fas)&
+	(seqkit scat -j 4 -i fasta $BASE > tests/scat_output.fas)&
 	SCAT_PID=$!
         BAK=$IFS
         IFS=$'\n'
@@ -590,7 +590,7 @@ fun(){
 	sync
 	kill -s INT $SCAT_PID
 	wait $SCAT_PID
-	sync
+	sync; sleep 0.5
 	seqkit sana -j 4 -I fasta -O fasta tests/scat_test_all.fas | seqkit sort -n -j 4 - > tests/sorted_scat_test_all.fas
 	seqkit sort -n -j 4 tests/scat_output.fas > tests/sorted_scat_output.fas
 	rm -fr $BASE
@@ -608,7 +608,7 @@ fun(){
 	rm -fr $BASE 
 	rm -f tests/scat_test_all.fq tests/scat_output.fq
         mkdir -p $BASE
-	(seqkit scat -j 4 -I fastq -O fastq $BASE > tests/scat_output.fq)&
+	(seqkit scat -j 4 -i fastq $BASE > tests/scat_output.fq)&
 	SCAT_PID=$!
         BAK=$IFS
         IFS=$'\n'
@@ -629,7 +629,7 @@ fun(){
 		done;
         done;
         IFS=$BAK
-	sync
+	sync; sleep 0.5
 	kill -s INT $SCAT_PID
 	wait $SCAT_PID
 	sync

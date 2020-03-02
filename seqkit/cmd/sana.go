@@ -59,7 +59,18 @@ var sanaCmd = &cobra.Command{
 		outFile := config.OutFile
 		qBase := getFlagPositiveInt(cmd, "qual-ascii-base")
 		inFmt := getFlagString(cmd, "in-format")
+		checkFileFormat(inFmt)
 		outFmt := getFlagString(cmd, "out-format")
+		checkFileFormat(outFmt)
+		inOutFmt := getFlagString(cmd, "format")
+		checkFileFormat(inOutFmt)
+		if inFmt == "" {
+			inFmt = inOutFmt
+		}
+		if outFmt == "" {
+			outFmt = inOutFmt
+		}
+
 		allowGaps := getFlagBool(cmd, "allow-gaps")
 		runtime.GOMAXPROCS(config.Threads)
 
@@ -110,8 +121,9 @@ var sanaCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(sanaCmd)
-	sanaCmd.Flags().StringP("in-format", "I", "fastq", "input format: fastq or fasta (fastq)")
-	sanaCmd.Flags().StringP("out-format", "O", "fastq", "output format: fastq or fasta (fastq)")
+	sanaCmd.Flags().StringP("in-format", "I", "", "input format: fastq or fasta")
+	sanaCmd.Flags().StringP("out-format", "O", "", "output format: fastq or fasta")
+	sanaCmd.Flags().StringP("format", "i", "fastq", "input and output format: fastq or fasta")
 	sanaCmd.Flags().BoolP("allow-gaps", "A", false, "allow gap character (-) in sequences")
 	sanaCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
 }
