@@ -38,6 +38,10 @@ var sampleCmd = &cobra.Command{
 	Short: "sample sequences by number or proportion",
 	Long: `sample sequences by number or proportion.
 
+Attention:
+1. Do not use '-n' on large FASTQ files, it loads all seqs into memory!
+   use 'seqkit sample -p 0.1 seqs.fq.gz | seqkit head -n N' instead!
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
@@ -136,6 +140,9 @@ var sampleCmd = &cobra.Command{
 					}
 				}
 			} else {
+				if !quiet {
+					log.Info("loading all sequences into memory...")
+				}
 				records, err := fastx.GetSeqs(file, alphabet, config.Threads, 10, idRegexp)
 				checkError(err)
 
@@ -193,7 +200,7 @@ func init() {
 	RootCmd.AddCommand(sampleCmd)
 
 	sampleCmd.Flags().Int64P("rand-seed", "s", 11, "rand seed")
-	sampleCmd.Flags().Int64P("number", "n", 0, "sample by number (result may not exactly match)")
+	sampleCmd.Flags().Int64P("number", "n", 0, "sample by number (result may not exactly match), DO NOT use on large FASTQ files.")
 	sampleCmd.Flags().Float64P("proportion", "p", 0, "sample by proportion")
 	sampleCmd.Flags().BoolP("two-pass", "2", false, "2-pass mode read files twice to lower memory usage. Not allowed when reading from stdin")
 }

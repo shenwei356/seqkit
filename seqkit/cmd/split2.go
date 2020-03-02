@@ -78,7 +78,7 @@ according to the input files.
 		size := getFlagNonNegativeInt(cmd, "by-size")
 		parts := getFlagNonNegativeInt(cmd, "by-part")
 		lengthS := getFlagString(cmd, "by-length")
-		var length int
+		var length int64
 		var err error
 		if lengthS != "" {
 			length, err = ParseByteSize(lengthS)
@@ -215,9 +215,9 @@ according to the input files.
 				var outfh *xopen.Writer
 				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
-				i := 0 // nth part
-				j := 0 // nth record
-				n := 0 // length sum
+				i := 0      // nth part
+				j := 0      // nth record
+				var n int64 // length sum
 				for {
 					record, err = fastxReader.Read()
 					if err != nil {
@@ -240,7 +240,7 @@ according to the input files.
 						}
 						renameFileExt = false
 					}
-					n += len(record.Seq.Seq)
+					n += int64(len(record.Seq.Seq))
 
 					if size > 0 {
 						if j == size {

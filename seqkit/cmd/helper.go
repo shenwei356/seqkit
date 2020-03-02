@@ -480,12 +480,12 @@ func readKVs(file string, ignoreCase bool) (map[string]string, error) {
 }
 
 // ParseByteSize parses byte size from string
-func ParseByteSize(val string) (int, error) {
+func ParseByteSize(val string) (int64, error) {
 	val = strings.Trim(val, " \t\r\n")
 	if val == "" {
 		return 0, nil
 	}
-	var u int
+	var u int64
 	var noUnit bool
 	switch val[len(val)-1] {
 	case 'B', 'b':
@@ -512,7 +512,7 @@ func ParseByteSize(val string) (int, error) {
 		if size < 0 {
 			size = 0
 		}
-		return int(size * float64(u)), nil
+		return int64(size), nil
 	}
 
 	if len(val) == 1 { // no value
@@ -526,5 +526,5 @@ func ParseByteSize(val string) (int, error) {
 	if size < 0 {
 		size = 0
 	}
-	return int(size * float64(u)), nil
+	return int64(size * float64(u)), nil
 }
