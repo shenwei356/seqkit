@@ -65,6 +65,8 @@ var scatCmd = &cobra.Command{
 		outFile := config.OutFile
 		runtime.GOMAXPROCS(config.Threads)
 
+		quiet := config.Quiet // FIXME: add quiet mode
+		_ = quiet
 		qBase := getFlagPositiveInt(cmd, "qual-ascii-base")
 		inFmt := getFlagString(cmd, "in-format")
 		checkFileFormat(inFmt)

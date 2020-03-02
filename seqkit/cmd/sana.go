@@ -57,6 +57,8 @@ var sanaCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
 		outFile := config.OutFile
+		quiet := config.Quiet // FIXME: add quiet mode
+		_ = quiet
 		qBase := getFlagPositiveInt(cmd, "qual-ascii-base")
 		inFmt := getFlagString(cmd, "in-format")
 		checkFileFormat(inFmt)
