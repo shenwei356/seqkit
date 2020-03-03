@@ -442,6 +442,10 @@ func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 			if len(line) > 0 {
 				sbuff = append(sbuff, FqLine{string(line), FqlState{Partial: true}})
 			}
+			if !final {
+				ctrlChanOut <- StreamEOF
+				return sbuff, nil
+			}
 			if final && len(sbuff) == 4 {
 				last := len(sbuff) - 1
 				sbuff[last].FqlState.Partial = false
@@ -462,9 +466,6 @@ func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 					out <- seq
 					sbuff = sbuff[:0]
 				}
-			}
-			if !final {
-				ctrlChanOut <- StreamEOF
 			}
 			return sbuff, nil
 		default:
@@ -578,7 +579,7 @@ func NewRawFastqStream(name string, inReader *bufio.Reader, seqChan chan *simple
 					}
 
 				} else if cmd == StreamQuit {
-					close(ctrlChanIn)
+					//close(ctrlChanIn)
 					sbuff, err = streamFastq(name, inReader, sbuff, seqChan, ctrlChanIn, ctrlChanOut, &lineCounter, qBase, gaps, true)
 					for _, l := range sbuff {
 						ems := fmt.Sprintf("Discarded line: %s", err)
@@ -586,11 +587,13 @@ func NewRawFastqStream(name string, inReader *bufio.Reader, seqChan chan *simple
 						seqChan <- serr
 					}
 					ctrlChanOut <- StreamExited
-					close(ctrlChanOut)
+					//close(ctrlChanOut)
 					return
 				} else {
 					log.Fatal("Invalid command:", int(cmd))
 				}
+			default:
+				continue
 			}
 		}
 	}()
@@ -616,7 +619,7 @@ func NewRawFastaStream(name string, inReader *bufio.Reader, seqChan chan *simple
 					}
 
 				} else if cmd == StreamQuit {
-					close(ctrlChanIn)
+					//close(ctrlChanIn)
 					sbuff, err = streamFasta(name, inReader, sbuff, seqChan, ctrlChanIn, ctrlChanOut, lineCounter, gaps, true)
 					for i, l := range sbuff {
 						ems := fmt.Sprintf("Discarded line: %s", err)
@@ -624,7 +627,7 @@ func NewRawFastaStream(name string, inReader *bufio.Reader, seqChan chan *simple
 						seqChan <- serr
 					}
 					ctrlChanOut <- StreamExited
-					close(ctrlChanOut)
+					//close(ctrlChanOut)
 					return
 				} else {
 					log.Fatal("Invalid command:", int(cmd))

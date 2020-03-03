@@ -80,11 +80,14 @@ var scatCmd = &cobra.Command{
 		if outFmt == "" {
 			outFmt = inOutFmt
 		}
+		log.Info("Input format is:", inFmt)
+		log.Info("Output format is:", outFmt)
 
 		dropString := getFlagString(cmd, "drop-time")
 		allowGaps := getFlagBool(cmd, "allow-gaps")
 		timeLimit := getFlagString(cmd, "time-limit")
 		waitPid := getFlagInt(cmd, "wait-pid")
+		findOnly := getFlagBool(cmd, "find-only")
 		delta := getFlagInt(cmd, "delta") * 1024
 		reStr := getFlagString(cmd, "regexp")
 		var err error
@@ -99,6 +102,11 @@ var scatCmd = &cobra.Command{
 			default:
 				log.Fatal("Impossible input format:", inFmt)
 			}
+		}
+		if findOnly {
+			log.Info("Will stream files matching regexp: \"" + reStr + "\"")
+		} else {
+			log.Info("Will watch files matching regexp: \"" + reStr + "\"")
 		}
 		reFilter, err := regexp.Compile(reStr)
 		checkError(err)
@@ -119,18 +127,20 @@ var scatCmd = &cobra.Command{
 			log.Info("No directories given to watch! Exiting.")
 			os.Exit(1)
 		}
-		LaunchFxWatchers(dirs, ctrlChan, reFilter, inFmt, outFmt, qBase, allowGaps, delta, timeLimit, dropString, waitPid, outfh)
+		LaunchFxWatchers(dirs, ctrlChan, reFilter, inFmt, outFmt, qBase, allowGaps, delta, timeLimit, dropString, waitPid, findOnly, outfh)
 
 	},
 }
 
-func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, timeout string, dropString string, waitPid int, outw *xopen.Writer) {
+func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, timeout string, dropString string, waitPid int, findOnly bool, outw *xopen.Writer) {
 	allSeqChans := make([]chan *simpleSeq, len(dirs))
-	allCtrlChans := make([]WatchCtrlChan, len(dirs))
+	allInCtrlChans := make([]WatchCtrlChan, len(dirs))
+	allOutCtrlChans := make([]WatchCtrlChan, len(dirs))
 	for i, dir := range dirs {
 		allSeqChans[i] = make(chan *simpleSeq, 10000)
-		allCtrlChans[i] = make(WatchCtrlChan, 0)
-		go NewFxWatcher(dir, allSeqChans[i], allCtrlChans[i], re, inFmt, outFmt, qBase, allowGaps, delta, dropString)
+		allInCtrlChans[i] = make(WatchCtrlChan, 1000)
+		allOutCtrlChans[i] = make(WatchCtrlChan, 1000)
+		go NewFxWatcher(dir, allSeqChans[i], allInCtrlChans[i], allOutCtrlChans[i], re, inFmt, outFmt, qBase, allowGaps, delta, dropString, findOnly)
 	}
 	sigChan := make(chan os.Signal, 5)
 	signal.Notify(sigChan, os.Interrupt)
@@ -155,7 +165,7 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 	pass, fail := 0, 0
 
 	sendQuitCmds := func() {
-		for i, cc := range allCtrlChans {
+		for i, cc := range allInCtrlChans {
 			if cc == nil || allSeqChans[i] == nil {
 				continue
 			}
@@ -185,7 +195,7 @@ MAIN:
 			activeCount = 0
 		CHAN:
 			for j, sc := range allSeqChans {
-				if sc == nil || allCtrlChans[j] == nil {
+				if sc == nil || allOutCtrlChans[j] == nil {
 					continue CHAN
 				}
 				activeCount++
@@ -210,17 +220,22 @@ MAIN:
 							ticker.Stop()
 							ticker = time.NewTimer(td)
 						}
-					case fb := <-allCtrlChans[j]:
+					case fb, ok := <-allOutCtrlChans[j]:
+						if !ok {
+							continue CHAN
+						}
 						if fb != WatchCtrl(-9) {
-							log.Fatal("Invalid command:", fb)
+							log.Fatal("Invalid exit feedback:", fb)
 						}
 						close(allSeqChans[j])
-						close(allCtrlChans[j])
+						close(allInCtrlChans[j])
+						close(allOutCtrlChans[j])
 						allSeqChans[j] = nil
-						allCtrlChans[j] = nil
+						allInCtrlChans[j] = nil
+						allOutCtrlChans[j] = nil
 						continue CHAN
 					default:
-						continue CHAN
+						break CHAN
 					}
 				} // select 1
 			} // for chan
@@ -251,7 +266,7 @@ type FxWatcher struct {
 	Mutex sync.Mutex
 }
 
-func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, minDelta int, dropString string) {
+func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watcherCtrlChanOut WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, minDelta int, dropString string, findOnly bool) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatalf("fsnotify error:", err)
@@ -263,6 +278,10 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 	dropDuration, err := time.ParseDuration(dropString)
 	checkError(err)
 
+	if findOnly {
+		watcher.Close()
+	}
+
 	walkFunc := func(path string, info os.FileInfo, err error) error {
 		path = ospath.Join(dir, path)
 		self.Mutex.Lock()
@@ -270,26 +289,33 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 			self.Mutex.Unlock()
 			return nil
 		}
-		if info.IsDir() {
+		if info.IsDir() && !findOnly {
 			err = watcher.Add(path)
 			checkError(err)
 			self.Pool[path] = &WatchedFx{Name: path, IsDir: true}
 			log.Info("Watching directory:", path)
 		} else {
 			if !reFilterName(path, re) {
+				self.Mutex.Unlock()
 				return nil
 			}
 			created := time.Now()
 			sc := seqChan
 			ctrlIn, ctrlOut := NewRawSeqStreamFromFile(path, sc, qBase, inFmt, allowGaps)
-			err := watcher.Add(path)
-			checkError(err)
+			if !findOnly {
+				err := watcher.Add(path)
+				checkError(err)
+			}
 			fi, err := os.Stat(path)
 			checkError(err)
 			self.Pool[path] = &WatchedFx{Name: path, IsDir: false, SeqChan: sc, CtrlChanIn: ctrlIn, CtrlChanOut: ctrlOut, LastSize: fi.Size(), LastTry: created}
 
+			if findOnly {
+				log.Info("Streaming file:", path)
+			} else {
+				log.Info("Watching file:", path)
+			}
 			ctrlIn <- StreamTry
-			log.Info("Watching file:", path)
 		}
 		self.Mutex.Unlock()
 		return nil
@@ -299,7 +325,7 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 	SFOR:
 		for {
 			select {
-			case <-ctrlChan:
+			case <-watcherCtrlChanIn:
 				self.Mutex.Lock()
 				for ePath, w := range self.Pool {
 					watcher.Remove(ePath)
@@ -310,20 +336,27 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 					}
 					log.Info("Stopped watching file: ", ePath)
 					w.CtrlChanIn <- StreamQuit
-					fb := <-w.CtrlChanOut
-					if fb == StreamExited {
-						delete(self.Pool, ePath)
-					} else {
-						log.Fatal("Invalid feedback when trying to quit:", int(fb))
+				DRAIN:
+					for fb := range w.CtrlChanOut {
+						switch fb {
+						case StreamExited:
+							delete(self.Pool, ePath)
+							break DRAIN
+						case StreamEOF:
+							continue
+
+						default:
+							log.Fatal("Invalid feedback when trying to quit:", int(fb))
+						}
 					}
 				}
 				self.Mutex.Unlock()
 				log.Info("Exiting.")
-				ctrlChan <- WatchCtrl(-9)
+				watcherCtrlChanOut <- WatchCtrl(-9)
 				return
 			case event, ok := <-watcher.Events:
 				if !ok {
-					return
+					continue
 				}
 				ePath := event.Name
 				if event.Op&fsnotify.Remove == fsnotify.Remove {
@@ -344,7 +377,7 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 					di.CtrlChanIn <- StreamQuit
 					fb := <-di.CtrlChanOut
 					if fb != StreamExited {
-						log.Fatal("Invalid command:", int(fb))
+						log.Fatal("Invalid removal feedback:", int(fb))
 					}
 					delete(self.Pool, ePath)
 					self.Mutex.Unlock()
@@ -355,7 +388,7 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 					self.Pool[ePath].CtrlChanIn <- StreamQuit
 					fb := <-self.Pool[ePath].CtrlChanOut
 					if fb != StreamExited {
-						log.Fatal("Invalid command:", int(fb))
+						log.Fatal("Invalid renaming feedback:", int(fb))
 					}
 					delete(self.Pool, ePath)
 				}
@@ -377,7 +410,6 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 						continue SFOR
 
 					}
-					log.Info("Skip:", ePath)
 					if !reFilterName(ePath, re) {
 						self.Mutex.Unlock()
 						continue SFOR
@@ -415,7 +447,7 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 						self.Pool[ePath].CtrlChanIn <- StreamQuit
 						fb := <-self.Pool[ePath].CtrlChanOut
 						if fb != StreamExited {
-							log.Fatal("Invalid command:", int(fb))
+							log.Fatal("Invalid truncation feedback:", int(fb))
 						}
 						delete(self.Pool, ePath)
 						self.Mutex.Unlock()
@@ -441,31 +473,56 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, ctrlChan WatchCtrlChan, r
 	}()
 
 	self.Mutex.Lock()
-	err = watcher.Add(dir)
+	if !findOnly {
+		err = watcher.Add(dir)
+		checkError(err)
+	}
 	self.Pool[dir] = &WatchedFx{Name: dir, IsDir: true}
-	checkError(err)
-	log.Info(fmt.Sprintf("Watcher (%s) launched on root: %s", inFmt, dir))
+	if !findOnly {
+		log.Info(fmt.Sprintf("Watcher (%s) launched on root: %s", inFmt, dir))
+	} else {
+		log.Info(fmt.Sprintf("Streaming %s records from directory: %s", inFmt, dir))
+	}
 	self.Mutex.Unlock()
 
 	err = cwalk.Walk(dir, walkFunc)
 	checkError(err)
 
+	if findOnly {
+		watcherCtrlChanIn <- WatchCtrl(1)
+	}
+
 	for {
 		self.Mutex.Lock()
+		if len(self.Pool) == 0 {
+			self.Mutex.Unlock()
+			break
+		}
+	POOL:
 		for ePath, w := range self.Pool {
-		CHAN:
 			for {
 				select {
-				case seq := <-w.SeqChan:
-					seqChan <- seq
-				case e := <-w.CtrlChanOut:
-					if e == StreamEOF {
-						continue CHAN
-					} else {
-						log.Fatal("Invalid command:", int(e))
+				case seq, ok := <-w.SeqChan:
+					if !ok {
+						break POOL
 					}
+					seqChan <- seq
+				case fb, ok := <-w.CtrlChanOut:
+					if !ok {
+						break POOL
+					}
+					switch fb {
+					case StreamExited:
+						delete(self.Pool, ePath)
+						break POOL
+					case StreamEOF:
+						continue POOL
+					default:
+						log.Fatal("Invalid feedback on channel: ", int(fb))
+					}
+
 				default:
-					break CHAN
+					continue POOL
 				}
 			}
 			fi, err := os.Stat(ePath)
