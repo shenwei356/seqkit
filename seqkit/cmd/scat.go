@@ -144,6 +144,7 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 	}
 	sigChan := make(chan os.Signal, 5)
 	signal.Notify(sigChan, os.Interrupt)
+	defer outw.Flush()
 
 	pidTimer := *time.NewTicker(time.Millisecond * 500)
 	if waitPid < 0 {
@@ -201,10 +202,7 @@ MAIN:
 				activeCount++
 				for {
 					select {
-					case rawSeq, ok := <-sc:
-						if !ok {
-							continue
-						}
+					case rawSeq := <-sc:
 						if rawSeq == nil {
 							log.Fatal("Trying to print nil sequence!")
 						}
@@ -238,6 +236,7 @@ MAIN:
 						break CHAN
 					}
 				} // select 1
+				outw.Flush()
 			} // for chan
 			if activeCount == 0 {
 				outw.Flush()
@@ -327,6 +326,8 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 			select {
 			case <-watcherCtrlChanIn:
 				self.Mutex.Lock()
+				sigChan := make(chan os.Signal, 2)
+				signal.Notify(sigChan, os.Interrupt)
 				for ePath, w := range self.Pool {
 					watcher.Remove(ePath)
 					if w.IsDir {
@@ -467,7 +468,7 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 					log.Fatalf("fsnotify error:", err)
 				}
 			default:
-				time.Sleep(time.Microsecond)
+				//time.Sleep(time.Microsecond)
 			}
 		}
 	}()
