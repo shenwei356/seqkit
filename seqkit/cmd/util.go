@@ -22,10 +22,86 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
+
+	au "github.com/logrusorgru/aurora"
+	colorable "github.com/mattn/go-colorable"
+	isatty "github.com/mattn/go-isatty"
 )
+
+// ColorCycler is a utilty object to cycle between colors and colorize text.
+type ColorCycler struct {
+	Dummy   bool
+	Index   int
+	Palette []au.Color
+}
+
+// NewColorCycler return a new color cycler object.
+func NewColorCycler(dummy bool) *ColorCycler {
+	self := new(ColorCycler)
+	self.Index = 0
+	self.Dummy = dummy
+	self.Palette = []au.Color{
+		au.RedFg,
+		au.GreenFg,
+		au.YellowFg,
+		au.BlueFg,
+		au.MagentaFg,
+		au.CyanFg,
+		au.WhiteFg,
+	}
+	return self
+}
+
+// Next swiches to the next color.
+func (p *ColorCycler) Next() {
+	if p.Dummy {
+		return
+	}
+	p.Index++
+	if p.Index >= len(p.Palette)-1 {
+		p.Index = 0
+	}
+}
+
+// Colorize adds the current ANSI color to the text.
+func (p *ColorCycler) Colorize(s string) string {
+	if p.Dummy {
+		return s
+	}
+	return au.Sprintf(au.Colorize(s, p.Palette[p.Index]))
+}
+
+// Colorize adds the current ANSI color to the text with a header style.
+func (p *ColorCycler) Header(s string) string {
+	if p.Dummy {
+		return s
+	}
+	return au.Sprintf(au.BgGray(5, au.Colorize(s, p.Palette[p.Index]|au.BoldFm)))
+}
+
+// Fancy colorizes text with normal or header styles.
+func (p *ColorCycler) Fancy(s string, head bool) string {
+	switch head {
+	case false:
+		return p.Colorize(s)
+	case true:
+		return p.Header(s)
+	}
+	return s
+}
+
+// WrapWriter wraps a file into am go-colorable object if necessary.
+func (p *ColorCycler) WrapWriter(fh *os.File) io.Writer {
+	if p.Dummy || !isatty.IsTerminal(fh.Fd()) {
+		return fh
+	}
+	return colorable.NewColorable(fh)
+}
 
 // BashExec executes a command via bash.
 func BashExec(command string) {
@@ -122,4 +198,65 @@ func RevCompDNA(s string) string {
 		tmp[size-1-i] = outBase
 	}
 	return string(tmp)
+}
+
+func maxStrLen(slice []string) int {
+	l := 0
+	for _, s := range slice {
+		if len(s) > l {
+			l = len(s)
+		}
+	}
+	return l
+}
+
+// PrettyPrintTsv pretty prints and optionally colorizes a "data frame".
+func PrettyPrintTsv(cols []string, fields [][]string, width int, color bool) (string, *ColorCycler) {
+	brush := NewColorCycler(!color)
+	nrCols := len(cols)
+	if nrCols != len(fields) {
+		panic("Length mismatch!")
+	}
+	out := make([][]string, nrCols)
+	for i := 0; i < nrCols; i++ {
+		out[i] = []string{cols[i]}
+		out[i] = append(out[i], fields[i]...)
+	}
+	auto := false
+	if width < 0 {
+		auto = true
+	}
+	prevCol := 0
+	for i := 0; i < nrCols; i++ {
+		width := 0
+		if auto {
+			width = maxStrLen(out[i])
+		}
+		if i > prevCol {
+			brush.Next()
+			prevCol++
+		}
+		for j := 0; j < len(out[i]); j++ {
+			head := false
+			if j == 0 {
+				head = true
+			}
+			sep := "\t"
+			if width > 0 {
+				out[i][j] = brush.Fancy(fmt.Sprintf("%-"+strconv.Itoa(width)+"s"+sep, out[i][j]), head)
+			} else {
+				out[i][j] = brush.Fancy(fmt.Sprintf("%s"+sep, out[i][j]), head)
+			}
+		}
+	}
+	outStr := ""
+	rows := len(out[0])
+	for i := 0; i < rows; i++ {
+		tmp := make([]string, len(out))
+		for j := 0; j < len(out); j++ {
+			tmp[j] = out[j][i]
+		}
+		outStr += strings.Join(tmp, "") + "\n"
+	}
+	return outStr, brush
 }
