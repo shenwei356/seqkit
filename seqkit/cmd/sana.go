@@ -592,7 +592,7 @@ func NewRawFastqStream(name string, inReader *bufio.Reader, seqChan chan *simple
 					log.Fatal("Invalid command:", int(cmd))
 				}
 			default:
-				continue
+				time.Sleep(NAP_SLEEP)
 			}
 		}
 	}()

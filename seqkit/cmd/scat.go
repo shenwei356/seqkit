@@ -313,6 +313,8 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 			checkError(err)
 			self.Pool[path] = &WatchedFx{Name: path, IsDir: true}
 			log.Info("Watching directory:", path)
+			self.Mutex.Unlock()
+			return nil
 		} else {
 			if !reFilterName(path, re) {
 				self.Mutex.Unlock()
@@ -329,7 +331,6 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 			checkError(err)
 			self.Pool[path] = &WatchedFx{Name: path, IsDir: false, SeqChan: sc, CtrlChanIn: ctrlIn, CtrlChanOut: ctrlOut, LastSize: fi.Size(), LastTry: created}
 
-			self.Mutex.Unlock()
 			if findOnly {
 				log.Info("Streaming file:", path)
 				ctrlIn <- StreamQuit
@@ -337,6 +338,8 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 				log.Info("Watching file:", path)
 				ctrlIn <- StreamTry
 			}
+			self.Mutex.Unlock()
+			return nil
 		}
 		return nil
 	}
@@ -349,25 +352,21 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 				if !ok {
 					continue
 				}
-				self.Mutex.Lock()
 				log.Info("Exiting...")
 				sigChan := make(chan os.Signal, 2)
 				signal.Notify(sigChan, os.Interrupt)
-				self.Mutex.Unlock()
+				self.Mutex.Lock()
 				for ePath, w := range self.Pool {
-					self.Mutex.Lock()
 					watcher.Remove(ePath)
 					if w.IsDir {
 						delete(self.Pool, ePath)
 						log.Info("Stopped watching directory: ", ePath)
-						self.Mutex.Unlock()
 						continue
 					}
 					log.Info("Stopped watching file: ", ePath)
 					if !findOnly {
 						w.CtrlChanIn <- StreamQuit
 					}
-					time.Sleep(NAP_SLEEP)
 				DRAIN:
 					for fb := range w.CtrlChanOut {
 						switch fb {
@@ -375,14 +374,13 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 							delete(self.Pool, ePath)
 							break DRAIN
 						case StreamEOF:
-							time.Sleep(BIG_SLEEP)
 							continue DRAIN
 						default:
 							log.Fatal("Invalid feedback when trying to quit:", int(fb))
 						}
 					}
-					self.Mutex.Unlock()
 				}
+				self.Mutex.Unlock()
 				watcherCtrlChanOut <- WatchCtrl(-9)
 				return
 			case event, ok := <-watcher.Events:
@@ -421,7 +419,9 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 					if fb != StreamExited {
 						log.Fatal("Invalid renaming feedback:", int(fb))
 					}
+					self.Mutex.Lock()
 					delete(self.Pool, ePath)
+					self.Mutex.Unlock()
 				}
 				if event.Op&fsnotify.Create == fsnotify.Create {
 					if self.Pool[ePath] != nil {
