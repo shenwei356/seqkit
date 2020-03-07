@@ -329,6 +329,7 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 			checkError(err)
 			self.Pool[path] = &WatchedFx{Name: path, IsDir: false, SeqChan: sc, CtrlChanIn: ctrlIn, CtrlChanOut: ctrlOut, LastSize: fi.Size(), LastTry: created}
 
+			self.Mutex.Unlock()
 			if findOnly {
 				log.Info("Streaming file:", path)
 				ctrlIn <- StreamQuit
@@ -337,7 +338,6 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 				ctrlIn <- StreamTry
 			}
 		}
-		self.Mutex.Unlock()
 		return nil
 	}
 
@@ -364,25 +364,24 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 						continue
 					}
 					log.Info("Stopped watching file: ", ePath)
-					w.CtrlChanIn <- StreamQuit
-					log.Info("Stopped watching sent quit: ", ePath)
+					if !findOnly {
+						w.CtrlChanIn <- StreamQuit
+					}
 					time.Sleep(NAP_SLEEP)
 				DRAIN:
 					for fb := range w.CtrlChanOut {
 						switch fb {
 						case StreamExited:
 							delete(self.Pool, ePath)
-							close(w.CtrlChanOut)
-							self.Mutex.Unlock()
 							break DRAIN
 						case StreamEOF:
 							time.Sleep(BIG_SLEEP)
-							log.Info("Stopped watching EOF")
 							continue DRAIN
 						default:
 							log.Fatal("Invalid feedback when trying to quit:", int(fb))
 						}
 					}
+					self.Mutex.Unlock()
 				}
 				watcherCtrlChanOut <- WatchCtrl(-9)
 				return
