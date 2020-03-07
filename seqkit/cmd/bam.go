@@ -271,12 +271,43 @@ type bamStatRec struct {
 	SupAln       int
 	Unmapped     int
 	TotalRec     int
+	TotalReads   int
 	File         string
 }
 
 // String generates string representatION for a pointer to bamStatRec.
 func (r *bamStatRec) String() string {
-	return fmt.Sprintf("%.2f\t%d\t%d\t%d\t%d\t%.2f\t%d\t%s", r.PrimAlnPerc, r.PrimAln, r.SecAln, r.SupAln, r.Unmapped, r.MultimapPerc, r.TotalRec, r.File)
+	return fmt.Sprintf("%.2f\t%d\t%d\t%d\t%d\t%.2f\t%d\t%d\t%s", r.PrimAlnPerc, r.PrimAln, r.SecAln, r.SupAln, r.Unmapped, r.MultimapPerc, r.TotalRec, r.TotalReads, r.File)
+}
+
+func (r *bamStatRec) StatFields() ([]string, []string) {
+	fields := []string{"PrimAlnPerc", "MultimapPerc", "PrimAln", "SecAln", "SupAln", "Unmapped", "TotalReads", "TotalRecords", "File"}
+	res := make([]string, len(fields))
+	for i, f := range fields {
+		switch f {
+		case "PrimAlnPerc":
+			res[i] = fmt.Sprintf("%.2f", r.PrimAlnPerc)
+		case "MultimapPerc":
+			res[i] = fmt.Sprintf("%.2f", r.MultimapPerc)
+		case "PrimAln":
+			res[i] = fmt.Sprintf("%d", r.PrimAln)
+		case "SecAln":
+			res[i] = fmt.Sprintf("%d", r.SecAln)
+		case "SupAln":
+			res[i] = fmt.Sprintf("%d", r.SupAln)
+		case "Unmapped":
+			res[i] = fmt.Sprintf("%d", r.Unmapped)
+		case "TotalReads":
+			res[i] = fmt.Sprintf("%d", r.TotalReads)
+		case "TotalRecords":
+			res[i] = fmt.Sprintf("%d", r.TotalRec)
+		case "File":
+			res[i] = fmt.Sprintf("%s", r.File)
+		default:
+			panic(f)
+		}
+	}
+	return fields, res
 }
 
 // bamIdxStats extracts rough statistics form the BAM index.
@@ -358,9 +389,10 @@ func bamStatsOnce(f string, mapQual int, includeIds map[string]bool, excludeIds 
 		if record.Flags&sam.Unmapped == 0 {
 			if record.Flags&sam.Supplementary != 0 {
 				res.SupAln++
-			}
-			if record.Flags&sam.Secondary != 0 {
+				continue
+			} else if record.Flags&sam.Secondary != 0 {
 				res.SecAln++
+				continue
 			} else {
 				if record.MapQ == 0 {
 					res.MultimapPerc++
@@ -377,25 +409,71 @@ func bamStatsOnce(f string, mapQual int, includeIds map[string]bool, excludeIds 
 	} // records
 	res.PrimAlnPerc = 100 * float64(res.PrimAln) / float64(res.PrimAln+res.Unmapped)
 	res.MultimapPerc = 100 * res.MultimapPerc / float64(res.PrimAln)
+	res.TotalReads = res.PrimAln + res.Unmapped
 	return res
 }
 
 // bamStats calculates detailed statistics for multiple BAM files and prints to stderr.
-func bamStats(files []string, mapQual int, includeIds map[string]bool, excludeIds map[string]bool, threads int) {
-	fmt.Fprintf(os.Stderr, "PrimAlnPerc\tPrimAln\tSecAln\tSupAln\tUnmapped\tMultimapPerc\tTotalRec\tFile\n")
+func bamStats(files []string, mapQual int, includeIds map[string]bool, excludeIds map[string]bool, threads int, pretty bool) {
+	width := 0
+	if pretty {
+		width = -1
+	}
+	var fields []string
+	var out [][]string
 	for _, f := range files {
 		s := bamStatsOnce(f, mapQual, includeIds, excludeIds, threads)
-		fmt.Fprintf(os.Stderr, "%s\n", s.String())
+		fi, data := s.StatFields()
+		if fields == nil {
+			fields = fi
+			out = make([][]string, len(fi))
+			for i, _ := range out {
+				out[i] = make([]string, 0)
+			}
+		}
+		for i, d := range data {
+			out[i] = append(out[i], d)
+		}
 	}
+	color := true
+	if width == 0 {
+		color = false
+	}
+	fs, brush := PrettyPrintTsv(fields, out, width, color)
+	brush.WrapWriter(os.Stderr).Write([]byte(fs))
 }
 
 // idxStats print rough statistics for multiple BAM files to stderr.
-func idxStats(files []string) {
-	fmt.Fprintf(os.Stderr, "Aligned\tUnmapped\tTotalRec\tFile\n")
+func idxStats(files []string, pretty bool) {
+	width := 0
+	if pretty {
+		width = -1
+	}
+	fields := []string{"AlnPerc", "Aligned", "Unmapped", "TotalRec", "File"}
+	data := make([][]string, len(fields))
 	for _, f := range files {
 		s := bamIdxStats(f)
-		fmt.Fprintf(os.Stderr, "%d\t%d\t%d\t%s\n", s.PrimAln, s.Unmapped, s.PrimAln+s.Unmapped, s.File)
+		for i, fi := range fields {
+			switch fi {
+			case "AlnPerc":
+				data[i] = append(data[i], fmt.Sprintf("%.2f", float64(s.PrimAln*100)/float64(s.PrimAln+s.Unmapped)))
+			case "Aligned":
+				data[i] = append(data[i], fmt.Sprintf("%d", s.PrimAln))
+			case "Unmapped":
+				data[i] = append(data[i], fmt.Sprintf("%d", s.Unmapped))
+			case "TotalRec":
+				data[i] = append(data[i], fmt.Sprintf("%d", s.PrimAln+s.Unmapped))
+			case "File":
+				data[i] = append(data[i], fmt.Sprintf("%s", s.File))
+			}
+		}
 	}
+	color := true
+	if width == 0 {
+		color = false
+	}
+	fs, brush := PrettyPrintTsv(fields, data, width, color)
+	brush.WrapWriter(os.Stderr).Write([]byte(fs))
 }
 
 // topEntry is a struct holding a SAM rcord along with a calculated field.
@@ -424,6 +502,7 @@ var bamCmd = &cobra.Command{
 		mapQual := getFlagInt(cmd, "map-qual")
 		field := getFlagString(cmd, "field")
 		printFreq := getFlagInt(cmd, "print-freq")
+		prettyTSV := getFlagBool(cmd, "pretty")
 		rangeMin := getFlagFloat64(cmd, "range-min")
 		rangeMax := getFlagFloat64(cmd, "range-max")
 		printCount := getFlagString(cmd, "count")
@@ -466,12 +545,12 @@ var bamCmd = &cobra.Command{
 		}
 
 		if printIdxStat {
-			idxStats(files)
+			idxStats(files, prettyTSV)
 			os.Exit(0)
 		}
 
 		if printStat {
-			bamStats(files, mapQual, includeIds, excludeIds, config.Threads)
+			bamStats(files, mapQual, includeIds, excludeIds, config.Threads, prettyTSV)
 			os.Exit(0)
 		}
 
@@ -1101,6 +1180,7 @@ func init() {
 	bamCmd.Flags().BoolP("quiet-mode", "Q", false, "supress all plotting to stderr")
 	bamCmd.Flags().BoolP("silent-mode", "Z", false, "supress TSV output to stderr")
 	bamCmd.Flags().BoolP("list-fields", "H", false, "list all available BAM record features")
+	bamCmd.Flags().BoolP("pretty", "k", false, "pretty print certain TSV outputs")
 	bamCmd.Flags().StringP("exec-after", "e", "", "execute command after reporting")
 	bamCmd.Flags().StringP("exec-before", "E", "", "execute command before reporting")
 	bamCmd.Flags().StringP("top-bam", "@", "", "save the top -? records to this bam file")
