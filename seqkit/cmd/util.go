@@ -52,7 +52,11 @@ func NewColorCycler(dummy bool) *ColorCycler {
 		au.BlueFg,
 		au.MagentaFg,
 		au.CyanFg,
-		au.WhiteFg,
+	}
+	const flagFg au.Color = 1 << 14 // presence flag (14th bit)
+	const shiftFg = 16              // shift for foreground (starting from 16th bit)
+	for i := uint8(19); i <= 216; i += 5 {
+		self.Palette = append(self.Palette, au.Color(i)<<shiftFg|flagFg)
 	}
 	return self
 }
