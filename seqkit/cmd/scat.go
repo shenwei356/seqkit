@@ -40,10 +40,12 @@ type WatchCtrl int
 
 type WatchCtrlChan chan WatchCtrl
 
+// reFilterName matches a file name to a regular expression.
 func reFilterName(name string, re *regexp.Regexp) bool {
 	return re.MatchString(name)
 }
 
+// checkFileFormat complains if the file format is not valid.
 func checkFileFormat(format string) {
 	switch format {
 	case "fasta":
@@ -132,6 +134,7 @@ var scatCmd = &cobra.Command{
 	},
 }
 
+// LaunchFxWatchers launches fastx watcher goroutines on multiple input directories.
 func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, timeout string, dropString string, waitPid int, findOnly bool, outw *xopen.Writer) {
 	allSeqChans := make([]chan *simpleSeq, len(dirs))
 	allInCtrlChans := make([]WatchCtrlChan, len(dirs))
@@ -276,6 +279,7 @@ type FxWatcher struct {
 	Mutex sync.Mutex
 }
 
+// NewFxWatcher streams records from fastx files under a directory.
 func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watcherCtrlChanOut WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, minDelta int, dropString string, findOnly bool) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {

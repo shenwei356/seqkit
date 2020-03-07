@@ -303,6 +303,7 @@ type FqLine struct {
 }
 type FqLines []FqLine
 
+// guessFqlState tries to infer the type of a fastq line.
 func guessFqlState(line []byte) FqlState {
 	state := FqlState{}
 	switch line[0] {
@@ -322,6 +323,7 @@ func guessFqlState(line []byte) FqlState {
 	return state
 }
 
+// guessFasState tries to infer the type of a fasta line.
 func guessFasState(line []byte, gaps bool) FqlState {
 	state := FqlState{}
 	switch line[0] {
@@ -341,6 +343,7 @@ func guessFasState(line []byte, gaps bool) FqlState {
 	return state
 }
 
+// FqLinesToSimpleSeq attempts to construct a valid fastq record from a buffer of parsed lines.
 func FqLinesToSimpleSeq(lines FqLines, qBase int, gaps bool) (*simpleSeq, error) {
 	if len(lines) != 4 {
 		return nil, errors.New("Line buffer must have 4 lines!")
@@ -359,6 +362,7 @@ func FqLinesToSimpleSeq(lines FqLines, qBase int, gaps bool) (*simpleSeq, error)
 	return nil, nil
 }
 
+// FasLinesToSimpleSeq attempts to construct a valid sequence record from a buffer of parsed lines.
 func FasLinesToSimpleSeq(lines FqLines) (*simpleSeq, error) {
 	if len(lines) < 2 {
 		return nil, errors.New("Line buffer must have at least 2 lines!")
@@ -376,6 +380,7 @@ func FasLinesToSimpleSeq(lines FqLines) (*simpleSeq, error) {
 	return s, nil
 }
 
+// streamFastq reads records from a potentially incomplete fastq file.
 func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSeq, ctrlChanIn, ctrlChanOut chan SeqStreamCtrl, lineCounter *int, qBase int, gaps bool, final bool) (FqLines, error) {
 	var line []byte
 	var spaceShift int
@@ -476,6 +481,7 @@ func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 	return sbuff[:0], nil
 }
 
+// streamFastq reads records from a potentially incomplete fasta file.
 func streamFasta(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSeq, ctrlChanIn, ctrlChanOut chan SeqStreamCtrl, lineCounter *int, gaps bool, final bool) (FqLines, error) {
 	var line []byte
 	var spaceShift int
