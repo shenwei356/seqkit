@@ -489,7 +489,7 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 					log.Fatalf("fsnotify error:", err)
 				}
 			default:
-				time.Sleep(time.Microsecond)
+				time.Sleep(time.Nanosecond)
 			}
 		}
 	}()
