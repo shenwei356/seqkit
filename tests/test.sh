@@ -590,8 +590,9 @@ fun(){
 	sync
 	kill -s INT $SCAT_PID
 	wait $SCAT_PID
+	seqkit scat -f -j 4 -i fasta $BASE | seqkit sort -n -j 4 - > tests/sorted_scat_find.fas
 	sync; sleep 0.5
-	seqkit sana -j 4 -I fasta -O fasta tests/scat_test_all.fas | seqkit sort -n -j 4 - > tests/sorted_scat_test_all.fas
+	seqkit sana -j 4 -i fasta tests/scat_test_all.fas | seqkit sort -n -j 4 - > tests/sorted_scat_test_all.fas
 	seqkit sort -n -j 4 tests/scat_output.fas > tests/sorted_scat_output.fas
 	rm -fr $BASE
 	rm -f tests/scat_test_all.fas tests/scat_output.fas
@@ -600,7 +601,9 @@ fun(){
 run scat_fasta fun
 cmp tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas
 assert_equal $? 0
-rm -f tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas
+cmp tests/sorted_scat_output.fas tests/sorted_scat_find.fas
+assert_equal $? 0
+rm -f tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas tests/sorted_scat_find.fas
 
 # Regression test for scat/fastq
 fun(){
@@ -633,10 +636,10 @@ fun(){
 	kill -s INT $SCAT_PID
 	wait $SCAT_PID
 	sync
-	seqkit sana -j 4 -I fastq -O fastq tests/scat_test_all.fq > tests/scat_test_all_sana.fq
+	seqkit sana -j 4 -i fastq tests/scat_test_all.fq > tests/scat_test_all_sana.fq
 	seqkit sort -n -j 4 tests/scat_test_all_sana.fq > tests/sorted_scat_test_all.fq
 	seqkit sort -n -j 4 tests/scat_output.fq > tests/sorted_scat_output.fq
-	rm -fr $BASE
+	#rm -fr $BASE
 	rm -f tests/scat_test_all.fq tests/scat_output.fq
 }
 

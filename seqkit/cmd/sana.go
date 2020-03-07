@@ -112,10 +112,10 @@ var sanaCmd = &cobra.Command{
 					outfh.WriteString(rawSeq.Format(outFmt) + "\n")
 				default:
 					fail++
-					os.Stderr.WriteString("File: " + rawSeq.File + "\t" + rawSeq.String() + "\n")
+					log.Info("File: " + rawSeq.File + "\t" + rawSeq.String() + "\n")
 				}
 			}
-			os.Stderr.WriteString(fmt.Sprintf("File: %s\tPass chunks: %d\tFail chunks: %d\n", file, pass, fail))
+			log.Info(fmt.Sprintf("File: %s\tPass records: %d\tDiscarded lines: %d\n", file, pass, fail))
 		}
 
 	},
@@ -274,8 +274,8 @@ func NewRawSeqStreamFromFile(inFastq string, seqChan chan *simpleSeq, qBase int,
 	checkError(err)
 	buffSize := 128 * 1024
 	bio := bufio.NewReaderSize(rio, buffSize)
-	ctrlChanIn := make(chan SeqStreamCtrl, 1000)
-	ctrlChanOut := make(chan SeqStreamCtrl, 1000)
+	ctrlChanIn := make(chan SeqStreamCtrl, 0)
+	ctrlChanOut := make(chan SeqStreamCtrl, 0)
 
 	switch format {
 	case "fastq":
@@ -526,6 +526,7 @@ func streamFasta(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 			if len(line) == 0 && !final {
 				spaceShift++
 			}
+
 			if len(line) > 0 {
 				state := guessFasState(line, gaps)
 				if !final {
@@ -533,27 +534,28 @@ func streamFasta(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 				}
 				sbuff = append(sbuff, FqLine{string(line), state})
 			}
+
 			if !final {
 				ctrlChanOut <- StreamEOF
 				return sbuff, nil
-			} else {
-				seq, err := FasLinesToSimpleSeq(sbuff[:len(sbuff)])
-				if err == nil {
-					seq.StartLine = spaceShift + *lineCounter - len(sbuff) - 1
-					out <- seq
-					sbuff = sbuff[:0]
-				} else {
-					for j := 0; j < len(sbuff)-1; j++ {
-						ems := fmt.Sprintf("Discarded line: %s", err)
-						serr := &simpleSeq{StartLine: spaceShift + *lineCounter - len(sbuff) - 1 + j, Err: errors.New(ems), Seq: sbuff[j].Line, File: name}
-						out <- serr
-					}
-				}
-				sbuff = sbuff[:0]
 			}
+
+			seq, err := FasLinesToSimpleSeq(sbuff[:len(sbuff)])
+			if err == nil {
+				seq.StartLine = spaceShift + *lineCounter - len(sbuff) - 1
+				out <- seq
+				sbuff = sbuff[:0]
+			} else {
+				for j := 0; j < len(sbuff)-1; j++ {
+					ems := fmt.Sprintf("Discarded line: %s", err)
+					serr := &simpleSeq{StartLine: spaceShift + *lineCounter - len(sbuff) - 1 + j, Err: errors.New(ems), Seq: sbuff[j].Line, File: name}
+					out <- serr
+				}
+			}
+			sbuff = sbuff[:0]
 			return sbuff, nil
 		default:
-			panic(err)
+			return sbuff, err
 		}
 
 	}
@@ -565,9 +567,8 @@ func NewRawFastqStream(name string, inReader *bufio.Reader, seqChan chan *simple
 	lineCounter := 0
 
 	go func() {
-		sbuff := make(FqLines, 0, 500)
+		sbuff := make(FqLines, 0, 1000)
 		var err error
-		_ = err
 
 		for {
 			select {
@@ -579,7 +580,6 @@ func NewRawFastqStream(name string, inReader *bufio.Reader, seqChan chan *simple
 					}
 
 				} else if cmd == StreamQuit {
-					//close(ctrlChanIn)
 					sbuff, err = streamFastq(name, inReader, sbuff, seqChan, ctrlChanIn, ctrlChanOut, &lineCounter, qBase, gaps, true)
 					for _, l := range sbuff {
 						ems := fmt.Sprintf("Discarded line: %s", err)
@@ -587,7 +587,6 @@ func NewRawFastqStream(name string, inReader *bufio.Reader, seqChan chan *simple
 						seqChan <- serr
 					}
 					ctrlChanOut <- StreamExited
-					//close(ctrlChanOut)
 					return
 				} else {
 					log.Fatal("Invalid command:", int(cmd))
@@ -606,7 +605,6 @@ func NewRawFastaStream(name string, inReader *bufio.Reader, seqChan chan *simple
 	go func() {
 		sbuff := make(FqLines, 0, 1000)
 		var err error
-		_ = err
 		lineCounter := new(int)
 
 		for {
@@ -619,7 +617,6 @@ func NewRawFastaStream(name string, inReader *bufio.Reader, seqChan chan *simple
 					}
 
 				} else if cmd == StreamQuit {
-					//close(ctrlChanIn)
 					sbuff, err = streamFasta(name, inReader, sbuff, seqChan, ctrlChanIn, ctrlChanOut, lineCounter, gaps, true)
 					for i, l := range sbuff {
 						ems := fmt.Sprintf("Discarded line: %s", err)
@@ -627,7 +624,6 @@ func NewRawFastaStream(name string, inReader *bufio.Reader, seqChan chan *simple
 						seqChan <- serr
 					}
 					ctrlChanOut <- StreamExited
-					//close(ctrlChanOut)
 					return
 				} else {
 					log.Fatal("Invalid command:", int(cmd))
