@@ -176,23 +176,17 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 
 	activeCount := 0
 
-	QUITING := false
-
 MAIN:
 	for {
 		select {
 		case <-sigChan:
-			if !QUITING {
-				QUITING = true
-				signal.Stop(sigChan)
-				sigChan = nil
-				sendQuitCmds()
-			}
+			signal.Stop(sigChan)
+			sigChan = nil
+			sendQuitCmds()
 			continue MAIN
 		case <-pidTimer.C:
 			killErr := syscall.Kill(waitPid, syscall.Signal(0))
-			if killErr != nil && !QUITING {
-				QUITING = true
+			if killErr != nil {
 				pidTimer.Stop()
 				pidTimer.C = nil
 				log.Info("Watched process with PID", waitPid, "exited.")
@@ -200,13 +194,10 @@ MAIN:
 			}
 			continue MAIN
 		case <-ticker.C:
-			if !QUITING {
-				QUITING = true
-				ticker.Stop()
-				ticker.C = nil
-				log.Info("Inactivity limit of", timeout, "reached!")
-				sendQuitCmds()
-			}
+			ticker.Stop()
+			ticker.C = nil
+			log.Info("Inactivity limit of", timeout, "reached!")
+			sendQuitCmds()
 			continue MAIN
 		default:
 			activeCount = 0
