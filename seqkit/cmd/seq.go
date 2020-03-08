@@ -139,7 +139,7 @@ var seqCmd = &cobra.Command{
 		var seqCol *SeqColorizer
 		if color {
 			switch alphabet {
-			case seq.DNA:
+			case seq.DNA, seq.DNAredundant:
 				seqCol = NewSeqColorizer("nucleic")
 			case seq.Protein:
 				seqCol = NewSeqColorizer("amino")

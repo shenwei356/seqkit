@@ -113,6 +113,7 @@ func (p *ColorCycler) WrapWriter(fh *os.File) io.Writer {
 	return colorable.NewColorable(fh)
 }
 
+// SeqColorizer is a sequence colorizer object.
 type SeqColorizer struct {
 	NucPalette  map[byte]au.Color
 	ProtPalette map[byte]au.Color
@@ -120,6 +121,7 @@ type SeqColorizer struct {
 	Alphabet    string
 }
 
+// NewSeqColorizer return a new sequence colorizer object.
 func NewSeqColorizer(alphabet string) *SeqColorizer {
 	res := new(SeqColorizer)
 	res.NucPalette = make(map[byte]au.Color)
@@ -184,6 +186,7 @@ func NewSeqColorizer(alphabet string) *SeqColorizer {
 	return res
 }
 
+// ColorNucleic adds ANSI colors to DNA/RNA sequences.
 func (p *SeqColorizer) ColorNucleic(seq []byte) []byte {
 	res := make([]byte, 0, len(seq)*4)
 	for _, base := range seq {
@@ -196,6 +199,7 @@ func (p *SeqColorizer) ColorNucleic(seq []byte) []byte {
 	return res
 }
 
+// ColorAmino adds ANSI colors to protein sequences.
 func (p *SeqColorizer) ColorAmino(seq []byte) []byte {
 	res := make([]byte, 0, len(seq)*4)
 	for _, base := range seq {
@@ -208,6 +212,7 @@ func (p *SeqColorizer) ColorAmino(seq []byte) []byte {
 	return res
 }
 
+// ColorAmino adds ANSI colors to DNA/RNA or protein sequences.
 func (p *SeqColorizer) Color(seq []byte) []byte {
 	switch p.Alphabet {
 	case "nucleic":
@@ -218,6 +223,7 @@ func (p *SeqColorizer) Color(seq []byte) []byte {
 	return seq
 }
 
+// ColorAmino adds grayscale colors to DNA/RNA or protein sequences.
 func (p *SeqColorizer) ColorQuals(quals []byte) []byte {
 	res := make([]byte, 0, len(quals)*4)
 	for _, base := range quals {
