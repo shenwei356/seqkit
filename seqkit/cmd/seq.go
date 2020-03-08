@@ -359,7 +359,7 @@ func init() {
 	seqCmd.Flags().BoolP("upper-case", "u", false, "print sequences in upper case")
 	seqCmd.Flags().BoolP("dna2rna", "", false, "DNA to RNA")
 	seqCmd.Flags().BoolP("rna2dna", "", false, "RNA to DNA")
-	seqCmd.Flags().BoolP("color", "k", false, "colorize sequences")
+	seqCmd.Flags().BoolP("color", "k", false, "colorize sequences - to be piped into \"less -R\"")
 	seqCmd.Flags().BoolP("validate-seq", "v", false, "validate bases according to the alphabet")
 	seqCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
 	seqCmd.Flags().IntP("min-len", "m", -1, "only print sequences longer than the minimum length (-1 for no limit)")
