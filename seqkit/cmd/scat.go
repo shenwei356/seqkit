@@ -140,12 +140,12 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 	allInCtrlChans := make([]WatchCtrlChan, len(dirs))
 	allOutCtrlChans := make([]WatchCtrlChan, len(dirs))
 	for i, dir := range dirs {
-		allSeqChans[i] = make(chan *simpleSeq, 0)
+		allSeqChans[i] = make(chan *simpleSeq, 10000)
 		allInCtrlChans[i] = make(WatchCtrlChan, 0)
 		allOutCtrlChans[i] = make(WatchCtrlChan, 0)
 		go NewFxWatcher(dir, allSeqChans[i], allInCtrlChans[i], allOutCtrlChans[i], re, inFmt, outFmt, qBase, allowGaps, delta, dropString, findOnly)
 	}
-	sigChan := make(chan os.Signal, 5)
+	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt)
 	defer outw.Flush()
 
@@ -178,14 +178,23 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 	}
 
 	activeCount := 0
+	QUITTING := false
 
 MAIN:
 	for {
 		select {
 		case <-sigChan:
 			signal.Stop(sigChan)
-			sigChan = nil
-			sendQuitCmds()
+			if !QUITTING {
+				QUITTING = true
+				sendQuitCmds()
+				close(sigChan)
+				for _ = range sigChan {
+				}
+			} else {
+				signal.Reset(os.Interrupt)
+				sigChan = nil
+			}
 			continue MAIN
 		case <-pidTimer.C:
 			killErr := syscall.Kill(waitPid, syscall.Signal(0))
