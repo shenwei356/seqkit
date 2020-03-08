@@ -230,6 +230,14 @@ func (p *SeqColorizer) ColorQuals(quals []byte) []byte {
 	return res
 }
 
+// WrapWriter wraps a file into am go-colorable object if necessary.
+func (p *SeqColorizer) WrapWriter(fh *os.File) io.Writer {
+	if !isatty.IsTerminal(fh.Fd()) {
+		return fh
+	}
+	return colorable.NewColorable(fh)
+}
+
 // BashExec executes a command via bash.
 func BashExec(command string) {
 	cmd := exec.Command("bash", "-c", command)
