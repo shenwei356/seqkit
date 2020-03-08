@@ -533,6 +533,125 @@ assert_exit_code 0
 rm seqkit_fish.tsv
 
 # ------------------------------------------------------------
+#                       sana
+# ------------------------------------------------------------
+
+# Regression test for sana/fasta
+fun(){
+	awk '{print ">" $1 "\n" $2}' tests/scat_test.tsv > tests/sana_test_input.fas
+	seqkit sana -i fasta tests/sana_test_input.fas > tests/sana_output.fas
+}
+run sana_fasta_regression fun
+cmp tests/sana_output.fas tests/sana_ground.fas
+assert_equal $? 0
+rm -f tests/sana_output.fas tests/sana_test_input.fas
+
+# Regression test for sana/fastq
+fun(){
+	awk '{print "@" $1 "\n" $2 "\n+\n" $3}' tests/scat_test.tsv > tests/sana_test_input.fq
+	seqkit sana -i fastq tests/sana_test_input.fq > tests/sana_output.fq
+}
+run sana_fastq_regression fun
+cmp tests/sana_output.fq tests/sana_ground.fq
+assert_equal $? 0
+rm -f tests/sana_output.fq tests/sana_test_input.fq
+
+# ------------------------------------------------------------
+#                       scat
+# ------------------------------------------------------------
+
+# Regression test for scat/fasta
+fun(){
+	BASE=tests/scat_test_fasta
+	rm -fr $BASE 
+	rm -f tests/scat_test_all.fas tests/scat_output.fas
+        mkdir -p $BASE
+	(seqkit scat -j 4 -i fasta $BASE > tests/scat_output.fas)&
+	SCAT_PID=$!
+        BAK=$IFS
+        IFS=$'\n'
+	SIZE=5
+        for i in `seq 0 $SIZE`;
+        do
+                for j in `seq 0 $SIZE`;
+                do
+			D=$BASE/$RANDOM/$RANDOM
+			mkdir -p $D
+                        F=$D/${RANDOM}.fas
+                        for l in `cat tests/scat_test.tsv`;
+                        do
+                                PRE=".${RANDOM}.${i}.${j}"
+                                echo -n $l | awk -v pre="$PRE" '{print ">" $1 pre  "\n" $2}' - >> $F
+                                echo -n $l | awk -v pre="$PRE" '{print ">" $1 pre  "\n" $2}' - >> tests/scat_test_all.fas
+                        done;
+		done;
+        done;
+        IFS=$BAK
+	sync
+	kill -s INT $SCAT_PID
+	wait $SCAT_PID
+	seqkit scat -f -j 4 -i fasta $BASE | seqkit sort -n -j 4 - > tests/sorted_scat_find.fas
+	sync
+	seqkit sana -j 4 -i fasta tests/scat_test_all.fas | seqkit sort -n -j 4 - > tests/sorted_scat_test_all.fas
+	seqkit sort -n -j 4 tests/scat_output.fas > tests/sorted_scat_output.fas
+	rm -fr $BASE
+	rm -f tests/scat_test_all.fas tests/scat_output.fas
+}
+
+run scat_fasta fun
+cmp tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas
+assert_equal $? 0
+cmp tests/sorted_scat_find.fas tests/sorted_scat_test_all.fas
+assert_equal $? 0
+rm -f tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas tests/sorted_scat_find.fas
+
+# Regression test for scat/fastq
+fun(){
+	BASE=tests/scat_test_fastq
+	rm -fr $BASE 
+	rm -f tests/scat_test_all.fq tests/scat_output.fq
+        mkdir -p $BASE
+	(seqkit scat -j 4 -i fastq $BASE > tests/scat_output.fq)&
+	SCAT_PID=$!
+        BAK=$IFS
+        IFS=$'\n'
+	SIZE=5
+        for i in `seq 0 $SIZE`;
+        do
+                for j in `seq 0 $SIZE`;
+                do
+                        D=$BASE/$RANDOM/$RANDOM
+                        mkdir -p $D
+                        F=$D/${RANDOM}.fq
+                        for l in `cat tests/scat_test.tsv`;
+                        do
+                                PRE=".${RANDOM}.${i}.${j}"
+                                echo -n $l | awk -v pre="$PRE" '{print "@" $1 pre  "\n" $2 "\n+\n" $3}' - >> $F
+                                echo -n $l | awk -v pre="$PRE" '{print "@" $1 pre  "\n" $2 "\n+\n" $3}' - >> tests/scat_test_all.fq
+                        done;
+		done;
+        done;
+        IFS=$BAK
+	sync; sleep 0.5
+	kill -s INT $SCAT_PID
+	wait $SCAT_PID
+	seqkit scat -f -j 4 -i fastq $BASE | seqkit sort -n -j 4 - > tests/sorted_scat_find.fq
+	sync
+	seqkit sana -j 4 -i fastq tests/scat_test_all.fq > tests/scat_test_all_sana.fq
+	seqkit sort -n -j 4 tests/scat_test_all_sana.fq > tests/sorted_scat_test_all.fq
+	seqkit sort -n -j 4 tests/scat_output.fq > tests/sorted_scat_output.fq
+	rm -fr $BASE
+	rm -f tests/scat_test_all.fq tests/scat_output.fq
+}
+
+run scat_fastq fun
+cmp tests/sorted_scat_output.fq tests/sorted_scat_test_all.fq
+assert_equal $? 0
+cmp tests/sorted_scat_find.fq tests/sorted_scat_test_all.fq
+assert_equal $? 0
+rm -f tests/sorted_scat_output.fq tests/sorted_scat_test_all.fq tests/sorted_scat_find.fq
+
+# ------------------------------------------------------------
 #                       faidx
 # ------------------------------------------------------------
 
