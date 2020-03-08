@@ -65,6 +65,7 @@ var seqCmd = &cobra.Command{
 		upperCase := getFlagBool(cmd, "upper-case")
 		dna2rna := getFlagBool(cmd, "dna2rna")
 		rna2dna := getFlagBool(cmd, "rna2dna")
+		color := getFlagBool(cmd, "color")
 		validateSeq := getFlagBool(cmd, "validate-seq")
 		validateSeqLength := getFlagValidateSeqLength(cmd, "validate-seq-length")
 		minLen := getFlagInt(cmd, "min-len")
@@ -135,6 +136,17 @@ var seqCmd = &cobra.Command{
 		var b *bytes.Buffer
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
+		var seqCol *SeqColorizer
+		if color {
+			switch alphabet {
+			case seq.DNA:
+				seqCol = NewSeqColorizer("nucleic")
+			case seq.Protein:
+				seqCol = NewSeqColorizer("amino")
+			default:
+				seqCol = NewSeqColorizer("nucleic")
+			}
+		}
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -274,12 +286,19 @@ var seqCmd = &cobra.Command{
 					}
 
 					if len(sequence.Seq) <= pageSize {
-						outfh.Write(byteutil.WrapByteSlice(sequence.Seq, config.LineWidth))
+						text := byteutil.WrapByteSlice(sequence.Seq, config.LineWidth)
+						if color {
+							text = seqCol.Color(text)
+						}
+						outfh.Write(text)
 					} else {
 						if bufferedByteSliceWrapper == nil {
 							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Seq), config.LineWidth)
 						}
 						text, b = bufferedByteSliceWrapper.Wrap(sequence.Seq, config.LineWidth)
+						if color {
+							text = seqCol.Color(text)
+						}
 						outfh.Write(text)
 						outfh.Flush()
 						bufferedByteSliceWrapper.Recycle(b)
@@ -294,12 +313,19 @@ var seqCmd = &cobra.Command{
 					}
 
 					if len(sequence.Qual) <= pageSize {
-						outfh.Write(byteutil.WrapByteSlice(sequence.Qual, config.LineWidth))
+						if color {
+							outfh.Write(byteutil.WrapByteSlice(seqCol.ColorQuals(sequence.Qual), config.LineWidth))
+						} else {
+							outfh.Write(byteutil.WrapByteSlice(sequence.Qual, config.LineWidth))
+						}
 					} else {
 						if bufferedByteSliceWrapper == nil {
 							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Qual), config.LineWidth)
 						}
 						text, b = bufferedByteSliceWrapper.Wrap(sequence.Qual, config.LineWidth)
+						if color {
+							text = seqCol.ColorQuals(text)
+						}
 						outfh.Write(text)
 						outfh.Flush()
 						bufferedByteSliceWrapper.Recycle(b)
@@ -333,6 +359,7 @@ func init() {
 	seqCmd.Flags().BoolP("upper-case", "u", false, "print sequences in upper case")
 	seqCmd.Flags().BoolP("dna2rna", "", false, "DNA to RNA")
 	seqCmd.Flags().BoolP("rna2dna", "", false, "RNA to DNA")
+	seqCmd.Flags().BoolP("color", "k", false, "colorize sequences")
 	seqCmd.Flags().BoolP("validate-seq", "v", false, "validate bases according to the alphabet")
 	seqCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
 	seqCmd.Flags().IntP("min-len", "m", -1, "only print sequences longer than the minimum length (-1 for no limit)")

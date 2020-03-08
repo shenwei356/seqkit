@@ -116,12 +116,22 @@ func (p *ColorCycler) WrapWriter(fh *os.File) io.Writer {
 type SeqColorizer struct {
 	NucPalette  map[byte]au.Color
 	ProtPalette map[byte]au.Color
+	QualPalette map[byte]au.Color
+	Alphabet    string
 }
 
-func NewSeqColorizer() *SeqColorizer {
+func NewSeqColorizer(alphabet string) *SeqColorizer {
 	res := new(SeqColorizer)
 	res.NucPalette = make(map[byte]au.Color)
 	res.ProtPalette = make(map[byte]au.Color)
+	res.QualPalette = make(map[byte]au.Color)
+	switch alphabet {
+	case "nucleic":
+	case "amino":
+	default:
+		panic("Invalid alphabet: " + alphabet)
+	}
+	res.Alphabet = alphabet
 	i := auStart
 	for base, _ := range IUPACBases {
 		switch base {
@@ -161,15 +171,24 @@ func NewSeqColorizer() *SeqColorizer {
 		case '-', '*': // Gap
 			res.ProtPalette[aa] = au.WhiteFg
 		}
+
+	}
+
+	gb := uint8(232)
+	for i := 33; i < 90; i++ {
+		res.QualPalette[byte(i)] = ((au.Color(gb) << auShiftFg) | auFlagFg)
+		if gb < 254 {
+			gb++
+		}
 	}
 	return res
 }
 
-func (p *SeqColorizer) ColorizeNucleic(seq []byte) []byte {
+func (p *SeqColorizer) ColorNucleic(seq []byte) []byte {
 	res := make([]byte, 0, len(seq)*4)
 	for _, base := range seq {
-		if _, ok := p.NucPalette[base]; ok {
-			res = append(res, []byte(au.Sprintf(au.Colorize(base, p.NucPalette[base])))...)
+		if color, ok := p.NucPalette[base]; ok {
+			res = append(res, []byte(au.Sprintf("%s", au.Colorize(string(base), color)))...)
 		} else {
 			res = append(res, base)
 		}
@@ -177,11 +196,33 @@ func (p *SeqColorizer) ColorizeNucleic(seq []byte) []byte {
 	return res
 }
 
-func (p *SeqColorizer) ColorizeAmino(seq []byte) []byte {
+func (p *SeqColorizer) ColorAmino(seq []byte) []byte {
 	res := make([]byte, 0, len(seq)*4)
 	for _, base := range seq {
-		if _, ok := p.ProtPalette[base]; ok {
-			res = append(res, []byte(au.Sprintf(au.Colorize(base, p.ProtPalette[base])))...)
+		if color, ok := p.ProtPalette[base]; ok {
+			res = append(res, []byte(au.Sprintf("%s", au.Colorize(string(base), color)))...)
+		} else {
+			res = append(res, base)
+		}
+	}
+	return res
+}
+
+func (p *SeqColorizer) Color(seq []byte) []byte {
+	switch p.Alphabet {
+	case "nucleic":
+		return p.ColorNucleic(seq)
+	case "amino":
+		return p.ColorAmino(seq)
+	}
+	return seq
+}
+
+func (p *SeqColorizer) ColorQuals(quals []byte) []byte {
+	res := make([]byte, 0, len(quals)*4)
+	for _, base := range quals {
+		if color, ok := p.QualPalette[base]; ok {
+			res = append(res, []byte(au.Sprintf("%s", au.Colorize(string(base), color)))...)
 		} else {
 			res = append(res, base)
 		}
