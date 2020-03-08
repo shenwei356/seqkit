@@ -40,6 +40,12 @@ type ColorCycler struct {
 	Palette []au.Color
 }
 
+const auFlagFg au.Color = 1 << 14 // presence flag (14th bit)
+const auShiftFg au.Color = 16     // shift for foreground (starting from 16th bit)
+const auStart au.Color = 19
+const auEnd au.Color = 216
+const auSkip au.Color = 5
+
 // NewColorCycler return a new color cycler object.
 func NewColorCycler(dummy bool) *ColorCycler {
 	self := new(ColorCycler)
@@ -55,7 +61,7 @@ func NewColorCycler(dummy bool) *ColorCycler {
 	}
 	const flagFg au.Color = 1 << 14 // presence flag (14th bit)
 	const shiftFg = 16              // shift for foreground (starting from 16th bit)
-	for i := uint8(19); i <= 216; i += 5 {
+	for i := auStart; i <= auEnd; i += auSkip {
 		self.Palette = append(self.Palette, au.Color(i)<<shiftFg|flagFg)
 	}
 	return self
@@ -105,6 +111,82 @@ func (p *ColorCycler) WrapWriter(fh *os.File) io.Writer {
 		return fh
 	}
 	return colorable.NewColorable(fh)
+}
+
+type SeqColorizer struct {
+	NucPalette  map[byte]au.Color
+	ProtPalette map[byte]au.Color
+}
+
+func NewSeqColorizer() *SeqColorizer {
+	res := new(SeqColorizer)
+	res.NucPalette = make(map[byte]au.Color)
+	res.ProtPalette = make(map[byte]au.Color)
+	i := auStart
+	for base, _ := range IUPACBases {
+		switch base {
+		case 'A', 'a':
+			res.NucPalette[base] = au.GreenFg
+		case 'C', 'c':
+			res.NucPalette[base] = au.BlueFg
+		case 'G', 'g':
+			res.NucPalette[base] = au.YellowFg
+		case 'T', 't':
+			res.NucPalette[base] = au.RedFg
+		case 'U', 'u':
+			res.NucPalette[base] = au.RedFg
+		case '-', '*':
+			res.NucPalette[base] = au.WhiteFg
+		default:
+			res.NucPalette[base] = i<<auShiftFg | auFlagFg
+			i += auSkip
+		}
+	}
+
+	// The Lesk color scheme from http://www.bioinformatics.nl/~berndb/aacolour.html
+	for aa, _ := range IUPACAminoAcids {
+		switch aa {
+		case 'G', 'A', 'S', 'T': // Small nonpolar
+			res.ProtPalette[aa] = au.YellowFg
+		case 'C', 'V', 'I', 'L', 'P', 'F', 'Y', 'M', 'W': //  Hydrophobic
+			res.ProtPalette[aa] = au.GreenFg
+		case 'N', 'Q', 'H': //  Polar
+			res.ProtPalette[aa] = au.MagentaFg
+		case 'D', 'E': //  Negatively charged
+			res.ProtPalette[aa] = au.RedFg
+		case 'K', 'R': //  Positively charged
+			res.ProtPalette[aa] = au.BlueFg
+		case 'X', 'B', 'Z': // Special
+			res.ProtPalette[aa] = au.WhiteFg
+		case '-', '*': // Gap
+			res.ProtPalette[aa] = au.WhiteFg
+		}
+	}
+	return res
+}
+
+func (p *SeqColorizer) ColorizeNucleic(seq []byte) []byte {
+	res := make([]byte, 0, len(seq)*4)
+	for _, base := range seq {
+		if _, ok := p.NucPalette[base]; ok {
+			res = append(res, []byte(au.Sprintf(au.Colorize(base, p.NucPalette[base])))...)
+		} else {
+			res = append(res, base)
+		}
+	}
+	return res
+}
+
+func (p *SeqColorizer) ColorizeAmino(seq []byte) []byte {
+	res := make([]byte, 0, len(seq)*4)
+	for _, base := range seq {
+		if _, ok := p.ProtPalette[base]; ok {
+			res = append(res, []byte(au.Sprintf(au.Colorize(base, p.ProtPalette[base])))...)
+		} else {
+			res = append(res, base)
+		}
+	}
+	return res
 }
 
 // BashExec executes a command via bash.
