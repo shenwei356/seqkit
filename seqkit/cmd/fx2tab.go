@@ -41,6 +41,10 @@ var fx2tabCmd = &cobra.Command{
 	Long: `convert FASTA/Q to tabular format, and provide various information,
 like sequence length, GC content/GC skew.
 
+Attention:
+  1. Fixed three columns (ID, sequence, quality) are outputted for either FASTA
+     or FASTQ, even when flag -n/--name is on. This is for format compatibility.
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -89,6 +93,9 @@ like sequence length, GC content/GC skew.
 				outfh.WriteString("\talphabet")
 			}
 
+			if printAvgQual {
+				outfh.WriteString("\tavg.qual")
+			}
 			outfh.WriteString("\n")
 		}
 
