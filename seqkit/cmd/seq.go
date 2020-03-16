@@ -288,7 +288,11 @@ var seqCmd = &cobra.Command{
 					if len(sequence.Seq) <= pageSize {
 						text := byteutil.WrapByteSlice(sequence.Seq, config.LineWidth)
 						if color {
-							text = seqCol.Color(text)
+							if sequence.Qual != nil {
+								text = seqCol.ColorWithQuals(text, sequence.Qual)
+							} else {
+								text = seqCol.Color(text)
+							}
 						}
 						outfh.Write(text)
 					} else {

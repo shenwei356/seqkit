@@ -41,7 +41,9 @@ type ColorCycler struct {
 }
 
 const auFlagFg au.Color = 1 << 14 // presence flag (14th bit)
-const auShiftFg au.Color = 16     // shift for foreground (starting from 16th bit)
+const auFlagBg au.Color = 1 << 15 // presence flag (15th bit)
+const auShiftFg au.Color = 16
+const auShiftBg au.Color = 24
 const auStart au.Color = 19
 const auEnd au.Color = 216
 const auSkip au.Color = 5
@@ -115,10 +117,11 @@ func (p *ColorCycler) WrapWriter(fh *os.File) io.Writer {
 
 // SeqColorizer is a sequence colorizer object.
 type SeqColorizer struct {
-	NucPalette  map[byte]au.Color
-	ProtPalette map[byte]au.Color
-	QualPalette map[byte]au.Color
-	Alphabet    string
+	NucPalette    map[byte]au.Color
+	ProtPalette   map[byte]au.Color
+	QualPalette   map[byte]au.Color
+	QualBgPalette map[byte]au.Color
+	Alphabet      string
 }
 
 // NewSeqColorizer return a new sequence colorizer object.
@@ -127,6 +130,7 @@ func NewSeqColorizer(alphabet string) *SeqColorizer {
 	res.NucPalette = make(map[byte]au.Color)
 	res.ProtPalette = make(map[byte]au.Color)
 	res.QualPalette = make(map[byte]au.Color)
+	res.QualBgPalette = make(map[byte]au.Color)
 	switch alphabet {
 	case "nucleic":
 	case "amino":
@@ -176,11 +180,21 @@ func NewSeqColorizer(alphabet string) *SeqColorizer {
 
 	}
 
-	gb := uint8(232)
+	gb := uint8(239)
 	for i := 33; i < 90; i++ {
 		res.QualPalette[byte(i)] = ((au.Color(gb) << auShiftFg) | auFlagFg)
 		if gb < 254 {
 			gb++
+		}
+	}
+
+	gb = uint8(232)
+	for i := 90; i >= 33; i-- {
+		res.QualBgPalette[byte(i)] = ((au.Color(gb) << auShiftBg) | auFlagBg)
+		if i <= 53 && gb < 254 {
+			if i%3 == 0 {
+				gb++
+			}
 		}
 	}
 	return res
@@ -192,6 +206,21 @@ func (p *SeqColorizer) ColorNucleic(seq []byte) []byte {
 	for _, base := range seq {
 		if color, ok := p.NucPalette[base]; ok {
 			res = append(res, []byte(au.Sprintf("%s", au.Colorize(string(base), color)))...)
+		} else {
+			res = append(res, base)
+		}
+	}
+	return res
+}
+
+// ColorNucleic adds ANSI colors to DNA/RNA, use quality palette as background.
+func (p *SeqColorizer) ColorNucleicWithQuals(seq []byte, quals []byte) []byte {
+	res := make([]byte, 0, len(seq)*4)
+	qIdx := 0
+	for _, base := range seq {
+		if color, ok := p.NucPalette[base]; ok {
+			res = append(res, []byte(au.Sprintf("%s", au.Colorize(string(base), color|p.QualBgPalette[quals[qIdx]])))...)
+			qIdx++
 		} else {
 			res = append(res, base)
 		}
@@ -219,6 +248,19 @@ func (p *SeqColorizer) Color(seq []byte) []byte {
 		return p.ColorNucleic(seq)
 	case "amino":
 		return p.ColorAmino(seq)
+	default:
+		return seq
+	}
+	return seq
+}
+
+// ColorAmino adds ANSI colors to DNA/RNA or protein sequences, use quality palette as background.
+func (p *SeqColorizer) ColorWithQuals(seq []byte, quals []byte) []byte {
+	switch p.Alphabet {
+	case "nucleic":
+		return p.ColorNucleicWithQuals(seq, quals)
+	default:
+		return seq
 	}
 	return seq
 }
