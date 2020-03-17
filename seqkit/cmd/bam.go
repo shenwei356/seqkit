@@ -1198,7 +1198,7 @@ func Bam2Bundles(inBam string, outDir string, minBundle int, nrProcBam int, quie
 		log.Info("Output directory:", outDir)
 	}
 	var recCount, bundleCount int
-	locusCount, bundleLoci := 1, 1
+	locusCount, bundleLoci := 0, 0
 	if !quiet && !silent {
 		os.Stderr.WriteString("Bundle\tChrom\tStart\tEnd\tNrRecs\tNrLoci\n")
 	}
@@ -1244,7 +1244,11 @@ func Bam2Bundles(inBam string, outDir string, minBundle int, nrProcBam int, quie
 				bundleLoci = 0
 				bundleCount++
 			} else {
-				chrom = rec.Ref.Name()
+				if rec.Ref.Name() != chrom {
+					chrom = rec.Ref.Name()
+					bStart = rec.Start()
+					bEnd = rec.End()
+				}
 			}
 		} else {
 			if len(recCache) > 0 && rec.Start() < recCache[len(recCache)-1].Start() {
@@ -1259,6 +1263,8 @@ func Bam2Bundles(inBam string, outDir string, minBundle int, nrProcBam int, quie
 
 	//Write out final batch:
 	if len(recCache) > 0 {
+		bundleLoci++
+		locusCount++
 		bundleName := fmt.Sprintf("%09d_%s:%d:%d_bundle.bam", bundleCount, chrom, bStart, bEnd)
 		outName := path.Join(outDir, bundleName)
 		outFh, err := os.Create(outName)
