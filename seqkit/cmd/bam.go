@@ -26,6 +26,7 @@ import (
 	"io"
 	"math"
 	"os"
+	"path"
 	"runtime"
 	"sort"
 	"strconv"
@@ -506,6 +507,7 @@ var bamCmd = &cobra.Command{
 		rangeMin := getFlagFloat64(cmd, "range-min")
 		rangeMax := getFlagFloat64(cmd, "range-max")
 		printCount := getFlagString(cmd, "count")
+		printBundle := getFlagInt(cmd, "bundle")
 		printPdf := getFlagString(cmd, "img")
 		//printScatter := getFlagString(cmd, "scatter")
 		//_ = printScatter
@@ -556,6 +558,17 @@ var bamCmd = &cobra.Command{
 
 		if printIdxCount {
 			bamIdxCount(files[0])
+			os.Exit(0)
+		}
+
+		if printBundle != 0 {
+			if len(files) != 1 {
+				log.Fatal("The BAM bundler takes exactly one input file!")
+			}
+			if outFile == "-" {
+				outFile = path.Base(files[0]) + "_bundles"
+			}
+			Bam2Bundles(files[0], outFile, printBundle, config.Threads, printQuiet, silentMode)
 			os.Exit(0)
 		}
 
@@ -870,7 +883,7 @@ var bamCmd = &cobra.Command{
 		}
 
 		if printPass {
-			bw, err := bam.NewWriter(outfh, bamHeader, 1)
+			bw, err := bam.NewWriter(outfh, bamHeader, config.Threads)
 			checkError(err)
 			bamWriter = bw
 			outfh.Flush()
@@ -1156,6 +1169,120 @@ func updateTop(record *sam.Record, value float64, topBuffer TopBuffer, printTop 
 
 }
 
+type Locus struct {
+	Chrom     string
+	Start     int
+	End       int
+	Order     int
+	NrRecords int
+	Size      int
+}
+
+func Bam2Bundles(inBam string, outDir string, minBundle int, nrProcBam int, quiet, silent bool) {
+	bamReader := NewBamReader(inBam, nrProcBam)
+	if _, err := os.Stat(outDir); err == nil {
+		log.Fatal("Cannot create output directory as it already exists:", outDir)
+	}
+	err := os.MkdirAll(outDir, 0750)
+	if err != nil {
+		log.Fatal("Could not create output directory for BAM bundles:", err)
+	}
+	bamHeader := bamReader.Header()
+	var chrom string
+	bStart := -1
+	bEnd := -1
+	recCache := make([]*sam.Record, 0, 20000)
+	if !silent {
+		log.Info("Creating BAM bundles from file:", inBam)
+		log.Info("Minimum reads per bundle:", minBundle)
+		log.Info("Output directory:", outDir)
+	}
+	var recCount, bundleCount int
+	locusCount, bundleLoci := 1, 1
+	if !quiet && !silent {
+		os.Stderr.WriteString("Bundle\tChrom\tStart\tEnd\tNrRecs\tNrLoci\n")
+	}
+	for {
+		rec, err := bamReader.Read()
+		if err == io.EOF {
+			break
+		}
+		checkError(err)
+		if rec.Flags&sam.Unmapped != 0 {
+			continue
+		}
+		recCount += 1
+		if bStart == -1 || bEnd == -1 {
+			bStart = rec.Start()
+			bEnd = rec.End()
+			chrom = rec.Ref.Name()
+		}
+		if (rec.Start() > bEnd) || (rec.Ref.Name() != chrom) {
+			locusCount++
+			bundleLoci++
+			if minBundle == -1 || len(recCache) >= minBundle {
+				bundleName := fmt.Sprintf("%09d_%s:%d:%d_bundle.bam", bundleCount, chrom, bStart, bEnd)
+				outName := path.Join(outDir, bundleName)
+				outFh, err := os.Create(outName)
+				checkError(err)
+				bamWriter, err := bam.NewWriter(outFh, bamHeader, nrProcBam)
+				checkError(err)
+
+				for _, r := range recCache {
+					bamWriter.Write(r)
+				}
+
+				bamWriter.Close()
+				outFh.Close()
+				if !quiet && !silent {
+					os.Stderr.WriteString(fmt.Sprintf("%d\t%s\t%d\t%d\t%d\t%d\n", bundleCount, chrom, bStart, bEnd, len(recCache), bundleLoci))
+				}
+				recCache = recCache[:0]
+				bStart = rec.Start()
+				bEnd = rec.End()
+				chrom = rec.Ref.Name()
+				bundleLoci = 0
+				bundleCount++
+			} else {
+				chrom = rec.Ref.Name()
+			}
+		} else {
+			if len(recCache) > 0 && rec.Start() < recCache[len(recCache)-1].Start() {
+				log.Fatal("BAM file is not sorted! Offending records:", recCache[len(recCache)-1].Ref.Name(), rec.Ref.Name())
+			}
+		}
+		if rec.End() > bEnd {
+			bEnd = rec.End()
+		}
+		recCache = append(recCache, rec)
+	}
+
+	//Write out final batch:
+	if len(recCache) > 0 {
+		bundleName := fmt.Sprintf("%09d_%s:%d:%d_bundle.bam", bundleCount, chrom, bStart, bEnd)
+		outName := path.Join(outDir, bundleName)
+		outFh, err := os.Create(outName)
+		checkError(err)
+		bamWriter, err := bam.NewWriter(outFh, bamHeader, nrProcBam)
+		checkError(err)
+
+		for _, r := range recCache {
+			bamWriter.Write(r)
+		}
+		if !quiet && !silent {
+			os.Stderr.WriteString(fmt.Sprintf("%d\t%s\t%d\t%d\t%d\t%d\n", bundleCount, chrom, bStart, bEnd, len(recCache), bundleLoci))
+		}
+
+		bamWriter.Close()
+		outFh.Close()
+		recCache = nil
+	}
+
+	if !silent {
+		log.Info(fmt.Sprintf("Written %d BAM records to %d loci and %d bundles.", recCount, locusCount, bundleCount+1))
+	}
+}
+
 func init() {
 	RootCmd.AddCommand(bamCmd)
 
@@ -1166,6 +1293,7 @@ func init() {
 	bamCmd.Flags().IntP("print-freq", "p", -1, "print/report after this many records (-1 for print after EOF)")
 	bamCmd.Flags().IntP("delay", "W", 1, "sleep this many seconds after plotting")
 	bamCmd.Flags().IntP("bins", "B", -1, "number of histogram bins")
+	bamCmd.Flags().IntP("bundle", "N", 0, "partition BAM file into loci (-1) or bundles with this minimum size")
 	bamCmd.Flags().Float64P("range-min", "m", math.NaN(), "discard record with field (-f) value less than this flag")
 	bamCmd.Flags().Float64P("range-max", "M", math.NaN(), "discard record with field (-f) value greater than this flag")
 	bamCmd.Flags().BoolP("dump", "y", false, "print histogram data to stderr instead of plotting")
