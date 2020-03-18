@@ -134,6 +134,7 @@ func NewSeqColorizer(alphabet string) *SeqColorizer {
 	switch alphabet {
 	case "nucleic":
 	case "amino":
+	case "dummy":
 	default:
 		panic("Invalid alphabet: " + alphabet)
 	}
@@ -248,6 +249,8 @@ func (p *SeqColorizer) Color(seq []byte) []byte {
 		return p.ColorNucleic(seq)
 	case "amino":
 		return p.ColorAmino(seq)
+	case "dummy":
+		return seq
 	default:
 		return seq
 	}

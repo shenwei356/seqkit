@@ -131,7 +131,7 @@ var seqCmd = &cobra.Command{
 			case seq.Protein:
 				seqCol = NewSeqColorizer("amino")
 			default:
-				seqCol = NewSeqColorizer("nucleic")
+				seqCol = NewSeqColorizer("dummy")
 			}
 		}
 		var outfh *os.File
