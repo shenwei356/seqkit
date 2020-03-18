@@ -192,7 +192,7 @@ func NewSeqColorizer(alphabet string) *SeqColorizer {
 	for i := 90; i >= 33; i-- {
 		res.QualBgPalette[byte(i)] = ((au.Color(gb) << auShiftBg) | auFlagBg)
 		if i <= 53 && gb < 254 {
-			if i%3 == 0 {
+			if i%2 == 0 {
 				gb++
 			}
 		}

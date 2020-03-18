@@ -24,6 +24,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"os"
 	"runtime"
 	"syscall"
 
@@ -32,7 +33,6 @@ import (
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/util/byteutil"
-	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
 
@@ -123,19 +123,6 @@ var seqCmd = &cobra.Command{
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
-		outfh, err := xopen.Wopen(outFile)
-		checkError(err)
-		defer outfh.Close()
-
-		var checkSeqType bool
-		var isFastq bool
-		var printName, printSeq, printQual bool
-		var head []byte
-		var sequence *seq.Seq
-		var text []byte
-		var b *bytes.Buffer
-		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		var seqCol *SeqColorizer
 		if color {
 			switch alphabet {
@@ -147,6 +134,31 @@ var seqCmd = &cobra.Command{
 				seqCol = NewSeqColorizer("nucleic")
 			}
 		}
+		var outfh *os.File
+		var err error
+		if outFile == "-" {
+			outfh = os.Stdout
+		} else {
+			outfh, err = os.Open(outFile)
+			checkError(err)
+		}
+		defer outfh.Close()
+		var outbw io.Writer
+		outbw = outfh
+		if color {
+			outbw = seqCol.WrapWriter(outfh)
+		}
+
+		var checkSeqType bool
+		var isFastq bool
+		var printName, printSeq, printQual bool
+		var head []byte
+		var sequence *seq.Seq
+		var text []byte
+		var b *bytes.Buffer
+		var record *fastx.Record
+		var fastxReader *fastx.Reader
+
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -217,17 +229,17 @@ var seqCmd = &cobra.Command{
 
 					if printSeq {
 						if isFastq {
-							outfh.WriteString("@")
-							outfh.Write(head)
-							outfh.WriteString("\n")
+							outbw.Write([]byte("@"))
+							outbw.Write(head)
+							outbw.Write([]byte("\n"))
 						} else {
-							outfh.WriteString(">")
-							outfh.Write(head)
-							outfh.WriteString("\n")
+							outbw.Write([]byte(">"))
+							outbw.Write(head)
+							outbw.Write([]byte("\n"))
 						}
 					} else {
-						outfh.Write(head)
-						outfh.WriteString("\n")
+						outbw.Write(head)
+						outbw.Write([]byte("\n"))
 					}
 				}
 
@@ -294,7 +306,7 @@ var seqCmd = &cobra.Command{
 								text = seqCol.Color(text)
 							}
 						}
-						outfh.Write(text)
+						outbw.Write(text)
 					} else {
 						if bufferedByteSliceWrapper == nil {
 							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Seq), config.LineWidth)
@@ -303,24 +315,23 @@ var seqCmd = &cobra.Command{
 						if color {
 							text = seqCol.Color(text)
 						}
-						outfh.Write(text)
-						outfh.Flush()
+						outbw.Write(text)
 						bufferedByteSliceWrapper.Recycle(b)
 					}
 
-					outfh.WriteString("\n")
+					outbw.Write([]byte("\n"))
 				}
 
 				if printQual {
 					if !onlyQual {
-						outfh.WriteString("+\n")
+						outbw.Write([]byte("+\n"))
 					}
 
 					if len(sequence.Qual) <= pageSize {
 						if color {
-							outfh.Write(byteutil.WrapByteSlice(seqCol.ColorQuals(sequence.Qual), config.LineWidth))
+							outbw.Write(byteutil.WrapByteSlice(seqCol.ColorQuals(sequence.Qual), config.LineWidth))
 						} else {
-							outfh.Write(byteutil.WrapByteSlice(sequence.Qual, config.LineWidth))
+							outbw.Write(byteutil.WrapByteSlice(sequence.Qual, config.LineWidth))
 						}
 					} else {
 						if bufferedByteSliceWrapper == nil {
@@ -330,12 +341,11 @@ var seqCmd = &cobra.Command{
 						if color {
 							text = seqCol.ColorQuals(text)
 						}
-						outfh.Write(text)
-						outfh.Flush()
+						outbw.Write(text)
 						bufferedByteSliceWrapper.Recycle(b)
 					}
 
-					outfh.WriteString("\n")
+					outbw.Write([]byte("\n"))
 				}
 			}
 
