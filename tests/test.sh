@@ -406,6 +406,7 @@ rm t.sort.*
 #-------------------------------------------------------------
 BAM=tests/pcs109_5k.bam
 PRIM_BAM=tests/pcs109_5k_prim.bam
+SPLICE_BAM=tests/pcs109_5k_spliced.bam
 PRIM_NANOPLOT=tests/pcs109_5k_prim_bam_NanoPplot.tsv
 PRIM_WUB=tests/pcs109_5k_bam_alignment_length.tsv
 WUB_CLIP=tests/pcs109_5k_bam_soft_clips_tab.tsv
@@ -512,6 +513,19 @@ echo Correlation: $R
 float_gt $R 0.99
 assert_equal $? 1
 rm corr.tsv seqkit.tsv joint.tsv
+
+# bundling with -N
+fun(){
+    rm -fr tests/bundler_test tests/bundler_merged.bam
+    $app bam -N -1 $SPLICE_BAM -o tests/bundler_test
+    ($app bam -s $SPLICE_BAM 2>&1) | cut -f 1-8 - > tests/bundler_stats_bulk.tsv
+    samtools merge -f tests/bundler_merged.bam tests/bundler_test/*.bam
+    ($app bam -s tests/bundler_merged.bam 2>&1) | cut -f 1-8 - > tests/bundler_stats_merged.tsv
+}
+run bam_bundler fun
+cmp tests/bundler_stats_merged.tsv tests/bundler_stats_bulk.tsv
+assert_equal $? 0
+rm -fr tests/bundler_test tests/bundler_stats_merged.tsv tests/bundler_stats_bulk.tsv tests/bundler_merged.bam
 
 # ------------------------------------------------------------
 #                       fish
