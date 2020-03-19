@@ -518,14 +518,14 @@ rm corr.tsv seqkit.tsv joint.tsv
 fun(){
     rm -fr tests/bundler_test tests/bundler_merged.bam
     $app bam -N -1 $SPLICE_BAM -o tests/bundler_test
-    ($app bam -s $SPLICE_BAM 2>&1) | cut -f 1-8 - > tests/bundler_stats_bulk.tsv
-    samtools merge -f tests/bundler_merged.bam tests/bundler_test/*.bam
-    ($app bam -s tests/bundler_merged.bam 2>&1) | cut -f 1-8 - > tests/bundler_stats_merged.tsv
+    ($app bam -s $SPLICE_BAM 2>&1) | cut -f 1,8 | sed '1d' - > tests/bundler_stats_bulk.tsv
+    ($app bam -s tests/bundler_test/*.bam 2>&1) \
+    | cut -f 1,8 | sed '1d' | csvtk -H -t summary -n 0 -g 1 -f "2:sum" > tests/bundler_stats_merged.tsv
 }
 run bam_bundler fun
 cmp tests/bundler_stats_merged.tsv tests/bundler_stats_bulk.tsv
 assert_equal $? 0
-rm -fr tests/bundler_test tests/bundler_stats_merged.tsv tests/bundler_stats_bulk.tsv tests/bundler_merged.bam
+rm -fr tests/bundler_test tests/bundler_stats_merged.tsv tests/bundler_stats_bulk.tsv 
 
 # ------------------------------------------------------------
 #                       fish
