@@ -74,7 +74,19 @@ Attention:
 		defer outfh.Close()
 
 		if printTitle {
-			outfh.WriteString("#name\tseq\tqual")
+			if onlyName {
+				if onlyID {
+					outfh.WriteString("#id")
+				} else {
+					outfh.WriteString("#name")
+				}
+			} else {
+				if onlyID {
+					outfh.WriteString("#id\tseq\tqual")
+				} else {
+					outfh.WriteString("#name\tseq\tqual")
+				}
+			}
 			if printLength {
 				outfh.WriteString("\tlength")
 			}
@@ -121,7 +133,7 @@ Attention:
 					name = record.Name
 				}
 				if onlyName {
-					outfh.WriteString(fmt.Sprintf("%s\t%s\t%s", name, "", ""))
+					outfh.Write(name)
 				} else {
 					//outfh.WriteString(fmt.Sprintf("%s\t%s\t%s", name,
 					//	record.Seq.Seq, record.Seq.Qual))
