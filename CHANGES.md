@@ -1,7 +1,10 @@
 - [SeqKit v0.12.1](https://github.com/shenwei356/seqkit/releases/tag/v0.12.1)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.12.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.12.1)
   - `seqkit split2`: new flag `-l/--by-length` for splitting into chunks of N bases.
-  - `seqkit fx2tab`: new flag `-I/--case-sensitive` for calculating case sensitive base content. [#108](https://github.com/shenwei356/seqkit/issues/108)
+  - `seqkit fx2tab`:
+    - new flag `-I/--case-sensitive` for calculating case sensitive base content. [#108](https://github.com/shenwei356/seqkit/issues/108)
+    - add missing column name for averge quality for `-H -q`.
+    - fix output of `-n/--only-name`, do not write empty columns of sequence and quality. [#104](https://github.com/shenwei356/seqkit/issues/104), [#115](https://github.com/shenwei356/seqkit/issues/115)
 - [SeqKit v0.12.0](https://github.com/shenwei356/seqkit/releases/tag/v0.12.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.12.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.12.0)
     - `seqkit`:
