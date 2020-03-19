@@ -189,6 +189,7 @@ func (s *simpleSeq) FastaString() string {
 
 // IUPACBases is a map of valid IUPAC bases.
 var IUPACBases map[byte]bool
+var IUPACAminoAcids map[byte]bool
 
 func init() {
 	IUPACBases = map[byte]bool{
@@ -226,6 +227,28 @@ func init() {
 		'u': true,
 	}
 
+	IUPACAminoAcids = map[byte]bool{
+		'A': true,
+		'C': true,
+		'D': true,
+		'E': true,
+		'F': true,
+		'G': true,
+		'H': true,
+		'I': true,
+		'K': true,
+		'L': true,
+		'M': true,
+		'N': true,
+		'P': true,
+		'Q': true,
+		'R': true,
+		'S': true,
+		'T': true,
+		'V': true,
+		'W': true,
+		'Y': true,
+	}
 }
 
 // validateSeqBytes check for illegal bases.

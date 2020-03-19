@@ -24,6 +24,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"os"
 	"runtime"
 	"syscall"
 
@@ -32,7 +33,6 @@ import (
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/util/byteutil"
-	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
 
@@ -65,6 +65,7 @@ var seqCmd = &cobra.Command{
 		upperCase := getFlagBool(cmd, "upper-case")
 		dna2rna := getFlagBool(cmd, "dna2rna")
 		rna2dna := getFlagBool(cmd, "rna2dna")
+		color := getFlagBool(cmd, "color")
 		validateSeq := getFlagBool(cmd, "validate-seq")
 		validateSeqLength := getFlagValidateSeqLength(cmd, "validate-seq-length")
 		minLen := getFlagInt(cmd, "min-len")
@@ -122,9 +123,31 @@ var seqCmd = &cobra.Command{
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
-		outfh, err := xopen.Wopen(outFile)
-		checkError(err)
+		var seqCol *SeqColorizer
+		if color {
+			switch alphabet {
+			case seq.DNA, seq.DNAredundant, seq.RNA, seq.RNAredundant:
+				seqCol = NewSeqColorizer("nucleic")
+			case seq.Protein:
+				seqCol = NewSeqColorizer("amino")
+			default:
+				seqCol = NewSeqColorizer("nucleic")
+			}
+		}
+		var outfh *os.File
+		var err error
+		if outFile == "-" {
+			outfh = os.Stdout
+		} else {
+			outfh, err = os.Open(outFile)
+			checkError(err)
+		}
 		defer outfh.Close()
+		var outbw io.Writer
+		outbw = outfh
+		if color {
+			outbw = seqCol.WrapWriter(outfh)
+		}
 
 		var checkSeqType bool
 		var isFastq bool
@@ -135,6 +158,7 @@ var seqCmd = &cobra.Command{
 		var b *bytes.Buffer
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
+
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -205,17 +229,17 @@ var seqCmd = &cobra.Command{
 
 					if printSeq {
 						if isFastq {
-							outfh.WriteString("@")
-							outfh.Write(head)
-							outfh.WriteString("\n")
+							outbw.Write([]byte("@"))
+							outbw.Write(head)
+							outbw.Write([]byte("\n"))
 						} else {
-							outfh.WriteString(">")
-							outfh.Write(head)
-							outfh.WriteString("\n")
+							outbw.Write([]byte(">"))
+							outbw.Write(head)
+							outbw.Write([]byte("\n"))
 						}
 					} else {
-						outfh.Write(head)
-						outfh.WriteString("\n")
+						outbw.Write(head)
+						outbw.Write([]byte("\n"))
 					}
 				}
 
@@ -274,38 +298,54 @@ var seqCmd = &cobra.Command{
 					}
 
 					if len(sequence.Seq) <= pageSize {
-						outfh.Write(byteutil.WrapByteSlice(sequence.Seq, config.LineWidth))
+						text := byteutil.WrapByteSlice(sequence.Seq, config.LineWidth)
+						if color {
+							if sequence.Qual != nil {
+								text = seqCol.ColorWithQuals(text, sequence.Qual)
+							} else {
+								text = seqCol.Color(text)
+							}
+						}
+						outbw.Write(text)
 					} else {
 						if bufferedByteSliceWrapper == nil {
 							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Seq), config.LineWidth)
 						}
 						text, b = bufferedByteSliceWrapper.Wrap(sequence.Seq, config.LineWidth)
-						outfh.Write(text)
-						outfh.Flush()
+						if color {
+							text = seqCol.Color(text)
+						}
+						outbw.Write(text)
 						bufferedByteSliceWrapper.Recycle(b)
 					}
 
-					outfh.WriteString("\n")
+					outbw.Write([]byte("\n"))
 				}
 
 				if printQual {
 					if !onlyQual {
-						outfh.WriteString("+\n")
+						outbw.Write([]byte("+\n"))
 					}
 
 					if len(sequence.Qual) <= pageSize {
-						outfh.Write(byteutil.WrapByteSlice(sequence.Qual, config.LineWidth))
+						if color {
+							outbw.Write(byteutil.WrapByteSlice(seqCol.ColorQuals(sequence.Qual), config.LineWidth))
+						} else {
+							outbw.Write(byteutil.WrapByteSlice(sequence.Qual, config.LineWidth))
+						}
 					} else {
 						if bufferedByteSliceWrapper == nil {
 							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Qual), config.LineWidth)
 						}
 						text, b = bufferedByteSliceWrapper.Wrap(sequence.Qual, config.LineWidth)
-						outfh.Write(text)
-						outfh.Flush()
+						if color {
+							text = seqCol.ColorQuals(text)
+						}
+						outbw.Write(text)
 						bufferedByteSliceWrapper.Recycle(b)
 					}
 
-					outfh.WriteString("\n")
+					outbw.Write([]byte("\n"))
 				}
 			}
 
@@ -333,6 +373,7 @@ func init() {
 	seqCmd.Flags().BoolP("upper-case", "u", false, "print sequences in upper case")
 	seqCmd.Flags().BoolP("dna2rna", "", false, "DNA to RNA")
 	seqCmd.Flags().BoolP("rna2dna", "", false, "RNA to DNA")
+	seqCmd.Flags().BoolP("color", "k", false, "colorize sequences - to be piped into \"less -R\"")
 	seqCmd.Flags().BoolP("validate-seq", "v", false, "validate bases according to the alphabet")
 	seqCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
 	seqCmd.Flags().IntP("min-len", "m", -1, "only print sequences longer than the minimum length (-1 for no limit)")
