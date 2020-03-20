@@ -532,6 +532,7 @@ var bamCmd = &cobra.Command{
 		execAfter := getFlagString(cmd, "exec-after")
 		printTop := getFlagString(cmd, "top-bam")
 		topSize := getFlagInt(cmd, "top-size")
+		toolYaml := getFlagString(cmd, "tool")
 		includeIdList := getFlagString(cmd, "grep-ids")
 		excludeIdList := getFlagString(cmd, "exclude-ids")
 
@@ -558,6 +559,18 @@ var bamCmd = &cobra.Command{
 
 		if printIdxCount {
 			bamIdxCount(files[0])
+			os.Exit(0)
+		}
+
+		if toolYaml != "" {
+			if toolYaml == "help" && len(toolYaml) == 0 {
+				files = []string{"-"}
+
+			}
+			if len(files) != 1 {
+				log.Fatal("The BAM toolbox takes exactly one input file!")
+			}
+			BamToolbox(toolYaml, files[0], outFile, printQuiet, silentMode, config.Threads)
 			os.Exit(0)
 		}
 
@@ -1307,6 +1320,7 @@ func init() {
 	bamCmd.Flags().BoolP("idx-stat", "i", false, "fast statistics based on the BAM index")
 	bamCmd.Flags().BoolP("idx-count", "C", false, "fast read per reference counting based on the BAM index")
 	bamCmd.Flags().StringP("count", "c", "", "count reads per reference and save to this file")
+	bamCmd.Flags().StringP("tool", "T", "", "invoke toolbox in YAML format (see documentation)")
 	bamCmd.Flags().BoolP("log", "L", false, "log10(x+1) transform numeric values")
 	bamCmd.Flags().BoolP("reset", "R", false, "reset histogram after every report")
 	bamCmd.Flags().BoolP("pass", "x", false, "passthrough mode (forward filtered BAM to output)")
