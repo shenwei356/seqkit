@@ -39,6 +39,7 @@ type BamTool struct {
 }
 
 type BamToolParams struct {
+	Yaml    *syaml.Yaml
 	InChan  chan *sam.Record
 	OutChan chan *sam.Record
 	Quiet   bool
@@ -155,6 +156,7 @@ func BamToolbox(toolYaml string, inFile string, outFile string, quiet bool, sile
 				nextOut = lastOut
 			}
 			params := &BamToolParams{
+				Yaml:    y.Get(tool),
 				InChan:  nextIn,
 				OutChan: nextOut,
 				Quiet:   quiet,
@@ -178,5 +180,8 @@ func ListTools(p *BamToolParams) {
 }
 
 func BamToolAlnContext(p *BamToolParams) {
-
+	for r := range p.InChan {
+		log.Info(r.Name)
+	}
+	close(p.OutChan)
 }
