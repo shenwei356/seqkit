@@ -29,6 +29,8 @@ import (
 
 	"github.com/biogo/hts/bam"
 	"github.com/biogo/hts/sam"
+	"github.com/shenwei356/bio/seqio/fai"
+	"github.com/shenwei356/bio/seqio/fastx"
 	syaml "github.com/smallfish/simpleyaml"
 )
 
@@ -180,8 +182,56 @@ func ListTools(p *BamToolParams) {
 }
 
 func BamToolAlnContext(p *BamToolParams) {
+	ref, err := p.Yaml.Get("Ref").String()
+	checkError(err)
+	idx := NewRefWitdFaidx(ref, false, p.Silent)
 	for r := range p.InChan {
-		log.Info(r.Name)
+		pos := r.Pos
+		s, _ := idx.IdxSubSeq(r.Ref.Name(), pos-10, pos+10)
+		log.Info(s)
 	}
 	close(p.OutChan)
+}
+
+type RefWithFaidx struct {
+	Fasta   string
+	IdxFile string
+	idx     fai.Index
+	faidx   *fai.Faidx
+	Cache   bool
+}
+
+func (idx *RefWithFaidx) IdxSubSeq(chrom string, start, end int) (string, error) {
+	b, err := idx.faidx.SubSeq(chrom, start, end)
+	return string(b), err
+}
+
+func NewRefWitdFaidx(file string, cache bool, quiet bool) *RefWithFaidx {
+	fileFai := file + ".seqkit.fai"
+	idRegexp := fastx.DefaultIDRegexp
+	var idx fai.Index
+	var err error
+	if fileNotExists(fileFai) {
+		if !quiet {
+			log.Infof("create FASTA index for %s", file)
+		}
+		idx, err = fai.CreateWithIDRegexp(file, fileFai, idRegexp)
+		checkError(err)
+	} else {
+		idx, err = fai.Read(fileFai)
+		checkError(err)
+	}
+
+	var faidx *fai.Faidx
+	faidx, err = fai.NewWithIndex(file, idx)
+	checkError(err)
+
+	i := &RefWithFaidx{
+		Fasta:   file,
+		IdxFile: fileFai,
+		idx:     idx,
+		faidx:   faidx,
+		Cache:   cache,
+	}
+	return i
 }
