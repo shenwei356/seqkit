@@ -14,7 +14,7 @@ before_install:
       sh ./miniconda.sh -b -p ./miniconda3 && source ./miniconda3/bin/activate;
       conda init bash && source $HOME/.bashrc;
       conda update --yes conda;
-      conda config --add channels conda-forge;
+      conda config --add channels conda-forge ;
       conda install --yes sed openssl;
 
 script:
