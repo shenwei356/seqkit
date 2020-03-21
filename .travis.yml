@@ -16,7 +16,6 @@ before_install:
   - conda config --add channels conda-forge;
   - export GOPOATH=`pwd`/go.pkgs
   - conda install -q --yes sed openssl go;
-  - (cd seqkit && go get ./...);
 
 script:
     - ./tests/test.sh
