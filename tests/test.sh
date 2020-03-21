@@ -20,8 +20,6 @@ md5sum () {
 	openssl dgst -sha256 $1  | cut -d $' ' -f 2; 
 }
 
-if [[ "$TRAVIS_OS_NAME" = "osx" ]]; then brew install ;gnu-sed; alias sed=gsed; fi
-
 # ------------------------------------------------------------
 #                        seq
 # ------------------------------------------------------------
