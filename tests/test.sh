@@ -10,7 +10,7 @@ app=./seqkit/seqkit
 
 set +e
 
-which csvtk || (git clone -–depth 1 https://github.com/shenwei356/csvtk; cd ./csvtk/csvtk; go get -v ... ; go build)
+which csvtk || (git clone --depth 1 https://github.com/shenwei356/csvtk; cd ./csvtk/csvtk; go get -v ... ; go build)
 CSVTK=csvtk
 which csvtk || CSVTK=./csvtk/csvtk/csvtk; true
 
