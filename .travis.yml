@@ -17,6 +17,7 @@ before_install:
   - conda init bash && source $HOME/.bashrc;
   - conda update -q --yes conda;
   - conda config --add channels conda-forge;
+  - conda config --add channels conda-forge;
   - conda install -q --yes sed openssl;
 
 script:
