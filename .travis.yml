@@ -8,7 +8,6 @@ go:
   - 1.x
 
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install ssed ; fi
 
 script:
     - ./tests/test.sh
