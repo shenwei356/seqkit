@@ -4,6 +4,13 @@ os:
   - linux
   - osx
 
+jobs:
+  include:
+    - os: linux
+      dist: bionic
+    - os: osx
+      osx_image: xcode10
+
 before_install:
   - if [ $TRAVIS_OS_NAME = "linux" ]; then wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh; fi;
   - if [ $TRAVIS_OS_NAME = "osx" ]; then wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh; fi;
