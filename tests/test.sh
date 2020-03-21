@@ -5,7 +5,7 @@ test -e ssshtest || wget -q https://raw.githubusercontent.com/ryanlayer/ssshtest
 . ssshtest
 set -e
 
-cd seqkit; go build; cd ..;
+cd seqkit; go get -u -v ...;go build; cd ..;
 app=./seqkit/seqkit
 
 set +e
