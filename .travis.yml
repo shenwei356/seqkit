@@ -9,7 +9,7 @@ go:
 
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-         brew install md5sha1sum;
+         brew install openssl;
       fi
 
 script:

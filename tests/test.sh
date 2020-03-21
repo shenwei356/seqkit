@@ -16,6 +16,10 @@ which csvtk || CSVTK=./csvtk/csvtk/csvtk; true
 
 STOP_ON_FAIL=1
 
+if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+	md5sum () { openssl dgst -sha256 $1  | cut -d $' ' -f 2; }
+fi
+
 # ------------------------------------------------------------
 #                        seq
 # ------------------------------------------------------------
