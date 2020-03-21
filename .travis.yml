@@ -1,4 +1,4 @@
-language: minimal
+language: go
 
 jobs:
   include:
@@ -14,7 +14,6 @@ before_install:
   - conda init bash && source $HOME/.bashrc;
   - conda update -q --yes conda;
   - conda config --add channels conda-forge;
-  - export GOPOATH=`pwd`/go.pkgs
   - conda install -q --yes sed openssl go;
 
 script:
