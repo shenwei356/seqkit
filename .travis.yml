@@ -8,7 +8,7 @@ go:
   - 1.x
 
 before_install:
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install openssl && brew link openssl --force; fi;
+#    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install openssl && brew link openssl --force; fi;
 
 script:
     - ./tests/test.sh
