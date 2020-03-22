@@ -203,7 +203,7 @@ And then:
 
 1. **For windows**, just copy `seqkit.exe` to `C:\WINDOWS\system32`.
 
-#### Method 2: Install via conda  (latest stable version) [![Anaconda Cloud](https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit) [![downloads](https://anaconda.org/bioconda/seqkit/badges/downloads.svg)](https://anaconda.org/bioconda/seqkit)
+#### Method 2: Install via conda  (latest stable version) [![Anaconda Cloud](https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit) [![downloads](https://anaconda.org/bioconda/seqkit/badges/downloads.svg)](https://anaconda.org/bioconda/seqkit) [![Join the chat at https://gitter.im/seqkit/community](https://badges.gitter.im/seqkit/community.svg)](https://gitter.im/seqkit/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
     conda install -c bioconda seqkit
 
