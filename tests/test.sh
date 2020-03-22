@@ -10,7 +10,7 @@ app=./seqkit/seqkit
 
 set +e
 
-which csvtk || (git clone https://github.com/shenwei356/csvtk; cd ./csvtk/csvtk; go get -v ... ; go build)
+which csvtk || (git clone --depth 1 https://github.com/shenwei356/csvtk; cd ./csvtk/csvtk; go get -v ... ; go build)
 CSVTK=csvtk
 which csvtk || CSVTK=./csvtk/csvtk/csvtk; true
 
@@ -19,8 +19,6 @@ STOP_ON_FAIL=1
 md5sum () { 
 	openssl dgst -sha256 $1  | cut -d $' ' -f 2; 
 }
-
-if [[ "$TRAVIS_OS_NAME" = "osx" ]]; then brew install ;gnu-sed; alias sed=gsed; fi
 
 # ------------------------------------------------------------
 #                        seq
