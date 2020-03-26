@@ -43,7 +43,7 @@ like sequence length, GC content/GC skew.
 
 Attention:
   1. Fixed three columns (ID, sequence, quality) are outputted for either FASTA
-     or FASTQ, even when flag -n/--name is on. This is for format compatibility.
+     or FASTQ, except when flag -n/--name is on. This is for format compatibility.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
