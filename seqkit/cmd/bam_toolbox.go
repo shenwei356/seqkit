@@ -24,7 +24,9 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
+	"regexp"
 	"sort"
 
 	"github.com/biogo/hts/bam"
@@ -76,7 +78,7 @@ func NewToolshed() Toolshed {
 }
 
 func NewBamReaderChan(inFile string, cp int, buff int, threads int) (chan *sam.Record, *bam.Reader) {
-	outChan := make(chan *sam.Record, buff)
+	outChan := make(chan *sam.Record, cp)
 	fh, err := os.Stdin, error(nil)
 	if inFile != "-" {
 		fh, err = os.Open(inFile)
@@ -91,6 +93,9 @@ func NewBamReaderChan(inFile string, cp int, buff int, threads int) (chan *sam.R
 				close(outChan)
 				return
 			}
+			if err != nil {
+				close(outChan)
+			}
 			checkError(err)
 			outChan <- rec
 		}
@@ -98,10 +103,23 @@ func NewBamReaderChan(inFile string, cp int, buff int, threads int) (chan *sam.R
 	return outChan, r
 }
 
+func NewBamSinkChan(cp int) (chan *sam.Record, chan bool) {
+	outChan := make(chan *sam.Record, cp)
+	doneChan := make(chan bool, 0)
+	go func() {
+		for rec := range outChan {
+			_ = rec
+		}
+		doneChan <- true
+	}()
+
+	return outChan, doneChan
+}
+
 func NewBamWriterChan(inFile string, head *sam.Header, cp int, buff int, threads int) (chan *sam.Record, chan bool) {
 	outChan := make(chan *sam.Record, buff)
 	doneChan := make(chan bool, 0)
-	fh, err := os.Stderr, error(nil)
+	fh, err := os.Stdout, error(nil)
 	if inFile != "-" {
 		fh, err = os.Open(inFile)
 		checkError(err)
@@ -130,8 +148,22 @@ func BamToolbox(toolYaml string, inFile string, outFile string, quiet bool, sile
 	checkError(err)
 	ty, err := y.GetMapKeys()
 	checkError(err)
+	if ty[0] == "Yaml" {
+		conf, err := y.Get("Yaml").String()
+		checkError(err)
+		cb, err := ioutil.ReadFile(conf)
+		checkError(err)
+		y, err = syaml.NewYaml(cb)
+		checkError(err)
+	}
+
 	chanCap := 5000
 	ioBuff := 1024 * 128
+
+	paramFields := map[string]bool{
+		"Sink": true,
+	}
+
 	switch len(ty) {
 	case 0:
 		log.Fatal("toolbox: not tool specified!")
@@ -139,22 +171,34 @@ func BamToolbox(toolYaml string, inFile string, outFile string, quiet bool, sile
 		tkeys, err := y.GetMapKeys()
 		checkError(err)
 		shed := NewToolshed()
-		var inChan, outChan chan *sam.Record
+		var inChan, outChan, lastOut chan *sam.Record
 		var bamReader *bam.Reader
 		var doneChan chan bool
+		var sink bool
+		log.Info(sink)
 		if tkeys[0] != "help" {
 			inChan, bamReader = NewBamReaderChan(inFile, chanCap, ioBuff, threads)
-			outChan, doneChan = NewBamWriterChan(inFile, bamReader.Header(), chanCap, ioBuff, threads)
+			sink, err = y.Get("Sink").Bool()
+			if err == nil && sink {
+				lastOut, doneChan = NewBamSinkChan(chanCap)
+			} else {
+				lastOut, doneChan = NewBamWriterChan(outFile, bamReader.Header(), chanCap, ioBuff, threads)
+			}
 		}
-		nextIn, lastOut := inChan, outChan
+		outChan = make(chan *sam.Record, chanCap)
+		nextIn, nextOut := inChan, outChan
+		paramFieldCount := 0 // FIXME
 		for rank, tool := range tkeys {
 			var wt BamTool
 			var ok bool
-			if wt, ok = shed[tool]; !ok {
-				log.Info("Unknown tool:", tool)
+			if paramFields[tool] {
+				paramFieldCount++
+				continue
 			}
-			nextOut := make(chan *sam.Record, chanCap)
-			if rank == len(tkeys)-1 {
+			if wt, ok = shed[tool]; !ok {
+				log.Fatal("Unknown tool:", tool)
+			}
+			if rank == (len(tkeys) - 1 - paramFieldCount) {
 				nextOut = lastOut
 			}
 			params := &BamToolParams{
@@ -168,9 +212,11 @@ func BamToolbox(toolYaml string, inFile string, outFile string, quiet bool, sile
 				Shed:    shed,
 			}
 			nextIn = nextOut
+			nextOut = make(chan *sam.Record, chanCap)
 			go wt.Use(params)
 
 		}
+		log.Info("Wai")
 		<-doneChan
 	}
 
@@ -184,11 +230,47 @@ func ListTools(p *BamToolParams) {
 func BamToolAlnContext(p *BamToolParams) {
 	ref, err := p.Yaml.Get("Ref").String()
 	checkError(err)
+	leftShift, err := p.Yaml.Get("LeftShift").Int()
+	checkError(err)
+	rightShift, err := p.Yaml.Get("RightShift").Int()
+	checkError(err)
+	var regStart *regexp.Regexp
+	var regEnd *regexp.Regexp
+	checkError(err)
+	regStrStart, err := p.Yaml.Get("RegexStart").String()
+	if err == nil {
+		regStart = regexp.MustCompile(regStrStart)
+	}
+	regStrEnd, err := p.Yaml.Get("RegexEnd").String()
+	if err == nil {
+		regEnd = regexp.MustCompile(regStrEnd)
+	}
 	idx := NewRefWitdFaidx(ref, false, p.Silent)
+
 	for r := range p.InChan {
-		pos := r.Pos
-		s, _ := idx.IdxSubSeq(r.Ref.Name(), pos-10, pos+10)
-		log.Info(s)
+		chrom := r.Ref.Name()
+		startPos, endPos := r.Pos, r.End()
+
+		if regStart != nil {
+			startSeq, err := idx.IdxSubSeq(chrom, startPos+leftShift, startPos+rightShift)
+			checkError(err)
+			if regStart.MatchString(startSeq) {
+				//log.Info(startSeq)
+				continue
+			}
+		}
+
+		if regEnd != nil {
+			endSeq, err := idx.IdxSubSeq(chrom, endPos+leftShift, endPos+rightShift)
+			checkError(err)
+			if regEnd.MatchString(endSeq) {
+				//log.Info(endSeq)
+				continue
+			}
+		}
+
+		p.OutChan <- r
+
 	}
 	close(p.OutChan)
 }
