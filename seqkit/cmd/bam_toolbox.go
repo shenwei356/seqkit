@@ -175,13 +175,15 @@ func BamToolbox(toolYaml string, inFile string, outFile string, quiet bool, sile
 		var bamReader *bam.Reader
 		var doneChan chan bool
 		var sink bool
-		log.Info(sink)
 		if tkeys[0] != "help" {
 			inChan, bamReader = NewBamReaderChan(inFile, chanCap, ioBuff, threads)
 			sink, err = y.Get("Sink").Bool()
+			sink = false
+			log.Info(sink)
 			if err == nil && sink {
 				lastOut, doneChan = NewBamSinkChan(chanCap)
 			} else {
+				log.Info("Write!")
 				lastOut, doneChan = NewBamWriterChan(outFile, bamReader.Header(), chanCap, ioBuff, threads)
 			}
 		}
