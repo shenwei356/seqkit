@@ -5,6 +5,7 @@
     - new flag `-I/--case-sensitive` for calculating case sensitive base content. [#108](https://github.com/shenwei356/seqkit/issues/108)
     - add missing column name for averge quality for `-H -q`.
     - fix output of `-n/--only-name`, do not write empty columns of sequence and quality. [#104](https://github.com/shenwei356/seqkit/issues/104), [#115](https://github.com/shenwei356/seqkit/issues/115)
+  - `seqkit locate/grep`: fix bug of `-m`, when query contains letter not in subject sequences. [#124](https://github.com/shenwei356/seqkit/issues/124)
 - [SeqKit v0.12.0](https://github.com/shenwei356/seqkit/releases/tag/v0.12.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.12.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.12.0)
     - `seqkit`:
