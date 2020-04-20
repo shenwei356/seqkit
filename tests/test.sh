@@ -555,19 +555,20 @@ rm seqkit_fish.tsv
 # ------------------------------------------------------------
 
 # Regression test for sana/fasta
-fun(){
-	awk '{print ">" $1 "\n" $2}' tests/scat_test.tsv > tests/sana_test_input.fas
-	seqkit sana -i fasta tests/sana_test_input.fas > tests/sana_output.fas
-}
-run sana_fasta_regression fun
-cmp tests/sana_output.fas tests/sana_ground.fas
-assert_equal $? 0
-rm -f tests/sana_output.fas tests/sana_test_input.fas
+#fun(){
+#	awk '{print ">" $1 "\n" $2}' tests/scat_test.tsv > tests/sana_test_input.fas
+#	seqkit sana -i fasta tests/sana_test_input.fas > tests/sana_output.fas
+#}
+#run sana_fasta_regression fun
+#cmp tests/sana_output.fas tests/sana_ground.fas
+#assert_equal $? 0
+#rm -f tests/sana_output.fas tests/sana_test_input.fas
 
 # Regression test for sana/fastq
 fun(){
 	awk '{print "@" $1 "\n" $2 "\n+\n" $3}' tests/scat_test.tsv > tests/sana_test_input.fq
-	seqkit sana -i fastq tests/sana_test_input.fq > tests/sana_output.fq
+	#seqkit sana -i fastq tests/sana_test_input.fq > tests/sana_output.fq
+	seqkit sana tests/sana_test_input.fq > tests/sana_output.fq
 }
 run sana_fastq_regression fun
 cmp tests/sana_output.fq tests/sana_ground.fq
