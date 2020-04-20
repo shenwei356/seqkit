@@ -34,6 +34,69 @@ import (
 	isatty "github.com/mattn/go-isatty"
 )
 
+var IUPACBases map[byte]bool
+var IUPACAminoAcids map[byte]bool
+
+func init() {
+	IUPACBases = map[byte]bool{
+		'A': true,
+		'C': true,
+		'G': true,
+		'T': true,
+		'R': true,
+		'Y': true,
+		'S': true,
+		'W': true,
+		'K': true,
+		'M': true,
+		'B': true,
+		'D': true,
+		'H': true,
+		'V': true,
+		'N': true,
+		'U': true,
+		'a': true,
+		'c': true,
+		'g': true,
+		't': true,
+		'r': true,
+		'y': true,
+		's': true,
+		'w': true,
+		'k': true,
+		'm': true,
+		'b': true,
+		'd': true,
+		'h': true,
+		'v': true,
+		'n': true,
+		'u': true,
+	}
+
+	IUPACAminoAcids = map[byte]bool{
+		'A': true,
+		'C': true,
+		'D': true,
+		'E': true,
+		'F': true,
+		'G': true,
+		'H': true,
+		'I': true,
+		'K': true,
+		'L': true,
+		'M': true,
+		'N': true,
+		'P': true,
+		'Q': true,
+		'R': true,
+		'S': true,
+		'T': true,
+		'V': true,
+		'W': true,
+		'Y': true,
+	}
+}
+
 // ColorCycler is a utilty object to cycle between colors and colorize text.
 type ColorCycler struct {
 	Dummy   bool
