@@ -1,5 +1,7 @@
-- [SeqKit v0.12.1](https://github.com/shenwei356/seqkit/releases/tag/v0.12.1)
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.12.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.12.1)
+- [SeqKit v0.13.0](https://github.com/shenwei356/seqkit/releases/tag/v0.13.0)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.13.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.13.0)
+  - new command `seqkit scat`: look for short sequences in larger sequences using local alignment, by [@bsipos](https://github.com/bsipos). [#111](https://github.com/shenwei356/seqkit/pull/111)
+  - `seqkit bam`: add colorised and pretty printed output, by [@bsipos](https://github.com/bsipos). [#110](https://github.com/shenwei356/seqkit/pull/110)
   - `seqkit locate/grep`: fix bug of `-m`, when query contains letters not in subject sequences. [#124](https://github.com/shenwei356/seqkit/issues/124)
   - `seqkit split2`: new flag `-l/--by-length` for splitting into chunks of N bases.
   - `seqkit fx2tab`:

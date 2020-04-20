@@ -1,3 +1,4 @@
+// +build !windows
 // Copyright © 2020 Botond Sipos.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,10 +23,6 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/fsnotify/fsnotify"
-	"github.com/iafan/cwalk"
-	"github.com/shenwei356/xopen"
-	"github.com/spf13/cobra"
 	"os"
 	"os/signal"
 	ospath "path"
@@ -34,27 +31,16 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/fsnotify/fsnotify"
+	"github.com/iafan/cwalk"
+	"github.com/shenwei356/xopen"
+	"github.com/spf13/cobra"
 )
 
 type WatchCtrl int
 
 type WatchCtrlChan chan WatchCtrl
-
-// reFilterName matches a file name to a regular expression.
-func reFilterName(name string, re *regexp.Regexp) bool {
-	return re.MatchString(name)
-}
-
-// checkFileFormat complains if the file format is not valid.
-func checkFileFormat(format string) {
-	switch format {
-	case "fasta":
-	case "fastq":
-	case "":
-	default:
-		log.Fatal("Invalid format specified:", format)
-	}
-}
 
 // scatCmd represents the fish command
 var scatCmd = &cobra.Command{

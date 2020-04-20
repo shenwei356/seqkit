@@ -25,6 +25,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -445,4 +446,20 @@ func PrettyPrintTsv(cols []string, fields [][]string, width int, color bool) (st
 		outStr += strings.Join(tmp, "") + "\n"
 	}
 	return outStr, brush
+}
+
+// reFilterName matches a file name to a regular expression.
+func reFilterName(name string, re *regexp.Regexp) bool {
+	return re.MatchString(name)
+}
+
+// checkFileFormat complains if the file format is not valid.
+func checkFileFormat(format string) {
+	switch format {
+	case "fasta":
+	case "fastq":
+	case "":
+	default:
+		log.Fatal("Invalid format specified:", format)
+	}
 }
