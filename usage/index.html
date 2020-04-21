@@ -1268,7 +1268,7 @@ reproduced in different environments with same random seed.</p>
 <h2 id="seqkit">seqkit</h2>
 <pre><code class="text">SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.12.0
+Version: 0.12.1
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -2048,13 +2048,18 @@ Usage:
   seqkit fx2tab [flags]
 
 Flags:
-  -B, --base-content value   print base content. (case ignored, multiple values supported) e.g. -B AT -B N (default [])
-  -g, --gc                   print GC content
-  -G, --gc-skew              print GC-Skew
-  -H, --header-line          print header line
-  -l, --length               print sequence length
-  -n, --name                 only print names (no sequences and qualities)
-  -i, --only-id              print ID instead of full head
+  -a, --alphabet               print alphabet letters
+  -q, --avg-qual               print average quality of a read
+  -B, --base-content strings   print base content. (case ignored, multiple values supported) e.g. -B AT -B N
+  -I, --case-sensitive         calculate case sensitive base content
+  -g, --gc                     print GC content
+  -G, --gc-skew                print GC-Skew
+  -H, --header-line            print header line
+  -h, --help                   help for fx2tab
+  -l, --length                 print sequence length
+  -n, --name                   only print names (no sequences and qualities)
+  -i, --only-id                print ID instead of full head
+  -b, --qual-ascii-base int    ASCII BASE, 33 for Phred+33 (default 33)
 
 </code></pre>
 
@@ -3137,13 +3142,14 @@ Usage:
   seqkit split2 [flags]
 
 Flags:
-  -p, --by-part int      split sequences into N parts
-  -s, --by-size int      split sequences into multi parts with N sequences
-  -f, --force            overwrite output directory
-  -h, --help             help for split2
-  -O, --out-dir string   output directory (default value is $infile.split)
-  -1, --read1 string     read1 file
-  -2, --read2 string     read2 file
+  -l, --by-length string   split sequences into chunks of N bases, supports K/M/G suffix
+  -p, --by-part int        split sequences into N parts
+  -s, --by-size int        split sequences into multi parts with N sequences
+  -f, --force              overwrite output directory
+  -h, --help               help for split2
+  -O, --out-dir string     output directory (default value is $infile.split)
+  -1, --read1 string       read1 file
+  -2, --read2 string       read2 file
 </code></pre>
 
 <p>Examples</p>
