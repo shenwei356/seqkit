@@ -71,8 +71,9 @@ func (s Toolshed) String() string {
 
 func NewToolshed() Toolshed {
 	ts := map[string]BamTool{
-		"AlnContext": BamTool{Name: "AlnContext", Desc: "filter records by the sequence context at start and end", Use: BamToolAlnContext},
-		"help":       BamTool{Name: "help", Desc: "list all tools with description", Use: ListTools},
+		"AlnContext":  BamTool{Name: "AlnContext", Desc: "filter records by the sequence context at start and end", Use: BamToolAlnContext},
+		"WeightedAcc": BamTool{Name: "WeightedAcc", Desc: "calculates mean accuracy weighted by aligment lengths", Use: BamToolWeightedAcc},
+		"help":        BamTool{Name: "help", Desc: "list all tools with description", Use: ListTools},
 	}
 	return ts
 }
@@ -178,29 +179,27 @@ func BamToolbox(toolYaml string, inFile string, outFile string, quiet bool, sile
 		if tkeys[0] != "help" {
 			inChan, bamReader = NewBamReaderChan(inFile, chanCap, ioBuff, threads)
 			sink, err = y.Get("Sink").Bool()
-			sink = false
-			log.Info(sink)
 			if err == nil && sink {
 				lastOut, doneChan = NewBamSinkChan(chanCap)
 			} else {
-				log.Info("Write!")
 				lastOut, doneChan = NewBamWriterChan(outFile, bamReader.Header(), chanCap, ioBuff, threads)
 			}
 		}
 		outChan = make(chan *sam.Record, chanCap)
 		nextIn, nextOut := inChan, outChan
-		paramFieldCount := 0 // FIXME
-		for rank, tool := range tkeys {
+		clearKeys := make([]string, 0)
+		for _, k := range tkeys {
+			if !paramFields[k] {
+				clearKeys = append(clearKeys, k)
+			}
+		}
+		for rank, tool := range clearKeys {
 			var wt BamTool
 			var ok bool
-			if paramFields[tool] {
-				paramFieldCount++
-				continue
-			}
 			if wt, ok = shed[tool]; !ok {
 				log.Fatal("Unknown tool:", tool)
 			}
-			if rank == (len(tkeys) - 1 - paramFieldCount) {
+			if rank == (len(clearKeys) - 1) {
 				nextOut = lastOut
 			}
 			params := &BamToolParams{
@@ -218,7 +217,6 @@ func BamToolbox(toolYaml string, inFile string, outFile string, quiet bool, sile
 			go wt.Use(params)
 
 		}
-		log.Info("Wai")
 		<-doneChan
 	}
 
@@ -257,7 +255,6 @@ func BamToolAlnContext(p *BamToolParams) {
 			startSeq, err := idx.IdxSubSeq(chrom, startPos+leftShift, startPos+rightShift)
 			checkError(err)
 			if regStart.MatchString(startSeq) {
-				//log.Info(startSeq)
 				continue
 			}
 		}
@@ -266,7 +263,6 @@ func BamToolAlnContext(p *BamToolParams) {
 			endSeq, err := idx.IdxSubSeq(chrom, endPos+leftShift, endPos+rightShift)
 			checkError(err)
 			if regEnd.MatchString(endSeq) {
-				//log.Info(endSeq)
 				continue
 			}
 		}
@@ -318,4 +314,152 @@ func NewRefWitdFaidx(file string, cache bool, quiet bool) *RefWithFaidx {
 		Cache:   cache,
 	}
 	return i
+}
+
+func BamToolWeightedAcc(p *BamToolParams) {
+	totalLen := 0
+	accSum := 0.0
+	tsvFh := os.Stderr
+	tsvFile, err := p.Yaml.Get("Tsv").String()
+	checkError(err)
+	if err == nil && tsvFile != "-" {
+		tsvFh, err = os.Create(tsvFile)
+	}
+	for r := range p.InChan {
+		if GetSamMapped(r) {
+			info := GetSamAlnDetails(r)
+			totalLen += info.Len
+			accSum += info.WAcc
+		}
+		p.OutChan <- r
+	}
+	tsvFh.WriteString("WeightedAcc\n")
+	tsvFh.WriteString(fmt.Sprintf("%.3f\n", accSum/float64(totalLen)))
+	close(p.OutChan)
+}
+
+type AlnDetails struct {
+	Mismatch      int
+	MatchMismatch int
+	Insertion     int
+	Deletion      int
+	Skip          int
+	Len           int
+	Acc           float64
+	WAcc          float64
+}
+
+func GetSamAlnDetails(r *sam.Record) *AlnDetails {
+	var mismatch int
+	res := new(AlnDetails)
+	aux, ok := r.Tag([]byte("NM"))
+	if !ok {
+		panic("no NM tag")
+	}
+	var mm int
+	var ins int
+	var del int
+	var skip int
+	switch aux.Value().(type) {
+	case int:
+		mismatch = int(aux.Value().(int))
+	case int8:
+		mismatch = int(aux.Value().(int8))
+	case int16:
+		mismatch = int(aux.Value().(int16))
+	case int32:
+		mismatch = int(aux.Value().(int32))
+	case int64:
+		mismatch = int(aux.Value().(int64))
+	case uint:
+		mismatch = int(aux.Value().(uint))
+	case uint8:
+		mismatch = int(aux.Value().(uint8))
+	case uint16:
+		mismatch = int(aux.Value().(uint16))
+	case uint32:
+		mismatch = int(aux.Value().(uint32))
+	case uint64:
+		mismatch = int(aux.Value().(uint64))
+	default:
+		panic("Could not parse NM tag: " + aux.String())
+	}
+	for _, op := range r.Cigar {
+		switch op.Type() {
+		case sam.CigarMatch, sam.CigarEqual, sam.CigarMismatch:
+			mm += op.Len()
+		case sam.CigarInsertion:
+			ins += op.Len()
+		case sam.CigarDeletion:
+			del += op.Len()
+		case sam.CigarSkipped:
+			skip += op.Len()
+		default:
+			//fmt.Println(op)
+		}
+	}
+	res.MatchMismatch = mm
+	res.Mismatch = mismatch
+	res.Insertion = ins
+	res.Deletion = del
+	res.Skip = skip
+	res.Len = mm + ins + del
+	res.Acc = (1.0 - float64(mismatch)/float64(mm+ins+del)) * 100
+	res.WAcc = res.Acc * float64(res.Len)
+	return res
+}
+
+func GetSamMapped(r *sam.Record) bool {
+	return (r.Flags&sam.Unmapped == 0)
+}
+
+func GetSamAcc(r *sam.Record) float64 {
+	var mismatch int
+	aux, ok := r.Tag([]byte("NM"))
+	if !ok {
+		panic("no NM tag")
+	}
+	var mm int
+	var ins int
+	var del int
+	var skip int
+	switch aux.Value().(type) {
+	case int:
+		mismatch = int(aux.Value().(int))
+	case int8:
+		mismatch = int(aux.Value().(int8))
+	case int16:
+		mismatch = int(aux.Value().(int16))
+	case int32:
+		mismatch = int(aux.Value().(int32))
+	case int64:
+		mismatch = int(aux.Value().(int64))
+	case uint:
+		mismatch = int(aux.Value().(uint))
+	case uint8:
+		mismatch = int(aux.Value().(uint8))
+	case uint16:
+		mismatch = int(aux.Value().(uint16))
+	case uint32:
+		mismatch = int(aux.Value().(uint32))
+	case uint64:
+		mismatch = int(aux.Value().(uint64))
+	default:
+		panic("Could not parse NM tag: " + aux.String())
+	}
+	for _, op := range r.Cigar {
+		switch op.Type() {
+		case sam.CigarMatch, sam.CigarEqual, sam.CigarMismatch:
+			mm += op.Len()
+		case sam.CigarInsertion:
+			ins += op.Len()
+		case sam.CigarDeletion:
+			del += op.Len()
+		case sam.CigarSkipped:
+			skip += op.Len()
+		default:
+			//fmt.Println(op)
+		}
+	}
+	return (1.0 - float64(mismatch)/float64(mm+ins+del)) * 100
 }

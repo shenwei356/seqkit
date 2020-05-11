@@ -692,56 +692,7 @@ var bamCmd = &cobra.Command{
 
 		fmap["Acc"] = fieldInfo{
 			"Alignment accuracy",
-			func(r *sam.Record) float64 {
-				var mismatch int
-				aux, ok := r.Tag([]byte("NM"))
-				if !ok {
-					panic("no NM tag")
-				}
-				var mm int
-				var ins int
-				var del int
-				var skip int
-				switch aux.Value().(type) {
-				case int:
-					mismatch = int(aux.Value().(int))
-				case int8:
-					mismatch = int(aux.Value().(int8))
-				case int16:
-					mismatch = int(aux.Value().(int16))
-				case int32:
-					mismatch = int(aux.Value().(int32))
-				case int64:
-					mismatch = int(aux.Value().(int64))
-				case uint:
-					mismatch = int(aux.Value().(uint))
-				case uint8:
-					mismatch = int(aux.Value().(uint8))
-				case uint16:
-					mismatch = int(aux.Value().(uint16))
-				case uint32:
-					mismatch = int(aux.Value().(uint32))
-				case uint64:
-					mismatch = int(aux.Value().(uint64))
-				default:
-					panic("Could not parse NM tag: " + aux.String())
-				}
-				for _, op := range r.Cigar {
-					switch op.Type() {
-					case sam.CigarMatch, sam.CigarEqual, sam.CigarMismatch:
-						mm += op.Len()
-					case sam.CigarInsertion:
-						ins += op.Len()
-					case sam.CigarDeletion:
-						del += op.Len()
-					case sam.CigarSkipped:
-						skip += op.Len()
-					default:
-						//fmt.Println(op)
-					}
-				}
-				return (1.0 - float64(mismatch)/float64(mm+ins+del)) * 100
-			},
+			GetSamAcc,
 		}
 
 		fmap["ReadLen"] = fieldInfo{
