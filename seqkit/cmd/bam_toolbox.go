@@ -73,6 +73,7 @@ func NewToolshed() Toolshed {
 	ts := map[string]BamTool{
 		"AlnContext": BamTool{Name: "AlnContext", Desc: "filter records by the sequence context at start and end", Use: BamToolAlnContext},
 		"AccStats":   BamTool{Name: "AccStats", Desc: "calculates mean accuracy weighted by aligment lengths", Use: BamToolAccStats},
+		"Dump":       BamTool{Name: "Dump", Desc: "dump various record properties in TSV format", Use: BamToolDump},
 		"help":       BamTool{Name: "help", Desc: "list all tools with description", Use: ListTools},
 	}
 	return ts
@@ -450,6 +451,21 @@ func GetSamAlnDetails(r *sam.Record) *AlnDetails {
 	res.Acc = (1.0 - float64(mismatch)/float64(mm+ins+del)) * 100
 	res.WAcc = res.Acc * float64(res.Len)
 	return res
+}
+
+func BamToolDump(p *BamToolParams) {
+	tsvFh := os.Stderr
+	tsvFile, err := p.Yaml.Get("Tsv").String()
+	if err == nil && tsvFile != "-" {
+		tsvFh, err = os.Create(tsvFile)
+	}
+	for r := range p.InChan {
+		if GetSamMapped(r) {
+		}
+		p.OutChan <- r
+	}
+	close(p.OutChan)
+	tsvFh.Close()
 }
 
 func GetSamMapped(r *sam.Record) bool {
