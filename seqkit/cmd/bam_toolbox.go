@@ -308,6 +308,7 @@ func BamToolAlnContext(p *BamToolParams) {
 
 	}
 	close(p.OutChan)
+	tsvFh.Close()
 }
 
 type RefWithFaidx struct {
