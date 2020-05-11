@@ -71,9 +71,9 @@ func (s Toolshed) String() string {
 
 func NewToolshed() Toolshed {
 	ts := map[string]BamTool{
-		"AlnContext":  BamTool{Name: "AlnContext", Desc: "filter records by the sequence context at start and end", Use: BamToolAlnContext},
-		"WeightedAcc": BamTool{Name: "WeightedAcc", Desc: "calculates mean accuracy weighted by aligment lengths", Use: BamToolWeightedAcc},
-		"help":        BamTool{Name: "help", Desc: "list all tools with description", Use: ListTools},
+		"AlnContext": BamTool{Name: "AlnContext", Desc: "filter records by the sequence context at start and end", Use: BamToolAlnContext},
+		"AccStats":   BamTool{Name: "AccStats", Desc: "calculates mean accuracy weighted by aligment lengths", Use: BamToolAccStats},
+		"help":       BamTool{Name: "help", Desc: "list all tools with description", Use: ListTools},
 	}
 	return ts
 }
@@ -316,9 +316,11 @@ func NewRefWitdFaidx(file string, cache bool, quiet bool) *RefWithFaidx {
 	return i
 }
 
-func BamToolWeightedAcc(p *BamToolParams) {
+func BamToolAccStats(p *BamToolParams) {
 	totalLen := 0
 	accSum := 0.0
+	wAccSum := 0.0
+	nr := 0.0
 	tsvFh := os.Stderr
 	tsvFile, err := p.Yaml.Get("Tsv").String()
 	checkError(err)
@@ -329,12 +331,16 @@ func BamToolWeightedAcc(p *BamToolParams) {
 		if GetSamMapped(r) {
 			info := GetSamAlnDetails(r)
 			totalLen += info.Len
-			accSum += info.WAcc
+			wAccSum += info.WAcc
+			accSum += info.Acc
+			nr++
 		}
 		p.OutChan <- r
 	}
-	tsvFh.WriteString("WeightedAcc\n")
-	tsvFh.WriteString(fmt.Sprintf("%.3f\n", accSum/float64(totalLen)))
+	WeightedAcc := wAccSum / float64(totalLen)
+	MeanAcc := accSum / nr
+	tsvFh.WriteString("AccMean\tWeightedAccMean\n")
+	tsvFh.WriteString(fmt.Sprintf("%.3f\t%.3f\n", MeanAcc, WeightedAcc))
 	close(p.OutChan)
 }
 
