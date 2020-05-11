@@ -408,6 +408,12 @@ func maxStrLen(slice []string) int {
 	return l
 }
 
+func PrintTsvLine(fields []string) string {
+	sep := "\t"
+	nsep := "\n"
+	return strings.Join(fields, sep) + nsep
+}
+
 // PrettyPrintTsv pretty prints and optionally colorizes a "data frame".
 func PrettyPrintTsv(cols []string, fields [][]string, width int, color bool) (string, *ColorCycler) {
 	brush := NewColorCycler(!color)

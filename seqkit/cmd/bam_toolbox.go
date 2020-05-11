@@ -31,6 +31,7 @@ import (
 
 	"github.com/biogo/hts/bam"
 	"github.com/biogo/hts/sam"
+	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
 	syaml "github.com/smallfish/simpleyaml"
@@ -383,6 +384,7 @@ func BamToolAccStats(p *BamToolParams) {
 }
 
 type AlnDetails struct {
+	Match         int
 	Mismatch      int
 	MatchMismatch int
 	Insertion     int
@@ -448,24 +450,139 @@ func GetSamAlnDetails(r *sam.Record) *AlnDetails {
 	res.Deletion = del
 	res.Skip = skip
 	res.Len = mm + ins + del
+	res.Match = res.MatchMismatch - res.Mismatch
 	res.Acc = (1.0 - float64(mismatch)/float64(mm+ins+del)) * 100
 	res.WAcc = res.Acc * float64(res.Len)
 	return res
 }
 
 func BamToolDump(p *BamToolParams) {
+	validFields := []string{"Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "Match", "Mismatch", "Ins", "Del", "AlnLen", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "IsSup", "ReadSeq", "ReadAlnSeq", "LeftSoftClipSeq", "RightSoftClip", "LeftHardClip", "RightHardClip"}
+
 	tsvFh := os.Stderr
 	tsvFile, err := p.Yaml.Get("Tsv").String()
 	if err == nil && tsvFile != "-" {
 		tsvFh, err = os.Create(tsvFile)
 	}
+
+	arr, err := p.Yaml.Get("Fields").Array()
+	checkError(err)
+	keys := []string{}
+	for _, k := range arr {
+		s, ok := k.(string)
+		if ok {
+			found := false
+			for _, x := range validFields {
+				if s == x {
+					found = true
+					continue
+				}
+			}
+			if found {
+				keys = append(keys, s)
+			}
+
+		}
+	}
+	if len(arr) == 1 {
+		tmp, ok := arr[0].(string)
+		if ok {
+			if tmp == "*" {
+				keys = validFields
+			}
+		}
+	}
+	tsvFh.WriteString(PrintTsvLine(keys))
 	for r := range p.InChan {
 		if GetSamMapped(r) {
+			tsvFh.WriteString(PrintTsvLine(SamDumper(keys, r)))
 		}
 		p.OutChan <- r
 	}
 	close(p.OutChan)
 	tsvFh.Close()
+}
+
+func SamDumper(fields []string, r *sam.Record) []string {
+	res := make([]string, len(fields))
+	for i, f := range fields {
+		res[i] = GetSamDump(f, r)
+	}
+	return res
+}
+
+func GetSamDump(field string, r *sam.Record) string {
+	acc := GetSamAlnDetails(r)
+	switch field {
+	case "Read":
+		return fmt.Sprintf("%s", GetSamName(r))
+	case "Ref":
+		return fmt.Sprintf("%s", GetSamRef(r))
+	case "Pos":
+		return fmt.Sprintf("%d", GetSamPos(r))
+	case "EndPos":
+		return fmt.Sprintf("%d", GetSamEndPos(r))
+	case "MapQual":
+		return fmt.Sprintf("%d", GetSamMapQual(r))
+	case "Acc":
+		return fmt.Sprintf("%.3f", acc.Acc)
+	case "Match":
+		return fmt.Sprintf("%d", acc.Match)
+	case "Mismatch":
+		return fmt.Sprintf("%d", acc.Mismatch)
+	case "Ins":
+		return fmt.Sprintf("%d", acc.Insertion)
+	case "Del":
+		return fmt.Sprintf("%d", acc.Deletion)
+	case "AlnLen":
+		return fmt.Sprintf("%d", acc.Len)
+	case "ReadLen":
+		return fmt.Sprintf("%d", GetSamReadLen(r))
+	case "RefLen":
+		return fmt.Sprintf("%d", GetSamRefLen(r))
+	case "RefAln":
+		return fmt.Sprintf("%d", GetSamRefAln(r))
+	case "RefCov":
+		return fmt.Sprintf("%.3f", GetSamRefCov(r))
+	case "ReadAln":
+		return fmt.Sprintf("%d", GetSamReadAln(r))
+	case "ReadCov":
+		return fmt.Sprintf("%.3f", GetSamReadCov(r))
+	case "Strand":
+		return fmt.Sprintf("%d", GetSamStrand(r))
+	case "MeanQual":
+		return fmt.Sprintf("%d", GetSamReadAln(r))
+	case "LeftClip":
+		return fmt.Sprintf("%d", GetSamLeftClip(r))
+	case "RightClip":
+		return fmt.Sprintf("%d", GetSamRightClip(r))
+	case "Flags":
+		return fmt.Sprintf("%d", r.Flags)
+	case "IsSec":
+		return fmt.Sprintf("%d", GetSamIsSec(r))
+	case "IsSup":
+		return fmt.Sprintf("%d", GetSamIsSup(r))
+	case "ReadSeq":
+		return fmt.Sprintf("%s", GetSamReadSeq(r))
+	case "ReadAlnSeq":
+		return fmt.Sprintf("%s", GetSamReadAlnSeq(r))
+	case "LeftSoftClipSeq":
+		return fmt.Sprintf("%s", GetSamLeftSoftClipSeq(r))
+	case "RightSoftClipSeq":
+		return fmt.Sprintf("%s", GetSamRightSoftClipSeq(r))
+	case "LeftSoftClip":
+		return fmt.Sprintf("%d", GetSamLeftSoftClip(r))
+	case "RightSoftClip":
+		return fmt.Sprintf("%d", GetSamRightSoftClip(r))
+	case "LeftHardClip":
+		return fmt.Sprintf("%d", GetSamLeftHardClip(r))
+	case "RightHardClip":
+		return fmt.Sprintf("%d", GetSamRightHardClip(r))
+	default:
+		return "<!INVALID_FIELD!>"
+
+	}
+	return ""
 }
 
 func GetSamMapped(r *sam.Record) bool {
@@ -482,6 +599,165 @@ func GetSamRef(r *sam.Record) string {
 
 func GetSamName(r *sam.Record) string {
 	return r.Name
+}
+
+func GetSamReadAlnSeq(r *sam.Record) string {
+	return r.Name
+}
+
+func GetSamReadSeq(r *sam.Record) string {
+	if r.Seq.Length > 0 {
+		return string(r.Seq.Expand())
+	}
+	return ""
+}
+
+func GetSamLeftSoftClipSeq(r *sam.Record) string {
+	seq := GetSamReadSeq(r)
+	if len(seq) > 0 {
+		return seq[:GetSamLeftSoftClip(r)]
+	}
+	return ""
+}
+
+func GetSamRightSoftClipSeq(r *sam.Record) string {
+	seq := GetSamReadSeq(r)
+	if len(seq) > 0 {
+		return seq[(len(seq) - GetSamRightSoftClip(r)):]
+	}
+	return ""
+}
+
+func GetSamMapQual(r *sam.Record) int {
+	return int(r.MapQ)
+}
+
+func GetSamHardClipped(r *sam.Record) int {
+	var hc int
+	last := len(r.Cigar) - 1
+	if r.Cigar[last].Type() == sam.CigarHardClipped {
+		hc += r.Cigar[last].Len()
+	}
+	if r.Cigar[0].Type() == sam.CigarHardClipped {
+		hc += r.Cigar[0].Len()
+	}
+	return hc
+}
+
+func GetSamLeftHardClip(r *sam.Record) int {
+	var hc int
+	if r.Cigar[0].Type() == sam.CigarHardClipped {
+		hc += r.Cigar[0].Len()
+	}
+	return hc
+}
+
+func GetSamLeftClip(r *sam.Record) int {
+	return GetSamLeftSoftClip(r) + GetSamLeftHardClip(r)
+}
+
+func GetSamRightClip(r *sam.Record) int {
+	return GetSamRightSoftClip(r) + GetSamRightHardClip(r)
+}
+
+func GetSamRightSoftClip(r *sam.Record) int {
+	var hc int
+	last := len(r.Cigar) - 1
+	if r.Cigar[last].Type() == sam.CigarSoftClipped {
+		hc += r.Cigar[last].Len()
+	}
+	return hc
+}
+
+func GetSamLeftSoftClip(r *sam.Record) int {
+	var hc int
+	if r.Cigar[0].Type() == sam.CigarSoftClipped {
+		hc += r.Cigar[0].Len()
+	}
+	return hc
+}
+
+func GetSamRightHardClip(r *sam.Record) int {
+	var hc int
+	last := len(r.Cigar) - 1
+	if r.Cigar[last].Type() == sam.CigarHardClipped {
+		hc += r.Cigar[last].Len()
+	}
+	return hc
+}
+
+func GetSamReadLen(r *sam.Record) int {
+	if r.Seq.Length > 0 {
+		sl := int(r.Seq.Length) + GetSamHardClipped(r)
+		return sl
+	}
+	var ql int
+	for _, op := range r.Cigar {
+		ql += op.Len() * op.Type().Consumes().Query
+	}
+	return ql
+}
+
+func GetSamRefAln(r *sam.Record) int {
+	return r.Len()
+}
+
+func GetSamRefLen(r *sam.Record) int {
+	return r.Ref.Len()
+}
+
+func GetSamRefCov(r *sam.Record) float64 {
+	return float64(r.Len()) / float64(r.Ref.Len()) * 100
+}
+
+func GetSamReadCov(r *sam.Record) float64 {
+	sl := float64(GetSamReadLen(r))
+	return float64(100 * (sl - float64(GetSamLeftClip(r)-GetSamRightClip(r))) / float64(sl))
+}
+
+func GetSamReadAln(r *sam.Record) int {
+	if r.Flags&sam.Unmapped != 0 {
+		return 0
+	}
+	sl := GetSamReadLen(r)
+	return (sl - GetSamLeftClip(r) - GetSamRightClip(r))
+}
+
+func GetSamStrand(r *sam.Record) int {
+	if GetSamReverse(r) {
+		return -1
+	}
+	return 1
+}
+
+func GetSamIsSup(r *sam.Record) int {
+	if r.Flags&sam.Supplementary != 0 {
+		return 1
+	}
+	return 0
+}
+
+func GetSamIsSec(r *sam.Record) int {
+	if r.Flags&sam.Secondary != 0 {
+		return 1
+	}
+	return 0
+}
+
+func GetSamMeanBaseQual(r *sam.Record) float64 {
+	if len(r.Qual) != r.Seq.Length {
+		return 0.0
+	}
+	s := &seq.Seq{Qual: r.Qual}
+	return s.AvgQual(0)
+}
+
+func GetSamPos(r *sam.Record) int {
+	return r.Pos
+}
+
+func GetSamEndPos(r *sam.Record) int {
+	return r.Pos + r.Len()
 }
 
 func GetSamAcc(r *sam.Record) float64 {

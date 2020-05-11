@@ -663,18 +663,6 @@ var bamCmd = &cobra.Command{
 		}
 		_ = getRightSoftClip
 
-		getHardClipped := func(r *sam.Record) float64 {
-			var hc float64
-			last := len(r.Cigar) - 1
-			if r.Cigar[last].Type() == sam.CigarHardClipped {
-				hc += float64(r.Cigar[last].Len())
-			}
-			if r.Cigar[0].Type() == sam.CigarHardClipped {
-				hc += float64(r.Cigar[0].Len())
-			}
-			return hc
-		}
-
 		getRead := func(r *sam.Record) string {
 			return r.Name
 		}
@@ -699,7 +687,7 @@ var bamCmd = &cobra.Command{
 			"Read length",
 			func(r *sam.Record) float64 {
 				if r.Seq.Length > 0 {
-					sl := float64(r.Seq.Length) + getHardClipped(r)
+					sl := float64(r.Seq.Length) + float64(GetSamHardClipped(r))
 					return float64(sl)
 				}
 				var ql int
@@ -1258,7 +1246,6 @@ func init() {
 
 	bamCmd.Flags().IntP("map-qual", "q", 0, "minimum mapping quality")
 	bamCmd.Flags().StringP("field", "f", "", "target fields")
-	//bamCmd.Flags().StringP("scatter", "S", "", "scatter plot of two numerical fields")
 	bamCmd.Flags().StringP("img", "O", "", "save histogram to this PDF/image file")
 	bamCmd.Flags().IntP("print-freq", "p", -1, "print/report after this many records (-1 for print after EOF)")
 	bamCmd.Flags().IntP("delay", "W", 1, "sleep this many seconds after plotting")
