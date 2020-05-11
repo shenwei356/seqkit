@@ -372,12 +372,24 @@ func RevCompDNA(s string) string {
 		switch inBase {
 		case 'A':
 			outBase = 'T'
+		case 'a':
+			outBase = 't'
 		case 'T':
 			outBase = 'A'
+		case 't':
+			outBase = 'a'
 		case 'G':
 			outBase = 'C'
+		case 'g':
+			outBase = 'c'
 		case 'C':
 			outBase = 'G'
+		case 'c':
+			outBase = 'g'
+		case 'n':
+			outBase = 'n'
+		case 'N':
+			outBase = 'N'
 		default:
 			outBase = 'N'
 		}

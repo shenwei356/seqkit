@@ -230,6 +230,7 @@ func ListTools(p *BamToolParams) {
 func BamToolAlnContext(p *BamToolParams) {
 	ref, err := p.Yaml.Get("Ref").String()
 	checkError(err)
+	idx := NewRefWitdFaidx(ref, false, p.Silent)
 	leftShift, err := p.Yaml.Get("LeftShift").Int()
 	checkError(err)
 	rightShift, err := p.Yaml.Get("RightShift").Int()
@@ -245,29 +246,65 @@ func BamToolAlnContext(p *BamToolParams) {
 	if err == nil {
 		regEnd = regexp.MustCompile(regStrEnd)
 	}
-	idx := NewRefWitdFaidx(ref, false, p.Silent)
+	stranded, invert := false, false
+	_ = invert
+	stranded, _ = p.Yaml.Get("Stranded").Bool()
+	invert, _ = p.Yaml.Get("Invert").Bool()
+	tsvFh := os.Stderr
+	tsvFile, err := p.Yaml.Get("Tsv").String()
+	if err == nil && tsvFile != "-" {
+		tsvFh, err = os.Create(tsvFile)
+	}
+
+	head := fmt.Sprintf("Read\tRef\tStrand\tStartSeq\tStartMatch\tEndSeq\tEndMatch\n")
+	tsvFh.WriteString(head)
 
 	for r := range p.InChan {
 		chrom := r.Ref.Name()
 		startPos, endPos := r.Pos, r.End()
+		startSeq, err := idx.IdxSubSeq(chrom, startPos+leftShift, startPos+rightShift)
+		checkError(err)
+		endSeq, err := idx.IdxSubSeq(chrom, endPos+leftShift, endPos+rightShift)
+		checkError(err)
+		strand := 1
+		if GetSamReverse(r) {
+			strand = -1
+			if stranded {
+				startSeq, endSeq = RevCompDNA(endSeq), RevCompDNA(startSeq)
+			}
+		}
 
+		yes, no := -1, 1
+		if invert {
+			no, yes = yes, no
+		}
+		startMatch := no
+		endMatch := no
 		if regStart != nil {
-			startSeq, err := idx.IdxSubSeq(chrom, startPos+leftShift, startPos+rightShift)
-			checkError(err)
 			if regStart.MatchString(startSeq) {
-				continue
+				startMatch = yes
 			}
 		}
 
 		if regEnd != nil {
-			endSeq, err := idx.IdxSubSeq(chrom, endPos+leftShift, endPos+rightShift)
-			checkError(err)
 			if regEnd.MatchString(endSeq) {
-				continue
+				endMatch = yes
 			}
 		}
 
-		p.OutChan <- r
+		match := (startMatch == yes) || (endMatch == yes)
+
+		info := fmt.Sprintf("%s\t%s\t%d\t%s\t%d\t%s\t%d\n", GetSamName(r), GetSamRef(r), strand, startSeq, startMatch, endSeq, endMatch)
+
+		if match && !invert {
+			p.OutChan <- r
+			tsvFh.WriteString(info)
+		} else if !match && invert {
+			p.OutChan <- r
+		} else {
+			tsvFh.WriteString(info)
+
+		}
 
 	}
 	close(p.OutChan)
@@ -323,7 +360,6 @@ func BamToolAccStats(p *BamToolParams) {
 	nr := 0.0
 	tsvFh := os.Stderr
 	tsvFile, err := p.Yaml.Get("Tsv").String()
-	checkError(err)
 	if err == nil && tsvFile != "-" {
 		tsvFh, err = os.Create(tsvFile)
 	}
@@ -417,6 +453,18 @@ func GetSamAlnDetails(r *sam.Record) *AlnDetails {
 
 func GetSamMapped(r *sam.Record) bool {
 	return (r.Flags&sam.Unmapped == 0)
+}
+
+func GetSamReverse(r *sam.Record) bool {
+	return (r.Flags&sam.Reverse == 0)
+}
+
+func GetSamRef(r *sam.Record) string {
+	return r.Ref.Name()
+}
+
+func GetSamName(r *sam.Record) string {
+	return r.Name
 }
 
 func GetSamAcc(r *sam.Record) float64 {
