@@ -1,0 +1,14 @@
+AlnContext:
+  Tsv: "context.tsv"
+  Ref: "../SIRV_150601a.fasta"
+  LeftShift: -10
+  RightShift: 10
+  RegexStart: "T{4,}"
+  RegexEnd: "A{4,}"
+  Stranded: True
+  Invert: True
+Dump:
+  Tsv: "dump.tsv"
+  Fields: ["Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "Match", "Mismatch", "Ins", "Del", "AlnLen", "  ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "  IsSup", "ReadSeq", "ReadAlnSeq", "LeftSoftClipSeq", "RightSoftClip", "LeftHardClip", "RightHardClip"]
+AccStats:
+  Tsv: "-"
