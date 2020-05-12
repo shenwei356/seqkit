@@ -32,7 +32,6 @@ import (
 	"regexp"
 	"runtime"
 	"sync"
-	"syscall"
 	"time"
 )
 
@@ -134,22 +133,6 @@ var scatCmd = &cobra.Command{
 	},
 }
 
-func isPidAlive(pid int) bool {
-	if runtime.GOOS == "windows" {
-		_, err := os.FindProcess(pid)
-		if err == nil {
-			return true
-		}
-	} else {
-		killErr := syscall.Kill(pid, syscall.Signal(0))
-		if killErr != nil {
-			return true
-		}
-
-	}
-	return false
-}
-
 // LaunchFxWatchers launches fastx watcher goroutines on multiple input directories.
 func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, timeout string, dropString string, waitPid int, findOnly bool, outw *xopen.Writer) {
 	allSeqChans := make([]chan *simpleSeq, len(dirs))
@@ -213,7 +196,7 @@ MAIN:
 			}
 			continue MAIN
 		case <-pidTimer.C:
-			if !isPidAlive(waitPid) {
+			if !IsPidAlive(waitPid) {
 				pidTimer.Stop()
 				pidTimer.C = nil
 				log.Info("Watched process with PID", waitPid, "exited.")
