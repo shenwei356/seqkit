@@ -187,70 +187,6 @@ func (s *simpleSeq) FastaString() string {
 	return fmt.Sprintf(">%s\n%s", s.Id, s.Seq)
 }
 
-// IUPACBases is a map of valid IUPAC bases.
-var IUPACBases map[byte]bool
-var IUPACAminoAcids map[byte]bool
-
-func init() {
-	IUPACBases = map[byte]bool{
-		'A': true,
-		'C': true,
-		'G': true,
-		'T': true,
-		'R': true,
-		'Y': true,
-		'S': true,
-		'W': true,
-		'K': true,
-		'M': true,
-		'B': true,
-		'D': true,
-		'H': true,
-		'V': true,
-		'N': true,
-		'U': true,
-		'a': true,
-		'c': true,
-		'g': true,
-		't': true,
-		'r': true,
-		'y': true,
-		's': true,
-		'w': true,
-		'k': true,
-		'm': true,
-		'b': true,
-		'd': true,
-		'h': true,
-		'v': true,
-		'n': true,
-		'u': true,
-	}
-
-	IUPACAminoAcids = map[byte]bool{
-		'A': true,
-		'C': true,
-		'D': true,
-		'E': true,
-		'F': true,
-		'G': true,
-		'H': true,
-		'I': true,
-		'K': true,
-		'L': true,
-		'M': true,
-		'N': true,
-		'P': true,
-		'Q': true,
-		'R': true,
-		'S': true,
-		'T': true,
-		'V': true,
-		'W': true,
-		'Y': true,
-	}
-}
-
 // validateSeqBytes check for illegal bases.
 func validateSeqBytes(dna []byte, gaps bool) error {
 	for i, base := range dna {
@@ -533,7 +469,7 @@ func streamFasta(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 				sbuff = append(sbuff, FqLine{lineStr, guessFasState(line, gaps)})
 				lastLine = &sbuff[len(sbuff)-1]
 			}
-			if len(sbuff) > 2 && !lastLine.FqlState.Partial {
+			if len(sbuff) >= 2 && !lastLine.FqlState.Partial {
 				if sbuff[0].FqlState.Header && (lastLine.FqlState.Header) {
 					seq, err := FasLinesToSimpleSeq(sbuff[:len(sbuff)-1])
 					if err == nil {

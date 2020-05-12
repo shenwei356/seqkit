@@ -6,30 +6,16 @@ SeqKit is implemented in [Go](https://golang.org/) programming language,
 
 ## Latest Version
 
-- [SeqKit v0.12.0](https://github.com/shenwei356/seqkit/releases/tag/v0.12.0)
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.12.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.12.0)
-    - `seqkit`:
-        - fix checking input file existence.
-        - new global flag `--infile-list` for long list of input files, if given, they are appended to files from cli arguments.
-    - `seqkit faidx`: supporting "truncated" (no ending newline charactor) file.
-    - `seqkit seq`:
-        - **do not force switching on `-g` when using `-m/-M`**.
-        - show recommendation if flag `-t/--seq-type` is not DNA/RNA when computing complement sequence. [#103](https://github.com/shenwei356/seqkit/issues/103)
-    - `seqkit translate`: supporting multiple frames. [#96](https://github.com/shenwei356/seqkit/issues/96)
-    - `seqkit grep/locate`:
-        - add detection and warning for space existing in search pattern/sequence.
-        - **speed improvement (2X) for `-m/--max-mismatch`**. [shenwei356/bwt/issues/3](https://github.com/shenwei356/bwt/issues/3)
-    - `seqkit locate`:
-        - new flag `-M/--hide-matched` for hiding matched sequences. [#98](https://github.com/shenwei356/seqkit/issues/98)
-        - **new flag `-r/--use-regexp` for explicitly using regular expression, so improve speed of default `index` operation. And you have to switch this on if using regexp now**.
-        [#101](https://github.com/shenwei356/seqkit/issues/101)
-        - **new flag `-F/--use-fmi` for improving search speed for lots of sequence patterns**.
-    - `seqkit rename`: making IDs unique across multiple files, and can write into multiple files. [#100](https://github.com/shenwei356/seqkit/issues/100)
-    - `seqkit sample`: fix stdin checking for flag `-2`. [#102](https://github.com/shenwei356/seqkit/issues/102).
-    - `seqkit rename/split/split2`: fix detection of existed outdir.
-    - `split split`: fix bug of `seqkit split -i -2` and parallizing it.
-    - `seqkit version`: checking update is optional (`-u`).
-
+- [SeqKit v0.12.1](https://github.com/shenwei356/seqkit/releases/tag/v0.12.1)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.12.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.12.1)
+  - `seqkit bam`: add colorised and pretty printed output, by [@bsipos](https://github.com/bsipos). [#110](https://github.com/shenwei356/seqkit/pull/110)
+  - `seqkit locate/grep`: fix bug of `-m`, when query contains letters not in subject sequences. [#124](https://github.com/shenwei356/seqkit/issues/124)
+  - `seqkit split2`: new flag `-l/--by-length` for splitting into chunks of N bases.
+  - `seqkit fx2tab`:
+    - new flag `-I/--case-sensitive` for calculating case sensitive base content. [#108](https://github.com/shenwei356/seqkit/issues/108)
+    - add missing column name for averge quality for `-H -q`. [#115](https://github.com/shenwei356/seqkit/issues/115)
+    - fix output of `-n/--only-name`, do not write empty columns of sequence and quality. [#104](https://github.com/shenwei356/seqkit/issues/104), [#115](https://github.com/shenwei356/seqkit/issues/115)
+    - `seqkit seq`: new flag `-k/--color`: colorize sequences.
 
 ### Please cite
 
@@ -46,12 +32,12 @@ SeqKit is implemented in [Go](https://golang.org/) programming language,
 
 OS     |Arch      |File, 中国镜像                                                                                                                                                                                  |Download Count
 :------|:---------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Linux  |32-bit    |[seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.12.0/seqkit_linux_386.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_linux_386.tar.gz)                            |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.12.0/seqkit_linux_386.tar.gz)
-Linux  |**64-bit**|[**seqkit_linux_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.12.0/seqkit_linux_amd64.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_linux_amd64.tar.gz)                  |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.12.0/seqkit_linux_amd64.tar.gz)
-OS X   |32-bit    |[seqkit_darwin_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.12.0/seqkit_darwin_386.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_darwin_386.tar.gz)                         |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.12.0/seqkit_darwin_386.tar.gz)
-OS X   |**64-bit**|[**seqkit_darwin_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.12.0/seqkit_darwin_amd64.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_darwin_amd64.tar.gz)               |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.12.0/seqkit_darwin_amd64.tar.gz)
-Windows|32-bit    |[seqkit_windows_386.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.12.0/seqkit_windows_386.exe.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_windows_386.exe.tar.gz)          |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_386.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.12.0/seqkit_windows_386.exe.tar.gz)
-Windows|**64-bit**|[**seqkit_windows_amd64.exe.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.12.0/seqkit_windows_amd64.exe.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_windows_amd64.exe.tar.gz)|[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_amd64.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.12.0/seqkit_windows_amd64.exe.tar.gz)
+Linux  |32-bit    |[seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.12.1/seqkit_linux_386.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_linux_386.tar.gz)                            |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.12.1/seqkit_linux_386.tar.gz)
+Linux  |**64-bit**|[**seqkit_linux_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.12.1/seqkit_linux_amd64.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_linux_amd64.tar.gz)                  |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.12.1/seqkit_linux_amd64.tar.gz)
+OS X   |32-bit    |[seqkit_darwin_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.12.1/seqkit_darwin_386.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_darwin_386.tar.gz)                         |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.12.1/seqkit_darwin_386.tar.gz)
+OS X   |**64-bit**|[**seqkit_darwin_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.12.1/seqkit_darwin_amd64.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_darwin_amd64.tar.gz)               |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.12.1/seqkit_darwin_amd64.tar.gz)
+Windows|32-bit    |[seqkit_windows_386.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v0.12.1/seqkit_windows_386.exe.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_windows_386.exe.tar.gz)          |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_386.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.12.1/seqkit_windows_386.exe.tar.gz)
+Windows|**64-bit**|[**seqkit_windows_amd64.exe.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v0.12.1/seqkit_windows_amd64.exe.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_windows_amd64.exe.tar.gz)|[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_amd64.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v0.12.1/seqkit_windows_amd64.exe.tar.gz)
 
 
 ## Installation
@@ -121,6 +107,29 @@ Howto:
 
 ## Release History
 
+- [SeqKit v0.12.0](https://github.com/shenwei356/seqkit/releases/tag/v0.12.0)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.12.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.12.0)
+    - `seqkit`:
+        - fix checking input file existence.
+        - new global flag `--infile-list` for long list of input files, if given, they are appended to files from cli arguments.
+    - `seqkit faidx`: supporting "truncated" (no ending newline charactor) file.
+    - `seqkit seq`:
+        - **do not force switching on `-g` when using `-m/-M`**.
+        - show recommendation if flag `-t/--seq-type` is not DNA/RNA when computing complement sequence. [#103](https://github.com/shenwei356/seqkit/issues/103)
+    - `seqkit translate`: supporting multiple frames. [#96](https://github.com/shenwei356/seqkit/issues/96)
+    - `seqkit grep/locate`:
+        - add detection and warning for space existing in search pattern/sequence.
+        - **speed improvement (2X) for `-m/--max-mismatch`**. [shenwei356/bwt/issues/3](https://github.com/shenwei356/bwt/issues/3)
+    - `seqkit locate`:
+        - new flag `-M/--hide-matched` for hiding matched sequences. [#98](https://github.com/shenwei356/seqkit/issues/98)
+        - **new flag `-r/--use-regexp` for explicitly using regular expression, so improve speed of default `index` operation. And you have to switch this on if using regexp now**.
+        [#101](https://github.com/shenwei356/seqkit/issues/101)
+        - **new flag `-F/--use-fmi` for improving search speed for lots of sequence patterns**.
+    - `seqkit rename`: making IDs unique across multiple files, and can write into multiple files. [#100](https://github.com/shenwei356/seqkit/issues/100)
+    - `seqkit sample`: fix stdin checking for flag `-2`. [#102](https://github.com/shenwei356/seqkit/issues/102).
+    - `seqkit rename/split/split2`: fix detection of existed outdir.
+    - `split split`: fix bug of `seqkit split -i -2` and parallizing it.
+    - `seqkit version`: checking update is optional (`-u`).
 - [SeqKit v0.11.0](https://github.com/shenwei356/seqkit/releases/tag/v0.11.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.11.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.11.0)
     - `seqkit`: fix hanging when reading from truncated gzip file.

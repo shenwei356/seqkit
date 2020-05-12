@@ -1,0 +1,10 @@
+AlnContext:
+  Tsv: "-"
+  Ref: "../SIRV_150601a.fasta"
+  LeftShift: -10
+  RightShift: 10
+  RegexStart: "T{4,}"
+  RegexEnd: "A{4,}"
+  Stranded: True
+  Invert: True
+Sink: True

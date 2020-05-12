@@ -25,6 +25,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -32,6 +33,69 @@ import (
 	colorable "github.com/mattn/go-colorable"
 	isatty "github.com/mattn/go-isatty"
 )
+
+var IUPACBases map[byte]bool
+var IUPACAminoAcids map[byte]bool
+
+func init() {
+	IUPACBases = map[byte]bool{
+		'A': true,
+		'C': true,
+		'G': true,
+		'T': true,
+		'R': true,
+		'Y': true,
+		'S': true,
+		'W': true,
+		'K': true,
+		'M': true,
+		'B': true,
+		'D': true,
+		'H': true,
+		'V': true,
+		'N': true,
+		'U': true,
+		'a': true,
+		'c': true,
+		'g': true,
+		't': true,
+		'r': true,
+		'y': true,
+		's': true,
+		'w': true,
+		'k': true,
+		'm': true,
+		'b': true,
+		'd': true,
+		'h': true,
+		'v': true,
+		'n': true,
+		'u': true,
+	}
+
+	IUPACAminoAcids = map[byte]bool{
+		'A': true,
+		'C': true,
+		'D': true,
+		'E': true,
+		'F': true,
+		'G': true,
+		'H': true,
+		'I': true,
+		'K': true,
+		'L': true,
+		'M': true,
+		'N': true,
+		'P': true,
+		'Q': true,
+		'R': true,
+		'S': true,
+		'T': true,
+		'V': true,
+		'W': true,
+		'Y': true,
+	}
+}
 
 // ColorCycler is a utilty object to cycle between colors and colorize text.
 type ColorCycler struct {
@@ -372,12 +436,24 @@ func RevCompDNA(s string) string {
 		switch inBase {
 		case 'A':
 			outBase = 'T'
+		case 'a':
+			outBase = 't'
 		case 'T':
 			outBase = 'A'
+		case 't':
+			outBase = 'a'
 		case 'G':
 			outBase = 'C'
+		case 'g':
+			outBase = 'c'
 		case 'C':
 			outBase = 'G'
+		case 'c':
+			outBase = 'g'
+		case 'n':
+			outBase = 'n'
+		case 'N':
+			outBase = 'N'
 		default:
 			outBase = 'N'
 		}
@@ -394,6 +470,12 @@ func maxStrLen(slice []string) int {
 		}
 	}
 	return l
+}
+
+func PrintTsvLine(fields []string) string {
+	sep := "\t"
+	nsep := "\n"
+	return strings.Join(fields, sep) + nsep
 }
 
 // PrettyPrintTsv pretty prints and optionally colorizes a "data frame".
@@ -445,4 +527,20 @@ func PrettyPrintTsv(cols []string, fields [][]string, width int, color bool) (st
 		outStr += strings.Join(tmp, "") + "\n"
 	}
 	return outStr, brush
+}
+
+// reFilterName matches a file name to a regular expression.
+func reFilterName(name string, re *regexp.Regexp) bool {
+	return re.MatchString(name)
+}
+
+// checkFileFormat complains if the file format is not valid.
+func checkFileFormat(format string) {
+	switch format {
+	case "fasta":
+	case "fastq":
+	case "":
+	default:
+		log.Fatal("Invalid format specified:", format)
+	}
 }
