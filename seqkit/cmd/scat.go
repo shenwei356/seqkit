@@ -59,8 +59,8 @@ func checkFileFormat(format string) {
 // scatCmd represents the fish command
 var scatCmd = &cobra.Command{
 	Use:   "scat",
-	Short: "look for short sequences in larger sequences using local alignment",
-	Long:  "look for short sequences in larger sequences using local alignment",
+	Short: "real time recursive concatenation and streaming of fastx files",
+	Long:  "real time recursive concatenation and streaming of fastx files",
 
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
