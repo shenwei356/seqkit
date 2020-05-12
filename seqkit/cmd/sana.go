@@ -533,7 +533,7 @@ func streamFasta(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 				sbuff = append(sbuff, FqLine{lineStr, guessFasState(line, gaps)})
 				lastLine = &sbuff[len(sbuff)-1]
 			}
-			if len(sbuff) > 2 && !lastLine.FqlState.Partial {
+			if len(sbuff) >= 2 && !lastLine.FqlState.Partial {
 				if sbuff[0].FqlState.Header && (lastLine.FqlState.Header) {
 					seq, err := FasLinesToSimpleSeq(sbuff[:len(sbuff)-1])
 					if err == nil {

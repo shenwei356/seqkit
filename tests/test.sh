@@ -616,12 +616,12 @@ fun(){
 	rm -f tests/scat_test_all.fas tests/scat_output.fas
 }
 
-#run scat_fasta fun
-#cmp tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas
-#assert_equal $? 0
-#cmp tests/sorted_scat_find.fas tests/sorted_scat_test_all.fas
-#assert_equal $? 0
-#rm -f tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas tests/sorted_scat_find.fas
+run scat_fasta fun
+cmp tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas
+assert_equal $? 0
+cmp tests/sorted_scat_find.fas tests/sorted_scat_test_all.fas
+assert_equal $? 0
+rm -f tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas tests/sorted_scat_find.fas
 
 # Regression test for scat/fastq
 fun(){
@@ -662,12 +662,12 @@ fun(){
 	rm -f tests/scat_test_all.fq tests/scat_output.fq
 }
 
-#run scat_fastq fun
-#cmp tests/sorted_scat_output.fq tests/sorted_scat_test_all.fq
-#assert_equal $? 0
-#cmp tests/sorted_scat_find.fq tests/sorted_scat_test_all.fq
-#assert_equal $? 0
-#rm -f tests/sorted_scat_output.fq tests/sorted_scat_test_all.fq tests/sorted_scat_find.fq
+run scat_fastq fun
+cmp tests/sorted_scat_output.fq tests/sorted_scat_test_all.fq
+assert_equal $? 0
+cmp tests/sorted_scat_find.fq tests/sorted_scat_test_all.fq
+assert_equal $? 0
+rm -f tests/sorted_scat_output.fq tests/sorted_scat_test_all.fq tests/sorted_scat_find.fq
 
 # ------------------------------------------------------------
 #                       faidx
