@@ -221,10 +221,7 @@ MAIN:
 				activeCount++
 				for {
 					select {
-					case rawSeq, ok := <-sc:
-						if !ok {
-							continue
-						}
+					case rawSeq := <-sc:
 						if rawSeq == nil {
 							log.Fatal("Trying to print nil sequence!")
 						}
@@ -241,21 +238,21 @@ MAIN:
 							ticker = time.NewTimer(td)
 						}
 						continue
-					case fb, ok := <-allOutCtrlChans[j]:
-						if !ok || allOutCtrlChans[j] == nil {
+					default:
+						select {
+						case fb := <-allOutCtrlChans[j]:
+							if fb != WatchCtrl(-9) {
+								log.Fatal("Invalid exit feedback:", fb)
+							}
+
+							allOutCtrlChans[j] = nil
+							allInCtrlChans[j] = nil
+							outw.Flush()
+							activeCount--
+							continue CHAN
+						default:
 							continue CHAN
 						}
-						if fb != WatchCtrl(-9) {
-							log.Fatal("Invalid exit feedback:", fb)
-						}
-
-						allOutCtrlChans[j] = nil
-						allInCtrlChans[j] = nil
-						outw.Flush()
-						activeCount--
-						continue CHAN
-					default:
-						continue CHAN
 					}
 				} // select 1
 			} // for chan
@@ -352,10 +349,7 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 	SFOR:
 		for {
 			select {
-			case _, ok := <-watcherCtrlChanIn:
-				if !ok {
-					continue
-				}
+			case <-watcherCtrlChanIn:
 				log.Info("Exiting...")
 				sigChan := make(chan os.Signal, 2)
 				signal.Notify(sigChan, os.Interrupt)
@@ -387,10 +381,7 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 				self.Mutex.Unlock()
 				watcherCtrlChanOut <- WatchCtrl(-9)
 				return
-			case event, ok := <-watcher.Events:
-				if !ok {
-					continue
-				}
+			case event := <-watcher.Events:
 				ePath := event.Name
 				if event.Op&fsnotify.Remove == fsnotify.Remove {
 					self.Mutex.Lock()
@@ -502,7 +493,7 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 					log.Fatalf("fsnotify error:", err)
 				}
 			default:
-				time.Sleep(time.Nanosecond)
+				time.Sleep(time.Nanosecond * 10)
 			}
 		}
 	}()
@@ -536,15 +527,9 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 		for ePath, w := range self.Pool {
 			for {
 				select {
-				case seq, ok := <-w.SeqChan:
-					if !ok {
-						continue POOL
-					}
+				case seq := <-w.SeqChan:
 					seqChan <- seq
-				case fb, ok := <-w.CtrlChanOut:
-					if !ok {
-						break POOL
-					}
+				case fb := <-w.CtrlChanOut:
 					switch fb {
 					case StreamExited:
 						delete(self.Pool, ePath)
