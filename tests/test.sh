@@ -667,7 +667,7 @@ cmp tests/sorted_scat_output.fq tests/sorted_scat_test_all.fq
 assert_equal $? 0
 cmp tests/sorted_scat_find.fq tests/sorted_scat_test_all.fq
 assert_equal $? 0
-rm -f tests/sorted_scat_output.fq tests/sorted_scat_test_all.fq tests/sorted_scat_find.fq
+rm -f tests/sorted_scat_output.fq tests/sorted_scat_test_all.fq tests/sorted_scat_find.fq tests/scat_test_all_sana.fq
 
 # ------------------------------------------------------------
 #                       faidx
