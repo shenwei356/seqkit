@@ -45,6 +45,7 @@ const (
 	StreamExited
 )
 
+const MICRO_SLEEP = time.Millisecond
 const NAP_SLEEP = 10 * time.Millisecond
 const BIG_SLEEP = 100 * time.Millisecond
 
@@ -97,7 +98,7 @@ var sanaCmd = &cobra.Command{
 							log.Fatal("Invalid command when trying to exit:", int(i))
 						}
 					default:
-						time.Sleep(NAP_SLEEP)
+						time.Sleep(BIG_SLEEP)
 					}
 				}
 				close(rawSeqChan)
@@ -233,8 +234,8 @@ func NewRawSeqStreamFromFile(inFastq string, seqChan chan *simpleSeq, qBase int,
 	checkError(err)
 	buffSize := 128 * 1024
 	bio := bufio.NewReaderSize(rio, buffSize)
-	ctrlChanIn := make(chan SeqStreamCtrl, 0)
-	ctrlChanOut := make(chan SeqStreamCtrl, 0)
+	ctrlChanIn := make(chan SeqStreamCtrl, 1000)
+	ctrlChanOut := make(chan SeqStreamCtrl, 1000)
 
 	switch format {
 	case "fastq":
@@ -353,6 +354,7 @@ func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 			log.Fatal("Buffered reader is nil!", err)
 		}
 		line, err = r.ReadBytes('\n')
+		line = bytes.TrimRight(line, "\r")
 		switch err {
 		case nil:
 			line = bytes.Trim(line, "\n\t ")
@@ -557,7 +559,7 @@ func NewRawFastqStream(name string, inReader *bufio.Reader, seqChan chan *simple
 					log.Fatal("Invalid command:", int(cmd))
 				}
 			default:
-				time.Sleep(NAP_SLEEP)
+				time.Sleep(BIG_SLEEP)
 			}
 		}
 	}()
@@ -593,6 +595,8 @@ func NewRawFastaStream(name string, inReader *bufio.Reader, seqChan chan *simple
 				} else {
 					log.Fatal("Invalid command:", int(cmd))
 				}
+			default:
+				time.Sleep(BIG_SLEEP)
 			}
 		}
 	}()
