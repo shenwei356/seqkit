@@ -354,10 +354,9 @@ func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 			log.Fatal("Buffered reader is nil!", err)
 		}
 		line, err = r.ReadBytes('\n')
-		line = bytes.TrimRight(line, "\r")
 		switch err {
 		case nil:
-			line = bytes.Trim(line, "\n\t ")
+			line = bytes.Trim(line, "\r\n\t ")
 			if len(line) == 0 {
 				*lineCounter++
 				spaceShift++
