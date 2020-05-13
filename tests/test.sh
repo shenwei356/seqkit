@@ -607,11 +607,11 @@ fun(){
         done;
         IFS=$BAK
 	sync
+	seqkit sana -j 4 -i fasta tests/scat_test_all.fas | seqkit sort -n -j 4 - > tests/sorted_scat_test_all.fas
 	kill -s INT $SCAT_PID
 	wait $SCAT_PID
 	seqkit scat -f -j 4 -i fasta $BASE | seqkit sort -n -j 4 - > tests/sorted_scat_find.fas
 	sync
-	seqkit sana -j 4 -i fasta tests/scat_test_all.fas | seqkit sort -n -j 4 - > tests/sorted_scat_test_all.fas
 	seqkit sort -n -j 4 tests/scat_output.fas > tests/sorted_scat_output.fas
 	rm -fr $BASE
 	rm -f tests/scat_test_all.fas tests/scat_output.fas
@@ -651,12 +651,12 @@ fun(){
 		done;
         done;
         IFS=$BAK
+	seqkit sana -j 4 -i fastq tests/scat_test_all.fq > tests/scat_test_all_sana.fq
 	sync; sleep 0.5
 	kill -s INT $SCAT_PID
 	wait $SCAT_PID
 	seqkit scat -f -j 4 -i fastq $BASE | seqkit sort -n -j 4 - > tests/sorted_scat_find.fq
 	sync
-	seqkit sana -j 4 -i fastq tests/scat_test_all.fq > tests/scat_test_all_sana.fq
 	seqkit sort -n -j 4 tests/scat_test_all_sana.fq > tests/sorted_scat_test_all.fq
 	seqkit sort -n -j 4 tests/scat_output.fq > tests/sorted_scat_output.fq
 	rm -fr $BASE

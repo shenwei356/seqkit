@@ -101,7 +101,7 @@ var scatCmd = &cobra.Command{
 		checkError(err)
 		defer outfh.Flush()
 		defer outfh.Close()
-		ctrlChan := make(WatchCtrlChan, 10)
+		ctrlChan := make(WatchCtrlChan, 0)
 		ndirs := []string{}
 		for _, d := range dirs {
 			if d != "-" {
@@ -125,7 +125,7 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 	for i, dir := range dirs {
 		allSeqChans[i] = make(chan *simpleSeq, 10000)
 		allInCtrlChans[i] = make(WatchCtrlChan, 1000)
-		allOutCtrlChans[i] = make(WatchCtrlChan, 1000)
+		allOutCtrlChans[i] = make(WatchCtrlChan, 0)
 		go NewFxWatcher(dir, allSeqChans[i], allInCtrlChans[i], allOutCtrlChans[i], re, inFmt, outFmt, qBase, allowGaps, delta, dropString, findOnly)
 	}
 	sigChan := make(chan os.Signal, 1)
