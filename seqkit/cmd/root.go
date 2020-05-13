@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strconv"
 
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/spf13/cobra"
@@ -59,6 +60,16 @@ func init() {
 	defaultThreads := runtime.NumCPU()
 	if defaultThreads > 2 {
 		defaultThreads = 2
+	}
+	envThreads := os.Getenv("SEQKIT_THREADS")
+	if envThreads != "" {
+		t, err := strconv.Atoi(envThreads)
+		if err == nil {
+			defaultThreads = t
+		}
+	}
+	if defaultThreads == -1 {
+		defaultThreads = runtime.NumCPU()
 	}
 	RootCmd.PersistentFlags().StringP("seq-type", "t", "auto", "sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence)")
 	RootCmd.PersistentFlags().IntP("threads", "j", defaultThreads, "number of CPUs. (default value: 1 for single-CPU PC, 2 for others)")
