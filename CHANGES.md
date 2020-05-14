@@ -1,3 +1,10 @@
+- [SeqKit v0.13.0](https://github.com/shenwei356/seqkit/releases/tag/v0.13.0)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.13.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.13.0)
+    - New features and improvements by [@bsipos](https://github.com/bsipos). [#130](https://github.com/shenwei356/seqkit/pull/130)
+    - Added `scat`, a subcommand for real-time robust concatenation of fastx files. 
+    - Rewrote the parser behind the `sana` subcommand, now it supports robust parsing of fasta file as well.
+    - Added a "toolbox" feature to the `bam` subcommand (`-T`), which is a collection of filters acting on streams of BAM records configured through a YAML string (see the docs for more).
+    - Added the `SEQKIT_THREADS` environmental variable to override the default number of threads.
 - [SeqKit v0.12.1](https://github.com/shenwei356/seqkit/releases/tag/v0.12.1)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.12.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.12.1)
     - `seqkit bam`: add colorised and pretty printed output, by [@bsipos](https://github.com/bsipos). [#110](https://github.com/shenwei356/seqkit/pull/110)
