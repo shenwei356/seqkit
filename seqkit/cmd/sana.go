@@ -234,7 +234,7 @@ func NewRawSeqStreamFromFile(inFastq string, seqChan chan *simpleSeq, qBase int,
 	buffSize := 128 * 1024
 	bio := bufio.NewReaderSize(rio, buffSize)
 	ctrlChanIn := make(chan SeqStreamCtrl, 1000)
-	ctrlChanOut := make(chan SeqStreamCtrl, 1000)
+	ctrlChanOut := make(chan SeqStreamCtrl, 0)
 
 	switch format {
 	case "fastq":
