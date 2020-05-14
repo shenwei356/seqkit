@@ -59,6 +59,7 @@ var scatCmd = &cobra.Command{
 		checkFileFormat(outFmt)
 		inOutFmt := getFlagString(cmd, "format")
 		checkFileFormat(inOutFmt)
+		gzOnly := getFlagBool(cmd, "gz-only")
 		if inFmt == "" {
 			inFmt = inOutFmt
 		}
@@ -76,8 +77,12 @@ var scatCmd = &cobra.Command{
 		delta := getFlagInt(cmd, "delta") * 1024
 		reStr := getFlagString(cmd, "regexp")
 		var err error
-		FASTA_REGEXP := ".*\\.(fas|fa|fasta)(\\.gz){0,1}$"
-		FASTQ_REGEXP := ".*\\.(fastq|fq)(\\.gz){0,1}$"
+		gzNr := 0
+		if gzOnly {
+			gzNr = 1
+		}
+		FASTA_REGEXP := fmt.Sprintf(".*\\.(fas|fa|fasta)(\\.gz){%d,1}$", gzNr)
+		FASTQ_REGEXP := fmt.Sprintf(".*\\.(fastq|fq)(\\.gz){%d,1}$", gzNr)
 		if reStr == "" {
 			switch inFmt {
 			case "fasta":
@@ -555,6 +560,7 @@ func init() {
 	scatCmd.Flags().StringP("out-format", "O", "", "output format: fastq or fasta")
 	scatCmd.Flags().BoolP("allow-gaps", "A", false, "allow gap character (-) in sequences")
 	scatCmd.Flags().BoolP("find-only", "f", false, "concatenate exisiting files and quit")
+	scatCmd.Flags().BoolP("gz-only", "g", false, "only look for gzipped files (.gz suffix)")
 	scatCmd.Flags().StringP("time-limit", "T", "", "quit after inactive for this time period")
 	scatCmd.Flags().IntP("wait-pid", "p", -1, "after process with this PID exited")
 	scatCmd.Flags().IntP("delta", "d", 5, "minimum size increase in kilobytes to trigger parsing")
