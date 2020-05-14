@@ -832,7 +832,7 @@ Examples
 2. Histogram of mean base qualities every 500 record, also saved as PDF
 
         seqkit watch -p 500 -O qhist.pdf -f MeanQual reads_1.fq.gz
-
+```
 
 ## sana
 
@@ -845,9 +845,12 @@ Usage:
   seqkit sana [flags]
 
 Flags:
+  -A, --allow-gaps            allow gap character (-) in sequences
+  -i, --format string         input and output format: fastq or fasta (default "fastq")
   -h, --help                  help for sana
+  -I, --in-format string      input format: fastq or fasta
+  -O, --out-format string     output format: fastq or fasta
   -b, --qual-ascii-base int   ASCII BASE, 33 for Phred+33 (default 33)
-
 ```
 
 Examples
@@ -856,6 +859,53 @@ Examples
 1. Rescue usable reads from fastq file with malformed records.
     
         seqkit sana broken.fq.gz -o rescued.fq.gz
+
+## scat
+
+Usage
+
+```text
+real time recursive concatenation and streaming of fastx files
+
+Usage:
+  seqkit scat [flags]
+
+Flags:
+  -A, --allow-gaps            allow gap character (-) in sequences
+  -d, --delta int             minimum size increase in kilobytes to trigger parsing (default 5)
+  -D, --drop-time string      Notification drop interval (default "500ms")
+  -f, --find-only             concatenate exisiting files and quit
+  -i, --format string         input and output format: fastq or fasta (fastq) (default "fastq")
+  -h, --help                  help for scat
+  -I, --in-format string      input format: fastq or fasta (fastq)
+  -O, --out-format string     output format: fastq or fasta
+  -b, --qual-ascii-base int   ASCII BASE, 33 for Phred+33 (default 33)
+  -r, --regexp string         regexp for watched files, by default guessed from the input format
+  -T, --time-limit string     quit after inactive for this time period
+  -p, --wait-pid int          after process with this PID exited (default -1)
+```
+
+Examples
+
+1. Concatenate all fastq files recursively under a directory
+
+	seqkit scat -j 4 -f fastq_dir > all_records.fq
+
+2. Watch a directory and stream fastq records in real time until interrupt is recieved and plot read lengths using `seqkit watch`:
+
+	seqkit scat -j 4 fastq_dir | seqkit watch -f ReadLen -
+
+3. Watch a directory and stream fastq records in real time until there is no write activity under the directory for 5 seconds:
+
+	seqkit scat -j 4 -T "5s" fastq_dir > all_records.fq
+
+4. Watch a directory and stream fastq records in real time until a process with a specified PID is alive:
+
+	seqkit scat -j 4 -p $PID fastq_dir > all_records.fq
+
+Notes
+
+You might need to increase the `ulimit` allowance on open files if you intend to stream fastx records from a large number of files.
 
 ## fq2fa
 
@@ -2807,12 +2857,15 @@ Usage:
 
 Flags:
   -B, --bins int             number of histogram bins (default -1)
+  -N, --bundle int           partition BAM file into loci (-1) or bundles with this minimum size
   -c, --count string         count reads per reference and save to this file
   -W, --delay int            sleep this many seconds after plotting (default 1)
   -y, --dump                 print histogram data to stderr instead of plotting
+  -G, --exclude-ids string   exclude records with IDs contained in this file
   -e, --exec-after string    execute command after reporting
   -E, --exec-before string   execute command before reporting
   -f, --field string         target fields
+  -g, --grep-ids string      only keep records with IDs contained in this file
   -h, --help                 help for bam
   -C, --idx-count            fast read per reference counting based on the BAM index
   -i, --idx-stat             fast statistics based on the BAM index
@@ -2821,25 +2874,18 @@ Flags:
   -L, --log                  log10(x+1) transform numeric values
   -q, --map-qual int         minimum mapping quality
   -x, --pass                 passthrough mode (forward filtered BAM to output)
+  -k, --pretty               pretty print certain TSV outputs
   -F, --prim-only            filter out non-primary alignment records
   -p, --print-freq int       print/report after this many records (-1 for print after EOF) (default -1)
   -Q, --quiet-mode           supress all plotting to stderr
   -M, --range-max float      discard record with field (-f) value greater than this flag (default NaN)
   -m, --range-min float      discard record with field (-f) value less than this flag (default NaN)
   -R, --reset                reset histogram after every report
+  -Z, --silent-mode          supress TSV output to stderr
   -s, --stat                 print BAM satistics of the input files
+  -T, --tool string          invoke toolbox in YAML format (see documentation)
   -@, --top-bam string       save the top -? records to this bam file
   -?, --top-size int         size of the top-mode buffer (default 100)
-
-Global Flags:
-      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
-      --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
-      --id-regexp string                regular expression for parsing ID (default "^(\\S+)\\s?")
-  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
-  -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
-      --quiet                           be quiet and do not show extra information
-  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
-  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
 ```
 
 Examples
@@ -2871,6 +2917,77 @@ Examples
 7. Save the best 100 records in terms of alignment accuracy to a BAM file.
 
     seqkit bam -f Acc -@ top_acc_100.bam -? 100 -Q sample.bam
+
+8. Inkvoke the BAM toolbox.
+
+The BAM toolbox is a collection of filters acting on a stream of BAM records, configured via YAML. 
+The currently available tools can be listed by `seqkit bam -T help`:
+
+```text
+Tool    Description
+----    -----------
+AccStats        calculates mean accuracy weighted by aligment lengths
+AlnContext      filter records by the sequence context at start and end
+Dump    	dump various record properties in TSV format
+help    	list all tools with description
+```
+
+Example YAML configs:
+
+Invoking the AccStats tool directly from the command line or YAML config:
+```text
+seqkit bam -T '{AccStats: {Tsv: "-"}, Sink: True}' input.bam
+seqkit bam -T '{Yaml: "tests/examples/bam_tool_acc_stats.yml"}' input.bam
+```
+Where the contents of `bam_tool_acc_stats.yml` are:
+```text
+AccStats:
+  Tsv: "-"
+Sink: True
+```
+Invoking the AlnContext tool using YAML:
+```text
+AlnContext:
+  Tsv: "-"
+  Ref: "../SIRV_150601a.fasta"
+  LeftShift: -10
+  RightShift: 10
+  RegexStart: "T{4,}"
+  RegexEnd: "A{4,}"
+  Stranded: True
+  Invert: True
+Sink: True
+```
+Invoking the Dump tool using YAML:
+```text
+Dump:
+  Tsv: "-"
+  Fields: ["Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "Match", "Mismatch", "Ins", "Del", "AlnLen", "  ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "  IsSup", "ReadSeq", "ReadAlnSeq", "LeftSoftClipSeq", "RightSoftClip", "LeftHardClip", "RightHardClip"]
+Sink: True
+```
+
+The tools can be chained together, for example the YAML using all three tools look like:
+```text
+AlnContext:
+  Tsv: "context.tsv"
+  Ref: "../SIRV_150601a.fasta"
+  LeftShift: -10
+  RightShift: 10
+  RegexStart: "T{4,}"
+  RegexEnd: "A{4,}"
+  Stranded: True
+  Invert: True
+Dump:
+  Tsv: "dump.tsv"
+  Fields: ["Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "Match", "Mismatch", "Ins", "Del", "AlnLen", "  ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "  IsSup", "ReadSeq", "ReadAlnSeq", "LeftSoftClipSeq", "RightSoftClip", "LeftHardClip", "RightHardClip"]
+AccStats:
+  Tsv: "-"
+```
+
+If the "Sink" parameter is not specified in the last pipeline step, the output BAM records are streamed to the standard output and can be piped into standard tools, for example:
+```text
+seqkit bam -T '{Yaml: "bam_tool_pipeline.yml"}' ../pcs109_5k_spliced.bam | samtools flagstat -
+```
 
 ## fish
 

@@ -128,6 +128,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - [`faidx`](https://bioinf.shenwei.me/seqkit/usage/#faidx)      create FASTA index file and extract subsequence
 - [`watch`](https://bioinf.shenwei.me/seqkit/usage/#watch)      monitoring and online histograms of sequence features
 - [`sana`](https://bioinf.shenwei.me/seqkit/usage/#sana)        sanitize broken single line fastq files
+- [`scat`](https://bioinf.shenwei.me/seqkit/usage/#scat)        real time concatenation and streaming of fastx files
 
 **Format conversion**
 

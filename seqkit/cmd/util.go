@@ -436,12 +436,24 @@ func RevCompDNA(s string) string {
 		switch inBase {
 		case 'A':
 			outBase = 'T'
+		case 'a':
+			outBase = 't'
 		case 'T':
 			outBase = 'A'
+		case 't':
+			outBase = 'a'
 		case 'G':
 			outBase = 'C'
+		case 'g':
+			outBase = 'c'
 		case 'C':
 			outBase = 'G'
+		case 'c':
+			outBase = 'g'
+		case 'n':
+			outBase = 'n'
+		case 'N':
+			outBase = 'N'
 		default:
 			outBase = 'N'
 		}
@@ -458,6 +470,12 @@ func maxStrLen(slice []string) int {
 		}
 	}
 	return l
+}
+
+func PrintTsvLine(fields []string) string {
+	sep := "\t"
+	nsep := "\n"
+	return strings.Join(fields, sep) + nsep
 }
 
 // PrettyPrintTsv pretty prints and optionally colorizes a "data frame".

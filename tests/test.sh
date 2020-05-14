@@ -607,22 +607,22 @@ fun(){
         done;
         IFS=$BAK
 	sync
+	seqkit sana -j 4 -i fasta tests/scat_test_all.fas | seqkit sort -n -j 4 - > tests/sorted_scat_test_all.fas
 	kill -s INT $SCAT_PID
 	wait $SCAT_PID
 	seqkit scat -f -j 4 -i fasta $BASE | seqkit sort -n -j 4 - > tests/sorted_scat_find.fas
 	sync
-	seqkit sana -j 4 -i fasta tests/scat_test_all.fas | seqkit sort -n -j 4 - > tests/sorted_scat_test_all.fas
 	seqkit sort -n -j 4 tests/scat_output.fas > tests/sorted_scat_output.fas
 	rm -fr $BASE
 	rm -f tests/scat_test_all.fas tests/scat_output.fas
 }
 
-#run scat_fasta fun
-#cmp tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas
-#assert_equal $? 0
-#cmp tests/sorted_scat_find.fas tests/sorted_scat_test_all.fas
-#assert_equal $? 0
-#rm -f tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas tests/sorted_scat_find.fas
+run scat_fasta fun
+cmp tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas
+assert_equal $? 0
+cmp tests/sorted_scat_find.fas tests/sorted_scat_test_all.fas
+assert_equal $? 0
+rm -f tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas tests/sorted_scat_find.fas
 
 # Regression test for scat/fastq
 fun(){
@@ -651,24 +651,24 @@ fun(){
 		done;
         done;
         IFS=$BAK
+	seqkit sana -j 4 -i fastq tests/scat_test_all.fq > tests/scat_test_all_sana.fq
 	sync; sleep 0.5
 	kill -s INT $SCAT_PID
 	wait $SCAT_PID
 	seqkit scat -f -j 4 -i fastq $BASE | seqkit sort -n -j 4 - > tests/sorted_scat_find.fq
 	sync
-	seqkit sana -j 4 -i fastq tests/scat_test_all.fq > tests/scat_test_all_sana.fq
 	seqkit sort -n -j 4 tests/scat_test_all_sana.fq > tests/sorted_scat_test_all.fq
 	seqkit sort -n -j 4 tests/scat_output.fq > tests/sorted_scat_output.fq
 	rm -fr $BASE
 	rm -f tests/scat_test_all.fq tests/scat_output.fq
 }
 
-#run scat_fastq fun
-#cmp tests/sorted_scat_output.fq tests/sorted_scat_test_all.fq
-#assert_equal $? 0
-#cmp tests/sorted_scat_find.fq tests/sorted_scat_test_all.fq
-#assert_equal $? 0
-#rm -f tests/sorted_scat_output.fq tests/sorted_scat_test_all.fq tests/sorted_scat_find.fq
+run scat_fastq fun
+cmp tests/sorted_scat_output.fq tests/sorted_scat_test_all.fq
+assert_equal $? 0
+cmp tests/sorted_scat_find.fq tests/sorted_scat_test_all.fq
+assert_equal $? 0
+rm -f tests/sorted_scat_output.fq tests/sorted_scat_test_all.fq tests/sorted_scat_find.fq tests/scat_test_all_sana.fq
 
 # ------------------------------------------------------------
 #                       faidx
