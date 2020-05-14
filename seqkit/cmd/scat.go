@@ -418,14 +418,16 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 					continue SFOR
 				}
 				if event.Op&fsnotify.Rename == fsnotify.Rename {
-					log.Info("Stopped watching renamed file:", ePath)
 					wm := self.Pool.Get(ePath)
-					wm.CtrlChanIn <- StreamQuit
-					fb := <-wm.CtrlChanOut
-					if fb != StreamExited {
-						log.Fatal("Invalid renaming feedback:", int(fb))
+					if wm != nil {
+						log.Info("Stopped watching renamed file:", ePath)
+						wm.CtrlChanIn <- StreamQuit
+						fb := <-wm.CtrlChanOut
+						if fb != StreamExited {
+							log.Fatal("Invalid renaming feedback:", int(fb))
+						}
+						self.Pool.Delete(ePath)
 					}
-					self.Pool.Delete(ePath)
 				}
 				if event.Op&fsnotify.Create == fsnotify.Create {
 					wm := self.Pool.Get(ePath)
