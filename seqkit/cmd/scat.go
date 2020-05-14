@@ -76,8 +76,8 @@ var scatCmd = &cobra.Command{
 		delta := getFlagInt(cmd, "delta") * 1024
 		reStr := getFlagString(cmd, "regexp")
 		var err error
-		FASTA_REGEXP := ".*\\.(fas|fa|fasta)$"
-		FASTQ_REGEXP := ".*\\.(fastq|fq)$"
+		FASTA_REGEXP := ".*\\.(fas|fa|fasta)(\\.gz){0,1}$"
+		FASTQ_REGEXP := ".*\\.(fastq|fq)(\\.gz){0,1}$"
 		if reStr == "" {
 			switch inFmt {
 			case "fasta":

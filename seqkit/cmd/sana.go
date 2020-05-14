@@ -27,7 +27,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"runtime"
 	"strings"
 	"time"
@@ -230,7 +229,7 @@ func ValidateSeq(seq *simpleSeq, gaps bool) error {
 
 // NewRawSeqStream initializes a new channel for reading fastq records from a file in a robust way.
 func NewRawSeqStreamFromFile(inFastq string, seqChan chan *simpleSeq, qBase int, format string, allowGaps bool) (chan SeqStreamCtrl, chan SeqStreamCtrl) {
-	rio, err := os.Open(inFastq)
+	rio, err := xopen.Ropen(inFastq)
 	checkError(err)
 	buffSize := 128 * 1024
 	bio := bufio.NewReaderSize(rio, buffSize)
