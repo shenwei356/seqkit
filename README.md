@@ -117,7 +117,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 ## Subcommands
 
-32 functional subcommands in total.
+33 functional subcommands in total.
 
 **Sequence and subsequence**
 

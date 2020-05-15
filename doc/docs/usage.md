@@ -16,6 +16,7 @@
 - [faidx](#faidx)
 - [watch](#watch)
 - [sana](#sana)
+- [scat](#scat)
 
 **Format conversion**
 
@@ -808,7 +809,7 @@ Flags:
   -B, --bins int                  number of histogram bins (default -1)
   -W, --delay int                 sleep this many seconds after online plotting (default 1)
   -y, --dump                      print histogram data to stderr instead of plotting
-  -f, --fields string             target fields (default "ReadLen")
+  -f, --fields string             target fields, available values: ReadLen, MeanQual, GC, GCSkew (default "ReadLen")
   -h, --help                      help for watch
   -O, --img string                save histogram to this PDF/image file
   -H, --list-fields               print out a list of available fields
@@ -832,6 +833,7 @@ Examples
 2. Histogram of mean base qualities every 500 record, also saved as PDF
 
         seqkit watch -p 500 -O qhist.pdf -f MeanQual reads_1.fq.gz
+
 ```
 
 ## sana
@@ -903,9 +905,7 @@ Examples
 
 	seqkit scat -j 4 -p $PID fastq_dir > all_records.fq
 
-Notes
-
-You might need to increase the `ulimit` allowance on open files if you intend to stream fastx records from a large number of files.
+**Notes**: You might need to increase the `ulimit` allowance on open files if you intend to stream fastx records from a large number of files.
 
 ## fq2fa
 

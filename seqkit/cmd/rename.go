@@ -40,6 +40,9 @@ var renameCmd = &cobra.Command{
 	Short: "rename duplicated IDs",
 	Long: `rename duplicated IDs
 
+Attention:
+  1. This command only appends "_N" to duplicated sequence IDs to make them unique.
+  2. Use "seqkit replace" for editing sequence IDs/headers using regular expression.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
