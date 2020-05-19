@@ -173,7 +173,7 @@ reproduced in different environments with same random seed.
 ``` text
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.12.1
+Version: 0.13.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -208,6 +208,7 @@ Available Commands:
   rmdup           remove duplicated sequences by id/name/sequence
   sample          sample sequences by number or proportion
   sana            sanitize broken single line fastq files
+  scat            real time recursive concatenation and streaming of fastx files
   seq             transform sequences (revserse, complement, extract ID...)
   shuffle         shuffle sequences
   sliding         sliding sequences, circular genome supported
@@ -231,7 +232,9 @@ Flags:
   -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
       --quiet                           be quiet and do not show extra information
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
-  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
+  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others. can also set with environment variable SEQKIT_THREADS) (default 2)
+
+Use "seqkit [command] --help" for more information about a command.
 
 ```
 

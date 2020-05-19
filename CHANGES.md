@@ -1,5 +1,6 @@
 - [SeqKit v0.13.0](https://github.com/shenwei356/seqkit/releases/tag/v0.13.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.13.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.13.0)
+    - `seqkit`: fix a rare FASTA/Q parser bug. [#127](https://github.com/shenwei356/seqkit/issues/127)
     - `seqkit seq`: output sequence or quality in single line when `-s/--seq` or `-q/--qual` is on. [#132](https://github.com/shenwei356/seqkit/issues/132)
     - New features and improvements by [@bsipos](https://github.com/bsipos). [#130](https://github.com/shenwei356/seqkit/pull/130)
     - Added `scat`, a subcommand for real-time robust concatenation of fastx files. 
