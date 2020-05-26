@@ -43,8 +43,8 @@ var translateCmd = &cobra.Command{
 
 Note:
 
-  1. this command supports codons containing any ambiguous base.
-     Plese switch on flag -L for details. e.g., for standard table:
+  1. This command supports codons containing any ambiguous base.
+     Please switch on flag -L INT for details. e.g., for standard table:
 
         ACN -> T
         CCN -> P
