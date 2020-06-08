@@ -3,6 +3,7 @@
     - `seqkit`: fix a rare FASTA/Q parser bug. [#127](https://github.com/shenwei356/seqkit/issues/127)
     - `seqkit seq`: output sequence or quality in single line when `-s/--seq` or `-q/--qual` is on. [#132](https://github.com/shenwei356/seqkit/issues/132)
     - `seqkit translate`: delete debug info, [#133](https://github.com/shenwei356/seqkit/issues/133), and fix typo, [#134](https://github.com/shenwei356/seqkit/issues/134)
+    - `seqkit split2`: performance improvement. [#137](https://github.com/shenwei356/seqkit/issues/137)
     - New features and improvements by [@bsipos](https://github.com/bsipos). [#130](https://github.com/shenwei356/seqkit/pull/130)
     - Added `scat`, a subcommand for real-time robust concatenation of fastx files. 
     - Rewrote the parser behind the `sana` subcommand, now it supports robust parsing of fasta file as well.
