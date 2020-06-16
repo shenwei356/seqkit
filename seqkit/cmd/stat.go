@@ -77,6 +77,8 @@ Tips:
 		skipErr := getFlagBool(cmd, "skip-err")
 		fqEncoding := parseQualityEncoding(getFlagString(cmd, "fq-encoding"))
 		basename := getFlagBool(cmd, "basename")
+		stdinLabel := getFlagString(cmd, "stdin-label")
+		replaceStdinLabel := stdinLabel != "-"
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
@@ -305,6 +307,9 @@ Tips:
 						return
 					default:
 					}
+					if replaceStdinLabel && isStdin(file) {
+						file = stdinLabel
+					}
 					ch <- statInfo{file: file, err: err, id: id}
 					return
 				}
@@ -327,6 +332,9 @@ Tips:
 							case <-cancel:
 								return
 							default:
+							}
+							if replaceStdinLabel && isStdin(file) {
+								file = stdinLabel
 							}
 							ch <- statInfo{file: file, err: err, id: id}
 							return
@@ -401,6 +409,9 @@ Tips:
 					if basename {
 						file = filepath.Base(file)
 					}
+					if replaceStdinLabel && isStdin(file) {
+						file = stdinLabel
+					}
 					ch <- statInfo{file, seqFormat, t,
 						0, 0, 0, 0,
 						0, lenMax, 0, 0,
@@ -410,6 +421,9 @@ Tips:
 				} else {
 					if basename {
 						file = filepath.Base(file)
+					}
+					if replaceStdinLabel && isStdin(file) {
+						file = stdinLabel
 					}
 					ch <- statInfo{file, seqFormat, t,
 						num, lenSum, gapSum, lenMin,
@@ -532,6 +546,7 @@ func init() {
 	statCmd.Flags().BoolP("skip-err", "e", false, "skip error, only show warning message")
 	statCmd.Flags().StringP("fq-encoding", "E", "sanger", `fastq quality encoding. available values: 'sanger', 'solexa', 'illumina-1.3+', 'illumina-1.5+', 'illumina-1.8+'.`)
 	statCmd.Flags().BoolP("basename", "b", false, "only output basename of files")
+	statCmd.Flags().StringP("stdin-label", "i", "-", `label for replacing default "-" for stdin`)
 }
 
 func median(sorted []int64) int64 {
