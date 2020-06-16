@@ -639,6 +639,7 @@ Flags:
   -G, --gap-letters string   gap letters (default "- .")
   -h, --help                 help for stats
   -e, --skip-err             skip error, only show warning message
+  -i, --stdin-label string   label for replacing default "-" for stdin (default "-")
   -T, --tabular              output in machine-friendly tabular format
 ```
 
@@ -743,6 +744,23 @@ This command is similar with "samtools faidx" but has some extra features:
   2. support regular expression as sequence ID with flag -r
   3. if you have large number of IDs, you can use:
         seqkit faidx seqs.fasta --infile-list IDs.txt
+
+The definition of region is 1-based and with some custom design.
+
+Examples:
+
+ 1-based index    1 2 3 4 5 6 7 8 9 10
+negative index    0-9-8-7-6-5-4-3-2-1
+           seq    A C G T N a c g t n
+           1:1    A
+           2:4      C G T
+         -4:-2                c g t
+         -4:-1                c g t n
+         -1:-1                      n
+          2:-2      C G T N a c g t
+          1:-1    A C G T N a c g t n
+          1:12    A C G T N a c g t n
+        -12:-1    A C G T N a c g t n
 
 Usage:
   seqkit faidx [flags] <fasta-file> [regions...]

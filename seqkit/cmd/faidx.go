@@ -39,16 +39,20 @@ import (
 var faidxCmd = &cobra.Command{
 	Use:   "faidx",
 	Short: "create FASTA index file and extract subsequence",
-	Long: `create FASTA index file and extract subsequence
+	Long: fmt.Sprintf(`create FASTA index file and extract subsequence
 
 This command is similar with "samtools faidx" but has some extra features:
 
   1. output full header line with flag -f
   2. support regular expression as sequence ID with flag -r
   3. if you have large number of IDs, you can use:
-        seqkit faidx seqs.fasta --infile-list IDs.txt
+		seqkit faidx seqs.fasta --infile-list IDs.txt
 
-`,
+The definition of region is 1-based and with some custom design.
+
+Examples:
+%s
+`, regionExample),
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
 		runtime.GOMAXPROCS(config.Threads)
