@@ -43,8 +43,8 @@ var translateCmd = &cobra.Command{
 
 Note:
 
-  1. this command supports codons containing any ambiguous base.
-     Plese switch on flag -L for details. e.g., for standard table:
+  1. This command supports codons containing any ambiguous base.
+     Please switch on flag -L INT for details. e.g., for standard table:
 
         ACN -> T
         CCN -> P
@@ -108,7 +108,6 @@ Translate Tables/Genetic Codes:
 			if err != nil {
 				checkError(fmt.Errorf("invalid frame(s): %s. available: 1, 2, 3, -1, -2, -3, and 6 for all. multiple frames should be separated by comma", _frame))
 			}
-			fmt.Println(_frame, frame)
 			if !(frame == 1 || frame == 2 || frame == 3 || frame == -1 || frame == -2 || frame == -3 || frame == 6) {
 				checkError(fmt.Errorf("invalid frame: %d. available: 1, 2, 3, -1, -2, -3, and 6 for all", frame))
 			}

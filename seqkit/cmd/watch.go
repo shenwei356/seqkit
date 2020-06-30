@@ -303,7 +303,7 @@ func init() {
 	watchCmd.Flags().BoolP("validate-seq", "v", false, "validate bases according to the alphabet")
 	watchCmd.Flags().BoolP("pass", "x", false, "pass through mode (write input to stdout)")
 	watchCmd.Flags().BoolP("log", "L", false, "log10(x+1) transform numeric values")
-	watchCmd.Flags().StringP("fields", "f", "ReadLen", "target fields")
+	watchCmd.Flags().StringP("fields", "f", "ReadLen", "target fields, available values: ReadLen, MeanQual, GC, GCSkew")
 	watchCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
 	watchCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
 	watchCmd.Flags().IntP("bins", "B", -1, "number of histogram bins")

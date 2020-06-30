@@ -16,6 +16,7 @@
 - [faidx](#faidx)
 - [watch](#watch)
 - [sana](#sana)
+- [scat](#scat)
 
 **Format conversion**
 
@@ -172,7 +173,7 @@ reproduced in different environments with same random seed.
 ``` text
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.12.1
+Version: 0.13.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -207,6 +208,7 @@ Available Commands:
   rmdup           remove duplicated sequences by id/name/sequence
   sample          sample sequences by number or proportion
   sana            sanitize broken single line fastq files
+  scat            real time recursive concatenation and streaming of fastx files
   seq             transform sequences (revserse, complement, extract ID...)
   shuffle         shuffle sequences
   sliding         sliding sequences, circular genome supported
@@ -230,7 +232,9 @@ Flags:
   -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
       --quiet                           be quiet and do not show extra information
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
-  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
+  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others. can also set with environment variable SEQKIT_THREADS) (default 2)
+
+Use "seqkit [command] --help" for more information about a command.
 
 ```
 
@@ -635,6 +639,7 @@ Flags:
   -G, --gap-letters string   gap letters (default "- .")
   -h, --help                 help for stats
   -e, --skip-err             skip error, only show warning message
+  -i, --stdin-label string   label for replacing default "-" for stdin (default "-")
   -T, --tabular              output in machine-friendly tabular format
 ```
 
@@ -740,6 +745,23 @@ This command is similar with "samtools faidx" but has some extra features:
   3. if you have large number of IDs, you can use:
         seqkit faidx seqs.fasta --infile-list IDs.txt
 
+The definition of region is 1-based and with some custom design.
+
+Examples:
+
+ 1-based index    1 2 3 4 5 6 7 8 9 10
+negative index    0-9-8-7-6-5-4-3-2-1
+           seq    A C G T N a c g t n
+           1:1    A
+           2:4      C G T
+         -4:-2                c g t
+         -4:-1                c g t n
+         -1:-1                      n
+          2:-2      C G T N a c g t
+          1:-1    A C G T N a c g t n
+          1:12    A C G T N a c g t n
+        -12:-1    A C G T N a c g t n
+
 Usage:
   seqkit faidx [flags] <fasta-file> [regions...]
 
@@ -808,7 +830,7 @@ Flags:
   -B, --bins int                  number of histogram bins (default -1)
   -W, --delay int                 sleep this many seconds after online plotting (default 1)
   -y, --dump                      print histogram data to stderr instead of plotting
-  -f, --fields string             target fields (default "ReadLen")
+  -f, --fields string             target fields, available values: ReadLen, MeanQual, GC, GCSkew (default "ReadLen")
   -h, --help                      help for watch
   -O, --img string                save histogram to this PDF/image file
   -H, --list-fields               print out a list of available fields
@@ -832,6 +854,7 @@ Examples
 2. Histogram of mean base qualities every 500 record, also saved as PDF
 
         seqkit watch -p 500 -O qhist.pdf -f MeanQual reads_1.fq.gz
+
 ```
 
 ## sana
@@ -903,9 +926,7 @@ Examples
 
 	seqkit scat -j 4 -p $PID fastq_dir > all_records.fq
 
-Notes
-
-You might need to increase the `ulimit` allowance on open files if you intend to stream fastx records from a large number of files.
+**Notes**: You might need to increase the `ulimit` allowance on open files if you intend to stream fastx records from a large number of files.
 
 ## fq2fa
 
@@ -1153,8 +1174,8 @@ translate DNA/RNA to protein sequence (supporting ambiguous bases)
 
 Note:
 
-  1. this command supports codons containing any ambiguous base.
-     Plese switch on flag -L for details. e.g., for standard table:
+  1. This command supports codons containing any ambiguous base.
+     Please switch on flag -L INT for details. e.g., for standard table:
 
         ACN -> T
         CCN -> P

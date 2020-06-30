@@ -166,6 +166,9 @@ var seqCmd = &cobra.Command{
 			checkSeqType = true
 			printQual = false
 			once := true
+			if onlySeq || onlyQual {
+				config.LineWidth = 0
+			}
 			for {
 				record, err = fastxReader.Read()
 				if err != nil {

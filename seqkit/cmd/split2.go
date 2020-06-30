@@ -26,7 +26,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"sort"
 	"strings"
 	"sync"
 
@@ -188,28 +187,20 @@ according to the input files.
 				var fastxReader *fastx.Reader
 				var err error
 
-				var outfhs map[int]*xopen.Writer
-				var counts map[int]int
-				var outfiles map[int]string
+				var outfhs []*xopen.Writer
+				var counts []int
+				var outfiles []string
 
-				if size > 0 {
-					outfhs = make(map[int]*xopen.Writer, 10)
-					outfhs[0] = nil
-					counts = make(map[int]int, 10)
-					outfiles = make(map[int]string, 10)
-				} else if parts > 0 {
-					outfhs = make(map[int]*xopen.Writer, parts)
-					counts = make(map[int]int, parts)
-					outfiles = make(map[int]string, parts)
-					for i := 0; i < parts; i++ {
-						outfhs[i] = nil
-						counts[i] = 0
-					}
+				if size > 0 || length > 0 { // by size or by length
+					outfhs = make([]*xopen.Writer, 0, 10)
+					counts = make([]int, 0, 10)
+					outfiles = make([]string, 0, 10)
+				} else if parts > 0 { // by part
+					outfhs = make([]*xopen.Writer, 0, parts)
+					counts = make([]int, 0, parts)
+					outfiles = make([]string, 0, parts)
 				} else {
-					outfhs = make(map[int]*xopen.Writer, 10)
-					outfhs[0] = nil
-					counts = make(map[int]int, 10)
-					outfiles = make(map[int]string, 10)
+					checkError(fmt.Errorf(`one of flags should be given: -s/-p. type "seqkit split2 -h" for help`))
 				}
 
 				var outfh *xopen.Writer
@@ -248,15 +239,17 @@ according to the input files.
 							if !quiet {
 								log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
 							}
-							delete(outfhs, i)
+							outfhs[i] = nil
 
 							i++
 							var outfh2 *xopen.Writer
 							outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
 							outfh2, err = xopen.Wopen(outfile)
 							checkError(err)
-							outfhs[i] = outfh2
-							outfiles[i] = outfile
+
+							outfhs = append(outfhs, outfh2)
+							counts = append(counts, 0)
+							outfiles = append(outfiles, outfile)
 
 							j = 0
 						}
@@ -266,27 +259,31 @@ according to the input files.
 							if !quiet {
 								log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
 							}
-							delete(outfhs, i)
+							outfhs[i] = nil
 
 							i++
 							var outfh2 *xopen.Writer
 							outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
 							outfh2, err = xopen.Wopen(outfile)
 							checkError(err)
-							outfhs[i] = outfh2
-							outfiles[i] = outfile
+
+							outfhs = append(outfhs, outfh2)
+							counts = append(counts, 0)
+							outfiles = append(outfiles, outfile)
 
 							n = 0
 						}
 					}
 
-					if outfhs[i] == nil {
+					if i+1 > len(outfhs) || outfhs[i] == nil {
 						var outfh2 *xopen.Writer
 						outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
 						outfh2, err = xopen.Wopen(outfile)
 						checkError(err)
-						outfhs[i] = outfh2
-						outfiles[i] = outfile
+
+						outfhs = append(outfhs, outfh2)
+						counts = append(counts, 0)
+						outfiles = append(outfiles, outfile)
 					}
 					outfh = outfhs[i]
 
@@ -295,10 +292,10 @@ according to the input files.
 					counts[i]++
 
 					if size > 0 {
-						j++
+						j++ // increase size
 					} else if parts > 0 {
 						i++
-						if i == parts {
+						if i == parts { // reset index
 							i = 0
 						}
 					} else {
@@ -306,17 +303,11 @@ according to the input files.
 					}
 				}
 
-				sortedI := make([]int, len(outfhs))
-				k := 0
-				for i = range outfhs {
-					sortedI[k] = i
-					k++
-				}
-				sort.Ints(sortedI)
-
-				for _, i := range sortedI {
-					if outfhs[i] != nil {
-						outfhs[i].Close()
+				// for by-size/length: only log last part,
+				// for by-parts: log all parts.
+				for i, outfh := range outfhs {
+					if outfh != nil {
+						outfh.Close()
 					}
 
 					if !quiet {
