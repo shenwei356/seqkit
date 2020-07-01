@@ -555,14 +555,14 @@ rm seqkit_fish.tsv
 # ------------------------------------------------------------
 
 # Regression test for sana/fasta
-#fun(){
-#	awk '{print ">" $1 "\n" $2}' tests/scat_test.tsv > tests/sana_test_input.fas
-#	seqkit sana -i fasta tests/sana_test_input.fas > tests/sana_output.fas
-#}
-#run sana_fasta_regression fun
-#cmp tests/sana_output.fas tests/sana_ground.fas
-#assert_equal $? 0
-#rm -f tests/sana_output.fas tests/sana_test_input.fas
+fun(){
+	awk '{print ">" $1 "\n" $2}' tests/scat_test.tsv > tests/sana_test_input.fas
+	seqkit sana -i fasta tests/sana_test_input.fas > tests/sana_output.fas
+}
+run sana_fasta_regression fun
+cmp tests/sana_output.fas tests/sana_ground.fas
+assert_equal $? 0
+rm -f tests/sana_output.fas tests/sana_test_input.fas
 
 # Regression test for sana/fastq
 fun(){
@@ -589,7 +589,7 @@ fun(){
 	SCAT_PID=$!
         BAK=$IFS
         IFS=$'\n'
-	SIZE=5
+	SIZE=3
         for i in `seq 0 $SIZE`;
         do
                 for j in `seq 0 $SIZE`;
@@ -602,17 +602,19 @@ fun(){
                                 PRE=".${RANDOM}.${i}.${j}"
                                 echo -n $l | awk -v pre="$PRE" '{print ">" $1 pre  "\n" $2}' - >> $F
                                 echo -n $l | awk -v pre="$PRE" '{print ">" $1 pre  "\n" $2}' - >> tests/scat_test_all.fas
+				sync;
                         done;
 		done;
         done;
         IFS=$BAK
-	sync
-	seqkit sana -j 4 -i fasta tests/scat_test_all.fas | seqkit sort -n -j 4 - > tests/sorted_scat_test_all.fas
+	sync; sleep 0.5
+	seqkit sana -j 4 -i fasta tests/scat_test_all.fas | seqkit sort -n -j 1 - > tests/sorted_scat_test_all.fas
 	kill -s INT $SCAT_PID
+	sync; sleep 0.5
 	wait $SCAT_PID
-	seqkit scat -f -j 4 -i fasta $BASE | seqkit sort -n -j 4 - > tests/sorted_scat_find.fas
-	sync
-	seqkit sort -n -j 4 tests/scat_output.fas > tests/sorted_scat_output.fas
+	sync; 
+	seqkit scat -f -j 4 -i fasta $BASE | seqkit sort -n -j 1 - > tests/sorted_scat_find.fas
+	seqkit sort -n -j 1 tests/scat_output.fas > tests/sorted_scat_output.fas
 	rm -fr $BASE
 	rm -f tests/scat_test_all.fas tests/scat_output.fas
 }
@@ -634,7 +636,7 @@ fun(){
 	SCAT_PID=$!
         BAK=$IFS
         IFS=$'\n'
-	SIZE=5
+	SIZE=3
         for i in `seq 0 $SIZE`;
         do
                 for j in `seq 0 $SIZE`;
@@ -651,14 +653,14 @@ fun(){
 		done;
         done;
         IFS=$BAK
-	seqkit sana -j 4 -i fastq tests/scat_test_all.fq > tests/scat_test_all_sana.fq
 	sync; sleep 0.5
+	seqkit sana -j 4 -i fastq tests/scat_test_all.fq > tests/scat_test_all_sana.fq
 	kill -s INT $SCAT_PID
 	wait $SCAT_PID
-	seqkit scat -f -j 4 -i fastq $BASE | seqkit sort -n -j 4 - > tests/sorted_scat_find.fq
-	sync
-	seqkit sort -n -j 4 tests/scat_test_all_sana.fq > tests/sorted_scat_test_all.fq
-	seqkit sort -n -j 4 tests/scat_output.fq > tests/sorted_scat_output.fq
+	sync; sleep 0.5
+	seqkit scat -f -j 4 -i fastq $BASE | seqkit sort -n -j 1 - > tests/sorted_scat_find.fq
+	seqkit sort -n -j 1 tests/scat_test_all_sana.fq > tests/sorted_scat_test_all.fq
+	seqkit sort -n -j 1 tests/scat_output.fq > tests/sorted_scat_output.fq
 	rm -fr $BASE
 	rm -f tests/scat_test_all.fq tests/scat_output.fq
 }
