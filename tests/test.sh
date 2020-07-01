@@ -589,7 +589,7 @@ fun(){
 	SCAT_PID=$!
         BAK=$IFS
         IFS=$'\n'
-	SIZE=5
+	SIZE=3
         for i in `seq 0 $SIZE`;
         do
                 for j in `seq 0 $SIZE`;
@@ -636,7 +636,7 @@ fun(){
 	SCAT_PID=$!
         BAK=$IFS
         IFS=$'\n'
-	SIZE=5
+	SIZE=3
         for i in `seq 0 $SIZE`;
         do
                 for j in `seq 0 $SIZE`;
