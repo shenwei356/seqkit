@@ -183,6 +183,7 @@ MAIN:
 				signal.Reset(os.Interrupt)
 				sigChan = nil
 			}
+			outw.Flush()
 			continue MAIN
 		case <-pidTimer.C:
 			if !IsPidAlive(waitPid) {
@@ -191,6 +192,7 @@ MAIN:
 				log.Info("Watched process with PID", waitPid, "exited.")
 				sendQuitCmds()
 			}
+			outw.Flush()
 			continue MAIN
 		case <-ticker.C:
 			ticker.Stop()
@@ -216,6 +218,7 @@ MAIN:
 						case nil:
 							pass++
 							outw.Write([]byte(rawSeq.Format(outFmt) + "\n"))
+							outw.Flush()
 						default:
 							fail++
 							os.Stderr.WriteString("From file: " + rawSeq.File + "\t" + rawSeq.String() + "\n")
@@ -238,6 +241,7 @@ MAIN:
 							activeCount--
 							continue CHAN
 						default:
+							outw.Flush()
 							continue CHAN
 						}
 					}
@@ -250,6 +254,7 @@ MAIN:
 		} // select 2
 	} //for evers
 
+	outw.Flush()
 	log.Info(fmt.Sprintf("Total stats:\tPass records: %d\tDiscarded lines: %d\n", pass, fail))
 }
 
