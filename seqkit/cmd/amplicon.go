@@ -118,6 +118,9 @@ Examples:
 		maxMismatch := getFlagNonNegativeInt(cmd, "max-mismatch")
 		strict := getFlagBool(cmd, "strict-mode")
 		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
+		outFmtBED := getFlagBool(cmd, "bed")
+
+		pName := "."
 
 		forward := []byte(forward0)
 		if seq.DNAredundant.IsValid(forward) != nil {
@@ -173,6 +176,7 @@ Examples:
 
 		strands := []string{"+", "-"}
 		var strand string
+		var tmpSeq *seq.Seq
 
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
@@ -214,8 +218,24 @@ Examples:
 						continue
 					}
 
-					record.Seq.SubSeqInplace(loc[0], loc[1])
+					if outFmtBED {
+						outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\t%s\n",
+							record.ID,
+							loc[0]-1,
+							loc[1],
+							pName,
+							0,
+							strand,
+							record.Seq.SubSeq(loc[0], loc[1]).Seq))
+
+						continue
+					}
+					tmpSeq = record.Seq
+
+					record.Seq = record.Seq.SubSeq(loc[0], loc[1])
 					record.FormatToWriter(outfh, config.LineWidth)
+
+					record.Seq = tmpSeq
 				}
 			}
 
@@ -235,6 +255,7 @@ func init() {
 	ampliconCmd.Flags().BoolP("flanking-region", "f", false, "region is flanking region")
 	ampliconCmd.Flags().BoolP("strict-mode", "s", false, "strict mode, i.e., discarding seqs not fully matching (shorter) given region range")
 	ampliconCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on positive strand")
+	ampliconCmd.Flags().BoolP("bed", "", false, "output in BED6+1 format with amplicon as 7th columns")
 }
 
 // AmpliconFinder is a struct for locating amplicon via primer(s).
@@ -539,4 +560,20 @@ func (finder *AmpliconFinder) Locate() ([]int, error) {
 	finder.searched, finder.found = true, true
 	finder.iBegin, finder.iEnd = locsI[0], locsI[0]+len(finder.R)-1
 	return []int{locsI[0] + 1, locsJ[len(locsJ)-1] + len(finder.R)}, nil
+}
+
+// Location returns location of amplicon.
+// Locations are 1-based, nil returns if not found.
+func (finder *AmpliconFinder) Location() ([]int, error) {
+	if !finder.searched {
+		_, err := finder.Locate()
+		if err != nil {
+			return nil, err
+		}
+	}
+	if !finder.found {
+		return nil, nil
+	}
+
+	return []int{finder.iBegin + 1, finder.iEnd + 1}, nil
 }

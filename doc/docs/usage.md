@@ -969,6 +969,7 @@ Flags:
   -n, --name                   only print names (no sequences and qualities)
   -i, --only-id                print ID instead of full head
   -b, --qual-ascii-base int    ASCII BASE, 33 for Phred+33 (default 33)
+  -s, --seq-hash               print hash of sequence (case sensitive)
 
 ```
 
