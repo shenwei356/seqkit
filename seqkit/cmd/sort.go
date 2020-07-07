@@ -155,8 +155,8 @@ and extracts sequences by FASTA index.
 					id2name[name] = []byte(string(record.Name))
 
 					if ignoreCase {
-						name = strings.ToLower(name)
 						name2name0[strings.ToLower(name)] = name
+						name = strings.ToLower(name)
 					} else {
 						name2name0[name] = name
 					}
