@@ -21,9 +21,11 @@
 package cmd
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"io"
+	"os"
 	"runtime"
 	"sort"
 	"strconv"
@@ -115,26 +117,24 @@ Examples:
 
 		forward0 := getFlagString(cmd, "forward")
 		reverse0 := getFlagString(cmd, "reverse")
+		primerFile := getFlagString(cmd, "primer-file")
 		maxMismatch := getFlagNonNegativeInt(cmd, "max-mismatch")
 		strict := getFlagBool(cmd, "strict-mode")
 		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
 		outFmtBED := getFlagBool(cmd, "bed")
 
-		pName := "."
+		var list [][3]string
+		var primers [][3][]byte
 
-		forward := []byte(forward0)
-		if seq.DNAredundant.IsValid(forward) != nil {
-			checkError(fmt.Errorf("invalid primer sequence: %s", forward))
+		if primerFile != "" {
+			list, err = loadPrimers(primerFile)
+			checkError(err)
+		} else {
+			list = [][3]string{[3]string{".", forward0, reverse0}}
 		}
 
-		reverse := []byte(reverse0)
-		if seq.DNAredundant.IsValid(reverse) != nil {
-			checkError(fmt.Errorf("invalid primer sequence: %s", reverse))
-		}
-
-		// compute revcom of reverse
-		s, _ := seq.NewSeq(seq.DNAredundant, reverse)
-		reverse = s.RevCom().Seq
+		primers, err = parsePrimers(list)
+		checkError(err)
 
 		var begin, end int
 
@@ -177,6 +177,7 @@ Examples:
 		strands := []string{"+", "-"}
 		var strand string
 		var tmpSeq *seq.Seq
+		var primer [3][]byte
 
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
@@ -204,38 +205,40 @@ Examples:
 						record.Seq.RevComInplace()
 					}
 
-					finder, err = NewAmpliconFinder(record.Seq.Seq, forward, reverse, maxMismatch)
-					checkError(err)
+					for _, primer = range primers {
+						finder, err = NewAmpliconFinder(record.Seq.Seq, primer[1], primer[2], maxMismatch)
+						checkError(err)
 
-					if usingRegion {
-						loc, err = finder.LocateRange(begin, end, fregion, strict)
-					} else {
-						loc, err = finder.Locate()
+						if usingRegion {
+							loc, err = finder.LocateRange(begin, end, fregion, strict)
+						} else {
+							loc, err = finder.Locate()
+						}
+						checkError(err)
+
+						if loc == nil {
+							continue
+						}
+
+						if outFmtBED {
+							outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\t%s\n",
+								record.ID,
+								loc[0]-1,
+								loc[1],
+								primer[0],
+								0,
+								strand,
+								record.Seq.SubSeq(loc[0], loc[1]).Seq))
+
+							continue
+						}
+						tmpSeq = record.Seq
+
+						record.Seq = record.Seq.SubSeq(loc[0], loc[1])
+						record.FormatToWriter(outfh, config.LineWidth)
+
+						record.Seq = tmpSeq
 					}
-					checkError(err)
-
-					if loc == nil {
-						continue
-					}
-
-					if outFmtBED {
-						outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\t%s\n",
-							record.ID,
-							loc[0]-1,
-							loc[1],
-							pName,
-							0,
-							strand,
-							record.Seq.SubSeq(loc[0], loc[1]).Seq))
-
-						continue
-					}
-					tmpSeq = record.Seq
-
-					record.Seq = record.Seq.SubSeq(loc[0], loc[1])
-					record.FormatToWriter(outfh, config.LineWidth)
-
-					record.Seq = tmpSeq
 				}
 			}
 
@@ -247,15 +250,73 @@ Examples:
 func init() {
 	RootCmd.AddCommand(ampliconCmd)
 
-	ampliconCmd.Flags().StringP("forward", "F", "", "forward primer")
-	ampliconCmd.Flags().StringP("reverse", "R", "", "reverse primer")
+	ampliconCmd.Flags().StringP("forward", "F", "", "forward primer (5'-primer-3')")
+	ampliconCmd.Flags().StringP("reverse", "R", "", "reverse primer (5'-primer-3')")
 	ampliconCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching primers")
+	ampliconCmd.Flags().StringP("primer-file", "p", "", "3- or 2-column tabular primer file, with first column as primer name")
 
 	ampliconCmd.Flags().StringP("region", "r", "", `specify region to return. type "seqkit amplicon -h" for detail`)
 	ampliconCmd.Flags().BoolP("flanking-region", "f", false, "region is flanking region")
 	ampliconCmd.Flags().BoolP("strict-mode", "s", false, "strict mode, i.e., discarding seqs not fully matching (shorter) given region range")
 	ampliconCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on positive strand")
 	ampliconCmd.Flags().BoolP("bed", "", false, "output in BED6+1 format with amplicon as 7th columns")
+}
+
+func loadPrimers(file string) ([][3]string, error) {
+	fh, err := os.Open(file)
+	if err != nil {
+		return nil, fmt.Errorf("load primers from '%s': %s", file, err)
+	}
+
+	var text string
+	var items []string
+	lists := make([][3]string, 0, 100)
+	scanner := bufio.NewScanner(fh)
+	for scanner.Scan() {
+		text = scanner.Text()
+		if strings.TrimSpace(text) == "" {
+			continue
+		}
+		items = strings.Split(text, "\t")
+		switch len(items) {
+		case 3:
+			lists = append(lists, [3]string{items[0], items[1], items[2]})
+		case 2:
+			lists = append(lists, [3]string{items[0], items[1], ""})
+		default:
+			continue
+		}
+	}
+	if err = scanner.Err(); err != nil {
+		return nil, fmt.Errorf("load primers from '%s': %s", file, err)
+	}
+
+	return lists, nil
+}
+
+func parsePrimers(primers [][3]string) ([][3][]byte, error) {
+	list := make([][3][]byte, 0, len(primers))
+
+	for _, items := range primers {
+		name := []byte(items[0])
+
+		forward := []byte(items[1])
+		if seq.DNAredundant.IsValid(forward) != nil {
+			return nil, fmt.Errorf("invalid primer sequence: %s", forward)
+		}
+
+		reverse := []byte(items[2])
+		if seq.DNAredundant.IsValid(reverse) != nil {
+			return nil, fmt.Errorf("invalid primer sequence: %s", reverse)
+		}
+
+		// compute revcom of reverse
+		s, _ := seq.NewSeq(seq.DNAredundant, reverse)
+		reverse = s.RevCom().Seq
+
+		list = append(list, [3][]byte{name, forward, reverse})
+	}
+	return list, nil
 }
 
 // AmpliconFinder is a struct for locating amplicon via primer(s).

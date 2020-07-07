@@ -1745,13 +1745,16 @@ Usage:
   seqkit amplicon [flags]
 
 Flags:
-  -f, --flanking-region    region is flanking region
-  -F, --forward string     forward primer
-  -h, --help               help for amplicon
-  -m, --max-mismatch int   max mismatch when matching primers
-  -r, --region string      specify region to return. type "seqkit amplicon -h" for detail
-  -R, --reverse string     reverse primer
-  -s, --strict             strict mode, i.e., discarding seqs not fully matching (shorter) given region range
+      --bed                    output in BED6+1 format with amplicon as 7th columns
+  -f, --flanking-region        region is flanking region
+  -F, --forward string         forward primer (5'-primer-3')
+  -h, --help                   help for amplicon
+  -m, --max-mismatch int       max mismatch when matching primers
+  -P, --only-positive-strand   only search on positive strand
+  -p, --primer-file string     3- or 2-column tabular primer file, with first column as primer name
+  -r, --region string          specify region to return. type "seqkit amplicon -h" for detail
+  -R, --reverse string         reverse primer (5'-primer-3')
+  -s, --strict-mode            strict mode, i.e., discarding seqs not fully matching (shorter) given region range
 ```
 
 Examples
@@ -1767,6 +1770,30 @@ Examples
         >seq
         cccactgaaa
 
+        # BED6+1
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F ccc -R ttt --bed
+        seq     3       13      .       0       +       cccactgaaa
+        
+1. Load primers from 3- or 2-column tabular primer file, with first column as primer name.
+        
+        $ cat seqs4amplicon.fa 
+        >seq1
+        acgcccactgaaatga
+        >seq2
+        acgtacggtcaga
+        
+        $ cat primers.tsv 
+        p1      ccc     ttt
+        p2      ttt     ccc
+        p3      CG      TG
+        
+        $ cat seqs4amplicon.fa | seqkit amplicon -p primers.tsv --bed
+        seq1    3       13      p1      0       +       cccactgaaa
+        seq1    1       7       p3      0       +       cgccca
+        seq1    3       13      p2      0       -       tttcagtggg
+        seq2    1       11      p3      0       +       cgtacggtca
+        
 1. Inner region
 
         # region right behind forward primer
@@ -1774,6 +1801,11 @@ Examples
             | seqkit amplicon -F ccc -R ttt -r 4:7
         >seq
         actg
+        
+        # BED
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F ccc -R ttt -r 4:7 --bed
+        seq     6       10      .       0       +       actg
         
         # more common case is triming primers
         $ echo -ne ">seq\nacgcccactgaaatga\n" \
@@ -1789,6 +1821,11 @@ Examples
             | seqkit amplicon -F ccc -f -r 3:6
         >seq
         tgaa
+        
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F ccc -f -r 3:6 --bed
+        seq     8       12      .       0       +       tgaa
+
         
         # if given region if out scope of sequence. e.g,
         # 2-5bp downstream of aaa, we can get part of region (2-4) by default
