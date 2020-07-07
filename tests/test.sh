@@ -557,7 +557,7 @@ rm seqkit_fish.tsv
 # Regression test for sana/fasta
 fun(){
 	awk '{print ">" $1 "\n" $2}' tests/scat_test.tsv > tests/sana_test_input.fas
-	seqkit sana -i fasta tests/sana_test_input.fas > tests/sana_output.fas
+	$app sana -i fasta tests/sana_test_input.fas > tests/sana_output.fas
 }
 run sana_fasta_regression fun
 cmp tests/sana_output.fas tests/sana_ground.fas
@@ -567,8 +567,8 @@ rm -f tests/sana_output.fas tests/sana_test_input.fas
 # Regression test for sana/fastq
 fun(){
 	awk '{print "@" $1 "\n" $2 "\n+\n" $3}' tests/scat_test.tsv > tests/sana_test_input.fq
-	#seqkit sana -i fastq tests/sana_test_input.fq > tests/sana_output.fq
-	seqkit sana tests/sana_test_input.fq > tests/sana_output.fq
+	# $app  sana -i fastq tests/sana_test_input.fq > tests/sana_output.fq
+	$app  sana tests/sana_test_input.fq > tests/sana_output.fq
 }
 run sana_fastq_regression fun
 cmp tests/sana_output.fq tests/sana_ground.fq
@@ -585,7 +585,7 @@ fun(){
 	rm -fr $BASE 
 	rm -f tests/scat_test_all.fas tests/scat_output.fas
         mkdir -p $BASE
-	(seqkit scat -j 4 -i fasta $BASE > tests/scat_output.fas)&
+	($app scat -j 4 -i fasta $BASE > tests/scat_output.fas)&
 	SCAT_PID=$!
         BAK=$IFS
         IFS=$'\n'
@@ -608,13 +608,13 @@ fun(){
         done;
         IFS=$BAK
 	sync; sleep 0.5
-	seqkit sana -j 4 -i fasta tests/scat_test_all.fas | seqkit sort -n -j 1 - > tests/sorted_scat_test_all.fas
+	$app sana -j 4 -i fasta tests/scat_test_all.fas | $app sort -n -j 1 - > tests/sorted_scat_test_all.fas
 	kill -s INT $SCAT_PID
 	sync; sleep 0.5
 	wait $SCAT_PID
 	sync; 
-	seqkit scat -f -j 4 -i fasta $BASE | seqkit sort -n -j 1 - > tests/sorted_scat_find.fas
-	seqkit sort -n -j 1 tests/scat_output.fas > tests/sorted_scat_output.fas
+	$app scat -f -j 4 -i fasta $BASE | $app sort -n -j 1 - > tests/sorted_scat_find.fas
+	$app sort -n -j 1 tests/scat_output.fas > tests/sorted_scat_output.fas
 	rm -fr $BASE
 	rm -f tests/scat_test_all.fas tests/scat_output.fas
 }
@@ -632,7 +632,7 @@ fun(){
 	rm -fr $BASE 
 	rm -f tests/scat_test_all.fq tests/scat_output.fq
         mkdir -p $BASE
-	(seqkit scat -j 4 -i fastq $BASE > tests/scat_output.fq)&
+	($app scat -j 4 -i fastq $BASE > tests/scat_output.fq)&
 	SCAT_PID=$!
         BAK=$IFS
         IFS=$'\n'
@@ -654,13 +654,13 @@ fun(){
         done;
         IFS=$BAK
 	sync; sleep 0.5
-	seqkit sana -j 4 -i fastq tests/scat_test_all.fq > tests/scat_test_all_sana.fq
+	$app sana -j 4 -i fastq tests/scat_test_all.fq > tests/scat_test_all_sana.fq
 	kill -s INT $SCAT_PID
 	wait $SCAT_PID
 	sync; sleep 0.5
-	seqkit scat -f -j 4 -i fastq $BASE | seqkit sort -n -j 1 - > tests/sorted_scat_find.fq
-	seqkit sort -n -j 1 tests/scat_test_all_sana.fq > tests/sorted_scat_test_all.fq
-	seqkit sort -n -j 1 tests/scat_output.fq > tests/sorted_scat_output.fq
+	$app scat -f -j 4 -i fastq $BASE | $app sort -n -j 1 - > tests/sorted_scat_find.fq
+	$app sort -n -j 1 tests/scat_test_all_sana.fq > tests/sorted_scat_test_all.fq
+	$app sort -n -j 1 tests/scat_output.fq > tests/sorted_scat_output.fq
 	rm -fr $BASE
 	rm -f tests/scat_test_all.fq tests/scat_output.fq
 }
@@ -684,14 +684,14 @@ fun(){
     $app faidx $file $(paste -s -d ' ' $idFile) > $outFile
 }
 run faidx_id fun
-assert_equal $($app grep -f $idFile $file | seqkit seq -i | seqkit sort | md5sum | cut -d" " -f 1) $(cat $outFile | seqkit sort | md5sum | cut -d" " -f 1)
+assert_equal $($app grep -f $idFile $file | $app seq -i | $app sort | md5sum | cut -d" " -f 1) $(cat $outFile | $app sort | md5sum | cut -d" " -f 1)
 rm $outFile
 
 fun(){
     $app faidx $file $(paste -s -d ' ' $idFile) -f > $outFile
 }
 run faidx_full_head fun
-assert_equal $($app grep -f $idFile $file | seqkit sort | md5sum | cut -d" " -f 1) $(cat $outFile | seqkit sort | md5sum | cut -d" " -f 1)
+assert_equal $($app grep -f $idFile $file | $app sort | md5sum | cut -d" " -f 1) $(cat $outFile | $app sort | md5sum | cut -d" " -f 1)
 rm $outFile
 
 
@@ -700,5 +700,5 @@ fun(){
     $app faidx $file "${ref}:5--5" -f > $outFile
 }
 run faidx_region fun
-assert_equal $($app grep -p $ref $file | seqkit subseq -r 5:-5 | seqkit seq -s -w 0) $(cat $outFile | seqkit seq -s -w 0)
+assert_equal $($app grep -p $ref $file | $app subseq -r 5:-5 | $app seq -s -w 0) $(cat $outFile | $app seq -s -w 0)
 rm $idFile $outFile
