@@ -117,6 +117,7 @@ Examples:
 		reverse0 := getFlagString(cmd, "reverse")
 		maxMismatch := getFlagNonNegativeInt(cmd, "max-mismatch")
 		strict := getFlagBool(cmd, "strict-mode")
+		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
 
 		forward := []byte(forward0)
 		if seq.DNAredundant.IsValid(forward) != nil {
@@ -170,6 +171,9 @@ Examples:
 		var finder *AmpliconFinder
 		var loc []int
 
+		strands := []string{"+", "-"}
+		var strand string
+
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -188,22 +192,31 @@ Examples:
 					fastx.ForcelyOutputFastq = true
 				}
 
-				finder, err = NewAmpliconFinder(record.Seq.Seq, forward, reverse, maxMismatch)
-				checkError(err)
+				for _, strand = range strands {
+					if strand == "-" {
+						if onlyPositiveStrand {
+							continue
+						}
+						record.Seq.RevComInplace()
+					}
 
-				if usingRegion {
-					loc, err = finder.LocateRange(begin, end, fregion, strict)
-				} else {
-					loc, err = finder.Locate()
+					finder, err = NewAmpliconFinder(record.Seq.Seq, forward, reverse, maxMismatch)
+					checkError(err)
+
+					if usingRegion {
+						loc, err = finder.LocateRange(begin, end, fregion, strict)
+					} else {
+						loc, err = finder.Locate()
+					}
+					checkError(err)
+
+					if loc == nil {
+						continue
+					}
+
+					record.Seq.SubSeqInplace(loc[0], loc[1])
+					record.FormatToWriter(outfh, config.LineWidth)
 				}
-				checkError(err)
-
-				if loc == nil {
-					continue
-				}
-
-				record.Seq.SubSeqInplace(loc[0], loc[1])
-				record.FormatToWriter(outfh, config.LineWidth)
 			}
 
 			config.LineWidth = lineWidth
@@ -221,6 +234,7 @@ func init() {
 	ampliconCmd.Flags().StringP("region", "r", "", `specify region to return. type "seqkit amplicon -h" for detail`)
 	ampliconCmd.Flags().BoolP("flanking-region", "f", false, "region is flanking region")
 	ampliconCmd.Flags().BoolP("strict-mode", "s", false, "strict mode, i.e., discarding seqs not fully matching (shorter) given region range")
+	ampliconCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on positive strand")
 }
 
 // AmpliconFinder is a struct for locating amplicon via primer(s).
