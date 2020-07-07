@@ -28,6 +28,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/cespare/xxhash"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/xopen"
@@ -68,6 +69,7 @@ Attention:
 		printAlphabet := getFlagBool(cmd, "alphabet")
 		printAvgQual := getFlagBool(cmd, "avg-qual")
 		qBase := getFlagPositiveInt(cmd, "qual-ascii-base")
+		printSeqHash := getFlagBool(cmd, "seq-hash")
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
@@ -104,10 +106,13 @@ Attention:
 			if printAlphabet {
 				outfh.WriteString("\talphabet")
 			}
-
 			if printAvgQual {
 				outfh.WriteString("\tavg.qual")
 			}
+			if printSeqHash {
+				outfh.WriteString("\tseq.hash")
+			}
+
 			outfh.WriteString("\n")
 		}
 
@@ -176,6 +181,11 @@ Attention:
 				if printAvgQual {
 					outfh.WriteString(fmt.Sprintf("\t%.2f", avgQual(record.Seq, qBase)))
 				}
+
+				if printSeqHash {
+					outfh.WriteString(fmt.Sprintf("\t%d", xxhash.Sum64(record.Seq.Seq)))
+				}
+
 				outfh.WriteString("\n")
 			}
 		}
@@ -196,6 +206,7 @@ func init() {
 	fx2tabCmd.Flags().BoolP("alphabet", "a", false, "print alphabet letters")
 	fx2tabCmd.Flags().BoolP("avg-qual", "q", false, "print average quality of a read")
 	fx2tabCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
+	fx2tabCmd.Flags().BoolP("seq-hash", "s", false, "print hash of sequence (case sensitive)")
 
 }
 
