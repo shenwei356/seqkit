@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"runtime"
 	"sort"
 	"strconv"
@@ -46,6 +47,10 @@ var ampliconCmd = &cobra.Command{
 	Use:   "amplicon",
 	Short: "retrieve amplicon (or specific region around it) via primer(s)",
 	Long: `retrieve amplicon (or specific region around it) via primer(s).
+
+Attentions:
+  1. Only one (the longest) matching location is returned for every primer pair.
+  2. Mismatch is allowed, but the mismatch location (5' or 3') is not controled. 
 
 Examples:
   0. no region given.
@@ -135,6 +140,10 @@ Examples:
 
 		primers, err = parsePrimers(list)
 		checkError(err)
+
+		if !config.Quiet {
+			log.Infof("%d primer pair loaded", len(primers))
+		}
 
 		var begin, end int
 
@@ -250,8 +259,8 @@ Examples:
 func init() {
 	RootCmd.AddCommand(ampliconCmd)
 
-	ampliconCmd.Flags().StringP("forward", "F", "", "forward primer (5'-primer-3')")
-	ampliconCmd.Flags().StringP("reverse", "R", "", "reverse primer (5'-primer-3')")
+	ampliconCmd.Flags().StringP("forward", "F", "", "forward primer (5'-primer-3'), degenerate bases allowed")
+	ampliconCmd.Flags().StringP("reverse", "R", "", "reverse primer (5'-primer-3'), degenerate bases allowed")
 	ampliconCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching primers")
 	ampliconCmd.Flags().StringP("primer-file", "p", "", "3- or 2-column tabular primer file, with first column as primer name")
 
@@ -273,10 +282,11 @@ func loadPrimers(file string) ([][3]string, error) {
 	lists := make([][3]string, 0, 100)
 	scanner := bufio.NewScanner(fh)
 	for scanner.Scan() {
-		text = scanner.Text()
-		if strings.TrimSpace(text) == "" {
+		text = strings.TrimSpace(scanner.Text())
+		if text == "" || text[0] == '#' {
 			continue
 		}
+
 		items = strings.Split(text, "\t")
 		switch len(items) {
 		case 3:
@@ -330,6 +340,8 @@ type AmpliconFinder struct {
 
 	searched, found bool
 	iBegin, iEnd    int // 0-based
+
+	rF, rR *regexp.Regexp
 }
 
 // NewAmpliconFinder returns a AmpliconFinder struct.
@@ -360,6 +372,24 @@ func NewAmpliconFinder(sequence, forwardPrimer, reversePrimerRC []byte, maxMisma
 		}
 		finder.MaxMismatch = maxMismatch
 		finder.FMindex = index
+	} else {
+		if seq.DNA.IsValid(finder.F) != nil { // containing degenerate base
+			s, _ := seq.NewSeq(seq.DNA, finder.F)
+			rF, err := regexp.Compile(s.Degenerate2Regexp())
+			if err != nil {
+				return nil, fmt.Errorf("fail to parse primer containing degenerate base: %s", finder.F)
+			}
+			finder.rF = rF
+		}
+
+		if seq.DNA.IsValid(finder.R) != nil { // containing degenerate base
+			s, _ := seq.NewSeq(seq.DNA, finder.R)
+			rR, err := regexp.Compile(s.Degenerate2Regexp())
+			if err != nil {
+				return nil, fmt.Errorf("fail to parse primer containing degenerate base: %s", finder.R)
+			}
+			finder.rR = rR
+		}
 	}
 	return finder, nil
 }
@@ -564,11 +594,23 @@ func (finder *AmpliconFinder) Locate() ([]int, error) {
 
 	if finder.MaxMismatch <= 0 { // exactly matching
 		// search F
-		i := bytes.Index(finder.Seq, finder.F)
-		if i < 0 { // not found
-			finder.searched, finder.found = true, false
-			return nil, nil
+		var i int
+
+		if finder.rF == nil {
+			i = bytes.Index(finder.Seq, finder.F)
+			if i < 0 { // not found
+				finder.searched, finder.found = true, false
+				return nil, nil
+			}
+		} else {
+			loc := finder.rF.FindSubmatchIndex(finder.Seq)
+			if len(loc) == 0 {
+				finder.searched, finder.found = true, false
+				return nil, nil
+			}
+			i = loc[0]
 		}
+
 		if len(finder.R) == 0 { // only forward primer, returns location of F
 			finder.searched, finder.found = true, true
 			finder.iBegin, finder.iEnd = i, i+len(finder.F)-1
@@ -576,10 +618,31 @@ func (finder *AmpliconFinder) Locate() ([]int, error) {
 		}
 
 		// two primers given, need to search R
-		j := bytes.Index(finder.Seq, finder.R)
-		if j < 0 {
-			finder.searched, finder.found = true, false
-			return nil, nil
+		var j int
+		if finder.rR == nil {
+			j = bytes.Index(finder.Seq, finder.R)
+			if j < 0 {
+				finder.searched, finder.found = true, false
+				return nil, nil
+			}
+
+			for {
+				if j+1 >= len(finder.Seq) {
+					break
+				}
+				k := bytes.Index(finder.Seq[j+1:], finder.R)
+				if k < 0 {
+					break
+				}
+				j += k + 1
+			}
+		} else {
+			loc := finder.rR.FindAllSubmatchIndex(finder.Seq, -1)
+			if len(loc) == 0 {
+				finder.searched, finder.found = true, false
+				return nil, nil
+			}
+			j = loc[len(loc)-1][0]
 		}
 
 		if j < i { // wrong location of F and R:  5' ---R-----F---- 3'

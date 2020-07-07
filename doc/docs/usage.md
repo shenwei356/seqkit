@@ -1697,6 +1697,10 @@ Usage
 
 retrieve amplicon (or specific region around it) via primer(s).
 
+Attentions:
+  1. Only one (the longest) matching location is returned for every primer pair.
+  2. Mismatch is allowed, but the mismatch location (5' or 3') is not controled. 
+
 Examples:
   0. no region given.
   
@@ -1745,7 +1749,7 @@ Usage:
   seqkit amplicon [flags]
 
 Flags:
-      --bed                    output in BED6+1 format with amplicon as 7th columns
+      --bed                    output in BED6+1 format with amplicon as 7th column
   -f, --flanking-region        region is flanking region
   -F, --forward string         forward primer (5'-primer-3')
   -h, --help                   help for amplicon
@@ -1769,30 +1773,48 @@ Examples
             | seqkit amplicon -F ccc -R ttt
         >seq
         cccactgaaa
+        
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F ccc -R ttt
 
         # BED6+1
         $ echo -ne ">seq\nacgcccactgaaatga\n" \
             | seqkit amplicon -F ccc -R ttt --bed
         seq     3       13      .       0       +       cccactgaaa
         
+        # supporting degenerate bases.
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F ccR -R ttt --bed
+        seq     4       13      .       0       +       ccactgaaa
+        
 1. Load primers from 3- or 2-column tabular primer file, with first column as primer name.
         
         $ cat seqs4amplicon.fa 
         >seq1
-        acgcccactgaaatga
+        ACGCCCACTGAAATGA
         >seq2
-        acgtacggtcaga
+        ACGTACGGTCAGATCCA
         
         $ cat primers.tsv 
         p1      ccc     ttt
         p2      ttt     ccc
-        p3      CG      TG
+        p3      ttt
+
+        p4      CG      TG
+        P5      CG      GA
+
+        # containing degenerate bases
+        p6      TRC     WGG
+
         
         $ cat seqs4amplicon.fa | seqkit amplicon -p primers.tsv --bed
-        seq1    3       13      p1      0       +       cccactgaaa
-        seq1    1       7       p3      0       +       cgccca
-        seq1    3       13      p2      0       -       tttcagtggg
-        seq2    1       11      p3      0       +       cgtacggtca
+        seq1    3       13      p1      0       +       CCCACTGAAA
+        seq1    1       7       p4      0       +       CGCCCA
+        seq1    3       13      p2      0       -       TTTCAGTGGG
+        seq1    3       6       p3      0       -       TTT
+        seq2    1       17      p4      0       +       CGTACGGTCAGATCCA
+        seq2    1       15      P5      0       +       CGTACGGTCAGATC
+        seq2    3       17      p6      0       +       TACGGTCAGATCCA
         
 1. Inner region
 

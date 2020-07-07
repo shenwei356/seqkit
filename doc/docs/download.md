@@ -10,11 +10,20 @@ SeqKit is implemented in [Go](https://golang.org/) programming language,
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.13.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.13.0)
     - `seqkit`: fix a rare FASTA/Q parser bug. [#127](https://github.com/shenwei356/seqkit/issues/127)
     - `seqkit seq`: output sequence or quality in single line when `-s/--seq` or `-q/--qual` is on. [#132](https://github.com/shenwei356/seqkit/issues/132)
-    - New features and improvements by [@bsipos](https://github.com/bsipos). [#130](https://github.com/shenwei356/seqkit/pull/130)
-    - Added `scat`, a subcommand for real-time robust concatenation of fastx files. 
-    - Rewrote the parser behind the `sana` subcommand, now it supports robust parsing of fasta file as well.
-    - Added a "toolbox" feature to the `bam` subcommand (`-T`), which is a collection of filters acting on streams of BAM records configured through a YAML string (see the docs for more).
-    - Added the `SEQKIT_THREADS` environmental variable to override the default number of threads.
+    - `seqkit translate`: delete debug info, [#133](https://github.com/shenwei356/seqkit/issues/133), and fix typo. [#134](https://github.com/shenwei356/seqkit/issues/134)
+    - `seqkit split2`: tiny performance improvement. [#137](https://github.com/shenwei356/seqkit/issues/137)
+    - `seqkit stats`: new flag `-i/--stdin-label` for replacing default "-" for stdin. [#139](https://github.com/shenwei356/seqkit/issues/139)
+    - `seqkit fx2tab`: new flag `-s/--seq-hash` for printing hash of sequence (case sensitive). [#144](https://github.com/shenwei356/seqkit/issues/144)
+    - `seqkit amplicon`:
+        - fix bug of missing searching reverse strand. [#140](https://github.com/shenwei356/seqkit/issues/140)
+        - supporting degenerate bases now. [#83](https://github.com/shenwei356/seqkit/issues/83)
+        - new flag `-p/--primer-file` for reading list of primer pairs. [#142](https://github.com/shenwei356/seqkit/issues/142)
+        - new flag `--bed` for outputing in BED6+1 format. [#141](https://github.com/shenwei356/seqkit/issues/141)
+    - New features and improvements by [@bsipos](https://github.com/bsipos). [#130](https://github.com/shenwei356/seqkit/pull/130), [#147](https://github.com/shenwei356/seqkit/pull/147)
+        - new command `seqkit scat`, for real-time robust concatenation of fastx files. 
+        - Rewrote the parser behind the `sana` subcommand, now it supports robust parsing of fasta file as well.
+        - Added a "toolbox" feature to the `bam` subcommand (`-T`), which is a collection of filters acting on streams of BAM records configured through a YAML string (see the docs for more).
+        - Added the `SEQKIT_THREADS` environmental variable to override the default number of threads.
 
 ### Please cite
 
