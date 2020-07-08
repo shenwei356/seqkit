@@ -547,6 +547,15 @@ func NewRawFastqStream(name string, inFh *xopen.Reader, inReader *bufio.Reader, 
 
 	MAIN_FQ:
 		for {
+			if inReader == nil {
+				inFh, err = xopen.Ropen(name)
+				if err == nil {
+					buffSize := 128 * 1024
+					inReader = bufio.NewReaderSize(inFh, buffSize)
+				} else {
+					continue MAIN_FQ
+				}
+			}
 			select {
 			case cmd := <-ctrlChanIn:
 				if inReader == nil {
@@ -600,6 +609,16 @@ func NewRawFastaStream(name string, inFh *xopen.Reader, inReader *bufio.Reader, 
 
 	MAIN_FA:
 		for {
+			if inReader == nil {
+				inFh, err = xopen.Ropen(name)
+				if err == nil {
+					buffSize := 128 * 1024
+					inReader = bufio.NewReaderSize(inFh, buffSize)
+				} else {
+					continue MAIN_FA
+				}
+
+			}
 			select {
 			case cmd := <-ctrlChanIn:
 				if inReader == nil {

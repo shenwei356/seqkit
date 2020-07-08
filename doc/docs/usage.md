@@ -969,6 +969,7 @@ Flags:
   -n, --name                   only print names (no sequences and qualities)
   -i, --only-id                print ID instead of full head
   -b, --qual-ascii-base int    ASCII BASE, 33 for Phred+33 (default 33)
+  -s, --seq-hash               print hash of sequence (case sensitive)
 
 ```
 
@@ -1696,6 +1697,10 @@ Usage
 
 retrieve amplicon (or specific region around it) via primer(s).
 
+Attentions:
+  1. Only one (the longest) matching location is returned for every primer pair.
+  2. Mismatch is allowed, but the mismatch location (5' or 3') is not controled. 
+
 Examples:
   0. no region given.
   
@@ -1744,13 +1749,16 @@ Usage:
   seqkit amplicon [flags]
 
 Flags:
-  -f, --flanking-region    region is flanking region
-  -F, --forward string     forward primer
-  -h, --help               help for amplicon
-  -m, --max-mismatch int   max mismatch when matching primers
-  -r, --region string      specify region to return. type "seqkit amplicon -h" for detail
-  -R, --reverse string     reverse primer
-  -s, --strict             strict mode, i.e., discarding seqs not fully matching (shorter) given region range
+      --bed                    output in BED6+1 format with amplicon as 7th column
+  -f, --flanking-region        region is flanking region
+  -F, --forward string         forward primer (5'-primer-3')
+  -h, --help                   help for amplicon
+  -m, --max-mismatch int       max mismatch when matching primers
+  -P, --only-positive-strand   only search on positive strand
+  -p, --primer-file string     3- or 2-column tabular primer file, with first column as primer name
+  -r, --region string          specify region to return. type "seqkit amplicon -h" for detail
+  -R, --reverse string         reverse primer (5'-primer-3')
+  -s, --strict-mode            strict mode, i.e., discarding seqs not fully matching (shorter) given region range
 ```
 
 Examples
@@ -1765,7 +1773,49 @@ Examples
             | seqkit amplicon -F ccc -R ttt
         >seq
         cccactgaaa
+        
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F ccc -R ttt
 
+        # BED6+1
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F ccc -R ttt --bed
+        seq     3       13      .       0       +       cccactgaaa
+        
+        # supporting degenerate bases.
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F ccR -R ttt --bed
+        seq     4       13      .       0       +       ccactgaaa
+        
+1. Load primers from 3- or 2-column tabular primer file, with first column as primer name.
+        
+        $ cat seqs4amplicon.fa 
+        >seq1
+        ACGCCCACTGAAATGA
+        >seq2
+        ACGTACGGTCAGATCCA
+        
+        $ cat primers.tsv 
+        p1      ccc     ttt
+        p2      ttt     ccc
+        p3      ttt
+
+        p4      CG      TG
+        P5      CG      GA
+
+        # containing degenerate bases
+        p6      TRC     WGG
+
+        
+        $ cat seqs4amplicon.fa | seqkit amplicon -p primers.tsv --bed
+        seq1    3       13      p1      0       +       CCCACTGAAA
+        seq1    1       7       p4      0       +       CGCCCA
+        seq1    3       13      p2      0       -       TTTCAGTGGG
+        seq1    3       6       p3      0       -       TTT
+        seq2    1       17      p4      0       +       CGTACGGTCAGATCCA
+        seq2    1       15      P5      0       +       CGTACGGTCAGATC
+        seq2    3       17      p6      0       +       TACGGTCAGATCCA
+        
 1. Inner region
 
         # region right behind forward primer
@@ -1773,6 +1823,11 @@ Examples
             | seqkit amplicon -F ccc -R ttt -r 4:7
         >seq
         actg
+        
+        # BED
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F ccc -R ttt -r 4:7 --bed
+        seq     6       10      .       0       +       actg
         
         # more common case is triming primers
         $ echo -ne ">seq\nacgcccactgaaatga\n" \
@@ -1788,6 +1843,11 @@ Examples
             | seqkit amplicon -F ccc -f -r 3:6
         >seq
         tgaa
+        
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F ccc -f -r 3:6 --bed
+        seq     8       12      .       0       +       tgaa
+
         
         # if given region if out scope of sequence. e.g,
         # 2-5bp downstream of aaa, we can get part of region (2-4) by default

@@ -21,9 +21,12 @@
 package cmd
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"io"
+	"os"
+	"regexp"
 	"runtime"
 	"sort"
 	"strconv"
@@ -44,6 +47,10 @@ var ampliconCmd = &cobra.Command{
 	Use:   "amplicon",
 	Short: "retrieve amplicon (or specific region around it) via primer(s)",
 	Long: `retrieve amplicon (or specific region around it) via primer(s).
+
+Attentions:
+  1. Only one (the longest) matching location is returned for every primer pair.
+  2. Mismatch is allowed, but the mismatch location (5' or 3') is not controled. 
 
 Examples:
   0. no region given.
@@ -115,22 +122,28 @@ Examples:
 
 		forward0 := getFlagString(cmd, "forward")
 		reverse0 := getFlagString(cmd, "reverse")
+		primerFile := getFlagString(cmd, "primer-file")
 		maxMismatch := getFlagNonNegativeInt(cmd, "max-mismatch")
 		strict := getFlagBool(cmd, "strict-mode")
+		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
+		outFmtBED := getFlagBool(cmd, "bed")
 
-		forward := []byte(forward0)
-		if seq.DNAredundant.IsValid(forward) != nil {
-			checkError(fmt.Errorf("invalid primer sequence: %s", forward))
+		var list [][3]string
+		var primers [][3][]byte
+
+		if primerFile != "" {
+			list, err = loadPrimers(primerFile)
+			checkError(err)
+		} else {
+			list = [][3]string{[3]string{".", forward0, reverse0}}
 		}
 
-		reverse := []byte(reverse0)
-		if seq.DNAredundant.IsValid(reverse) != nil {
-			checkError(fmt.Errorf("invalid primer sequence: %s", reverse))
-		}
+		primers, err = parsePrimers(list)
+		checkError(err)
 
-		// compute revcom of reverse
-		s, _ := seq.NewSeq(seq.DNAredundant, reverse)
-		reverse = s.RevCom().Seq
+		if !config.Quiet {
+			log.Infof("%d primer pair loaded", len(primers))
+		}
 
 		var begin, end int
 
@@ -170,6 +183,11 @@ Examples:
 		var finder *AmpliconFinder
 		var loc []int
 
+		strands := []string{"+", "-"}
+		var strand string
+		var tmpSeq *seq.Seq
+		var primer [3][]byte
+
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -188,22 +206,49 @@ Examples:
 					fastx.ForcelyOutputFastq = true
 				}
 
-				finder, err = NewAmpliconFinder(record.Seq.Seq, forward, reverse, maxMismatch)
-				checkError(err)
+				for _, strand = range strands {
+					if strand == "-" {
+						if onlyPositiveStrand {
+							continue
+						}
+						record.Seq.RevComInplace()
+					}
 
-				if usingRegion {
-					loc, err = finder.LocateRange(begin, end, fregion, strict)
-				} else {
-					loc, err = finder.Locate()
+					for _, primer = range primers {
+						finder, err = NewAmpliconFinder(record.Seq.Seq, primer[1], primer[2], maxMismatch)
+						checkError(err)
+
+						if usingRegion {
+							loc, err = finder.LocateRange(begin, end, fregion, strict)
+						} else {
+							loc, err = finder.Locate()
+						}
+						checkError(err)
+
+						if loc == nil {
+							continue
+						}
+
+						if outFmtBED {
+							outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\t%s\n",
+								record.ID,
+								loc[0]-1,
+								loc[1],
+								primer[0],
+								0,
+								strand,
+								record.Seq.SubSeq(loc[0], loc[1]).Seq))
+
+							continue
+						}
+						tmpSeq = record.Seq
+
+						record.Seq = record.Seq.SubSeq(loc[0], loc[1])
+						record.FormatToWriter(outfh, config.LineWidth)
+
+						record.Seq = tmpSeq
+					}
 				}
-				checkError(err)
-
-				if loc == nil {
-					continue
-				}
-
-				record.Seq.SubSeqInplace(loc[0], loc[1])
-				record.FormatToWriter(outfh, config.LineWidth)
 			}
 
 			config.LineWidth = lineWidth
@@ -214,13 +259,74 @@ Examples:
 func init() {
 	RootCmd.AddCommand(ampliconCmd)
 
-	ampliconCmd.Flags().StringP("forward", "F", "", "forward primer")
-	ampliconCmd.Flags().StringP("reverse", "R", "", "reverse primer")
+	ampliconCmd.Flags().StringP("forward", "F", "", "forward primer (5'-primer-3'), degenerate bases allowed")
+	ampliconCmd.Flags().StringP("reverse", "R", "", "reverse primer (5'-primer-3'), degenerate bases allowed")
 	ampliconCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching primers")
+	ampliconCmd.Flags().StringP("primer-file", "p", "", "3- or 2-column tabular primer file, with first column as primer name")
 
 	ampliconCmd.Flags().StringP("region", "r", "", `specify region to return. type "seqkit amplicon -h" for detail`)
 	ampliconCmd.Flags().BoolP("flanking-region", "f", false, "region is flanking region")
 	ampliconCmd.Flags().BoolP("strict-mode", "s", false, "strict mode, i.e., discarding seqs not fully matching (shorter) given region range")
+	ampliconCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on positive strand")
+	ampliconCmd.Flags().BoolP("bed", "", false, "output in BED6+1 format with amplicon as 7th columns")
+}
+
+func loadPrimers(file string) ([][3]string, error) {
+	fh, err := os.Open(file)
+	if err != nil {
+		return nil, fmt.Errorf("load primers from '%s': %s", file, err)
+	}
+
+	var text string
+	var items []string
+	lists := make([][3]string, 0, 100)
+	scanner := bufio.NewScanner(fh)
+	for scanner.Scan() {
+		text = strings.TrimSpace(scanner.Text())
+		if text == "" || text[0] == '#' {
+			continue
+		}
+
+		items = strings.Split(text, "\t")
+		switch len(items) {
+		case 3:
+			lists = append(lists, [3]string{items[0], items[1], items[2]})
+		case 2:
+			lists = append(lists, [3]string{items[0], items[1], ""})
+		default:
+			continue
+		}
+	}
+	if err = scanner.Err(); err != nil {
+		return nil, fmt.Errorf("load primers from '%s': %s", file, err)
+	}
+
+	return lists, nil
+}
+
+func parsePrimers(primers [][3]string) ([][3][]byte, error) {
+	list := make([][3][]byte, 0, len(primers))
+
+	for _, items := range primers {
+		name := []byte(items[0])
+
+		forward := []byte(items[1])
+		if seq.DNAredundant.IsValid(forward) != nil {
+			return nil, fmt.Errorf("invalid primer sequence: %s", forward)
+		}
+
+		reverse := []byte(items[2])
+		if seq.DNAredundant.IsValid(reverse) != nil {
+			return nil, fmt.Errorf("invalid primer sequence: %s", reverse)
+		}
+
+		// compute revcom of reverse
+		s, _ := seq.NewSeq(seq.DNAredundant, reverse)
+		reverse = s.RevCom().Seq
+
+		list = append(list, [3][]byte{name, forward, reverse})
+	}
+	return list, nil
 }
 
 // AmpliconFinder is a struct for locating amplicon via primer(s).
@@ -234,6 +340,8 @@ type AmpliconFinder struct {
 
 	searched, found bool
 	iBegin, iEnd    int // 0-based
+
+	rF, rR *regexp.Regexp
 }
 
 // NewAmpliconFinder returns a AmpliconFinder struct.
@@ -264,6 +372,24 @@ func NewAmpliconFinder(sequence, forwardPrimer, reversePrimerRC []byte, maxMisma
 		}
 		finder.MaxMismatch = maxMismatch
 		finder.FMindex = index
+	} else {
+		if seq.DNA.IsValid(finder.F) != nil { // containing degenerate base
+			s, _ := seq.NewSeq(seq.DNA, finder.F)
+			rF, err := regexp.Compile(s.Degenerate2Regexp())
+			if err != nil {
+				return nil, fmt.Errorf("fail to parse primer containing degenerate base: %s", finder.F)
+			}
+			finder.rF = rF
+		}
+
+		if seq.DNA.IsValid(finder.R) != nil { // containing degenerate base
+			s, _ := seq.NewSeq(seq.DNA, finder.R)
+			rR, err := regexp.Compile(s.Degenerate2Regexp())
+			if err != nil {
+				return nil, fmt.Errorf("fail to parse primer containing degenerate base: %s", finder.R)
+			}
+			finder.rR = rR
+		}
 	}
 	return finder, nil
 }
@@ -468,11 +594,23 @@ func (finder *AmpliconFinder) Locate() ([]int, error) {
 
 	if finder.MaxMismatch <= 0 { // exactly matching
 		// search F
-		i := bytes.Index(finder.Seq, finder.F)
-		if i < 0 { // not found
-			finder.searched, finder.found = true, false
-			return nil, nil
+		var i int
+
+		if finder.rF == nil {
+			i = bytes.Index(finder.Seq, finder.F)
+			if i < 0 { // not found
+				finder.searched, finder.found = true, false
+				return nil, nil
+			}
+		} else {
+			loc := finder.rF.FindSubmatchIndex(finder.Seq)
+			if len(loc) == 0 {
+				finder.searched, finder.found = true, false
+				return nil, nil
+			}
+			i = loc[0]
 		}
+
 		if len(finder.R) == 0 { // only forward primer, returns location of F
 			finder.searched, finder.found = true, true
 			finder.iBegin, finder.iEnd = i, i+len(finder.F)-1
@@ -480,10 +618,31 @@ func (finder *AmpliconFinder) Locate() ([]int, error) {
 		}
 
 		// two primers given, need to search R
-		j := bytes.Index(finder.Seq, finder.R)
-		if j < 0 {
-			finder.searched, finder.found = true, false
-			return nil, nil
+		var j int
+		if finder.rR == nil {
+			j = bytes.Index(finder.Seq, finder.R)
+			if j < 0 {
+				finder.searched, finder.found = true, false
+				return nil, nil
+			}
+
+			for {
+				if j+1 >= len(finder.Seq) {
+					break
+				}
+				k := bytes.Index(finder.Seq[j+1:], finder.R)
+				if k < 0 {
+					break
+				}
+				j += k + 1
+			}
+		} else {
+			loc := finder.rR.FindAllSubmatchIndex(finder.Seq, -1)
+			if len(loc) == 0 {
+				finder.searched, finder.found = true, false
+				return nil, nil
+			}
+			j = loc[len(loc)-1][0]
 		}
 
 		if j < i { // wrong location of F and R:  5' ---R-----F---- 3'
@@ -525,4 +684,20 @@ func (finder *AmpliconFinder) Locate() ([]int, error) {
 	finder.searched, finder.found = true, true
 	finder.iBegin, finder.iEnd = locsI[0], locsI[0]+len(finder.R)-1
 	return []int{locsI[0] + 1, locsJ[len(locsJ)-1] + len(finder.R)}, nil
+}
+
+// Location returns location of amplicon.
+// Locations are 1-based, nil returns if not found.
+func (finder *AmpliconFinder) Location() ([]int, error) {
+	if !finder.searched {
+		_, err := finder.Locate()
+		if err != nil {
+			return nil, err
+		}
+	}
+	if !finder.found {
+		return nil, nil
+	}
+
+	return []int{finder.iBegin + 1, finder.iEnd + 1}, nil
 }

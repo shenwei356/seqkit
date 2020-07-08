@@ -1,0 +1,9 @@
+p1	ccc	ttt
+p2	ttt	ccc
+p3	ttt
+
+p4	CG	TG
+P5	CG	GA
+
+# containing degenerate bases
+p6	TRC	WGG
