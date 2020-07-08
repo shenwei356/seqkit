@@ -558,6 +558,20 @@ func NewRawFastqStream(name string, inFh *xopen.Reader, inReader *bufio.Reader, 
 			}
 			select {
 			case cmd := <-ctrlChanIn:
+				if inReader == nil {
+					inFh, err = xopen.Ropen(name)
+					if err == nil {
+						buffSize := 128 * 1024
+						inReader = bufio.NewReaderSize(inFh, buffSize)
+					} else {
+						if cmd == StreamQuit {
+							ctrlChanOut <- StreamExited
+							return
+						}
+						continue MAIN_FQ
+					}
+
+				}
 				if cmd == StreamTry {
 					sbuff, err = streamFastq(name, inReader, sbuff, seqChan, ctrlChanIn, ctrlChanOut, &lineCounter, qBase, gaps, false)
 					if err != nil {
@@ -607,6 +621,20 @@ func NewRawFastaStream(name string, inFh *xopen.Reader, inReader *bufio.Reader, 
 			}
 			select {
 			case cmd := <-ctrlChanIn:
+				if inReader == nil {
+					inFh, err = xopen.Ropen(name)
+					if err == nil {
+						buffSize := 128 * 1024
+						inReader = bufio.NewReaderSize(inFh, buffSize)
+					} else {
+						if cmd == StreamQuit {
+							ctrlChanOut <- StreamExited
+							return
+						}
+						continue MAIN_FA
+					}
+
+				}
 				if cmd == StreamTry {
 					sbuff, err = streamFasta(name, inReader, sbuff, seqChan, ctrlChanIn, ctrlChanOut, lineCounter, gaps, false)
 					if err != nil {
