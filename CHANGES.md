@@ -1,3 +1,6 @@
+- [SeqKit v0.13.1](https://github.com/shenwei356/seqkit/releases/tag/v0.13.1)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.13.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.13.1)
+    - `seqkit sana`: fix bug causing hanging on empty files. [#148](https://github.com/shenwei356/seqkit/pull/148)
 - [SeqKit v0.13.0](https://github.com/shenwei356/seqkit/releases/tag/v0.13.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.13.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.13.0)
     - `seqkit`: fix a rare FASTA/Q parser bug. [#127](https://github.com/shenwei356/seqkit/issues/127)
