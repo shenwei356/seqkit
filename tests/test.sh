@@ -570,10 +570,26 @@ fun(){
 	# $app  sana -i fastq tests/sana_test_input.fq > tests/sana_output.fq
 	$app  sana tests/sana_test_input.fq > tests/sana_output.fq
 }
-run sana_fastq_regression fun
+run sana_fastq_regression_empty_line fun
 cmp tests/sana_output.fq tests/sana_ground.fq
 assert_equal $? 0
 rm -f tests/sana_output.fq tests/sana_test_input.fq
+
+# Regression test for sana/fasta empty file issue
+fun(){
+	$app  sana -j 2 -i fasta tests/empty.fx
+}
+run sana_fasta_regression_empty_line fun
+assert_equal $? 0
+
+
+# Regression test for sana/fastq empty file issue
+fun(){
+	$app  sana -j 2 -i fastq tests/empty.fx
+}
+run sana_fastq_regression fun
+assert_equal $? 0
+
 
 # ------------------------------------------------------------
 #                       scat
