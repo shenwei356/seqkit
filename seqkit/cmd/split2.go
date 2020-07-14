@@ -87,6 +87,7 @@ according to the input files.
 		}
 
 		outdir := getFlagString(cmd, "out-dir")
+		post := getFlagString(cmd, "post")
 		force := getFlagBool(cmd, "force")
 
 		if size == 0 && parts == 0 && length == 0 {
@@ -244,8 +245,7 @@ according to the input files.
 							i++
 							var outfh2 *xopen.Writer
 							outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
-							outfh2, err = xopen.Wopen(outfile)
-							checkError(err)
+							outfh2 = openWriter(outfile, post)
 
 							outfhs = append(outfhs, outfh2)
 							counts = append(counts, 0)
@@ -264,8 +264,7 @@ according to the input files.
 							i++
 							var outfh2 *xopen.Writer
 							outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
-							outfh2, err = xopen.Wopen(outfile)
-							checkError(err)
+							outfh2 = openWriter(outfile, post)
 
 							outfhs = append(outfhs, outfh2)
 							counts = append(counts, 0)
@@ -278,8 +277,7 @@ according to the input files.
 					if i+1 > len(outfhs) || outfhs[i] == nil {
 						var outfh2 *xopen.Writer
 						outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
-						outfh2, err = xopen.Wopen(outfile)
-						checkError(err)
+						outfh2 = openWriter(outfile, post)
 
 						outfhs = append(outfhs, outfh2)
 						counts = append(counts, 0)
@@ -331,5 +329,6 @@ func init() {
 	split2Cmd.Flags().IntP("by-part", "p", 0, "split sequences into N parts")
 	split2Cmd.Flags().StringP("by-length", "l", "", "split sequences into chunks of N bases, supports K/M/G suffix")
 	split2Cmd.Flags().StringP("out-dir", "O", "", "output directory (default value is $infile.split)")
+	split2Cmd.Flags().StringP("post", "P", "", "postprocess shell command ($FILE for formatted out-dir)")
 	split2Cmd.Flags().BoolP("force", "f", false, "overwrite output directory")
 }
