@@ -139,7 +139,7 @@ var seqCmd = &cobra.Command{
 		if outFile == "-" {
 			outfh = os.Stdout
 		} else {
-			outfh, err = os.Open(outFile)
+			outfh, err = os.Create(outFile)
 			checkError(err)
 		}
 		defer outfh.Close()
