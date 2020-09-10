@@ -256,7 +256,7 @@ Attension:
 		}
 
 		if !config.Quiet {
-			log.Infof("%d paired-end reads saved", n)
+			log.Infof("%d paired-end reads saved to %s and %s", n, outFile1, outFile2)
 		}
 
 	},
