@@ -63,13 +63,16 @@ Attension:
 		runtime.GOMAXPROCS(config.Threads)
 
 		if len(args) > 0 {
-			checkError(errors.New("no positional arugments should be given"))
+			checkError(errors.New("no positional arugments are allowed"))
 		}
 
 		read1 := getFlagString(cmd, "read1")
 		read2 := getFlagString(cmd, "read2")
 		if read1 == "" || read2 == "" {
 			checkError(fmt.Errorf("flag -1/--read1 and -2/--read2 needed"))
+		}
+		if read1 == read2 {
+			checkError(fmt.Errorf("values of flag -1/--read1 and -2/--read2 can not be the same"))
 		}
 
 		outdir := getFlagString(cmd, "out-dir")
@@ -133,8 +136,10 @@ Attension:
 		checkError(errors.Wrap(err, outFile2))
 		defer outfh2.Close()
 
+		// load first records
 		record1, err = reader1.Read()
 		checkError(errors.Wrap(err, read1))
+
 		record2, err = reader2.Read()
 		checkError(errors.Wrap(err, read2))
 		if !reader1.IsFastq || !reader2.IsFastq {
@@ -154,7 +159,7 @@ Attension:
 				break
 			}
 
-			if bytes.Compare(record1.Seq.Seq, record2.Seq.Seq) == 0 {
+			if !eof1 && !eof2 && bytes.Compare(record1.ID, record2.ID) == 0 { // same ID
 				record1.FormatToWriter(outfh1, lineWidth)
 				record2.FormatToWriter(outfh2, lineWidth)
 				n++
@@ -186,23 +191,23 @@ Attension:
 						}
 					}
 				}
+
 				continue
 			}
 
-			h1 = xxhash.Sum64(record1.ID)
-			if r2, ok2 = m2[h1]; ok2 { // found pair of record1 in m2
-				record1.FormatToWriter(outfh1, lineWidth)
-				r2.FormatToWriter(outfh2, lineWidth)
-				n++
-
-				delete(m2, h1)
-			} else {
-				m1[h1] = record1.Clone()
-			}
-
-			// new read1
-
 			if !eof1 {
+				h1 = xxhash.Sum64(record1.ID)
+				if r2, ok2 = m2[h1]; ok2 { // found pair of record1 in m2
+					record1.FormatToWriter(outfh1, lineWidth)
+					r2.FormatToWriter(outfh2, lineWidth)
+					n++
+
+					delete(m2, h1)
+				} else {
+					m1[h1] = record1.Clone()
+				}
+
+				// new read1
 				record1, err = reader1.Read()
 				if err != nil {
 					if err == io.EOF {
@@ -213,24 +218,27 @@ Attension:
 						break
 					}
 				}
+			} else {
+				if _, ok1 = m1[h1]; !ok1 { // add once
+					m1[h1] = record1.Clone()
+				}
 			}
 
 			// ---
 
-			h2 = xxhash.Sum64(record2.ID)
-			if r1, ok1 = m1[h2]; ok1 { // found pair of record2 in m1
-				r1.FormatToWriter(outfh1, lineWidth)
-				record2.FormatToWriter(outfh2, lineWidth)
-				n++
-
-				delete(m1, h2)
-			} else {
-				m2[h2] = record2.Clone()
-			}
-
-			// new read2
-
 			if !eof2 {
+				h2 = xxhash.Sum64(record2.ID)
+				if r1, ok1 = m1[h2]; ok1 { // found pair of record2 in m1
+					r1.FormatToWriter(outfh1, lineWidth)
+					record2.FormatToWriter(outfh2, lineWidth)
+					n++
+
+					delete(m1, h2)
+				} else {
+					m2[h2] = record2.Clone()
+				}
+
+				// new read2
 				record2, err = reader2.Read()
 				if err != nil {
 					if err == io.EOF {
@@ -241,6 +249,10 @@ Attension:
 						break
 					}
 				}
+			} else {
+				if _, ok2 = m2[h2]; !ok2 { // add once
+					m2[h2] = record2.Clone()
+				}
 			}
 		}
 
@@ -248,8 +260,8 @@ Attension:
 		if len(m1) > 0 && len(m2) > 0 {
 			for h1, r1 = range m1 {
 				if r2, ok2 = m2[h1]; ok2 {
-					record1.FormatToWriter(outfh1, lineWidth)
-					record2.FormatToWriter(outfh2, lineWidth)
+					r1.FormatToWriter(outfh1, lineWidth)
+					r2.FormatToWriter(outfh2, lineWidth)
 					n++
 				}
 			}
