@@ -2189,6 +2189,10 @@ match up paired-end reads from two fastq files
 Attension:
 1. Orders of headers in the two files better be the same (sorted),
    Or lots of memory needed to cache reads in memory.
+2. Unpaired reads are discarded.
+3. If flag -O/--out-dir not given, output will be saved in the same directory
+   of input, with suffix "paired", e.g., read_1.paired.fq.gz.
+   Or names are kept untouched in the given out directory.
 
 Usage:
   seqkit pair [flags]
@@ -2196,17 +2200,29 @@ Usage:
 Flags:
   -f, --force            overwrite output directory
   -h, --help             help for pair
-  -O, --out-dir string   output directory (default value is $read1.paired)
+  -O, --out-dir string   output directory
   -1, --read1 string     read1 file
   -2, --read2 string     read2 file
-
 ```
 
 Examples
 
 1. Simple one
 
-        seqkit pair -1 read_1.fq.gz -2 read_2.fq.gz -O outdir
+        seqkit pair -1 reads_1.fq.gz -2 reads_2.fq.gz
+        
+        # output
+        reads_1.paired.fq.gz
+        reads_2.paired.fq.gz
+        
+2. set output directory
+
+        seqkit pair -1 reads_1.fq.gz -2 reads_2.fq.gz -O paired
+        
+        # output         
+        paired/
+        ├── reads_1.fq.gz
+        └── reads_2.fq.gz
 
 ## sample
 

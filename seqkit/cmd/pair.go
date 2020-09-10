@@ -47,13 +47,17 @@ var pairCmd = &cobra.Command{
 Attension:
 1. Orders of headers in the two files better be the same (sorted),
    Or lots of memory needed to cache reads in memory.
+2. Unpaired reads are discarded.
+3. If flag -O/--out-dir not given, output will be saved in the same directory
+   of input, with suffix "paired", e.g., read_1.paired.fq.gz.
+   Or names are kept untouched in the given out directory.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		lineWidth := config.LineWidth
+		lineWidth := 0
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
@@ -72,11 +76,10 @@ Attension:
 		force := getFlagBool(cmd, "force")
 
 		if outdir == "" {
-			outdir = fmt.Sprintf("%s.paired", read1)
-		} else if filepath.Clean(filepath.Dir(read1)) == filepath.Clean(outdir) {
-			checkError(fmt.Errorf("outdir (%s) should be different from inputdir (%s)", filepath.Clean(outdir), filepath.Clean(filepath.Dir(read1))))
+			outdir = filepath.Dir(read1)
 		}
 
+		var addSuffix bool
 		if outdir != "./" && outdir != "." {
 			existed, err := pathutil.DirExists(outdir)
 			checkError(err)
@@ -94,6 +97,9 @@ Attension:
 			} else {
 				checkError(os.MkdirAll(outdir, 0755))
 			}
+		} else if filepath.Clean(filepath.Dir(read1)) == filepath.Clean(outdir) {
+			addSuffix = true
+			// checkError(fmt.Errorf("outdir (%s) should be different from inputdir (%s)", filepath.Clean(outdir), filepath.Clean(filepath.Dir(read1))))
 		}
 
 		var reader1, reader2 *fastx.Reader
@@ -105,12 +111,24 @@ Attension:
 		reader2, err = fastx.NewReader(alphabet, read2, idRegexp)
 		checkError(errors.Wrap(err, read2))
 
-		outFile1 := filepath.Join(outdir, filepath.Base(read1))
+		var outFile1 string
+		if addSuffix {
+			base, suffix := filepathTrimExtension(filepath.Base(read1))
+			outFile1 = filepath.Join(outdir, base+".paired"+suffix)
+		} else {
+			outFile1 = filepath.Join(outdir, filepath.Base(read1))
+		}
 		outfh1, err := xopen.Wopen(outFile1)
 		checkError(errors.Wrap(err, outFile1))
 		defer outfh1.Close()
 
-		outFile2 := filepath.Join(outdir, filepath.Base(read2))
+		var outFile2 string
+		if addSuffix {
+			base, suffix := filepathTrimExtension(filepath.Base(read2))
+			outFile2 = filepath.Join(outdir, base+".paired"+suffix)
+		} else {
+			outFile2 = filepath.Join(outdir, filepath.Base(read2))
+		}
 		outfh2, err := xopen.Wopen(outFile2)
 		checkError(errors.Wrap(err, outFile2))
 		defer outfh2.Close()
@@ -249,6 +267,6 @@ func init() {
 
 	pairCmd.Flags().StringP("read1", "1", "", "read1 file")
 	pairCmd.Flags().StringP("read2", "2", "", "read2 file")
-	pairCmd.Flags().StringP("out-dir", "O", "", "output directory (default value is $read1.paired)")
+	pairCmd.Flags().StringP("out-dir", "O", "", "output directory")
 	pairCmd.Flags().BoolP("force", "f", false, "overwrite output directory")
 }
