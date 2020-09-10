@@ -46,6 +46,7 @@
 - [common](#common)
 - [split](#split)
 - [split2](#split2)
+- [pair](#pair)
 
 **Edit**
 
@@ -173,7 +174,7 @@ reproduced in different environments with same random seed.
 ``` text
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.13.2
+Version: 0.14.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -201,6 +202,7 @@ Available Commands:
   help            Help about any command
   locate          locate subsequences/motifs, mismatch allowed
   mutate          edit sequence (point mutation, insertion, deletion)
+  pair            match up paired-end reads from two fastq files
   range           print FASTA/Q records in a range (start:end)
   rename          rename duplicated IDs
   replace         replace name/sequence by regular expression
@@ -2177,6 +2179,34 @@ Examples
         [INFO] write 1250 sequences to file: out/reads_1.part_001.fq.gz
         [INFO] write 1250 sequences to file: out/reads_1.part_002.fq.gz
 
+## pair
+
+Usage
+
+```text
+match up paired-end reads from two fastq files
+
+Attension:
+1. Orders of headers in the two files better be the same (sorted),
+   Or lots of memory needed to cache reads in memory.
+
+Usage:
+  seqkit pair [flags]
+
+Flags:
+  -f, --force            overwrite output directory
+  -h, --help             help for pair
+  -O, --out-dir string   output directory (default value is $read1.paired)
+  -1, --read1 string     read1 file
+  -2, --read2 string     read2 file
+
+```
+
+Examples
+
+1. Simple one
+
+        seqkit pair -1 read_1.fq.gz -2 read_2.fq.gz -O outdir
 
 ## sample
 
