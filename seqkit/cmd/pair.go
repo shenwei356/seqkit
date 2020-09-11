@@ -267,15 +267,6 @@ Attensions:
 				base1, suffix1 = filepathTrimExtension(filepath.Base(read1))
 				base2, suffix2 = filepathTrimExtension(filepath.Base(read2))
 			}
-			outFile1U = filepath.Join(outdir, base1+".unpaired"+suffix1)
-			outfh1U, err = xopen.Wopen(outFile1U)
-			checkError(errors.Wrap(err, outFile1U))
-			defer outfh1U.Close()
-
-			outFile2U = filepath.Join(outdir, base2+".unpaired"+suffix2)
-			outfh2U, err = xopen.Wopen(outFile2U)
-			checkError(errors.Wrap(err, outFile2U))
-			defer outfh2U.Close()
 		}
 
 		// left reads
@@ -297,12 +288,25 @@ Attensions:
 						delete(m2, h2)
 					}
 				} else if saveUnpaired { // unpaired reads in m1
+					if outfh1U == nil {
+						outFile1U = filepath.Join(outdir, base1+".unpaired"+suffix1)
+						outfh1U, err = xopen.Wopen(outFile1U)
+						checkError(errors.Wrap(err, outFile1U))
+						defer outfh1U.Close()
+					}
 					r1.FormatToWriter(outfh1U, lineWidth)
 					n1U++
 				}
 			}
 			if saveUnpaired {
 				for _, r2 = range m2 { // left unpaired reads in m2
+					if outfh2U == nil {
+						outFile2U = filepath.Join(outdir, base2+".unpaired"+suffix2)
+						outfh2U, err = xopen.Wopen(outFile2U)
+						checkError(errors.Wrap(err, outFile2U))
+						defer outfh2U.Close()
+					}
+
 					r2.FormatToWriter(outfh2U, lineWidth)
 					n2U++
 				}
@@ -310,12 +314,26 @@ Attensions:
 		} else if len(m1) > 0 {
 			if saveUnpaired {
 				for _, r1 = range m1 { // all reads in m1 are unpaired
+					if outfh1U == nil {
+						outFile1U = filepath.Join(outdir, base1+".unpaired"+suffix1)
+						outfh1U, err = xopen.Wopen(outFile1U)
+						checkError(errors.Wrap(err, outFile1U))
+						defer outfh1U.Close()
+					}
+
 					r1.FormatToWriter(outfh1U, lineWidth)
 					n1U++
 				}
 			}
 		} else if saveUnpaired { // len(m2) > 0
 			for _, r2 = range m2 { // all reads in m2 are unpaired
+				if outfh2U == nil {
+					outFile2U = filepath.Join(outdir, base2+".unpaired"+suffix2)
+					outfh2U, err = xopen.Wopen(outFile2U)
+					checkError(errors.Wrap(err, outFile2U))
+					defer outfh2U.Close()
+				}
+
 				r2.FormatToWriter(outfh2U, lineWidth)
 				n2U++
 			}
@@ -324,8 +342,17 @@ Attensions:
 		if !config.Quiet {
 			log.Infof("%d paired-end reads saved to %s and %s", n, outFile1, outFile2)
 			if saveUnpaired {
-				log.Infof("%d unpaired reads saved to %s", n1U, outFile1U)
-				log.Infof("%d unpaired reads saved to %s", n2U, outFile2U)
+				if n1U > 0 {
+					log.Infof("%d unpaired reads saved to %s", n1U, outFile1U)
+				} else {
+					log.Infof("no unpaired reads in %s", read1)
+				}
+
+				if n2U > 0 {
+					log.Infof("%d unpaired reads saved to %s", n2U, outFile2U)
+				} else {
+					log.Infof("no unpaired reads in %s", read2)
+				}
 			}
 		}
 
@@ -339,5 +366,5 @@ func init() {
 	pairCmd.Flags().StringP("read2", "2", "", "(gzipped) read2 file")
 	pairCmd.Flags().StringP("out-dir", "O", "", "output directory")
 	pairCmd.Flags().BoolP("force", "f", false, "overwrite output directory")
-	pairCmd.Flags().BoolP("save-unpaired", "u", false, "save unpaired reads")
+	pairCmd.Flags().BoolP("save-unpaired", "u", false, "save unpaired reads if there are")
 }

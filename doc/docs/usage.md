@@ -2203,6 +2203,7 @@ Flags:
   -O, --out-dir string   output directory
   -1, --read1 string     (gzipped) read1 file
   -2, --read2 string     (gzipped) read2 file
+  -u, --save-unpaired    save unpaired reads if there are
 ```
 
 Examples
@@ -2224,7 +2225,7 @@ Examples
         ├── reads_1.fq.gz
         └── reads_2.fq.gz
         
-3. Save unpaired reads
+3. Save unpaired reads if there are.
 
         $ seqkit pair -1 reads_1.fq.gz -2 reads_2.fq.gz -O result -u
         
