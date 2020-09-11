@@ -51,6 +51,8 @@ Attensions:
 3. If flag -O/--out-dir not given, output will be saved in the same directory
    of input, with suffix "paired", e.g., read_1.paired.fq.gz.
    Otherwise names are kept untouched in the given output directory.
+4. Paired gzipped files may be slightly larger than original files, because
+   of using different gzip package/library, don't worry.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
