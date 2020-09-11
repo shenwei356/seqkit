@@ -44,13 +44,13 @@ var pairCmd = &cobra.Command{
 	Short: "match up paired-end reads from two fastq files",
 	Long: `match up paired-end reads from two fastq files
 
-Attension:
-1. Orders of headers in the two files better be the same (sorted),
-   Or lots of memory needed to cache reads in memory.
-2. Unpaired reads are discarded.
+Attensions:
+1. Orders of headers in the two files better be the same (not shuffled),
+   otherwise it consumes huge number of memory for buffering reads in memory.
+2. Unpaired reads are optional outputted with flag -u/--save-unpaired.
 3. If flag -O/--out-dir not given, output will be saved in the same directory
    of input, with suffix "paired", e.g., read_1.paired.fq.gz.
-   Or names are kept untouched in the given out directory.
+   Otherwise names are kept untouched in the given output directory.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -77,6 +77,7 @@ Attension:
 
 		outdir := getFlagString(cmd, "out-dir")
 		force := getFlagBool(cmd, "force")
+		saveUnpaired := getFlagBool(cmd, "save-unpaired")
 
 		if outdir == "" {
 			outdir = filepath.Dir(read1)
@@ -102,22 +103,23 @@ Attension:
 			}
 		} else if filepath.Clean(filepath.Dir(read1)) == filepath.Clean(outdir) {
 			addSuffix = true
-			// checkError(fmt.Errorf("outdir (%s) should be different from inputdir (%s)", filepath.Clean(outdir), filepath.Clean(filepath.Dir(read1))))
 		}
 
 		var reader1, reader2 *fastx.Reader
 		var record1, record2 *fastx.Record
 
+		// readers
 		var err error
 		reader1, err = fastx.NewReader(alphabet, read1, idRegexp)
 		checkError(errors.Wrap(err, read1))
 		reader2, err = fastx.NewReader(alphabet, read2, idRegexp)
 		checkError(errors.Wrap(err, read2))
 
-		var outFile1 string
+		// out file 1
+		var outFile1, base1, suffix1 string
 		if addSuffix {
-			base, suffix := filepathTrimExtension(filepath.Base(read1))
-			outFile1 = filepath.Join(outdir, base+".paired"+suffix)
+			base1, suffix1 = filepathTrimExtension(filepath.Base(read1))
+			outFile1 = filepath.Join(outdir, base1+".paired"+suffix1)
 		} else {
 			outFile1 = filepath.Join(outdir, filepath.Base(read1))
 		}
@@ -125,10 +127,11 @@ Attension:
 		checkError(errors.Wrap(err, outFile1))
 		defer outfh1.Close()
 
-		var outFile2 string
+		// out file 2
+		var outFile2, base2, suffix2 string
 		if addSuffix {
-			base, suffix := filepathTrimExtension(filepath.Base(read2))
-			outFile2 = filepath.Join(outdir, base+".paired"+suffix)
+			base2, suffix2 = filepathTrimExtension(filepath.Base(read2))
+			outFile2 = filepath.Join(outdir, base2+".paired"+suffix2)
 		} else {
 			outFile2 = filepath.Join(outdir, filepath.Base(read2))
 		}
@@ -139,15 +142,18 @@ Attension:
 		// load first records
 		record1, err = reader1.Read()
 		checkError(errors.Wrap(err, read1))
-
 		record2, err = reader2.Read()
 		checkError(errors.Wrap(err, read2))
+
+		// require fastq
 		if !reader1.IsFastq || !reader2.IsFastq {
 			checkError(fmt.Errorf("fastq files needed"))
 		}
 
+		// buffer for saving unpaired reads
 		m1 := make(map[uint64]*fastx.Record, 1024)
 		m2 := make(map[uint64]*fastx.Record, 1024)
+
 		var h1, h2 uint64
 		var ok1, ok2 bool
 		var r1, r2 *fastx.Record
@@ -155,11 +161,14 @@ Attension:
 		var n uint64
 
 		for {
+			// break when finishing reading both files.
 			if eof1 && eof2 {
 				break
 			}
 
+			// paired
 			if !eof1 && !eof2 && bytes.Compare(record1.ID, record2.ID) == 0 { // same ID
+				// output paired reads
 				record1.FormatToWriter(outfh1, lineWidth)
 				record2.FormatToWriter(outfh2, lineWidth)
 				n++
@@ -198,6 +207,7 @@ Attension:
 			if !eof1 {
 				h1 = xxhash.Sum64(record1.ID)
 				if r2, ok2 = m2[h1]; ok2 { // found pair of record1 in m2
+					// output paired reads
 					record1.FormatToWriter(outfh1, lineWidth)
 					r2.FormatToWriter(outfh2, lineWidth)
 					n++
@@ -218,10 +228,6 @@ Attension:
 						break
 					}
 				}
-			} else {
-				if _, ok1 = m1[h1]; !ok1 { // add once
-					m1[h1] = record1.Clone()
-				}
 			}
 
 			// ---
@@ -229,6 +235,7 @@ Attension:
 			if !eof2 {
 				h2 = xxhash.Sum64(record2.ID)
 				if r1, ok1 = m1[h2]; ok1 { // found pair of record2 in m1
+					// output paired reads
 					r1.FormatToWriter(outfh1, lineWidth)
 					record2.FormatToWriter(outfh2, lineWidth)
 					n++
@@ -249,26 +256,77 @@ Attension:
 						break
 					}
 				}
-			} else {
-				if _, ok2 = m2[h2]; !ok2 { // add once
-					m2[h2] = record2.Clone()
-				}
 			}
+		}
+
+		var outFile1U, outFile2U string
+		var outfh1U, outfh2U *xopen.Writer
+		var n1U, n2U uint64
+		if saveUnpaired {
+			if !addSuffix {
+				base1, suffix1 = filepathTrimExtension(filepath.Base(read1))
+				base2, suffix2 = filepathTrimExtension(filepath.Base(read2))
+			}
+			outFile1U = filepath.Join(outdir, base1+".unpaired"+suffix1)
+			outfh1U, err = xopen.Wopen(outFile1U)
+			checkError(errors.Wrap(err, outFile1U))
+			defer outfh1U.Close()
+
+			outFile2U = filepath.Join(outdir, base2+".unpaired"+suffix2)
+			outfh2U, err = xopen.Wopen(outFile2U)
+			checkError(errors.Wrap(err, outFile2U))
+			defer outfh2U.Close()
 		}
 
 		// left reads
 		if len(m1) > 0 && len(m2) > 0 {
 			for h1, r1 = range m1 {
+
+				if string(r1.ID) == "A00582:209:HWWJCDSXX:1:1101:8314:2581" {
+					fmt.Println("shit----")
+				}
+
 				if r2, ok2 = m2[h1]; ok2 {
+					// output paired reads
 					r1.FormatToWriter(outfh1, lineWidth)
 					r2.FormatToWriter(outfh2, lineWidth)
 					n++
+
+					if saveUnpaired { // delete paired reads in m2
+						// delete(m1, h1) // no need
+						delete(m2, h2)
+					}
+				} else if saveUnpaired { // unpaired reads in m1
+					r1.FormatToWriter(outfh1U, lineWidth)
+					n1U++
 				}
+			}
+			if saveUnpaired {
+				for _, r2 = range m2 { // left unpaired reads in m2
+					r2.FormatToWriter(outfh2U, lineWidth)
+					n2U++
+				}
+			}
+		} else if len(m1) > 0 {
+			if saveUnpaired {
+				for _, r1 = range m1 { // all reads in m1 are unpaired
+					r1.FormatToWriter(outfh1U, lineWidth)
+					n1U++
+				}
+			}
+		} else if saveUnpaired { // len(m2) > 0
+			for _, r2 = range m2 { // all reads in m2 are unpaired
+				r2.FormatToWriter(outfh2U, lineWidth)
+				n2U++
 			}
 		}
 
 		if !config.Quiet {
 			log.Infof("%d paired-end reads saved to %s and %s", n, outFile1, outFile2)
+			if saveUnpaired {
+				log.Infof("%d unpaired reads saved to %s", n1U, outFile1U)
+				log.Infof("%d unpaired reads saved to %s", n2U, outFile2U)
+			}
 		}
 
 	},
@@ -277,8 +335,9 @@ Attension:
 func init() {
 	RootCmd.AddCommand(pairCmd)
 
-	pairCmd.Flags().StringP("read1", "1", "", "read1 file")
-	pairCmd.Flags().StringP("read2", "2", "", "read2 file")
+	pairCmd.Flags().StringP("read1", "1", "", "(gzipped) read1 file")
+	pairCmd.Flags().StringP("read2", "2", "", "(gzipped) read2 file")
 	pairCmd.Flags().StringP("out-dir", "O", "", "output directory")
 	pairCmd.Flags().BoolP("force", "f", false, "overwrite output directory")
+	pairCmd.Flags().BoolP("save-unpaired", "u", false, "save unpaired reads")
 }

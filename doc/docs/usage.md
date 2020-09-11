@@ -2129,8 +2129,8 @@ Flags:
   -f, --force              overwrite output directory
   -h, --help               help for split2
   -O, --out-dir string     output directory (default value is $infile.split)
-  -1, --read1 string       read1 file
-  -2, --read2 string       read2 file
+  -1, --read1 string       (gzipped) read1 file
+  -2, --read2 string       (gzipped) read2 file
 ```
 
 Examples
@@ -2186,13 +2186,13 @@ Usage
 ```text
 match up paired-end reads from two fastq files
 
-Attension:
-1. Orders of headers in the two files better be the same (sorted),
-   Or lots of memory needed to cache reads in memory.
-2. Unpaired reads are discarded.
+Attensions:
+1. Orders of headers in the two files better be the same (not shuffled),
+   otherwise it consumes huge number of memory for buffering reads in memory.
+2. Unpaired reads are optional outputted with flag -u/--save-unpaired.
 3. If flag -O/--out-dir not given, output will be saved in the same directory
    of input, with suffix "paired", e.g., read_1.paired.fq.gz.
-   Or names are kept untouched in the given out directory.
+   Otherwise names are kept untouched in the given output directory.
 
 Usage:
   seqkit pair [flags]
@@ -2201,28 +2201,40 @@ Flags:
   -f, --force            overwrite output directory
   -h, --help             help for pair
   -O, --out-dir string   output directory
-  -1, --read1 string     read1 file
-  -2, --read2 string     read2 file
+  -1, --read1 string     (gzipped) read1 file
+  -2, --read2 string     (gzipped) read2 file
 ```
 
 Examples
 
 1. Simple one
 
-        seqkit pair -1 reads_1.fq.gz -2 reads_2.fq.gz
+        $ seqkit pair -1 reads_1.fq.gz -2 reads_2.fq.gz
         
         # output
         reads_1.paired.fq.gz
         reads_2.paired.fq.gz
         
-2. set output directory
+2. Set output directory, file names are kept untouched.
 
-        seqkit pair -1 reads_1.fq.gz -2 reads_2.fq.gz -O paired
+        $ seqkit pair -1 reads_1.fq.gz -2 reads_2.fq.gz -O result
         
-        # output         
-        paired/
+        $ tree result        
+        result/
         ├── reads_1.fq.gz
         └── reads_2.fq.gz
+        
+3. Save unpaired reads
+
+        $ seqkit pair -1 reads_1.fq.gz -2 reads_2.fq.gz -O result -u
+        
+        $ tree result
+        result
+        ├── reads_1.fq.gz
+        ├── reads_1.unpaired.fq.gz
+        ├── reads_2.fq.gz
+        └── reads_2.unpaired.fq.gz
+
 
 ## sample
 

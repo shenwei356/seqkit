@@ -326,8 +326,8 @@ according to the input files.
 func init() {
 	RootCmd.AddCommand(split2Cmd)
 
-	split2Cmd.Flags().StringP("read1", "1", "", "read1 file")
-	split2Cmd.Flags().StringP("read2", "2", "", "read2 file")
+	split2Cmd.Flags().StringP("read1", "1", "", "(gzipped) read1 file")
+	split2Cmd.Flags().StringP("read2", "2", "", "(gzipped) read2 file")
 	split2Cmd.Flags().IntP("by-size", "s", 0, "split sequences into multi parts with N sequences")
 	split2Cmd.Flags().IntP("by-part", "p", 0, "split sequences into N parts")
 	split2Cmd.Flags().StringP("by-length", "l", "", "split sequences into chunks of N bases, supports K/M/G suffix")
