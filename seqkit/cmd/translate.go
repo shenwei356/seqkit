@@ -123,6 +123,7 @@ Translate Tables/Genetic Codes:
 		markInitCodonAsM := getFlagBool(cmd, "init-codon-as-M")
 		listTable := getFlagInt(cmd, "list-transl-table")
 		listTableAmb := getFlagInt(cmd, "list-transl-table-with-amb-codons")
+		appendFrame := getFlagBool(cmd, "append-frame")
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
@@ -192,7 +193,11 @@ Translate Tables/Genetic Codes:
 					}
 					checkError(err)
 
-					outfh.WriteString(fmt.Sprintf(">%s_frame=%d %s\n", record.ID, frame, record.Desc))
+					if appendFrame {
+						outfh.WriteString(fmt.Sprintf(">%s_frame=%d %s\n", record.ID, frame, record.Desc))
+					} else {
+						outfh.WriteString(string(record.Name) + "\n")
+					}
 					outfh.Write(byteutil.WrapByteSlice(_seq.Seq, config.LineWidth))
 					outfh.WriteString("\n")
 				}
@@ -213,4 +218,5 @@ func init() {
 	translateCmd.Flags().BoolP("init-codon-as-M", "M", false, "translate initial codon at beginning to 'M'")
 	translateCmd.Flags().IntP("list-transl-table", "l", -1, "show details of translate table N, 0 for all")
 	translateCmd.Flags().IntP("list-transl-table-with-amb-codons", "L", -1, "show details of translate table N (including ambigugous codons), 0 for all. ")
+	translateCmd.Flags().BoolP("append-frame", "F", false, "append frame infomation to sequence ID")
 }
