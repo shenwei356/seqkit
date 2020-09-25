@@ -218,5 +218,5 @@ func init() {
 	translateCmd.Flags().BoolP("init-codon-as-M", "M", false, "translate initial codon at beginning to 'M'")
 	translateCmd.Flags().IntP("list-transl-table", "l", -1, "show details of translate table N, 0 for all")
 	translateCmd.Flags().IntP("list-transl-table-with-amb-codons", "L", -1, "show details of translate table N (including ambigugous codons), 0 for all. ")
-	translateCmd.Flags().BoolP("append-frame", "F", false, "append frame infomation to sequence ID")
+	translateCmd.Flags().BoolP("append-frame", "F", false, "append frame information to sequence ID")
 }

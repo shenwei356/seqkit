@@ -1226,6 +1226,7 @@ Usage:
 
 Flags:
   -x, --allow-unknown-codon                     translate unknown code to 'X'. And you may not use flag --trim which removes 'X'
+  -F, --append-frame                            append frame infomation to sequence ID
       --clean                                   change all STOP codon positions from the '*' character to 'X' (an unknown residue)
   -f, --frame strings                           frame(s) to translate, available value: 1, 2, 3, -1, -2, -3, and 6 for all six frames (default [1])
   -h, --help                                    help for translate
