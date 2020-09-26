@@ -196,7 +196,7 @@ Translate Tables/Genetic Codes:
 					if appendFrame {
 						outfh.WriteString(fmt.Sprintf(">%s_frame=%d %s\n", record.ID, frame, record.Desc))
 					} else {
-						outfh.WriteString(string(record.Name) + "\n")
+						outfh.WriteString(">" + string(record.Name) + "\n")
 					}
 					outfh.Write(byteutil.WrapByteSlice(_seq.Seq, config.LineWidth))
 					outfh.WriteString("\n")
