@@ -56,6 +56,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - [Acknowledgements](#acknowledgements)
 - [Contact](#contact)
 - [License](#license)
+- [Starchart](#startchart)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -419,3 +420,7 @@ propose new functions or ask for help.
 ## License
 
 [MIT License](https://github.com/shenwei356/seqkit/blob/master/LICENSE)
+
+## Starchart
+
+<img src="https://starchart.cc/shenwei356/seqkit.svg" alt="Stargazers over time" style="max-width: 100%">
