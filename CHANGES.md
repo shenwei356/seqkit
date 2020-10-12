@@ -3,6 +3,8 @@
     - new command `seqkit pair`: match up paired-end reads from two fastq files, faster than fastq-pair.
     - `seqkit translate`: new flag `-F/--append-fram` for optional adding frame info to ID. [#159](https://github.com/shenwei356/seqkit/issues/159)
     - `seqkit stats`: reduce memory usage when using `-a` for calculating N50. [#153](https://github.com/shenwei356/seqkit/issues/153)
+    - `seqkit mutate`: fix inserting sequence `-i/--insertion`, 
+       this bug occurs when `insert site` is big in some cases, don't worry if no error reported.
 - [SeqKit v0.13.2](https://github.com/shenwei356/seqkit/releases/tag/v0.13.2)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.13.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.13.2)
     - `seqkit sana`: fix bug causing hanging on empty files. [#149](https://github.com/shenwei356/seqkit/pull/149)
