@@ -76,6 +76,7 @@ Special replacement symbols (only for replacing name not sequence):
 		nrWidth := getFlagPositiveInt(cmd, "nr-width")
 		kvFile := getFlagString(cmd, "kv-file")
 		keepKey := getFlagBool(cmd, "keep-key")
+		keepUntouch := getFlagBool(cmd, "keep-untouch")
 		keyCaptIdx := getFlagPositiveInt(cmd, "key-capt-idx")
 		keyMissRepl := getFlagString(cmd, "key-miss-repl")
 
@@ -145,6 +146,7 @@ Special replacement symbols (only for replacing name not sequence):
 		var found [][]byte
 		var k string
 		var ok bool
+		var doNotChange bool
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
 		nrFormat := fmt.Sprintf("%%0%dd", nrWidth)
@@ -168,8 +170,13 @@ Special replacement symbols (only for replacing name not sequence):
 
 				nr++
 				if bySeq {
+					if fastxReader.IsFastq {
+						checkError(fmt.Errorf("editing FASTQ is not supported"))
+					}
 					record.Seq.Seq = patternRegexp.ReplaceAll(record.Seq.Seq, replacement)
 				} else {
+					doNotChange = false
+
 					r = replacement
 
 					if replaceWithNR {
@@ -181,6 +188,7 @@ Special replacement symbols (only for replacing name not sequence):
 						if len(founds) > 1 {
 							checkError(fmt.Errorf(`pattern "%s" matches multiple targets in "%s", this will cause chaos`, p, record.Name))
 						}
+
 						if len(founds) > 0 {
 							found = founds[0]
 							if keyCaptIdx > len(found)-1 {
@@ -192,15 +200,21 @@ Special replacement symbols (only for replacing name not sequence):
 							}
 							if _, ok = kvs[k]; ok {
 								r = reKV.ReplaceAll(r, []byte(kvs[k]))
+							} else if keepUntouch {
+								doNotChange = true
 							} else if keepKey {
 								r = reKV.ReplaceAll(r, found[keyCaptIdx])
 							} else {
 								r = reKV.ReplaceAll(r, []byte(keyMissRepl))
 							}
+						} else {
+							doNotChange = true
 						}
 					}
 
-					record.Name = patternRegexp.ReplaceAll(record.Name, r)
+					if !doNotChange {
+						record.Name = patternRegexp.ReplaceAll(record.Name, r)
+					}
 				}
 
 				record.FormatToWriter(outfh, config.LineWidth)
@@ -222,10 +236,11 @@ func init() {
 			`use ${1} instead of $1 when {kv} given!`)
 	replaceCmd.Flags().IntP("nr-width", "", 1, `minimum width for {nr} in flag -r/--replacement. e.g., formating "1" to "001" by --nr-width 3`)
 	// replaceCmd.Flags().BoolP("by-name", "n", false, "replace full name instead of just id")
-	replaceCmd.Flags().BoolP("by-seq", "s", false, "replace seq")
+	replaceCmd.Flags().BoolP("by-seq", "s", false, "replace seq (only FASTA)")
 	replaceCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	replaceCmd.Flags().StringP("kv-file", "k", "",
 		`tab-delimited key-value file for replacing key with value when using "{kv}" in -r (--replacement) (only for sequence name)`)
+	replaceCmd.Flags().BoolP("keep-untouch", "U", false, "do not change anything when no value found for the key (only for sequence name)")
 	replaceCmd.Flags().BoolP("keep-key", "K", false, "keep the key as value when no value found for the key (only for sequence name)")
 	replaceCmd.Flags().IntP("key-capt-idx", "I", 1, "capture variable index of key (1-based)")
 	replaceCmd.Flags().StringP("key-miss-repl", "m", "", "replacement for key with no corresponding value")
