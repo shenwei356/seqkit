@@ -554,6 +554,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#pair" class="md-nav__link">
+    pair
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#sample" class="md-nav__link">
     sample
   </a>
@@ -984,6 +991,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#pair" class="md-nav__link">
+    pair
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#sample" class="md-nav__link">
     sample
   </a>
@@ -1156,6 +1170,7 @@
 <li><a href="#common">common</a></li>
 <li><a href="#split">split</a></li>
 <li><a href="#split2">split2</a></li>
+<li><a href="#pair">pair</a></li>
 </ul>
 <p><strong>Edit</strong></p>
 <ul>
@@ -1269,7 +1284,7 @@ reproduced in different environments with same random seed.</p>
 <h2 id="seqkit">seqkit</h2>
 <pre><code class="text">SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.13.2
+Version: 0.14.0
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -1297,6 +1312,7 @@ Available Commands:
   help            Help about any command
   locate          locate subsequences/motifs, mismatch allowed
   mutate          edit sequence (point mutation, insertion, deletion)
+  pair            match up paired-end reads from two fastq files
   range           print FASTA/Q records in a range (start:end)
   rename          rename duplicated IDs
   replace         replace name/sequence by regular expression
@@ -2365,6 +2381,7 @@ Usage:
 
 Flags:
   -x, --allow-unknown-codon                     translate unknown code to 'X'. And you may not use flag --trim which removes 'X'
+  -F, --append-frame                            append frame infomation to sequence ID
       --clean                                   change all STOP codon positions from the '*' character to 'X' (an unknown residue)
   -f, --frame strings                           frame(s) to translate, available value: 1, 2, 3, -1, -2, -3, and 6 for all six frames (default [1])
   -h, --help                                    help for translate
@@ -2508,6 +2525,8 @@ Stranslate Table:
 <pre><code class="text">search sequences by ID/name/sequence/sequence motifs, mismatch allowed
 
 Attentions:
+  0. By default, we match sequence ID with patterns, use &quot;-n/--by-name&quot;
+     for matching full name instead of just ID.
   1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
      (ID/full header) by default. Please switch &quot;-r/--use-regexp&quot; on
      for partly matching.
@@ -2543,7 +2562,7 @@ Usage:
   seqkit grep [flags]
 
 Flags:
-  -n, --by-name               match by full name instead of just id
+  -n, --by-name               match by full name instead of just ID
   -s, --by-seq                search subseq on seq, only positive strand is searched, and mismatch allowed using flag -m/--max-mismatch
   -d, --degenerate            pattern/motif contains degenerate base
       --delete-matched        delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions
@@ -2554,12 +2573,33 @@ Flags:
   -p, --pattern strings       search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '&quot;A{2,}&quot;'))
   -f, --pattern-file string   pattern file (one record per line)
   -R, --region string         specify sequence region for searching. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases
-  -r, --use-regexp            patterns are regular expression
+  -r, --use-regexp            patterns are regular expressio
 
 </code></pre>
 
 <p>Examples</p>
 <ol>
+<li>
+<p>Searching with list of sequence IDs (do not containing whitespace)</p>
+<pre><code>$ seqkit grep -f id.txt seqs.fq.gz -o result.fq.gz
+
+# ignore case
+$ seqkit grep -i -f id.txt seqs.fq.gz -o result.fq.gz
+</code></pre>
+</li>
+<li>
+<p>Serching non-canonical sequence IDs, Using <code>--id-regexp</code> to capture IDs. 
+   Refer to <a href="#sequence-id">section Sequence ID</a> and <a href="#seq">seqkit seq</a> for examples.</p>
+</li>
+<li>
+<p>Searching with list of sequence names (they may contain whitespace).</p>
+<pre><code>$ seqkit grep -n -f name.txt seqs.fa.gz -o result.fa.gz
+</code></pre>
+</li>
+<li>
+<p>Useq <code>-r/--use-regexp</code> for partly matching, but <strong>this may produce "false positive" matches</strong>.
+   For example, <code>seq_1</code> matches <code>seq_10</code> with <code>-nri</code>.</p>
+</li>
 <li>
 <p>Extract human hairpins (i.e. sequences with name starting with <code>hsa</code>)</p>
 <pre><code>$ zcat hairpin.fa.gz | seqkit grep -r -p ^hsa
@@ -2572,7 +2612,7 @@ CCUAGCUUUCCU
 </code></pre>
 </li>
 <li>
-<p>Remove human and mice hairpins.</p>
+<p>Remove human and mice hairpins (invert match with <code>-v</code>)</p>
 <pre><code>$ zcat hairpin.fa.gz | seqkit grep -r -p ^hsa -p ^mmu -v
 </code></pre>
 </li>
@@ -3278,8 +3318,8 @@ Flags:
   -f, --force              overwrite output directory
   -h, --help               help for split2
   -O, --out-dir string     output directory (default value is $infile.split)
-  -1, --read1 string       read1 file
-  -2, --read2 string       read2 file
+  -1, --read1 string       (gzipped) read1 file
+  -2, --read2 string       (gzipped) read2 file
 </code></pre>
 
 <p>Examples</p>
@@ -3330,6 +3370,66 @@ $ seqkit split2 reads_1.fq.gz -p 2 -O out -f
 [INFO] split into 2 parts
 [INFO] write 1250 sequences to file: out/reads_1.part_001.fq.gz
 [INFO] write 1250 sequences to file: out/reads_1.part_002.fq.gz
+</code></pre>
+</li>
+</ol>
+<h2 id="pair">pair</h2>
+<p>Usage</p>
+<pre><code class="text">match up paired-end reads from two fastq files
+
+Attensions:
+1. Orders of headers in the two files better be the same (not shuffled),
+   otherwise it consumes huge number of memory for buffering reads in memory.
+2. Unpaired reads are optional outputted with flag -u/--save-unpaired.
+3. If flag -O/--out-dir not given, output will be saved in the same directory
+   of input, with suffix &quot;paired&quot;, e.g., read_1.paired.fq.gz.
+   Otherwise names are kept untouched in the given output directory.
+4. Paired gzipped files may be slightly larger than original files, because
+   of using different gzip package/library, don't worry.
+
+Usage:
+  seqkit pair [flags]
+
+Flags:
+  -f, --force            overwrite output directory
+  -h, --help             help for pair
+  -O, --out-dir string   output directory
+  -1, --read1 string     (gzipped) read1 file
+  -2, --read2 string     (gzipped) read2 file
+  -u, --save-unpaired    save unpaired reads if there are
+</code></pre>
+
+<p>Examples</p>
+<ol>
+<li>
+<p>Simple one</p>
+<pre><code>$ seqkit pair -1 reads_1.fq.gz -2 reads_2.fq.gz
+
+# output
+reads_1.paired.fq.gz
+reads_2.paired.fq.gz
+</code></pre>
+</li>
+<li>
+<p>Set output directory, file names are kept untouched.</p>
+<pre><code>$ seqkit pair -1 reads_1.fq.gz -2 reads_2.fq.gz -O result
+
+$ tree result        
+result/
+├── reads_1.fq.gz
+└── reads_2.fq.gz
+</code></pre>
+</li>
+<li>
+<p>Save unpaired reads if there are.</p>
+<pre><code>$ seqkit pair -1 reads_1.fq.gz -2 reads_2.fq.gz -O result -u
+
+$ tree result
+result
+├── reads_1.fq.gz
+├── reads_1.unpaired.fq.gz
+├── reads_2.fq.gz
+└── reads_2.unpaired.fq.gz
 </code></pre>
 </li>
 </ol>

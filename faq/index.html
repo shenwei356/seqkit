@@ -824,67 +824,7 @@ is the second captured match. Command:</p>
     --replacement "\${1}{kv} " --key-capt-idx 2 --keep-key viral.1.protein.faa.gz &gt; renamed.fa
 </code></pre>
 <h2 id="how-to-extract-paired-reads-from-two-paired-end-reads-file">How to extract paired reads from two paired-end reads file?</h2>
-<p>Let's create two unbanlanced PE reads file:</p>
-<pre><code>$ seqkit rmdup duplicated-reads.fq.gz \
-    | seqkit replace --pattern " .+" --replacement " 1" \
-    | seqkit sample --proportion 0.9 --rand-seed 1 --out-file read_1.fq.gz
-$ seqkit rmdup duplicated-reads.fq.gz \
-    | seqkit replace --pattern " .+" --replacement " 2" \
-    | seqkit sample --proportion 0.9 --rand-seed 2 --out-file read_2.fq.gz
-</code></pre>
-<p>Overview:</p>
-<pre><code># number of records
-$ seqkit stat read_1.fq.gz read_2.fq.gz
-file          format  type  num_seqs  sum_len  min_len  avg_len  max_len
-read_1.fq.gz  FASTQ   DNA      9,033  912,333      101      101      101
-read_2.fq.gz  FASTQ   DNA      8,965  905,465      101      101      101
-
-# sequence headers
-$ seqkit head -n 3 read_1.fq.gz | seqkit seq --name
-SRR1972739.1 1
-SRR1972739.3 1
-SRR1972739.4 1
-
-$ seqkit head -n 3 read_2.fq.gz | seqkit seq --name
-SRR1972739.1 2
-SRR1972739.2 2
-SRR1972739.3 2
-</code></pre>
-<p>Firstly, extract sequence IDs of two file and compute the intersection:</p>
-<pre><code>$ seqkit seq --name --only-id read_1.fq.gz read_2.fq.gz \
-    | sort | uniq -d &gt; id.txt
-
-$ # number of IDs
-wc -l id.txt
-8090 id.txt
-</code></pre>
-<p>Then extract reads using <code>id.txt</code>:</p>
-<pre><code>$ seqkit grep --pattern-file id.txt read_1.fq.gz -o read_1.f.fq.gz
-$ seqkit grep --pattern-file id.txt read_2.fq.gz -o read_2.f.fq.gz
-</code></pre>
-<p>Check if the IDs in two files are the same by <code>md5sum</code>:</p>
-<pre><code>$ seqkit seq --name --only-id read_1.f.fq.gz &gt; read_1.f.fq.gz.id.txt
-$ seqkit seq --name --only-id read_2.f.fq.gz &gt; read_2.f.fq.gz.id.txt
-
-$ md5sum read_*.f.fq.gz.id.txt
-537c57cfdc3923bb94a3dc31a0c3b02a  read_1.f.fq.gz.id.txt
-537c57cfdc3923bb94a3dc31a0c3b02a  read_2.f.fq.gz.id.txt
-</code></pre>
-<p>Note that this example assumes that the IDs in the two reads file have
-same order. If not you can sort them after previous steps. Shell <code>sort</code>
-can sort large file using disk, so temporary directory is set as
-current directory by option <code>-T .</code>.</p>
-<pre><code>$ gzip -d -c read_1.f.fq.gz \
-    | seqkit fx2tab \
-    | sort -k1,1 -T . \
-    | seqkit tab2fx \
-    | gzip -c &gt; read_1.f.sorted.fq.gz
-$ gzip -d -c read_2.f.fq.gz \
-    | seqkit fx2tab \
-    | sort -k1,1 -T . \
-    | seqkit tab2fx \
-    | gzip -c &gt; read_2.f.sorted.fq.gz
-</code></pre>
+<p>Use <a href="https://bioinf.shenwei.me/seqkit/usage/#pair">seqkit pair</a>.</p>
 <h2 id="how-to-concatenate-two-fasta-sequences-in-to-one">How to concatenate two FASTA sequences in to one?</h2>
 <p>Related posts: <a href="https://www.biostars.org/p/231806/">Combining two fasta sequences into one</a></p>
 <p>Data (not in same order):</p>
