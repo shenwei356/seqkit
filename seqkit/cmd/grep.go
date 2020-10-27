@@ -46,6 +46,8 @@ var grepCmd = &cobra.Command{
 	Long: fmt.Sprintf(`search sequences by ID/name/sequence/sequence motifs, mismatch allowed
 
 Attentions:
+  0. By default, we match sequence ID with patterns, use "-n/--by-name"
+     for matching full name instead of just ID.
   1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
      (ID/full header) by default. Please switch "-r/--use-regexp" on
      for partly matching.
@@ -375,7 +377,7 @@ func init() {
 	grepCmd.Flags().BoolP("use-regexp", "r", false, "patterns are regular expression")
 	grepCmd.Flags().BoolP("delete-matched", "", false, "delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions")
 	grepCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")
-	grepCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
+	grepCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just ID")
 	grepCmd.Flags().BoolP("by-seq", "s", false, "search subseq on seq, only positive strand is searched, and mismatch allowed using flag -m/--max-mismatch")
 	grepCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster")
 	grepCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")

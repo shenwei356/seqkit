@@ -1366,6 +1366,8 @@ Usage
 search sequences by ID/name/sequence/sequence motifs, mismatch allowed
 
 Attentions:
+  0. By default, we match sequence ID with patterns, use "-n/--by-name"
+     for matching full name instead of just ID.
   1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
      (ID/full header) by default. Please switch "-r/--use-regexp" on
      for partly matching.
@@ -1401,7 +1403,7 @@ Usage:
   seqkit grep [flags]
 
 Flags:
-  -n, --by-name               match by full name instead of just id
+  -n, --by-name               match by full name instead of just ID
   -s, --by-seq                search subseq on seq, only positive strand is searched, and mismatch allowed using flag -m/--max-mismatch
   -d, --degenerate            pattern/motif contains degenerate base
       --delete-matched        delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions
@@ -1412,11 +1414,29 @@ Flags:
   -p, --pattern strings       search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"'))
   -f, --pattern-file string   pattern file (one record per line)
   -R, --region string         specify sequence region for searching. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases
-  -r, --use-regexp            patterns are regular expression
+  -r, --use-regexp            patterns are regular expressio
 
 ```
 
 Examples
+
+
+1. Searching with list of sequence IDs (do not containing whitespace)
+
+        $ seqkit grep -f id.txt seqs.fq.gz -o result.fq.gz
+        
+        # ignore case
+        $ seqkit grep -i -f id.txt seqs.fq.gz -o result.fq.gz
+
+1. Serching non-canonical sequence IDs, Using `--id-regexp` to capture IDs. 
+   Refer to [section Sequence ID](#sequence-id) and [seqkit seq](#seq) for examples.
+
+1. Searching with list of sequence names (they may contain whitespace).
+
+        $ seqkit grep -n -f name.txt seqs.fa.gz -o result.fa.gz
+        
+1. Useq `-r/--use-regexp` for partly matching, but **this may produce "false positive" matches**.
+   For example, `seq_1` matches `seq_10` with `-nri`.
 
 1. Extract human hairpins (i.e. sequences with name starting with `hsa`)
 
@@ -1428,7 +1448,7 @@ Examples
         AGGUUGAGGUAGUAGGUUGUAUAGUUUAGAAUUACAUCAAGGGAGAUAACUGUACAGCCU
         CCUAGCUUUCCU
 
-1. Remove human and mice hairpins.
+1. Remove human and mice hairpins (invert match with `-v`)
 
         $ zcat hairpin.fa.gz | seqkit grep -r -p ^hsa -p ^mmu -v
 
