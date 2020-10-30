@@ -16,6 +16,7 @@ SeqKit is implemented in [Go](https://golang.org/) programming language,
     - `seqkit replace`:
         - new flag `-U/--keep-untouched`: do not change anything when no value found for the key (only for sequence name).
         - do no support editing FASTQ sequence.
+    - `seqkit grep/locate`: new flag `--circular` for supporting circular genome. [#158](https://github.com/shenwei356/seqkit/issues/158)
 
 ### Please cite
 

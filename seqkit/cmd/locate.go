@@ -53,6 +53,9 @@ Mismatch is allowed using flag "-m/--max-mismatch",
 but it's not fast enough for large genome like human genome.
 Though, it's fast enough for microbial genomes.
 
+When using flag --circular, end position of matched subsequence that 
+crossing genome sequence end would be greater than sequence length.
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -84,6 +87,7 @@ Though, it's fast enough for microbial genomes.
 		outFmtBED := getFlagBool(cmd, "bed")
 		mismatches := getFlagNonNegativeInt(cmd, "max-mismatch")
 		hideMatched := getFlagBool(cmd, "hide-matched")
+		circular := getFlagBool(cmd, "circular")
 
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
@@ -256,6 +260,11 @@ Though, it's fast enough for microbial genomes.
 				}
 
 				l = len(record.Seq.Seq)
+
+				if circular { // concat two copies of sequence
+					record.Seq.Seq = append(record.Seq.Seq, record.Seq.Seq...)
+				}
+
 				if !onlyPositiveStrand {
 					seqRP = record.Seq.RevCom()
 				}
@@ -272,7 +281,12 @@ Though, it's fast enough for microbial genomes.
 							checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", pName, record.Name, err))
 						}
 						for _, i = range loc {
+							if circular && i+1 > l { // 2nd clone of original part
+								continue
+							}
+
 							begin = i + 1
+
 							end = i + len(pSeq)
 							if i+len(pSeq) > len(record.Seq.Seq) {
 								continue
@@ -333,6 +347,10 @@ Though, it's fast enough for microbial genomes.
 							checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", pName, record.Name, err))
 						}
 						for _, i = range loc {
+							if circular && i+1 > l { // 2nd clone of original part
+								continue
+							}
+
 							begin = l - i - len(pSeq) + 1
 							end = l - i
 							if i+len(pSeq) > len(record.Seq.Seq) {
@@ -407,6 +425,11 @@ Though, it's fast enough for microbial genomes.
 							loc = []int{i, i + lpatten}
 						}
 						begin = offset + loc[0] + 1
+
+						if circular && begin > l { // 2nd clone of original part
+							break
+						}
+
 						end = offset + loc[1]
 
 						flag = true // check "duplicated" region
@@ -495,8 +518,16 @@ Though, it's fast enough for microbial genomes.
 							loc = []int{i, i + lpatten}
 						}
 
+						if circular && offset+loc[0]+1 > l { // 2nd clone of original part
+							break
+						}
+
 						begin = l - offset - loc[1] + 1
 						end = l - offset - loc[0]
+						if offset+loc[1] > l {
+							begin += l
+							end += l
+						}
 
 						flag = true
 						if useRegexp || degenerate {
@@ -582,4 +613,5 @@ func init() {
 	locateCmd.Flags().BoolP("bed", "", false, "output in BED6 format")
 	locateCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster")
 	locateCmd.Flags().BoolP("hide-matched", "M", false, "do not show matched sequences")
+	locateCmd.Flags().BoolP("circular", "c", false, `circular genome. type "seqkit locate -h" for details`)
 }

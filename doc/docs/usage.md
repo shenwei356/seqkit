@@ -563,7 +563,8 @@ Usage:
   seqkit sliding [flags]
 
 Flags:
-  -C, --circular-genome   circular genome.
+  -c, --circular          circular genome (same to -C/--circular-genome)
+  -C, --circular-genome   circular genome (same to -c/--circular)
   -g, --greedy            greedy mode, i.e., exporting last subsequences even shorter than windows size
   -s, --step int          step size
   -W, --window int        window size
@@ -1405,6 +1406,7 @@ Usage:
 Flags:
   -n, --by-name               match by full name instead of just ID
   -s, --by-seq                search subseq on seq, only positive strand is searched, and mismatch allowed using flag -m/--max-mismatch
+  -c  --circular              circular genome
   -d, --degenerate            pattern/motif contains degenerate base
       --delete-matched        delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions
   -h, --help                  help for grep
@@ -1471,7 +1473,18 @@ Examples
 
         $ cat hairpin.fa.gz | seqkit grep -s -i -p aggcg
 
+1. Circular genome
 
+        $ echo -e ">seq\nACGTTGCA" 
+        >seq
+        ACGTTGCA
+        
+        $ echo -e ">seq\nACGTTGCA"  | seqkit grep -s -i -p AA
+        
+        $ echo -e ">seq\nACGTTGCA"  | seqkit grep -s -i -p AA -c
+        >seq
+        ACGTTGCA
+        
 1. Extract sequences containing AGGCG (allow mismatch)
 
         $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg | seqkit stats
@@ -1525,11 +1538,15 @@ Mismatch is allowed using flag "-m/--max-mismatch",
 but it's not fast enough for large genome like human genome.
 Though, it's fast enough for microbial genomes.
 
+When using flag --circular, end position of matched subsequence that 
+crossing genome sequence end would be greater than sequence length.
+
 Usage:
   seqkit locate [flags]
 
 Flags:
       --bed                       output in BED6 format
+  -c  --circular                  circular genome
   -d, --degenerate                pattern/motif contains degenerate base
       --gtf                       output in GTF format
   -h, --help                      help for locate
@@ -1636,7 +1653,7 @@ Examples
         cel-mir-58a     SeqKit  location        81      88      0       +       .       gene_id "AUGGACUN";
         ath-MIR163      SeqKit  location        122     129     0       -       .       gene_id "AUGGACUN";
 
-1. greedy mode (default)
+1. Greedy mode (default)
 
          $ echo -e '>seq\nACGACGACGA' | seqkit locate -p ACGA | csvtk -t pretty
          seqID   patternName   pattern   strand   start   end   matched
@@ -1644,12 +1661,32 @@ Examples
          seq     ACGA          ACGA      +        4       7     ACGA
          seq     ACGA          ACGA      +        7       10    ACGA
 
-1. non-greedy mode (`-G`)
+1. Non-greedy mode (`-G`)
 
         $ echo -e '>seq\nACGACGACGA' | seqkit locate -p ACGA -G | csvtk -t pretty
         seqID   patternName   pattern   strand   start   end   matched
         seq     ACGA          ACGA      +        1       4     ACGA
         seq     ACGA          ACGA      +        7       10    ACGA
+
+
+1. Circular genome. Note that end position of matched subsequence that 
+crossing genome sequence end would be greater than sequence length.
+
+        $ echo -e ">seq\nACGTTGCA"
+        >seq
+        ACGTTGCA
+    
+        $ echo -e ">seq\nACGTTGCA" \
+            | seqkit locate -i -p aa
+        seqID   patternName     pattern strand  start   end     matched
+        seq     aa      aa      -       4       5       aa
+        
+        $ echo -e ">seq\nACGTTGCA" \
+            | seqkit locate -i -p aa -c \
+            | csvtk pretty -t
+        seqID   patternName   pattern   strand   start   end   matched
+        seq     aa            aa        +        8       9     aa
+        seq     aa            aa        -        4       5     aa
 
         
 ## fish

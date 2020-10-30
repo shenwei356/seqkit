@@ -93,6 +93,7 @@ Examples:
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		degenerate := getFlagBool(cmd, "degenerate")
 		region := getFlagString(cmd, "region")
+		circular := getFlagBool(cmd, "circular")
 
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
@@ -286,6 +287,11 @@ Examples:
 				} else if bySeq {
 					if limitRegion {
 						target = record.Seq.SubSeq(start, end).Seq
+					} else if circular {
+						// concat two copies of sequence, and do not change orginal sequence
+						target = make([]byte, len(record.Seq.Seq)*2)
+						copy(target[0:len(record.Seq.Seq)], record.Seq.Seq)
+						copy(target[len(record.Seq.Seq):], record.Seq.Seq)
 					} else {
 						target = record.Seq.Seq
 					}
@@ -384,5 +390,5 @@ func init() {
 	grepCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
 	grepCmd.Flags().StringP("region", "R", "", "specify sequence region for searching. "+
 		"e.g 1:12 for first 12 bases, -12:-1 for last 12 bases")
-
+	grepCmd.Flags().BoolP("circular", "c", false, "circular genome")
 }

@@ -8,6 +8,7 @@
     - `seqkit replace`:
         - new flag `-U/--keep-untouched`: do not change anything when no value found for the key (only for sequence name).
         - do no support editing FASTQ sequence.
+    - `seqkit grep/locate`: new flag `--circular` for supporting circular genome. [#158](https://github.com/shenwei356/seqkit/issues/158)
 - [SeqKit v0.13.2](https://github.com/shenwei356/seqkit/releases/tag/v0.13.2)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.13.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.13.2)
     - `seqkit sana`: fix bug causing hanging on empty files. [#149](https://github.com/shenwei356/seqkit/pull/149)
