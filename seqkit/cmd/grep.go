@@ -46,17 +46,23 @@ var grepCmd = &cobra.Command{
 	Long: fmt.Sprintf(`search sequences by ID/name/sequence/sequence motifs, mismatch allowed
 
 Attentions:
+
   0. By default, we match sequence ID with patterns, use "-n/--by-name"
      for matching full name instead of just ID.
   1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
      (ID/full header) by default. Please switch "-r/--use-regexp" on
      for partly matching.
-  2. While when searching by sequences, only positive strand is searched,
+  2. When searching by sequences, only positive strand is searched,
      and it's partly matching. 
      Mismatch is allowed using flag "-m/--max-mismatch",
      but it's not fast enough for large genome like human genome.
      Though, it's fast enough for microbial genomes.
-  3. The order of sequences in result is consistent with that in original
+  3. When providing search patterns (motifs) via flag '-p',
+     please use double quotation marks for patterns containing comma, 
+     e.g., -p '"A{2,}"' or -p "\"A{2,}\"". Because the command line argument
+     parser accepts comma-separated-values (CSV) for multiple values (motifs).
+     Patterns in file do not follow this rule.
+  4. The order of sequences in result is consistent with that in original
      file, not the order of the query patterns. 
      But for FASTA file, you can use:
         seqkit faidx seqs.fasta --infile-list IDs.txt

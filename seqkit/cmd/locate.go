@@ -41,20 +41,23 @@ var locateCmd = &cobra.Command{
 	Short: "locate subsequences/motifs, mismatch allowed",
 	Long: `locate subsequences/motifs, mismatch allowed
 
-Motifs could be EITHER plain sequence containing "ACTGN" OR regular
-expression like "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" for ORFs.
-Degenerate bases like "RYMM.." are also supported by flag -d.
+Attentions:
 
-By default, motifs are treated as regular expression.
-When flag -d given, regular expression may be wrong.
-For example: "\w" will be wrongly converted to "\[AT]".
-
-Mismatch is allowed using flag "-m/--max-mismatch",
-but it's not fast enough for large genome like human genome.
-Though, it's fast enough for microbial genomes.
-
-When using flag --circular, end position of matched subsequence that 
-crossing genome sequence end would be greater than sequence length.
+  1. Motifs could be EITHER plain sequence containing "ACTGN" OR regular
+     expression like "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" for ORFs.     
+  2. Degenerate bases/residues like "RYMM.." are also supported by flag -d.
+     But do not use degenerate bases/residues in regular expression, you need
+     convert them to regular expression, e.g., change "N" or "X"  to ".".
+  3. When providing search patterns (motifs) via flag '-p',
+     please use double quotation marks for patterns containing comma, 
+     e.g., -p '"A{2,}"' or -p "\"A{2,}\"". Because the command line argument
+     parser accepts comma-separated-values (CSV) for multiple values (motifs).
+     Patterns in file do not follow this rule.     
+  4. Mismatch is allowed using flag "-m/--max-mismatch",
+     but it's not fast enough for large genome like human genome.
+     Though, it's fast enough for microbial genomes.
+  5. When using flag --circular, end position of matched subsequence that 
+     crossing genome sequence end would be greater than sequence length.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -88,6 +91,10 @@ crossing genome sequence end would be greater than sequence length.
 		mismatches := getFlagNonNegativeInt(cmd, "max-mismatch")
 		hideMatched := getFlagBool(cmd, "hide-matched")
 		circular := getFlagBool(cmd, "circular")
+
+		if config.Alphabet == seq.Protein {
+			onlyPositiveStrand = true
+		}
 
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
@@ -209,6 +216,7 @@ crossing genome sequence end would be greater than sequence length.
 						}
 						re, err := regexp.Compile(s)
 						checkError(err)
+						fmt.Println(s, re)
 						regexps[p] = re
 					} else if bytes.Index(patterns[p], []byte(".")) >= 0 ||
 						!(seq.DNAredundant.IsValid(patterns[p]) == nil ||
