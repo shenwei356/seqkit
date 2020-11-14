@@ -283,6 +283,11 @@ Usage
 ``` text
 transform sequences (revserse, complement, extract ID...)
 
+Attentions:
+
+  1. This command outputs plain text even when out file ends with ".gz".
+
+
 Usage:
   seqkit seq [flags]
 
