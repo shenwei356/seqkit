@@ -1372,20 +1372,23 @@ Attentions:
   1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
      (ID/full header) by default. Please switch "-r/--use-regexp" on
      for partly matching.
-  2. While when searching by sequences, only positive strand is searched,
-     and it's partly matching. 
+  2. When searching by sequences, it's partly matching, and both positive
+     and negative strands are searched.
      Mismatch is allowed using flag "-m/--max-mismatch",
      but it's not fast enough for large genome like human genome.
      Though, it's fast enough for microbial genomes.
-  3. The order of sequences in result is consistent with that in original
+  3. Degenerate bases/residues like "RYMM.." are also supported by flag -d.
+     But do not use degenerate bases/residues in regular expression, you need
+     convert them to regular expression, e.g., change "N" or "X"  to ".".
+  4. When providing search patterns (motifs) via flag '-p',
+     please use double quotation marks for patterns containing comma, 
+     e.g., -p '"A{2,}"' or -p "\"A{2,}\"". Because the command line argument
+     parser accepts comma-separated-values (CSV) for multiple values (motifs).
+     Patterns in file do not follow this rule.
+  5. The order of sequences in result is consistent with that in original
      file, not the order of the query patterns. 
      But for FASTA file, you can use:
         seqkit faidx seqs.fasta --infile-list IDs.txt
-  4. When providing search patterns (motifs) via flag '-p',
-     please use double quotation marks for patterns containing comma, 
-     e.g., -p '"A{2,}"' or -p "\"A{2,}\"". Patterns in file do not need
-     to follow this rule. Because the command line argument parser accepts
-     comma-separated-values (CSV) for multiple values.
 
 You can specify the sequence region for searching with flag -R (--region).
 The definition of region is 1-based and with some custom design.
@@ -1409,19 +1412,20 @@ Usage:
   seqkit grep [flags]
 
 Flags:
-  -n, --by-name               match by full name instead of just ID
-  -s, --by-seq                search subseq on seq, only positive strand is searched, and mismatch allowed using flag -m/--max-mismatch
-  -c  --circular              circular genome
-  -d, --degenerate            pattern/motif contains degenerate base
-      --delete-matched        delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions
-  -h, --help                  help for grep
-  -i, --ignore-case           ignore case
-  -v, --invert-match          invert the sense of matching, to select non-matching records
-  -m, --max-mismatch int      max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster
-  -p, --pattern strings       search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"'))
-  -f, --pattern-file string   pattern file (one record per line)
-  -R, --region string         specify sequence region for searching. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases
-  -r, --use-regexp            patterns are regular expressio
+  -n, --by-name                match by full name instead of just ID
+  -s, --by-seq                 search subseq on seq, both positive and negative strand are searched, and mismatch allowed using flag -m/--max-mismatch
+  -c, --circular               circular genome
+  -d, --degenerate             pattern/motif contains degenerate base
+      --delete-matched         delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions
+  -h, --help                   help for grep
+  -i, --ignore-case            ignore case
+  -v, --invert-match           invert the sense of matching, to select non-matching records
+  -m, --max-mismatch int       max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster
+  -P, --only-positive-strand   only search on positive strand
+  -p, --pattern strings        search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"'))
+  -f, --pattern-file string    pattern file (one record per line)
+  -R, --region string          specify sequence region for searching. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases
+  -r, --use-regexp             patterns are regular expression
 
 ```
 
@@ -1768,6 +1772,9 @@ retrieve amplicon (or specific region around it) via primer(s).
 Attentions:
   1. Only one (the longest) matching location is returned for every primer pair.
   2. Mismatch is allowed, but the mismatch location (5' or 3') is not controled. 
+  3. Degenerate bases/residues like "RYMM.." are also supported.
+     But do not use degenerate bases/residues in regular expression, you need
+     convert them to regular expression, e.g., change "N" or "X"  to ".".
 
 Examples:
   0. no region given.
@@ -1817,16 +1824,17 @@ Usage:
   seqkit amplicon [flags]
 
 Flags:
-      --bed                    output in BED6+1 format with amplicon as 7th column
+      --bed                    output in BED6+1 format with amplicon as 7th columns
   -f, --flanking-region        region is flanking region
-  -F, --forward string         forward primer (5'-primer-3')
+  -F, --forward string         forward primer (5'-primer-3'), degenerate bases allowed
   -h, --help                   help for amplicon
-  -m, --max-mismatch int       max mismatch when matching primers
+  -m, --max-mismatch int       max mismatch when matching primers, no degenerate bases allowed
   -P, --only-positive-strand   only search on positive strand
   -p, --primer-file string     3- or 2-column tabular primer file, with first column as primer name
   -r, --region string          specify region to return. type "seqkit amplicon -h" for detail
-  -R, --reverse string         reverse primer (5'-primer-3')
+  -R, --reverse string         reverse primer (5'-primer-3'), degenerate bases allowed
   -s, --strict-mode            strict mode, i.e., discarding seqs not fully matching (shorter) given region range
+
 ```
 
 Examples

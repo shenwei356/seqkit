@@ -52,17 +52,20 @@ Attentions:
   1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
      (ID/full header) by default. Please switch "-r/--use-regexp" on
      for partly matching.
-  2. When searching by sequences, only positive strand is searched,
-     and it's partly matching. 
+  2. When searching by sequences, it's partly matching, and both positive
+     and negative strands are searched.
      Mismatch is allowed using flag "-m/--max-mismatch",
      but it's not fast enough for large genome like human genome.
      Though, it's fast enough for microbial genomes.
-  3. When providing search patterns (motifs) via flag '-p',
+  3. Degenerate bases/residues like "RYMM.." are also supported by flag -d.
+     But do not use degenerate bases/residues in regular expression, you need
+     convert them to regular expression, e.g., change "N" or "X"  to ".".
+  4. When providing search patterns (motifs) via flag '-p',
      please use double quotation marks for patterns containing comma, 
      e.g., -p '"A{2,}"' or -p "\"A{2,}\"". Because the command line argument
      parser accepts comma-separated-values (CSV) for multiple values (motifs).
      Patterns in file do not follow this rule.
-  4. The order of sequences in result is consistent with that in original
+  5. The order of sequences in result is consistent with that in original
      file, not the order of the query patterns. 
      But for FASTA file, you can use:
         seqkit faidx seqs.fasta --infile-list IDs.txt
@@ -94,6 +97,7 @@ Examples:
 		deleteMatched := getFlagBool(cmd, "delete-matched")
 		invertMatch := getFlagBool(cmd, "invert-match")
 		bySeq := getFlagBool(cmd, "by-seq")
+		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
 		mismatches := getFlagNonNegativeInt(cmd, "max-mismatch")
 		byName := getFlagBool(cmd, "by-name")
 		ignoreCase := getFlagBool(cmd, "ignore-case")
@@ -262,6 +266,7 @@ Examples:
 		checkError(err)
 		defer outfh.Close()
 
+		var sequence *seq.Seq
 		var target []byte
 		var ok, hit bool
 		var record *fastx.Record
@@ -270,6 +275,8 @@ Examples:
 		var locs []int
 		var re *regexp.Regexp
 		var p string
+		strands := []byte{'+', '-'}
+		var strand byte
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -291,76 +298,101 @@ Examples:
 				if byName {
 					target = record.Name
 				} else if bySeq {
-					if limitRegion {
-						target = record.Seq.SubSeq(start, end).Seq
-					} else if circular {
-						// concat two copies of sequence, and do not change orginal sequence
-						target = make([]byte, len(record.Seq.Seq)*2)
-						copy(target[0:len(record.Seq.Seq)], record.Seq.Seq)
-						copy(target[len(record.Seq.Seq):], record.Seq.Seq)
-					} else {
-						target = record.Seq.Seq
-					}
+
 				} else {
 					target = record.ID
 				}
 
 				hit = false
 
-				if degenerate || useRegexp {
-					for p, re = range patterns {
-						if re.Match(target) {
-							hit = true
-							if deleteMatched && !invertMatch {
-								delete(patterns, p)
+				for _, strand = range strands {
+					if hit {
+						break
+					}
+
+					if strand == '-' {
+						if bySeq {
+							if onlyPositiveStrand {
+								break
 							}
+						} else {
 							break
 						}
 					}
-				} else if bySeq {
-					if ignoreCase {
-						target = bytes.ToLower(target)
+
+					if bySeq {
+						sequence = record.Seq
+						if strand == '-' {
+							sequence = record.Seq.RevCom()
+						}
+						if limitRegion {
+							target = sequence.SubSeq(start, end).Seq
+						} else if circular {
+							// concat two copies of sequence, and do not change orginal sequence
+							target = make([]byte, len(sequence.Seq)*2)
+							copy(target[0:len(sequence.Seq)], sequence.Seq)
+							copy(target[len(sequence.Seq):], sequence.Seq)
+						} else {
+							target = sequence.Seq
+						}
 					}
-					if mismatches == 0 {
-						for k = range patterns {
-							if bytes.Contains(target, []byte(k)) {
+
+					if degenerate || useRegexp {
+						for p, re = range patterns {
+							if re.Match(target) {
 								hit = true
 								if deleteMatched && !invertMatch {
-									delete(patterns, k)
+									delete(patterns, p)
 								}
 								break
+							}
+						}
+					} else if bySeq {
+						if ignoreCase {
+							target = bytes.ToLower(target)
+						}
+						if mismatches == 0 {
+							for k = range patterns {
+								if bytes.Contains(target, []byte(k)) {
+									hit = true
+									if deleteMatched && !invertMatch {
+										delete(patterns, k)
+									}
+									break
+								}
+							}
+						} else {
+							_, err = sfmi.Transform(target)
+							if err != nil {
+								checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
+							}
+							for k = range patterns {
+								locs, err = sfmi.Locate([]byte(k), mismatches)
+								if err != nil {
+									checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", k, record.Name, err))
+								}
+								if len(locs) > 0 {
+									hit = true
+									if deleteMatched && !invertMatch {
+										delete(patterns, k)
+									}
+									break
+								}
 							}
 						}
 					} else {
-						_, err = sfmi.Transform(target)
-						if err != nil {
-							checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
+						k = string(target)
+						if ignoreCase {
+							k = strings.ToLower(k)
 						}
-						for k = range patterns {
-							locs, err = sfmi.Locate([]byte(k), mismatches)
-							if err != nil {
-								checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", k, record.Name, err))
-							}
-							if len(locs) > 0 {
-								hit = true
-								if deleteMatched && !invertMatch {
-									delete(patterns, k)
-								}
-								break
+						if _, ok = patterns[k]; ok {
+							hit = true
+							if deleteMatched && !invertMatch {
+								delete(patterns, k)
 							}
 						}
 					}
-				} else {
-					k = string(target)
-					if ignoreCase {
-						k = strings.ToLower(k)
-					}
-					if _, ok = patterns[k]; ok {
-						hit = true
-						if deleteMatched && !invertMatch {
-							delete(patterns, k)
-						}
-					}
+
 				}
 
 				if invertMatch {
@@ -390,7 +422,8 @@ func init() {
 	grepCmd.Flags().BoolP("delete-matched", "", false, "delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions")
 	grepCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")
 	grepCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just ID")
-	grepCmd.Flags().BoolP("by-seq", "s", false, "search subseq on seq, only positive strand is searched, and mismatch allowed using flag -m/--max-mismatch")
+	grepCmd.Flags().BoolP("by-seq", "s", false, "search subseq on seq, both positive and negative strand are searched, and mismatch allowed using flag -m/--max-mismatch")
+	grepCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on positive strand")
 	grepCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster")
 	grepCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	grepCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")

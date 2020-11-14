@@ -51,6 +51,9 @@ var ampliconCmd = &cobra.Command{
 Attentions:
   1. Only one (the longest) matching location is returned for every primer pair.
   2. Mismatch is allowed, but the mismatch location (5' or 3') is not controled. 
+  3. Degenerate bases/residues like "RYMM.." are also supported.
+     But do not use degenerate bases/residues in regular expression, you need
+     convert them to regular expression, e.g., change "N" or "X"  to ".".
 
 Examples:
   0. no region given.
@@ -135,7 +138,7 @@ Examples:
 			list, err = loadPrimers(primerFile)
 			checkError(err)
 		} else {
-			list = [][3]string{[3]string{".", forward0, reverse0}}
+			list = [][3]string{{".", forward0, reverse0}}
 		}
 
 		primers, err = parsePrimers(list)
@@ -261,7 +264,7 @@ func init() {
 
 	ampliconCmd.Flags().StringP("forward", "F", "", "forward primer (5'-primer-3'), degenerate bases allowed")
 	ampliconCmd.Flags().StringP("reverse", "R", "", "reverse primer (5'-primer-3'), degenerate bases allowed")
-	ampliconCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching primers")
+	ampliconCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching primers, no degenerate bases allowed")
 	ampliconCmd.Flags().StringP("primer-file", "p", "", "3- or 2-column tabular primer file, with first column as primer name")
 
 	ampliconCmd.Flags().StringP("region", "r", "", `specify region to return. type "seqkit amplicon -h" for detail`)
@@ -374,6 +377,9 @@ func NewAmpliconFinder(sequence, forwardPrimer, reversePrimerRC []byte, maxMisma
 		finder.FMindex = index
 	} else {
 		if seq.DNA.IsValid(finder.F) != nil { // containing degenerate base
+			if maxMismatch > 0 {
+				checkError(fmt.Errorf("it does not support both degenerate base and mismatch"))
+			}
 			s, _ := seq.NewSeq(seq.DNA, finder.F)
 			rF, err := regexp.Compile(s.Degenerate2Regexp())
 			if err != nil {
@@ -383,6 +389,9 @@ func NewAmpliconFinder(sequence, forwardPrimer, reversePrimerRC []byte, maxMisma
 		}
 
 		if seq.DNA.IsValid(finder.R) != nil { // containing degenerate base
+			if maxMismatch > 0 {
+				checkError(fmt.Errorf("it does not support both degenerate base and mismatch"))
+			}
 			s, _ := seq.NewSeq(seq.DNA, finder.R)
 			rR, err := regexp.Compile(s.Degenerate2Regexp())
 			if err != nil {

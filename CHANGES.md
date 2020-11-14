@@ -1,3 +1,7 @@
+- [SeqKit v0.15.0](https://github.com/shenwei356/seqkit/releases/tag/v0.15.0)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.15.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.15.0)
+    - `seqkit grep/locate`: update help message.
+    - `seqkit grep`: search on both strand when searching by sequence.
 - [SeqKit v0.14.0](https://github.com/shenwei356/seqkit/releases/tag/v0.14.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.14.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.14.0)
     - new command `seqkit pair`: match up paired-end reads from two fastq files, faster than fastq-pair.
