@@ -307,9 +307,10 @@ according to the input files.
 				// for by-size/length: only log last part,
 				// for by-parts: log all parts.
 				for i, outfh := range outfhs {
-					if outfh != nil {
-						outfh.Close()
+					if outfh == nil {
+						continue
 					}
+					outfh.Close()
 
 					if !quiet {
 						log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
