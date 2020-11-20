@@ -46,6 +46,7 @@
 - [common](#common)
 - [split](#split)
 - [split2](#split2)
+- [pair](#pair)
 
 **Edit**
 
@@ -173,7 +174,7 @@ reproduced in different environments with same random seed.
 ``` text
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.13.1
+Version: 0.14.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -201,6 +202,7 @@ Available Commands:
   help            Help about any command
   locate          locate subsequences/motifs, mismatch allowed
   mutate          edit sequence (point mutation, insertion, deletion)
+  pair            match up paired-end reads from two fastq files
   range           print FASTA/Q records in a range (start:end)
   rename          rename duplicated IDs
   replace         replace name/sequence by regular expression
@@ -280,6 +282,11 @@ Usage
 
 ``` text
 transform sequences (revserse, complement, extract ID...)
+
+Attentions:
+
+  1. This command outputs plain text even when out file ends with ".gz".
+
 
 Usage:
   seqkit seq [flags]
@@ -561,7 +568,8 @@ Usage:
   seqkit sliding [flags]
 
 Flags:
-  -C, --circular-genome   circular genome.
+  -c, --circular          circular genome (same to -C/--circular-genome)
+  -C, --circular-genome   circular genome (same to -c/--circular)
   -g, --greedy            greedy mode, i.e., exporting last subsequences even shorter than windows size
   -s, --step int          step size
   -W, --window int        window size
@@ -1224,6 +1232,7 @@ Usage:
 
 Flags:
   -x, --allow-unknown-codon                     translate unknown code to 'X'. And you may not use flag --trim which removes 'X'
+  -F, --append-frame                            append frame infomation to sequence ID
       --clean                                   change all STOP codon positions from the '*' character to 'X' (an unknown residue)
   -f, --frame strings                           frame(s) to translate, available value: 1, 2, 3, -1, -2, -3, and 6 for all six frames (default [1])
   -h, --help                                    help for translate
@@ -1363,15 +1372,25 @@ Usage
 search sequences by ID/name/sequence/sequence motifs, mismatch allowed
 
 Attentions:
+  0. By default, we match sequence ID with patterns, use "-n/--by-name"
+     for matching full name instead of just ID.
   1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
      (ID/full header) by default. Please switch "-r/--use-regexp" on
      for partly matching.
-  2. While when searching by sequences, only positive strand is searched,
-     and it's partly matching. 
+  2. When searching by sequences, it's partly matching, and both positive
+     and negative strands are searched.
      Mismatch is allowed using flag "-m/--max-mismatch",
      but it's not fast enough for large genome like human genome.
      Though, it's fast enough for microbial genomes.
-  3. The order of sequences in result is consistent with that in original
+  3. Degenerate bases/residues like "RYMM.." are also supported by flag -d.
+     But do not use degenerate bases/residues in regular expression, you need
+     convert them to regular expression, e.g., change "N" or "X"  to ".".
+  4. When providing search patterns (motifs) via flag '-p',
+     please use double quotation marks for patterns containing comma, 
+     e.g., -p '"A{2,}"' or -p "\"A{2,}\"". Because the command line argument
+     parser accepts comma-separated-values (CSV) for multiple values (motifs).
+     Patterns in file do not follow this rule.
+  5. The order of sequences in result is consistent with that in original
      file, not the order of the query patterns. 
      But for FASTA file, you can use:
         seqkit faidx seqs.fasta --infile-list IDs.txt
@@ -1398,22 +1417,42 @@ Usage:
   seqkit grep [flags]
 
 Flags:
-  -n, --by-name               match by full name instead of just id
-  -s, --by-seq                search subseq on seq, only positive strand is searched, and mismatch allowed using flag -m/--max-mismatch
-  -d, --degenerate            pattern/motif contains degenerate base
-      --delete-matched        delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions
-  -h, --help                  help for grep
-  -i, --ignore-case           ignore case
-  -v, --invert-match          invert the sense of matching, to select non-matching records
-  -m, --max-mismatch int      max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster
-  -p, --pattern strings       search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"'))
-  -f, --pattern-file string   pattern file (one record per line)
-  -R, --region string         specify sequence region for searching. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases
-  -r, --use-regexp            patterns are regular expression
+  -n, --by-name                match by full name instead of just ID
+  -s, --by-seq                 search subseq on seq, both positive and negative strand are searched, and mismatch allowed using flag -m/--max-mismatch
+  -c, --circular               circular genome
+  -d, --degenerate             pattern/motif contains degenerate base
+      --delete-matched         delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions
+  -h, --help                   help for grep
+  -i, --ignore-case            ignore case
+  -v, --invert-match           invert the sense of matching, to select non-matching records
+  -m, --max-mismatch int       max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster
+  -P, --only-positive-strand   only search on positive strand
+  -p, --pattern strings        search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"'))
+  -f, --pattern-file string    pattern file (one record per line)
+  -R, --region string          specify sequence region for searching. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases
+  -r, --use-regexp             patterns are regular expression
 
 ```
 
 Examples
+
+
+1. Searching with list of sequence IDs (do not contain whitespace)
+
+        $ seqkit grep -f id.txt seqs.fq.gz -o result.fq.gz
+        
+        # ignore case
+        $ seqkit grep -i -f id.txt seqs.fq.gz -o result.fq.gz
+
+1. Serching non-canonical sequence IDs, Using `--id-regexp` to capture IDs. 
+   Refer to [section Sequence ID](#sequence-id) and [seqkit seq](#seq) for examples.
+
+1. Searching with list of sequence names (they may contain whitespace).
+
+        $ seqkit grep -n -f name.txt seqs.fa.gz -o result.fa.gz
+        
+1. Useq `-r/--use-regexp` for partly matching, but **this may produce "false positive" matches**.
+   For example, `seq_1` matches `seq_10` with `-nri`.
 
 1. Extract human hairpins (i.e. sequences with name starting with `hsa`)
 
@@ -1425,7 +1464,7 @@ Examples
         AGGUUGAGGUAGUAGGUUGUAUAGUUUAGAAUUACAUCAAGGGAGAUAACUGUACAGCCU
         CCUAGCUUUCCU
 
-1. Remove human and mice hairpins.
+1. Remove human and mice hairpins (invert match with `-v`)
 
         $ zcat hairpin.fa.gz | seqkit grep -r -p ^hsa -p ^mmu -v
 
@@ -1448,7 +1487,18 @@ Examples
 
         $ cat hairpin.fa.gz | seqkit grep -s -i -p aggcg
 
+1. Circular genome
 
+        $ echo -e ">seq\nACGTTGCA" 
+        >seq
+        ACGTTGCA
+        
+        $ echo -e ">seq\nACGTTGCA"  | seqkit grep -s -i -p AA
+        
+        $ echo -e ">seq\nACGTTGCA"  | seqkit grep -s -i -p AA -c
+        >seq
+        ACGTTGCA
+        
 1. Extract sequences containing AGGCG (allow mismatch)
 
         $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg | seqkit stats
@@ -1490,23 +1540,30 @@ Usage
 ``` text
 locate subsequences/motifs, mismatch allowed
 
-Motifs could be EITHER plain sequence containing "ACTGN" OR regular
-expression like "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" for ORFs.
-Degenerate bases like "RYMM.." are also supported by flag -d.
+Attentions:
 
-By default, motifs are treated as regular expression.
-When flag -d given, regular expression may be wrong.
-For example: "\w" will be wrongly converted to "\[AT]".
-
-Mismatch is allowed using flag "-m/--max-mismatch",
-but it's not fast enough for large genome like human genome.
-Though, it's fast enough for microbial genomes.
+  1. Motifs could be EITHER plain sequence containing "ACTGN" OR regular
+     expression like "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" for ORFs.     
+  2. Degenerate bases/residues like "RYMM.." are also supported by flag -d.
+     But do not use degenerate bases/residues in regular expression, you need
+     convert them to regular expression, e.g., change "N" or "X"  to ".".
+  3. When providing search patterns (motifs) via flag '-p',
+     please use double quotation marks for patterns containing comma, 
+     e.g., -p '"A{2,}"' or -p "\"A{2,}\"". Because the command line argument
+     parser accepts comma-separated-values (CSV) for multiple values (motifs).
+     Patterns in file do not follow this rule.     
+  4. Mismatch is allowed using flag "-m/--max-mismatch",
+     but it's not fast enough for large genome like human genome.
+     Though, it's fast enough for microbial genomes.
+  5. When using flag --circular, end position of matched subsequence that 
+     crossing genome sequence end would be greater than sequence length.
 
 Usage:
   seqkit locate [flags]
 
 Flags:
       --bed                       output in BED6 format
+  -c  --circular                  circular genome
   -d, --degenerate                pattern/motif contains degenerate base
       --gtf                       output in GTF format
   -h, --help                      help for locate
@@ -1613,7 +1670,7 @@ Examples
         cel-mir-58a     SeqKit  location        81      88      0       +       .       gene_id "AUGGACUN";
         ath-MIR163      SeqKit  location        122     129     0       -       .       gene_id "AUGGACUN";
 
-1. greedy mode (default)
+1. Greedy mode (default)
 
          $ echo -e '>seq\nACGACGACGA' | seqkit locate -p ACGA | csvtk -t pretty
          seqID   patternName   pattern   strand   start   end   matched
@@ -1621,12 +1678,32 @@ Examples
          seq     ACGA          ACGA      +        4       7     ACGA
          seq     ACGA          ACGA      +        7       10    ACGA
 
-1. non-greedy mode (`-G`)
+1. Non-greedy mode (`-G`)
 
         $ echo -e '>seq\nACGACGACGA' | seqkit locate -p ACGA -G | csvtk -t pretty
         seqID   patternName   pattern   strand   start   end   matched
         seq     ACGA          ACGA      +        1       4     ACGA
         seq     ACGA          ACGA      +        7       10    ACGA
+
+
+1. Circular genome. Note that end position of matched subsequence that 
+crossing genome sequence end would be greater than sequence length.
+
+        $ echo -e ">seq\nACGTTGCA"
+        >seq
+        ACGTTGCA
+    
+        $ echo -e ">seq\nACGTTGCA" \
+            | seqkit locate -i -p aa
+        seqID   patternName     pattern strand  start   end     matched
+        seq     aa      aa      -       4       5       aa
+        
+        $ echo -e ">seq\nACGTTGCA" \
+            | seqkit locate -i -p aa -c \
+            | csvtk pretty -t
+        seqID   patternName   pattern   strand   start   end   matched
+        seq     aa            aa        +        8       9     aa
+        seq     aa            aa        -        4       5     aa
 
         
 ## fish
@@ -1700,6 +1777,9 @@ retrieve amplicon (or specific region around it) via primer(s).
 Attentions:
   1. Only one (the longest) matching location is returned for every primer pair.
   2. Mismatch is allowed, but the mismatch location (5' or 3') is not controled. 
+  3. Degenerate bases/residues like "RYMM.." are also supported.
+     But do not use degenerate bases/residues in regular expression, you need
+     convert them to regular expression, e.g., change "N" or "X"  to ".".
 
 Examples:
   0. no region given.
@@ -1749,16 +1829,17 @@ Usage:
   seqkit amplicon [flags]
 
 Flags:
-      --bed                    output in BED6+1 format with amplicon as 7th column
+      --bed                    output in BED6+1 format with amplicon as 7th columns
   -f, --flanking-region        region is flanking region
-  -F, --forward string         forward primer (5'-primer-3')
+  -F, --forward string         forward primer (5'-primer-3'), degenerate bases allowed
   -h, --help                   help for amplicon
-  -m, --max-mismatch int       max mismatch when matching primers
+  -m, --max-mismatch int       max mismatch when matching primers, no degenerate bases allowed
   -P, --only-positive-strand   only search on positive strand
   -p, --primer-file string     3- or 2-column tabular primer file, with first column as primer name
   -r, --region string          specify region to return. type "seqkit amplicon -h" for detail
-  -R, --reverse string         reverse primer (5'-primer-3')
+  -R, --reverse string         reverse primer (5'-primer-3'), degenerate bases allowed
   -s, --strict-mode            strict mode, i.e., discarding seqs not fully matching (shorter) given region range
+
 ```
 
 Examples
@@ -2127,8 +2208,8 @@ Flags:
   -f, --force              overwrite output directory
   -h, --help               help for split2
   -O, --out-dir string     output directory (default value is $infile.split)
-  -1, --read1 string       read1 file
-  -2, --read2 string       read2 file
+  -1, --read1 string       (gzipped) read1 file
+  -2, --read2 string       (gzipped) read2 file
 ```
 
 Examples
@@ -2176,6 +2257,65 @@ Examples
         [INFO] split into 2 parts
         [INFO] write 1250 sequences to file: out/reads_1.part_001.fq.gz
         [INFO] write 1250 sequences to file: out/reads_1.part_002.fq.gz
+
+## pair
+
+Usage
+
+```text
+match up paired-end reads from two fastq files
+
+Attensions:
+1. Orders of headers in the two files better be the same (not shuffled),
+   otherwise it consumes huge number of memory for buffering reads in memory.
+2. Unpaired reads are optional outputted with flag -u/--save-unpaired.
+3. If flag -O/--out-dir not given, output will be saved in the same directory
+   of input, with suffix "paired", e.g., read_1.paired.fq.gz.
+   Otherwise names are kept untouched in the given output directory.
+4. Paired gzipped files may be slightly larger than original files, because
+   of using different gzip package/library, don't worry.
+
+Usage:
+  seqkit pair [flags]
+
+Flags:
+  -f, --force            overwrite output directory
+  -h, --help             help for pair
+  -O, --out-dir string   output directory
+  -1, --read1 string     (gzipped) read1 file
+  -2, --read2 string     (gzipped) read2 file
+  -u, --save-unpaired    save unpaired reads if there are
+```
+
+Examples
+
+1. Simple one
+
+        $ seqkit pair -1 reads_1.fq.gz -2 reads_2.fq.gz
+        
+        # output
+        reads_1.paired.fq.gz
+        reads_2.paired.fq.gz
+        
+2. Set output directory, file names are kept untouched.
+
+        $ seqkit pair -1 reads_1.fq.gz -2 reads_2.fq.gz -O result
+        
+        $ tree result        
+        result/
+        ├── reads_1.fq.gz
+        └── reads_2.fq.gz
+        
+3. Save unpaired reads if there are.
+
+        $ seqkit pair -1 reads_1.fq.gz -2 reads_2.fq.gz -O result -u
+        
+        $ tree result
+        result
+        ├── reads_1.fq.gz
+        ├── reads_1.unpaired.fq.gz
+        ├── reads_2.fq.gz
+        └── reads_2.unpaired.fq.gz
 
 
 ## sample

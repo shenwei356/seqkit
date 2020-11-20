@@ -33,6 +33,7 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/bio/util"
 	"github.com/shenwei356/util/byteutil"
 	"github.com/shenwei356/util/math"
 	"github.com/shenwei356/xopen"
@@ -141,7 +142,7 @@ Tips:
 								info.lenAvg,
 								info.lenMax))
 						} else {
-							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%d\t%d\t%d\t%d\t%d\t%.2f\t%.2f\n",
+							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\n",
 								info.file,
 								info.format,
 								info.t,
@@ -177,7 +178,7 @@ Tips:
 										info1.lenAvg,
 										info1.lenMax))
 								} else {
-									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%d\t%d\t%d\t%d\t%d\t%.2f\t%.2f\n",
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\n",
 										info1.file,
 										info1.format,
 										info1.t,
@@ -230,7 +231,7 @@ Tips:
 								info.lenAvg,
 								info.lenMax))
 						} else {
-							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%d\t%d\t%d\t%d\t%d\t%.2f\t%.2f\n",
+							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\n",
 								info.file,
 								info.format,
 								info.t,
@@ -288,13 +289,13 @@ Tips:
 					<-token
 				}()
 
-				var num, l, lenMin, lenMax, lenSum, gapSum int64
-				var n50, sum, l50 int64
-				var q1, q2, q3 int64
+				var gapSum uint64
+
+				lensStats := util.NewLengthStats()
+
 				var q20, q30 int64
 				var q byte
 				var encodeOffset int = fqEncoding.Offset()
-				var lens sortutil.Int64Slice
 				var seqFormat, t string
 				var record *fastx.Record
 				var fastxReader *fastx.Reader
@@ -315,12 +316,7 @@ Tips:
 				}
 
 				seqFormat = ""
-				num, lenMin, lenMax, lenSum, gapSum = 0, int64(^uint64(0)>>1), 0, 0, 0
-				n50, sum, l50 = 0, 0, 0
-				q20, q30 = 0, 0
-				if all {
-					lens = make(sortutil.Int64Slice, 0, 1000)
-				}
+
 				for {
 					record, err = fastxReader.Read()
 					if err != nil {
@@ -342,7 +338,6 @@ Tips:
 						break
 					}
 
-					num++
 					if seqFormat == "" {
 						if len(record.Seq.Qual) > 0 {
 							seqFormat = "FASTQ"
@@ -350,17 +345,9 @@ Tips:
 							seqFormat = "FASTA"
 						}
 					}
-					l = int64(len(record.Seq.Seq))
-					if all {
-						lens = append(lens, l)
-					}
-					lenSum += l
-					if l < lenMin {
-						lenMin = l
-					}
-					if l > lenMax {
-						lenMax = l
-					}
+
+					lensStats.Add(uint64(len(record.Seq.Seq)))
+
 					if all {
 						if fastxReader.IsFastq {
 							for _, q = range record.Seq.Qual {
@@ -373,7 +360,7 @@ Tips:
 							}
 						}
 
-						gapSum += int64(byteutil.CountBytes(record.Seq.Seq, gapLettersBytes))
+						gapSum += uint64(byteutil.CountBytes(record.Seq.Seq, gapLettersBytes))
 					}
 				}
 
@@ -387,17 +374,13 @@ Tips:
 					t = fastxReader.Alphabet().String()
 				}
 
+				var n50 uint64
+				var l50 int
+				var q1, q2, q3 float64
 				if all {
-					sort.Sort(lens)
-					for i := num - 1; i >= 0; i-- {
-						sum += lens[i]
-						if (sum << 1) >= lenSum {
-							n50 = lens[i]
-							l50 = num - i
-							break
-						}
-					}
-					q1, q2, q3 = quartile(lens)
+					n50 = lensStats.N50()
+					l50 = lensStats.L50()
+					q1, q2, q3 = lensStats.Q1(), lensStats.Q2(), lensStats.Q3()
 				}
 
 				select {
@@ -405,7 +388,7 @@ Tips:
 					return
 				default:
 				}
-				if num == 0 {
+				if lensStats.Count() == 0 {
 					if basename {
 						file = filepath.Base(file)
 					}
@@ -414,8 +397,8 @@ Tips:
 					}
 					ch <- statInfo{file, seqFormat, t,
 						0, 0, 0, 0,
-						0, lenMax, 0, 0,
-						q1, q2, q3,
+						0, 0, 0, 0,
+						0, 0, 0,
 						0, 0,
 						nil, id}
 				} else {
@@ -426,10 +409,10 @@ Tips:
 						file = stdinLabel
 					}
 					ch <- statInfo{file, seqFormat, t,
-						num, lenSum, gapSum, lenMin,
-						math.Round(float64(lenSum)/float64(num), 1), lenMax, n50, l50,
+						lensStats.Count(), lensStats.Sum(), gapSum, lensStats.Min(),
+						math.Round(lensStats.Mean(), 1), lensStats.Max(), n50, l50,
 						q1, q2, q3,
-						math.Round(float64(q20)/float64(lenSum)*100, 2), math.Round(float64(q30)/float64(lenSum)*100, 2),
+						math.Round(float64(q20)/float64(lensStats.Sum())*100, 2), math.Round(float64(q30)/float64(lensStats.Sum())*100, 2),
 						nil, id}
 				}
 			}(file, id)
@@ -485,26 +468,26 @@ Tips:
 					info.file,
 					info.format,
 					info.t,
-					humanize.Comma(info.num),
-					humanize.Comma(info.lenSum),
-					humanize.Comma(info.lenMin),
+					humanize.Comma(int64(info.num)),
+					humanize.Comma(int64(info.lenSum)),
+					humanize.Comma(int64(info.lenMin)),
 					humanize.Commaf(info.lenAvg),
-					humanize.Comma(info.lenMax))
+					humanize.Comma(int64(info.lenMax)))
 			} else {
 				tbl.AddRow(
 					info.file,
 					info.format,
 					info.t,
-					humanize.Comma(info.num),
-					humanize.Comma(info.lenSum),
-					humanize.Comma(info.lenMin),
+					humanize.Comma(int64(info.num)),
+					humanize.Comma(int64(info.lenSum)),
+					humanize.Comma(int64(info.lenMin)),
 					humanize.Commaf(info.lenAvg),
-					humanize.Comma(info.lenMax),
-					humanize.Comma(info.Q1),
-					humanize.Comma(info.Q2),
-					humanize.Comma(info.Q3),
-					humanize.Comma(info.gapSum),
-					humanize.Comma(info.N50),
+					humanize.Comma(int64(info.lenMax)),
+					humanize.Commaf(info.Q1),
+					humanize.Commaf(info.Q2),
+					humanize.Commaf(info.Q3),
+					humanize.Comma(int64(info.gapSum)),
+					humanize.Comma(int64(info.N50)),
 					humanize.Commaf(info.q20),
 					humanize.Commaf(info.q30),
 					// humanize.Comma(info.L50),
@@ -519,19 +502,23 @@ type statInfo struct {
 	file   string
 	format string
 	t      string
-	num    int64
-	lenSum int64
-	gapSum int64
-	lenMin int64
+
+	num    uint64
+	lenSum uint64
+	gapSum uint64
+	lenMin uint64
+
 	lenAvg float64
-	lenMax int64
-	N50    int64
-	L50    int64
-	Q1     int64
-	Q2     int64
-	Q3     int64
-	q20    float64
-	q30    float64
+	lenMax uint64
+	N50    uint64
+	L50    int
+
+	Q1 float64
+	Q2 float64
+	Q3 float64
+
+	q20 float64
+	q30 float64
 
 	err error
 	id  uint64

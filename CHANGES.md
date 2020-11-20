@@ -1,3 +1,22 @@
+- [SeqKit v0.15.0](https://github.com/shenwei356/seqkit/releases/tag/v0.15.0)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.15.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.15.0)
+    - `seqkit grep/locate`: update help message.
+    - `seqkit grep`: search on both strand when searching by sequence.
+    - `seqkit split2`: fix redundant log when using `-s`.
+- [SeqKit v0.14.0](https://github.com/shenwei356/seqkit/releases/tag/v0.14.0)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.14.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.14.0)
+    - new command `seqkit pair`: match up paired-end reads from two fastq files, faster than fastq-pair.
+    - `seqkit translate`: new flag `-F/--append-fram` for optional adding frame info to ID. [#159](https://github.com/shenwei356/seqkit/issues/159)
+    - `seqkit stats`: reduce memory usage when using `-a` for calculating N50. [#153](https://github.com/shenwei356/seqkit/issues/153)
+    - `seqkit mutate`: fix inserting sequence `-i/--insertion`, 
+       this bug occurs when `insert site` is big in some cases, don't worry if no error reported.
+    - `seqkit replace`:
+        - new flag `-U/--keep-untouched`: do not change anything when no value found for the key (only for sequence name).
+        - do no support editing FASTQ sequence.
+    - `seqkit grep/locate`: new flag `--circular` for supporting circular genome. [#158](https://github.com/shenwei356/seqkit/issues/158)
+- [SeqKit v0.13.2](https://github.com/shenwei356/seqkit/releases/tag/v0.13.2)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.13.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.13.2)
+    - `seqkit sana`: fix bug causing hanging on empty files. [#149](https://github.com/shenwei356/seqkit/pull/149)
 - [SeqKit v0.13.1](https://github.com/shenwei356/seqkit/releases/tag/v0.13.1)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.13.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.13.1)
     - `seqkit sana`: fix bug causing hanging on empty files. [#148](https://github.com/shenwei356/seqkit/pull/148)

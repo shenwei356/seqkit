@@ -169,12 +169,13 @@ according to the input files.
 					if !empty {
 						if force {
 							checkError(os.RemoveAll(outdir))
+							checkError(os.MkdirAll(outdir, 0755))
 						} else {
 							log.Warningf("outdir not empty: %s, you can use --force to overwrite", outdir)
 						}
 					}
 				} else {
-					checkError(os.MkdirAll(outdir, 0777))
+					checkError(os.MkdirAll(outdir, 0755))
 				}
 			}
 
@@ -306,9 +307,10 @@ according to the input files.
 				// for by-size/length: only log last part,
 				// for by-parts: log all parts.
 				for i, outfh := range outfhs {
-					if outfh != nil {
-						outfh.Close()
+					if outfh == nil {
+						continue
 					}
+					outfh.Close()
 
 					if !quiet {
 						log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
@@ -325,8 +327,8 @@ according to the input files.
 func init() {
 	RootCmd.AddCommand(split2Cmd)
 
-	split2Cmd.Flags().StringP("read1", "1", "", "read1 file")
-	split2Cmd.Flags().StringP("read2", "2", "", "read2 file")
+	split2Cmd.Flags().StringP("read1", "1", "", "(gzipped) read1 file")
+	split2Cmd.Flags().StringP("read2", "2", "", "(gzipped) read2 file")
 	split2Cmd.Flags().IntP("by-size", "s", 0, "split sequences into multi parts with N sequences")
 	split2Cmd.Flags().IntP("by-part", "p", 0, "split sequences into N parts")
 	split2Cmd.Flags().StringP("by-length", "l", "", "split sequences into chunks of N bases, supports K/M/G suffix")

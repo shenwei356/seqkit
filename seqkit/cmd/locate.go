@@ -41,17 +41,23 @@ var locateCmd = &cobra.Command{
 	Short: "locate subsequences/motifs, mismatch allowed",
 	Long: `locate subsequences/motifs, mismatch allowed
 
-Motifs could be EITHER plain sequence containing "ACTGN" OR regular
-expression like "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" for ORFs.
-Degenerate bases like "RYMM.." are also supported by flag -d.
+Attentions:
 
-By default, motifs are treated as regular expression.
-When flag -d given, regular expression may be wrong.
-For example: "\w" will be wrongly converted to "\[AT]".
-
-Mismatch is allowed using flag "-m/--max-mismatch",
-but it's not fast enough for large genome like human genome.
-Though, it's fast enough for microbial genomes.
+  1. Motifs could be EITHER plain sequence containing "ACTGN" OR regular
+     expression like "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" for ORFs.     
+  2. Degenerate bases/residues like "RYMM.." are also supported by flag -d.
+     But do not use degenerate bases/residues in regular expression, you need
+     convert them to regular expression, e.g., change "N" or "X"  to ".".
+  3. When providing search patterns (motifs) via flag '-p',
+     please use double quotation marks for patterns containing comma, 
+     e.g., -p '"A{2,}"' or -p "\"A{2,}\"". Because the command line argument
+     parser accepts comma-separated-values (CSV) for multiple values (motifs).
+     Patterns in file do not follow this rule.     
+  4. Mismatch is allowed using flag "-m/--max-mismatch",
+     but it's not fast enough for large genome like human genome.
+     Though, it's fast enough for microbial genomes.
+  5. When using flag --circular, end position of matched subsequence that 
+     crossing genome sequence end would be greater than sequence length.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -84,6 +90,11 @@ Though, it's fast enough for microbial genomes.
 		outFmtBED := getFlagBool(cmd, "bed")
 		mismatches := getFlagNonNegativeInt(cmd, "max-mismatch")
 		hideMatched := getFlagBool(cmd, "hide-matched")
+		circular := getFlagBool(cmd, "circular")
+
+		if config.Alphabet == seq.Protein {
+			onlyPositiveStrand = true
+		}
 
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
@@ -205,6 +216,7 @@ Though, it's fast enough for microbial genomes.
 						}
 						re, err := regexp.Compile(s)
 						checkError(err)
+						fmt.Println(s, re)
 						regexps[p] = re
 					} else if bytes.Index(patterns[p], []byte(".")) >= 0 ||
 						!(seq.DNAredundant.IsValid(patterns[p]) == nil ||
@@ -256,6 +268,11 @@ Though, it's fast enough for microbial genomes.
 				}
 
 				l = len(record.Seq.Seq)
+
+				if circular { // concat two copies of sequence
+					record.Seq.Seq = append(record.Seq.Seq, record.Seq.Seq...)
+				}
+
 				if !onlyPositiveStrand {
 					seqRP = record.Seq.RevCom()
 				}
@@ -272,7 +289,12 @@ Though, it's fast enough for microbial genomes.
 							checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", pName, record.Name, err))
 						}
 						for _, i = range loc {
+							if circular && i+1 > l { // 2nd clone of original part
+								continue
+							}
+
 							begin = i + 1
+
 							end = i + len(pSeq)
 							if i+len(pSeq) > len(record.Seq.Seq) {
 								continue
@@ -333,6 +355,10 @@ Though, it's fast enough for microbial genomes.
 							checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", pName, record.Name, err))
 						}
 						for _, i = range loc {
+							if circular && i+1 > l { // 2nd clone of original part
+								continue
+							}
+
 							begin = l - i - len(pSeq) + 1
 							end = l - i
 							if i+len(pSeq) > len(record.Seq.Seq) {
@@ -407,6 +433,11 @@ Though, it's fast enough for microbial genomes.
 							loc = []int{i, i + lpatten}
 						}
 						begin = offset + loc[0] + 1
+
+						if circular && begin > l { // 2nd clone of original part
+							break
+						}
+
 						end = offset + loc[1]
 
 						flag = true // check "duplicated" region
@@ -495,8 +526,16 @@ Though, it's fast enough for microbial genomes.
 							loc = []int{i, i + lpatten}
 						}
 
+						if circular && offset+loc[0]+1 > l { // 2nd clone of original part
+							break
+						}
+
 						begin = l - offset - loc[1] + 1
 						end = l - offset - loc[0]
+						if offset+loc[1] > l {
+							begin += l
+							end += l
+						}
 
 						flag = true
 						if useRegexp || degenerate {
@@ -582,4 +621,5 @@ func init() {
 	locateCmd.Flags().BoolP("bed", "", false, "output in BED6 format")
 	locateCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster")
 	locateCmd.Flags().BoolP("hide-matched", "M", false, "do not show matched sequences")
+	locateCmd.Flags().BoolP("circular", "c", false, `circular genome. type "seqkit locate -h" for details`)
 }

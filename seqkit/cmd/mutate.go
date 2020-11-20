@@ -294,16 +294,16 @@ Examples:
 					if mIns.pos == 0 {
 						s = 0
 						record.Seq.Seq = append(record.Seq.Seq, mIns.seq...)
-						copy(record.Seq.Seq[s+len(mIns.seq):], record.Seq.Seq[s:s+seqLen])
+						copy(record.Seq.Seq[s+len(mIns.seq):], record.Seq.Seq[s:seqLen])
 						copy(record.Seq.Seq[s:s+len(mIns.seq)], mIns.seq)
 					} else {
 						s, _, ok = seq.SubLocation(seqLen, mIns.pos, mIns.pos)
 						if !ok {
 							log.Warningf("[%s]: insertion mutation: position (%d) out of sequence length (%d)", record.ID, mIns.pos, seqLen)
 						} else {
-							record.Seq.Seq = append(record.Seq.Seq, mIns.seq...)
-							copy(record.Seq.Seq[s+len(mIns.seq):], record.Seq.Seq[s:s+seqLen])
-							copy(record.Seq.Seq[s:s+len(mIns.seq)], mIns.seq)
+							record.Seq.Seq = append(record.Seq.Seq, mIns.seq...)             // append insert sequence to the end
+							copy(record.Seq.Seq[s+len(mIns.seq):], record.Seq.Seq[s:seqLen]) // move sequence behind the insert location at the end, so leave space for IS.
+							copy(record.Seq.Seq[s:s+len(mIns.seq)], mIns.seq)                // copy IS into desired region.
 						}
 					}
 

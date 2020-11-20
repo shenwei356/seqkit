@@ -264,72 +264,7 @@ is the second captured match. Command:
 
 ## How to extract paired reads from two paired-end reads file?
 
-Let's create two unbanlanced PE reads file:
-
-    $ seqkit rmdup duplicated-reads.fq.gz \
-        | seqkit replace --pattern " .+" --replacement " 1" \
-        | seqkit sample --proportion 0.9 --rand-seed 1 --out-file read_1.fq.gz
-    $ seqkit rmdup duplicated-reads.fq.gz \
-        | seqkit replace --pattern " .+" --replacement " 2" \
-        | seqkit sample --proportion 0.9 --rand-seed 2 --out-file read_2.fq.gz
-
-Overview:
-
-    # number of records
-    $ seqkit stat read_1.fq.gz read_2.fq.gz
-    file          format  type  num_seqs  sum_len  min_len  avg_len  max_len
-    read_1.fq.gz  FASTQ   DNA      9,033  912,333      101      101      101
-    read_2.fq.gz  FASTQ   DNA      8,965  905,465      101      101      101
-
-    # sequence headers
-    $ seqkit head -n 3 read_1.fq.gz | seqkit seq --name
-    SRR1972739.1 1
-    SRR1972739.3 1
-    SRR1972739.4 1
-
-    $ seqkit head -n 3 read_2.fq.gz | seqkit seq --name
-    SRR1972739.1 2
-    SRR1972739.2 2
-    SRR1972739.3 2
-
-Firstly, extract sequence IDs of two file and compute the intersection:
-
-    $ seqkit seq --name --only-id read_1.fq.gz read_2.fq.gz \
-        | sort | uniq -d > id.txt
-
-    $ # number of IDs
-    wc -l id.txt
-    8090 id.txt
-
-Then extract reads using `id.txt`:
-
-    $ seqkit grep --pattern-file id.txt read_1.fq.gz -o read_1.f.fq.gz
-    $ seqkit grep --pattern-file id.txt read_2.fq.gz -o read_2.f.fq.gz
-
-Check if the IDs in two files are the same by `md5sum`:
-
-    $ seqkit seq --name --only-id read_1.f.fq.gz > read_1.f.fq.gz.id.txt
-    $ seqkit seq --name --only-id read_2.f.fq.gz > read_2.f.fq.gz.id.txt
-
-    $ md5sum read_*.f.fq.gz.id.txt
-    537c57cfdc3923bb94a3dc31a0c3b02a  read_1.f.fq.gz.id.txt
-    537c57cfdc3923bb94a3dc31a0c3b02a  read_2.f.fq.gz.id.txt
-
-Note that this example assumes that the IDs in the two reads file have
-same order. If not you can sort them after previous steps. Shell `sort`
-can sort large file using disk, so temporary directory is set as
-current directory by option `-T .`.
-
-    $ gzip -d -c read_1.f.fq.gz \
-        | seqkit fx2tab \
-        | sort -k1,1 -T . \
-        | seqkit tab2fx \
-        | gzip -c > read_1.f.sorted.fq.gz
-    $ gzip -d -c read_2.f.fq.gz \
-        | seqkit fx2tab \
-        | sort -k1,1 -T . \
-        | seqkit tab2fx \
-        | gzip -c > read_2.f.sorted.fq.gz
+Use [seqkit pair](https://bioinf.shenwei.me/seqkit/usage/#pair).
 
 ## How to concatenate two FASTA sequences in to one?
 

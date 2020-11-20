@@ -42,6 +42,10 @@ var seqCmd = &cobra.Command{
 	Short: "transform sequences (revserse, complement, extract ID...)",
 	Long: `transform sequences (revserse, complement, extract ID...)
 
+Attentions:
+
+  1. This command outputs plain text even when out file ends with ".gz".
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -139,7 +143,7 @@ var seqCmd = &cobra.Command{
 		if outFile == "-" {
 			outfh = os.Stdout
 		} else {
-			outfh, err = os.Open(outFile)
+			outfh, err = os.Create(outFile)
 			checkError(err)
 		}
 		defer outfh.Close()

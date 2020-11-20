@@ -88,12 +88,13 @@ Attention:
 					if !empty {
 						if force {
 							checkError(os.RemoveAll(outdir))
+							checkError(os.MkdirAll(outdir, 0755))
 						} else {
 							log.Warningf("outdir not empty: %s, you can use --force to overwrite", outdir)
 						}
 					}
 				} else {
-					checkError(os.MkdirAll(outdir, 0777))
+					checkError(os.MkdirAll(outdir, 0755))
 				}
 			}
 		}
