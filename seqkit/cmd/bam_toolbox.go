@@ -457,7 +457,7 @@ func GetSamAlnDetails(r *sam.Record) *AlnDetails {
 }
 
 func BamToolDump(p *BamToolParams) {
-	validFields := []string{"Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "Match", "Mismatch", "Ins", "Del", "AlnLen", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "IsSup", "ReadSeq", "ReadAlnSeq", "LeftSoftClipSeq", "RightSoftClip", "LeftHardClip", "RightHardClip"}
+	validFields := []string{"Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "Match", "Mismatch", "Ins", "Del", "AlnLen", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "IsSup", "ReadSeq", "ReadAlnSeq", "LeftSoftClipSeq", "RightSoftClipSeq", "RightSoftClip", "LeftHardClip", "RightHardClip"}
 
 	tsvFh := os.Stderr
 	tsvFile, err := p.Yaml.Get("Tsv").String()
