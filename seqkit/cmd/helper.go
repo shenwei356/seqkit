@@ -415,7 +415,20 @@ negative index    0-9-8-7-6-5-4-3-2-1
         -12:-1    A C G T N a c g t n
 `
 
-func writeSeqs(records []*fastx.Record, file string, lineWidth int, quiet bool, dryRun bool) error {
+
+func openWriter(file string, post string) *xopen.Writer {
+	if post == "" {
+		outfh, err := xopen.Wopen(file)
+		checkError(err)
+		return(outfh)
+	} else {
+		outfh, err := xopen.WopenPipe(file, post)
+		checkError(err)
+		return(outfh)
+	}
+}
+
+func writeSeqs(records []*fastx.Record, file string, post string, lineWidth int, quiet bool, dryRun bool) error {
 	if !quiet {
 		log.Infof("write %d sequences to file: %s\n", len(records), file)
 	}
@@ -423,8 +436,7 @@ func writeSeqs(records []*fastx.Record, file string, lineWidth int, quiet bool, 
 		return nil
 	}
 
-	outfh, err := xopen.Wopen(file)
-	checkError(err)
+	outfh := openWriter(file, post)
 	defer outfh.Close()
 
 	for _, record := range records {

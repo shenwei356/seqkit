@@ -88,6 +88,7 @@ Examples:
 		dryRun := getFlagBool(cmd, "dry-run")
 
 		outdir := getFlagString(cmd, "out-dir")
+		post := getFlagString(cmd, "post")
 		force := getFlagBool(cmd, "force")
 
 		file := files[0]
@@ -172,14 +173,14 @@ Examples:
 					records = append(records, record.Clone())
 					if len(records) == size {
 						outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
-						writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
+						writeSeqs(records, outfile, post, config.LineWidth, quiet, dryRun)
 						i++
 						records = []*fastx.Record{}
 					}
 				}
 				if len(records) > 0 {
 					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
-					writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
+					writeSeqs(records, outfile, post, config.LineWidth, quiet, dryRun)
 				}
 
 				return
@@ -246,8 +247,7 @@ Examples:
 			if len(IDs) > 0 {
 				outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
 				if !dryRun {
-					outfh, err = xopen.Wopen(outfile)
-					checkError(err)
+					outfh = openWriter(file, post)
 				}
 			}
 			j := 0
@@ -274,8 +274,7 @@ Examples:
 					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
 					if !dryRun {
 						outfh.Close()
-						outfh, err = xopen.Wopen(outfile)
-						checkError(err)
+						outfh = openWriter(file, post)
 					}
 					j = 0
 				}
@@ -339,14 +338,14 @@ Examples:
 					records = append(records, record)
 					if len(records) == size {
 						outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
-						writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
+						writeSeqs(records, outfile, post, config.LineWidth, quiet, dryRun)
 						i++
 						records = []*fastx.Record{}
 					}
 				}
 				if len(records) > 0 {
 					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
-					writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
+					writeSeqs(records, outfile, post, config.LineWidth, quiet, dryRun)
 				}
 				return
 			}
@@ -424,8 +423,7 @@ Examples:
 			if len(IDs) > 0 {
 				outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
 				if !dryRun {
-					outfh, err = xopen.Wopen(outfile)
-					checkError(err)
+					outfh = openWriter(file, post)
 				}
 			}
 			j := 0
@@ -452,8 +450,7 @@ Examples:
 					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
 					if !dryRun {
 						outfh.Close()
-						outfh, err = xopen.Wopen(outfile)
-						checkError(err)
+						outfh = openWriter(file, post)
 					}
 					j = 0
 				}
@@ -515,7 +512,7 @@ Examples:
 					outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s",
 						filepath.Base(fileName),
 						pathutil.RemoveInvalidPathChars(id, "__"), fileExt))
-					writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
+					writeSeqs(records, outfile, post, config.LineWidth, quiet, dryRun)
 				}
 				return
 			}
@@ -611,8 +608,7 @@ Examples:
 						pathutil.RemoveInvalidPathChars(id, "__"), fileExt))
 
 					if !dryRun {
-						outfh, err = xopen.Wopen(outfile)
-						checkError(err)
+						outfh = openWriter(file, post)
 						for _, chr := range _IDs {
 							r, ok := faidx.Index[chr]
 							if !ok {
@@ -706,7 +702,7 @@ Examples:
 				var outfile string
 				for subseq, records := range recordsBySeqs {
 					outfile = filepath.Join(outdir, fmt.Sprintf("%s.region_%d:%d_%s%s", filepath.Base(fileName), start, end, subseq, fileExt))
-					writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
+					writeSeqs(records, outfile, post, config.LineWidth, quiet, dryRun)
 				}
 				return
 			}
@@ -811,8 +807,7 @@ Examples:
 					outfile := filepath.Join(outdir, fmt.Sprintf("%s.region_%d:%d_%s%s", filepath.Base(fileName), start, end, subseq, fileExt))
 
 					if !dryRun {
-						outfh, err = xopen.Wopen(outfile)
-						checkError(err)
+						outfh = openWriter(file, post)
 
 						for _, chr := range chrs {
 							r, ok := faidx.Index[chr]
@@ -856,6 +851,7 @@ func init() {
 	splitCmd.Flags().BoolP("dry-run", "d", false, "dry run, just print message and no files will be created.")
 	splitCmd.Flags().BoolP("keep-temp", "k", false, "keep tempory FASTA and .fai file when using 2-pass mode")
 	splitCmd.Flags().StringP("out-dir", "O", "", "output directory (default value is $infile.split)")
+	splitCmd.Flags().StringP("post", "P", "", "postprocess shell command ($FILE for formatted out-dir)")
 	splitCmd.Flags().BoolP("force", "f", false, "overwrite output directory")
 }
 
