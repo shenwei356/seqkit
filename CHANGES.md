@@ -5,6 +5,7 @@
     - `seqkit split2`: fix redundant log when using `-s`.
     - `seqkit bam`: new field `RightSoftClipSeq`. [#172](https://github.com/shenwei356/seqkit/pull/172)
     - `seqkit sample -2`: remove extra `\n`. [#173](https://github.com/shenwei356/seqkit/issues/173)
+    - `seqkit split2 -l`: fix bug for splitting by accumulative length, this bug occurs when the first record is longer than `-l`, no sequences are lost.
 - [SeqKit v0.14.0](https://github.com/shenwei356/seqkit/releases/tag/v0.14.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.14.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.14.0)
     - new command `seqkit pair`: match up paired-end reads from two fastq files, faster than fastq-pair.

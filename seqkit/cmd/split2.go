@@ -90,8 +90,12 @@ according to the input files.
 		force := getFlagBool(cmd, "force")
 
 		if size == 0 && parts == 0 && length == 0 {
-			checkError(fmt.Errorf(`one of flags should be given: -s/-p. type "seqkit split2 -h" for help`))
+			checkError(fmt.Errorf(`one of flags should be given: -s/-p/-l. type "seqkit split2 -h" for help`))
 		}
+
+		bySize := size > 0
+		byParts := parts > 0
+		byLength := length > 0
 
 		if parts >= 1000 {
 			log.Warningf(`value of -p/--parts > 1000 may cause error of "too many open files"`)
@@ -134,9 +138,9 @@ according to the input files.
 
 		if !quiet {
 			log.Infof("split seqs from %s", source)
-			if size > 0 {
+			if bySize {
 				log.Infof("split into %d seqs per file", size)
-			} else if parts > 0 {
+			} else if byParts {
 				log.Infof("split into %d parts", parts)
 			} else {
 				log.Infof("split by sequence length: %s", lengthS)
@@ -192,23 +196,24 @@ according to the input files.
 				var counts []int
 				var outfiles []string
 
-				if size > 0 || length > 0 { // by size or by length
+				var flag bool
+
+				if bySize || byLength { // by size or by length
 					outfhs = make([]*xopen.Writer, 0, 10)
 					counts = make([]int, 0, 10)
 					outfiles = make([]string, 0, 10)
-				} else if parts > 0 { // by part
+				} else if byParts { // by part
 					outfhs = make([]*xopen.Writer, 0, parts)
 					counts = make([]int, 0, parts)
 					outfiles = make([]string, 0, parts)
 				} else {
-					checkError(fmt.Errorf(`one of flags should be given: -s/-p. type "seqkit split2 -h" for help`))
+					checkError(fmt.Errorf(`one of flags should be given: -s/-p/-l. type "seqkit split2 -h" for help`))
 				}
 
-				var outfh *xopen.Writer
 				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
-				i := 0      // nth part
-				j := 0      // nth record
+				i := 0 // nth part
+				j := 0
 				var n int64 // length sum
 				for {
 					record, err = fastxReader.Read()
@@ -219,6 +224,7 @@ according to the input files.
 						checkError(err)
 						break
 					}
+
 					if fastxReader.IsFastq {
 						config.LineWidth = 0
 						fastx.ForcelyOutputFastq = true
@@ -234,7 +240,7 @@ according to the input files.
 					}
 					n += int64(len(record.Seq.Seq))
 
-					if size > 0 {
+					if bySize {
 						if j == size {
 							outfhs[i].Close()
 							if !quiet {
@@ -254,25 +260,55 @@ according to the input files.
 
 							j = 0
 						}
-					} else if length > 0 {
+					} else if byLength {
+						flag = false
 						if n >= length {
-							outfhs[i].Close()
-							if !quiet {
-								log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
+							if len(outfhs) == 0 { // order is different
+								var outfh2 *xopen.Writer
+								outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
+								outfh2, err = xopen.Wopen(outfile)
+								checkError(err)
+
+								outfhs = append(outfhs, outfh2)
+								counts = append(counts, 0)
+								outfiles = append(outfiles, outfile)
+
+								record.FormatToWriter(outfhs[i], config.LineWidth)
+								counts[i]++
+
+								outfhs[i].Close()
+								if !quiet {
+									log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
+								}
+								outfhs[i] = nil
+								i++
+
+								n = 0
+							} else {
+								record.FormatToWriter(outfhs[i], config.LineWidth)
+								counts[i]++
+
+								outfhs[i].Close()
+								if !quiet {
+									log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
+								}
+								outfhs[i] = nil
+								i++
+
+								var outfh2 *xopen.Writer
+								outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
+								outfh2, err = xopen.Wopen(outfile)
+								checkError(err)
+
+								outfhs = append(outfhs, outfh2)
+								counts = append(counts, 0)
+								outfiles = append(outfiles, outfile)
+
+								n = 0
 							}
-							outfhs[i] = nil
-
-							i++
-							var outfh2 *xopen.Writer
-							outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
-							outfh2, err = xopen.Wopen(outfile)
-							checkError(err)
-
-							outfhs = append(outfhs, outfh2)
-							counts = append(counts, 0)
-							outfiles = append(outfiles, outfile)
-
-							n = 0
+							flag = false
+						} else { // write this record later
+							flag = true
 						}
 					}
 
@@ -286,15 +322,20 @@ according to the input files.
 						counts = append(counts, 0)
 						outfiles = append(outfiles, outfile)
 					}
-					outfh = outfhs[i]
 
-					record.FormatToWriter(outfh, config.LineWidth)
+					if byLength {
+						if flag {
+							record.FormatToWriter(outfhs[i], config.LineWidth)
+							counts[i]++
+						}
+					} else {
+						record.FormatToWriter(outfhs[i], config.LineWidth)
+						counts[i]++
+					}
 
-					counts[i]++
-
-					if size > 0 {
+					if bySize {
 						j++ // increase size
-					} else if parts > 0 {
+					} else if byParts {
 						i++
 						if i == parts { // reset index
 							i = 0
@@ -304,7 +345,7 @@ according to the input files.
 					}
 				}
 
-				// for by-size/length: only log last part,
+				// for by-size: only log last part,
 				// for by-parts: log all parts.
 				for i, outfh := range outfhs {
 					if outfh == nil {
@@ -313,7 +354,11 @@ according to the input files.
 					outfh.Close()
 
 					if !quiet {
-						log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
+						if counts[i] == 0 {
+							os.Remove(outfiles[i])
+						} else {
+							log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
+						}
 					}
 				}
 
@@ -331,7 +376,7 @@ func init() {
 	split2Cmd.Flags().StringP("read2", "2", "", "(gzipped) read2 file")
 	split2Cmd.Flags().IntP("by-size", "s", 0, "split sequences into multi parts with N sequences")
 	split2Cmd.Flags().IntP("by-part", "p", 0, "split sequences into N parts")
-	split2Cmd.Flags().StringP("by-length", "l", "", "split sequences into chunks of N bases, supports K/M/G suffix")
+	split2Cmd.Flags().StringP("by-length", "l", "", "split sequences into chunks of >=N bases, supports K/M/G suffix")
 	split2Cmd.Flags().StringP("out-dir", "O", "", "output directory (default value is $infile.split)")
 	split2Cmd.Flags().BoolP("force", "f", false, "overwrite output directory")
 }

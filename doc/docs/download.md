@@ -13,6 +13,7 @@ SeqKit is implemented in [Go](https://golang.org/) programming language,
     - `seqkit split2`: fix redundant log when using `-s`.
     - `seqkit bam`: new field `RightSoftClipSeq`. [#172](https://github.com/shenwei356/seqkit/pull/172)
     - `seqkit sample -2`: remove extra `\n`. [#173](https://github.com/shenwei356/seqkit/issues/173)
+    - `seqkit split2 -l`: fix bug for splitting by accumulative length, this bug occurs when the first record is longer than `-l`, no sequences are lost.
 
 ### Please cite
 

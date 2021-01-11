@@ -2202,7 +2202,7 @@ Usage:
   seqkit split2 [flags]
 
 Flags:
-  -l, --by-length string   split sequences into chunks of N bases, supports K/M/G suffix
+  -l, --by-length string   split sequences into chunks of >=N bases, supports K/M/G suffix
   -p, --by-part int        split sequences into N parts
   -s, --by-size int        split sequences into multi parts with N sequences
   -f, --force              overwrite output directory
