@@ -1,5 +1,5 @@
 site_name: SeqKit - Ultrafast FASTA/Q kit
-pages:
+nav:
 - Home: index.md
 - Download: download.md
 - Documents:
@@ -12,17 +12,17 @@ pages:
 # theme: cinder
 
 theme:
-    name: 'material'
+    name: material
     palette:
-        primary: 'teal'
-        accent: 'blue grey'
-    logo:
-        icon: 'school'
-    favicon: 'files/favicon.ico'
+        primary: teal
+        accent: blue grey
+    icon:
+        logo: material/school
+    favicon: files/favicon.ico
     feature:
-        tabs: false
+        navigation.tabs: false
 extra:
-  manifest: 'manifest.webmanifest'
+  manifest: manifest.webmanifest
 
 repo_url: https://github.com/shenwei356/seqkit
 site_description: SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
