@@ -281,6 +281,10 @@ Examples:
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
+			if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
+				onlyPositiveStrand = true
+			}
+
 			for {
 				record, err = fastxReader.Read()
 				if err != nil {

@@ -1,3 +1,8 @@
+- [SeqKit v0.15.1](https://github.com/shenwei356/seqkit/releases/tag/v0.15.1)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.15.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.15.1)
+    - `seqkit grep`:
+        - fix a bug of `-m`. [#178](https://github.com/shenwei356/seqkit/issues/178)
+        - onply search on positive strand when searching unlimited or protein sequences.
 - [SeqKit v0.15.0](https://github.com/shenwei356/seqkit/releases/tag/v0.15.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.15.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.15.0)
     - `seqkit grep/locate`: update help message.
