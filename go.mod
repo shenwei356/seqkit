@@ -24,7 +24,7 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/shenwei356/bio v0.0.0-20201213090627-18e3e643a476
 	github.com/shenwei356/breader v0.0.0-20170924140440-21f0a70fe179
-	github.com/shenwei356/bwt v0.3.1
+	github.com/shenwei356/bwt v0.3.2
 	github.com/shenwei356/go-logging v0.0.0-20171012171522-c6b9702d88ba
 	github.com/shenwei356/natsort v0.0.0-20190418160752-600d539c017d // indirect
 	github.com/shenwei356/util v2020.12.31+incompatible

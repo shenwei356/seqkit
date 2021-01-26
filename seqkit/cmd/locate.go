@@ -250,9 +250,15 @@ Attentions:
 		var pSeq, p []byte
 		var pName string
 		var re *regexp.Regexp
+		_onlyPositiveStrand := onlyPositiveStrand
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
+
+			if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
+				_onlyPositiveStrand = true
+			}
+
 			for {
 				record, err = fastxReader.Read()
 				if err != nil {
@@ -341,7 +347,7 @@ Attentions:
 						}
 					}
 
-					if onlyPositiveStrand {
+					if _onlyPositiveStrand {
 						continue
 					}
 
