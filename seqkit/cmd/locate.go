@@ -216,7 +216,6 @@ Attentions:
 						}
 						re, err := regexp.Compile(s)
 						checkError(err)
-						fmt.Println(s, re)
 						regexps[p] = re
 					} else if bytes.Index(patterns[p], []byte(".")) >= 0 ||
 						!(seq.DNAredundant.IsValid(patterns[p]) == nil ||

@@ -3,6 +3,8 @@
     - `seqkit grep/locate`:
         - fix bug of `-m` when querying contains letters not in alphabet, usually for protein sequences. [#178](https://github.com/shenwei356/seqkit/issues/178), [#179](https://github.com/shenwei356/seqkit/issues/179)
         - onply search on positive strand when searching unlimited or protein sequences
+    - `seqkit locate`:
+        - removing debug info for `-r` introduced in a0f6b6e. [#180](https://github.com/shenwei356/seqkit/issues/180)
 - [SeqKit v0.15.0](https://github.com/shenwei356/seqkit/releases/tag/v0.15.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.15.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.15.0)
     - `seqkit grep/locate`: update help message.
