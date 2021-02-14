@@ -63,6 +63,7 @@ Attention:
 		printGC := getFlagBool(cmd, "gc")
 		printGCSkew := getFlagBool(cmd, "gc-skew")
 		baseContents := getFlagStringSlice(cmd, "base-content")
+		baseCounts := getFlagStringSlice(cmd, "base-count")
 		caseSensitive := getFlagBool(cmd, "case-sensitive")
 		onlyName := getFlagBool(cmd, "name")
 		printTitle := getFlagBool(cmd, "header-line")
@@ -97,6 +98,11 @@ Attention:
 			}
 			if printGCSkew {
 				outfh.WriteString("\tGC-Skew")
+			}
+			if len(baseCounts) > 0 {
+				for _, bc := range baseCounts {
+					outfh.WriteString(fmt.Sprintf("\t%s", bc))
+				}
 			}
 			if len(baseContents) > 0 {
 				for _, bc := range baseContents {
@@ -164,6 +170,16 @@ Attention:
 					outfh.WriteString(fmt.Sprintf("\t%.2f", (g-c)/(g+c)*100))
 				}
 
+				if len(baseCounts) > 0 {
+					for _, bc := range baseCounts {
+						if caseSensitive {
+							outfh.WriteString(fmt.Sprintf("\t%d", record.Seq.BaseCountCaseSensitive(bc)))
+						} else {
+							outfh.WriteString(fmt.Sprintf("\t%d", record.Seq.BaseCount(bc)))
+						}
+					}
+				}
+
 				if len(baseContents) > 0 {
 					for _, bc := range baseContents {
 						if caseSensitive {
@@ -199,6 +215,7 @@ func init() {
 	fx2tabCmd.Flags().BoolP("gc", "g", false, "print GC content")
 	fx2tabCmd.Flags().BoolP("gc-skew", "G", false, "print GC-Skew")
 	fx2tabCmd.Flags().StringSliceP("base-content", "B", []string{}, "print base content. (case ignored, multiple values supported) e.g. -B AT -B N")
+	fx2tabCmd.Flags().StringSliceP("base-count", "C", []string{}, "print base count. (case ignored, multiple values supported) e.g. -C AT -C N")
 	fx2tabCmd.Flags().BoolP("case-sensitive", "I", false, "calculate case sensitive base content")
 	fx2tabCmd.Flags().BoolP("only-id", "i", false, "print ID instead of full head")
 	fx2tabCmd.Flags().BoolP("name", "n", false, "only print names (no sequences and qualities)")

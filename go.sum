@@ -194,8 +194,8 @@ github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFR
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/ryanuber/columnize v0.0.0-20160712163229-9b3edd62028f/go.mod h1:sm1tb6uqfes/u+d4ooFouqFdy9/2g9QGwK3SQygK0Ts=
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg65j358z/aeFdxmN0P9QXhEzd20vsDc=
-github.com/shenwei356/bio v0.0.0-20201213090627-18e3e643a476 h1:PE3sUBFeHWFNLsrQ7Blyk4duI+emVGKQ1+iYo4ZalKk=
-github.com/shenwei356/bio v0.0.0-20201213090627-18e3e643a476/go.mod h1:tKIebGVfqYwgLIoXohkLiQO685B2d3l9vTf1cjRZaVk=
+github.com/shenwei356/bio v0.0.0-20210214151329-aff1c373610b h1:ZlBFkewtnExFmzL4lQauXWBmSVbp7fMZCmvjf7TYy1k=
+github.com/shenwei356/bio v0.0.0-20210214151329-aff1c373610b/go.mod h1:tKIebGVfqYwgLIoXohkLiQO685B2d3l9vTf1cjRZaVk=
 github.com/shenwei356/bpool v0.0.0-20160710042833-f9e0ee4d0403 h1:/3JklLnHXiWUBxWc3joQYavDQJpncRhRA909cUb7eOw=
 github.com/shenwei356/bpool v0.0.0-20160710042833-f9e0ee4d0403/go.mod h1:YkgdTWfNnJgv5HVJbVSDmxQtkK3/jZWDoqcG26BVU8k=
 github.com/shenwei356/breader v0.0.0-20170924140440-21f0a70fe179 h1:MZiEG6aN8j1A0jXzCzyZM2BM6ZHbePYiwR4FXgUTCCk=

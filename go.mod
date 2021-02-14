@@ -22,7 +22,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/errors v0.9.1
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
-	github.com/shenwei356/bio v0.0.0-20201213090627-18e3e643a476
+	github.com/shenwei356/bio v0.0.0-20210214151329-aff1c373610b
 	github.com/shenwei356/breader v0.0.0-20170924140440-21f0a70fe179
 	github.com/shenwei356/bwt v0.3.2
 	github.com/shenwei356/go-logging v0.0.0-20171012171522-c6b9702d88ba

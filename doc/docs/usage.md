@@ -968,6 +968,7 @@ Flags:
   -a, --alphabet               print alphabet letters
   -q, --avg-qual               print average quality of a read
   -B, --base-content strings   print base content. (case ignored, multiple values supported) e.g. -B AT -B N
+  -C, --base-count strings     print base count. (case ignored, multiple values supported) e.g. -C AT -C N
   -I, --case-sensitive         calculate case sensitive base content
   -g, --gc                     print GC content
   -G, --gc-skew                print GC-Skew
