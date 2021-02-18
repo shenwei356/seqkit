@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2021 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,44 +33,60 @@ import (
 // genautocompleteCmd represents the fq2fa command
 var genautocompleteCmd = &cobra.Command{
 	Use:   "genautocomplete",
-	Short: "generate shell autocompletion script",
+	Short: "generate shell autocompletion script (bash|zsh|fish|powershell)",
 	Long: `generate shell autocompletion script
 
-Note: The current version supports Bash only.
-This should work for *nix systems with Bash installed.
+Supported shell: bash|zsh|fish|powershell
 
-Howto:
+Bash:
 
-1. run: seqkit genautocomplete
+    # generate completion shell
+    seqkit genautocomplete --shell bash
 
-2. create and edit ~/.bash_completion file if you don't have it.
+    # configure if never did.
+    # install bash-completion if the "complete" command is not found.
+    echo "for bcfile in ~/.bash_completion.d/* ; do source \$bcfile; done" >> ~/.bash_completion
+    echo "source ~/.bash_completion" >> ~/.bashrc
 
-        nano ~/.bash_completion
+Zsh:
 
-    add the following:
+    # generate completion shell
+    seqkit genautocomplete --shell zsh --file ~/.zfunc/_seqkit
 
-        for bcfile in ~/.bash_completion.d/* ; do
-          . $bcfile
-        done
+    # configure if never did
+    echo 'fpath=( ~/.zfunc "${fpath[@]}" )' >> ~/.zshrc
+    echo "autoload -U compinit; compinit" >> ~/.zshrc
+
+fish:
+
+    seqkit genautocomplete --shell fish --file ~/.config/fish/completions/seqkit.fish
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		autocompleteTarget := getFlagString(cmd, "file")
-		autocompleteType := getFlagString(cmd, "type")
+		outfile := getFlagString(cmd, "file")
+		shell := getFlagString(cmd, "shell")
 
-		if autocompleteType != "bash" {
-			checkError(fmt.Errorf("only Bash is supported for now"))
-		}
-
-		dir := filepath.Dir(autocompleteTarget)
+		dir := filepath.Dir(outfile)
 		ok, err := pathutil.DirExists(dir)
 		checkError(err)
 		if !ok {
 			os.MkdirAll(dir, 0744)
 		}
-		checkError(cmd.Root().GenBashCompletionFile(autocompleteTarget))
 
-		log.Infof("bash completion file for SeqKit saved to %s", autocompleteTarget)
+		switch shell {
+		case "bash":
+			checkError(cmd.Root().GenBashCompletionFile(outfile))
+		case "zsh":
+			checkError(cmd.Root().GenZshCompletionFile(outfile))
+		case "fish":
+			checkError(cmd.Root().GenFishCompletionFile(outfile, true))
+		case "powershell":
+			checkError(cmd.Root().GenPowerShellCompletionFile(outfile))
+		default:
+			checkError(fmt.Errorf("unsupported shell: %s", shell))
+		}
+
+		log.Infof("%s completion file for seqkit saved to %s", shell, outfile)
 	},
 }
 
@@ -79,5 +95,5 @@ func init() {
 	defaultCompletionFile, err := homedir.Expand("~/.bash_completion.d/seqkit.sh")
 	checkError(err)
 	genautocompleteCmd.Flags().StringP("file", "", defaultCompletionFile, "autocompletion file")
-	genautocompleteCmd.Flags().StringP("type", "", "bash", "autocompletion type (currently only bash supported)")
+	genautocompleteCmd.Flags().StringP("shell", "", "bash", "autocompletion type (bash|zsh|fish|powershell)")
 }

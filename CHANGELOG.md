@@ -1,3 +1,5 @@
+
+
 - [SeqKit v0.15.1](https://github.com/shenwei356/seqkit/releases/tag/v0.15.1)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.15.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.15.1)
     - `seqkit grep/locate`:
@@ -7,6 +9,8 @@
         - removing debug info for `-r` introduced in a0f6b6e. [#180](https://github.com/shenwei356/seqkit/issues/180)
     - `seqkit fx2tab`:
         - new flag `-C/--base-count` for counting bases.
+    - `seqkit genautocomplete`: 
+        - support bash|zsh|fish|powershell.
 - [SeqKit v0.15.0](https://github.com/shenwei356/seqkit/releases/tag/v0.15.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.15.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.15.0)
     - `seqkit grep/locate`: update help message.
