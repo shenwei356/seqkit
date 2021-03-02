@@ -28,7 +28,6 @@ import (
 	"strings"
 
 	"github.com/shenwei356/breader"
-	"github.com/shenwei356/util/stringutil"
 )
 
 // BedFeature is the gff BedFeature struct
@@ -64,9 +63,8 @@ func ReadBedFilteredFeatures(file string, chrs []string) ([]BedFeature, error) {
 		if line == "" || line[0] == '#' || (len(line) > 7 && string(line[0:7]) == "browser") || (len(line) > 5 && string(line[0:5]) == "track") {
 			return nil, false, nil
 		}
-		//
-		// do not use regexp.Split(), it's very slow
-		items := stringutil.Split(line, "\t")
+
+		items := strings.Split(line, "\t")
 		n := len(items)
 		if n < 3 {
 			return nil, false, nil

@@ -271,7 +271,7 @@ func init() {
 	ampliconCmd.Flags().BoolP("flanking-region", "f", false, "region is flanking region")
 	ampliconCmd.Flags().BoolP("strict-mode", "s", false, "strict mode, i.e., discarding seqs not fully matching (shorter) given region range")
 	ampliconCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on positive strand")
-	ampliconCmd.Flags().BoolP("bed", "", false, "output in BED6+1 format with amplicon as 7th columns")
+	ampliconCmd.Flags().BoolP("bed", "", false, "output in BED6+1 format with amplicon as the 7th column")
 }
 
 func loadPrimers(file string) ([][3]string, error) {

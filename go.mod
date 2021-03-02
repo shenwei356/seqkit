@@ -13,8 +13,6 @@ require (
 	github.com/edsrzf/mmap-go v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/iafan/cwalk v0.0.0-20191125092548-dd7f505d2f66
-	github.com/klauspost/compress v1.11.4 // indirect
-	github.com/klauspost/pgzip v1.2.5 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mattn/go-colorable v0.1.8
 	github.com/mattn/go-isatty v0.0.12
@@ -23,13 +21,13 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/shenwei356/bio v0.0.0-20210214151329-aff1c373610b
-	github.com/shenwei356/breader v0.0.0-20170924140440-21f0a70fe179
+	github.com/shenwei356/breader v0.1.0
 	github.com/shenwei356/bwt v0.3.2
 	github.com/shenwei356/go-logging v0.0.0-20171012171522-c6b9702d88ba
 	github.com/shenwei356/natsort v0.0.0-20190418160752-600d539c017d // indirect
 	github.com/shenwei356/util v2020.12.31+incompatible
 	github.com/shenwei356/xopen v0.0.0-20181203091311-f4f16ddd3992
 	github.com/smallfish/simpleyaml v0.0.0-20170911015856-a32031077861
-	github.com/spf13/cobra v1.1.1
+	github.com/spf13/cobra v1.1.3
 	github.com/tatsushid/go-prettytable v0.0.0-20141013043238-ed2d14c29939
 )
