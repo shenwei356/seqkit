@@ -8,7 +8,7 @@
     - `seqkit locate`:
         - removing debug info for `-r` introduced in a0f6b6e. [#180](https://github.com/shenwei356/seqkit/issues/180)
     - `seqkit fx2tab`:
-        - new flag `-C/--base-count` for counting bases.
+        - new flag `-C/--base-count` for counting bases. [#183](https://github.com/shenwei356/seqkit/issues/183)
     - `seqkit subseq`:
         - fix bug for BED with empty columns. [#195](https://github.com/shenwei356/seqkit/issues/195)
     - `seqkit genautocomplete`: 
