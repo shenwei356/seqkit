@@ -21,12 +21,11 @@
 package cmd
 
 import (
-	"bytes"
+	"bufio"
 	"fmt"
 	"runtime"
 	"strings"
 
-	"github.com/shenwei356/breader"
 	"github.com/shenwei356/util/byteutil"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
@@ -53,92 +52,57 @@ var tab2faCmd = &cobra.Command{
 		checkError(err)
 		defer outfh.Close()
 
-		type Slice []string
-		fn := func(line string) (interface{}, bool, error) {
-			line = strings.TrimRight(line, "\r\n")
-
-			if line == "" {
-				return "", false, nil
-			}
-			// check comment line
-			isCommentLine := false
-			for _, p := range commentPrefixes {
-				if strings.HasPrefix(line, p) {
-					isCommentLine = true
-					break
-				}
-			}
-			if isCommentLine {
-				return "", false, nil
-			}
-
-			items := strings.Split(line, "\t")
-			if len(items) < 2 {
-				return Slice(items), false, fmt.Errorf("at least two columns needed: %s", line)
-			}
-			if len(items) > 2 {
-				return Slice(items[0:3]), true, nil
-			}
-			return Slice(items[0:2]), true, nil
-		}
-
+		var line, p string
+		var items []string
+		var isCommentLine, isFastq bool
+		var scanner *bufio.Scanner
+		var fh *xopen.Reader
 		for _, file := range files {
-			reader, err := breader.NewBufferedReader(file, config.Threads, 10, fn)
+			fh, err = xopen.Ropen(file)
 			checkError(err)
-			var text []byte
-			var b *bytes.Buffer
-			isFastq := false
-			for chunk := range reader.Ch {
-				if chunk.Err != nil {
-					checkError(chunk.Err)
-					break
+
+			scanner = bufio.NewScanner(fh)
+
+			isFastq = false
+			for scanner.Scan() {
+				line = strings.TrimRight(scanner.Text(), "\r\n")
+
+				if line == "" {
+					continue
 				}
-				for _, data := range chunk.Data {
-					items := data.(Slice)
-					if len(items) == 3 && (len(items[2]) > 0 || isFastq) { // fastq
-						isFastq = true
-						outfh.WriteString(fmt.Sprintf("@%s\n", items[0]))
-
-						// 	outfh.Write(byteutil.WrapByteSlice([]byte(items[1]), lineWidth))
-
-						// if bufferedByteSliceWrapper == nil {
-						// 	bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(items[1]), lineWidth)
-						// }
-						// text, b = bufferedByteSliceWrapper.Wrap([]byte(items[1]), lineWidth)
-						// outfh.Write(text)
-						// outfh.Flush()
-						// bufferedByteSliceWrapper.Recycle(b)
-
-						outfh.WriteString(items[1]) // seq
-
-						outfh.WriteString("\n+\n")
-
-						// outfh.Write(byteutil.WrapByteSlice([]byte(items[2]), lineWidth))
-
-						// text, b = bufferedByteSliceWrapper.Wrap([]byte(items[2]), lineWidth)
-						// outfh.Write(text)
-						// outfh.Flush()
-						// bufferedByteSliceWrapper.Recycle(b)
-
-						outfh.WriteString(items[2]) // qual
-
-						outfh.WriteString("\n")
-					} else {
-						outfh.WriteString(fmt.Sprintf(">%s\n", items[0]))
-
-						// outfh.Write(byteutil.WrapByteSlice([]byte(items[1]), lineWidth))
-						if bufferedByteSliceWrapper == nil {
-							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(items[1]), lineWidth)
-						}
-						text, b = bufferedByteSliceWrapper.Wrap([]byte(items[1]), lineWidth)
-						outfh.Write(text)
-						outfh.Flush()
-						bufferedByteSliceWrapper.Recycle(b)
-
-						outfh.WriteString("\n")
+				// check comment line
+				isCommentLine = false
+				for _, p = range commentPrefixes {
+					if strings.HasPrefix(line, p) {
+						isCommentLine = true
+						break
 					}
 				}
+				if isCommentLine {
+					continue
+				}
+
+				items = strings.Split(line, "\t")
+				if len(items) < 2 {
+					checkError(fmt.Errorf("at least two columns needed: %s", line))
+				}
+
+				if len(items) == 3 && (len(items[2]) > 0 || isFastq) { // fastq
+					isFastq = true
+					outfh.WriteString(fmt.Sprintf("@%s\n", items[0]))
+					outfh.WriteString(items[1]) // seq
+					outfh.WriteString("\n+\n")
+					outfh.WriteString(items[2]) // qual
+
+					outfh.WriteString("\n")
+				} else {
+					outfh.WriteString(fmt.Sprintf(">%s\n", items[0]))
+					outfh.Write(byteutil.WrapByteSlice([]byte(items[1]), lineWidth))
+					outfh.WriteString("\n")
+				}
+
 			}
+			checkError(scanner.Err())
 		}
 	},
 }
