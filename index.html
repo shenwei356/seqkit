@@ -329,8 +329,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#bash-completion" class="md-nav__link">
-    Bash-completion
+  <a href="#command-line-completion" class="md-nav__link">
+    Command-line completion
   </a>
   
 </li>
@@ -694,8 +694,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#bash-completion" class="md-nav__link">
-    Bash-completion
+  <a href="#command-line-completion" class="md-nav__link">
+    Command-line completion
   </a>
   
 </li>
@@ -878,7 +878,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <li><a href="#features">Features</a></li>
 <li><a href="#subcommands">Subcommands</a></li>
 <li><a href="#installation">Installation</a></li>
-<li><a href="#bash-completion">Bash-completion</a></li>
+<li><a href="#command-line-completion">Command-line completion</a></li>
 <li><a href="#technical-details-and-guides-for-use">Technical details and guides for use</a></li>
 <li><a href="#usage--examples">Usage &amp;&amp; Examples</a></li>
 <li><a href="#benchmark">Benchmark</a></li>
@@ -1231,7 +1231,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.</p>
 <p><strong>Misc</strong></p>
 <ul>
 <li><code>version</code>   print version information and check for update</li>
-<li><code>genautocomplete</code> generate shell autocompletion script</li>
+<li><code>genautocomplete</code> generate shell autocompletion script (bash|zsh|fish|powershell)</li>
 </ul>
 <h2 id="installation">Installation</h2>
 <p>Go to <a href="http://bioinf.shenwei.me/seqkit/download">Download Page</a> for more download options and changelogs.</p>
@@ -1282,25 +1282,28 @@ And then:</p>
 docker build -t shenwei356/seqkit .
 docker run -it shenwei356/seqkit:latest
 </code></pre>
-<h2 id="bash-completion">Bash-completion</h2>
-<p>Note: The current version supports Bash only.
-This should work for *nix systems with Bash installed.</p>
-<p>Howto:</p>
-<ol>
-<li>
-<p>run: <code>seqkit genautocomplete</code></p>
-</li>
-<li>
-<p>create and edit <code>~/.bash_completion</code> file if you don't have it.</p>
-<pre><code>nano ~/.bash_completion
+<h2 id="command-line-completion">Command-line completion</h2>
+<p>Supported shell: bash|zsh|fish|powershell</p>
+<p>Bash:</p>
+<pre><code># generate completion shell
+seqkit genautocomplete --shell bash
+
+# configure if never did.
+# install bash-completion if the "complete" command is not found.
+echo "for bcfile in ~/.bash_completion.d/* ; do source \$bcfile; done" &gt;&gt; ~/.bash_completion
+echo "source ~/.bash_completion" &gt;&gt; ~/.bashrc
 </code></pre>
-<p>add the following:</p>
-<pre><code>for bcfile in ~/.bash_completion.d/* ; do
-  . $bcfile
-done
+<p>Zsh:</p>
+<pre><code># generate completion shell
+seqkit genautocomplete --shell zsh --file ~/.zfunc/_seqkit
+
+# configure if never did
+echo 'fpath=( ~/.zfunc "${fpath[@]}" )' &gt;&gt; ~/.zshrc
+echo "autoload -U compinit; compinit" &gt;&gt; ~/.zshrc
 </code></pre>
-</li>
-</ol>
+<p>fish:</p>
+<pre><code>seqkit genautocomplete --shell fish --file ~/.config/fish/completions/seqkit.fish
+</code></pre>
 <h2 id="technical-details-and-guides-for-use">Technical details and guides for use</h2>
 <h3 id="fastaq-format-parsing">FASTA/Q format parsing</h3>
 <p>SeqKit uses author's lightweight and high-performance bioinformatics packages

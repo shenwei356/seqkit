@@ -2102,6 +2102,7 @@ Flags:
   -a, --alphabet               print alphabet letters
   -q, --avg-qual               print average quality of a read
   -B, --base-content strings   print base content. (case ignored, multiple values supported) e.g. -B AT -B N
+  -C, --base-count strings     print base count. (case ignored, multiple values supported) e.g. -C AT -C N
   -I, --case-sensitive         calculate case sensitive base content
   -g, --gc                     print GC content
   -G, --gc-skew                print GC-Skew
@@ -4409,22 +4410,30 @@ Global Flags:
 <p>Usage</p>
 <pre><code class="language-text">generate shell autocompletion script
 
-Note: The current version supports Bash only.
-This should work for *nix systems with Bash installed.
+Supported shell: bash|zsh|fish|powershell
 
-Howto:
+Bash:
 
-1. run: seqkit genautocomplete
+    # generate completion shell
+    seqkit genautocomplete --shell bash
 
-2. create and edit ~/.bash_completion file if you don't have it.
+    # configure if never did.
+    # install bash-completion if the &quot;complete&quot; command is not found.
+    echo &quot;for bcfile in ~/.bash_completion.d/* ; do source \$bcfile; done&quot; &gt;&gt; ~/.bash_completion
+    echo &quot;source ~/.bash_completion&quot; &gt;&gt; ~/.bashrc
 
-        nano ~/.bash_completion
+Zsh:
 
-   add the following:
+    # generate completion shell
+    seqkit genautocomplete --shell zsh --file ~/.zfunc/_seqkit
 
-        for bcfile in ~/.bash_completion.d/* ; do
-          . $bcfile
-        done
+    # configure if never did
+    echo 'fpath=( ~/.zfunc &quot;${fpath[@]}&quot; )' &gt;&gt; ~/.zshrc
+    echo &quot;autoload -U compinit; compinit&quot; &gt;&gt; ~/.zshrc
+
+fish:
+
+    seqkit genautocomplete --shell fish --file ~/.config/fish/completions/seqkit.fish
 
 Usage:
   seqkit genautocomplete [flags]
