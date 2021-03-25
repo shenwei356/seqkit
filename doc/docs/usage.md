@@ -1425,6 +1425,7 @@ Flags:
       --delete-matched         delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions
   -h, --help                   help for grep
   -i, --ignore-case            ignore case
+  -I, --immediate-output       print output immediately, do not use write buffer
   -v, --invert-match           invert the sense of matching, to select non-matching records
   -m, --max-mismatch int       max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster
   -P, --only-positive-strand   only search on positive strand
@@ -1570,6 +1571,7 @@ Flags:
   -h, --help                      help for locate
   -M, --hide-matched              do not show matched sequences
   -i, --ignore-case               ignore case
+  -I, --immediate-output       print output immediately, do not use write buffer
   -m, --max-mismatch int          max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster
   -G, --non-greedy                non-greedy mode, faster but may miss motifs overlapping with others
   -P, --only-positive-strand      only search on positive strand

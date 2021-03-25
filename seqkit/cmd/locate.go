@@ -92,6 +92,8 @@ Attentions:
 		hideMatched := getFlagBool(cmd, "hide-matched")
 		circular := getFlagBool(cmd, "circular")
 
+		immediateOutput := getFlagBool(cmd, "immediate-output")
+
 		if config.Alphabet == seq.Protein {
 			onlyPositiveStrand = true
 		}
@@ -605,6 +607,10 @@ Attentions:
 						}
 					}
 				}
+
+				if immediateOutput {
+					outfh.Flush()
+				}
 			}
 		}
 	},
@@ -627,4 +633,5 @@ func init() {
 	locateCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster")
 	locateCmd.Flags().BoolP("hide-matched", "M", false, "do not show matched sequences")
 	locateCmd.Flags().BoolP("circular", "c", false, `circular genome. type "seqkit locate -h" for details`)
+	locateCmd.Flags().BoolP("immediate-output", "I", false, "print output immediately, do not use write buffer")
 }

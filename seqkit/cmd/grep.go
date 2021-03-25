@@ -105,6 +105,8 @@ Examples:
 		region := getFlagString(cmd, "region")
 		circular := getFlagBool(cmd, "circular")
 
+		immediateOutput := getFlagBool(cmd, "immediate-output")
+
 		if len(pattern) == 0 && patternFile == "" {
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
 		}
@@ -410,6 +412,10 @@ Examples:
 				}
 
 				record.FormatToWriter(outfh, config.LineWidth)
+
+				if immediateOutput {
+					outfh.Flush()
+				}
 			}
 
 			config.LineWidth = lineWidth
@@ -434,4 +440,5 @@ func init() {
 	grepCmd.Flags().StringP("region", "R", "", "specify sequence region for searching. "+
 		"e.g 1:12 for first 12 bases, -12:-1 for last 12 bases")
 	grepCmd.Flags().BoolP("circular", "c", false, "circular genome")
+	grepCmd.Flags().BoolP("immediate-output", "I", false, "print output immediately, do not use write buffer")
 }
