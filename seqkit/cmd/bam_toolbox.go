@@ -58,7 +58,7 @@ type Toolshed map[string]BamTool
 
 func (s Toolshed) String() string {
 	tools := make([]string, 0, len(s))
-	for t, _ := range s {
+	for t := range s {
 		tools = append(tools, t)
 	}
 	sort.Strings(tools)

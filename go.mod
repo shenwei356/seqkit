@@ -29,4 +29,5 @@ require (
 	github.com/smallfish/simpleyaml v0.0.0-20170911015856-a32031077861
 	github.com/spf13/cobra v1.1.3
 	github.com/tatsushid/go-prettytable v0.0.0-20141013043238-ed2d14c29939
+	github.com/twotwotwo/sorts v0.0.0-20160814051341-bf5c1f2b8553
 )

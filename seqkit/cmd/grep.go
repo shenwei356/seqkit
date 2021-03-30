@@ -28,8 +28,10 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/shenwei356/bwt"
+	"github.com/twotwotwo/sorts/sortutil"
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
@@ -56,7 +58,8 @@ Attentions:
      and negative strands are searched.
      Mismatch is allowed using flag "-m/--max-mismatch",
      but it's not fast enough for large genome like human genome.
-     Though, it's fast enough for microbial genomes.
+     Though, it's fast for microbial genomes or reads.
+	 You can also increase value of "-j/--threads" to accelerate processing
   3. Degenerate bases/residues like "RYMM.." are also supported by flag -d.
      But do not use degenerate bases/residues in regular expression, you need
      convert them to regular expression, e.g., change "N" or "X"  to ".".
@@ -268,16 +271,201 @@ Examples:
 		checkError(err)
 		defer outfh.Close()
 
+		var fastxReader *fastx.Reader
+		var record *fastx.Record
+		strands := []byte{'+', '-'}
+
+		// -------------------------------------------------------------------
+		// only for searching with sequences and mismatch > 0
+
+		if bySeq && mismatches > 1 {
+			type Arecord struct {
+				id     uint64
+				ok     bool
+				record *fastx.Record
+			}
+
+			var wg sync.WaitGroup
+			ch := make(chan *Arecord, config.Threads)
+			tokens := make(chan int, config.Threads)
+
+			done := make(chan int)
+			go func() {
+				m := make(map[uint64]*Arecord, config.Threads)
+				var id, _id uint64
+				var ok bool
+				var _r *Arecord
+
+				id = 1
+				for r := range ch {
+					_id = r.id
+
+					if _id == id { // right there
+						if r.ok {
+							r.record.FormatToWriter(outfh, config.LineWidth)
+							if immediateOutput {
+								outfh.Flush()
+							}
+						}
+						id++
+						continue
+					}
+
+					m[_id] = r // save for later check
+
+					if _r, ok = m[id]; ok { // check buffered
+						if _r.ok {
+							_r.record.FormatToWriter(outfh, config.LineWidth)
+							if immediateOutput {
+								outfh.Flush()
+							}
+						}
+						delete(m, id)
+						id++
+					}
+				}
+
+				if len(m) > 0 {
+					ids := make([]uint64, len(m))
+					i := 0
+					for _id = range m {
+						ids[i] = _id
+						i++
+					}
+					sortutil.Uint64s(ids)
+					for _, _id = range ids {
+						_r = m[_id]
+
+						if _r.ok {
+							_r.record.FormatToWriter(outfh, config.LineWidth)
+							if immediateOutput {
+								outfh.Flush()
+							}
+						}
+					}
+				}
+				done <- 1
+			}()
+
+			var id uint64
+			for _, file := range files {
+				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+				checkError(err)
+
+				if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
+					onlyPositiveStrand = true
+				}
+
+				for {
+					record, err = fastxReader.Read()
+					if err != nil {
+						if err == io.EOF {
+							break
+						}
+						checkError(err)
+						break
+					}
+					if fastxReader.IsFastq {
+						config.LineWidth = 0
+						fastx.ForcelyOutputFastq = true
+					}
+
+					tokens <- 1
+					wg.Add(1)
+					id++
+					go func(record *fastx.Record, id uint64) {
+						defer func() {
+							wg.Done()
+							<-tokens
+						}()
+
+						var sequence *seq.Seq
+						var target []byte
+						var hit bool
+						var k string
+						var locs []int
+
+						sfmi := fmi.NewFMIndex()
+
+						for _, strand := range strands {
+							if hit {
+								break
+							}
+
+							if strand == '-' && onlyPositiveStrand {
+								break
+							}
+
+							sequence = record.Seq
+							if strand == '-' {
+								sequence = record.Seq.RevCom()
+							}
+							if limitRegion {
+								target = sequence.SubSeq(start, end).Seq
+							} else if circular {
+								// concat two copies of sequence, and do not change orginal sequence
+								target = make([]byte, len(sequence.Seq)*2)
+								copy(target[0:len(sequence.Seq)], sequence.Seq)
+								copy(target[len(sequence.Seq):], sequence.Seq)
+							} else {
+								target = sequence.Seq
+							}
+
+							if ignoreCase {
+								target = bytes.ToLower(target)
+							}
+
+							_, err = sfmi.Transform(target)
+							if err != nil {
+								checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
+							}
+							for k = range patterns {
+								locs, err = sfmi.Locate([]byte(k), mismatches)
+								if err != nil {
+									checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", k, record.Name, err))
+								}
+								if len(locs) > 0 {
+									hit = true
+									break
+								}
+							}
+
+						}
+
+						if invertMatch {
+							if hit {
+								ch <- &Arecord{record: nil, ok: false, id: id}
+								return
+							}
+						} else {
+							if !hit {
+								ch <- &Arecord{record: nil, ok: false, id: id}
+								return
+							}
+						}
+
+						ch <- &Arecord{record: record, ok: true, id: id}
+
+					}(record.Clone(), id)
+				}
+			}
+
+			wg.Wait()
+			close(ch)
+			<-done
+
+			return
+		}
+
+		// -------------------------------------------------------------------
+
 		var sequence *seq.Seq
 		var target []byte
 		var ok, hit bool
-		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		var k string
 		var locs []int
 		var re *regexp.Regexp
 		var p string
-		strands := []byte{'+', '-'}
 		var strand byte
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
