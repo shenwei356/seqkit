@@ -240,14 +240,21 @@ Attentions:
 				outfh.WriteString("seqID\tpatternName\tpattern\tstrand\tstart\tend\tmatched\n")
 			}
 		}
+
+		// -------------------------------------------------------------------
+		// only for m > 0, were FMI is very slow
+
+		var record *fastx.Record
+		var fastxReader *fastx.Reader
+
+		// -------------------------------------------------------------------
+
 		var seqRP *seq.Seq
 		var offset, l, lpatten int
 		var loc []int
 		var locs, locsNeg [][2]int
 		var i, begin, end int
 		var flag bool
-		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		var pSeq, p []byte
 		var pName string
 		var re *regexp.Regexp

@@ -276,7 +276,7 @@ Examples:
 		strands := []byte{'+', '-'}
 
 		// -------------------------------------------------------------------
-		// only for searching with sequences and mismatch > 0
+		// only for searching with sequences and mismatch > 0, were FMI is very slow
 
 		if bySeq && mismatches > 1 {
 			type Arecord struct {
