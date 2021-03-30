@@ -2,11 +2,14 @@
 
 - [SeqKit v0.16.0](https://github.com/shenwei356/seqkit/releases/tag/v0.16.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.16.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.16.0)
+    - `seqkit grep/locate/amplicon`
+        - **much faster searching with mismatch allowed** by optimizing FM-indexing.
+        - `grep`: using multi-threads for further speedup, results in 300-400x speedup with 2-16 threads.
+        - `locate/amplicon`: 20x speedup
     - `seqkit grep/locate`:
         - fix bug of `-m` when querying contains letters not in alphabet, usually for protein sequences. [#178](https://github.com/shenwei356/seqkit/issues/178), [#179](https://github.com/shenwei356/seqkit/issues/179)
         - onply search on positive strand when searching unlimited or protein sequences
         - new flag `--immediate-output`
-        - **using multi-threads to accelerate searching by sequences while allowing mismatch**.
     - `seqkit locate`:
         - removing debug info for `-r` introduced in a0f6b6e. [#180](https://github.com/shenwei356/seqkit/issues/180)
     - `seqkit fx2tab`:

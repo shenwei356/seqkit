@@ -56,10 +56,8 @@ Attentions:
      for partly matching.
   2. When searching by sequences, it's partly matching, and both positive
      and negative strands are searched.
-     Mismatch is allowed using flag "-m/--max-mismatch",
-     but it's not fast enough for large genome like human genome.
-     Though, it's fast for microbial genomes or reads.
-	 You can also increase value of "-j/--threads" to accelerate processing
+     Mismatch is allowed using flag "-m/--max-mismatch", you can increase
+     the value of "-j/--threads" to accelerate processing.
   3. Degenerate bases/residues like "RYMM.." are also supported by flag -d.
      But do not use degenerate bases/residues in regular expression, you need
      convert them to regular expression, e.g., change "N" or "X"  to ".".
@@ -383,7 +381,6 @@ Examples:
 						var target []byte
 						var hit bool
 						var k string
-						var locs []int
 
 						sfmi := fmi.NewFMIndex()
 
@@ -420,12 +417,11 @@ Examples:
 								checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
 							}
 							for k = range patterns {
-								locs, err = sfmi.Locate([]byte(k), mismatches)
+								hit, err = sfmi.Match([]byte(k), mismatches)
 								if err != nil {
 									checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", k, record.Name, err))
 								}
-								if len(locs) > 0 {
-									hit = true
+								if hit {
 									break
 								}
 							}
@@ -463,7 +459,6 @@ Examples:
 		var target []byte
 		var ok, hit bool
 		var k string
-		var locs []int
 		var re *regexp.Regexp
 		var p string
 		var strand byte
@@ -561,12 +556,11 @@ Examples:
 								checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
 							}
 							for k = range patterns {
-								locs, err = sfmi.Locate([]byte(k), mismatches)
+								hit, err = sfmi.Match([]byte(k), mismatches)
 								if err != nil {
 									checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", k, record.Name, err))
 								}
-								if len(locs) > 0 {
-									hit = true
+								if hit {
 									if deleteMatched && !invertMatch {
 										delete(patterns, k)
 									}

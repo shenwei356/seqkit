@@ -1380,9 +1380,8 @@ Attentions:
      for partly matching.
   2. When searching by sequences, it's partly matching, and both positive
      and negative strands are searched.
-     Mismatch is allowed using flag "-m/--max-mismatch",
-     but it's not fast enough for large genome like human genome.
-     Though, it's fast enough for microbial genomes.
+     Mismatch is allowed using flag "-m/--max-mismatch", you can increase
+     the value of "-j/--threads" to accelerate processing.
   3. Degenerate bases/residues like "RYMM.." are also supported by flag -d.
      But do not use degenerate bases/residues in regular expression, you need
      convert them to regular expression, e.g., change "N" or "X"  to ".".
