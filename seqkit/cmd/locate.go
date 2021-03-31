@@ -26,6 +26,7 @@ import (
 	"io"
 	"regexp"
 	"runtime"
+	"sync"
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
@@ -33,6 +34,7 @@ import (
 	"github.com/shenwei356/bwt/fmi"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
+	"github.com/twotwotwo/sorts/sortutil"
 )
 
 // locateCmd represents the locate command
@@ -54,8 +56,7 @@ Attentions:
      parser accepts comma-separated-values (CSV) for multiple values (motifs).
      Patterns in file do not follow this rule.     
   4. Mismatch is allowed using flag "-m/--max-mismatch",
-     but it's not fast enough for large genome like human genome.
-     Though, it's fast enough for microbial genomes.
+     you can increase the value of "-j/--threads" to accelerate processing.
   5. When using flag --circular, end position of matched subsequence that 
      crossing genome sequence end would be greater than sequence length.
 
@@ -102,7 +103,6 @@ Attentions:
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
 		}
 
-		var sfmi *fmi.FMIndex
 		if mismatches > 0 {
 			if degenerate {
 				checkError(fmt.Errorf("flag -d (--degenerate) not allowed when giving flag -m (--max-mismatch)"))
@@ -113,7 +113,7 @@ Attentions:
 			if nonGreedy && !quiet {
 				log.Infof("flag -G (--non-greedy) ignored when giving flag -m (--max-mismatch)")
 			}
-			sfmi = fmi.NewFMIndex()
+
 		}
 		if useFMI {
 			if degenerate {
@@ -122,7 +122,6 @@ Attentions:
 			if useRegexp {
 				checkError(fmt.Errorf("flag -r (--use-regexp) ignored when giving flag -F (--use-fmi)"))
 			}
-			sfmi = fmi.NewFMIndex()
 		}
 
 		// prepare pattern
@@ -246,6 +245,281 @@ Attentions:
 
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
+		_onlyPositiveStrand := onlyPositiveStrand
+
+		if mismatches > 0 || useFMI {
+			type Arecord struct {
+				id     uint64
+				ok     bool
+				record []string
+			}
+
+			var wg sync.WaitGroup
+			ch := make(chan *Arecord, config.Threads)
+			tokens := make(chan int, config.Threads)
+
+			done := make(chan int)
+			go func() {
+				m := make(map[uint64]*Arecord, config.Threads)
+				var id, _id uint64
+				var ok bool
+				var _r *Arecord
+				var row string
+
+				id = 1
+				for r := range ch {
+					_id = r.id
+
+					if _id == id { // right there
+						if r.ok {
+							for _, row = range r.record {
+								outfh.WriteString(row)
+							}
+
+							if immediateOutput {
+								outfh.Flush()
+							}
+						}
+						id++
+						continue
+					}
+
+					m[_id] = r // save for later check
+
+					if _r, ok = m[id]; ok { // check buffered
+						if _r.ok {
+							for _, row = range _r.record {
+								outfh.WriteString(row)
+							}
+
+							if immediateOutput {
+								outfh.Flush()
+							}
+						}
+						delete(m, id)
+						id++
+					}
+				}
+
+				if len(m) > 0 {
+					ids := make([]uint64, len(m))
+					i := 0
+					for _id = range m {
+						ids[i] = _id
+						i++
+					}
+					sortutil.Uint64s(ids)
+					for _, _id = range ids {
+						_r = m[_id]
+
+						if _r.ok {
+							for _, row = range _r.record {
+								outfh.WriteString(row)
+							}
+
+							if immediateOutput {
+								outfh.Flush()
+							}
+						}
+					}
+				}
+				done <- 1
+			}()
+
+			var id uint64
+			for _, file := range files {
+				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+				checkError(err)
+
+				checkAlphabet := true
+				for {
+					record, err = fastxReader.Read()
+					if err != nil {
+						if err == io.EOF {
+							break
+						}
+						checkError(err)
+						break
+					}
+
+					if checkAlphabet {
+						if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
+							_onlyPositiveStrand = true
+						}
+						checkAlphabet = false
+					}
+
+					tokens <- 1
+					wg.Add(1)
+					id++
+					go func(record *fastx.Record, id uint64) {
+						defer func() {
+							wg.Done()
+							<-tokens
+						}()
+
+						var seqRP *seq.Seq
+						var l int
+						var loc []int
+						var i, begin, end int
+						var pSeq []byte
+						var pName string
+						var sfmi *fmi.FMIndex
+						sfmi = fmi.NewFMIndex()
+						results := make([]string, 0, 2)
+
+						if !(degenerate || useRegexp) && ignoreCase {
+							record.Seq.Seq = bytes.ToLower(record.Seq.Seq)
+						}
+
+						l = len(record.Seq.Seq)
+
+						if circular { // concat two copies of sequence
+							record.Seq.Seq = append(record.Seq.Seq, record.Seq.Seq...)
+						}
+
+						_, err = sfmi.Transform(record.Seq.Seq)
+						if err != nil {
+							checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
+						}
+
+						for pName, pSeq = range patterns {
+							loc, err = sfmi.Locate(pSeq, mismatches)
+							if err != nil {
+								checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", pName, record.Name, err))
+							}
+							for _, i = range loc {
+								if circular && i+1 > l { // 2nd clone of original part
+									continue
+								}
+
+								begin = i + 1
+
+								end = i + len(pSeq)
+								if i+len(pSeq) > len(record.Seq.Seq) {
+									continue
+								}
+								if outFmtGTF {
+									results = append(results, fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%s\tgene_id \"%s\"; \n",
+										record.ID,
+										"SeqKit",
+										"location",
+										begin,
+										end,
+										0,
+										"+",
+										".",
+										pName))
+								} else if outFmtBED {
+									results = append(results, fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
+										record.ID,
+										begin-1,
+										end,
+										pName,
+										0,
+										"+"))
+								} else {
+									if hideMatched {
+										results = append(results, fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
+											record.ID,
+											pName,
+											patterns[pName],
+											"+",
+											begin,
+											end))
+									} else {
+										results = append(results, fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+											record.ID,
+											pName,
+											patterns[pName],
+											"+",
+											begin,
+											end,
+											record.Seq.Seq[i:i+len(pSeq)]))
+									}
+								}
+							}
+						}
+
+						if _onlyPositiveStrand {
+							ch <- &Arecord{record: results, id: id, ok: len(results) > 0}
+							return
+						}
+
+						seqRP = record.Seq.RevCom()
+
+						_, err = sfmi.Transform(seqRP.Seq)
+						if err != nil {
+							checkError(fmt.Errorf("fail to build FMIndex for reverse complement sequence: %s", record.Name))
+						}
+						for pName, pSeq = range patterns {
+							loc, err = sfmi.Locate(pSeq, mismatches)
+							if err != nil {
+								checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", pName, record.Name, err))
+							}
+							for _, i = range loc {
+								if circular && i+1 > l { // 2nd clone of original part
+									continue
+								}
+
+								begin = l - i - len(pSeq) + 1
+								end = l - i
+								if i+len(pSeq) > len(record.Seq.Seq) {
+									continue
+								}
+								if outFmtGTF {
+									results = append(results, fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%s\tgene_id \"%s\"; \n",
+										record.ID,
+										"SeqKit",
+										"location",
+										begin,
+										end,
+										0,
+										"-",
+										".",
+										pName))
+								} else if outFmtBED {
+									results = append(results, fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
+										record.ID,
+										begin-1,
+										end,
+										pName,
+										0,
+										"-"))
+								} else {
+									if hideMatched {
+										results = append(results, fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
+											record.ID,
+											pName,
+											patterns[pName],
+											"-",
+											begin,
+											end))
+									} else {
+										results = append(results, fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+											record.ID,
+											pName,
+											patterns[pName],
+											"-",
+											begin,
+											end,
+											seqRP.Seq[i:i+len(pSeq)]))
+									}
+								}
+							}
+						}
+
+						ch <- &Arecord{record: results, id: id, ok: len(results) > 0}
+					}(record.Clone(), id)
+				}
+			}
+
+			wg.Wait()
+			close(ch)
+			<-done
+
+			return
+		}
 
 		// -------------------------------------------------------------------
 
@@ -258,15 +532,16 @@ Attentions:
 		var pSeq, p []byte
 		var pName string
 		var re *regexp.Regexp
-		_onlyPositiveStrand := onlyPositiveStrand
+		var sfmi *fmi.FMIndex
+		if mismatches > 0 || useFMI {
+			sfmi = fmi.NewFMIndex()
+		}
+
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
-			if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
-				_onlyPositiveStrand = true
-			}
-
+			checkAlphabet := true
 			for {
 				record, err = fastxReader.Read()
 				if err != nil {
@@ -277,6 +552,13 @@ Attentions:
 					break
 				}
 
+				if checkAlphabet {
+					if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
+						_onlyPositiveStrand = true
+					}
+					checkAlphabet = false
+				}
+
 				if !(degenerate || useRegexp) && ignoreCase {
 					record.Seq.Seq = bytes.ToLower(record.Seq.Seq)
 				}
@@ -285,10 +567,6 @@ Attentions:
 
 				if circular { // concat two copies of sequence
 					record.Seq.Seq = append(record.Seq.Seq, record.Seq.Seq...)
-				}
-
-				if !onlyPositiveStrand {
-					seqRP = record.Seq.RevCom()
 				}
 
 				if mismatches > 0 || useFMI {
@@ -359,6 +637,8 @@ Attentions:
 						continue
 					}
 
+					seqRP = record.Seq.RevCom()
+
 					_, err = sfmi.Transform(seqRP.Seq)
 					if err != nil {
 						checkError(fmt.Errorf("fail to build FMIndex for reverse complement sequence: %s", record.Name))
@@ -418,6 +698,10 @@ Attentions:
 								}
 							}
 						}
+					}
+
+					if immediateOutput {
+						outfh.Flush()
 					}
 
 					continue
@@ -520,6 +804,8 @@ Attentions:
 					if onlyPositiveStrand {
 						continue
 					}
+
+					seqRP = record.Seq.RevCom()
 
 					locsNeg = make([][2]int, 0, 1000)
 

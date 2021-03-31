@@ -350,10 +350,7 @@ Examples:
 				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 
-				if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
-					onlyPositiveStrand = true
-				}
-
+				checkAlphabet := true
 				for {
 					record, err = fastxReader.Read()
 					if err != nil {
@@ -363,6 +360,14 @@ Examples:
 						checkError(err)
 						break
 					}
+
+					if checkAlphabet {
+						if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
+							onlyPositiveStrand = true
+						}
+						checkAlphabet = false
+					}
+
 					if fastxReader.IsFastq {
 						config.LineWidth = 0
 						fastx.ForcelyOutputFastq = true
@@ -466,10 +471,7 @@ Examples:
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
-			if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
-				onlyPositiveStrand = true
-			}
-
+			checkAlphabet := true
 			for {
 				record, err = fastxReader.Read()
 				if err != nil {
@@ -479,6 +481,14 @@ Examples:
 					checkError(err)
 					break
 				}
+
+				if checkAlphabet {
+					if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
+						onlyPositiveStrand = true
+					}
+					checkAlphabet = false
+				}
+
 				if fastxReader.IsFastq {
 					config.LineWidth = 0
 					fastx.ForcelyOutputFastq = true
