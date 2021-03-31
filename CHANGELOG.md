@@ -3,15 +3,15 @@
 - [SeqKit v0.16.0](https://github.com/shenwei356/seqkit/releases/tag/v0.16.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.16.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.16.0)
     - `seqkit grep/locate/amplicon -m`
-        - **much faster searching with mismatch allowed** by optimizing FM-indexing.
-        - `grep`: using multi-threads for further speedup, results in 300-400x speedup with 2-16 threads. `grep` only tests a match while `locate/amplicon` needs to find all matching locations.
-        - `locate/amplicon`: 20x speedup. 
+        - **much faster (300-400x) searching with mismatch allowed** by optimizing FM-indexing and parallelization.
+        - new flag `-I/--immediate-output`.
     - `seqkit grep/locate`:
         - fix bug of `-m` when querying contains letters not in alphabet, usually for protein sequences. [#178](https://github.com/shenwei356/seqkit/issues/178), [#179](https://github.com/shenwei356/seqkit/issues/179)
-        - onply search on positive strand when searching unlimited or protein sequences
-        - new flag `--immediate-output`
+        - onply search on positive strand when searching unlimited or protein sequences.
     - `seqkit locate`:
         - removing debug info for `-r` introduced in a0f6b6e. [#180](https://github.com/shenwei356/seqkit/issues/180)
+    - `seqkit amplicon`:
+        - fix bug of `-m`, when mismatch is allowed.
     - `seqkit fx2tab`:
         - new flag `-C/--base-count` for counting bases. [#183](https://github.com/shenwei356/seqkit/issues/183)
     -  `seqkit tab2fx`:

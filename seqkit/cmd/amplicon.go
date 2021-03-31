@@ -31,6 +31,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/shenwei356/bio/featio/gtf"
 	"github.com/shenwei356/bio/seq"
@@ -40,6 +41,7 @@ import (
 	"github.com/shenwei356/bwt/fmi"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
+	"github.com/twotwotwo/sorts/sortutil"
 )
 
 // ampliconCmd represents the amplicon command
@@ -51,6 +53,7 @@ var ampliconCmd = &cobra.Command{
 Attentions:
   1. Only one (the longest) matching location is returned for every primer pair.
   2. Mismatch is allowed, but the mismatch location (5' or 3') is not controled. 
+     You can increase the value of "-j/--threads" to accelerate processing.
   3. Degenerate bases/residues like "RYMM.." are also supported.
      But do not use degenerate bases/residues in regular expression, you need
      convert them to regular expression, e.g., change "N" or "X"  to ".".
@@ -131,6 +134,8 @@ Examples:
 		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
 		outFmtBED := getFlagBool(cmd, "bed")
 
+		immediateOutput := getFlagBool(cmd, "immediate-output")
+
 		var list [][3]string
 		var primers [][3][]byte
 
@@ -180,13 +185,194 @@ Examples:
 			usingRegion = true
 		}
 
+		strands := []string{"+", "-"}
+
+		// -------------------------------------------------------------------
+		// only for m > 0, where FMI is slow
+
+		if maxMismatch > 0 {
+			type Arecord struct {
+				id     uint64
+				ok     bool
+				record []string
+			}
+
+			var wg sync.WaitGroup
+			ch := make(chan *Arecord, config.Threads)
+			tokens := make(chan int, config.Threads)
+
+			done := make(chan int)
+			go func() {
+				m := make(map[uint64]*Arecord, config.Threads)
+				var id, _id uint64
+				var ok bool
+				var _r *Arecord
+				var row string
+
+				id = 1
+				for r := range ch {
+					_id = r.id
+
+					if _id == id { // right there
+						if r.ok {
+							for _, row = range r.record {
+								outfh.WriteString(row)
+							}
+
+							if immediateOutput {
+								outfh.Flush()
+							}
+						}
+						id++
+						continue
+					}
+
+					m[_id] = r // save for later check
+
+					if _r, ok = m[id]; ok { // check buffered
+						if _r.ok {
+							for _, row = range _r.record {
+								outfh.WriteString(row)
+							}
+
+							if immediateOutput {
+								outfh.Flush()
+							}
+						}
+						delete(m, id)
+						id++
+					}
+				}
+
+				if len(m) > 0 {
+					ids := make([]uint64, len(m))
+					i := 0
+					for _id = range m {
+						ids[i] = _id
+						i++
+					}
+					sortutil.Uint64s(ids)
+					for _, _id = range ids {
+						_r = m[_id]
+
+						if _r.ok {
+							for _, row = range _r.record {
+								outfh.WriteString(row)
+							}
+
+							if immediateOutput {
+								outfh.Flush()
+							}
+						}
+					}
+				}
+				done <- 1
+			}()
+
+			var id uint64
+			for _, file := range files {
+				var record *fastx.Record
+				var fastxReader *fastx.Reader
+
+				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+				checkError(err)
+
+				for {
+					record, err = fastxReader.Read()
+					if err != nil {
+						if err == io.EOF {
+							break
+						}
+						checkError(err)
+						break
+					}
+					if fastxReader.IsFastq {
+						config.LineWidth = 0
+						fastx.ForcelyOutputFastq = true
+					}
+
+					tokens <- 1
+					wg.Add(1)
+					id++
+					go func(record *fastx.Record, id uint64) {
+						defer func() {
+							wg.Done()
+							<-tokens
+						}()
+
+						var finder *AmpliconFinder
+						var loc []int
+						var strand string
+						var tmpSeq *seq.Seq
+						var primer [3][]byte
+
+						results := make([]string, 0, 2)
+
+						for _, strand = range strands {
+							if strand == "-" {
+								if onlyPositiveStrand {
+									continue
+								}
+								record.Seq.RevComInplace()
+							}
+
+							for _, primer = range primers {
+								finder, err = NewAmpliconFinder(record.Seq.Seq, primer[1], primer[2], maxMismatch)
+								checkError(err)
+
+								if usingRegion {
+									loc, err = finder.LocateRange(begin, end, fregion, strict)
+								} else {
+									loc, err = finder.Locate()
+								}
+								checkError(err)
+
+								if loc == nil {
+									continue
+								}
+
+								if outFmtBED {
+									results = append(results, fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\t%s\n",
+										record.ID,
+										loc[0]-1,
+										loc[1],
+										primer[0],
+										0,
+										strand,
+										record.Seq.SubSeq(loc[0], loc[1]).Seq))
+
+									continue
+								}
+								tmpSeq = record.Seq
+
+								record.Seq = record.Seq.SubSeq(loc[0], loc[1])
+
+								results = append(results, string(record.Format(config.LineWidth)))
+
+								record.Seq = tmpSeq
+							}
+						}
+
+						ch <- &Arecord{record: results, id: id, ok: len(results) > 0}
+					}(record.Clone(), id)
+				}
+
+				config.LineWidth = lineWidth
+			}
+
+			wg.Wait()
+			close(ch)
+			<-done
+
+			return
+		}
+
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
 
 		var finder *AmpliconFinder
 		var loc []int
 
-		strands := []string{"+", "-"}
 		var strand string
 		var tmpSeq *seq.Seq
 		var primer [3][]byte
@@ -272,6 +458,7 @@ func init() {
 	ampliconCmd.Flags().BoolP("strict-mode", "s", false, "strict mode, i.e., discarding seqs not fully matching (shorter) given region range")
 	ampliconCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on positive strand")
 	ampliconCmd.Flags().BoolP("bed", "", false, "output in BED6+1 format with amplicon as the 7th column")
+	ampliconCmd.Flags().BoolP("immediate-output", "I", false, "print output immediately, do not use write buffer")
 }
 
 func loadPrimers(file string) ([][3]string, error) {
@@ -691,7 +878,7 @@ func (finder *AmpliconFinder) Locate() ([]int, error) {
 	sort.Ints(locsI) // to remain the FIRST location
 	sort.Ints(locsJ) // to remain the LAST location
 	finder.searched, finder.found = true, true
-	finder.iBegin, finder.iEnd = locsI[0], locsI[0]+len(finder.R)-1
+	finder.iBegin, finder.iEnd = locsI[0], locsJ[len(locsJ)-1]+len(finder.R)-1
 	return []int{locsI[0] + 1, locsJ[len(locsJ)-1] + len(finder.R)}, nil
 }
 

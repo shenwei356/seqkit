@@ -1510,13 +1510,14 @@ Examples
         user    0m0.100s
         sys     0m0.017s
 
-        $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg -m 1 | seqkit stats
+        $ time zcat hairpin.fa.gz | seqkit grep -s -i -p aggcg -m 1 | seqkit stats
         file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
-        -     FASTA   RNA     17,168  1,881,005       39    109.6    2,354
+        -     FASTA   RNA     22,290  2,375,819       39    106.6    2,354
 
-        real    0m0.864s
-        user    0m0.941s
-        sys     0m0.014s
+        real    0m1.081s
+        user    0m1.305s
+        sys     0m0.158s
+
 
 1. Extract sequences starting with AGGCG
 
@@ -1554,8 +1555,7 @@ Attentions:
      parser accepts comma-separated-values (CSV) for multiple values (motifs).
      Patterns in file do not follow this rule.     
   4. Mismatch is allowed using flag "-m/--max-mismatch",
-     but it's not fast enough for large genome like human genome.
-     Though, it's fast enough for microbial genomes.
+     you can increase the value of "-j/--threads" to accelerate processing.
   5. When using flag --circular, end position of matched subsequence that 
      crossing genome sequence end would be greater than sequence length.
 
@@ -1570,7 +1570,7 @@ Flags:
   -h, --help                      help for locate
   -M, --hide-matched              do not show matched sequences
   -i, --ignore-case               ignore case
-  -I, --immediate-output       print output immediately, do not use write buffer
+  -I, --immediate-output          print output immediately, do not use write buffer
   -m, --max-mismatch int          max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster
   -G, --non-greedy                non-greedy mode, faster but may miss motifs overlapping with others
   -P, --only-positive-strand      only search on positive strand
@@ -1779,6 +1779,7 @@ retrieve amplicon (or specific region around it) via primer(s).
 Attentions:
   1. Only one (the longest) matching location is returned for every primer pair.
   2. Mismatch is allowed, but the mismatch location (5' or 3') is not controled. 
+     You can increase the value of "-j/--threads" to accelerate processing.
   3. Degenerate bases/residues like "RYMM.." are also supported.
      But do not use degenerate bases/residues in regular expression, you need
      convert them to regular expression, e.g., change "N" or "X"  to ".".
@@ -1835,6 +1836,7 @@ Flags:
   -f, --flanking-region        region is flanking region
   -F, --forward string         forward primer (5'-primer-3'), degenerate bases allowed
   -h, --help                   help for amplicon
+  -I, --immediate-output       print output immediately, do not use write buffer
   -m, --max-mismatch int       max mismatch when matching primers, no degenerate bases allowed
   -P, --only-positive-strand   only search on positive strand
   -p, --primer-file string     3- or 2-column tabular primer file, with first column as primer name

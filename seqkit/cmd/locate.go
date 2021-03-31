@@ -241,7 +241,7 @@ Attentions:
 		}
 
 		// -------------------------------------------------------------------
-		// only for m > 0, were FMI is very slow
+		// only for m > 0, where FMI is slow
 
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
