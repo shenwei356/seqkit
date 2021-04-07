@@ -2,8 +2,10 @@
 
 - [SeqKit v0.16.0](https://github.com/shenwei356/seqkit/releases/tag/v0.16.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.16.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.16.0)
+    - new command `seqkit head-genome`:
+        - print sequences of the first genome with common prefixes in name
     - `seqkit grep/locate/amplicon -m`
-        - **much faster (300-400x) searching with mismatch allowed** by optimizing FM-indexing and parallelization.
+        - *much faster (300-400x) searching with mismatch allowed* by optimizing FM-indexing and parallelization.
         - new flag `-I/--immediate-output`.
     - `seqkit grep/locate`:
         - fix bug of `-m` when querying contains letters not in alphabet, usually for protein sequences. [#178](https://github.com/shenwei356/seqkit/issues/178), [#179](https://github.com/shenwei356/seqkit/issues/179)
