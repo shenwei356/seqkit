@@ -119,7 +119,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 
 ## Subcommands
 
-34 functional subcommands in total.
+35 functional subcommands in total.
 
 **Sequence and subsequence**
 
@@ -154,6 +154,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 **Set operations**
 
 - [`head`](https://bioinf.shenwei.me/seqkit/usage/#head)            print first N FASTA/Q records
+- [`head-genome`](https://bioinf.shenwei.me/seqkit/usage/#head-genome) print sequences of the first genome with common prefixes in name
 - [`range`](https://bioinf.shenwei.me/seqkit/usage/#range)          print FASTA/Q records in a range (start:end)
 - [`sample`](https://bioinf.shenwei.me/seqkit/usage/#sample)        sample sequences by number or proportion
 - [`rmdup`](https://bioinf.shenwei.me/seqkit/usage/#rmdup)          remove duplicated sequences by id/name/sequence

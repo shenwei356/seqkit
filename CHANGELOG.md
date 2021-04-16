@@ -17,7 +17,7 @@
     - `seqkit fx2tab`:
         - new flag `-C/--base-count` for counting bases. [#183](https://github.com/shenwei356/seqkit/issues/183)
     -  `seqkit tab2fx`:
-       -  fix a rare bug. [#197](https://github.com/shenwei356/seqkit/issues/197)
+        -  fix a rare bug. [#197](https://github.com/shenwei356/seqkit/issues/197)
     - `seqkit subseq`:
         - fix bug for BED with empty columns. [#195](https://github.com/shenwei356/seqkit/issues/195)
     - `seqkit genautocomplete`: 
