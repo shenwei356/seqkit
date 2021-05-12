@@ -399,8 +399,7 @@ and extracts sequences by FASTA index.
 				sequence := subseqByFaixNotCleaned(faidx, chr, r, 1, -1)
 				outfh.Write([]byte(fmt.Sprintf(">%s\n", chr)))
 				outfh.Write(sequence)
-				if len(sequence) > 0 && sequence[len(sequence)-1] == '\n' {
-				} else {
+				if len(sequence) > 0 && sequence[len(sequence)-1] != '\n' {
 					outfh.WriteString("\n")
 				}
 			}
@@ -416,8 +415,7 @@ and extracts sequences by FASTA index.
 				sequence := subseqByFaixNotCleaned(faidx, chr, r, 1, -1)
 				outfh.Write([]byte(fmt.Sprintf(">%s\n", chr)))
 				outfh.Write(sequence)
-				if len(sequence) > 0 && sequence[len(sequence)-1] == '\n' {
-				} else {
+				if len(sequence) > 0 && sequence[len(sequence)-1] != '\n' {
 					outfh.WriteString("\n")
 				}
 			}
