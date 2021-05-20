@@ -86,7 +86,10 @@ Attensions:
 		}
 
 		var addSuffix bool
-		if outdir != "./" && outdir != "." {
+
+		if filepath.Clean(filepath.Dir(read1)) == filepath.Clean(outdir) {
+			addSuffix = true
+		} else if outdir != "./" && outdir != "." {
 			existed, err := pathutil.DirExists(outdir)
 			checkError(err)
 			if existed {
@@ -103,8 +106,6 @@ Attensions:
 			} else {
 				checkError(os.MkdirAll(outdir, 0755))
 			}
-		} else if filepath.Clean(filepath.Dir(read1)) == filepath.Clean(outdir) {
-			addSuffix = true
 		}
 
 		var reader1, reader2 *fastx.Reader
