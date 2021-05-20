@@ -1,7 +1,7 @@
 - [SeqKit v0.16.1](https://github.com/shenwei356/seqkit/releases/tag/v0.16.1)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.16.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.16.1)
     - `seqkit shuffle --two-pass`: fix bug introduced in [#173](https://github.com/shenwei356/seqkit/issues/173) . [#209](https://github.com/shenwei356/seqkit/issues/209)
-    - `seqkit pair`: fix a dangerous bug when input files are not in current directory, input files were overwritten.
+    - `seqkit pair`: fix a dangerous bug: when input files are not in current directory, input files were overwritten.
 - [SeqKit v0.16.0](https://github.com/shenwei356/seqkit/releases/tag/v0.16.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.16.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.16.0)
     - new command `seqkit head-genome`:
