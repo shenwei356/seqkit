@@ -133,6 +133,7 @@ Examples:
 		strict := getFlagBool(cmd, "strict-mode")
 		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
 		outFmtBED := getFlagBool(cmd, "bed")
+		saveUnmatched := getFlagBool(cmd, "save-unmatched")
 
 		immediateOutput := getFlagBool(cmd, "immediate-output")
 
@@ -353,7 +354,20 @@ Examples:
 							}
 						}
 
-						ch <- &Arecord{record: results, id: id, ok: len(results) > 0}
+						if len(results) > 0 {
+							ch <- &Arecord{record: results, id: id, ok: true}
+						} else if saveUnmatched {
+							if onlyPositiveStrand {
+								results = append(results, string(record.Format(config.LineWidth)))
+							} else {
+								record.Seq.RevComInplace()
+								results = append(results, string(record.Format(config.LineWidth)))
+							}
+							ch <- &Arecord{record: results, id: id, ok: true}
+						} else {
+							ch <- &Arecord{record: results, id: id, ok: false}
+						}
+
 					}(record.Clone(), id)
 				}
 
@@ -376,6 +390,7 @@ Examples:
 		var strand string
 		var tmpSeq *seq.Seq
 		var primer [3][]byte
+		var matched bool
 
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
@@ -394,6 +409,8 @@ Examples:
 					config.LineWidth = 0
 					fastx.ForcelyOutputFastq = true
 				}
+
+				matched = false
 
 				for _, strand = range strands {
 					if strand == "-" {
@@ -418,6 +435,8 @@ Examples:
 							continue
 						}
 
+						matched = true
+
 						if outFmtBED {
 							outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\t%s\n",
 								record.ID,
@@ -437,6 +456,13 @@ Examples:
 
 						record.Seq = tmpSeq
 					}
+				}
+
+				if saveUnmatched && !matched {
+					if !onlyPositiveStrand {
+						record.Seq.RevComInplace()
+					}
+					record.FormatToWriter(outfh, config.LineWidth)
 				}
 			}
 
@@ -459,6 +485,7 @@ func init() {
 	ampliconCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on positive strand")
 	ampliconCmd.Flags().BoolP("bed", "", false, "output in BED6+1 format with amplicon as the 7th column")
 	ampliconCmd.Flags().BoolP("immediate-output", "I", false, "print output immediately, do not use write buffer")
+	ampliconCmd.Flags().BoolP("save-unmatched", "u", false, "also save records that do not match any primer")
 }
 
 func loadPrimers(file string) ([][3]string, error) {
