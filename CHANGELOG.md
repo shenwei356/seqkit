@@ -2,6 +2,8 @@
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.17.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.17.0)
     - `seqkit amplicon`:
         - new flag `-u/--save-unmatched` for saving records that do not match any primer.
+    - `seqkit grep`:
+        - allowing empty pattern files
 - [SeqKit v0.16.1](https://github.com/shenwei356/seqkit/releases/tag/v0.16.1)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.16.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.16.1)
     - `seqkit shuffle --two-pass`: fix bug introduced in [#173](https://github.com/shenwei356/seqkit/issues/173) . [#209](https://github.com/shenwei356/seqkit/issues/209)

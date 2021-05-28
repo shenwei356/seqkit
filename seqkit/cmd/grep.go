@@ -220,6 +220,9 @@ Examples:
 					}
 				}
 			}
+			if !quiet {
+				log.Infof("%d patterns loaded from file", len(patterns))
+			}
 		} else {
 			for _, p := range pattern {
 				if !quiet && strings.IndexAny(p, "\t ") >= 0 {
