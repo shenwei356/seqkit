@@ -221,7 +221,11 @@ Examples:
 				}
 			}
 			if !quiet {
-				log.Infof("%d patterns loaded from file", len(patterns))
+				if len(patterns) == 0 {
+					log.Warningf("%d patterns loaded from file", len(patterns))
+				} else {
+					log.Infof("%d patterns loaded from file", len(patterns))
+				}
 			}
 		} else {
 			for _, p := range pattern {
