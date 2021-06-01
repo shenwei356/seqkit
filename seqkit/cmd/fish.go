@@ -102,7 +102,7 @@ func parseRanges(rf string) Ranges {
 			e, err = strconv.ParseFloat(te, 64)
 			checkError(err)
 		}
-		if e < s {
+		if e > 0 && s > 0 && e < s {
 			panic("invalid range: " + t)
 		}
 		res = append(res, Range{s, e})
