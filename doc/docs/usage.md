@@ -992,7 +992,9 @@ Usage:
   seqkit tab2fx [flags]
 
 Flags:
-  -p, --comment-line-prefix value   comment line prefix (default [#,//])
+  -b, --buffer-size string            size of buffer, supported unit: K, M, G. You need increase the value when "bufio.Scanner: token too long" error reported (default "1G")
+  -p, --comment-line-prefix strings   comment line prefix (default [#,//])
+  -h, --help                          help for tab2fx
 
 ```
 

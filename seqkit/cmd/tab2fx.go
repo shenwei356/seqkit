@@ -47,6 +47,14 @@ var tab2faCmd = &cobra.Command{
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		commentPrefixes := getFlagStringSlice(cmd, "comment-line-prefix")
+		bufferSizeS := getFlagString(cmd, "buffer-size")
+		if bufferSizeS == "" {
+			checkError(fmt.Errorf("value of buffer size. supported unit: K, M, G"))
+		}
+		bufferSize, err := ParseByteSize(bufferSizeS)
+		if err != nil {
+			checkError(fmt.Errorf("invalid value of buffer size. supported unit: K, M, G"))
+		}
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
@@ -57,11 +65,13 @@ var tab2faCmd = &cobra.Command{
 		var isCommentLine, isFastq bool
 		var scanner *bufio.Scanner
 		var fh *xopen.Reader
+		buf := make([]byte, bufferSize)
 		for _, file := range files {
 			fh, err = xopen.Ropen(file)
 			checkError(err)
 
 			scanner = bufio.NewScanner(fh)
+			scanner.Buffer(buf, int(bufferSize))
 
 			isFastq = false
 			for scanner.Scan() {
@@ -110,4 +120,5 @@ var tab2faCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(tab2faCmd)
 	tab2faCmd.Flags().StringSliceP("comment-line-prefix", "p", []string{"#", "//"}, "comment line prefix")
+	tab2faCmd.Flags().StringP("buffer-size", "b", "1G", `size of buffer, supported unit: K, M, G. You need increase the value when "bufio.Scanner: token too long" error reported`)
 }
