@@ -58,9 +58,14 @@ var rmdupCmd = &cobra.Command{
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		dupFile := getFlagString(cmd, "dup-seqs-file")
 		numFile := getFlagString(cmd, "dup-num-file")
+		revcom := getFlagBool(cmd, "consider-revcom")
 
 		if bySeq && byName {
 			checkError(fmt.Errorf("only one/none of the flags -s (--by-seq) and -n (--by-name) is allowed"))
+		}
+
+		if revcom && !bySeq {
+			checkError(fmt.Errorf("flag -s (--by-seq) needed when using -r (--consider-revcom"))
 		}
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
@@ -129,13 +134,35 @@ var rmdupCmd = &cobra.Command{
 					if len(numFile) > 0 {
 						names[subject] = append(names[subject], string(record.ID))
 					}
-				} else { // new one
-					record.FormatToWriter(outfh, config.LineWidth)
-					counter[subject]++
 
-					if len(numFile) > 0 {
-						names[subject] = []string{string(record.ID)}
+					continue
+				}
+
+				if bySeq && revcom {
+					if ignoreCase {
+						subject = xxhash.Sum64(bytes.ToLower(record.Seq.RevComInplace().Seq))
+					} else {
+						subject = xxhash.Sum64(record.Seq.RevComInplace().Seq)
 					}
+
+					if _, ok := counter[subject]; ok { // duplicated
+						counter[subject]++
+						removed++
+						if len(dupFile) > 0 {
+							outfhDup.Write(record.Format(config.LineWidth))
+						}
+						if len(numFile) > 0 {
+							names[subject] = append(names[subject], string(record.ID))
+						}
+						continue
+					}
+				}
+
+				record.FormatToWriter(outfh, config.LineWidth)
+				counter[subject]++
+
+				if len(numFile) > 0 {
+					names[subject] = []string{string(record.ID)}
 				}
 			}
 
@@ -172,6 +199,7 @@ func init() {
 	rmdupCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	rmdupCmd.Flags().StringP("dup-seqs-file", "d", "", "file to save duplicated seqs")
 	rmdupCmd.Flags().StringP("dup-num-file", "D", "", "file to save number and list of duplicated seqs")
+	rmdupCmd.Flags().BoolP("consider-revcom", "r", false, "considering the reverse compelment sequence")
 }
 
 type listOfStringSlice struct {
