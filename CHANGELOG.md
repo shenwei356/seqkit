@@ -2,6 +2,9 @@
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.17.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.17.0)
     - `seqkit amplicon`: new flag `-u/--save-unmatched` for saving records that do not match any primer.
     - `seqkit grep`: allowing empty pattern files.
+    - `seqkit fx2tab`:
+        - new flag `-Q/--no-qual` for disabling outputing quality even for FASTQ file. [#221](https://github.com/shenwei356/seqkit/issues/221)
+        - for `-s/--seq-hash`: outputing MD5 instead of xxhash. [#219](https://github.com/shenwei356/seqkit/issues/219)
     - `seqkit tab2fx`: fix bug for very long sequences. [#214](https://github.com/shenwei356/seqkit/issues/214)
     - `seqkit fish`: fix range check. [#213](https://github.com/shenwei356/seqkit/issues/213)
     - `seqkit sample`: slightly faster.

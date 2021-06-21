@@ -977,6 +977,7 @@ Flags:
   -h, --help                   help for fx2tab
   -l, --length                 print sequence length
   -n, --name                   only print names (no sequences and qualities)
+  -Q, --no-qual                only output two column even for FASTQ file
   -i, --only-id                print ID instead of full head
   -b, --qual-ascii-base int    ASCII BASE, 33 for Phred+33 (default 33)
   -s, --seq-hash               print hash (MD5) of sequence

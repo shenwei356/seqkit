@@ -73,6 +73,7 @@ Attention:
 		printAvgQual := getFlagBool(cmd, "avg-qual")
 		qBase := getFlagPositiveInt(cmd, "qual-ascii-base")
 		printSeqHash := getFlagBool(cmd, "seq-hash")
+		noQual := getFlagBool(cmd, "no-qual")
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
@@ -87,9 +88,18 @@ Attention:
 				}
 			} else {
 				if onlyID {
-					outfh.WriteString("#id\tseq\tqual")
+					if noQual {
+						outfh.WriteString("#id\tseq")
+					} else {
+						outfh.WriteString("#id\tseq\tqual")
+					}
 				} else {
-					outfh.WriteString("#name\tseq\tqual")
+					if noQual {
+						outfh.WriteString("#name\tseq")
+					} else {
+						outfh.WriteString("#name\tseq\tqual")
+					}
+
 				}
 			}
 			if printLength {
@@ -153,8 +163,10 @@ Attention:
 					//	record.Seq.Seq, record.Seq.Qual))
 					outfh.WriteString(fmt.Sprintf("%s\t", name))
 					outfh.Write(record.Seq.Seq)
-					outfh.WriteString("\t")
-					outfh.Write(record.Seq.Qual)
+					if !noQual {
+						outfh.WriteString("\t")
+						outfh.Write(record.Seq.Qual)
+					}
 
 				}
 
@@ -234,6 +246,7 @@ func init() {
 	fx2tabCmd.Flags().BoolP("avg-qual", "q", false, "print average quality of a read")
 	fx2tabCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
 	fx2tabCmd.Flags().BoolP("seq-hash", "s", false, "print hash (MD5) of sequence")
+	fx2tabCmd.Flags().BoolP("no-qual", "Q", false, "only output two column even for FASTQ file")
 
 }
 
