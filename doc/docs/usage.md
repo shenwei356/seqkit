@@ -970,7 +970,7 @@ Flags:
   -q, --avg-qual               print average quality of a read
   -B, --base-content strings   print base content. (case ignored, multiple values supported) e.g. -B AT -B N
   -C, --base-count strings     print base count. (case ignored, multiple values supported) e.g. -C AT -C N
-  -I, --case-sensitive         calculate case sensitive base content
+  -I, --case-sensitive         calculate case sensitive base content/sequence hash
   -g, --gc                     print GC content
   -G, --gc-skew                print GC-Skew
   -H, --header-line            print header line
@@ -979,7 +979,7 @@ Flags:
   -n, --name                   only print names (no sequences and qualities)
   -i, --only-id                print ID instead of full head
   -b, --qual-ascii-base int    ASCII BASE, 33 for Phred+33 (default 33)
-  -s, --seq-hash               print hash of sequence (case sensitive)
+  -s, --seq-hash               print hash (MD5) of sequence
 
 ```
 
@@ -2013,6 +2013,7 @@ Usage:
 Flags:
   -n, --by-name                by full name instead of just id
   -s, --by-seq                 by seq
+  -r, --consider-revcom        considering the reverse compelment sequence
   -D, --dup-num-file string    file to save number and list of duplicated seqs
   -d, --dup-seqs-file string   file to save duplicated seqs
   -h, --help                   help for rmdup
@@ -2026,10 +2027,10 @@ Similar to `common`.
 
 1. General use
 
-        $ zcat hairpin.fa.gz | seqkit rmdup -s -o clean.fa.gz
+        $ zcat hairpin.fa.gz | seqkit rmdup -s -r -o clean.fa.gz
         [INFO] 2226 duplicated records removed
 
-        $ zcat reads_1.fq.gz | seqkit rmdup -s -o clean.fa.gz
+        $ zcat reads_1.fq.gz | seqkit rmdup -s -r -o clean.fa.gz
         [INFO] 1086 duplicated records removed
 
 1. Save duplicated sequences to file

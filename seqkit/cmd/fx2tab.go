@@ -21,6 +21,9 @@
 package cmd
 
 import (
+	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"math"
@@ -28,7 +31,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/cespare/xxhash"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/xopen"
@@ -126,6 +128,7 @@ Attention:
 		var g, c float64
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
+		var sum [md5.Size]byte
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -199,7 +202,14 @@ Attention:
 				}
 
 				if printSeqHash {
-					outfh.WriteString(fmt.Sprintf("\t%d", xxhash.Sum64(record.Seq.Seq)))
+					if caseSensitive {
+						sum = md5.Sum(record.Seq.Seq)
+						outfh.WriteString(fmt.Sprintf("\t%s", hex.EncodeToString(sum[:])))
+					} else {
+						sum = md5.Sum(bytes.ToLower(record.Seq.Seq))
+						outfh.WriteString(fmt.Sprintf("\t%s", hex.EncodeToString(sum[:])))
+					}
+
 				}
 
 				outfh.WriteString("\n")
@@ -216,14 +226,14 @@ func init() {
 	fx2tabCmd.Flags().BoolP("gc-skew", "G", false, "print GC-Skew")
 	fx2tabCmd.Flags().StringSliceP("base-content", "B", []string{}, "print base content. (case ignored, multiple values supported) e.g. -B AT -B N")
 	fx2tabCmd.Flags().StringSliceP("base-count", "C", []string{}, "print base count. (case ignored, multiple values supported) e.g. -C AT -C N")
-	fx2tabCmd.Flags().BoolP("case-sensitive", "I", false, "calculate case sensitive base content")
+	fx2tabCmd.Flags().BoolP("case-sensitive", "I", false, "calculate case sensitive base content/sequence hash")
 	fx2tabCmd.Flags().BoolP("only-id", "i", false, "print ID instead of full head")
 	fx2tabCmd.Flags().BoolP("name", "n", false, "only print names (no sequences and qualities)")
 	fx2tabCmd.Flags().BoolP("header-line", "H", false, "print header line")
 	fx2tabCmd.Flags().BoolP("alphabet", "a", false, "print alphabet letters")
 	fx2tabCmd.Flags().BoolP("avg-qual", "q", false, "print average quality of a read")
 	fx2tabCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
-	fx2tabCmd.Flags().BoolP("seq-hash", "s", false, "print hash of sequence (case sensitive)")
+	fx2tabCmd.Flags().BoolP("seq-hash", "s", false, "print hash (MD5) of sequence")
 
 }
 
