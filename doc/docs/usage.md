@@ -3040,9 +3040,12 @@ Usage:
   seqkit sort [flags]
 
 Flags:
+  -b, --by-bases                by non-gap bases
   -l, --by-length               by sequence length
   -n, --by-name                 by full name instead of just id
   -s, --by-seq                  by sequence
+  -G, --gap-letters string      gap letters (default "- \t.")
+  -h, --help                    help for sort
   -i, --ignore-case             ignore case
   -k, --keep-temp               keep tempory FASTA and .fai file when using 2-pass mode
   -N, --natural-order           sort in natural order, when sorting by IDs/full name

@@ -35,3 +35,4 @@ t.*
 seqkit/t.*
 seqkit/bench-fx2tab
 doc/docs/chinese/
+*.brename_detail.txt

@@ -12,6 +12,8 @@
     - `seqkit faidx`:
         - supporting region with begin > end, i.e., return reverse complement sequence
         - add new flag `-l/--region-file`:  file containing a list of regions
+    - `seqkit sort`:
+        - new flag `-b/--by-bases` for sorting by non-gap bases, for multiple sequence alignment files.[#216](https://github.com/shenwei356/seqkit/issues/216)
 - [SeqKit v0.16.1](https://github.com/shenwei356/seqkit/releases/tag/v0.16.1)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.16.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.16.1)
     - `seqkit shuffle --two-pass`: fix bug introduced in [#173](https://github.com/shenwei356/seqkit/issues/173) . [#209](https://github.com/shenwei356/seqkit/issues/209)

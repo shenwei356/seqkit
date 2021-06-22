@@ -74,6 +74,8 @@ and extracts sequences by FASTA index.
 		bySeq := getFlagBool(cmd, "by-seq")
 		byName := getFlagBool(cmd, "by-name")
 		byLength := getFlagBool(cmd, "by-length")
+		byBases := getFlagBool(cmd, "by-bases")
+		gapLetters := getFlagString(cmd, "gap-letters")
 		reverse := getFlagBool(cmd, "reverse")
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		twoPass := getFlagBool(cmd, "two-pass")
@@ -81,6 +83,13 @@ and extracts sequences by FASTA index.
 		keepTemp := getFlagBool(cmd, "keep-temp")
 		if keepTemp && !twoPass {
 			checkError(fmt.Errorf("flag -k (--keep-temp) must be used with flag -2 (--two-pass)"))
+		}
+		if byBases {
+			byLength = true
+
+			if twoPass {
+				checkError(fmt.Errorf("-b/--by-bases is not incompatible with -2/--two-pass "))
+			}
 		}
 
 		n := 0
@@ -126,6 +135,7 @@ and extracts sequences by FASTA index.
 				log.Infof("read sequences ...")
 			}
 			var name string
+			var length int
 			for _, file := range files {
 				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
@@ -164,7 +174,12 @@ and extracts sequences by FASTA index.
 					record2 := record.Clone()
 					sequences[name] = record2
 					if byLength {
-						name2length = append(name2length, stringutil.StringCount{Key: name, Count: len(record2.Seq.Seq)})
+						if byBases {
+							length = record2.Seq.Bases(gapLetters)
+						} else {
+							length = len(record2.Seq.Seq)
+						}
+						name2length = append(name2length, stringutil.StringCount{Key: name, Count: length})
 					} else if byID || byName || bySeq {
 						if ignoreCase {
 							name2sequence = append(name2sequence, stringutil.String2ByteSlice{Key: name, Value: bytes.ToLower(record2.Seq.Seq)})
@@ -314,6 +329,7 @@ and extracts sequences by FASTA index.
 			checkError(err)
 			var name string
 			var prefix []byte
+			var length int
 			for {
 				record, err := fastxReader.Read()
 				if err != nil {
@@ -347,6 +363,13 @@ and extracts sequences by FASTA index.
 				}
 				name2sequence = append(name2sequence,
 					stringutil.String2ByteSlice{Key: name, Value: []byte(string(prefix))})
+
+				if byBases {
+					length = record.Seq.Bases(gapLetters)
+				} else {
+					length = len(record.Seq.Seq)
+				}
+				name2length = append(name2length, stringutil.StringCount{Key: name, Count: length})
 				name2length = append(name2length,
 					stringutil.StringCount{Key: name, Count: len(record.Seq.Seq)})
 			}
@@ -434,6 +457,8 @@ func init() {
 	sortCmd.Flags().BoolP("by-name", "n", false, "by full name instead of just id")
 	sortCmd.Flags().BoolP("by-seq", "s", false, "by sequence")
 	sortCmd.Flags().BoolP("by-length", "l", false, "by sequence length")
+	sortCmd.Flags().BoolP("by-bases", "b", false, "by non-gap bases")
+	sortCmd.Flags().StringP("gap-letters", "G", "- 	.", "gap letters")
 	sortCmd.Flags().BoolP("reverse", "r", false, "reverse the result")
 	sortCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 
