@@ -775,10 +775,11 @@ Usage:
   seqkit faidx [flags] <fasta-file> [regions...]
 
 Flags:
-  -f, --full-head     print full header line instead of just ID. New fasta index file ending with .seqkit.fai will be created
-  -h, --help          help for faidx
-  -i, --ignore-case   ignore case
-  -r, --use-regexp    IDs are regular expression. But subseq region is not suppored here.
+  -f, --full-head            print full header line instead of just ID. New fasta index file ending with .seqkit.fai will be created
+  -h, --help                 help for faidx
+  -i, --ignore-case          ignore case
+  -l, --region-file string   file containing a list of regions
+  -r, --use-regexp           IDs are regular expression. But subseq region is not suppored here.
 
 ```
 
@@ -817,6 +818,12 @@ Example
         $ seqkit faidx tests/hairpin.fa hsa-let-7a-1:1
         >hsa-let-7a-1:1-1
         U
+        
+3. supporting `begin` > `start`, i.e., returning reverse complement sequence, not supported by `samtools faidx`
+
+        $ seqkit faidx tests/hairpin.fa hsa-let-7a-1:10-1
+        >hsa-let-7a-1:10-1
+        CCUCAUCCCA
 
 4. use regular expression
 
@@ -2014,7 +2021,7 @@ Usage:
 Flags:
   -n, --by-name                by full name instead of just id
   -s, --by-seq                 by seq
-  -r, --consider-revcom        considering the reverse compelment sequence
+  -r, --consider-revcom        considering the reverse complement sequence
   -D, --dup-num-file string    file to save number and list of duplicated seqs
   -d, --dup-seqs-file string   file to save duplicated seqs
   -h, --help                   help for rmdup

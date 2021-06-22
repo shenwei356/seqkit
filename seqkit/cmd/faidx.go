@@ -28,8 +28,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/breader"
 	"github.com/shenwei356/util/byteutil"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
@@ -46,7 +48,7 @@ This command is similar with "samtools faidx" but has some extra features:
   1. output full header line with flag -f
   2. support regular expression as sequence ID with flag -r
   3. if you have large number of IDs, you can use:
-		seqkit faidx seqs.fasta --infile-list IDs.txt
+        seqkit faidx seqs.fasta -l IDs.txt
 
 The definition of region is 1-based and with some custom design.
 
@@ -62,6 +64,7 @@ Examples:
 		fullHead := getFlagBool(cmd, "full-head")
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		useRegexp := getFlagBool(cmd, "use-regexp")
+		regionFile := getFlagString(cmd, "region-file")
 
 		files := getFileListFromArgsAndFile(cmd, args, false, "infile-list", false)
 
@@ -73,6 +76,33 @@ Examples:
 
 		if strings.HasSuffix(strings.ToLower(file), ".gz") {
 			checkError(fmt.Errorf("gzipped file not supported"))
+		}
+
+		var err error
+		regions := make([]string, 0, 256)
+		if regionFile != "" {
+			var reader *breader.BufferedReader
+			reader, err = breader.NewDefaultBufferedReader(regionFile)
+			checkError(err)
+			var data interface{}
+			var r string
+			for chunk := range reader.Ch {
+				checkError(chunk.Err)
+				for _, data = range chunk.Data {
+					r = data.(string)
+					if r == "" {
+						continue
+					}
+					regions = append(regions, r)
+				}
+			}
+			if !quiet {
+				if len(regions) == 0 {
+					log.Warningf("%d patterns loaded from file", len(regions))
+				} else {
+					log.Infof("%d patterns loaded from file", len(regions))
+				}
+			}
 		}
 
 		outfh, err := xopen.Wopen(config.OutFile)
@@ -102,7 +132,9 @@ Examples:
 		}
 
 		if len(files) == 1 { // just creat .fai file
-			return
+			if len(regions) == 0 {
+				return
+			}
 		}
 
 		var faidx *fai.Faidx
@@ -130,14 +162,19 @@ Examples:
 		}
 
 		// handle queries
-		queries := files[1:]
+		queries := make([]string, len(regions), len(regions)+len(files)-1)
+		if len(regions) > 0 {
+			copy(queries, regions)
+		}
+		queries = append(queries, files[1:]...)
+
 		faidxQueries := make([]faidxQuery, 0, len(queries))
 		var region [2]int
 
 		var ok bool
 		if !useRegexp {
 			var begin, end int
-			for _, query := range files[1:] {
+			for _, query := range queries {
 				id, begin, end = parseRegion(query)
 
 				if ignoreCase {
@@ -174,10 +211,29 @@ Examples:
 		var subseq []byte
 		var text []byte
 		var b *bytes.Buffer
+		var _s *seq.Seq
+		var alphabet *seq.Alphabet
 		for _, faidxQ := range faidxQueries {
 			head = id2head[faidxQ.ID]
 			region = faidxQ.Region
-			subseq, _ = faidx.SubSeq(head, region[0], region[1])
+			if region[0] <= region[1] {
+				subseq, _ = faidx.SubSeq(head, region[0], region[1])
+			} else { // reverse complement sequence
+				subseq, _ = faidx.SubSeq(head, region[1], region[0])
+				alphabet = config.Alphabet
+				if alphabet == nil {
+					alphabet = seq.DNAredundant
+					if bytes.ContainsAny(subseq, "uU") {
+						alphabet = seq.RNAredundant
+					}
+				}
+				_s, err = seq.NewSeqWithoutValidation(alphabet, subseq)
+				if err != nil {
+					checkError(fmt.Errorf("fail to compute reverse complemente sequence for region: %s:%d-%d", head, region[0], region[1]))
+				}
+				subseq = _s.RevComInplace().Seq
+			}
+
 			if region[0] == 1 && region[1] == -1 {
 				outfh.WriteString(fmt.Sprintf(">%s\n", head))
 			} else {
@@ -212,6 +268,7 @@ func init() {
 	faidxCmd.Flags().BoolP("use-regexp", "r", false, "IDs are regular expression. But subseq region is not suppored here.")
 	faidxCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	faidxCmd.Flags().BoolP("full-head", "f", false, "print full header line instead of just ID. New fasta index file ending with .seqkit.fai will be created")
+	faidxCmd.Flags().StringP("region-file", "l", "", "file containing a list of regions")
 
 	faidxCmd.SetUsageTemplate(`Usage:{{if .Runnable}}
   {{if .HasAvailableFlags}}{{appendIfNotPresent .UseLine "[flags]"}}{{else}}{{.UseLine}}{{end}}{{end}}{{if .HasAvailableSubCommands}}
