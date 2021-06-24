@@ -70,9 +70,9 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
   (see [download](http://bioinf.shenwei.me/seqkit/download/))
 - **UltraFast** (see [benchmark](#benchmark)),
   **multiple-CPUs supported**
-- **Practical functions supported by 34 subcommands** (see subcommands and
+- **Practical functions supported by 35 subcommands** (see subcommands and
   [usage](http://bioinf.shenwei.me/seqkit/usage/) )
-- **Supporting [Bash-completion](#bash-completion)**
+- **Supporting [Bash/Zsh completion](#command-line-completion)**
 - **Well documented** (detailed [usage](http://bioinf.shenwei.me/seqkit/usage/)
   and [benchmark](http://bioinf.shenwei.me/seqkit/benchmark/) )
 - **Seamlessly parsing both FASTA and FASTQ formats**
@@ -127,7 +127,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 - [`subseq`](https://bioinf.shenwei.me/seqkit/usage/#subseq)    get subsequences by region/gtf/bed, including flanking sequences
 - [`sliding`](https://bioinf.shenwei.me/seqkit/usage/#sliding)  sliding sequences, circular genome supported
 - [`stats`](https://bioinf.shenwei.me/seqkit/usage/#stats)      simple statistics of FASTA/Q files
-- [`faidx`](https://bioinf.shenwei.me/seqkit/usage/#faidx)      create FASTA index file and extract subsequence
+- [`faidx`](https://bioinf.shenwei.me/seqkit/usage/#faidx)      create FASTA index file and extract subsequence (with more features than samtools faidx)
 - [`watch`](https://bioinf.shenwei.me/seqkit/usage/#watch)      monitoring and online histograms of sequence features
 - [`sana`](https://bioinf.shenwei.me/seqkit/usage/#sana)        sanitize broken single line fastq files
 - [`scat`](https://bioinf.shenwei.me/seqkit/usage/#scat)        real time concatenation and streaming of fastx files
@@ -175,7 +175,7 @@ enable researchers to rapidly accomplish common FASTA/Q file manipulations.
 **Ordering**
 
 - [`shuffle`](https://bioinf.shenwei.me/seqkit/usage/#shuffle)  shuffle sequences
-- [`sort`](https://bioinf.shenwei.me/seqkit/usage/#sort)        sort sequences by id/name/sequence
+- [`sort`](https://bioinf.shenwei.me/seqkit/usage/#sort)        sort sequences by id/name/sequence/length
 
 **Misc**
 
