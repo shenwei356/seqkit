@@ -21,15 +21,18 @@
 package cmd
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"io"
 	"os"
 	"runtime"
+	"strings"
 	"syscall"
 
 	// "runtime/debug"
 
+	gzip "github.com/klauspost/pgzip"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/util/byteutil"
@@ -137,6 +140,10 @@ Attentions:
 			default:
 				seqCol = NewSeqColorizer("nucleic")
 			}
+
+			if outFile != "-" {
+				log.Warning("flag -k/--color only applies for stdout")
+			}
 		}
 		var outfh *os.File
 		var err error
@@ -145,13 +152,27 @@ Attentions:
 		} else {
 			outfh, err = os.Create(outFile)
 			checkError(err)
+			color = false
 		}
 		defer outfh.Close()
-		var outbw io.Writer
-		outbw = outfh
+
+		gzippedOutfile := strings.HasSuffix(strings.ToLower(outFile), ".gz")
+		var fh io.Writer
 		if color {
-			outbw = seqCol.WrapWriter(outfh)
+			fh = seqCol.WrapWriter(outfh)
+		} else if gzippedOutfile {
+			fh = gzip.NewWriter(outfh)
+		} else {
+			fh = outfh
 		}
+
+		outbw := bufio.NewWriterSize(fh, os.Getpagesize()*2)
+		defer func() {
+			outbw.Flush()
+			if gzippedOutfile {
+				fh.(*gzip.Writer).Flush()
+			}
+		}()
 
 		var checkSeqType bool
 		var isFastq bool
@@ -359,7 +380,6 @@ Attentions:
 			config.LineWidth = lineWidth
 		}
 
-		outfh.Close()
 	},
 }
 

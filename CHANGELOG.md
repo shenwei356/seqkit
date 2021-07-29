@@ -1,5 +1,6 @@
 - [SeqKit v0.17.0](https://github.com/shenwei356/seqkit/releases/tag/v0.17.0)
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.17.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.17.0)
+    - `seqkit seq`: fix buffered (gzipped) output since v0.12.1.
     - `seqkit amplicon`: new flag `-u/--save-unmatched` for saving records that do not match any primer.
     - `seqkit grep`: allowing empty pattern files.
     - `seqkit fx2tab`:
