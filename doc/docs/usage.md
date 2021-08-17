@@ -2675,6 +2675,32 @@ Usage
 ``` text
 rename duplicated IDs
 
+Attention:
+  1. This command only appends "_N" to duplicated sequence IDs to make them unique.
+  2. Use "seqkit replace" for editing sequence IDs/headers using regular expression.
+
+Example:
+
+    $ seqkit seq seqs.fasta 
+    >id comment
+    actg
+    >id description
+    ACTG
+    
+    # Default: use new ID and append original header
+    $ seqkit rename seqs.fasta 
+    >id comment
+    actg
+    >id_2 id description
+    ACTG
+    
+    # You may need this: only renaming ID
+    $ seqkit rename seqs.fasta -i
+    >id comment
+    actg
+    >id_2 description
+    ACTG
+
 Usage:
   seqkit rename [flags]
 
@@ -2682,6 +2708,7 @@ Flags:
   -n, --by-name             check duplication by full name instead of just id
   -f, --force               overwrite output directory
   -h, --help                help for rename
+  -i, --inplace             rename ID in-place
   -m, --multiple-outfiles   write results into separated files for multiple input files
   -O, --out-dir string      output directory (default "renamed")
 
@@ -2705,6 +2732,15 @@ acgt
 >b comment of b
 ACTG
 >a_2 a comment
+aaaa
+
+$ echo -e ">a comment\nacgt\n>b comment of b\nACTG\n>a comment\naaaa" \
+    | seqkit rename -i
+>a comment
+acgt
+>b comment of b
+ACTG
+>a_2 comment
 aaaa
 ```
 

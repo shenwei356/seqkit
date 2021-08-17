@@ -81,7 +81,7 @@ Run the following commands:
     docker build -t shenwei356/seqkit .
     docker run -it shenwei356/seqkit:latest
 
-## Bash-completion
+## Shell-completion
 
 Supported shell: bash|zsh|fish|powershell
 

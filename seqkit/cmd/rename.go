@@ -43,6 +43,29 @@ var renameCmd = &cobra.Command{
 Attention:
   1. This command only appends "_N" to duplicated sequence IDs to make them unique.
   2. Use "seqkit replace" for editing sequence IDs/headers using regular expression.
+
+Example:
+
+    $ seqkit seq seqs.fasta 
+    >id comment
+    actg
+    >id description
+    ACTG
+    
+    # Default: use new ID and append original header
+    $ seqkit rename seqs.fasta 
+    >id comment
+    actg
+    >id_2 id description
+    ACTG
+    
+    # You may need this: only renaming ID
+    $ seqkit rename seqs.fasta -i
+    >id comment
+    actg
+    >id_2 description
+    ACTG
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -57,6 +80,7 @@ Attention:
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		byName := getFlagBool(cmd, "by-name")
+		inPlace := getFlagBool(cmd, "inplace")
 		mOutputs := getFlagBool(cmd, "multiple-outfiles")
 		outdir := getFlagString(cmd, "out-dir")
 		force := getFlagBool(cmd, "force")
@@ -140,7 +164,11 @@ Attention:
 					if _, ok = numbers[k]; ok {
 						numbers[k]++
 						newID = fmt.Sprintf("%s_%d", record.ID, numbers[k])
-						record.Name = []byte(fmt.Sprintf("%s %s", newID, record.Name))
+						if inPlace {
+							record.Name = []byte(fmt.Sprintf("%s %s", newID, record.Desc))
+						} else {
+							record.Name = []byte(fmt.Sprintf("%s %s", newID, record.Name))
+						}
 					} else {
 						numbers[k] = 1
 					}
@@ -160,4 +188,5 @@ func init() {
 	renameCmd.Flags().BoolP("multiple-outfiles", "m", false, "write results into separated files for multiple input files")
 	renameCmd.Flags().StringP("out-dir", "O", "renamed", "output directory")
 	renameCmd.Flags().BoolP("force", "f", false, "overwrite output directory")
+	renameCmd.Flags().BoolP("inplace", "i", false, "rename ID in-place")
 }
