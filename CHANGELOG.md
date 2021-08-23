@@ -1,6 +1,10 @@
-- [SeqKit v0.17.0](https://github.com/shenwei356/seqkit/releases/tag/v0.17.0)
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.17.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.17.0)
-    - `seqkit seq`: fix buffered (gzipped) output since v0.12.1.
+- [SeqKit v2.0.0](https://github.com/shenwei356/seqkit/releases/tag/v2.0.0)
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.0.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.0.0)
+    - `seqkit`:
+        - faster FASTA/Q parsing speed, check the [benchmark](https://github.com/shenwei356/bio/tree/0e8cc4e503d6fd3520d9abdabe5678b9f244ce5e#fastaq-parsing).
+    - `seqkit seq`: 
+        - fix buffered (gzipped) output since v0.12.1.
+        - faster speed.
     - `seqkit amplicon`: new flag `-u/--save-unmatched` for saving records that do not match any primer.
     - `seqkit grep`: allowing empty pattern files.
     - `seqkit fx2tab`:

@@ -257,17 +257,17 @@ Attentions:
 
 					if printSeq {
 						if isFastq {
-							outbw.Write([]byte("@"))
+							outbw.Write(_mark_fastq)
 							outbw.Write(head)
-							outbw.Write([]byte("\n"))
+							outbw.Write(_mark_newline)
 						} else {
-							outbw.Write([]byte(">"))
+							outbw.Write(_mark_fasta)
 							outbw.Write(head)
-							outbw.Write([]byte("\n"))
+							outbw.Write(_mark_newline)
 						}
 					} else {
 						outbw.Write(head)
-						outbw.Write([]byte("\n"))
+						outbw.Write(_mark_newline)
 					}
 				}
 
@@ -409,3 +409,7 @@ func init() {
 	seqCmd.Flags().Float64P("min-qual", "Q", -1, "only print sequences with average quality qreater or equal than this limit (-1 for no limit)")
 	seqCmd.Flags().Float64P("max-qual", "R", -1, "only print sequences with average quality less than this limit (-1 for no limit)")
 }
+
+var _mark_fasta = []byte{'>'}
+var _mark_fastq = []byte{'@'}
+var _mark_newline = []byte{'\n'}
