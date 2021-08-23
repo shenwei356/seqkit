@@ -216,8 +216,15 @@ Examples:
 		for _, faidxQ := range faidxQueries {
 			head = id2head[faidxQ.ID]
 			region = faidxQ.Region
-			if region[0] <= region[1] {
+
+			if (region[0] == 1 && region[1] == -1) || (region[0] > 0 && region[1] < 0) { // full record or region like [5, -5].
 				subseq, _ = faidx.SubSeq(head, region[0], region[1])
+
+				outfh.WriteString(fmt.Sprintf(">%s\n", head))
+			} else if region[0] <= region[1] {
+				subseq, _ = faidx.SubSeq(head, region[0], region[1])
+
+				outfh.WriteString(fmt.Sprintf(">%s:%d-%d\n", head, region[0], region[1]))
 			} else { // reverse complement sequence
 				subseq, _ = faidx.SubSeq(head, region[1], region[0])
 				alphabet = config.Alphabet
@@ -232,11 +239,7 @@ Examples:
 					checkError(fmt.Errorf("fail to compute reverse complemente sequence for region: %s:%d-%d", head, region[0], region[1]))
 				}
 				subseq = _s.RevComInplace().Seq
-			}
 
-			if region[0] == 1 && region[1] == -1 {
-				outfh.WriteString(fmt.Sprintf(">%s\n", head))
-			} else {
 				outfh.WriteString(fmt.Sprintf(">%s:%d-%d\n", head, region[0], region[1]))
 			}
 

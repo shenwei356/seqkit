@@ -692,6 +692,7 @@ rm -f tests/sorted_scat_output.fq tests/sorted_scat_test_all.fq tests/sorted_sca
 #                       faidx
 # ------------------------------------------------------------
 
+file=tests/hairpin.fa
 idFile=tests/t.ids
 outFile=tests/t.fa
 $app sample -n 10 $file| $app seq -i -n | shuf > $idFile

@@ -4,20 +4,21 @@ go 1.16
 
 require (
 	github.com/biogo/biogo v1.0.3
-	github.com/biogo/hts v1.2.2
+	github.com/biogo/hts v1.4.3
 	github.com/bsipos/thist v1.0.0
 	github.com/cespare/xxhash v1.1.0
 	github.com/cznic/sortutil v0.0.0-20181122101858-f5f958428db8
 	github.com/dustin/go-humanize v1.0.0
-	github.com/fsnotify/fsnotify v1.4.9
-	github.com/iafan/cwalk v0.0.0-20191125092548-dd7f505d2f66
+	github.com/fsnotify/fsnotify v1.5.0
+	github.com/iafan/cwalk v0.0.0-20210125030640-586a8832a711
 	github.com/klauspost/pgzip v1.2.5
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mattn/go-colorable v0.1.8
-	github.com/mattn/go-isatty v0.0.12
-	github.com/mattn/go-runewidth v0.0.9 // indirect
+	github.com/mattn/go-isatty v0.0.13
+	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/errors v0.9.1
+	github.com/pkg/profile v1.6.0
 	github.com/shenwei356/bio v0.1.1
 	github.com/shenwei356/breader v0.2.0
 	github.com/shenwei356/bwt v0.5.1
@@ -25,8 +26,8 @@ require (
 	github.com/shenwei356/natsort v0.0.0-20190418160752-600d539c017d // indirect
 	github.com/shenwei356/util v0.3.0
 	github.com/shenwei356/xopen v0.0.0-20181203091311-f4f16ddd3992
-	github.com/smallfish/simpleyaml v0.0.0-20170911015856-a32031077861
-	github.com/spf13/cobra v1.1.3
+	github.com/smallfish/simpleyaml v0.1.0
+	github.com/spf13/cobra v1.2.1
 	github.com/tatsushid/go-prettytable v0.0.0-20141013043238-ed2d14c29939
 	github.com/twotwotwo/sorts v0.0.0-20160814051341-bf5c1f2b8553
 )
