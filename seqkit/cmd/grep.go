@@ -71,7 +71,7 @@ Attentions:
      But for FASTA file, you can use:
         seqkit faidx seqs.fasta --infile-list IDs.txt
 
-You can specify the sequence region for searching with flag -R (--region).
+You can specify the sequence region for searching with the flag -R (--region).
 The definition of region is 1-based and with some custom design.
 
 Examples:

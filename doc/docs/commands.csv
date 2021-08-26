@@ -1,0 +1,36 @@
+category,command,function,input,strand-sensitivity,multi-threads,popularity
+basic,[seq](https://bioinf.shenwei.me/seqkit/usage/#seq) ,"transform sequences: extract ID/seq, filter by length/quality, remove gaps…",FASTA/Q,,,★★★★★
+,[stats](https://bioinf.shenwei.me/seqkit/usage/#stats) ,"simple statistics: #seqs, min/max_len, N50, Q20%, Q30%…",FASTA/Q,,✓,★★★★★
+,[subseq](https://bioinf.shenwei.me/seqkit/usage/#subseq) ,"extract subsequences or flanking sequences by region/gtf/bed, ",FASTA/Q,+ or/and -,,★★★
+,[sliding](https://bioinf.shenwei.me/seqkit/usage/#sliding) ,extract subsequences in sliding windows,FASTA/Q,+ only,,★★
+,[faidx](https://bioinf.shenwei.me/seqkit/usage/#faidx) ,create FASTA index file and extract subsequence (with more features than samtools faidx),FASTA,+ or/and -,,
+,[watch ](https://bioinf.shenwei.me/seqkit/usage/#watch ) ,monitoring and online histograms of sequence features,FASTA/Q,,,
+,[sana](https://bioinf.shenwei.me/seqkit/usage/#sana) ,sanitize broken single line FASTQ files,FASTQ,,,
+,[scat ](https://bioinf.shenwei.me/seqkit/usage/#scat ) ,real time concatenation and streaming of fastx files,FASTA/Q,,✓,
+format conversion,[fq2fa](https://bioinf.shenwei.me/seqkit/usage/#fq2fa) ,convert FASTQ to FASTA,FASTQ,,,★★
+,[fx2tab](https://bioinf.shenwei.me/seqkit/usage/#fx2tab) ,convert FASTA/Q to tabular format,FASTA/Q,,,★★
+,[tab2fx](https://bioinf.shenwei.me/seqkit/usage/#tab2fx) ,convert tabular format to FASTA/Q format,FASTA/Q,,,
+,[convert](https://bioinf.shenwei.me/seqkit/usage/#convert) ,"convert FASTQ quality encoding between Sanger, Solexa and Illumina",FASTA/Q,,,
+,[translate](https://bioinf.shenwei.me/seqkit/usage/#translate) ,translate DNA/RNA to protein sequence,FASTA/Q,+ or/and -,,★★
+searching,[grep](https://bioinf.shenwei.me/seqkit/usage/#grep) ,"search sequences by ID/name/sequence/sequence motifs, mismatch allowed",FASTA/Q,+ and -,"partly, -m",★★★★★
+,[locate](https://bioinf.shenwei.me/seqkit/usage/#locate) ,"locate subsequences/motifs, mismatch allowed",FASTA/Q,+ and -,"partly, -m",★★★★★
+,[amplicon](https://bioinf.shenwei.me/seqkit/usage/#amplicon) ,"extract amplicon (or specific region around it), mismatch allowed",FASTA/Q,+ and -,"partly, -m",★
+,[fish](https://bioinf.shenwei.me/seqkit/usage/#fish) ,look for short sequences in larger sequences,FASTA/Q,+ and -,,
+set operation,[sample](https://bioinf.shenwei.me/seqkit/usage/#sample) ,sample sequences by number or proportion,FASTA/Q,,,★★★★
+,[rmdup](https://bioinf.shenwei.me/seqkit/usage/#rmdup) ,remove duplicated sequences by ID/name/sequence,FASTA/Q,+ and -,,★★★
+,[common](https://bioinf.shenwei.me/seqkit/usage/#common) ,find common sequences of multiple files by id/name/sequence,FASTA/Q,+ and -,,
+,[duplicate](https://bioinf.shenwei.me/seqkit/usage/#duplicate) ,duplicate sequences N times,FASTA/Q,,,★
+,[split](https://bioinf.shenwei.me/seqkit/usage/#split) ,split sequences into files by id/seq region/size/parts (mainly for FASTA),FASTA preffered,,,★
+,[spit2](https://bioinf.shenwei.me/seqkit/usage/#spit2) ,"split sequences into files by size/parts (FASTA, PE/SE FASTQ)",FASTA/Q,,,★★
+,[head](https://bioinf.shenwei.me/seqkit/usage/#head) ,print first N FASTA/Q records,FASTA/Q,,,
+,[head-genome](https://bioinf.shenwei.me/seqkit/usage/#head-genome) ,print sequences of the first genome with common prefixes in name,FASTA/Q,,,
+,[range](https://bioinf.shenwei.me/seqkit/usage/#range) ,print FASTA/Q records in a range (start:end),FASTA/Q,,,
+,[pair](https://bioinf.shenwei.me/seqkit/usage/#pair) ,match up paired-end reads from two fastq files,FASTA/Q,,,
+edit,[concat](https://bioinf.shenwei.me/seqkit/usage/#concat) ,concatenate sequences with same ID from multiple files,FASTA/Q,+ only,,★★★
+,[replace](https://bioinf.shenwei.me/seqkit/usage/#replace) ,replace name/sequence by regular expression,FASTA/Q,+ only,,★★
+,[restart](https://bioinf.shenwei.me/seqkit/usage/#restart) ,reset start position for circular genome,FASTA/Q,+ only,,★
+,[mutate](https://bioinf.shenwei.me/seqkit/usage/#mutate) ,"edit sequence (point mutation, insertion, deletion)",FASTA/Q,+ only,,
+,[rename](https://bioinf.shenwei.me/seqkit/usage/#rename) ,rename duplicated IDs,FASTA/Q,,,★
+ordering,[sort](https://bioinf.shenwei.me/seqkit/usage/#sort) ,sort sequences by id/name/sequence/length,FASTA preffered,,,★★
+,[shuffle](https://bioinf.shenwei.me/seqkit/usage/#shuffle) ,shuffle sequences,FASTA preffered,,,
+BAM processing,[bam](https://bioinf.shenwei.me/seqkit/usage/#bam),monitoring and online histograms of BAM record features,BAM,,,

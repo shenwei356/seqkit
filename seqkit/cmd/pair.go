@@ -47,8 +47,8 @@ var pairCmd = &cobra.Command{
 Attensions:
 1. Orders of headers in the two files better be the same (not shuffled),
    otherwise it consumes huge number of memory for buffering reads in memory.
-2. Unpaired reads are optional outputted with flag -u/--save-unpaired.
-3. If flag -O/--out-dir not given, output will be saved in the same directory
+2. Unpaired reads are optional outputted with the flag -u/--save-unpaired.
+3. If the flag -O/--out-dir not given, output will be saved in the same directory
    of input, with suffix "paired", e.g., read_1.paired.fq.gz.
    Otherwise names are kept untouched in the given output directory.
 4. Paired gzipped files may be slightly larger than original files, because
@@ -170,7 +170,7 @@ Attensions:
 			}
 
 			// paired
-			if !eof1 && !eof2 && bytes.Compare(record1.ID, record2.ID) == 0 { // same ID
+			if !eof1 && !eof2 && bytes.Equal(record1.ID, record2.ID) { // same ID
 				// output paired reads
 				record1.FormatToWriter(outfh1, lineWidth)
 				record2.FormatToWriter(outfh2, lineWidth)

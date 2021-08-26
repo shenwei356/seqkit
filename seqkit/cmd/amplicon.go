@@ -47,8 +47,8 @@ import (
 // ampliconCmd represents the amplicon command
 var ampliconCmd = &cobra.Command{
 	Use:   "amplicon",
-	Short: "retrieve amplicon (or specific region around it) via primer(s)",
-	Long: `retrieve amplicon (or specific region around it) via primer(s).
+	Short: "extract amplicon (or specific region around it) via primer(s)",
+	Long: `extract amplicon (or specific region around it) via primer(s).
 
 Attentions:
   1. Only one (the longest) matching location is returned for every primer pair.

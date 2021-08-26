@@ -231,13 +231,13 @@ var watchCmd = &cobra.Command{
 				head = record.Name
 
 				if isFastq {
-					outfh.WriteString("@")
+					outfh.Write(_mark_fastq)
 					outfh.Write(head)
-					outfh.WriteString("\n")
+					outfh.Write(_mark_newline)
 				} else {
-					outfh.WriteString(">")
+					outfh.Write(_mark_fasta)
 					outfh.Write(head)
-					outfh.WriteString("\n")
+					outfh.Write(_mark_newline)
 				}
 
 				sequence = record.Seq
@@ -254,10 +254,10 @@ var watchCmd = &cobra.Command{
 					bufferedByteSliceWrapper.Recycle(b)
 				}
 
-				outfh.WriteString("\n")
+				outfh.Write(_mark_newline)
 
 				if printQual {
-					outfh.WriteString("+\n")
+					outfh.Write(_mark_plus_newline)
 
 					if len(sequence.Qual) <= pageSize {
 						outfh.Write(byteutil.WrapByteSlice(sequence.Qual, config.LineWidth))
@@ -271,7 +271,7 @@ var watchCmd = &cobra.Command{
 						bufferedByteSliceWrapper.Recycle(b)
 					}
 
-					outfh.WriteString("\n")
+					outfh.Write(_mark_newline)
 				}
 
 			} // record

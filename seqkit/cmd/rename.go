@@ -51,16 +51,8 @@ Example:
     actg
     >id description
     ACTG
-    
-    # Default: use new ID and append original header
-    $ seqkit rename seqs.fasta 
-    >id comment
-    actg
-    >id_2 id description
-    ACTG
-    
-    # You may need this: only renaming ID
-    $ seqkit rename seqs.fasta -i
+
+    $ seqkit rename seqs.fasta
     >id comment
     actg
     >id_2 description
@@ -80,7 +72,8 @@ Example:
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		byName := getFlagBool(cmd, "by-name")
-		inPlace := getFlagBool(cmd, "inplace")
+		// inPlace := getFlagBool(cmd, "inplace")
+		inPlace := true
 		mOutputs := getFlagBool(cmd, "multiple-outfiles")
 		outdir := getFlagString(cmd, "out-dir")
 		force := getFlagBool(cmd, "force")
@@ -188,5 +181,5 @@ func init() {
 	renameCmd.Flags().BoolP("multiple-outfiles", "m", false, "write results into separated files for multiple input files")
 	renameCmd.Flags().StringP("out-dir", "O", "renamed", "output directory")
 	renameCmd.Flags().BoolP("force", "f", false, "overwrite output directory")
-	renameCmd.Flags().BoolP("inplace", "i", false, "rename ID in-place")
+	// renameCmd.Flags().BoolP("inplace", "i", false, "rename ID in-place")
 }

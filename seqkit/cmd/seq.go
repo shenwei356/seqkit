@@ -42,12 +42,8 @@ import (
 // seqCmd represents the seq command
 var seqCmd = &cobra.Command{
 	Use:   "seq",
-	Short: "transform sequences (revserse, complement, extract ID...)",
-	Long: `transform sequences (revserse, complement, extract ID...)
-
-Attentions:
-
-  1. This command outputs plain text even when out file ends with ".gz".
+	Short: "transform sequences (extract ID, filter by length, remove gaps...)",
+	Long: `transform sequences (extract ID, filter by length, remove gaps...)
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -347,12 +343,12 @@ Attentions:
 						bufferedByteSliceWrapper.Recycle(b)
 					}
 
-					outbw.Write([]byte("\n"))
+					outbw.Write(_mark_newline)
 				}
 
 				if printQual {
 					if !onlyQual {
-						outbw.Write([]byte("+\n"))
+						outbw.Write(_mark_plus_newline)
 					}
 
 					if len(sequence.Qual) <= pageSize {
@@ -373,7 +369,7 @@ Attentions:
 						bufferedByteSliceWrapper.Recycle(b)
 					}
 
-					outbw.Write([]byte("\n"))
+					outbw.Write(_mark_newline)
 				}
 			}
 
@@ -412,4 +408,5 @@ func init() {
 
 var _mark_fasta = []byte{'>'}
 var _mark_fastq = []byte{'@'}
+var _mark_plus_newline = []byte{'+', '\n'}
 var _mark_newline = []byte{'\n'}

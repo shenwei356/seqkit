@@ -34,8 +34,8 @@ import (
 // slidingCmd represents the sliding command
 var slidingCmd = &cobra.Command{
 	Use:   "sliding",
-	Short: "sliding sequences, circular genome supported",
-	Long: `sliding sequences, circular genome supported
+	Short: "extract subsequences in sliding windows",
+	Long: `extract subsequences in sliding windows
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {

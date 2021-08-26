@@ -51,8 +51,8 @@ const BIG_SLEEP = 100 * time.Millisecond
 // sanaCmd represents the sana command
 var sanaCmd = &cobra.Command{
 	Use:   "sana",
-	Short: "sanitize broken single line fastq files",
-	Long:  "sanitize broken single line fastq files",
+	Short: "sanitize broken single line FASTQ files",
+	Long:  "sanitize broken single line FASTQ files",
 
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)

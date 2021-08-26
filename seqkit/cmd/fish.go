@@ -271,13 +271,13 @@ Attention:
 				sequence = record.Seq
 
 				if isFastq {
-					outfh.WriteString("@")
+					outfh.Write(_mark_fastq)
 					outfh.Write(head)
-					outfh.WriteString("\n")
+					outfh.Write(_mark_newline)
 				} else {
-					outfh.WriteString(">")
+					outfh.Write(_mark_fasta)
 					outfh.Write(head)
-					outfh.WriteString("\n")
+					outfh.Write(_mark_newline)
 				}
 
 				if len(sequence.Seq) <= pageSize {
@@ -292,10 +292,10 @@ Attention:
 					bufferedByteSliceWrapper.Recycle(b)
 				}
 
-				outfh.WriteString("\n")
+				outfh.Write(_mark_newline)
 
 				if printQual {
-					outfh.WriteString("+\n")
+					outfh.Write(_mark_plus_newline)
 
 					if len(sequence.Qual) <= pageSize {
 						outfh.Write(byteutil.WrapByteSlice(sequence.Qual, config.LineWidth))
@@ -309,7 +309,7 @@ Attention:
 						bufferedByteSliceWrapper.Recycle(b)
 					}
 
-					outfh.WriteString("\n")
+					outfh.Write(_mark_newline)
 				}
 
 			} // record

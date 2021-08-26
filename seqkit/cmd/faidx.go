@@ -45,8 +45,8 @@ var faidxCmd = &cobra.Command{
 
 This command is similar with "samtools faidx" but has some extra features:
 
-  1. output full header line with flag -f
-  2. support regular expression as sequence ID with flag -r
+  1. output full header line with the flag -f
+  2. support regular expression as sequence ID with the flag -r
   3. if you have large number of IDs, you can use:
         seqkit faidx seqs.fasta -l IDs.txt
 

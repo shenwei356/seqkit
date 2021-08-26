@@ -38,9 +38,15 @@ import (
 // rmdupCmd represents the rmdup command
 var rmdupCmd = &cobra.Command{
 	Use:   "rmdup",
-	Short: "remove duplicated sequences by id/name/sequence",
-	Long: `remove duplicated sequences by id/name/sequence
+	Short: "remove duplicated sequences by ID/name/sequence",
+	Long: `remove duplicated sequences by ID/name/sequence
 
+Attentions:
+
+  1. When comparing by sequences, both positive and negative strands are
+     compared. Switch on -P/--only-positive-strand for considering the
+     positive strand only.
+     
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -58,14 +64,16 @@ var rmdupCmd = &cobra.Command{
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		dupFile := getFlagString(cmd, "dup-seqs-file")
 		numFile := getFlagString(cmd, "dup-num-file")
-		revcom := getFlagBool(cmd, "consider-revcom")
+
+		// revcom := getFlagBool(cmd, "consider-revcom")
+		revcom := !getFlagBool(cmd, "only-positive-strand")
 
 		if bySeq && byName {
 			checkError(fmt.Errorf("only one/none of the flags -s (--by-seq) and -n (--by-name) is allowed"))
 		}
 
-		if revcom && !bySeq {
-			checkError(fmt.Errorf("flag -s (--by-seq) needed when using -r (--consider-revcom"))
+		if !revcom && !bySeq {
+			checkError(fmt.Errorf("flag -s (--by-seq) needed when using -P (--only-positive-strand)"))
 		}
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
@@ -140,9 +148,9 @@ var rmdupCmd = &cobra.Command{
 
 				if bySeq && revcom {
 					if ignoreCase {
-						subject = xxhash.Sum64(bytes.ToLower(record.Seq.RevComInplace().Seq))
+						subject = xxhash.Sum64(bytes.ToLower(record.Seq.RevCom().Seq))
 					} else {
-						subject = xxhash.Sum64(record.Seq.RevComInplace().Seq)
+						subject = xxhash.Sum64(record.Seq.RevCom().Seq)
 					}
 
 					if _, ok := counter[subject]; ok { // duplicated
@@ -199,7 +207,8 @@ func init() {
 	rmdupCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	rmdupCmd.Flags().StringP("dup-seqs-file", "d", "", "file to save duplicated seqs")
 	rmdupCmd.Flags().StringP("dup-num-file", "D", "", "file to save number and list of duplicated seqs")
-	rmdupCmd.Flags().BoolP("consider-revcom", "r", false, "considering the reverse compelment sequence")
+	// rmdupCmd.Flags().BoolP("consider-revcom", "r", false, "considering the reverse compelment sequence")
+	rmdupCmd.Flags().BoolP("only-positive-strand", "P", false, "only considering positive strand when comparing by sequence")
 }
 
 type listOfStringSlice struct {

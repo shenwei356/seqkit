@@ -55,7 +55,7 @@ type ReadCounts []*RefCounts
 // NewReadCounts initializes a new read count slice.
 func NewReadCounts(refs []*sam.Reference) ReadCounts {
 	res := make(ReadCounts, len(refs))
-	for i, _ := range res {
+	for i := range res {
 		res[i] = &RefCounts{Ref: refs[i]}
 	}
 	return res
@@ -303,7 +303,7 @@ func (r *bamStatRec) StatFields() ([]string, []string) {
 		case "TotalRecords":
 			res[i] = fmt.Sprintf("%d", r.TotalRec)
 		case "File":
-			res[i] = fmt.Sprintf("%s", r.File)
+			res[i] = r.File
 		default:
 			panic(f)
 		}
@@ -324,6 +324,7 @@ func bamIdxStats(file string) *bamStatRec {
 	fh, err := xopen.Ropen(idx)
 	checkError(err)
 	i, err := bam.ReadIndex(fh)
+	checkError(err)
 	res := new(bamStatRec)
 	um, ok := i.Unmapped()
 	if !ok {
@@ -428,7 +429,7 @@ func bamStats(files []string, mapQual int, includeIds map[string]bool, excludeId
 		if fields == nil {
 			fields = fi
 			out = make([][]string, len(fi))
-			for i, _ := range out {
+			for i := range out {
 				out[i] = make([]string, 0)
 			}
 		}
@@ -465,7 +466,7 @@ func idxStats(files []string, pretty bool) {
 			case "TotalRec":
 				data[i] = append(data[i], fmt.Sprintf("%d", s.PrimAln+s.Unmapped))
 			case "File":
-				data[i] = append(data[i], fmt.Sprintf("%s", s.File))
+				data[i] = append(data[i], s.File)
 			}
 		}
 	}

@@ -1,0 +1,265 @@
+command,function,publication
+sample,downsampling,https://journals.asm.org/doi/10.1128/MRA.00544-21
+sample,downsampling,https://www.nature.com/articles/s41598-021-94911-0
+sample,downsampling,https://www.biorxiv.org/content/10.1101/2021.08.11.456029v1.full.pdf
+sample,downsampling,https://www.biorxiv.org/content/10.1101/2021.07.20.452950v1.full.pdf
+sample,downsampling,https://www.jstage.jst.go.jp/article/jsme2/36/2/36_ME21018/_html/-char/en
+sample,downsampling,https://www.mdpi.com/2073-4425/12/6/886/htm
+sample,downsampling,https://www.cell.com/cell-reports/fulltext/S2211-1247(21)00577-5
+sample,downsampling,https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-021-01044-7
+sample,downsampling,https://academic.oup.com/g3journal/article/11/6/jkab083/6188627
+sample,downsampling,https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04089-5
+sample,downsampling,https://academic.oup.com/gbe/article/13/4/evab053/6178793
+sample,downsampling,https://www.nature.com/articles/s41467-021-21472-1
+sample,downsampling,https://www.biorxiv.org/content/10.1101/2021.01.21.427579v3.full.pdf
+sample,downsampling,https://academic.oup.com/ve/article/7/1/veab003/6104627
+sample,downsampling,https://epigeneticsandchromatin.biomedcentral.com/articles/10.1186/s13072-020-00375-3
+sample,downsampling,https://sci-hub.ee/epdf/10.15252/embj.2020104708
+sample,downsampling,https://www.biorxiv.org/content/10.1101/2020.09.02.269407v1.full.pdf
+sample,downsampling,https://www.biorxiv.org/content/10.1101/2020.07.21.213975v1.full.pdf
+concat,concatenating sequences,https://www.nature.com/articles/s41598-020-79842-6
+concat,concatenating sequences,https://www.tandfonline.com/doi/full/10.1080/23802359.2020.1859341
+concat,concatenating sequences,https://academic.oup.com/mbe/article/38/7/2750/6157842
+concat,concatenating sequences,https://journals.asm.org/doi/10.1128/mBio.03381-20
+concat,concatenating sequences,https://www.biorxiv.org/content/10.1101/2021.06.05.447185v1.full.pdf
+concat,concatenating sequences,https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0251368
+concat,concatenating sequences,https://bmcecolevol.biomedcentral.com/articles/10.1186/s12862-021-01806-9
+concat,concatenating sequences,https://www.medrxiv.org/content/10.1101/2020.11.11.20229765v1.full.pdf
+concat,concatenating sequences,https://www.biorxiv.org/content/10.1101/2020.10.14.339143v1.full.pdf
+concat,concatenating sequences,https://www.mdpi.com/2223-7747/9/10/1354/htm
+concat,concatenating sequences,https://www.biorxiv.org/content/10.1101/2020.10.12.336396v1.full.pdf
+concat,concatenating sequences,https://academic.oup.com/gbe/article/12/2/3818/5709815
+seq,reverse complement,https://www.frontiersin.org/articles/10.3389/fviro.2021.714475/full
+seq,reverse complement,https://www.nature.com/articles/s41598-020-75417-7
+seq,reverse complement,https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02165-2
+seq,reverse complement,https://jasbsci.biomedcentral.com/articles/10.1186/s40104-019-0412-z
+seq,reverse complement,https://www.biorxiv.org/content/10.1101/2021.01.04.425358v1.full.pdf
+seq,filtering by length,https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-020-00966-y
+seq,filtering by length,https://journals.asm.org/doi/10.1128/MRA.00547-21
+seq,filtering by length,https://journals.asm.org/doi/10.1128/mBio.01638-21
+seq,filtering by length,https://academic.oup.com/ve/advance-article/doi/10.1093/ve/veab066/6319603
+seq,filtering by length,https://www.cell.com/cell-host-microbe/fulltext/S1931-3128(21)00302-4
+seq,filtering by length,https://www.biorxiv.org/content/10.1101/2021.07.14.452346v1.full.pdf
+seq,filtering by length,https://www.nature.com/articles/s41598-021-91425-7
+seq,filtering by length,https://sfamjournals.onlinelibrary.wiley.com/doi/10.1111/1751-7915.13845
+seq,filtering by length,https://www.mdpi.com/2076-2607/9/6/1115/htm
+seq,filtering by length,https://www.biorxiv.org/content/10.1101/2021.05.17.444395v2.full.pdf
+seq,filtering by length,https://link.springer.com/article/10.1007%2Fs12250-021-00378-8
+seq,filtering by length,https://www.biorxiv.org/content/10.1101/2021.04.08.438920v1.full.pdf
+seq,filtering by length,https://www.biorxiv.org/content/10.1101/2021.02.27.433172v1.full.pdf
+seq,filtering by length,https://academic.oup.com/nar/article/49/5/2700/6137370
+seq,filtering by length,https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-021-07390-y
+seq,filtering by length,https://bmcmicrobiol.biomedcentral.com/articles/10.1186/s12866-021-02094-5
+seq,filtering by length,https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0245333
+seq,filtering by length,https://journals.asm.org/doi/10.1128/MRA.01295-20
+seq,filtering by length,https://academic.oup.com/ve/article/7/1/veab003/6104627
+seq,filtering by length,https://www.biorxiv.org/content/10.1101/2021.01.11.425816v2.full.pdf
+seq,filtering by length,https://www.mdpi.com/2079-6382/10/1/74/htm
+seq,filtering by length,https://www.biorxiv.org/content/10.1101/2021.01.07.425663v2.full.pdf
+seq,filtering by length,https://www.exeley.com/exeley/journals/journal_of_nematology/53/i_current/pdf/10.21307_jofnem-2021-040.pdf
+seq,filtering by length,https://www.nature.com/articles/s41598-020-78890-2
+seq,filtering by length,https://www.nature.com/articles/s41598-020-78890-2
+seq,filtering by length,https://link.springer.com/article/10.1007%2Fs11262-020-01803-y
+seq,filtering by length,https://www.nature.com/articles/s41396-020-00773-1
+seq,filtering by length,https://www.mdpi.com/2073-4425/11/9/1097/htm
+seq,filtering by length,https://academic.oup.com/g3journal/article/10/9/3087/6060135
+seq,filtering by length,https://academic.oup.com/g3journal/article/10/9/3087/6060135
+seq,filtering by length,https://currentprotocols.onlinelibrary.wiley.com/doi/10.1002/cpbi.104
+seq,filtering by length,https://www.nature.com/articles/s41598-020-69450-9
+seq,filtering by length,https://www.biorxiv.org/content/10.1101/2020.07.24.219899v2.full.pdf
+seq,filtering by length,https://www.sciencedirect.com/science/article/pii/S2001037020303421?via%3Dihub
+seq,filtering by length,https://www.frontiersin.org/articles/10.3389/fpls.2020.00829/full
+seq,filtering by length,https://journals.asm.org/doi/10.1128/JCM.00060-20
+seq,filtering by length,https://www.frontiersin.org/articles/10.3389/fmicb.2020.00126/full
+seq,filtering by length,https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0228483
+seq,filtering by quality,https://www.nature.com/articles/s41598-021-91425-7
+seq,filtering by quality,https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0233373
+replace,renaming,https://www.nature.com/articles/s42003-021-02373-x
+replace,renaming,https://www.mdpi.com/1999-4915/13/6/1152/htm
+replace,renaming,https://www.biorxiv.org/content/10.1101/2021.05.12.443844v2.full.pdf
+replace,renaming,https://onlinelibrary.wiley.com/doi/10.1111/1755-0998.13258
+replace,renaming,https://academic.oup.com/mbe/article/38/3/856/5910553
+replace,renaming,https://academic.oup.com/g3journal/article/10/2/475/6026246
+,benchmark,https://academic.oup.com/bib/article-abstract/22/4/bbaa368/6042388
+,benchmark,https://www.mdpi.com/2306-5354/8/5/59
+sort,reordering,https://www.nature.com/articles/s42003-021-02373-x
+sort,reordering,https://onlinelibrary.wiley.com/doi/10.1111/1755-0998.13258
+sort,reordering,https://academic.oup.com/mbe/article/38/3/856/5910553
+sort,reordering,https://academic.oup.com/g3journal/article/10/9/3087/6060135
+sort,reordering,https://academic.oup.com/g3journal/article/10/2/475/6026246
+,uncertain,https://www.biorxiv.org/content/10.1101/2021.08.13.456260v1.full.pdf
+,uncertain,https://onlinelibrary.wiley.com/doi/10.1002/jmv.27190
+,uncertain,https://journals.asm.org/doi/10.1128/MRA.00141-21
+,uncertain,https://sfamjournals.onlinelibrary.wiley.com/doi/10.1111/1462-2920.15605
+,uncertain,https://academic.oup.com/mbe/article/38/9/3972/6275246
+,uncertain,https://www.medrxiv.org/content/10.1101/2021.03.30.21254591v1.full.pdf
+,uncertain,https://assets.researchsquare.com/files/rs-135952/v1/b90966ab-1217-4263-8c9c-1f667bb7c7b2.pdf
+,uncertain,https://www.mdpi.com/2076-2607/9/1/2/htm
+,uncertain,https://academic.oup.com/g3journal/article/11/1/jkaa018/6007473
+,uncertain,https://www.biorxiv.org/content/10.1101/2020.11.11.377689v1.full.pdf
+,uncertain,https://gigabytejournal.com/articles/7
+,uncertain,https://www.biorxiv.org/content/10.1101/2020.09.25.313239v1.full.pdf
+,uncertain,https://assets.researchsquare.com/files/rs-60068/v1/6d6d70c5-a42f-4114-a081-1e8cec686acc.pdf?c=1602620608
+,uncertain,https://www.biorxiv.org/content/10.1101/2020.08.07.241729v2.full.pdf
+,uncertain,https://elifesciences.org/articles/53392
+,uncertain,https://www.sciencedirect.com/science/article/pii/S200103702030341X?via%3Dihub
+,uncertain,https://www.sciencedirect.com/science/article/pii/S2001037020303421?via%3Dihub
+,uncertain,https://www.cell.com/molecular-plant/fulltext/S1674-2052(20)30187-8
+,uncertain,https://academic.oup.com/gigascience/article/9/6/giaa060/5851733
+,uncertain,https://www.nature.com/articles/s41598-020-64517-z
+,uncertain,https://www.tandfonline.com/doi/full/10.1080/23802359.2020.1749166
+,uncertain,https://www.tandfonline.com/doi/full/10.1080/23802359.2020.1749157
+,uncertain,https://www.tandfonline.com/doi/full/10.1080/23802359.2020.1749167
+,uncertain,https://www.biorxiv.org/content/10.1101/2020.02.27.956110v4.full.pdf
+,uncertain,https://www.nature.com/articles/s41597-020-0363-4
+seq,sequence length,https://www.mdpi.com/2073-4425/12/7/953/htm
+seq,sequence length,https://www.mdpi.com/1422-0067/21/15/5253/htm
+subseq,reads cliping/triming,https://www.nature.com/articles/s41467-021-24575-x
+subseq,reads cliping/triming,https://onlinelibrary.wiley.com/doi/10.1111/1755-0998.13440
+subseq,reads cliping/triming,https://www.biorxiv.org/content/10.1101/2021.05.25.445702v1.full.pdf
+subseq,reads cliping/triming,https://www.aging-us.com/article/202400/text
+restart,rotating circular sequence,https://www.nature.com/articles/s41598-020-67209-w
+subseq,subsequence,https://www.biorxiv.org/content/10.1101/2021.04.21.440786v1.full.pdf
+subseq,subsequence,https://nph.onlinelibrary.wiley.com/doi/10.1111/nph.16926
+subseq,subsequence,https://www.frontiersin.org/articles/10.3389/fgene.2020.570156/full
+subseq,subsequence,https://www.biorxiv.org/content/10.1101/2020.09.17.292417v1.full.pdf
+subseq,subsequence,https://www.nature.com/articles/s41598-020-71530-9
+subseq,subsequence,https://www.frontiersin.org/articles/10.3389/fmicb.2020.01430/full
+subseq,subsequence,https://www.biorxiv.org/content/10.1101/2020.04.10.022103v2.full.pdf
+subseq,subsequence,https://onlinelibrary.wiley.com/doi/10.1111/1755-0998.13147
+stats,statistics,https://academic.oup.com/g3journal/advance-article/doi/10.1093/g3journal/jkab277/6342417
+stats,statistics,https://www.frontiersin.org/articles/10.3389/fmicb.2021.665041/full
+stats,statistics,https://www.biorxiv.org/content/10.1101/2021.06.15.448618v1.full.pdf
+stats,statistics,https://www.sciencedirect.com/science/article/pii/S2352340921003371
+stats,statistics,https://academic.oup.com/g3journal/article/11/6/jkab083/6188627
+stats,statistics,https://academic.oup.com/gbe/article/13/4/evab053/6178793
+stats,statistics,https://www.frontiersin.org/articles/10.3389/fmicb.2021.657471/full
+stats,statistics,https://www.biorxiv.org/content/10.1101/2021.02.17.431734v1.full.pdf
+stats,statistics,https://www.sciencedirect.com/science/article/pii/S0888754321000318
+stats,statistics,https://academic.oup.com/nargab/article/3/1/lqaa107/6066537
+stats,statistics,https://www.nature.com/articles/s41598-020-78890-2
+stats,statistics,https://www.frontiersin.org/articles/10.3389/fmicb.2020.585374/full
+stats,statistics,https://academic.oup.com/cid/advance-article/doi/10.1093/cid/ciaa1153/5890413
+stats,statistics,https://www.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000409
+stats,statistics,https://onlinelibrary.wiley.com/doi/10.1111/jse.12646
+stats,statistics,https://sci-hub.ee/10.1111/1462-2920.15062
+stats,statistics,https://www.biorxiv.org/content/10.1101/2020.03.16.994376v1.full.pdf
+fx2tab,GC content,https://www.biorxiv.org/content/10.1101/2021.06.09.447812v1.full.pdf
+fx2tab,GC content,https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-021-07700-4
+fx2tab,GC content,https://www.biorxiv.org/content/10.1101/2021.03.11.434922v1.full.pdf
+fx2tab,GC content,https://www.biorxiv.org/content/10.1101/2021.03.09.434534v2.full.pdf
+fx2tab,base content,https://www.biorxiv.org/content/10.1101/2021.05.25.445702v1.full.pdf
+fx2tab,base content,https://www.nature.com/articles/s41598-020-78890-2
+fx2tab,base content,https://journals.asm.org/doi/10.1128/JCM.01598-20
+rmdup,remove duplication,https://royalsocietypublishing.org/doi/10.1098/rsos.210518
+rmdup,remove duplication,https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02349-4
+rmdup,remove duplication,https://www.sciencedirect.com/science/article/pii/S1383576921000829
+rmdup,remove duplication,https://www.nature.com/articles/s41556-021-00653-6
+rmdup,remove duplication,https://www.biorxiv.org/content/10.1101/2021.03.12.435204v2.full.pdf
+rmdup,remove duplication,https://www.nature.com/articles/s41598-020-80142-2
+rmdup,remove duplication,https://www.exeley.com/exeley/journals/journal_of_nematology/53/i_current/pdf/10.21307_jofnem-2021-040.pdf
+rmdup,remove duplication,https://www.nature.com/articles/s41598-020-78890-2
+rmdup,remove duplication,https://www.biorxiv.org/content/10.1101/2020.11.24.395459v2.full.pdf
+rmdup,remove duplication,https://www.biorxiv.org/content/10.1101/2020.07.21.214270v1.full.pdf
+rmdup,remove duplication,https://onlinelibrary.wiley.com/doi/10.1111/1755-0998.13150
+rmdup,remove duplication,https://www.nature.com/articles/s41467-019-14103-3
+rmdup,remove duplication,https://www.biorxiv.org/content/10.1101/2020.01.10.902239v4.full.pdf
+duplicate,duplication,https://www.sciencedirect.com/science/article/pii/S1567134820303361
+sliding,sliding,https://www.biorxiv.org/content/10.1101/2021.03.11.434922v1.full.pdf
+sliding,sliding,https://academic.oup.com/mbe/article/38/7/2750/6157842
+sliding,sliding,https://www.biorxiv.org/content/10.1101/2020.09.29.315374v3.full.pdf
+sliding,sliding,https://www.sciencedirect.com/science/article/pii/S2001037020303421?via%3Dihub
+translate,translation,https://www.mdpi.com/2075-4450/12/8/746/htm
+translate,translation,https://www.sciencedirect.com/science/article/pii/S1055790321002086
+translate,translation,https://www.mdpi.com/2073-4425/12/3/377/htm
+translate,translation,https://journals.asm.org/doi/10.1128/mSystems.00770-20
+grep,extracting sequence subset,https://www.sciencedirect.com/science/article/pii/S1055790321002086
+grep,extracting sequence subset,https://www.biorxiv.org/content/10.1101/2021.07.29.454331v1.full.pdf
+grep,extracting sequence subset,https://www.biorxiv.org/content/10.1101/2021.07.01.450727v1.full.pdf
+grep,extracting sequence subset,https://elifesciences.org/articles/67290
+grep,extracting sequence subset,https://www.nature.com/articles/s41598-021-91425-7
+grep,extracting sequence subset,https://www.biorxiv.org/content/10.1101/2021.05.23.445375v1.full.pdf
+grep,extracting sequence subset,https://www.sciencedirect.com/science/article/pii/S2352340921003371
+grep,extracting sequence subset,https://www.frontiersin.org/articles/10.3389/ffunb.2021.656751/full
+grep,extracting sequence subset,https://www.sciencedirect.com/science/article/pii/S0168170221000770
+grep,extracting sequence subset,https://www.nature.com/articles/s41438-021-00501-6
+grep,extracting sequence subset,https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0245858
+grep,extracting sequence subset,https://www.sciencedirect.com/science/article/pii/S1878614620301938
+grep,extracting sequence subset,https://www.biorxiv.org/content/10.1101/2020.12.16.423115v2.full.pdf
+grep,extracting sequence subset,https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0240975
+grep,extracting sequence subset,https://royalsocietypublishing.org/doi/10.1098/rstb.2019.0584
+grep,extracting sequence subset,https://onlinelibrary.wiley.com/doi/10.1111/tbed.13834
+grep,extracting sequence subset,https://www.biorxiv.org/content/10.1101/2020.09.29.315374v3.full.pdf
+grep,extracting sequence subset,https://link.springer.com/content/pdf/10.1007/s11427-020-1807-0.pdf
+grep,extracting sequence subset,https://currentprotocols.onlinelibrary.wiley.com/doi/10.1002/cpbi.104
+grep,extracting sequence subset,https://www.frontiersin.org/articles/10.3389/fmicb.2020.01848/full
+grep,extracting sequence subset,https://journals.asm.org/doi/10.1128/JCM.00060-20
+grep,extracting sequence subset,https://journals.asm.org/doi/10.1128/mSphere.00056-20
+grep,extracting sequence subset,https://www.biorxiv.org/content/10.1101/2020.04.07.029462v1.full.pdf
+grep,extracting sequence subset,https://www.biorxiv.org/content/10.1101/2020.03.16.994376v1.full.pdf
+grep,extracting sequence subset,https://onlinelibrary.wiley.com/doi/10.1111/gtc.12760
+grep,extracting sequence subset,https://www.biorxiv.org/content/10.1101/2020.01.07.897553v3.full.pdf
+grep,demultiplexing,https://www.biorxiv.org/content/10.1101/2021.04.20.440609v2.full.pdf
+grep,demultiplexing,https://www.frontiersin.org/articles/10.3389/fmicb.2021.645893/full
+grep,demultiplexing,https://www.mdpi.com/2073-4425/11/10/1121/htm
+seq,merge files,https://www.nature.com/articles/s41467-021-24036-5
+seq,merge files,https://www.biorxiv.org/content/10.1101/2021.01.25.428044v1.full.pdf
+grep,searching motifs/sequences,https://www.cell.com/cell-host-microbe/fulltext/S1931-3128(21)00302-4
+grep,searching motifs/sequences,https://academic.oup.com/bib/advance-article/doi/10.1093/bib/bbab170/6278148
+grep,searching motifs/sequences,https://www.biorxiv.org/content/10.1101/2021.06.07.447263v1.full.pdf
+grep,searching motifs/sequences,https://academic.oup.com/g3journal/article/11/8/jkab126/6248093
+grep,searching motifs/sequences,https://peerj.com/articles/10571/
+grep,searching motifs/sequences,https://www.tandfonline.com/doi/full/10.1080/19490976.2020.1865706
+grep,searching motifs/sequences,https://www.nature.com/articles/s41598-020-75417-7
+grep,searching motifs/sequences,https://journals.asm.org/doi/10.1128/JCM.01598-20
+grep,searching motifs/sequences,https://www.nature.com/articles/s41598-020-70812-6
+amplicon,in silico PCR,https://www.frontiersin.org/articles/10.3389/fmicb.2021.649010/full
+locate,locating motifs/sequences,https://www.biorxiv.org/content/10.1101/2021.05.08.442635v1.full.pdf
+locate,locating motifs/sequences,https://www.cell.com/cell-reports/fulltext/S2211-1247(21)00577-5
+locate,locating motifs/sequences,https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02369-0
+locate,locating motifs/sequences,https://www.biorxiv.org/content/10.1101/2021.04.20.440587v1.full.pdf
+locate,locating motifs/sequences,https://link.springer.com/article/10.1007%2Fs00253-021-11250-w
+locate,locating motifs/sequences,https://microbiomejournal.biomedcentral.com/articles/10.1186/s40168-020-00994-8
+locate,locating motifs/sequences,https://apsjournals.apsnet.org/doi/10.1094/MPMI-06-20-0145-R
+locate,locating motifs/sequences,https://academic.oup.com/g3journal/article/11/3/jkaa015/6007476
+locate,locating motifs/sequences,https://genome.cshlp.org/content/30/12/1705.full
+locate,locating motifs/sequences,https://www.mdpi.com/1999-4915/12/10/1068/htm
+locate,locating motifs/sequences,https://apsjournals.apsnet.org/doi/pdf/10.1094/MPMI-34-2
+locate,locating motifs/sequences,https://www.biorxiv.org/content/10.1101/2020.08.25.266239v1.full.pdf
+locate,locating motifs/sequences,https://link.springer.com/book/10.1007/978-1-0716-0787-9
+locate,locating motifs/sequences,https://www.frontiersin.org/articles/10.3389/fevo.2020.00105/full
+locate,locating motifs/sequences,https://www.biorxiv.org/content/10.1101/2020.04.17.038315v2.full.pdf
+locate,locating motifs/sequences,https://gsejournal.biomedcentral.com/articles/10.1186/s12711-021-00632-3
+locate,locating motifs/sequences,https://www.hindawi.com/journals/jpath/2020/5187578/
+locate,locating motifs/sequences,https://www.biorxiv.org/content/10.1101/2020.03.16.994376v1.full.pdf
+locate,locating motifs/sequences,https://www.mdpi.com/2073-4425/11/1/77/htm
+split,splitting sequence,https://www.biorxiv.org/content/10.1101/2021.08.03.454735v1.full.pdf
+split,splitting sequence,https://www.cell.com/cell-host-microbe/fulltext/S1931-3128(21)00302-4
+split,splitting sequence,https://www.frontiersin.org/articles/10.3389/fmicb.2021.665041/full
+split,splitting sequence,https://www.nature.com/articles/s41598-020-78890-2
+fq2fa,converting FASTQ to FASTA,https://journals.asm.org/doi/10.1128/Spectrum.00259-21
+fq2fa,converting FASTQ to FASTA,https://journals.plos.org/plospathogens/article?id=10.1371/journal.ppat.1009638
+fq2fa,converting FASTQ to FASTA,https://www.biorxiv.org/content/10.1101/2021.04.01.438119v1.full.pdf
+fq2fa,converting FASTQ to FASTA,https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0245333
+fq2fa,converting FASTQ to FASTA,https://www.aging-us.com/article/202400/text
+fq2fa,converting FASTQ to FASTA,https://www.frontiersin.org/articles/10.3389/fmicb.2020.590325/full
+fq2fa,converting FASTQ to FASTA,https://www.sciencedirect.com/science/article/pii/S0006291X20314248?via%3Dihub
+fq2fa,converting FASTQ to FASTA,https://peerj.com/articles/8971/
+fq2fa,converting FASTQ to FASTA,https://www.medrxiv.org/content/10.1101/2020.03.23.20041400v2.full.pdf
+seq,converting  RNA to DNA,https://elifesciences.org/articles/49658
+,no-access,https://onlinelibrary.wiley.com/doi/full/10.1111/jeb.13914
+,no-access,https://www.pnas.org/content/118/32/e2105124118
+,no-access,https://link.springer.com/protocol/10.1007%2F978-1-0716-1681-9_4
+,no-access,https://journals.asm.org/doi/10.1128/JB.00025-21
+,no-access,https://febs.onlinelibrary.wiley.com/doi/full/10.1111/febs.16134
+,no-access,https://journals.asm.org/doi/10.1128/AAC.02349-20
+,no-access,https://link.springer.com/protocol/10.1007%2F978-1-0716-1460-0_19
+,no-access,https://www.journalofinfection.com/article/S0163-4453(21)00308-X/fulltext
+,no-access,https://onlinelibrary.wiley.com/doi/full/10.1111/1755-0998.13447
+,no-access,https://rupress.org/jem/article-abstract/218/8/e20201708/212182/
+,no-access,https://link.springer.com/article/10.1007%2Fs12539-021-00439-2
+,no-access,https://onlinelibrary.wiley.com/doi/full/10.1111/1755-0998.13407
+,no-access,https://academic.oup.com/icb/advance-article-abstract/doi/10.1093/icb/icab039/6255754?
+,no-access,https://www.tandfonline.com/doi/abs/10.1080/23744235.2021.1892178?journalCode=infd20
+,no-access,https://link.springer.com/article/10.1007%2Fs00705-021-05010-4
+,no-access,https://www.tandfonline.com/doi/abs/10.1080/15476286.2021.1872961

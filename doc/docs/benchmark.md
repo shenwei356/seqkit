@@ -1,5 +1,6 @@
 # Benchmark
 
+Note: these benchmarks was performaned in 2016.
 
 ## Softwares
 
@@ -27,32 +28,32 @@ to compute running time and peak memory usage of a process.
 
 ## Features
 
-Categories          |Features               |seqkit  |fasta_utilities|fastx_toolkit|pyfaidx|seqmagick|seqtk
-:-------------------|:----------------------|:------:|:-------------:|:-----------:|:-----:|:-------:|:---:
-**Formats support** |Multi-line FASTA       |Yes     |Yes            |--           |Yes    |Yes      |Yes
-                    |FASTQ                  |Yes     |Yes            |Yes          |--     |Yes      |Yes
-                    |Multi-line  FASTQ      |Yes     |Yes            |--           |--     |Yes      |Yes
-                    |Validating sequences   |Yes     |--             |Yes          |Yes    |--       |--
-                    |Supporting RNA         |Yes     |Yes            |--           |--     |Yes      |Yes
-**Functions**       |Searching by motifs    |Yes     |Yes            |--           |--     |Yes      |--
-                    |Sampling               |Yes     |--             |--           |--     |Yes      |Yes
-                    |Extracting sub-sequence|Yes     |Yes            |--           |Yes    |Yes      |Yes
-                    |Removing duplicates    |Yes     |--             |--           |--     |Partly   |--
-                    |Splitting              |Yes     |Yes            |--           |Partly |--       |--
-                    |Splitting by seq       |Yes     |--             |Yes          |Yes    |--       |--
-                    |Shuffling              |Yes     |--             |--           |--     |--       |--
-                    |Sorting                |Yes     |Yes            |--           |--     |Yes      |--
-                    |Locating motifs        |Yes     |--             |--           |--     |--       |--
-                    |Common sequences       |Yes     |--             |--           |--     |--       |--
-                    |Cleaning bases         |Yes     |Yes            |Yes          |Yes    |--       |--
-                    |Transcription          |Yes     |Yes            |Yes          |Yes    |Yes      |Yes
-                    |Translation            |--      |Yes            |Yes          |Yes    |Yes      |--
-                    |Filtering by size      |Indirect|Yes            |--           |Yes    |Yes      |--
-                    |Renaming header        |Yes     |Yes            |--           |--     |Yes      |Yes
-**Other features**  |Cross-platform         |Yes     |Partly         |Partly       |Yes    |Yes      |Yes
-                    |Reading STDIN          |Yes     |Yes            |Yes          |--     |Yes      |Yes
-                    |Reading gzipped file   |Yes     |Yes            |--           |--     |Yes      |Yes
-                    |Writing gzip file      |Yes     |--             |--           |--     |Yes      |--
+|Categories          |Features               |seqkit  |fasta_utilities|fastx_toolkit|pyfaidx|seqmagick|seqtk|
+|:-------------------|:----------------------|:-------|:--------------|:------------|:------|:--------|:----|
+|**Formats supports**|Multi-line FASTA       |Yes     |Yes            |--           |Yes    |Yes      |Yes  |
+|                    |FASTQ                  |Yes     |Yes            |Yes          |--     |Yes      |Yes  |
+|                    |Multi-line  FASTQ      |Yes     |Yes            |--           |--     |Yes      |Yes  |
+|                    |Validating sequences   |Yes     |--             |Yes          |Yes    |--       |--   |
+|                    |Supporting RNA         |Yes     |Yes            |--           |--     |Yes      |Yes  |
+|**Functions**       |Searching by motifs    |Yes     |Yes            |--           |--     |Yes      |--   |
+|                    |Sampling               |Yes     |--             |--           |--     |Yes      |Yes  |
+|                    |Extracting sub-sequence|Yes     |Yes            |--           |Yes    |Yes      |Yes  |
+|                    |Removing duplicates    |Yes     |--             |--           |--     |Partly   |--   |
+|                    |Splitting              |Yes     |Yes            |--           |Partly |--       |--   |
+|                    |Splitting by seq       |Yes     |--             |Yes          |Yes    |--       |--   |
+|                    |Shuffling              |Yes     |--             |--           |--     |--       |--   |
+|                    |Sorting                |Yes     |Yes            |--           |--     |Yes      |--   |
+|                    |Locating motifs        |Yes     |--             |--           |--     |--       |--   |
+|                    |Common sequences       |Yes     |--             |--           |--     |--       |--   |
+|                    |Cleaning bases         |Yes     |Yes            |Yes          |Yes    |--       |--   |
+|                    |Transcription          |Yes     |Yes            |Yes          |Yes    |Yes      |Yes  |
+|                    |Translation            |--      |Yes            |Yes          |Yes    |Yes      |--   |
+|                    |Filtering by size      |Indirect|Yes            |--           |Yes    |Yes      |--   |
+|                    |Renaming header        |Yes     |Yes            |--           |--     |Yes      |Yes  |
+|**Other features**  |Cross-platform         |Yes     |Partly         |Partly       |Yes    |Yes      |Yes  |
+|                    |Reading STDIN          |Yes     |Yes            |Yes          |--     |Yes      |Yes  |
+|                    |Reading gzipped file   |Yes     |Yes            |--           |--     |Yes      |Yes  |
+|                    |Writing gzip file      |Yes     |--             |--           |--     |Yes      |--   |
 
 **Note 2**: See [usage](http://bioinf.shenwei.me/seqkit/usage/) for detailed options of seqkit.
 
@@ -178,23 +179,24 @@ seqkit version: v0.3.1.1
 
 FASTA:
 
-![benchmark-5tests.tsv.png](benchmark/benchmark.5tests.tsv.png)
+
+<img src="benchmark.5tests.tsv.png" alt="" width="750" align="center" />
 
 FASTQ:
 
-![benchmark-5tests.tsv.png](benchmark/benchmark.5tests.tsv.C.png)
+<img src="benchmark.5tests.tsv.C.png" alt="" width="750" align="center" />
 
 ### Test of multiple threads:
 
 From the results, 2 threads/CPU is enough, so the default threads of seqkit is 2.
 
-![benchmark-5tests.tsv.png](benchmark/seqkit_multi_threads/benchmark.5tests.tsv.png)
+<img src="seqkit_multi_threads/benchmark.5tests.tsv.png" alt="" width="750" align="center" />
 
 ### Tests on different file sizes
 
 Files are generated by replicating Human genome chr1 for N times.
 
-![benchmark.seqkit.files_size.tsv.png](benchmark/seqkit_file_size/benchmark.seqkit.files_size.tsv.png)
+<img src="seqkit_file_size/benchmark.seqkit.files_size.tsv.png" alt="" width="550" align="center" />
 
 <div id="disqus_thread"></div>
 <script>

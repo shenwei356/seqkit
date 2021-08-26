@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 #End: install prerequisites
 
 #Begin: install golang
-ENV GOLANG_VERSION 1.11
+ENV GOLANG_VERSION 1.17
 ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
 ENV GOLANG_SHA256_CHECKSUM b3fcf280ff86558e0559e185b601c9eade0fd24c900b4c63cd14d1d38613e499
 ENV GOPATH $HOME/go

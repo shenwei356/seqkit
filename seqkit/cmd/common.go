@@ -42,10 +42,13 @@ var commonCmd = &cobra.Command{
 
 Note:
   1. 'seqkit common' is designed to support 2 and MORE files.
-  2. For 2 files, 'seqkit grep' is much faster and consumes lesser memory:
+  2. When comparing by sequences, both positive and negative strands are
+     compared. Switch on -P/--only-positive-strand for considering the
+     positive strand only.
+  3. For 2 files, 'seqkit grep' is much faster and consumes lesser memory:
      seqkit grep -f <(seqkit seq -n -i small.fq.gz) big.fq.gz # by seq ID
      seqkit grep -s -f <(seqkit seq -s small.fq.gz) big.fq.gz # by seq
-  3. Some records in one file may have same sequences/IDs. They will ALL be
+  4. Some records in one file may have same sequences/IDs. They will ALL be
      retrieved if the sequence/ID was shared in multiple files.
      So the records number may be larger than that of the smallest file.
 
@@ -69,6 +72,13 @@ Note:
 			checkError(fmt.Errorf("only one/none of the flags -s (--by-seq) and -n (--by-name) is allowed"))
 		}
 
+		// revcom := getFlagBool(cmd, "consider-revcom")
+		revcom := !getFlagBool(cmd, "only-positive-strand")
+
+		if !revcom && !bySeq {
+			checkError(fmt.Errorf("flag -s (--by-seq) needed when using -P (--only-positive-strand)"))
+		}
+
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		if len(files) < 2 {
@@ -81,6 +91,7 @@ Note:
 
 		// target -> file -> struct{}
 		counter := make(map[uint64]map[string]struct{}, 1000)
+		var _counter map[string]struct{}
 
 		// target -> seqnames in firstFile
 		// note that it's []string, i.e., records may have same sequences
@@ -146,16 +157,31 @@ Note:
 					}
 				}
 
-				if _, ok = counter[subject]; !ok {
-					counter[subject] = make(map[string]struct{})
+				if _counter, ok = counter[subject]; !ok {
+					_counter = make(map[string]struct{})
+					counter[subject] = _counter
 				}
-				counter[subject][file] = struct{}{}
+				_counter[file] = struct{}{}
 
 				if isFirstFile {
 					if _, ok = names[subject]; !ok {
 						names[subject] = make([]string, 0, 1)
 					}
 					names[subject] = append(names[subject], string(record.Name))
+				}
+
+				if bySeq && revcom {
+					if ignoreCase {
+						subject = xxhash.Sum64(bytes.ToLower(record.Seq.RevComInplace().Seq))
+					} else {
+						subject = xxhash.Sum64(record.Seq.RevComInplace().Seq)
+					}
+
+					if _counter, ok = counter[subject]; !ok {
+						_counter = make(map[string]struct{})
+						counter[subject] = _counter
+					}
+					_counter[file] = struct{}{}
 				}
 			}
 			if isFirstFile {
@@ -234,4 +260,7 @@ func init() {
 	commonCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just id")
 	commonCmd.Flags().BoolP("by-seq", "s", false, "match by sequence")
 	commonCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
+	// commonCmd.Flags().BoolP("consider-revcom", "r", false, "considering the reverse compelment sequence")
+	commonCmd.Flags().BoolP("only-positive-strand", "P", false, "only considering positive strand when comparing by sequence")
+
 }
