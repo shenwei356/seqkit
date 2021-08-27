@@ -75,6 +75,11 @@ var seqCmd = &cobra.Command{
 		minQual := getFlagFloat64(cmd, "min-qual")
 		maxQual := getFlagFloat64(cmd, "max-qual")
 
+		filterMinLen := minLen > 0
+		filterMaxLen := maxLen > 0
+		filterMinQual := minQual > 0
+		filterMaxQual := maxQual > 0
+
 		if gapLetters == "" {
 			checkError(fmt.Errorf("value of flag -G (--gap-letters) should not be empty"))
 		}
@@ -220,20 +225,20 @@ var seqCmd = &cobra.Command{
 					record.Seq.RemoveGapsInplace(gapLetters)
 				}
 
-				if minLen >= 0 && len(record.Seq.Seq) < minLen {
+				if filterMinLen && len(record.Seq.Seq) < minLen {
 					continue
 				}
 
-				if maxLen >= 0 && len(record.Seq.Seq) > maxLen {
+				if filterMaxLen && len(record.Seq.Seq) > maxLen {
 					continue
 				}
 
-				if minQual > 0 || maxQual > 0 {
+				if filterMinQual || filterMaxQual {
 					avgQual := record.Seq.AvgQual(qBase)
-					if minQual > 0 && avgQual < minQual {
+					if filterMinQual && avgQual < minQual {
 						continue
 					}
-					if maxQual > 0 && avgQual >= maxQual {
+					if filterMaxQual && avgQual >= maxQual {
 						continue
 					}
 				}
