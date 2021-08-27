@@ -18,6 +18,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/errors v0.9.1
+	github.com/pkg/profile v1.6.0
 	github.com/shenwei356/bio v0.2.1
 	github.com/shenwei356/breader v0.2.0
 	github.com/shenwei356/bwt v0.5.1

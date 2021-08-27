@@ -28,7 +28,6 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	"syscall"
 
 	// "runtime/debug"
 
@@ -150,24 +149,33 @@ var seqCmd = &cobra.Command{
 			checkError(err)
 			color = false
 		}
-		defer outfh.Close()
 
 		gzippedOutfile := strings.HasSuffix(strings.ToLower(outFile), ".gz")
+
 		var fh io.Writer
+		var outbw *bufio.Writer
+		var gw *gzip.Writer
+
 		if color {
 			fh = seqCol.WrapWriter(outfh)
+			outbw = bufio.NewWriterSize(fh, pageSize)
 		} else if gzippedOutfile {
-			fh = gzip.NewWriter(outfh)
+			gw = gzip.NewWriter(outfh)
+			outbw = bufio.NewWriterSize(gw, pageSize)
 		} else {
 			fh = outfh
+			outbw = bufio.NewWriterSize(fh, pageSize)
 		}
 
-		outbw := bufio.NewWriterSize(fh, os.Getpagesize()*2)
 		defer func() {
 			outbw.Flush()
 			if gzippedOutfile {
-				fh.(*gzip.Writer).Flush()
+				err = gw.Flush()
+				checkError(err)
+				gw.Close()
 			}
+
+			outfh.Close()
 		}()
 
 		var checkSeqType bool
@@ -379,7 +387,8 @@ var seqCmd = &cobra.Command{
 	},
 }
 
-var pageSize = syscall.Getpagesize()
+// var pageSize = syscall.Getpagesize()
+var pageSize = 65536
 
 func init() {
 	RootCmd.AddCommand(seqCmd)

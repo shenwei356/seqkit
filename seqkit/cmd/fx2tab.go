@@ -161,13 +161,15 @@ Attention:
 				} else {
 					//outfh.WriteString(fmt.Sprintf("%s\t%s\t%s", name,
 					//	record.Seq.Seq, record.Seq.Qual))
-					outfh.WriteString(fmt.Sprintf("%s\t", name))
+
+					// outfh.WriteString(fmt.Sprintf("%s\t", name))
+					outfh.Write(name)
+					outfh.Write(_tab)
 					outfh.Write(record.Seq.Seq)
 					if !noQual {
-						outfh.WriteString("\t")
+						outfh.Write(_tab)
 						outfh.Write(record.Seq.Qual)
 					}
-
 				}
 
 				if printLength {
@@ -224,7 +226,8 @@ Attention:
 
 				}
 
-				outfh.WriteString("\n")
+				// outfh.WriteString("\n")
+				outfh.Write(_mark_newline)
 			}
 		}
 	},
@@ -276,3 +279,5 @@ func avgQual(s *seq.Seq, base int) float64 {
 	}
 	return -10 * math.Log10(sum/float64(len(s.QualValue)))
 }
+
+var _tab = []byte{'\t'}

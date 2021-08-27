@@ -12,7 +12,7 @@
             - fix failing to output gzipped format for file name with extension of `.gz` since v0.12.1.
         - `seqkit tab2fx`:
             - fix bug for very long sequences. [#214](https://github.com/shenwei356/seqkit/issues/214)
-        - `seqkit fish`:-
+        - `seqkit fish`:
             - fix range check. [#213](https://github.com/shenwei356/seqkit/issues/213)
     - New features/enhancements
         - `seqkit grep`: 
@@ -29,8 +29,8 @@
     - Performance improvements
         - `seqkit`:
             - **faster FASTA/Q parsing speed, especially for FASTQ**, see the [benchmark](https://github.com/shenwei356/bio/tree/0e8cc4e503d6fd3520d9abdabe5678b9f244ce5e#fastaq-parsing).
-        - `seqkit seq`:
-            - faster speed by optimizing outputing.
+        - `seqkit seq/fx2tab`:
+            - faster speed by optimizing outputting.
         - `seqkit sample`:
             - slightly faster by asynchronously generating random number.
 - [SeqKit v0.16.1](https://github.com/shenwei356/seqkit/releases/tag/v0.16.1) - 2021-05-20
