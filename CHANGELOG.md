@@ -29,6 +29,7 @@
     - Performance improvements
         - `seqkit`:
             - **faster FASTA/Q reading and writing, especially for FASTQ**, see the [benchmark](https://github.com/shenwei356/bio/tree/0e8cc4e503d6fd3520d9abdabe5678b9f244ce5e#fastaq-parsing).
+            - change default value of `-j/--threads` from 2 to 4, which is faster for writting gzip files.
 - [SeqKit v0.16.1](https://github.com/shenwei356/seqkit/releases/tag/v0.16.1) - 2021-05-20
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.16.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.16.1)
     - `seqkit shuffle --two-pass`: fix bug introduced in [#173](https://github.com/shenwei356/seqkit/issues/173) . [#209](https://github.com/shenwei356/seqkit/issues/209)

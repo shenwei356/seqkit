@@ -28,7 +28,6 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	"syscall"
 
 	// "runtime/debug"
 
@@ -376,8 +375,6 @@ var seqCmd = &cobra.Command{
 
 	},
 }
-
-var pageSize = syscall.Getpagesize()
 
 var bufSize = 65536
 

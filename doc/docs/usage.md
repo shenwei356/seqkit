@@ -99,15 +99,17 @@ are parallelized for large sequences.
 
 Parsing of line-based files, including BED/GFF file and ID list file are also parallelized.
 
+The `pgzip` package reads and write gzip files in parallel.
+
 The Parallelization is implemented by multiple goroutines in golang
  which are similar to but much
 lighter weight than threads. The concurrency number is configurable with global
-flag `-j` or `--threads` (default value: 1 for single-CPU PC, 2 for others).
+flag `-j` or `--threads` (default value: 4).
 
-**Using two threads is fast enough for most commands where FASTA/Q parsing is the
+**Using four threads is fast enough for most commands where FASTA/Q reading and writing is the
 performance bottleneck, and using more threads will not increase the speed**. 
 
-Few commands could benefit from multiple (>2) threads:
+Few commands could benefit from multiple (>4) threads:
 
 - `stats`
 - `scat`
@@ -202,7 +204,7 @@ Flags:
   -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
       --quiet                           be quiet and do not show extra information
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
-  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others. can also set with environment variable SEQKIT_THREADS) (default 2)
+  -j, --threads int                     number of CPUs. can also set with environment variable SEQKIT_THREADS) (default 4)
 
 Use "seqkit [command] --help" for more information about a command.
 ```
