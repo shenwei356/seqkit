@@ -21,6 +21,7 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"math/rand"
@@ -546,6 +547,7 @@ func checkFileFormat(format string) {
 	}
 }
 
+// it's slow, do not use
 func randomFloat64Generator(seed int64) chan float64 {
 	rand.Seed(seed)
 	ch := make(chan float64, 1024)
@@ -555,4 +557,42 @@ func randomFloat64Generator(seed int64) chan float64 {
 		}
 	}()
 	return ch
+}
+
+func wrapByteSlice(s []byte, width int, buffer *bytes.Buffer) ([]byte, *bytes.Buffer) {
+	if width < 1 {
+		return s, buffer
+	}
+	l := len(s)
+	if l == 0 {
+		return s, buffer
+	}
+
+	var lines int
+	if l%width == 0 {
+		lines = l/width - 1
+	} else {
+		lines = int(l / width)
+	}
+
+	if buffer == nil {
+		buffer = bytes.NewBuffer(make([]byte, 0, l+lines))
+	} else {
+		buffer.Reset()
+	}
+
+	var start, end int
+	for i := 0; i <= lines; i++ {
+		start = i * width
+		end = (i + 1) * width
+		if end > l {
+			end = l
+		}
+
+		buffer.Write(s[start:end])
+		if i < lines {
+			buffer.Write(_mark_newline)
+		}
+	}
+	return buffer.Bytes(), buffer
 }

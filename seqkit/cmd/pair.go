@@ -28,7 +28,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/cespare/xxhash"
+	"github.com/cespare/xxhash/v2"
 	"github.com/pkg/errors"
 
 	"github.com/shenwei356/bio/seq"

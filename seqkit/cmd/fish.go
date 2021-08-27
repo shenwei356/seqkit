@@ -34,7 +34,6 @@ import (
 	"github.com/biogo/hts/sam"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
-	"github.com/shenwei356/util/byteutil"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -187,7 +186,7 @@ Attention:
 		var printQual bool
 		var head []byte
 		var text []byte
-		var b *bytes.Buffer
+		var buffer *bytes.Buffer
 		var record *fastx.Record
 		var sequence *seq.Seq
 		var fastxReader *fastx.Reader
@@ -280,34 +279,16 @@ Attention:
 					outfh.Write(_mark_newline)
 				}
 
-				if len(sequence.Seq) <= pageSize {
-					outfh.Write(byteutil.WrapByteSlice(sequence.Seq, config.LineWidth))
-				} else {
-					if bufferedByteSliceWrapper == nil {
-						bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Seq), config.LineWidth)
-					}
-					text, b = bufferedByteSliceWrapper.Wrap(sequence.Seq, config.LineWidth)
-					outfh.Write(text)
-					outfh.Flush()
-					bufferedByteSliceWrapper.Recycle(b)
-				}
+				text, buffer = wrapByteSlice(sequence.Seq, config.LineWidth, buffer)
+				outfh.Write(text)
 
 				outfh.Write(_mark_newline)
 
 				if printQual {
 					outfh.Write(_mark_plus_newline)
 
-					if len(sequence.Qual) <= pageSize {
-						outfh.Write(byteutil.WrapByteSlice(sequence.Qual, config.LineWidth))
-					} else {
-						if bufferedByteSliceWrapper == nil {
-							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Qual), config.LineWidth)
-						}
-						text, b = bufferedByteSliceWrapper.Wrap(sequence.Qual, config.LineWidth)
-						outfh.Write(text)
-						outfh.Flush()
-						bufferedByteSliceWrapper.Recycle(b)
-					}
+					text, buffer = wrapByteSlice(sequence.Qual, config.LineWidth, buffer)
+					outfh.Write(text)
 
 					outfh.Write(_mark_newline)
 				}

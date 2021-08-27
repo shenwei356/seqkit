@@ -28,11 +28,7 @@
             - new flag `-b/--by-bases` for sorting by non-gap bases, for multiple sequence alignment files.[#216](https://github.com/shenwei356/seqkit/issues/216)
     - Performance improvements
         - `seqkit`:
-            - **faster FASTA/Q parsing speed, especially for FASTQ**, see the [benchmark](https://github.com/shenwei356/bio/tree/0e8cc4e503d6fd3520d9abdabe5678b9f244ce5e#fastaq-parsing).
-        - `seqkit seq/fx2tab`:
-            - faster speed by optimizing outputting.
-        - `seqkit sample`:
-            - slightly faster by asynchronously generating random number.
+            - **faster FASTA/Q reading and writing, especially for FASTQ**, see the [benchmark](https://github.com/shenwei356/bio/tree/0e8cc4e503d6fd3520d9abdabe5678b9f244ce5e#fastaq-parsing).
 - [SeqKit v0.16.1](https://github.com/shenwei356/seqkit/releases/tag/v0.16.1) - 2021-05-20
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.16.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.16.1)
     - `seqkit shuffle --two-pass`: fix bug introduced in [#173](https://github.com/shenwei356/seqkit/issues/173) . [#209](https://github.com/shenwei356/seqkit/issues/209)

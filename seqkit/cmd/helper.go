@@ -36,7 +36,6 @@ import (
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/breader"
-	"github.com/shenwei356/util/byteutil"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -437,14 +436,6 @@ func writeSeqs(records []*fastx.Record, file string, lineWidth int, quiet bool, 
 func isStdin(file string) bool {
 	return file == "-"
 }
-
-var defaultBytesBufferSize = 1 << 20
-
-var bufferedByteSliceWrapper *byteutil.BufferedByteSliceWrapper
-
-// func init() {
-// 	bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper(1, defaultBytesBufferSize)
-// }
 
 func readKVs(file string, ignoreCase bool) (map[string]string, error) {
 	type KV [2]string

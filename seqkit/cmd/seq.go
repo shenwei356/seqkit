@@ -28,13 +28,13 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"syscall"
 
 	// "runtime/debug"
 
 	gzip "github.com/klauspost/pgzip"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
-	"github.com/shenwei356/util/byteutil"
 	"github.com/spf13/cobra"
 )
 
@@ -158,13 +158,13 @@ var seqCmd = &cobra.Command{
 
 		if color {
 			fh = seqCol.WrapWriter(outfh)
-			outbw = bufio.NewWriterSize(fh, pageSize)
+			outbw = bufio.NewWriterSize(fh, bufSize)
 		} else if gzippedOutfile {
 			gw = gzip.NewWriter(outfh)
-			outbw = bufio.NewWriterSize(gw, pageSize)
+			outbw = bufio.NewWriterSize(gw, bufSize)
 		} else {
 			fh = outfh
-			outbw = bufio.NewWriterSize(fh, pageSize)
+			outbw = bufio.NewWriterSize(fh, bufSize)
 		}
 
 		defer func() {
@@ -184,7 +184,7 @@ var seqCmd = &cobra.Command{
 		var head []byte
 		var sequence *seq.Seq
 		var text []byte
-		var b *bytes.Buffer
+		var buffer *bytes.Buffer
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
 
@@ -329,8 +329,19 @@ var seqCmd = &cobra.Command{
 						sequence.Seq = bytes.ToUpper(sequence.Seq)
 					}
 
-					if len(sequence.Seq) <= pageSize {
-						text := byteutil.WrapByteSlice(sequence.Seq, config.LineWidth)
+					if isFastq {
+						if color {
+							if sequence.Qual != nil {
+								outbw.Write(seqCol.ColorWithQuals(sequence.Seq, sequence.Qual))
+							} else {
+								outbw.Write(seqCol.Color(sequence.Seq))
+							}
+						} else {
+							outbw.Write(sequence.Seq)
+						}
+					} else {
+						text, buffer = wrapByteSlice(sequence.Seq, config.LineWidth, buffer)
+
 						if color {
 							if sequence.Qual != nil {
 								text = seqCol.ColorWithQuals(text, sequence.Qual)
@@ -338,17 +349,8 @@ var seqCmd = &cobra.Command{
 								text = seqCol.Color(text)
 							}
 						}
+
 						outbw.Write(text)
-					} else {
-						if bufferedByteSliceWrapper == nil {
-							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Seq), config.LineWidth)
-						}
-						text, b = bufferedByteSliceWrapper.Wrap(sequence.Seq, config.LineWidth)
-						if color {
-							text = seqCol.Color(text)
-						}
-						outbw.Write(text)
-						bufferedByteSliceWrapper.Recycle(b)
 					}
 
 					outbw.Write(_mark_newline)
@@ -359,22 +361,10 @@ var seqCmd = &cobra.Command{
 						outbw.Write(_mark_plus_newline)
 					}
 
-					if len(sequence.Qual) <= pageSize {
-						if color {
-							outbw.Write(byteutil.WrapByteSlice(seqCol.ColorQuals(sequence.Qual), config.LineWidth))
-						} else {
-							outbw.Write(byteutil.WrapByteSlice(sequence.Qual, config.LineWidth))
-						}
+					if color {
+						outbw.Write(seqCol.ColorQuals(sequence.Qual))
 					} else {
-						if bufferedByteSliceWrapper == nil {
-							bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(sequence.Qual), config.LineWidth)
-						}
-						text, b = bufferedByteSliceWrapper.Wrap(sequence.Qual, config.LineWidth)
-						if color {
-							text = seqCol.ColorQuals(text)
-						}
-						outbw.Write(text)
-						bufferedByteSliceWrapper.Recycle(b)
+						outbw.Write(sequence.Qual)
 					}
 
 					outbw.Write(_mark_newline)
@@ -387,8 +377,9 @@ var seqCmd = &cobra.Command{
 	},
 }
 
-// var pageSize = syscall.Getpagesize()
-var pageSize = 65536
+var pageSize = syscall.Getpagesize()
+
+var bufSize = 65536
 
 func init() {
 	RootCmd.AddCommand(seqCmd)

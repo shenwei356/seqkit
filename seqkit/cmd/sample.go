@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"math/rand"
 	"runtime"
 
 	"github.com/shenwei356/bio/seq"
@@ -85,7 +86,8 @@ Attention:
 		checkError(err)
 		defer outfh.Close()
 
-		randg := randomFloat64Generator(seed)
+		rand.Seed(seed)
+		// randg := randomFloat64Generator(seed)
 
 		n := int64(0)
 		var record *fastx.Record
@@ -130,7 +132,8 @@ Attention:
 						fastx.ForcelyOutputFastq = true
 					}
 
-					if <-randg <= proportion {
+					// if <-randg <= proportion {
+					if rand.Float64() <= proportion {
 						n++
 						record.FormatToWriter(outfh, config.LineWidth)
 						if n == number {
@@ -152,7 +155,8 @@ Attention:
 				proportion = float64(number) / float64(len(records))
 
 				for _, record := range records {
-					if <-randg <= proportion {
+					// if <-randg <= proportion {
+					if rand.Float64() <= proportion {
 						n++
 						record.FormatToWriter(outfh, config.LineWidth)
 						if n == number {
@@ -182,7 +186,8 @@ Attention:
 					fastx.ForcelyOutputFastq = true
 				}
 
-				if <-randg <= proportion {
+				// if <-randg <= proportion {
+				if rand.Float64() <= proportion {
 					n++
 					record.FormatToWriter(outfh, config.LineWidth)
 				}

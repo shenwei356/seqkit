@@ -32,7 +32,6 @@ import (
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/breader"
-	"github.com/shenwei356/util/byteutil"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -65,6 +64,8 @@ Examples:
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		useRegexp := getFlagBool(cmd, "use-regexp")
 		regionFile := getFlagString(cmd, "region-file")
+
+		immediateOutput := getFlagBool(cmd, "immediate-output")
 
 		files := getFileListFromArgsAndFile(cmd, args, false, "infile-list", false)
 
@@ -210,7 +211,7 @@ Examples:
 		var head string
 		var subseq []byte
 		var text []byte
-		var b *bytes.Buffer
+		var buffer *bytes.Buffer
 		var _s *seq.Seq
 		var alphabet *seq.Alphabet
 		for _, faidxQ := range faidxQueries {
@@ -243,16 +244,11 @@ Examples:
 				outfh.WriteString(fmt.Sprintf(">%s:%d-%d\n", head, region[0], region[1]))
 			}
 
-			if len(subseq) <= pageSize {
-				outfh.Write(byteutil.WrapByteSlice(subseq, config.LineWidth))
-			} else {
-				if bufferedByteSliceWrapper == nil {
-					bufferedByteSliceWrapper = byteutil.NewBufferedByteSliceWrapper2(1, len(subseq), config.LineWidth)
-				}
-				text, b = bufferedByteSliceWrapper.Wrap(subseq, config.LineWidth)
-				outfh.Write(text)
+			text, buffer = wrapByteSlice(subseq, config.LineWidth, buffer)
+			outfh.Write(text)
+
+			if immediateOutput {
 				outfh.Flush()
-				bufferedByteSliceWrapper.Recycle(b)
 			}
 
 			outfh.WriteString("\n")
@@ -272,6 +268,8 @@ func init() {
 	faidxCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	faidxCmd.Flags().BoolP("full-head", "f", false, "print full header line instead of just ID. New fasta index file ending with .seqkit.fai will be created")
 	faidxCmd.Flags().StringP("region-file", "l", "", "file containing a list of regions")
+
+	faidxCmd.Flags().BoolP("immediate-output", "I", false, "print output immediately, do not use write buffer")
 
 	faidxCmd.SetUsageTemplate(`Usage:{{if .Runnable}}
   {{if .HasAvailableFlags}}{{appendIfNotPresent .UseLine "[flags]"}}{{else}}{{.UseLine}}{{end}}{{end}}{{if .HasAvailableSubCommands}}

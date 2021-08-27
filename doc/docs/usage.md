@@ -745,6 +745,7 @@ Flags:
   -f, --full-head            print full header line instead of just ID. New fasta index file ending with .seqkit.fai will be created
   -h, --help                 help for faidx
   -i, --ignore-case          ignore case
+  -I, --immediate-output     print output immediately, do not use write buffer
   -l, --region-file string   file containing a list of regions
   -r, --use-regexp           IDs are regular expression. But subseq region is not suppored here.
 
