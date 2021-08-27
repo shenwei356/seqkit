@@ -283,7 +283,7 @@ Examples:
 		// -------------------------------------------------------------------
 		// only for searching with sequences and mismatch > 0, were FMI is very slow
 
-		if bySeq && mismatches > 1 {
+		if bySeq && mismatches > 0 {
 			type Arecord struct {
 				id     uint64
 				ok     bool

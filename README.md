@@ -88,7 +88,7 @@ Notes:
     - `+ only`: only processing on the positive/forward strand.
     - `+ and -`: searching on both strands.
     - `+ or/and -`: depends on users' flags/options/arguments.
-- Multiple-threads: Using the default 2 threads is fast enough for most commands, some commands can benefit from extra threads.
+- Multiple-threads: Using the default 4 threads is fast enough for most commands, some commands can benefit from extra threads.
 - Popularity: Bases on statistics of 227 publications citing seqkit since 2020.
 
 ## Citation

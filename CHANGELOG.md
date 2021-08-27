@@ -14,6 +14,8 @@
             - fix bug for very long sequences. [#214](https://github.com/shenwei356/seqkit/issues/214)
         - `seqkit fish`:
             - fix range check. [#213](https://github.com/shenwei356/seqkit/issues/213)
+        - `seqkit grep`:
+            - it's not exactly a bug: forgot to use multi-threads for `-m` > 0.
     - New features/enhancements
         - `seqkit grep`: 
             - allow empty pattern files.
