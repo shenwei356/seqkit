@@ -36,3 +36,6 @@ seqkit/t.*
 seqkit/bench-fx2tab
 doc/docs/chinese/
 *.brename_detail.txt
+dataset_A.fa*
+dataset_B.fa*
+dataset_C.fq*
