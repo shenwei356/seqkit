@@ -47,9 +47,9 @@ And then:
 
     conda install -c bioconda seqkit
 
-#### Method 3: Install via homebrew (latest stable version)
+#### Method 3: Install via [homebrew](https://brew.sh/) (latest stable version)
 
-    brew install brewsci/bio/seqkit
+    brew install seqkit
 
 #### Method 4: For Go developer (latest stable/dev version)
 
