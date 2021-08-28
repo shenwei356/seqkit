@@ -292,8 +292,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#table-of-contents" class="md-nav__link">
-    Table of Contents
+  <a href="#quick-guide" class="md-nav__link">
+    Quick Guide
   </a>
   
 </li>
@@ -307,8 +307,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#fastaq-format-parsing" class="md-nav__link">
-    FASTA/Q format parsing
+  <a href="#fastaq-format-parsing-and-writing" class="md-nav__link">
+    FASTA/Q format parsing and writing
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#input-and-output-files" class="md-nav__link">
+    Input and output files
   </a>
   
 </li>
@@ -418,6 +425,13 @@
         <li class="md-nav__item">
   <a href="#watch" class="md-nav__link">
     watch
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sana" class="md-nav__link">
+    sana
   </a>
   
 </li>
@@ -607,27 +621,6 @@
         <li class="md-nav__item">
   <a href="#bam" class="md-nav__link">
     bam
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#fish_1" class="md-nav__link">
-    fish
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sana" class="md-nav__link">
-    sana
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#watch_1" class="md-nav__link">
-    watch
   </a>
   
 </li>
@@ -741,8 +734,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#table-of-contents" class="md-nav__link">
-    Table of Contents
+  <a href="#quick-guide" class="md-nav__link">
+    Quick Guide
   </a>
   
 </li>
@@ -756,8 +749,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#fastaq-format-parsing" class="md-nav__link">
-    FASTA/Q format parsing
+  <a href="#fastaq-format-parsing-and-writing" class="md-nav__link">
+    FASTA/Q format parsing and writing
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#input-and-output-files" class="md-nav__link">
+    Input and output files
   </a>
   
 </li>
@@ -867,6 +867,13 @@
         <li class="md-nav__item">
   <a href="#watch" class="md-nav__link">
     watch
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sana" class="md-nav__link">
+    sana
   </a>
   
 </li>
@@ -1061,27 +1068,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#fish_1" class="md-nav__link">
-    fish
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sana" class="md-nav__link">
-    sana
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#watch_1" class="md-nav__link">
-    watch
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#genautocomplete" class="md-nav__link">
     genautocomplete
   </a>
@@ -1106,93 +1092,61 @@
                 
                 
                 <h1 id="usage-and-examples">Usage and Examples</h1>
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-<h2 id="table-of-contents">Table of Contents</h2>
+<h2 id="quick-guide">Quick Guide</h2>
 <ul>
-<li><a href="#technical-details-and-guides-for-use">Technical details and guides for use</a></li>
-<li><a href="#seqkit">seqkit</a></li>
+<li>Basic: <a href="#seq">seq</a>, <a href="#stats">stats</a>, <a href="#subseq">subseq</a>, <a href="#sliding">sliding</a>,
+  <a href="#faidx">faidx</a>, <a href="#watch">watch</a>, <a href="#sana">sana</a>, <a href="#scat">scat</a></li>
+<li>Format conversion: <a href="#fq2fa">fq2fa</a>, <a href="#fx2tab-tab2fx">fx2tab</a>, <a href="#fx2tab-tab2fx">tab2fx</a>,
+  <a href="#convert">convert</a>, <a href="#translate">translate</a></li>
+<li>Searching: <a href="#grep">grep</a>, <a href="#locate">locate</a>, <a href="#amplicon">amplicon</a>, <a href="#fish">fish</a></li>
+<li>Set operation: <a href="#sample">sample</a>, <a href="#rmdup">rmdup</a>, <a href="#common">common</a>,
+  <a href="#duplicate">duplicate</a>, <a href="#split">split</a>, <a href="#split2">split2</a>, <a href="#head">head</a>,
+  <a href="#head-genome">head-genome</a>, <a href="#range">range</a>, <a href="#pair">pair</a></li>
+<li>Edit: <a href="#concat">concat</a>, <a href="#replace">replace</a>, <a href="#restart">restart</a>, <a href="#mutate">mutate</a>,
+  <a href="#rename">rename</a></li>
+<li>Ordering: <a href="#sort">sort</a>, <a href="#shuffle">shuffle</a></li>
+<li>BAM processing: <a href="#bam">bam</a></li>
 </ul>
-<p><strong>Sequence and subsequence</strong></p>
-<ul>
-<li><a href="#seq">seq</a></li>
-<li><a href="#subseq">subseq</a></li>
-<li><a href="#sliding">sliding</a></li>
-<li><a href="#stats">stats</a></li>
-<li><a href="#faidx">faidx</a></li>
-<li><a href="#watch">watch</a></li>
-<li><a href="#sana">sana</a></li>
-<li><a href="#scat">scat</a></li>
-</ul>
-<p><strong>Format conversion</strong></p>
-<ul>
-<li><a href="#fq2fa">fq2fa</a></li>
-<li><a href="#fx2tab--tab2fx">fx2tab &amp; tab2fx</a></li>
-<li><a href="#convert">convert</a></li>
-<li><a href="#translate">translate</a></li>
-</ul>
-<p><strong>Searching</strong></p>
-<ul>
-<li><a href="#grep">grep</a></li>
-<li><a href="#locate">locate</a></li>
-<li><a href="#fish">fish</a></li>
-<li><a href="#amplicon">amplicon</a></li>
-</ul>
-<p><strong>BAM processing and monitoring</strong></p>
-<ul>
-<li><a href="#bam">bam</a></li>
-</ul>
-<p><strong>Set operations</strong></p>
-<ul>
-<li><a href="#head">head</a></li>
-<li><a href="#head-genome">head-genome</a></li>
-<li><a href="#range">range</a></li>
-<li><a href="#sample">sample</a></li>
-<li><a href="#rmdup">rmdup</a></li>
-<li><a href="#duplicate">duplicate</a></li>
-<li><a href="#common">common</a></li>
-<li><a href="#split">split</a></li>
-<li><a href="#split2">split2</a></li>
-<li><a href="#pair">pair</a></li>
-</ul>
-<p><strong>Edit</strong></p>
-<ul>
-<li><a href="#replace">replace</a></li>
-<li><a href="#rename">rename</a></li>
-<li><a href="#restart">restart</a></li>
-<li><a href="#concat">concat</a></li>
-<li><a href="#mutate">mutate</a></li>
-</ul>
-<p><strong>Ordering</strong></p>
-<ul>
-<li><a href="#shuffle">shuffle</a></li>
-<li><a href="#sort">sort</a></li>
-</ul>
-<p><strong>Misc</strong></p>
-<ul>
-<li><a href="#genautocomplete">genautocomplete</a></li>
-</ul>
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 <h2 id="technical-details-and-guides-for-use">Technical details and guides for use</h2>
-<h3 id="fastaq-format-parsing">FASTA/Q format parsing</h3>
-<p>SeqKit uses author's lightweight and high-performance bioinformatics packages
+<h3 id="fastaq-format-parsing-and-writing">FASTA/Q format parsing and writing</h3>
+<p>SeqKit uses the author's lightweight and high-performance bioinformatics package
 <a href="https://github.com/shenwei356/bio">bio</a> for FASTA/Q parsing,
 which has <a href="https://github.com/shenwei356/bio#fastaq-parsing">high performance</a>
 close to the
 famous C lib <a href="https://github.com/attractivechaos/klib/">klib</a> (<a href="https://github.com/attractivechaos/klib/blob/master/kseq.h">kseq.h</a>).</p>
-<p><img alt="" src="https://github.com/shenwei356/bio/raw/master/benchmark/benchmark.tsv.png" /></p>
-<p><s>Seqkit calls <code>pigz</code> (much faster than <code>gzip</code>) or <code>gzip</code> to decompress .gz file if they are available.
-So please <strong>install <a href="http://zlib.net/pigz/">pigz</a> to gain better parsing performance for gzipped data</strong>.</s>
-Seqkit does not call <code>pigz</code> or <code>gzip</code> any more since v0.8.1,
-Because it does not always increase the speed.
-But you can still utilize <code>pigz</code> or <code>gzip</code> by <code>pigz -d -c seqs.fq.gz | seqkit xxx</code>.</p>
-<p>Seqkit uses package <a href="https://github.com/klauspost/pgzip">pgzip</a> to write gzip file,
-which is very fast (<strong>10X of <code>gzip</code>, 4X of <code>pigz</code></strong>) and the gzip file would be slighty larger.</p>
+<p><img src="https://github.com/shenwei356/bio/raw/master/benchmark/benchmark.tsv.png" alt="" width="700" align="center" /></p>
+<p>Notes:</p>
+<ul>
+<li><code>seqkit</code> uses 4 threads by default.</li>
+<li><code>seqkit_t1</code> uses 1 thread.</li>
+<li><code>seqtk</code> is single-threaded.</li>
+<li><code>seqtk+gzip</code>: <code>seqtk</code> pipes data to the single-threaded <code>gzip</code>.</li>
+<li><code>seqtk+pigz</code>: <code>seqtk</code> pipes data to the multithreaded <code>pigz</code> which uses 4 threads here.</li>
+</ul>
+<h3 id="input-and-output-files">Input and output files</h3>
+<p>Seqkit accepts input data from standard input (STDIN) and plain or gzip-compressed files.
+Files can be given via positional arguments or the flag <code>--infile-list</code>. For example:</p>
+<pre><code>seqkit seq   a.fasta b.fasta
+
+seqkit seq --infile-list file-list.txt
+
+seqkit seq --infile-list &lt;(find -name "*.fq.gz" directory)
+</code></pre>
+<p>Result are printed to standard ouput (STDOUT) by default, you can also specify the output file
+via the flag <code>-o/--out-file</code>. The file name extension <code>.gz</code> is automatically recognized.
+For example:</p>
+<pre><code>seqkit seq a.fasta -o a.fasta.gz
+
+seqkit grep -f IDs.txt read_1.fq.gz -o dir/read_1.fq.gz
+</code></pre>
+<p>Seqkit utlizies the <a href="https://github.com/klauspost/pgzip">pgzip</a> package to read and write gzip file,
+and the outputted gzip file would be slighty larger than files generated by GNU <code>gzip</code>.</p>
+<p><strong>Seqkit writes gzip files very fast, much faster than the multi-threaded <code>pigz</code>,
+so there's no need to pipe the result to <code>gzip</code>/<code>pigz</code></strong>.</p>
 <h3 id="sequence-formats-and-types">Sequence formats and types</h3>
 <p>SeqKit seamlessly support FASTA and FASTQ format.
 Sequence format is automatically detected.
-All subcommands except for <code>faidx</code> can handle both formats.
+All subcommands except for <code>faidx</code> and <code>bam</code> can handle both formats.
 And only when some commands (<code>subseq</code>, <code>split</code>, <code>sort</code> and <code>shuffle</code>)
 which utilise FASTA index to improve perfrmance for large files in two pass mode
 (by flag <code>--two-pass</code>), only FASTA format is supported.</p>
@@ -1242,10 +1196,21 @@ created by <code>samtools</code>. SeqKit uses full sequence head instead of just
 <p>The validation of sequences bases and complement process of sequences
 are parallelized for large sequences.</p>
 <p>Parsing of line-based files, including BED/GFF file and ID list file are also parallelized.</p>
+<p>The <code>pgzip</code> package reads and write gzip files in parallel.</p>
 <p>The Parallelization is implemented by multiple goroutines in golang
  which are similar to but much
 lighter weight than threads. The concurrency number is configurable with global
-flag <code>-j</code> or <code>--threads</code> (default value: 1 for single-CPU PC, 2 for others).</p>
+flag <code>-j</code> or <code>--threads</code> (default value: 4).</p>
+<p><strong>Using four threads is fast enough for most commands where FASTA/Q reading and writing is the
+performance bottleneck, and using more threads will not increase the speed</strong>. </p>
+<p>Few commands could benefit from multiple (&gt;4) threads:</p>
+<ul>
+<li><code>stats</code></li>
+<li><code>scat</code></li>
+<li><code>grep -s -m</code></li>
+<li><code>locate -s -m</code></li>
+<li><code>amplicon -s -m</code></li>
+</ul>
 <h3 id="memory-occupation">Memory occupation</h3>
 <p>Most of the subcommands do not read whole FASTA/Q records in to memory,
 including <code>stat</code>, <code>fq2fa</code>, <code>fx2tab</code>, <code>tab2fx</code>, <code>grep</code>, <code>locate</code>, <code>replace</code>,
@@ -1253,10 +1218,6 @@ including <code>stat</code>, <code>fq2fa</code>, <code>fx2tab</code>, <code>tab2
 <p>Note that when using <code>subseq --gtf | --bed</code>, if the GTF/BED files are too
 big, the memory usage will increase.
 You could use <code>--chr</code> to specify chromesomes and <code>--feature</code> to limit features.</p>
-<p>Some subcommands need to store sequences or heads in memory, but there are
-strategy to reduce memory occupation, including <code>rmdup</code> and <code>common</code>.
-When comparing with sequences, MD5 digest could be used to replace sequence by
-flag <code>-m</code> (<code>--md5</code>).</p>
 <p>Some subcommands could either read all records or read the files twice by flag
 <code>-2</code> (<code>--two-pass</code>), including <code>sample</code>, <code>split</code>, <code>shuffle</code> and <code>sort</code>.
 They use FASTA index for rapid acccess of sequences and reducing memory occupation.</p>
@@ -1267,7 +1228,7 @@ reproduced in different environments with same random seed.</p>
 <h2 id="seqkit">seqkit</h2>
 <pre><code class="language-text">SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 0.15.0
+Version: 2.0.0
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -1275,23 +1236,33 @@ Documents  : http://bioinf.shenwei.me/seqkit
 Source code: https://github.com/shenwei356/seqkit
 Please cite: https://doi.org/10.1371/journal.pone.0163962
 
+
+Seqkit utlizies the pgzip (https://github.com/klauspost/pgzip) package to
+read and write gzip file, and the outputted gzip file would be slighty
+larger than files generated by GNU gzip.
+
+Seqkit writes gzip files very fast, much faster than the multi-threaded pigz,
+therefore there's no need to pipe the result to gzip/pigz.
+
 Usage:
   seqkit [command]
 
 Available Commands:
-  amplicon        retrieve amplicon (or specific region around it) via primer(s)
+  amplicon        extract amplicon (or specific region around it) via primer(s)
   bam             monitoring and online histograms of BAM record features
   common          find common sequences of multiple files by id/name/sequence
+  completion      generate the autocompletion script for the specified shell
   concat          concatenate sequences with same ID from multiple files
   convert         convert FASTQ quality encoding between Sanger, Solexa and Illumina
   duplicate       duplicate sequences N times
   faidx           create FASTA index file and extract subsequence
   fish            look for short sequences in larger sequences using local alignment
   fq2fa           convert FASTQ to FASTA
-  fx2tab          convert FASTA/Q to tabular format (with length/GC content/GC skew)
-  genautocomplete generate shell autocompletion script
+  fx2tab          convert FASTA/Q to tabular format (and length, GC content, average quality...)
+  genautocomplete generate shell autocompletion script (bash|zsh|fish|powershell)
   grep            search sequences by ID/name/sequence/sequence motifs, mismatch allowed
   head            print first N FASTA/Q records
+  head-genome     print sequences of the first genome with common prefixes in name
   help            Help about any command
   locate          locate subsequences/motifs, mismatch allowed
   mutate          edit sequence (point mutation, insertion, deletion)
@@ -1300,13 +1271,13 @@ Available Commands:
   rename          rename duplicated IDs
   replace         replace name/sequence by regular expression
   restart         reset start position for circular genome
-  rmdup           remove duplicated sequences by id/name/sequence
+  rmdup           remove duplicated sequences by ID/name/sequence
   sample          sample sequences by number or proportion
-  sana            sanitize broken single line fastq files
+  sana            sanitize broken single line FASTQ files
   scat            real time recursive concatenation and streaming of fastx files
-  seq             transform sequences (revserse, complement, extract ID...)
+  seq             transform sequences (extract ID, filter by length, remove gaps...)
   shuffle         shuffle sequences
-  sliding         sliding sequences, circular genome supported
+  sliding         extract subsequences in sliding windows
   sort            sort sequences by id/name/sequence/length
   split           split sequences into files by id/seq region/size/parts (mainly for FASTA)
   split2          split sequences into files by size/parts (FASTA, PE/SE FASTQ)
@@ -1327,10 +1298,9 @@ Flags:
   -o, --out-file string                 out file (&quot;-&quot; for stdout, suffix .gz for gzipped out) (default &quot;-&quot;)
       --quiet                           be quiet and do not show extra information
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default &quot;auto&quot;)
-  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others. can also set with environment variable SEQKIT_THREADS) (default 2)
+  -j, --threads int                     number of CPUs. can also set with environment variable SEQKIT_THREADS) (default 4)
 
 Use &quot;seqkit [command] --help&quot; for more information about a command.
-
 </code></pre>
 <h3 id="datasets">Datasets</h3>
 <p>Datasets from <a href="ftp://mirbase.org/pub/mirbase/21/">The miRBase Sequence Database -- Release 21</a></p>
@@ -1372,17 +1342,13 @@ with command<pre><code>zcat Homo_sapiens.GRCh38.84.gtf.gz \
 </ul>
 <h2 id="seq">seq</h2>
 <p>Usage</p>
-<pre><code class="language-text">transform sequences (revserse, complement, extract ID...)
-
-Attentions:
-
-  1. This command outputs plain text even when out file ends with &quot;.gz&quot;.
-
+<pre><code class="language-text">transform sequences (extract ID, filter by length, remove gaps...)
 
 Usage:
   seqkit seq [flags]
 
 Flags:
+  -k, --color                     colorize sequences - to be piped into &quot;less -R&quot;
   -p, --complement                complement sequence, flag '-v' is recommended to switch on
       --dna2rna                   DNA to RNA
   -G, --gap-letters string        gap letters (default &quot;- \t.&quot;)
@@ -1403,6 +1369,7 @@ Flags:
   -u, --upper-case                print sequences in upper case
   -v, --validate-seq              validate bases according to the alphabet
   -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+
 </code></pre>
 <p>Examples</p>
 <ol>
@@ -1416,7 +1383,7 @@ Flags:
 UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
 UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 
-$ seqkit seq read_1.fq.gz
+$ seqkit seq reads_1.fq.gz
 @HWI-D00523:240:HF3WGBCXX:1:1101:2574:2226 1:N:0:CTGTAG
 TGAGGAATATTGGTCAATGGGCGCGAGCCTGAACCAGCCAAGTAGCGTGAAGGATGACTGCCCTACGGG
 +
@@ -1569,12 +1536,13 @@ Usage:
   seqkit subseq [flags]
 
 Flags:
-      --bed string        by BED file
-      --chr value         select limited sequence with sequence IDs when using flag --gtf or --bed  (multiple value supported, case ignored) (default [])
+      --bed string        by tab-delimited BED file
+      --chr strings       select limited sequence with sequence IDs when using --gtf or --bed (multiple value supported, case ignored)
   -d, --down-stream int   down stream length
-      --feature value     select limited feature types (multiple value supported, case ignored, only works with GTF) (default [])
+      --feature strings   select limited feature types (multiple value supported, case ignored, only works with GTF)
       --gtf string        by GTF (version 2.2) file
-      --gtf-tag string        output this tag as sequence comment (default &quot;gene_id&quot;)
+      --gtf-tag string    output this tag as sequence comment (default &quot;gene_id&quot;)
+  -h, --help              help for subseq
   -f, --only-flank        only return up/down stream sequence
   -r, --region string     by region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases, 13:-1 for cutting first 12 bases. type &quot;seqkit subseq -h&quot; for more examples
   -u, --up-stream int     up stream length
@@ -1665,7 +1633,7 @@ chr1.gz.rmdup.fa   FASTA        DNA          90,914         1   6,455.8   1,551,
 </ol>
 <h2 id="sliding">sliding</h2>
 <p>Usage</p>
-<pre><code class="language-text">sliding sequences, circular genome supported
+<pre><code class="language-text">extract subsequences in sliding windows
 
 Usage:
   seqkit sliding [flags]
@@ -1674,6 +1642,7 @@ Flags:
   -c, --circular          circular genome (same to -C/--circular-genome)
   -C, --circular-genome   circular genome (same to -c/--circular)
   -g, --greedy            greedy mode, i.e., exporting last subsequences even shorter than windows size
+  -h, --help              help for sliding
   -s, --step int          step size
   -W, --window int        window size
 
@@ -1780,6 +1749,7 @@ reads_2.fq.gz   FASTQ   DNA     2500    560002  223     224.0   225
 
 $ seqkit stats *.f{a,q}.gz -T | csvtk pretty -t
 file                format   type   num_seqs   sum_len   min_len   avg_len   max_len
+-----------------   ------   ----   --------   -------   -------   -------   -------
 hairpin.fa.gz       FASTA    RNA    28645      2949871   39        103.0     2354
 mature.fa.gz        FASTA    RNA    35828      781222    15        21.8      34
 Illimina1.8.fq.gz   FASTQ    DNA    10000      1500000   150       150.0     150
@@ -1789,13 +1759,13 @@ reads_2.fq.gz       FASTQ    DNA    2500       560002    223       224.0     225
 # To markdown
 
 $ seqkit stats *.f{a,q}.gz -T | csvtk csv2md -t
-file             |format|type|num_seqs|sum_len|min_len|avg_len|max_len
-:----------------|:-----|:---|:-------|:------|:------|:------|:------
-hairpin.fa.gz    |FASTA |RNA |28645   |2949871|39     |103.0  |2354
-mature.fa.gz     |FASTA |RNA |35828   |781222 |15     |21.8   |34
-Illimina1.8.fq.gz|FASTQ |DNA |10000   |1500000|150    |150.0  |150
-reads_1.fq.gz    |FASTQ |DNA |2500    |567516 |226    |227.0  |229
-reads_2.fq.gz    |FASTQ |DNA |2500    |560002 |223    |224.0  |225
+|file             |format|type|num_seqs|sum_len|min_len|avg_len|max_len|
+|:----------------|:-----|:---|:-------|:------|:------|:------|:------|
+|hairpin.fa.gz    |FASTA |RNA |28645   |2949871|39     |103.0  |2354   |
+|mature.fa.gz     |FASTA |RNA |35828   |781222 |15     |21.8   |34     |
+|Illimina1.8.fq.gz|FASTQ |DNA |10000   |1500000|150    |150.0  |150    |
+|reads_1.fq.gz    |FASTQ |DNA |2500    |567516 |226    |227.0  |229    |
+|reads_2.fq.gz    |FASTQ |DNA |2500    |560002 |223    |224.0  |225    |
 </code></pre>
 <table>
 <thead>
@@ -1876,7 +1846,7 @@ reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225 
 </code></pre>
 </li>
 <li>
-<p>Parallelize counting files, it's much faster for lots of small files, especially for files on SSD</p>
+<p><strong>Parallelize counting files, it's much faster for lots of small files, especially for files on SSD</strong></p>
 <pre><code>seqkit stats -j 10 refseq/virual/*.fna.gz
 </code></pre>
 </li>
@@ -1911,10 +1881,10 @@ tests/reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224    
 
 This command is similar with &quot;samtools faidx&quot; but has some extra features:
 
-  1. output full header line with flag -f
-  2. support regular expression as sequence ID with flag -r
+  1. output full header line with the flag -f
+  2. support regular expression as sequence ID with the flag -r
   3. if you have large number of IDs, you can use:
-        seqkit faidx seqs.fasta --infile-list IDs.txt
+        seqkit faidx seqs.fasta -l IDs.txt
 
 The definition of region is 1-based and with some custom design.
 
@@ -1937,10 +1907,12 @@ Usage:
   seqkit faidx [flags] &lt;fasta-file&gt; [regions...]
 
 Flags:
-  -f, --full-head     print full header line instead of just ID. New fasta index file ending with .seqkit.fai will be created
-  -h, --help          help for faidx
-  -i, --ignore-case   ignore case
-  -r, --use-regexp    IDs are regular expression. But subseq region is not suppored here.
+  -f, --full-head            print full header line instead of just ID. New fasta index file ending with .seqkit.fai will be created
+  -h, --help                 help for faidx
+  -i, --ignore-case          ignore case
+  -I, --immediate-output     print output immediately, do not use write buffer
+  -l, --region-file string   file containing a list of regions
+  -r, --use-regexp           IDs are regular expression. But subseq region is not suppored here.
 
 </code></pre>
 <p>Example</p>
@@ -1983,6 +1955,13 @@ U
 </code></pre>
 </li>
 <li>
+<p>supporting <code>begin</code> &gt; <code>start</code>, i.e., returning reverse complement sequence, not supported by <code>samtools faidx</code></p>
+<pre><code>$ seqkit faidx tests/hairpin.fa hsa-let-7a-1:10-1
+&gt;hsa-let-7a-1:10-1
+CCUCAUCCCA
+</code></pre>
+</li>
+<li>
 <p>use regular expression</p>
 <pre><code>$ seqkit faidx tests/hairpin.fa hsa -r | seqkit stats
 file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
@@ -2018,23 +1997,26 @@ Flags:
 <p>Examples</p>
 <ol>
 <li>
-<p>Histogram of log sequence length</p>
-<pre><code>seqkit watch -L -f ReadLen hairpin.fa
+<p>Histogram of sequence length</p>
+<pre><code>seqkit watch --fields ReadLen nanopore.fq.gz -O len.png
 </code></pre>
+<p><img alt="" src="../files/usage/watch.p0.png" /></p>
 </li>
 <li>
-<p>Histogram of mean base qualities every 500 record, also saved as PDF</p>
-<pre><code>seqkit watch -p 500 -O qhist.pdf -f MeanQual reads_1.fq.gz
+<p>Dynamic histogram of log sequence length</p>
+<pre><code>seqkit watch --log --fields ReadLen nanopore.fq.gz
+</code></pre>
+<p><img alt="" src="../files/usage/watch.p1.png" /></p>
+</li>
+<li>
+<p>Histogram of mean base qualities every 500 record, also saved as png</p>
+<pre><code>seqkit watch -p 500 -O qhist.png -f MeanQual nanopore.fq.gz
 </code></pre>
 </li>
 </ol>
-<pre><code>
-## sana
-
-Usage
-
-``` text
-sanitize broken single line fastq files
+<h2 id="sana">sana</h2>
+<p>Usage</p>
+<pre><code class="language-text">sanitize broken single line FASTQ files
 
 Usage:
   seqkit sana [flags]
@@ -2066,6 +2048,7 @@ Flags:
   -D, --drop-time string      Notification drop interval (default &quot;500ms&quot;)
   -f, --find-only             concatenate exisiting files and quit
   -i, --format string         input and output format: fastq or fasta (fastq) (default &quot;fastq&quot;)
+  -g, --gz-only               only look for gzipped files (.gz suffix)
   -h, --help                  help for scat
   -I, --in-format string      input format: fastq or fasta (fastq)
   -O, --out-format string     output format: fastq or fasta
@@ -2073,24 +2056,29 @@ Flags:
   -r, --regexp string         regexp for watched files, by default guessed from the input format
   -T, --time-limit string     quit after inactive for this time period
   -p, --wait-pid int          after process with this PID exited (default -1)
+
 </code></pre>
 <p>Examples</p>
 <ol>
 <li>
 <p>Concatenate all fastq files recursively under a directory</p>
-<p>seqkit scat -j 4 -f fastq_dir &gt; all_records.fq</p>
+<pre><code>seqkit scat -j 4 -f fastq_dir &gt; all_records.fq
+</code></pre>
 </li>
 <li>
 <p>Watch a directory and stream fastq records in real time until interrupt is recieved and plot read lengths using <code>seqkit watch</code>:</p>
-<p>seqkit scat -j 4 fastq_dir | seqkit watch -f ReadLen -</p>
+<pre><code>seqkit scat -j 4 fastq_dir | seqkit watch -f ReadLen -
+</code></pre>
 </li>
 <li>
 <p>Watch a directory and stream fastq records in real time until there is no write activity under the directory for 5 seconds:</p>
-<p>seqkit scat -j 4 -T "5s" fastq_dir &gt; all_records.fq</p>
+<pre><code>seqkit scat -j 4 -T "5s" fastq_dir &gt; all_records.fq
+</code></pre>
 </li>
 <li>
 <p>Watch a directory and stream fastq records in real time until a process with a specified PID is alive:</p>
-<p>seqkit scat -j 4 -p $PID fastq_dir &gt; all_records.fq</p>
+<pre><code>seqkit scat -j 4 -p $PID fastq_dir &gt; all_records.fq
+</code></pre>
 </li>
 </ol>
 <p><strong>Notes</strong>: You might need to increase the <code>ulimit</code> allowance on open files if you intend to stream fastx records from a large number of files.</p>
@@ -2110,6 +2098,10 @@ Usage:
 <pre><code class="language-text">convert FASTA/Q to tabular format, and provide various information,
 like sequence length, GC content/GC skew.
 
+Attention:
+  1. Fixed three columns (ID, sequence, quality) are outputted for either FASTA
+     or FASTQ, except when flag -n/--name is on. This is for format compatibility.
+
 Usage:
   seqkit fx2tab [flags]
 
@@ -2118,16 +2110,17 @@ Flags:
   -q, --avg-qual               print average quality of a read
   -B, --base-content strings   print base content. (case ignored, multiple values supported) e.g. -B AT -B N
   -C, --base-count strings     print base count. (case ignored, multiple values supported) e.g. -C AT -C N
-  -I, --case-sensitive         calculate case sensitive base content
+  -I, --case-sensitive         calculate case sensitive base content/sequence hash
   -g, --gc                     print GC content
   -G, --gc-skew                print GC-Skew
   -H, --header-line            print header line
   -h, --help                   help for fx2tab
   -l, --length                 print sequence length
   -n, --name                   only print names (no sequences and qualities)
+  -Q, --no-qual                only output two column even for FASTQ file
   -i, --only-id                print ID instead of full head
   -b, --qual-ascii-base int    ASCII BASE, 33 for Phred+33 (default 33)
-  -s, --seq-hash               print hash of sequence (case sensitive)
+  -s, --seq-hash               print hash (MD5) of sequence
 
 </code></pre>
 <p>Usage (tab2fx)</p>
@@ -2137,7 +2130,9 @@ Usage:
   seqkit tab2fx [flags]
 
 Flags:
-  -p, --comment-line-prefix value   comment line prefix (default [#,//])
+  -b, --buffer-size string            size of buffer, supported unit: K, M, G. You need increase the value when &quot;bufio.Scanner: token too long&quot; error reported (default &quot;1G&quot;)
+  -p, --comment-line-prefix strings   comment line prefix (default [#,//])
+  -h, --help                          help for tab2fx
 
 </code></pre>
 <p>Examples</p>
@@ -2201,8 +2196,6 @@ it could be handled with CSV/TSV tools,
 computates intersection of multiple files. It could achieve similar function
 as <code>seqkit common -n</code> along with shell.</li>
 <li><code>csvtk join</code> joins multiple CSV/TSV files by multiple IDs.</li>
-<li><a href="https://github.com/shenwei356/datakit/blob/master/csv_melt">csv_melt</a>
-provides melt function, could be used in preparation of data for ploting.</li>
 </ul>
 <h2 id="convert">convert</h2>
 <p>Usage</p>
@@ -2351,7 +2344,7 @@ Usage:
 
 Flags:
   -x, --allow-unknown-codon                     translate unknown code to 'X'. And you may not use flag --trim which removes 'X'
-  -F, --append-frame                            append frame infomation to sequence ID
+  -F, --append-frame                            append frame information to sequence ID
       --clean                                   change all STOP codon positions from the '*' character to 'X' (an unknown residue)
   -f, --frame strings                           frame(s) to translate, available value: 1, 2, 3, -1, -2, -3, and 6 for all six frames (default [1])
   -h, --help                                    help for translate
@@ -2494,6 +2487,7 @@ Stranslate Table:
 <pre><code class="language-text">search sequences by ID/name/sequence/sequence motifs, mismatch allowed
 
 Attentions:
+
   0. By default, we match sequence ID with patterns, use &quot;-n/--by-name&quot;
      for matching full name instead of just ID.
   1. Unlike POSIX/GNU grep, we compare the pattern to the whole target
@@ -2516,7 +2510,7 @@ Attentions:
      But for FASTA file, you can use:
         seqkit faidx seqs.fasta --infile-list IDs.txt
 
-You can specify the sequence region for searching with flag -R (--region).
+You can specify the sequence region for searching with the flag -R (--region).
 The definition of region is 1-based and with some custom design.
 
 Examples:
@@ -2695,7 +2689,7 @@ Usage:
 
 Flags:
       --bed                       output in BED6 format
-  -c  --circular                  circular genome
+  -c, --circular                  circular genome. type &quot;seqkit locate -h&quot; for details
   -d, --degenerate                pattern/motif contains degenerate base
       --gtf                       output in GTF format
   -h, --help                      help for locate
@@ -2778,7 +2772,6 @@ seqID       patternName                        pattern                          
 cel-lin-4   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   +        1       36    AUGCUUCCGGCCUGUUCCCUGAGACCUCAAGUGUGA
 cel-mir-1   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   +        54      95    AUGGAUAUGGAAUGUAAAGAAGUAUGUAGAACGGGGUGGUAG
 cel-mir-1   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   -        43      51    AUGAUAUAG
-cel-mir-1   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)   -        30      41    AUGGGCAUGUAA
 </code></pre>
 </li>
 <li>
@@ -2792,7 +2785,6 @@ cel-mir-58a   AUGGACUN      AUGGACUN   +        81      88    AUGGACUG
 ath-MIR163    AUGGACUN      AUGGACUN   -        122     129   AUGGACUC
 cel-mir-270   AUGGACUN      AUGGACUN   +        84      91    AUGGACUG
 </code></pre>
-<p>Notice that <code>seqkit grep</code> only searches in positive strand, but <code>seqkit loate</code> could recognize both strand.</p>
 </li>
 <li>
 <p>Output in <code>GTF</code> or <code>BED6</code> format, which you can use in <code>seqkit subseq</code></p>
@@ -2902,8 +2894,7 @@ seq   0          4        q0      0            4          +        60.00     16 
 </ol>
 <h2 id="amplicon">amplicon</h2>
 <p>Usage</p>
-<pre><code class="language-text">
-retrieve amplicon (or specific region around it) via primer(s).
+<pre><code class="language-text">extract amplicon (or specific region around it) via primer(s).
 
 Attentions:
   1. Only one (the longest) matching location is returned for every primer pair.
@@ -2961,7 +2952,7 @@ Usage:
   seqkit amplicon [flags]
 
 Flags:
-      --bed                    output in BED6+1 format with amplicon as 7th columns
+      --bed                    output in BED6+1 format with amplicon as the 7th column
   -f, --flanking-region        region is flanking region
   -F, --forward string         forward primer (5'-primer-3'), degenerate bases allowed
   -h, --help                   help for amplicon
@@ -2971,6 +2962,7 @@ Flags:
   -p, --primer-file string     3- or 2-column tabular primer file, with first column as primer name
   -r, --region string          specify region to return. type &quot;seqkit amplicon -h&quot; for detail
   -R, --reverse string         reverse primer (5'-primer-3'), degenerate bases allowed
+  -u, --save-unmatched         also save records that do not match any primer
   -s, --strict-mode            strict mode, i.e., discarding seqs not fully matching (shorter) given region range
 
 </code></pre>
@@ -3122,7 +3114,7 @@ UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 &gt;cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
 UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
 UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
-&gt;cel-let-7_2 cel-let-7 MI0000001 Caenorhabditis elegans let-7 stem-loop
+&gt;cel-let-7_2 MI0000001 Caenorhabditis elegans let-7 stem-loop
 UACACUGUGGAUCCGGUGAGGUAGUAGGUUGUAUAGUUUGGAAUAUUACCACCGGUGAAC
 UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 </code></pre>
@@ -3130,7 +3122,13 @@ UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 </ol>
 <h2 id="rmdup">rmdup</h2>
 <p>Usage</p>
-<pre><code class="language-text">remove duplicated sequences by id/name/sequence
+<pre><code class="language-text">remove duplicated sequences by ID/name/sequence
+
+Attentions:
+
+  1. When comparing by sequences, both positive and negative strands are
+     compared. Switch on -P/--only-positive-strand for considering the
+     positive strand only.
 
 Usage:
   seqkit rmdup [flags]
@@ -3142,6 +3140,7 @@ Flags:
   -d, --dup-seqs-file string   file to save duplicated seqs
   -h, --help                   help for rmdup
   -i, --ignore-case            ignore case
+  -P, --only-positive-strand   only considering positive strand when comparing by sequence
 
 </code></pre>
 <p>Examples</p>
@@ -3174,22 +3173,26 @@ $ cat duplicated.detail.txt   # here is not the entire list
 <pre><code class="language-text">find common sequences of multiple files by id/name/sequence
 
 Note:
-    1. 'seqkit common' is designed to support 2 and MORE files.
-    2. For 2 files, 'seqkit grep' is much faster and consumes lesser memory:
-         seqkit grep -f &lt;(seqkit seq -n -i small.fq.gz) big.fq.gz # by seq ID
-         seqkit grep -s -f &lt;(seqkit seq -s small.fq.gz) big.fq.gz # by seq
-    3. Some records in one file may have same sequences/IDs. They will ALL be
-       retrieved if the sequence/ID was shared in multiple files.
-       So the records number may be larger than that of the smallest file.
+  1. 'seqkit common' is designed to support 2 and MORE files.
+  2. When comparing by sequences, both positive and negative strands are
+     compared. Switch on -P/--only-positive-strand for considering the
+     positive strand only.
+  3. For 2 files, 'seqkit grep' is much faster and consumes lesser memory:
+     seqkit grep -f &lt;(seqkit seq -n -i small.fq.gz) big.fq.gz # by seq ID
+     seqkit grep -s -f &lt;(seqkit seq -s small.fq.gz) big.fq.gz # by seq
+  4. Some records in one file may have same sequences/IDs. They will ALL be
+     retrieved if the sequence/ID was shared in multiple files.
+     So the records number may be larger than that of the smallest file.
 
 Usage:
   seqkit common [flags]
 
 Flags:
-  -n, --by-name       match by full name instead of just id
-  -s, --by-seq        match by sequence
-  -h, --help          help for common
-  -i, --ignore-case   ignore case
+  -n, --by-name                match by full name instead of just id
+  -s, --by-seq                 match by sequence
+  -h, --help                   help for common
+  -i, --ignore-case            ignore case
+  -P, --only-positive-strand   only considering positive strand when comparing by sequence
 
 </code></pre>
 <p>Examples</p>
@@ -3215,7 +3218,8 @@ Flags:
 <pre><code class="language-text">split sequences into files by name ID, subsequence of given region,
 part size or number of parts.
 
-Please use &quot;seqkit split2&quot; for paired- and single-end FASTQ.
+If you just want to split by parts or sizes, please use &quot;seqkit split2&quot;,
+which also apply for paired- and single-end FASTQ.
 
 The definition of region is 1-based and with some custom design.
 
@@ -3396,8 +3400,8 @@ $ seqkit split2 reads_1.fq.gz -p 2 -O out -f
 Attensions:
 1. Orders of headers in the two files better be the same (not shuffled),
    otherwise it consumes huge number of memory for buffering reads in memory.
-2. Unpaired reads are optional outputted with flag -u/--save-unpaired.
-3. If flag -O/--out-dir not given, output will be saved in the same directory
+2. Unpaired reads are optional outputted with the flag -u/--save-unpaired.
+3. If the flag -O/--out-dir not given, output will be saved in the same directory
    of input, with suffix &quot;paired&quot;, e.g., read_1.paired.fq.gz.
    Otherwise names are kept untouched in the given output directory.
 4. Paired gzipped files may be slightly larger than original files, because
@@ -3452,11 +3456,16 @@ result
 <p>Usage</p>
 <pre><code class="language-text">sample sequences by number or proportion.
 
+Attention:
+1. Do not use '-n' on large FASTQ files, it loads all seqs into memory!
+   use 'seqkit sample -p 0.1 seqs.fq.gz | seqkit head -n N' instead!
+
 Usage:
   seqkit sample [flags]
 
 Flags:
-  -n, --number int         sample by number (result may not exactly match)
+  -h, --help               help for sample
+  -n, --number int         sample by number (result may not exactly match), DO NOT use on large FASTQ files.
   -p, --proportion float   sample by proportion
   -s, --rand-seed int      rand seed (default 11)
   -2, --two-pass           2-pass mode read files twice to lower memory usage. Not allowed when reading from stdin
@@ -3630,10 +3639,11 @@ Usage:
   seqkit replace [flags]
 
 Flags:
-  -s, --by-seq                 replace seq
+  -s, --by-seq                 replace seq (only FASTA)
   -h, --help                   help for replace
   -i, --ignore-case            ignore case
   -K, --keep-key               keep the key as value when no value found for the key (only for sequence name)
+  -U, --keep-untouch           do not change anything when no value found for the key (only for sequence name)
   -I, --key-capt-idx int       capture variable index of key (1-based) (default 1)
   -m, --key-miss-repl string   replacement for key with no corresponding value
   -k, --kv-file string         tab-delimited key-value file for replacing key with value when using &quot;{kv}&quot; in -r (--replacement) (only for sequence name)
@@ -3678,6 +3688,11 @@ ACGTACGT
     | seqkit replace -p "(.)" -r '$1 ' -s
 &gt;seq1 abc-123
 A C G T - A C G T
+
+$ echo -e "&gt;seq1 abc-123\nACGT-ACGT" \
+    | seqkit replace -p "(.)" -r "\$1 " -s
+&gt;seq1 abc-123
+A C G T - A C G T
 </code></pre>
 </li>
 <li>
@@ -3698,7 +3713,7 @@ T       T
 </code></pre>
 </li>
 <li>
-<p>Rename with number of record</p>
+<p><strong>Rename with number of record</strong></p>
 <pre><code>$ echo -e "&gt;abc\nACTG\n&gt;123\nATTT" \
     |  seqkit replace -p .+ -r "seq_{nr}"
 &gt;seq_1
@@ -3765,8 +3780,7 @@ TTCCTTCCTGAGCGAAGCCTGGGGATGAACG
 
 $ cat seq.fa \
     | seqkit replace -s -p '(\w{10})' -r '$1 ' -w 66 \
-    | perl -ne 'if (/^&gt;/) {print; $n=1} \
-        else {s/ \r?\n$/\n/; printf "%9d %s", $n, $_; $n+=60;}'
+    | perl -ne 'if (/^&gt;/) {print; $n=1} else {s/ \r?\n$/\n/; printf "%9d %s", $n, $_; $n+=60;}'
 &gt;seq1
         1 TTTAAAGAGA CCGGCGATTC TAGTGAAATC GAACGGGCAG GTCAATTTCC AACCAGCGAT
        61 GACGTAATAG ATAGATACAA GGAAGTCATT TTTCTTTTAA AGGATAGAAA CGGTTAATGC
@@ -3781,6 +3795,24 @@ $ cat seq.fa \
 <h2 id="rename">rename</h2>
 <p>Usage</p>
 <pre><code class="language-text">rename duplicated IDs
+
+Attention:
+  1. This command only appends &quot;_N&quot; to duplicated sequence IDs to make them unique.
+  2. Use &quot;seqkit replace&quot; for editing sequence IDs/headers using regular expression.
+
+Example:
+
+    $ seqkit seq seqs.fasta 
+    &gt;id comment
+    actg
+    &gt;id description
+    ACTG
+
+    $ seqkit rename seqs.fasta
+    &gt;id comment
+    actg
+    &gt;id_2 description
+    ACTG
 
 Usage:
   seqkit rename [flags]
@@ -3808,7 +3840,7 @@ $ echo -e &quot;&gt;a comment\nacgt\n&gt;b comment of b\nACTG\n&gt;a comment\naa
 acgt
 &gt;b comment of b
 ACTG
-&gt;a_2 a comment
+&gt;a_2 comment
 aaaa
 </code></pre>
 <h2 id="restart">restart</h2>
@@ -3903,9 +3935,9 @@ Flags:
   -I, --ignore-case           [match seqs to mutate] ignore case of search pattern
   -i, --insertion string      insertion mutation: inserting bases behind of given position, e.g., -i 0:ACGT for inserting ACGT at the beginning, -1:* for add * to the end
   -v, --invert-match          [match seqs to mutate] invert the sense of matching, to select non-matching records
-      --pattern strings       [match seqs to mutate] search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '&quot;A{2,}&quot;'))
+  -s, --pattern strings       [match seqs to mutate] search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '&quot;A{2,}&quot;'))
   -f, --pattern-file string   [match seqs to mutate] pattern file (one record per line)
-  -p, --point strings         point mutation: changing base at given postion. e.g., -p 2:C for setting 2nd base as C, -p -1:A for change last base as A
+  -p, --point strings         point mutation: changing base at given position. e.g., -p 2:C for setting 2nd base as C, -p -1:A for change last base as A
   -r, --use-regexp            [match seqs to mutate] search patterns are regular expression
 
 </code></pre>
@@ -4131,9 +4163,12 @@ Usage:
   seqkit sort [flags]
 
 Flags:
+  -b, --by-bases                by non-gap bases
   -l, --by-length               by sequence length
   -n, --by-name                 by full name instead of just id
   -s, --by-seq                  by sequence
+  -G, --gap-letters string      gap letters (default &quot;- \t.&quot;)
+  -h, --help                    help for sort
   -i, --ignore-case             ignore case
   -k, --keep-temp               keep tempory FASTA and .fai file when using 2-pass mode
   -N, --natural-order           sort in natural order, when sorting by IDs/full name
@@ -4254,31 +4289,38 @@ Flags:
 <ol>
 <li>
 <p>Get detailed statistics from multiple BAM files.</p>
-<p>seqkit bam -s *.bam</p>
+<pre><code>seqkit bam -s *.bam
+</code></pre>
 </li>
 <li>
 <p>Get rough statistics from multiple indexed BAM files.</p>
-<p>seqkit bam -i *.bam</p>
+<pre><code>seqkit bam -i *.bam
+</code></pre>
 </li>
 <li>
 <p>Count reads mapped to references from a BAM stream.</p>
-<p>cat sample.bam | seqkit bam -c counts.tsv  -</p>
+<pre><code>cat sample.bam | seqkit bam -c counts.tsv  -
+</code></pre>
 </li>
 <li>
 <p>Count reads mapped to references using the BAM index.</p>
-<p>seqkit bam -C sorted_indexed.bam</p>
+<pre><code>seqkit bam -C sorted_indexed.bam
+</code></pre>
 </li>
 <li>
 <p>Monitor alignment accuracy from a bam stream and report after every 1000 records, use 20 bins.</p>
-<p>cat sample.bam | seqkit bam -B -f Acc -p 1000 - </p>
+<pre><code>cat sample.bam | seqkit bam -B -f Acc -p 1000 -
+</code></pre>
 </li>
 <li>
 <p>Dump selected fields to TSV.</p>
-<p>seqkit bam -f Ref,Acc,RefCov,Strand sample.bam</p>
+<pre><code>seqkit bam -f Ref,Acc,RefCov,Strand sample.bam
+</code></pre>
 </li>
 <li>
 <p>Save the best 100 records in terms of alignment accuracy to a BAM file.</p>
-<p>seqkit bam -f Acc -@ top_acc_100.bam -? 100 -Q sample.bam</p>
+<pre><code>seqkit bam -f Acc -@ top_acc_100.bam -? 100 -Q sample.bam
+</code></pre>
 </li>
 <li>
 <p>Inkvoke the BAM toolbox.</p>
@@ -4286,10 +4328,10 @@ Flags:
 </ol>
 <p>The BAM toolbox is a collection of filters acting on a stream of BAM records, configured via YAML. 
 The currently available tools can be listed by <code>seqkit bam -T help</code>:</p>
-<pre><code class="language-text">Tool    Description
-----    -----------
-AccStats        calculates mean accuracy weighted by aligment lengths
-AlnContext      filter records by the sequence context at start and end
+<pre><code class="language-text">Tool        Description
+----        -----------
+AccStats    calculates mean accuracy weighted by aligment lengths
+AlnContext  filter records by the sequence context at start and end
 Dump        dump various record properties in TSV format
 help        list all tools with description
 </code></pre>
@@ -4340,119 +4382,6 @@ AccStats:
 <p>If the "Sink" parameter is not specified in the last pipeline step, the output BAM records are streamed to the standard output and can be piped into standard tools, for example:</p>
 <pre><code class="language-text">seqkit bam -T '{Yaml: &quot;bam_tool_pipeline.yml&quot;}' ../pcs109_5k_spliced.bam | samtools flagstat -
 </code></pre>
-<h2 id="fish_1">fish</h2>
-<pre><code class="language-text">look for short sequences in larger sequences using local alignment
-
-Usage:
-  seqkit fish [flags]
-
-Flags:
-  -a, --all                       search all
-  -p, --aln-params string         alignment parameters in format &quot;&lt;match&gt;,&lt;mismatch&gt;,&lt;gap_open&gt;,&lt;gap_extend&gt;&quot; (default &quot;4,-4,-2,-1&quot;)
-  -h, --help                      help for fish
-  -i, --invert                    print out references not matching with any query
-  -q, --min-qual float            minimum mapping quality (default 5)
-  -b, --out-bam string            save aligmnets to this BAM file (memory intensive)
-  -x, --pass                      pass through mode (write input to stdout)
-  -g, --print-aln                 print sequence alignments
-  -D, --print-desc                print full sequence header
-  -f, --query-fastx string        query fasta
-  -F, --query-sequences string    query sequences
-  -r, --ranges string             target ranges, for example: &quot;:10,30:40,-20:&quot;
-  -s, --stranded                  search + strand only
-  -v, --validate-seq              validate bases according to the alphabet
-  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
-
-Global Flags:
-      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
-      --id-ncbi                         FASTA head is NCBI-style, e.g. &gt;gi|110645304|ref|NC_002516.2| Pseud...
-      --id-regexp string                regular expression for parsing ID (default &quot;^(\\S+)\\s?&quot;)
-  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
-  -o, --out-file string                 out file (&quot;-&quot; for stdout, suffix .gz for gzipped out) (default &quot;-&quot;)
-      --quiet                           be quiet and do not show extra information
-  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default &quot;auto&quot;)
-  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
-</code></pre>
-<p>Examples</p>
-<ol>
-<li>Find best local alignment of a short sequence in reads in a fasta file, print results as tabular</li>
-</ol>
-<p>seqkit fish -q 4.7 -F "GGCGGCTGTGACC" -g mouse-p53-cds.fna</p>
-<ol>
-<li>Find all local alignment of a short sequences in reads in a fasta file, print results as tabular and save as BAM</li>
-</ol>
-<p>seqkit fish -a -q 4.67 -f query.fas -b alignments.bam -g mouse-p53-cds.fna</p>
-<h2 id="sana">sana</h2>
-<pre><code class="language-text">sanitize broken single line fastq files
-
-Usage:
-  seqkit sana [flags]
-
-Flags:
-  -h, --help                  help for sana
-  -b, --qual-ascii-base int   ASCII BASE, 33 for Phred+33 (default 33)
-
-Global Flags:
-      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
-      --id-ncbi                         FASTA head is NCBI-style, e.g. &gt;gi|110645304|ref|NC_002516.2| Pseud...
-      --id-regexp string                regular expression for parsing ID (default &quot;^(\\S+)\\s?&quot;)
-  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
-  -o, --out-file string                 out file (&quot;-&quot; for stdout, suffix .gz for gzipped out) (default &quot;-&quot;)
-      --quiet                           be quiet and do not show extra information
-  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default &quot;auto&quot;)
-  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
-</code></pre>
-<p>Examples</p>
-<ol>
-<li>
-<p>Rescue usable reads from fastq file with malformed records.</p>
-<p>seqkit sana broken.fq &gt; rescued.fq</p>
-</li>
-</ol>
-<h2 id="watch_1">watch</h2>
-<pre><code class="language-text">monitoring and online histograms of sequence features
-
-Usage:
-  seqkit watch [flags]
-
-Flags:
-  -B, --bins int                  number of histogram bins (default -1)
-  -W, --delay int                 sleep this many seconds after online plotting (default 1)
-  -y, --dump                      print histogram data to stderr instead of plotting
-  -f, --fields string             target fields (default &quot;ReadLen&quot;)
-  -h, --help                      help for watch
-  -O, --img string                save histogram to this PDF/image file
-  -H, --list-fields               print out a list of available fields
-  -L, --log                       log10(x+1) transform numeric values
-  -x, --pass                      pass through mode (write input to stdout)
-  -p, --print-freq int            print/report after this many records (-1 for print after EOF) (default -1)
-  -b, --qual-ascii-base int       ASCII BASE, 33 for Phred+33 (default 33)
-  -Q, --quiet-mode                supress all plotting to stderr
-  -R, --reset                     reset histogram after every report
-  -v, --validate-seq              validate bases according to the alphabet
-  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
-
-Global Flags:
-      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
-      --id-ncbi                         FASTA head is NCBI-style, e.g. &gt;gi|110645304|ref|NC_002516.2| Pseud...
-      --id-regexp string                regular expression for parsing ID (default &quot;^(\\S+)\\s?&quot;)
-  -w, --line-width int                  line width when outputing FASTA format (0 for no wrap) (default 60)
-  -o, --out-file string                 out file (&quot;-&quot; for stdout, suffix .gz for gzipped out) (default &quot;-&quot;)
-      --quiet                           be quiet and do not show extra information
-  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default &quot;auto&quot;)
-  -j, --threads int                     number of CPUs. (default value: 1 for single-CPU PC, 2 for others) (default 2)
-</code></pre>
-<p>Examples</p>
-<ol>
-<li>
-<p>Histogram of log sequence length</p>
-<p>seqkit watch -L -f ReadLen hairpin.fa </p>
-</li>
-<li>
-<p>Histogram of mean base qualities every 500 record, also saved as PDF</p>
-<p>seqkit watch -p 500 -O qhist.pdf -f MeanQual reads_1.fq.gz</p>
-</li>
-</ol>
 <h2 id="genautocomplete">genautocomplete</h2>
 <p>Usage</p>
 <pre><code class="language-text">generate shell autocompletion script
