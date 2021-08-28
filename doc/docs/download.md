@@ -100,29 +100,46 @@ fish:
 
 ## Release History
 
-- [SeqKit v2.0.0](https://github.com/shenwei356/seqkit/releases/tag/v2.0.0) - 2021-08-24
+- [SeqKit v2.0.0](https://github.com/shenwei356/seqkit/releases/tag/v2.0.0) - 2021-08-27
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.0.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.0.0)
-    - `seqkit`:
-        - faster FASTA/Q parsing speed, check the [benchmark](https://github.com/shenwei356/bio/tree/0e8cc4e503d6fd3520d9abdabe5678b9f244ce5e#fastaq-parsing).
-    - `seqkit seq`: 
-        - fix buffered (gzipped) output since v0.12.1.
-        - faster speed.
-    - `seqkit amplicon`: new flag `-u/--save-unmatched` for saving records that do not match any primer.
-    - `seqkit grep`: allowing empty pattern files.
-    - `seqkit fx2tab`:
-        - new flag `-Q/--no-qual` for disabling outputing quality even for FASTQ file. [#221](https://github.com/shenwei356/seqkit/issues/221)
-        - for `-s/--seq-hash`: outputing MD5 instead of xxhash. [#219](https://github.com/shenwei356/seqkit/issues/219)
-    - `seqkit tab2fx`: fix bug for very long sequences. [#214](https://github.com/shenwei356/seqkit/issues/214)
-    - `seqkit fish`: fix range check. [#213](https://github.com/shenwei356/seqkit/issues/213)
-    - `seqkit sample`: slightly faster.
-    - `seqkit rmdup`: add flag for considering reverse complementary sequence [#215](https://github.com/shenwei356/seqkit/issues/215)
-    - `seqkit faidx`:
-        - supporting region with begin > end, i.e., return reverse complement sequence
-        - add new flag `-l/--region-file`:  file containing a list of regions
-    - `seqkit sort`:
-        - new flag `-b/--by-bases` for sorting by non-gap bases, for multiple sequence alignment files.[#216](https://github.com/shenwei356/seqkit/issues/216)
-    - `seqkit rename`:
-        - new flag `-i/--inplace` for renaming ID only. [#236](https://github.com/shenwei356/seqkit/issues/236)
+    - **Performance improvements**
+        - `seqkit`:
+            - **faster FASTA/Q reading and writing, especially on FASTQ**, see the [benchmark](https://github.com/shenwei356/bio/tree/1e130b6b973e5321bc0e508316716f763cd6f304#fastaq-reading-and-writing).
+                - reading (plain text): 4X faster. `seqkit stats dataset_C.fq`
+                - reading (gzip files): 45% faster. `seqkit stats dataset_C.fq.gz`
+                - reading + writing (plain text): 3.5X faster. `seqkit grep -p . -v  dataset_C.fq -o t`
+                - reading + writing (gzip files): 2.2X faster. `seqkit grep -p . -v  dataset_C.fq.gz -o t.gz`
+            - **change default value of `-j/--threads` from 2 to 4**, which is faster for writting gzip files.
+        - `seqkit seq`:
+            - **fix writing speed, which was slowed down in v0.12.1**.
+    - **Breaking changes**
+        - `seqkit grep/rmdup/common`: 
+            - **consider reverse complement sequence by default for comparing by sequence**, add flag `-P/--only-positive-strand`. [#215](https://github.com/shenwei356/seqkit/issues/215)
+        - `seqkit rename`:
+            - **rename ID only, do not append original header to new ID**. [#236](https://github.com/shenwei356/seqkit/issues/236)
+        - `seqkit fx2tab`:
+            - for `-s/--seq-hash`: outputing MD5 instead of hash value (integers) of xxhash. [#219](https://github.com/shenwei356/seqkit/issues/219)
+    - **Bugfixes**
+        - `seqkit seq`:
+            - **fix failing to output gzipped format for file name with extension of `.gz` since v0.12.1**.
+        - `seqkit tab2fx`:
+            - fix bug for very long sequences. [#214](https://github.com/shenwei356/seqkit/issues/214)
+        - `seqkit fish`:
+            - fix range check. [#213](https://github.com/shenwei356/seqkit/issues/213)
+        - `seqkit grep`:
+            - it's not exactly a bug: forgot to use multi-threads for `-m` > 0.
+    - **New features/enhancements**
+        - `seqkit grep`: 
+            - allow empty pattern files.
+        - `seqkit faidx`:
+            - support region with `begin > end`, i.e., **returning reverse complement sequence**
+            - add new flag `-l/--region-file`:  file containing a list of regions.
+        - `seqkit fx2tab`:
+            - new flag `-Q/--no-qual` for disabling outputing quality even for FASTQ file. [#221](https://github.com/shenwei356/seqkit/issues/221)
+        - `seqkit amplicon`:
+            - new flag `-u/--save-unmatched` for saving records that do not match any primer.
+        - `seqkit sort`:
+            - new flag `-b/--by-bases` for sorting by non-gap bases, for multiple sequence alignment files.[#216](https://github.com/shenwei356/seqkit/issues/216)
 - [SeqKit v0.16.1](https://github.com/shenwei356/seqkit/releases/tag/v0.16.1) - 2021-05-20
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v0.16.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v0.16.1)
     - `seqkit shuffle --two-pass`: fix bug introduced in [#173](https://github.com/shenwei356/seqkit/issues/173) . [#209](https://github.com/shenwei356/seqkit/issues/209)

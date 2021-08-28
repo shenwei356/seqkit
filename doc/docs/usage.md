@@ -25,7 +25,15 @@ which has [high performance](https://github.com/shenwei356/bio#fastaq-parsing)
 close to the
 famous C lib [klib](https://github.com/attractivechaos/klib/) ([kseq.h](https://github.com/attractivechaos/klib/blob/master/kseq.h)).
 
-<img src="https://github.com/shenwei356/bio/raw/master/benchmark/benchmark.tsv.png" alt="" width="500" align="center" />
+<img src="https://github.com/shenwei356/bio/raw/master/benchmark/benchmark.tsv.png" alt="" width="700" align="center" />
+
+Notes:
+
+- `seqkit` uses 4 threads by default.
+- `seqkit_t1` uses 1 thread.
+- `seqtk` is single-threaded.
+- `seqtk+gzip`: `seqtk` pipes data to the single-threaded `gzip`.
+- `seqtk+pigz`: `seqtk` pipes data to the multithreaded `pigz` which uses 4 threads here.
 
 ### Input and output files
 

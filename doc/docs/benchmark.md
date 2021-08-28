@@ -1,6 +1,6 @@
 # Benchmark
 
-Note: these benchmarks was performaned in 2016.
+**Note: these benchmarks was performed in 2016**.
 
 ## Softwares
 

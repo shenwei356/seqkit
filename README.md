@@ -24,7 +24,7 @@ and
     - Providing statically linked executable binaries for multiple platforms (Linux/Windows/macOS, amd64/arm64) 
     - Light weight and out-of-the-box, no dependencies, no compilation, no configuration
 - **Easy to use** 
-    - Ultrafast (see [benchmark](http://bioinf.shenwei.me/seqkit/benchmark) and [technical-details](http://bioinf.shenwei.me/seqkit/usage/#technical-details-and-guides-for-use))
+    - Ultrafast (see [technical-details](http://bioinf.shenwei.me/seqkit/usage/#technical-details-and-guides-for-use) and [benchmark](http://bioinf.shenwei.me/seqkit/benchmark))
     - Seamlessly parsing both FASTA and FASTQ formats
     - Supporting (gzipped) STDIN/STDOUT and input/output file, easily integrated in pipe
     - Reproducible results (configurable rand seed in `sample` and `shuffle`)
