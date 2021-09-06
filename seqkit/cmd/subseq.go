@@ -43,7 +43,13 @@ var subseqCmd = &cobra.Command{
 	Short: "get subsequences by region/gtf/bed, including flanking sequences",
 	Long: fmt.Sprintf(`get subsequences by region/gtf/bed, including flanking sequences.
 
-Recommendation: use plain FASTA file, so seqkit could utilize FASTA index.
+Attentions:
+  1. Use "seqkit grep" for extract subsets of sequences.
+     "seqtk subseq seqs.fasta id.txt" equals to
+     "seqkit grep -f id.txt seqs.fasta"
+
+Recommendation:
+  1. use plain FASTA file, so seqkit could utilize FASTA index.
 
 The definition of region is 1-based and with some custom design.
 

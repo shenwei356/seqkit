@@ -70,6 +70,8 @@ Attentions:
      file, not the order of the query patterns. 
      But for FASTA file, you can use:
         seqkit faidx seqs.fasta --infile-list IDs.txt
+  6. For multiple patterns, you can either set "-p" multiple times, i.e.,
+     -p pattern1 -p pattern2, or give a file of patterns via "-f/--pattern-file".
 
 You can specify the sequence region for searching with the flag -R (--region).
 The definition of region is 1-based and with some custom design.
