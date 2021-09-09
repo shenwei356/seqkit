@@ -58,6 +58,13 @@ Special replacement symbols (only for replacing name not sequence):
     {nr}    Record number, starting from 1
     {kv}    Corresponding value of the key (captured variable $n) by key-value file,
             n can be specified by flag -I (--key-capt-idx) (default: 1)
+            
+Special cases:
+  1. If replacements contain '$', 
+    a). If using '{kv}', you need use '$$$$' instead of a single '$':
+            -r '{kv}' -k <(sed 's/\$/$$$$/' kv.txt)
+    b). If not, use '$$':
+            -r 'xxx$$xx'
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -144,7 +151,7 @@ Special replacement symbols (only for replacing name not sequence):
 		var r []byte
 		var founds [][][]byte
 		var found [][]byte
-		var k string
+		var k, v string
 		var ok bool
 		var doNotChange bool
 		var record *fastx.Record
@@ -198,8 +205,8 @@ Special replacement symbols (only for replacing name not sequence):
 							if ignoreCase {
 								k = strings.ToLower(k)
 							}
-							if _, ok = kvs[k]; ok {
-								r = reKV.ReplaceAll(r, []byte(kvs[k]))
+							if v, ok = kvs[k]; ok {
+								r = reKV.ReplaceAll(r, []byte(v))
 							} else if keepUntouch {
 								doNotChange = true
 							} else if keepKey {
