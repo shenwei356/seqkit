@@ -27,7 +27,7 @@ import (
 
 	colorable "github.com/mattn/go-colorable"
 	"github.com/shenwei356/go-logging"
-	"github.com/shenwei356/seqkit/seqkit/cmd"
+	"github.com/shenwei356/seqkit/v2/seqkit/cmd"
 )
 
 var logFormat = logging.MustStringFormatter(
