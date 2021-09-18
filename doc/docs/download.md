@@ -53,7 +53,7 @@ And then:
 
 #### Method 4: For Go developer (latest stable/dev version)
 
-    go get -u github.com/shenwei356/seqkit/seqkit
+    go get -u github.com/shenwei356/seqkit/v2/seqkit/
 
 #### Method 5: Docker based installation (latest stable/dev version)
 

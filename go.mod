@@ -17,11 +17,11 @@ require (
 	github.com/mattn/go-isatty v0.0.13
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/errors v0.9.1
-	github.com/shenwei356/bio v0.3.0
-	github.com/shenwei356/breader v0.3.0
+	github.com/shenwei356/bio v0.3.1
+	github.com/shenwei356/breader v0.3.1
 	github.com/shenwei356/bwt v0.5.1
 	github.com/shenwei356/go-logging v0.0.0-20171012171522-c6b9702d88ba
-	github.com/shenwei356/util v0.3.0
+	github.com/shenwei356/util v0.3.2
 	github.com/shenwei356/xopen v0.1.0
 	github.com/smallfish/simpleyaml v0.1.0
 	github.com/spf13/cobra v1.2.1
@@ -36,7 +36,7 @@ require (
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jung-kurt/gofpdf v1.0.3-0.20190309125859-24315acbbda5 // indirect
-	github.com/klauspost/compress v1.13.4 // indirect
+	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/shenwei356/bpool v0.0.0-20160710042833-f9e0ee4d0403 // indirect
