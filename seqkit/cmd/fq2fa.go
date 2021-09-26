@@ -41,7 +41,7 @@ var fq2faCmd = &cobra.Command{
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		lineWidth := config.LineWidth
+		// lineWidth := config.LineWidth
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
@@ -70,7 +70,8 @@ var fq2faCmd = &cobra.Command{
 				}
 
 				record.Seq.Qual = []byte{}
-				record.FormatToWriter(outfh, lineWidth)
+				// record.FormatToWriter(outfh, lineWidth)
+				record.FormatToWriter(outfh, 0)
 			}
 		}
 	},

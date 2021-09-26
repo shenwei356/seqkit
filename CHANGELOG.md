@@ -1,3 +1,7 @@
+- [SeqKit v2.1.0](https://github.com/shenwei356/seqkit/releases/tag/v2.1.0) - 2021-08-27
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.1.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.1.0)
+    - `seqkit fq2fa`: 
+        - faster, and do not wrap sequences.
 - [SeqKit v2.0.0](https://github.com/shenwei356/seqkit/releases/tag/v2.0.0) - 2021-08-27
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.0.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.0.0)
     - **Performance improvements**
