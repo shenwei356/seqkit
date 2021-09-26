@@ -50,7 +50,7 @@ supported.
 
 Firstly, seqkit reads the sequence head and length information.
 If the file is not plain FASTA file,
-seqkit will write the sequences to tempory files, and create FASTA index.
+seqkit will write the sequences to temporary files, and create FASTA index.
 
 Secondly, seqkit sorts sequence by head and length information
 and extracts sequences by FASTA index.
@@ -255,7 +255,7 @@ and extracts sequences by FASTA index.
 				newFile = file + ".fastx"
 			}
 			if !quiet {
-				log.Infof("read and write sequences to tempory file: %s ...", newFile)
+				log.Infof("read and write sequences to temporary file: %s ...", newFile)
 			}
 
 			var nseqs int
@@ -463,6 +463,6 @@ func init() {
 	sortCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 
 	sortCmd.Flags().BoolP("two-pass", "2", false, "two-pass mode read files twice to lower memory usage. (only for FASTA format)")
-	sortCmd.Flags().BoolP("keep-temp", "k", false, "keep tempory FASTA and .fai file when using 2-pass mode")
+	sortCmd.Flags().BoolP("keep-temp", "k", false, "keep temporary FASTA and .fai file when using 2-pass mode")
 	sortCmd.Flags().IntP("seq-prefix-length", "L", 10000, "length of sequence prefix on which seqkit sorts by sequences (0 for whole sequence)")
 }

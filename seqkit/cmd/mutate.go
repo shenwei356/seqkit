@@ -43,7 +43,7 @@ var mutateCmd = &cobra.Command{
 
 Attentions:
 
-  1. Mutiple point mutations (-p/--point) are allowed, but only single 
+  1. Multiple point mutations (-p/--point) are allowed, but only single
      insertion (-i/--insertion) OR single deletion (-d/--deletion) is allowed.
   2. Point mutation takes place before insertion/deletion.
 

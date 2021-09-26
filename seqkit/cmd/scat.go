@@ -566,7 +566,7 @@ func init() {
 	scatCmd.Flags().StringP("in-format", "I", "", "input format: fastq or fasta (fastq)")
 	scatCmd.Flags().StringP("out-format", "O", "", "output format: fastq or fasta")
 	scatCmd.Flags().BoolP("allow-gaps", "A", false, "allow gap character (-) in sequences")
-	scatCmd.Flags().BoolP("find-only", "f", false, "concatenate exisiting files and quit")
+	scatCmd.Flags().BoolP("find-only", "f", false, "concatenate existing files and quit")
 	scatCmd.Flags().BoolP("gz-only", "g", false, "only look for gzipped files (.gz suffix)")
 	scatCmd.Flags().StringP("time-limit", "T", "", "quit after inactive for this time period")
 	scatCmd.Flags().IntP("wait-pid", "p", -1, "after process with this PID exited")

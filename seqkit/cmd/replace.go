@@ -241,7 +241,7 @@ func init() {
 			"ATTENTION: for *nix OS, use SINGLE quote NOT double quotes or "+
 			`use the \ escape character. Record number is also supported by "{nr}".`+
 			`use ${1} instead of $1 when {kv} given!`)
-	replaceCmd.Flags().IntP("nr-width", "", 1, `minimum width for {nr} in flag -r/--replacement. e.g., formating "1" to "001" by --nr-width 3`)
+	replaceCmd.Flags().IntP("nr-width", "", 1, `minimum width for {nr} in flag -r/--replacement. e.g., formatting "1" to "001" by --nr-width 3`)
 	// replaceCmd.Flags().BoolP("by-name", "n", false, "replace full name instead of just id")
 	replaceCmd.Flags().BoolP("by-seq", "s", false, "replace seq (only FASTA)")
 	replaceCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
