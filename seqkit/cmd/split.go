@@ -196,7 +196,7 @@ Examples:
 					newFile = file + ".fastx"
 				}
 				if !quiet {
-					log.Infof("read and write sequences to tempory file: %s ...", newFile)
+					log.Infof("read and write sequences to temporary file: %s ...", newFile)
 				}
 
 				var nseqs int
@@ -362,7 +362,7 @@ Examples:
 					newFile = file + ".fastx"
 				}
 				if !quiet {
-					log.Infof("read and write sequences to tempory file: %s ...", newFile)
+					log.Infof("read and write sequences to temporary file: %s ...", newFile)
 				}
 
 				var nseqs int
@@ -531,7 +531,7 @@ Examples:
 					newFile = file + ".fastx"
 				}
 				if !quiet {
-					log.Infof("read and write sequences to tempory file: %s ...", newFile)
+					log.Infof("read and write sequences to temporary file: %s ...", newFile)
 				}
 
 				var nseqs int
@@ -722,7 +722,7 @@ Examples:
 					newFile = file + ".fastx"
 				}
 				if !quiet {
-					log.Infof("read and write sequences to tempory file: %s ...", newFile)
+					log.Infof("read and write sequences to temporary file: %s ...", newFile)
 				}
 
 				var nseqs int
@@ -854,7 +854,7 @@ func init() {
 		`e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type "seqkit split -h" for more examples`)
 	splitCmd.Flags().BoolP("two-pass", "2", false, "two-pass mode read files twice to lower memory usage. (only for FASTA format)")
 	splitCmd.Flags().BoolP("dry-run", "d", false, "dry run, just print message and no files will be created.")
-	splitCmd.Flags().BoolP("keep-temp", "k", false, "keep tempory FASTA and .fai file when using 2-pass mode")
+	splitCmd.Flags().BoolP("keep-temp", "k", false, "keep temporary FASTA and .fai file when using 2-pass mode")
 	splitCmd.Flags().StringP("out-dir", "O", "", "output directory (default value is $infile.split)")
 	splitCmd.Flags().BoolP("force", "f", false, "overwrite output directory")
 }

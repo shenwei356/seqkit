@@ -46,7 +46,7 @@ For FASTA format, use flag -2 (--two-pass) to reduce memory usage. FASTQ not
 supported.
 
 Firstly, seqkit reads the sequence IDs. If the file is not plain FASTA file,
-seqkit will write the sequences to tempory files, and create FASTA index.
+seqkit will write the sequences to temporary files, and create FASTA index.
 
 Secondly, seqkit shuffles sequence IDs and extract sequences by FASTA index.
 
@@ -149,7 +149,7 @@ Secondly, seqkit shuffles sequence IDs and extract sequences by FASTA index.
 				newFile = file + ".fastx"
 			}
 			if !quiet {
-				log.Infof("read and write sequences to tempory file: %s ...", newFile)
+				log.Infof("read and write sequences to temporary file: %s ...", newFile)
 			}
 
 			var nseqs int
@@ -233,5 +233,5 @@ func init() {
 	RootCmd.AddCommand(shuffleCmd)
 	shuffleCmd.Flags().Int64P("rand-seed", "s", 23, "rand seed for shuffle")
 	shuffleCmd.Flags().BoolP("two-pass", "2", false, "two-pass mode read files twice to lower memory usage. (only for FASTA format)")
-	shuffleCmd.Flags().BoolP("keep-temp", "k", false, "keep tempory FASTA and .fai file when using 2-pass mode")
+	shuffleCmd.Flags().BoolP("keep-temp", "k", false, "keep temporary FASTA and .fai file when using 2-pass mode")
 }

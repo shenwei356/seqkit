@@ -707,14 +707,14 @@ var bamCmd = &cobra.Command{
 		}
 
 		fmap["RefAln"] = fieldInfo{
-			"Aligned refence length",
+			"Aligned reference length",
 			func(r *sam.Record) float64 {
 				return float64(r.Len())
 			},
 		}
 
 		fmap["RefCov"] = fieldInfo{
-			"Refence coverage",
+			"Reference coverage",
 			func(r *sam.Record) float64 {
 				return float64(r.Len()) / float64(r.Ref.Len()) * 100
 			},

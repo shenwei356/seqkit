@@ -65,7 +65,7 @@ Attensions:
 		runtime.GOMAXPROCS(config.Threads)
 
 		if len(args) > 0 {
-			checkError(errors.New("no positional arugments are allowed"))
+			checkError(errors.New("no positional arguments are allowed"))
 		}
 
 		read1 := getFlagString(cmd, "read1")

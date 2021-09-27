@@ -264,7 +264,7 @@ type faidxQuery struct {
 func init() {
 	RootCmd.AddCommand(faidxCmd)
 
-	faidxCmd.Flags().BoolP("use-regexp", "r", false, "IDs are regular expression. But subseq region is not suppored here.")
+	faidxCmd.Flags().BoolP("use-regexp", "r", false, "IDs are regular expression. But subseq region is not supported here.")
 	faidxCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	faidxCmd.Flags().BoolP("full-head", "f", false, "print full header line instead of just ID. New fasta index file ending with .seqkit.fai will be created")
 	faidxCmd.Flags().StringP("region-file", "l", "", "file containing a list of regions")

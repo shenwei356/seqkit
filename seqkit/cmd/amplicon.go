@@ -52,7 +52,7 @@ var ampliconCmd = &cobra.Command{
 
 Attentions:
   1. Only one (the longest) matching location is returned for every primer pair.
-  2. Mismatch is allowed, but the mismatch location (5' or 3') is not controled. 
+  2. Mismatch is allowed, but the mismatch location (5' or 3') is not controlled.
      You can increase the value of "-j/--threads" to accelerate processing.
   3. Degenerate bases/residues like "RYMM.." are also supported.
      But do not use degenerate bases/residues in regular expression, you need
