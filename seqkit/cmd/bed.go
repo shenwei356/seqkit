@@ -94,7 +94,7 @@ func ReadBedFilteredFeatures(file string, chrs []string) ([]BedFeature, error) {
 		}
 		var strand *string
 		if n >= 6 {
-			if items[5] != "+" && items[5] != "-" {
+			if items[5] != "+" && items[5] != "-" && items[5] != "." {
 				return nil, false, fmt.Errorf("bad strand: %s", items[5])
 			}
 			strand = &items[5]
@@ -106,7 +106,7 @@ func ReadBedFilteredFeatures(file string, chrs []string) ([]BedFeature, error) {
 	if err != nil {
 		return nil, err
 	}
-	BedFeatures := []BedFeature{}
+	BedFeatures := make([]BedFeature, 0, 1024)
 	for chunk := range reader.Ch {
 		if chunk.Err != nil {
 			return nil, chunk.Err
