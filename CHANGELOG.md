@@ -5,7 +5,7 @@
     - `seqkit subseq`:
         - fix `--bed` which fail to recognize strand `.`.
     - `seqkit convert`:
-        - change default value of `-N/--thresh-B-in-n-most-common` from `4` to `2`. 
+        - fix quality encoding checking, change default value of `-N/--thresh-B-in-n-most-common` from `4` to `2`. 
         [#254](https://github.com/shenwei356/seqkit/issues/254) and [#239](https://github.com/shenwei356/seqkit/issues/239])
 - [SeqKit v2.0.0](https://github.com/shenwei356/seqkit/releases/tag/v2.0.0) - 2021-08-27
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.0.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.0.0)
