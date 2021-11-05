@@ -26,7 +26,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"math"
 	"runtime"
 	"sort"
 	"strings"
@@ -212,7 +211,7 @@ Attention:
 				}
 
 				if printAvgQual {
-					outfh.WriteString(fmt.Sprintf("\t%.2f", avgQual(record.Seq, qBase)))
+					outfh.WriteString(fmt.Sprintf("\t%.2f", record.Seq.AvgQual(qBase)))
 				}
 
 				if printSeqHash {
@@ -266,18 +265,6 @@ func alphabetStr(s []byte) string {
 	}
 	sort.Strings(alphabet)
 	return strings.Join(alphabet, "")
-}
-
-func avgQual(s *seq.Seq, base int) float64 {
-	if len(s.Qual) == 0 {
-		return 0
-	}
-	s.ParseQual(base)
-	var sum float64
-	for _, q := range s.QualValue {
-		sum += math.Pow(10, float64(q)/-10)
-	}
-	return -10 * math.Log10(sum/float64(len(s.QualValue)))
 }
 
 var _tab = []byte{'\t'}
