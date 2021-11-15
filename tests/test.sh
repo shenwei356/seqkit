@@ -203,7 +203,7 @@ assert_equal $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1) $($app seq $file | md
 
 file=tests/reads_1.fq.gz
 run fq2fa $app fq2fa $file
-assert_equal $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1) $($app fx2tab $file | cut -f 1,2 | $app tab2fx | md5sum | cut -d" " -f 1)
+assert_equal $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1) $($app fx2tab $file | cut -f 1,2 | $app tab2fx -w 0 | md5sum | cut -d" " -f 1)
 
 READS_FQ=tests/pcs109_5k.fq
 NANO_FQ_TSV=tests/pcs109_5k_fq_NanoPlot.tsv

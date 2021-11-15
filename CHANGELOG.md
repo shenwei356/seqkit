@@ -1,4 +1,4 @@
-- [SeqKit v2.1.0](https://github.com/shenwei356/seqkit/releases/tag/v2.1.0) - 2021-08-27
+- [SeqKit v2.1.0](https://github.com/shenwei356/seqkit/releases/tag/v2.1.0) - 2021-11-15
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.1.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.1.0)
     - `seqkit seq`:
         - **fix filtering by average quality `-Q/-R`**. [#257](https://github.com/shenwei356/seqkit/issues/257)
