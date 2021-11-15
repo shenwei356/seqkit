@@ -458,11 +458,17 @@ Examples:
 					j = 0
 				}
 			}
-			if j > 0 && !quiet {
-				log.Infof("write %d sequences to file: %s\n", j, outfile)
-			}
-			if !dryRun {
-				outfh.Close()
+			if j > 0 {
+				if quiet {
+					log.Infof("write %d sequences to file: %s\n", j, outfile)
+				}
+				if !dryRun {
+					outfh.Close()
+				}
+			} else {
+				if !dryRun {
+					checkError(os.Remove(outfile))
+				}
 			}
 
 			if (isstdin || !isPlainFile(file)) && !keepTemp {
@@ -555,7 +561,7 @@ Examples:
 				}
 				if isFastq {
 					checkError(os.Remove(newFile))
-					checkError(fmt.Errorf("Sorry, two-pass mode does not support FASTQ format"))
+					checkError(fmt.Errorf("sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
 			fileExt = suffixFA

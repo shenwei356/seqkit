@@ -8,7 +8,9 @@
         - fix quality encoding checking, change default value of `-N/--thresh-B-in-n-most-common` from `4` to `2`. 
         [#254](https://github.com/shenwei356/seqkit/issues/254) and [#239](https://github.com/shenwei356/seqkit/issues/239])
     - `seqkit seq`:
-        - fix filtering by average quality `-Q/-R`. [#257](https://github.com/shenwei356/seqkit/issues/257)
+        - **fix filtering by average quality `-Q/-R`**. [#257](https://github.com/shenwei356/seqkit/issues/257)
+    - `seqkit split`:
+        - fix writing an extra empty file when using `--two-pass`[#244](https://github.com/shenwei356/seqkit/issues/244)
 - [SeqKit v2.0.0](https://github.com/shenwei356/seqkit/releases/tag/v2.0.0) - 2021-08-27
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.0.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.0.0)
     - **Performance improvements**
