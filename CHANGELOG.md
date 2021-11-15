@@ -1,16 +1,18 @@
 - [SeqKit v2.1.0](https://github.com/shenwei356/seqkit/releases/tag/v2.1.0) - 2021-08-27
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.1.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.1.0)
-    - `seqkit fq2fa`: 
-        - faster, and do not wrap sequences.
-    - `seqkit subseq`:
-        - fix `--bed` which fail to recognize strand `.`.
+    - `seqkit seq`:
+        - **fix filtering by average quality `-Q/-R`**. [#257](https://github.com/shenwei356/seqkit/issues/257)
     - `seqkit convert`:
         - fix quality encoding checking, change default value of `-N/--thresh-B-in-n-most-common` from `4` to `2`. 
         [#254](https://github.com/shenwei356/seqkit/issues/254) and [#239](https://github.com/shenwei356/seqkit/issues/239])
-    - `seqkit seq`:
-        - **fix filtering by average quality `-Q/-R`**. [#257](https://github.com/shenwei356/seqkit/issues/257)
     - `seqkit split`:
         - fix writing an extra empty file when using `--two-pass`[#244](https://github.com/shenwei356/seqkit/issues/244)
+    - `seqkit subseq`:
+        - fix `--bed` which fail to recognize strand `.`.
+    - `seqkit fq2fa`: 
+        - faster, and do not wrap sequences.
+    - `seqkit grep/locate/mutate`:
+        - detect unquoted comma and show warning message, e.g., `-p 'A{2,}'`. [#250](https://github.com/shenwei356/seqkit/issues/250)
 - [SeqKit v2.0.0](https://github.com/shenwei356/seqkit/releases/tag/v2.0.0) - 2021-08-27
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.0.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.0.0)
     - **Performance improvements**

@@ -135,6 +135,22 @@ Examples:
 		// 	checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
 		// }
 
+		// check pattern with unquoted comma
+		hasUnquotedComma := false
+		for _, _pattern := range pattern {
+			if reUnquotedComma.MatchString(_pattern) {
+				hasUnquotedComma = true
+				break
+			}
+		}
+		if hasUnquotedComma {
+			if outFile == "-" {
+				defer log.Warningf(helpUnquotedComma)
+			} else {
+				log.Warningf(helpUnquotedComma)
+			}
+		}
+
 		// prepare pattern
 		patterns := make(map[string]*regexp.Regexp)
 		if patternFile != "" {

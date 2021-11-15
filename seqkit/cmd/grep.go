@@ -114,6 +114,22 @@ Examples:
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
 		}
 
+		// check pattern with unquoted comma
+		hasUnquotedComma := false
+		for _, _pattern := range pattern {
+			if reUnquotedComma.MatchString(_pattern) {
+				hasUnquotedComma = true
+				break
+			}
+		}
+		if hasUnquotedComma {
+			if outFile == "-" {
+				defer log.Warningf(helpUnquotedComma)
+			} else {
+				log.Warningf(helpUnquotedComma)
+			}
+		}
+
 		if degenerate && !bySeq {
 			log.Infof("when flag -d (--degenerate) given, flag -s (--by-seq) is automatically on")
 			bySeq = true
@@ -643,3 +659,6 @@ func init() {
 	grepCmd.Flags().BoolP("circular", "c", false, "circular genome")
 	grepCmd.Flags().BoolP("immediate-output", "I", false, "print output immediately, do not use write buffer")
 }
+
+var reUnquotedComma = regexp.MustCompile(`\{[^\}]*$|^[^\{]*\}`)
+var helpUnquotedComma = `possible unquoted comma detected, please use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"' or -p "\"A{2,}\""`

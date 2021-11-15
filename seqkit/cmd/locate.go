@@ -103,6 +103,22 @@ Attentions:
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
 		}
 
+		// check pattern with unquoted comma
+		hasUnquotedComma := false
+		for _, _pattern := range pattern {
+			if reUnquotedComma.MatchString(_pattern) {
+				hasUnquotedComma = true
+				break
+			}
+		}
+		if hasUnquotedComma {
+			if outFile == "-" {
+				defer log.Warningf(helpUnquotedComma)
+			} else {
+				log.Warningf(helpUnquotedComma)
+			}
+		}
+
 		if mismatches > 0 {
 			if degenerate {
 				checkError(fmt.Errorf("flag -d (--degenerate) not allowed when giving flag -m (--max-mismatch)"))
@@ -906,6 +922,7 @@ Attentions:
 				}
 			}
 		}
+
 	},
 }
 
