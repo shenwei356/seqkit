@@ -376,13 +376,21 @@ Attentions:
 
 						var seqRP *seq.Seq
 						var l int
-						var loc []int
-						var i, begin, end int
-						var pSeq []byte
-						var pName string
 						var sfmi *fmi.FMIndex
 						sfmi = fmi.NewFMIndex()
 						results := make([]string, 0, 2)
+
+						var _wg sync.WaitGroup
+						_done := make(chan int)
+						_tokens := make(chan int, config.Threads)
+						_ch := make(chan string, config.Threads)
+
+						go func() {
+							for r := range _ch {
+								results = append(results, r)
+							}
+							_done <- 1
+						}()
 
 						if !(degenerate || useRegexp) && ignoreCase {
 							record.Seq.Seq = bytes.ToLower(record.Seq.Seq)
@@ -399,68 +407,84 @@ Attentions:
 							checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
 						}
 
-						for pName, pSeq = range patterns {
-							loc, err = sfmi.Locate(pSeq, mismatches)
-							if err != nil {
-								checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", pName, record.Name, err))
-							}
-							for _, i = range loc {
-								if circular && i+1 > l { // 2nd clone of original part
-									continue
-								}
+						for pName, pSeq := range patterns {
+							_tokens <- 1
+							_wg.Add(1)
 
-								begin = i + 1
-
-								end = i + len(pSeq)
-								if i+len(pSeq) > len(record.Seq.Seq) {
-									continue
+							go func(pName string, pSeq []byte) {
+								loc, err := sfmi.Locate(pSeq, mismatches)
+								if err != nil {
+									checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", pName, record.Name, err))
 								}
-								if outFmtGTF {
-									results = append(results, fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%s\tgene_id \"%s\"; \n",
-										record.ID,
-										"SeqKit",
-										"location",
-										begin,
-										end,
-										0,
-										"+",
-										".",
-										pName))
-								} else if outFmtBED {
-									results = append(results, fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
-										record.ID,
-										begin-1,
-										end,
-										pName,
-										0,
-										"+"))
-								} else {
-									if hideMatched {
-										results = append(results, fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
+								var begin, end int
+								for _, i := range loc {
+									if circular && i+1 > l { // 2nd clone of original part
+										continue
+									}
+
+									begin = i + 1
+
+									end = i + len(pSeq)
+									if i+len(pSeq) > len(record.Seq.Seq) {
+										continue
+									}
+									if outFmtGTF {
+										_ch <- fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%s\tgene_id \"%s\"; \n",
 											record.ID,
-											pName,
-											patterns[pName],
-											"+",
-											begin,
-											end))
-									} else {
-										results = append(results, fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-											record.ID,
-											pName,
-											patterns[pName],
-											"+",
+											"SeqKit",
+											"location",
 											begin,
 											end,
-											record.Seq.Seq[i:i+len(pSeq)]))
+											0,
+											"+",
+											".",
+											pName)
+									} else if outFmtBED {
+										_ch <- fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
+											record.ID,
+											begin-1,
+											end,
+											pName,
+											0,
+											"+")
+									} else {
+										if hideMatched {
+											_ch <- fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
+												record.ID,
+												pName,
+												patterns[pName],
+												"+",
+												begin,
+												end)
+										} else {
+											_ch <- fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+												record.ID,
+												pName,
+												patterns[pName],
+												"+",
+												begin,
+												end,
+												record.Seq.Seq[i:i+len(pSeq)])
+										}
 									}
 								}
-							}
+
+								_wg.Done()
+								<-_tokens
+							}(pName, pSeq)
 						}
 
+						_wg.Wait()
+
 						if _onlyPositiveStrand {
+							close(_ch)
+							<-_done
+
 							ch <- &Arecord{record: results, id: id, ok: len(results) > 0}
 							return
 						}
+
+						var _wg2 sync.WaitGroup
 
 						seqRP = record.Seq.RevCom()
 
@@ -468,62 +492,76 @@ Attentions:
 						if err != nil {
 							checkError(fmt.Errorf("fail to build FMIndex for reverse complement sequence: %s", record.Name))
 						}
-						for pName, pSeq = range patterns {
-							loc, err = sfmi.Locate(pSeq, mismatches)
-							if err != nil {
-								checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", pName, record.Name, err))
-							}
-							for _, i = range loc {
-								if circular && i+1 > l { // 2nd clone of original part
-									continue
-								}
 
-								begin = l - i - len(pSeq) + 1
-								end = l - i
-								if i+len(pSeq) > len(record.Seq.Seq) {
-									continue
+						for pName, pSeq := range patterns {
+							_tokens <- 1
+							_wg2.Add(1)
+
+							go func(pName string, pSeq []byte) {
+								loc, err := sfmi.Locate(pSeq, mismatches)
+								if err != nil {
+									checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", pName, record.Name, err))
 								}
-								if outFmtGTF {
-									results = append(results, fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%s\tgene_id \"%s\"; \n",
-										record.ID,
-										"SeqKit",
-										"location",
-										begin,
-										end,
-										0,
-										"-",
-										".",
-										pName))
-								} else if outFmtBED {
-									results = append(results, fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
-										record.ID,
-										begin-1,
-										end,
-										pName,
-										0,
-										"-"))
-								} else {
-									if hideMatched {
-										results = append(results, fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
+								var begin, end int
+								for _, i := range loc {
+									if circular && i+1 > l { // 2nd clone of original part
+										continue
+									}
+
+									begin = l - i - len(pSeq) + 1
+									end = l - i
+									if i+len(pSeq) > len(record.Seq.Seq) {
+										continue
+									}
+									if outFmtGTF {
+										_ch <- fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%s\tgene_id \"%s\"; \n",
 											record.ID,
-											pName,
-											patterns[pName],
-											"-",
-											begin,
-											end))
-									} else {
-										results = append(results, fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-											record.ID,
-											pName,
-											patterns[pName],
-											"-",
+											"SeqKit",
+											"location",
 											begin,
 											end,
-											seqRP.Seq[i:i+len(pSeq)]))
+											0,
+											"-",
+											".",
+											pName)
+									} else if outFmtBED {
+										_ch <- fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
+											record.ID,
+											begin-1,
+											end,
+											pName,
+											0,
+											"-")
+									} else {
+										if hideMatched {
+											_ch <- fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
+												record.ID,
+												pName,
+												patterns[pName],
+												"-",
+												begin,
+												end)
+										} else {
+											_ch <- fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+												record.ID,
+												pName,
+												patterns[pName],
+												"-",
+												begin,
+												end,
+												seqRP.Seq[i:i+len(pSeq)])
+										}
 									}
 								}
-							}
+
+								_wg2.Done()
+								<-_tokens
+							}(pName, pSeq)
 						}
+
+						_wg2.Wait()
+						close(_ch)
+						<-_done
 
 						ch <- &Arecord{record: results, id: id, ok: len(results) > 0}
 					}(record.Clone(), id)
