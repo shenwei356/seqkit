@@ -121,7 +121,7 @@ The University of Hong Kong, HK for advice on the manuscript.
 We thank [Li Peng](https://github.com/penglbio) for reporting many bugs.
 
 We appreciate [Klaus Post](https://github.com/klauspost) for his fantastic packages (
-[compress](https://github.com/klauspost/compress) and [pgzip](github.com/klauspost/pgzip)
+[compress](https://github.com/klauspost/compress) and [pgzip](https://github.com/klauspost/pgzip)
 ) which accelerate gzip file reading and writing.
 
 ## Contact
