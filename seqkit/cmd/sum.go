@@ -78,6 +78,7 @@ Method:
 		k := getFlagPositiveInt(cmd, "kmer-size")
 		removeGaps := getFlagBool(cmd, "remove-gaps")
 		gapLetters := getFlagString(cmd, "gap-letters")
+		all := getFlagBool(cmd, "all")
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
@@ -108,8 +109,12 @@ Method:
 
 				if _id == id { // right there
 					if r.ok {
-						fmt.Fprintf(outfh, "%s\t%s\n", r.result.Digest, r.result.File)
-						// fmt.Fprintf(outfh, "%s\t%d\t%d\t%s\n", r.result.Digest, r.result.SeqLen, r.result.SeqNum, r.result.File)
+						if all {
+							fmt.Fprintf(outfh, "%s\t%s\t%d\t%d\n", r.result.Digest, r.result.File, r.result.SeqNum, r.result.SeqLen)
+						} else {
+							fmt.Fprintf(outfh, "%s\t%s\n", r.result.Digest, r.result.File)
+						}
+
 						outfh.Flush()
 					}
 					id++
@@ -120,8 +125,11 @@ Method:
 
 				if _r, ok = m[id]; ok { // check buffered
 					if r.ok {
-						fmt.Fprintf(outfh, "%s\t%s\n", _r.result.Digest, _r.result.File)
-						// fmt.Fprintf(outfh, "%s\t%d\t%d\t%s\n", _r.result.Digest, _r.result.SeqLen, _r.result.SeqNum, _r.result.File)
+						if all {
+							fmt.Fprintf(outfh, "%s\t%s\t%d\t%d\n", _r.result.Digest, _r.result.File, _r.result.SeqNum, _r.result.SeqLen)
+						} else {
+							fmt.Fprintf(outfh, "%s\t%s\n", _r.result.Digest, _r.result.File)
+						}
 						outfh.Flush()
 					}
 					delete(m, id)
@@ -141,8 +149,11 @@ Method:
 					_r = m[_id]
 
 					if _r.ok {
-						fmt.Fprintf(outfh, "%s\t%s\n", _r.result.Digest, _r.result.File)
-						// fmt.Fprintf(outfh, "%s\t%d\t%d\t%s\n", _r.result.Digest, _r.result.SeqLen, _r.result.SeqNum, _r.result.File)
+						if all {
+							fmt.Fprintf(outfh, "%s\t%s\t%d\t%d\n", _r.result.Digest, _r.result.File, _r.result.SeqNum, _r.result.SeqLen)
+						} else {
+							fmt.Fprintf(outfh, "%s\t%s\n", _r.result.Digest, _r.result.File)
+						}
 						outfh.Flush()
 					}
 				}
@@ -366,6 +377,7 @@ func init() {
 	sumCmd.Flags().BoolP("basename", "b", false, "only output basename of files")
 	sumCmd.Flags().BoolP("remove-gaps", "g", false, "remove gaps")
 	sumCmd.Flags().StringP("gap-letters", "G", "- 	.", "gap letters")
+	sumCmd.Flags().BoolP("all", "a", false, "all information, including the sequences length and the number of sequences")
 }
 
 type SumResult struct {
