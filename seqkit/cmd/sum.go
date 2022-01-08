@@ -124,7 +124,7 @@ Method:
 				m[_id] = r // save for later check
 
 				if _r, ok = m[id]; ok { // check buffered
-					if r.ok {
+					if _r.ok {
 						if all {
 							fmt.Fprintf(outfh, "%s\t%s\t%d\t%d\n", _r.result.Digest, _r.result.File, _r.result.SeqNum, _r.result.SeqLen)
 						} else {
@@ -190,7 +190,7 @@ Method:
 						ok:     false,
 						result: nil,
 					}
-					log.Warningf(fmt.Sprintf("%s: %s", file, err))
+					log.Warningf(fmt.Sprintf("skip file: %s: %s", file, err))
 					return
 				}
 
@@ -215,18 +215,32 @@ Method:
 								ok:     false,
 								result: nil,
 							}
-							log.Warningf(fmt.Sprintf("%s: %s", file, err))
+							log.Warningf(fmt.Sprintf("skip file: %s: %s", file, err))
 							return
 						}
 
 						_seq = record.Seq
 
 						if k > len(_seq.Seq) {
-							checkError(fmt.Errorf("k is too big for sequence of %d bp: %s", len(record.Seq.Seq), file))
+							// checkError(fmt.Errorf("k is too big for sequence of %d bp: %s", len(record.Seq.Seq), file))
+							ch <- &Aresult{
+								id:     id,
+								ok:     false,
+								result: nil,
+							}
+							log.Errorf(fmt.Sprintf("k is too big for sequence of %d bp: %s", len(record.Seq.Seq), file))
+							return
 						}
 
 						if n >= 1 {
-							checkError(fmt.Errorf("only one sequence is allowed for circular genome"))
+							// checkError(fmt.Errorf("only one sequence is allowed for circular genome"))
+							ch <- &Aresult{
+								id:     id,
+								ok:     false,
+								result: nil,
+							}
+							log.Warningf(fmt.Sprintf("skip file with > 1 sequences: %s", file))
+							return
 						}
 
 						if removeGaps {
