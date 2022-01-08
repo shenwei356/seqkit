@@ -34,7 +34,6 @@ import (
 	"github.com/cespare/xxhash/v2"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
-	"github.com/shenwei356/bio/sketches"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 	"github.com/twotwotwo/sorts/sortutil"
@@ -110,6 +109,7 @@ Method:
 				if _id == id { // right there
 					if r.ok {
 						fmt.Fprintf(outfh, "%s\t%s\n", r.result.Digest, r.result.File)
+						// fmt.Fprintf(outfh, "%s\t%d\t%d\t%s\n", r.result.Digest, r.result.SeqLen, r.result.SeqNum, r.result.File)
 						outfh.Flush()
 					}
 					id++
@@ -121,6 +121,7 @@ Method:
 				if _r, ok = m[id]; ok { // check buffered
 					if r.ok {
 						fmt.Fprintf(outfh, "%s\t%s\n", _r.result.Digest, _r.result.File)
+						// fmt.Fprintf(outfh, "%s\t%d\t%d\t%s\n", _r.result.Digest, _r.result.SeqLen, _r.result.SeqNum, _r.result.File)
 						outfh.Flush()
 					}
 					delete(m, id)
@@ -141,6 +142,7 @@ Method:
 
 					if _r.ok {
 						fmt.Fprintf(outfh, "%s\t%s\n", _r.result.Digest, _r.result.File)
+						// fmt.Fprintf(outfh, "%s\t%d\t%d\t%s\n", _r.result.Digest, _r.result.SeqLen, _r.result.SeqNum, _r.result.File)
 						outfh.Flush()
 					}
 				}
@@ -182,7 +184,11 @@ Method:
 
 				if circular {
 					var ok bool
-					var iter *sketches.Iterator
+					// var iter *sketches.Iterator
+					var slider func() (*seq.Seq, bool)
+					var s *seq.Seq
+					var h2 uint64
+
 					for {
 						record, err = fastxReader.Read()
 						if err != nil {
@@ -213,15 +219,33 @@ Method:
 						}
 
 						record.Seq.Seq = bytes.ToLower(record.Seq.Seq)
-						iter, err = sketches.NewHashIterator(record.Seq, k, true, true)
+
+						// ntHash shoud be simpler and faster, but some thing wrong I didn't fingure out.
+						// iter, err = sketches.NewHashIterator(record.Seq, k, true, true)
+						// for {
+						// 	h, ok = iter.NextHash()
+						// 	if !ok {
+						// 		break
+						// 	}
+
+						// 	hashes = append(hashes, h)
+						// }
+
+						slider = record.Seq.Slider(k, 1, true, true)
 
 						for {
-							h, ok = iter.NextHash()
+							s, ok = slider()
 							if !ok {
 								break
 							}
 
-							hashes = append(hashes, h)
+							h = xxhash.Sum64(s.Seq)
+							h2 = xxhash.Sum64(s.Clone().RevComInplace().Seq)
+							if h < h2 {
+								hashes = append(hashes, h)
+							} else {
+								hashes = append(hashes, h2)
+							}
 						}
 
 						n++
