@@ -34,6 +34,7 @@ import (
 	"github.com/cespare/xxhash/v2"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/bio/sketches"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 	"github.com/twotwotwo/sorts/sortutil"
@@ -42,14 +43,25 @@ import (
 // sumCmd represents the fq2fa command
 var sumCmd = &cobra.Command{
 	Use:   "sum",
-	Short: "compute message digest for FASTA/Q files",
-	Long: `compute message digest for FASTA/Q files
+	Short: "compute message digest for all sequences in FASTA/Q files",
+	Long: `compute message digest for all sequences in FASTA/Q files
 
-Methods:
-  1. computing the hash (xxhash) for every sequence (in lower case, gap removed).
-  2. sorting all hash values, for ignoring the order or sequences.
-  3. computing MD5 digest from the hash values from 2),
-     along with sequences length and number.
+Attentions:
+  1. Sequence headers and qualities are skipped, only sequences matter.
+  2. The order of sequences records does not matter.
+  3. Circular complete genomes are supported with the flag -c/--circular.
+     - The same genomes with different start positions or in reverse
+       complement strand will not affect the result.
+     - The message digest would change with different values of k-mer size.
+  4. Multiple files are processed in parallel (-j/--threads).
+
+Method:
+  1. Converting the sequences to low cases, optionally removing gaps (-g).
+  2. Computing the hash (xxhash) for all sequences or k-mers of a circular
+     complete genome (-c/--circular).
+  3. Sorting all hash values, for ignoring the order of sequences.
+  4. Computing MD5 digest from the hash values, sequences length, and
+     the number of sequences.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -64,7 +76,8 @@ Methods:
 
 		basename := getFlagBool(cmd, "basename")
 		circular := getFlagBool(cmd, "circular")
-		// removeGaps := getFlagBool(cmd, "remove-gaps")
+		k := getFlagPositiveInt(cmd, "kmer-size")
+		removeGaps := getFlagBool(cmd, "remove-gaps")
 		gapLetters := getFlagString(cmd, "gap-letters")
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
@@ -74,27 +87,74 @@ Methods:
 		defer outfh.Close()
 
 		tokens := make(chan int, config.Threads)
-		ch := make(chan SumResult, config.Threads)
 		done := make(chan int)
 		var wg sync.WaitGroup
 
+		type Aresult struct {
+			ok     bool
+			id     uint64
+			result *SumResult
+		}
+		ch := make(chan *Aresult, config.Threads)
+
 		go func() {
-			var file string
+			m := make(map[uint64]*Aresult, config.Threads)
+			var id, _id uint64
+			var ok bool
+			var _r *Aresult
+
+			id = 1
 			for r := range ch {
-				file = r.File
-				if basename {
-					file = filepath.Base(file)
+				_id = r.id
+
+				if _id == id { // right there
+					if r.ok {
+						fmt.Fprintf(outfh, "%s\t%s\n", r.result.Digest, r.result.File)
+						outfh.Flush()
+					}
+					id++
+					continue
 				}
-				fmt.Fprintf(outfh, "%s\t%s\n", r.Digest, file)
+
+				m[_id] = r // save for later check
+
+				if _r, ok = m[id]; ok { // check buffered
+					if r.ok {
+						fmt.Fprintf(outfh, "%s\t%s\n", _r.result.Digest, _r.result.File)
+						outfh.Flush()
+					}
+					delete(m, id)
+					id++
+				}
+			}
+
+			if len(m) > 0 {
+				ids := make([]uint64, len(m))
+				i := 0
+				for _id = range m {
+					ids[i] = _id
+					i++
+				}
+				sortutil.Uint64s(ids)
+				for _, _id = range ids {
+					_r = m[_id]
+
+					if _r.ok {
+						fmt.Fprintf(outfh, "%s\t%s\n", _r.result.Digest, _r.result.File)
+						outfh.Flush()
+					}
+				}
 			}
 			done <- 1
 		}()
 
+		var id uint64
 		for _, file := range files {
 			tokens <- 1
 			wg.Add(1)
+			id++
 
-			go func(file string) {
+			go func(file string, id uint64) {
 				defer func() {
 					<-tokens
 					wg.Done()
@@ -109,28 +169,92 @@ Methods:
 				var fastxReader *fastx.Reader
 
 				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
-				checkError(err)
+				// checkError(err)
+				if err != nil {
+					ch <- &Aresult{
+						id:     id,
+						ok:     false,
+						result: nil,
+					}
+					log.Warningf(fmt.Sprintf("%s: %s", file, err))
+					return
+				}
 
-				for {
-					record, err = fastxReader.Read()
-					if err != nil {
-						if err == io.EOF {
-							break
+				if circular {
+					var ok bool
+					var iter *sketches.Iterator
+					for {
+						record, err = fastxReader.Read()
+						if err != nil {
+							if err == io.EOF {
+								break
+							}
+							// checkError(err)
+							// break
+							ch <- &Aresult{
+								id:     id,
+								ok:     false,
+								result: nil,
+							}
+							log.Warningf(fmt.Sprintf("%s: %s", file, err))
+							return
 						}
-						checkError(err)
-						break
+
+						if k > len(record.Seq.Seq) {
+							checkError(fmt.Errorf("k is too big for sequence of %d bp: %s", len(record.Seq.Seq), file))
+						}
+
+						if n >= 1 {
+							checkError(fmt.Errorf("only one sequence is allowed for circular genome"))
+						}
+
+						if removeGaps {
+							record.Seq.RemoveGapsInplace(gapLetters)
+						}
+
+						record.Seq.Seq = bytes.ToLower(record.Seq.Seq)
+						iter, err = sketches.NewHashIterator(record.Seq, k, true, true)
+
+						for {
+							h, ok = iter.NextHash()
+							if !ok {
+								break
+							}
+
+							hashes = append(hashes, h)
+						}
+
+						n++
+						l += len(record.Seq.Seq)
 					}
+				} else {
+					for {
+						record, err = fastxReader.Read()
+						if err != nil {
+							if err == io.EOF {
+								break
+							}
+							// checkError(err)
+							// break
+							ch <- &Aresult{
+								id:     id,
+								ok:     false,
+								result: nil,
+							}
+							log.Warningf(fmt.Sprintf("%s: %s", file, err))
+							return
+						}
 
-					if circular && n >= 1 {
-						checkError(fmt.Errorf("only one sequence is allowed for circular genome"))
+						if removeGaps {
+							record.Seq.RemoveGapsInplace(gapLetters)
+						}
+
+						h = xxhash.Sum64(bytes.ToLower(record.Seq.Seq))
+						hashes = append(hashes, h)
+
+						n++
+						l += len(record.Seq.Seq)
 					}
-
-					h = xxhash.Sum64(bytes.ToLower(record.Seq.RemoveGapsInplace(gapLetters).Seq))
-
-					hashes = append(hashes, h)
-
-					n++
-					l += len(record.Seq.Seq)
 				}
 
 				// sequences
@@ -158,13 +282,20 @@ Methods:
 				digest := md5.Sum(buf)
 
 				// return result
-				ch <- SumResult{
-					File:   file,
-					SeqNum: n,
-					SeqLen: l,
-					Digest: hex.EncodeToString(digest[:]),
+				if basename {
+					file = filepath.Base(file)
 				}
-			}(file)
+				ch <- &Aresult{
+					id: id,
+					ok: true,
+					result: &SumResult{
+						File:   file,
+						SeqNum: n,
+						SeqLen: l,
+						Digest: hex.EncodeToString(digest[:]),
+					},
+				}
+			}(file, id)
 		}
 
 		wg.Wait()
@@ -177,8 +308,9 @@ func init() {
 	RootCmd.AddCommand(sumCmd)
 
 	sumCmd.Flags().BoolP("circular", "c", false, "the file contains a single cicular genome sequence")
+	sumCmd.Flags().IntP("kmer-size", "k", 1000, "k-mer size for processing circular genomes")
 	sumCmd.Flags().BoolP("basename", "b", false, "only output basename of files")
-	// seqCmd.Flags().BoolP("remove-gaps", "g", false, "remove gaps")
+	sumCmd.Flags().BoolP("remove-gaps", "g", false, "remove gaps")
 	sumCmd.Flags().StringP("gap-letters", "G", "- 	.", "gap letters")
 }
 

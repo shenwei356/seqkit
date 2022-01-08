@@ -2,9 +2,9 @@
 
 ## Quick Guide
 
-- Basic: [seq](#seq), [stats](#stats), [subseq](#subseq), [sliding](#sliding),
+- Basic: [seq](#seq), [stats](#stats), [sum](#sum), [subseq](#subseq), [sliding](#sliding),
   [faidx](#faidx), [watch](#watch), [sana](#sana), [scat](#scat)
-- Format conversion: [fq2fa](#fq2fa), [fx2tab](#fx2tab-tab2fx), [tab2fx](#fx2tab-tab2fx),
+- Format conversion: [fq2fa](#fq2fa), [fa2fq](#fa2fq), [fx2tab](#fx2tab-tab2fx), [tab2fx](#fx2tab-tab2fx),
   [convert](#convert), [translate](#translate)
 - Searching: [grep](#grep), [locate](#locate), [amplicon](#amplicon), [fish](#fish)
 - Set operation: [sample](#sample), [rmdup](#rmdup), [common](#common),
@@ -154,7 +154,7 @@ reproduced in different environments with same random seed.
 ``` text
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 2.0.0
+Version: 2.2.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -177,10 +177,10 @@ Available Commands:
   amplicon        extract amplicon (or specific region around it) via primer(s)
   bam             monitoring and online histograms of BAM record features
   common          find common sequences of multiple files by id/name/sequence
-  completion      generate the autocompletion script for the specified shell
   concat          concatenate sequences with same ID from multiple files
   convert         convert FASTQ quality encoding between Sanger, Solexa and Illumina
   duplicate       duplicate sequences N times
+  fa2fq           retrieve corresponding FASTQ records by a FASTA file
   faidx           create FASTA index file and extract subsequence
   fish            look for short sequences in larger sequences using local alignment
   fq2fa           convert FASTQ to FASTA
@@ -189,7 +189,6 @@ Available Commands:
   grep            search sequences by ID/name/sequence/sequence motifs, mismatch allowed
   head            print first N FASTA/Q records
   head-genome     print sequences of the first genome with common prefixes in name
-  help            Help about any command
   locate          locate subsequences/motifs, mismatch allowed
   mutate          edit sequence (point mutation, insertion, deletion)
   pair            match up paired-end reads from two fastq files
@@ -209,6 +208,7 @@ Available Commands:
   split2          split sequences into files by size/parts (FASTA, PE/SE FASTQ)
   stats           simple statistics of FASTA/Q files
   subseq          get subsequences by region/gtf/bed, including flanking sequences
+  sum             compute message digest for all sequences in FASTA/Q files
   tab2fx          convert tabular format to FASTA/Q format
   translate       translate DNA/RNA to protein sequence (supporting ambiguous bases)
   version         print version information and check for update
@@ -734,7 +734,100 @@ Eexamples
         
 1. Output basename instead of full path (`-b/--basename`)
     
+## sum
 
+Usage
+
+```text
+compute message digest for all sequences in FASTA/Q files
+
+Attentions:
+  1. Sequence headers and qualities are skipped, only sequences matter.
+  2. The order of sequences records does not matter.
+  3. Circular complete genomes are supported with the flag -c/--circular.
+     - The same genomes with different start positions or in reverse
+       complement strand will not affect the result.
+     - The message digest would change with different values of k-mer size.
+  4. Multiple files are processed in parallel (-j/--threads).
+
+Method:
+  1. Converting the sequences to low cases, optionally removing gaps (-g).
+  2. Computing the hash (xxhash) for all sequences or k-mers of a circular
+     complete genome (-c/--circular).
+  3. Sorting all hash values, for ignoring the order of sequences.
+  4. Computing MD5 digest from the hash values, sequences length, and
+     the number of sequences.
+
+Usage:
+  seqkit sum [flags]
+
+Flags:
+  -b, --basename             only output basename of files
+  -c, --circular             the file contains a single cicular genome sequence
+  -G, --gap-letters string   gap letters (default "- \t.")
+  -h, --help                 help for sum
+  -k, --kmer-size int        k-mer size for processing circular genomes (default 1000)
+  -g, --remove-gaps          remove gaps
+
+```
+
+Examples:
+
+A, B, C, D are the same vircular genomes with different starting positions or strands:
+
+    $ cat virus-{A,B,C,D}.fasta
+    >seq
+    TGGTAGGGAGTTGAGTAGCATGGGTATAGTATAGTGTCATGATGCCAGATTTTAAAAAAA
+    >seq.revcom
+    TTTTTTTAAAATCTGGCATCATGACACTATACTATACCCATGCTACTCAACTCCCTACCA
+    >seq.new-start
+    GGTAGGGAGTTGAGTAGCATGGGTATAGTATAGTGTCATGATGCCAGATTTTAAAAAAAT
+    >seq.revcom.new-start
+    TTTTTTAAAATCTGGCATCATGACACTATACTATACCCATGCTACTCAACTCCCTACCAT
+    
+    # cat to one file
+    $ cat virus-{A,B,C,D}.fasta > virues.fasta
+    
+    # shuffle and rename
+    $ cat virus-{A,B,C,D}.fasta \
+        | seqkit shuffle \
+        | seqkit replace -p '.*' -r '{nr}' \
+        | tee virues.shuffled.fasta
+    >1
+    TTTTTTAAAATCTGGCATCATGACACTATACTATACCCATGCTACTCAACTCCCTACCAT
+    >2
+    TGGTAGGGAGTTGAGTAGCATGGGTATAGTATAGTGTCATGATGCCAGATTTTAAAAAAA
+    >3
+    GGTAGGGAGTTGAGTAGCATGGGTATAGTATAGTGTCATGATGCCAGATTTTAAAAAAAT
+    >4
+    TTTTTTTAAAATCTGGCATCATGACACTATACTATACCCATGCTACTCAACTCCCTACCA
+
+Sum of all files (the sequences order does not matter):
+
+    $ seqkit sum viru*.fasta
+    9bbe0abefc26013dffdde952a6725b17        virues.fasta
+    9bbe0abefc26013dffdde952a6725b17        virues.shuffled.fasta
+    176250c8d1cde6c385397df525aa1a94        virus-A.fasta
+    7a813339f9ae686b376b1df55cd596ca        virus-B.fasta
+    0fd51028bfbfa85ddbdd2b86ef7bd1c1        virus-C.fasta
+    88b1d20dd0fe0dbf41c00b075fee4e4e        virus-D.fasta
+
+Circular genomes (the same genomes with different start positions or in reverse
+complement strand will not affect the result):
+
+    $ seqkit sum -c -k 21  virus-*.fasta
+    a7bc5eca47c14bb9db5568f7c5446b92        virus-A.fasta
+    a7bc5eca47c14bb9db5568f7c5446b92        virus-B.fasta
+    a7bc5eca47c14bb9db5568f7c5446b92        virus-C.fasta
+    a7bc5eca47c14bb9db5568f7c5446b92        virus-D.fasta
+    
+    $ seqkit sum -c -k 51  virus-*.fasta
+    90cf26400dc1853e178582dfe8204a3a        virus-A.fasta
+    90cf26400dc1853e178582dfe8204a3a        virus-B.fasta
+    90cf26400dc1853e178582dfe8204a3a        virus-C.fasta
+    90cf26400dc1853e178582dfe8204a3a        virus-D.fasta
+
+    
 ## faidx
 
 Usage
@@ -953,7 +1046,7 @@ Examples
 
 Usage
 
-``` text
+```text
 convert FASTQ to FASTA
 
 Usage:
@@ -966,6 +1059,27 @@ Examples
     seqkit fq2fa reads_1.fq.gz -o reads_1.fa.gz
 
 
+## fa2fq
+
+Usage
+
+```text
+retrieve corresponding FASTQ records by a FASTA file
+
+Attention:
+  1. We assume the FASTA file comes from the FASTQ file,
+     so they share sequence IDs, and sequences in FASTA
+     should be subseq of sequences in FASTQ file.
+
+Usage:
+  seqkit fa2fq [flags]
+
+Flags:
+  -f, --fasta-file string      FASTA file)
+  -h, --help                   help for fa2fq
+  -P, --only-positive-strand   only search on positive strand
+```
+    
 ## fx2tab & tab2fx
 
 Usage (fx2tab)

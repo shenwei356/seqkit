@@ -1,5 +1,6 @@
 - [SeqKit v2.2.0](https://github.com/shenwei356/seqkit/releases/tag/v2.2.0) - 2021-11-15
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.2.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.2.0)
+    - new command `seqkit sum`: computing message digest for all sequences in FASTA/Q files"
     - new command `seqkit fa2fq`: retrieving corresponding FASTQ records by a FASTA file
     - `seqkit locate`:
         - parallelizing `-F/--use-fmi` and `-m` for large number of search patterns.

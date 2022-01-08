@@ -152,7 +152,7 @@ Attentions:
 			}
 			for name, record := range records {
 				patterns[name] = record.Seq.Seq
-				if !quiet && bytes.IndexAny(record.Seq.Seq, "\t ") >= 0 {
+				if !quiet && bytes.Contains(record.Seq.Seq, []byte("\t ")) {
 					log.Warningf("space found in sequence: %s", name)
 				}
 
