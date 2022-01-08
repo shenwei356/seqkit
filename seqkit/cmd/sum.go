@@ -39,7 +39,7 @@ import (
 	"github.com/twotwotwo/sorts/sortutil"
 )
 
-// sumCmd represents the fq2fa command
+// sumCmd represents the sum command
 var sumCmd = &cobra.Command{
 	Use:   "sum",
 	Short: "compute message digest for all sequences in FASTA/Q files",
@@ -169,6 +169,7 @@ Method:
 
 				var record *fastx.Record
 				var fastxReader *fastx.Reader
+				var _seq *seq.Seq
 
 				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 				// checkError(err)
@@ -183,12 +184,13 @@ Method:
 				}
 
 				if circular {
-					var ok bool
-					// var iter *sketches.Iterator
-					var slider func() (*seq.Seq, bool)
-					var s *seq.Seq
-					var h2 uint64
+					// var ok bool
 
+					// var iter *sketches.Iterator
+					var rc *seq.Seq
+					var s, src []byte
+					var h2 uint64
+					var i, j, e, l, end, originalLen int
 					for {
 						record, err = fastxReader.Read()
 						if err != nil {
@@ -206,7 +208,9 @@ Method:
 							return
 						}
 
-						if k > len(record.Seq.Seq) {
+						_seq = record.Seq
+
+						if k > len(_seq.Seq) {
 							checkError(fmt.Errorf("k is too big for sequence of %d bp: %s", len(record.Seq.Seq), file))
 						}
 
@@ -215,13 +219,13 @@ Method:
 						}
 
 						if removeGaps {
-							record.Seq.RemoveGapsInplace(gapLetters)
+							_seq.RemoveGapsInplace(gapLetters)
 						}
 
-						record.Seq.Seq = bytes.ToLower(record.Seq.Seq)
+						_seq.Seq = bytes.ToLower(_seq.Seq)
 
-						// ntHash shoud be simpler and faster, but some thing wrong I didn't fingure out.
-						// iter, err = sketches.NewHashIterator(record.Seq, k, true, true)
+						// // ntHash shoud be simpler and faster, but some thing wrong I didn't fingure out.
+						// iter, err = sketches.NewHashIterator(_seq, k, true, true)
 						// for {
 						// 	h, ok = iter.NextHash()
 						// 	if !ok {
@@ -231,21 +235,44 @@ Method:
 						// 	hashes = append(hashes, h)
 						// }
 
-						slider = record.Seq.Slider(k, 1, true, true)
+						rc = _seq.RevCom()
 
+						l = len(_seq.Seq)
+						originalLen = l
+						end = l - 1
+
+						i = 0
 						for {
-							s, ok = slider()
-							if !ok {
+							if i > end {
 								break
 							}
+							e = i + k
 
-							h = xxhash.Sum64(s.Seq)
-							h2 = xxhash.Sum64(s.Clone().RevComInplace().Seq)
+							if e > originalLen {
+								e = e - originalLen
+								s = _seq.Seq[i:]
+								s = append(s, _seq.Seq[0:e]...)
+
+								j = l - i
+								src = rc.Seq[l-e:]
+								src = append(src, rc.Seq[0:j]...)
+							} else {
+								s = _seq.Seq[i : i+k]
+
+								j = l - i
+								src = rc.Seq[j-k : j]
+							}
+							// fmt.Println(i, string(s), string(src))
+
+							h = xxhash.Sum64(s)
+							h2 = xxhash.Sum64(src)
 							if h < h2 {
 								hashes = append(hashes, h)
 							} else {
 								hashes = append(hashes, h2)
 							}
+
+							i++
 						}
 
 						n++
@@ -269,15 +296,17 @@ Method:
 							return
 						}
 
+						_seq = record.Seq
+
 						if removeGaps {
-							record.Seq.RemoveGapsInplace(gapLetters)
+							_seq.RemoveGapsInplace(gapLetters)
 						}
 
-						h = xxhash.Sum64(bytes.ToLower(record.Seq.Seq))
+						h = xxhash.Sum64(bytes.ToLower(_seq.Seq))
 						hashes = append(hashes, h)
 
 						n++
-						l += len(record.Seq.Seq)
+						l += len(_seq.Seq)
 					}
 				}
 
@@ -289,6 +318,7 @@ Method:
 				di := xxhash.New()
 
 				for _, h = range hashes {
+					// fmt.Println(h)
 					le.PutUint64(buf, h)
 					di.Write(buf)
 				}

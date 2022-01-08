@@ -816,17 +816,20 @@ Circular genomes (the same genomes with different start positions or in reverse
 complement strand will not affect the result):
 
     $ seqkit sum -c -k 21  virus-*.fasta
-    a7bc5eca47c14bb9db5568f7c5446b92        virus-A.fasta
-    a7bc5eca47c14bb9db5568f7c5446b92        virus-B.fasta
-    a7bc5eca47c14bb9db5568f7c5446b92        virus-C.fasta
-    a7bc5eca47c14bb9db5568f7c5446b92        virus-D.fasta
+    8935b72c29c293ab5ec96acad1e64af0        virus-A.fasta
+    8935b72c29c293ab5ec96acad1e64af0        virus-B.fasta
+    8935b72c29c293ab5ec96acad1e64af0        virus-C.fasta
+    8935b72c29c293ab5ec96acad1e64af0        virus-D.fasta
     
     $ seqkit sum -c -k 51  virus-*.fasta
-    90cf26400dc1853e178582dfe8204a3a        virus-A.fasta
-    90cf26400dc1853e178582dfe8204a3a        virus-B.fasta
-    90cf26400dc1853e178582dfe8204a3a        virus-C.fasta
-    90cf26400dc1853e178582dfe8204a3a        virus-D.fasta
-
+    55ca24ee678fba50ecad7c672f521c40        virus-A.fasta
+    55ca24ee678fba50ecad7c672f521c40        virus-B.fasta
+    55ca24ee678fba50ecad7c672f521c40        virus-C.fasta
+    55ca24ee678fba50ecad7c672f521c40        virus-D.fasta
+    
+    # collect files with the same genomes
+    $ seqkit sum -c -k 51  virus-*.fasta | csvtk fold -Ht -f 1 -v 2 
+    55ca24ee678fba50ecad7c672f521c40        virus-A.fasta; virus-B.fasta; virus-C.fasta; virus-D.fasta
     
 ## faidx
 
