@@ -173,8 +173,8 @@ Method:
 					wg.Done()
 				}()
 
-				var n int // number of sequences
-				var l int // lengths of all seqs
+				var n int    // number of sequences
+				var lens int // lengths of all seqs
 				var h uint64
 				hashes := make([]uint64, 0, 1024)
 
@@ -287,7 +287,7 @@ Method:
 						}
 
 						n++
-						l += len(record.Seq.Seq)
+						lens += len(record.Seq.Seq)
 					}
 				} else {
 					for {
@@ -317,7 +317,7 @@ Method:
 						hashes = append(hashes, h)
 
 						n++
-						l += len(_seq.Seq)
+						lens += len(_seq.Seq)
 					}
 				}
 
@@ -335,7 +335,7 @@ Method:
 				}
 
 				// sequence length
-				le.PutUint64(buf, uint64(l))
+				le.PutUint64(buf, uint64(lens))
 				di.Write(buf)
 
 				// sequence number
@@ -356,7 +356,7 @@ Method:
 					result: &SumResult{
 						File:   file,
 						SeqNum: n,
-						SeqLen: l,
+						SeqLen: lens,
 						Digest: hex.EncodeToString(digest[:]),
 					},
 				}

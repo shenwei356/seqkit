@@ -762,6 +762,7 @@ Usage:
   seqkit sum [flags]
 
 Flags:
+  -a, --all                  all information, including the sequences length and the number of sequences
   -b, --basename             only output basename of files
   -c, --circular             the file contains a single cicular genome sequence
   -G, --gap-letters string   gap letters (default "- \t.")
@@ -816,20 +817,20 @@ Circular genomes (the same genomes with different start positions or in reverse
 complement strand will not affect the result):
 
     $ seqkit sum -c -k 21  virus-*.fasta
-    8935b72c29c293ab5ec96acad1e64af0        virus-A.fasta
-    8935b72c29c293ab5ec96acad1e64af0        virus-B.fasta
-    8935b72c29c293ab5ec96acad1e64af0        virus-C.fasta
-    8935b72c29c293ab5ec96acad1e64af0        virus-D.fasta
+    7efd18ce33380268d3aa335ffd2dd1cc        virus-A.fasta
+    7efd18ce33380268d3aa335ffd2dd1cc        virus-B.fasta
+    7efd18ce33380268d3aa335ffd2dd1cc        virus-C.fasta
+    7efd18ce33380268d3aa335ffd2dd1cc        virus-D.fasta
     
     $ seqkit sum -c -k 51  virus-*.fasta
-    55ca24ee678fba50ecad7c672f521c40        virus-A.fasta
-    55ca24ee678fba50ecad7c672f521c40        virus-B.fasta
-    55ca24ee678fba50ecad7c672f521c40        virus-C.fasta
-    55ca24ee678fba50ecad7c672f521c40        virus-D.fasta
-    
+    39e267864fddeafd7a5cacd77e0a6a11        virus-A.fasta
+    39e267864fddeafd7a5cacd77e0a6a11        virus-B.fasta
+    39e267864fddeafd7a5cacd77e0a6a11        virus-C.fasta
+    39e267864fddeafd7a5cacd77e0a6a11        virus-D.fasta
+        
     # collect files with the same genomes
     $ seqkit sum -c -k 51  virus-*.fasta | csvtk fold -Ht -f 1 -v 2 
-    55ca24ee678fba50ecad7c672f521c40        virus-A.fasta; virus-B.fasta; virus-C.fasta; virus-D.fasta
+    39e267864fddeafd7a5cacd77e0a6a11        virus-A.fasta; virus-B.fasta; virus-C.fasta; virus-D.fasta
     
 ## faidx
 
