@@ -29,6 +29,7 @@ import (
 	"io"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 
 	"github.com/cespare/xxhash/v2"
@@ -49,8 +50,9 @@ Attentions:
   1. Sequence headers and qualities are skipped, only sequences matter.
   2. The order of sequences records does not matter.
   3. Circular complete genomes are supported with the flag -c/--circular.
-     - The same genomes with different start positions or in reverse
-       complement strand will not affect the result.
+     - The same double-stranded genomes with different start positions or
+       in reverse complement strand will not affect the result.
+     - For single-stranded genomes like ssRNA genomes, use -s/--single-strand.
      - The message digest would change with different values of k-mer size.
   4. Multiple files are processed in parallel (-j/--threads).
 
@@ -61,6 +63,26 @@ Method:
   3. Sorting all hash values, for ignoring the order of sequences.
   4. Computing MD5 digest from the hash values, sequences length, and
      the number of sequences.
+
+Following the seqhash in Poly (https://github.com/TimothyStiles/poly/),
+We add meta information to the message digest, with format of:
+
+    <version>_<seq type><seq structure><strand>_<kmer size>_<seq digest>
+
+    <version>:       digest version
+    <seq type>:      'D' for DNA, 'R' for RNA, 'P' for protein
+    <seq structure>: 'L' for linear sequence, 'C' for circular genome
+    <strand>:        'D' for double-stranded, 'S' for single-stranded
+    <kmer size>:     0 for linear sequence, other values for circular genome
+
+Examples:
+
+    v0.1_DLS_k0_176250c8d1cde6c385397df525aa1a94    DNA.fq.gz
+    v0.1_PLS_k0_c244954e4960dd2a1409cd8ee53d92b9    Protein.fasta
+    v0.1_RLS_k0_0f1fb263f0c05a259ae179a61a80578d    single-stranded RNA.fasta
+
+    v0.1_DCD_k31_e59dad6d561f1f1f28ebf185c6f4c183   double-stranded circular DNA.fasta
+    v0.1_DCS_k31_dd050490cd62ea5f94d73d4d636b7d60   single-stranded circular DNA.fasta
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -79,6 +101,8 @@ Method:
 		removeGaps := getFlagBool(cmd, "remove-gaps")
 		gapLetters := getFlagString(cmd, "gap-letters")
 		all := getFlagBool(cmd, "all")
+		rna2dna := getFlagBool(cmd, "rna2dna")
+		singleStrand := getFlagBool(cmd, "single-strand")
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
@@ -181,6 +205,15 @@ Method:
 				var record *fastx.Record
 				var fastxReader *fastx.Reader
 				var _seq *seq.Seq
+				var ab *seq.Alphabet
+				var ii int
+				var bb byte
+
+				// add tag to the hash
+				// ref: https://github.com/TimothyStiles/poly/blob/prime/seqhash/seqhash.go
+				var seqType string      // "D" for DNA, "R" for RNA, "P" for protein
+				var seqStructure string // "L" for linear, "C" for circular
+				var strand string       // "D" for double strands, "S" for single strand
 
 				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 				// checkError(err)
@@ -194,7 +227,15 @@ Method:
 					return
 				}
 
+				checkAlphabet := true
+
 				if circular {
+					seqStructure = "C"
+					if singleStrand {
+						strand = "S"
+					} else {
+						strand = "D"
+					}
 					// var ok bool
 
 					// var iter *sketches.Iterator
@@ -219,6 +260,17 @@ Method:
 							return
 						}
 
+						if n >= 1 {
+							// checkError(fmt.Errorf("only one sequence is allowed for circular genome"))
+							ch <- &Aresult{
+								id:     id,
+								ok:     false,
+								result: nil,
+							}
+							log.Warningf(fmt.Sprintf("skip file with more than 1 sequences: %s", file))
+							return
+						}
+
 						_seq = record.Seq
 
 						if k > len(_seq.Seq) {
@@ -228,18 +280,7 @@ Method:
 								ok:     false,
 								result: nil,
 							}
-							log.Errorf(fmt.Sprintf("k is too big for sequence of %d bp: %s", len(record.Seq.Seq), file))
-							return
-						}
-
-						if n >= 1 {
-							// checkError(fmt.Errorf("only one sequence is allowed for circular genome"))
-							ch <- &Aresult{
-								id:     id,
-								ok:     false,
-								result: nil,
-							}
-							log.Warningf(fmt.Sprintf("skip file with > 1 sequences: %s", file))
+							log.Errorf(fmt.Sprintf("k (%d) is too big for sequence of %d bp: %s", k, len(record.Seq.Seq), file))
 							return
 						}
 
@@ -248,6 +289,40 @@ Method:
 						}
 
 						_seq.Seq = bytes.ToLower(_seq.Seq)
+
+						if checkAlphabet {
+							ab = fastxReader.Alphabet()
+							if ab == seq.Protein {
+								seqType = "P"
+
+								ch <- &Aresult{
+									id:     id,
+									ok:     false,
+									result: nil,
+								}
+								log.Errorf(fmt.Sprintf("the flag -c/--circular does not support protein sequences: %s", file))
+								return
+
+							} else if ab == seq.RNA || ab == seq.RNAredundant {
+								seqType = "R"
+							} else if ab == seq.DNA || ab == seq.DNAredundant {
+								seqType = "D"
+							} else {
+								seqType = "N"
+							}
+
+							checkAlphabet = false
+						}
+
+						if rna2dna {
+							if !(ab == seq.RNA || ab == seq.RNAredundant) {
+								for ii, bb = range _seq.Seq {
+									if bb == 'u' {
+										_seq.Seq[ii] = 't'
+									}
+								}
+							}
+						}
 
 						// // ntHash shoud be simpler and faster, but some thing wrong I didn't fingure out.
 						// iter, err = sketches.NewHashIterator(_seq, k, true, true)
@@ -260,7 +335,9 @@ Method:
 						// 	hashes = append(hashes, h)
 						// }
 
-						rc = _seq.RevCom()
+						if !singleStrand {
+							rc = _seq.RevCom()
+						}
 
 						l = len(_seq.Seq)
 						originalLen = l
@@ -278,23 +355,31 @@ Method:
 								s = _seq.Seq[i:]
 								s = append(s, _seq.Seq[0:e]...)
 
-								j = l - i
-								src = rc.Seq[l-e:]
-								src = append(src, rc.Seq[0:j]...)
+								if !singleStrand {
+									j = l - i
+									src = rc.Seq[l-e:]
+									src = append(src, rc.Seq[0:j]...)
+								}
 							} else {
 								s = _seq.Seq[i : i+k]
 
-								j = l - i
-								src = rc.Seq[j-k : j]
+								if !singleStrand {
+									j = l - i
+									src = rc.Seq[j-k : j]
+								}
 							}
 							// fmt.Println(i, string(s), string(src))
 
 							h = xxhash.Sum64(s)
-							h2 = xxhash.Sum64(src)
-							if h < h2 {
+							if singleStrand {
 								hashes = append(hashes, h)
 							} else {
-								hashes = append(hashes, h2)
+								h2 = xxhash.Sum64(src)
+								if h < h2 {
+									hashes = append(hashes, h)
+								} else {
+									hashes = append(hashes, h2)
+								}
 							}
 
 							i++
@@ -304,6 +389,9 @@ Method:
 						lens += len(record.Seq.Seq)
 					}
 				} else {
+					seqStructure = "L"
+					strand = "S"
+
 					for {
 						record, err = fastxReader.Read()
 						if err != nil {
@@ -327,7 +415,41 @@ Method:
 							_seq.RemoveGapsInplace(gapLetters)
 						}
 
-						h = xxhash.Sum64(bytes.ToLower(_seq.Seq))
+						_seq.Seq = bytes.ToLower(_seq.Seq)
+
+						if checkAlphabet {
+							ab = fastxReader.Alphabet()
+							if ab == seq.Protein {
+								seqType = "P"
+								if !removeGaps {
+									if !strings.Contains(gapLetters, "*") {
+										gapLetters += "*"
+									}
+									log.Infof(`the flag -g/--remove-gaps is switched on for removing the stop condon '*' character for protein sequences`)
+								}
+							} else if ab == seq.RNA || ab == seq.RNAredundant {
+								seqType = "R"
+							} else if ab == seq.DNA || ab == seq.DNAredundant {
+								seqType = "D"
+							} else {
+								seqType = "N"
+							}
+
+							checkAlphabet = false
+						}
+
+						if rna2dna {
+							if !(ab == seq.RNA || ab == seq.RNAredundant) {
+								for ii, bb = range _seq.Seq {
+									if bb == 'u' {
+										_seq.Seq[ii] = 't'
+									}
+								}
+							}
+						}
+
+						h = xxhash.Sum64(_seq.Seq)
+
 						hashes = append(hashes, h)
 
 						n++
@@ -364,6 +486,18 @@ Method:
 				if basename {
 					file = filepath.Base(file)
 				}
+
+				if !circular {
+					k = 0
+				}
+				sum := fmt.Sprintf("v%s_%s%s%s_k%d_%s",
+					sumVersion,
+					seqType,
+					seqStructure,
+					strand,
+					k,
+					hex.EncodeToString(digest[:]))
+
 				ch <- &Aresult{
 					id: id,
 					ok: true,
@@ -371,7 +505,7 @@ Method:
 						File:   file,
 						SeqNum: n,
 						SeqLen: lens,
-						Digest: hex.EncodeToString(digest[:]),
+						Digest: sum,
 					},
 				}
 			}(file, id)
@@ -390,8 +524,10 @@ func init() {
 	sumCmd.Flags().IntP("kmer-size", "k", 1000, "k-mer size for processing circular genomes")
 	sumCmd.Flags().BoolP("basename", "b", false, "only output basename of files")
 	sumCmd.Flags().BoolP("remove-gaps", "g", false, "remove gaps")
-	sumCmd.Flags().StringP("gap-letters", "G", "- 	.", "gap letters")
-	sumCmd.Flags().BoolP("all", "a", false, "all information, including the sequences length and the number of sequences")
+	sumCmd.Flags().StringP("gap-letters", "G", "- 	.*", "gap letters")
+	sumCmd.Flags().BoolP("all", "a", false, "show all information, including the sequences length and the number of sequences")
+	sumCmd.Flags().BoolP("rna2dna", "", false, "convert RNA to DNA")
+	sumCmd.Flags().BoolP("single-strand", "s", false, "only consider the positive strand of a circular genome, e.g., ssRNA virus genomes")
 }
 
 type SumResult struct {
@@ -400,3 +536,5 @@ type SumResult struct {
 	SeqLen int
 	Digest string
 }
+
+const sumVersion = "0.1"
