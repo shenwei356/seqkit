@@ -760,12 +760,12 @@ Method:
      the number of sequences.
 
 Following the seqhash in Poly (https://github.com/TimothyStiles/poly/),
-We add meta information to the message digest, with format of:
+We add meta information to the message digest, with the format of:
 
     <version>_<seq type><seq structure><strand>_<kmer size>_<seq digest>
 
     <version>:       digest version
-    <seq type>:      'D' for DNA, 'R' for RNA, 'P' for protein
+    <seq type>:      'D' for DNA, 'R' for RNA, 'P' for protein, 'N' for others
     <seq structure>: 'L' for linear sequence, 'C' for circular genome
     <strand>:        'D' for double-stranded, 'S' for single-stranded
     <kmer size>:     0 for linear sequence, other values for circular genome
