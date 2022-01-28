@@ -17,6 +17,7 @@ and
 [![Anaconda Cloud](https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit)
 - **[Please cite](#citation):** [![doi](https://img.shields.io/badge/doi-10.1371%2Fjournal.pone.0163962-blue.svg?style=flat)](https://doi.org/10.1371/journal.pone.0163962) 
 <span class="__dimensions_badge_embed__" data-doi="10.1371/journal.pone.0163962" data-style="small_rectangle"></span>
+- **Others**: [![check in Biotreasury](https://img.shields.io/badge/Biotreasury-collected-brightgreen)](https://biotreasury.rjmart.cn/#/tool?id=10081)  
 
 ## Features
 
