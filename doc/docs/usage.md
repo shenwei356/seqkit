@@ -762,7 +762,7 @@ Method:
 Following the seqhash in Poly (https://github.com/TimothyStiles/poly/),
 We add meta information to the message digest, with the format of:
 
-    <version>_<seq type><seq structure><strand>_<kmer size>_<seq digest>
+    seqkit.<version>_<seq type><seq structure><strand>_<kmer size>_<seq digest>
 
     <version>:       digest version
     <seq type>:      'D' for DNA, 'R' for RNA, 'P' for protein, 'N' for others
@@ -772,12 +772,12 @@ We add meta information to the message digest, with the format of:
 
 Examples:
 
-    v0.1_DLS_k0_176250c8d1cde6c385397df525aa1a94    DNA.fq.gz
-    v0.1_PLS_k0_c244954e4960dd2a1409cd8ee53d92b9    Protein.fasta
-    v0.1_RLS_k0_0f1fb263f0c05a259ae179a61a80578d    single-stranded RNA.fasta
+    seqkit.v0.1_DLS_k0_176250c8d1cde6c385397df525aa1a94    DNA.fq.gz
+    seqkit.v0.1_PLS_k0_c244954e4960dd2a1409cd8ee53d92b9    Protein.fasta
+    seqkit.v0.1_RLS_k0_0f1fb263f0c05a259ae179a61a80578d    single-stranded RNA.fasta
 
-    v0.1_DCD_k31_e59dad6d561f1f1f28ebf185c6f4c183   double-stranded circular DNA.fasta
-    v0.1_DCS_k31_dd050490cd62ea5f94d73d4d636b7d60   single-stranded circular DNA.fasta
+    seqkit.v0.1_DCD_k31_e59dad6d561f1f1f28ebf185c6f4c183   double-stranded-circular DNA.fasta
+    seqkit.v0.1_DCS_k31_dd050490cd62ea5f94d73d4d636b7d60   single-stranded-circular DNA.fasta
 
 Usage:
   seqkit sum [flags]
@@ -829,31 +829,31 @@ A, B, C, D are the same vircular genomes with different starting positions or st
 Sum of all files (the sequences order does not matter):
 
     $ seqkit sum viru*.fasta
-    v0.1_DLS_k0_9bbe0abefc26013dffdde952a6725b17    virues.fasta
-    v0.1_DLS_k0_9bbe0abefc26013dffdde952a6725b17    virues.shuffled.fasta
-    v0.1_DLS_k0_176250c8d1cde6c385397df525aa1a94    virus-A.fasta
-    v0.1_DLS_k0_7a813339f9ae686b376b1df55cd596ca    virus-B.fasta
-    v0.1_DLS_k0_0fd51028bfbfa85ddbdd2b86ef7bd1c1    virus-C.fasta
-    v0.1_DLS_k0_88b1d20dd0fe0dbf41c00b075fee4e4e    virus-D.fasta
+    seqkit.v0.1_DLS_k0_9bbe0abefc26013dffdde952a6725b17    virues.fasta
+    seqkit.v0.1_DLS_k0_9bbe0abefc26013dffdde952a6725b17    virues.shuffled.fasta
+    seqkit.v0.1_DLS_k0_176250c8d1cde6c385397df525aa1a94    virus-A.fasta
+    seqkit.v0.1_DLS_k0_7a813339f9ae686b376b1df55cd596ca    virus-B.fasta
+    seqkit.v0.1_DLS_k0_0fd51028bfbfa85ddbdd2b86ef7bd1c1    virus-C.fasta
+    seqkit.v0.1_DLS_k0_88b1d20dd0fe0dbf41c00b075fee4e4e    virus-D.fasta
 
 Circular genomes (the same genomes with different start positions or in reverse
 complement strand will not affect the result):
 
     $ seqkit sum -c -k 21  virus-*.fasta
-    v0.1_DCD_k21_7efd18ce33380268d3aa335ffd2dd1cc   virus-A.fasta
-    v0.1_DCD_k21_7efd18ce33380268d3aa335ffd2dd1cc   virus-B.fasta
-    v0.1_DCD_k21_7efd18ce33380268d3aa335ffd2dd1cc   virus-C.fasta
-    v0.1_DCD_k21_7efd18ce33380268d3aa335ffd2dd1cc   virus-D.fasta
+    seqkit.v0.1_DCD_k21_7efd18ce33380268d3aa335ffd2dd1cc   virus-A.fasta
+    seqkit.v0.1_DCD_k21_7efd18ce33380268d3aa335ffd2dd1cc   virus-B.fasta
+    seqkit.v0.1_DCD_k21_7efd18ce33380268d3aa335ffd2dd1cc   virus-C.fasta
+    seqkit.v0.1_DCD_k21_7efd18ce33380268d3aa335ffd2dd1cc   virus-D.fasta
     
     $ seqkit sum -c -k 51  virus-*.fasta
-    v0.1_DCD_k51_39e267864fddeafd7a5cacd77e0a6a11   virus-A.fasta
-    v0.1_DCD_k51_39e267864fddeafd7a5cacd77e0a6a11   virus-B.fasta
-    v0.1_DCD_k51_39e267864fddeafd7a5cacd77e0a6a11   virus-C.fasta
-    v0.1_DCD_k51_39e267864fddeafd7a5cacd77e0a6a11   virus-D.fasta
+    seqkit.v0.1_DCD_k51_39e267864fddeafd7a5cacd77e0a6a11   virus-A.fasta
+    seqkit.v0.1_DCD_k51_39e267864fddeafd7a5cacd77e0a6a11   virus-B.fasta
+    seqkit.v0.1_DCD_k51_39e267864fddeafd7a5cacd77e0a6a11   virus-C.fasta
+    seqkit.v0.1_DCD_k51_39e267864fddeafd7a5cacd77e0a6a11   virus-D.fasta
         
     # collect files with the same genomes
     $ seqkit sum -c -k 51  virus-*.fasta | csvtk fold -Ht -f 1 -v 2 
-    v0.1_DCD_k51_39e267864fddeafd7a5cacd77e0a6a11   virus-A.fasta; virus-B.fasta; virus-C.fasta; virus-D.fasta
+    seqkit.v0.1_DCD_k51_39e267864fddeafd7a5cacd77e0a6a11   virus-A.fasta; virus-B.fasta; virus-C.fasta; virus-D.fasta
     
 ## faidx
 

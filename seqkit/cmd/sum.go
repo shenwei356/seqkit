@@ -67,7 +67,7 @@ Method:
 Following the seqhash in Poly (https://github.com/TimothyStiles/poly/),
 We add meta information to the message digest, with the format of:
 
-    <version>_<seq type><seq structure><strand>_<kmer size>_<seq digest>
+    seqkit.<version>_<seq type><seq structure><strand>_<kmer size>_<seq digest>
 
     <version>:       digest version
     <seq type>:      'D' for DNA, 'R' for RNA, 'P' for protein, 'N' for others
@@ -77,12 +77,12 @@ We add meta information to the message digest, with the format of:
 
 Examples:
 
-    v0.1_DLS_k0_176250c8d1cde6c385397df525aa1a94    DNA.fq.gz
-    v0.1_PLS_k0_c244954e4960dd2a1409cd8ee53d92b9    Protein.fasta
-    v0.1_RLS_k0_0f1fb263f0c05a259ae179a61a80578d    single-stranded RNA.fasta
+    seqkit.v0.1_DLS_k0_176250c8d1cde6c385397df525aa1a94    DNA.fq.gz
+    seqkit.v0.1_PLS_k0_c244954e4960dd2a1409cd8ee53d92b9    Protein.fasta
+    seqkit.v0.1_RLS_k0_0f1fb263f0c05a259ae179a61a80578d    single-stranded RNA.fasta
 
-    v0.1_DCD_k31_e59dad6d561f1f1f28ebf185c6f4c183   double-stranded circular DNA.fasta
-    v0.1_DCS_k31_dd050490cd62ea5f94d73d4d636b7d60   single-stranded circular DNA.fasta
+    seqkit.v0.1_DCD_k31_e59dad6d561f1f1f28ebf185c6f4c183   double-stranded-circular DNA.fasta
+    seqkit.v0.1_DCS_k31_dd050490cd62ea5f94d73d4d636b7d60   single-stranded-circular DNA.fasta
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -490,7 +490,7 @@ Examples:
 				if !circular {
 					k = 0
 				}
-				sum := fmt.Sprintf("v%s_%s%s%s_k%d_%s",
+				sum := fmt.Sprintf("seqkit.v%s_%s%s%s_k%d_%s",
 					sumVersion,
 					seqType,
 					seqStructure,
