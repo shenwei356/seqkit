@@ -4,6 +4,8 @@
     - new command `seqkit fa2fq`: retrieving corresponding FASTQ records by a FASTA file
     - `seqkit locate`:
         - parallelizing `-F/--use-fmi` and `-m` for large number of search patterns.
+    - `seqkit amplicon`:
+        - new flag `-M/--output-mismatches` to append the total mismatches and	mismatches of 5' end and 3' end. [#286](https://github.com/shenwei356/seqkit/issues/286)
 - [SeqKit v2.1.0](https://github.com/shenwei356/seqkit/releases/tag/v2.1.0) - 2021-11-15
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.1.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.1.0)
     - `seqkit seq`:

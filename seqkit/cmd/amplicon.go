@@ -54,6 +54,8 @@ Attentions:
   1. Only one (the longest) matching location is returned for every primer pair.
   2. Mismatch is allowed, but the mismatch location (5' or 3') is not controlled.
      You can increase the value of "-j/--threads" to accelerate processing.
+     You can switch "-M/--output-mismatches" to append total mismatches and
+     mismatches of 5' end and 3' end.
   3. Degenerate bases/residues like "RYMM.." are also supported.
      But do not use degenerate bases/residues in regular expression, you need
      convert them to regular expression, e.g., change "N" or "X"  to ".".
@@ -130,6 +132,7 @@ Examples:
 		reverse0 := getFlagString(cmd, "reverse")
 		primerFile := getFlagString(cmd, "primer-file")
 		maxMismatch := getFlagNonNegativeInt(cmd, "max-mismatch")
+		outputMismatches := getFlagBool(cmd, "output-mismatches")
 		strict := getFlagBool(cmd, "strict-mode")
 		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
 		outFmtBED := getFlagBool(cmd, "bed")
@@ -303,11 +306,14 @@ Examples:
 
 						var finder *AmpliconFinder
 						var loc []int
+						var mis []int
 						var strand string
 						var tmpSeq *seq.Seq
 						var primer [3][]byte
 
 						results := make([]string, 0, 2)
+						var s []byte
+						name0 := string(record.Name)
 
 						for _, strand = range strands {
 							if strand == "-" {
@@ -322,9 +328,9 @@ Examples:
 								checkError(err)
 
 								if usingRegion {
-									loc, err = finder.LocateRange(begin, end, fregion, strict)
+									loc, mis, err = finder.LocateRange(begin, end, fregion, strict)
 								} else {
-									loc, err = finder.Locate()
+									loc, mis, err = finder.Locate()
 								}
 								checkError(err)
 
@@ -333,21 +339,39 @@ Examples:
 								}
 
 								if outFmtBED {
-									results = append(results, fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\t%s\n",
-										record.ID,
-										loc[0]-1,
-										loc[1],
-										primer[0],
-										0,
-										strand,
-										record.Seq.SubSeq(loc[0], loc[1]).Seq))
+									if outputMismatches {
+										s = record.Seq.SubSeq(loc[0], loc[1]).Seq
+										results = append(results, fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\t%s\t%d\t%d\t%d\n",
+											record.ID,
+											loc[0]-1,
+											loc[1],
+											primer[0],
+											0,
+											strand,
+											s,
+											mis[0]+mis[1],
+											mis[0],
+											mis[1],
+										))
+									} else {
+										results = append(results, fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\t%s\n",
+											record.ID,
+											loc[0]-1,
+											loc[1],
+											primer[0],
+											0,
+											strand,
+											record.Seq.SubSeq(loc[0], loc[1]).Seq))
+									}
 
 									continue
 								}
 								tmpSeq = record.Seq
 
 								record.Seq = record.Seq.SubSeq(loc[0], loc[1])
-
+								if outputMismatches {
+									record.Name = []byte(fmt.Sprintf("%s mismatches=%d(%d+%d)", name0, mis[0]+mis[1], mis[0], mis[1]))
+								}
 								results = append(results, string(record.Format(config.LineWidth)))
 
 								record.Seq = tmpSeq
@@ -391,6 +415,7 @@ Examples:
 		var tmpSeq *seq.Seq
 		var primer [3][]byte
 		var matched bool
+		var name0 string
 
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
@@ -411,6 +436,7 @@ Examples:
 				}
 
 				matched = false
+				name0 = string(record.Name)
 
 				for _, strand = range strands {
 					if strand == "-" {
@@ -425,9 +451,9 @@ Examples:
 						checkError(err)
 
 						if usingRegion {
-							loc, err = finder.LocateRange(begin, end, fregion, strict)
+							loc, _, err = finder.LocateRange(begin, end, fregion, strict)
 						} else {
-							loc, err = finder.Locate()
+							loc, _, err = finder.Locate()
 						}
 						checkError(err)
 
@@ -438,20 +464,40 @@ Examples:
 						matched = true
 
 						if outFmtBED {
-							outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\t%s\n",
-								record.ID,
-								loc[0]-1,
-								loc[1],
-								primer[0],
-								0,
-								strand,
-								record.Seq.SubSeq(loc[0], loc[1]).Seq))
+							if outputMismatches {
+								fmt.Fprintf(outfh,
+									"%s\t%d\t%d\t%s\t%d\t%s\t%s\t%d\t%d\t%d\n",
+									record.ID,
+									loc[0]-1,
+									loc[1],
+									primer[0],
+									0,
+									strand,
+									record.Seq.SubSeq(loc[0], loc[1]).Seq,
+									0,
+									0,
+									0,
+								)
+							} else {
+								fmt.Fprintf(outfh,
+									"%s\t%d\t%d\t%s\t%d\t%s\t%s\n",
+									record.ID,
+									loc[0]-1,
+									loc[1],
+									primer[0],
+									0,
+									strand,
+									record.Seq.SubSeq(loc[0], loc[1]).Seq)
+							}
 
 							continue
 						}
 						tmpSeq = record.Seq
 
 						record.Seq = record.Seq.SubSeq(loc[0], loc[1])
+						if outputMismatches {
+							record.Name = []byte(fmt.Sprintf("%s mismatches=%d(%d+%d)", name0, 0, 0, 0))
+						}
 						record.FormatToWriter(outfh, config.LineWidth)
 
 						record.Seq = tmpSeq
@@ -477,6 +523,7 @@ func init() {
 	ampliconCmd.Flags().StringP("forward", "F", "", "forward primer (5'-primer-3'), degenerate bases allowed")
 	ampliconCmd.Flags().StringP("reverse", "R", "", "reverse primer (5'-primer-3'), degenerate bases allowed")
 	ampliconCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching primers, no degenerate bases allowed")
+	ampliconCmd.Flags().BoolP("output-mismatches", "M", false, "append the total mismatches and	mismatches of 5' end and 3' end")
 	ampliconCmd.Flags().StringP("primer-file", "p", "", "3- or 2-column tabular primer file, with first column as primer name")
 
 	ampliconCmd.Flags().StringP("region", "r", "", `specify region to return. type "seqkit amplicon -h" for detail`)
@@ -486,6 +533,17 @@ func init() {
 	ampliconCmd.Flags().BoolP("bed", "", false, "output in BED6+1 format with amplicon as the 7th column")
 	ampliconCmd.Flags().BoolP("immediate-output", "I", false, "print output immediately, do not use write buffer")
 	ampliconCmd.Flags().BoolP("save-unmatched", "u", false, "also save records that do not match any primer")
+}
+
+// only used in this command
+func amplicon_mismatches(s1, s2 []byte) int {
+	var n int
+	for i, a := range s1 {
+		if a != s2[i] {
+			n++
+		}
+	}
+	return n
 }
 
 func loadPrimers(file string) ([][3]string, error) {
@@ -557,6 +615,7 @@ type AmpliconFinder struct {
 
 	searched, found bool
 	iBegin, iEnd    int // 0-based
+	mis5, mis3      int
 
 	rF, rR *regexp.Regexp
 }
@@ -618,19 +677,19 @@ func NewAmpliconFinder(sequence, forwardPrimer, reversePrimerRC []byte, maxMisma
 }
 
 // LocateRange returns location of the range (begin:end, 1-based).
-func (finder *AmpliconFinder) LocateRange(begin, end int, flanking bool, strictMode bool) ([]int, error) {
+func (finder *AmpliconFinder) LocateRange(begin, end int, flanking bool, strictMode bool) ([]int, []int, error) {
 	if begin == 0 || end == 0 {
 		checkError(fmt.Errorf("both begin and end in region should not be 0"))
 	}
 
 	if !finder.searched {
-		_, err := finder.Locate()
+		_, _, err := finder.Locate()
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 	if !finder.found {
-		return nil, nil
+		return nil, nil, nil
 	}
 
 	var b, e int
@@ -642,10 +701,10 @@ func (finder *AmpliconFinder) LocateRange(begin, end int, flanking bool, strictM
 	}
 
 	if ok {
-		return []int{b, e}, nil
+		return []int{b, e}, []int{finder.mis5, finder.mis3}, nil
 	}
 
-	return nil, nil
+	return nil, nil, nil
 }
 
 // SubLocationInner returns location of a range (begin:end, relative to amplicon).
@@ -807,12 +866,12 @@ func SubLocationFlanking(length, B, E, begin, end int, strictMode bool) (int, in
 
 // Locate returns location of amplicon.
 // Locations are 1-based, nil returns if not found.
-func (finder *AmpliconFinder) Locate() ([]int, error) {
+func (finder *AmpliconFinder) Locate() ([]int, []int, error) {
 	if finder.searched {
 		if finder.found {
-			return []int{finder.iBegin, finder.iEnd}, nil
+			return []int{finder.iBegin, finder.iEnd}, []int{finder.mis5, finder.mis3}, nil
 		}
-		return nil, nil
+		return nil, nil, nil
 	}
 
 	if finder.MaxMismatch <= 0 { // exactly matching
@@ -823,13 +882,13 @@ func (finder *AmpliconFinder) Locate() ([]int, error) {
 			i = bytes.Index(finder.Seq, finder.F)
 			if i < 0 { // not found
 				finder.searched, finder.found = true, false
-				return nil, nil
+				return nil, nil, nil
 			}
 		} else {
 			loc := finder.rF.FindSubmatchIndex(finder.Seq)
 			if len(loc) == 0 {
 				finder.searched, finder.found = true, false
-				return nil, nil
+				return nil, nil, nil
 			}
 			i = loc[0]
 		}
@@ -837,7 +896,11 @@ func (finder *AmpliconFinder) Locate() ([]int, error) {
 		if len(finder.R) == 0 { // only forward primer, returns location of F
 			finder.searched, finder.found = true, true
 			finder.iBegin, finder.iEnd = i, i+len(finder.F)-1
-			return []int{i + 1, i + len(finder.F)}, nil
+			finder.mis5 = amplicon_mismatches(finder.Seq[i:i+len(finder.F)], finder.F)
+			finder.mis3 = 0
+			return []int{i + 1, i + len(finder.F)},
+				[]int{finder.mis5, finder.mis3},
+				nil
 		}
 
 		// two primers given, need to search R
@@ -846,7 +909,7 @@ func (finder *AmpliconFinder) Locate() ([]int, error) {
 			j = bytes.Index(finder.Seq, finder.R)
 			if j < 0 {
 				finder.searched, finder.found = true, false
-				return nil, nil
+				return nil, nil, nil
 			}
 
 			for {
@@ -863,64 +926,76 @@ func (finder *AmpliconFinder) Locate() ([]int, error) {
 			loc := finder.rR.FindAllSubmatchIndex(finder.Seq, -1)
 			if len(loc) == 0 {
 				finder.searched, finder.found = true, false
-				return nil, nil
+				return nil, nil, nil
 			}
 			j = loc[len(loc)-1][0]
 		}
 
 		if j < i { // wrong location of F and R:  5' ---R-----F---- 3'
 			finder.searched, finder.found = true, false
-			return nil, nil
+			return nil, nil, nil
 		}
 		finder.searched, finder.found = true, true
 		finder.iBegin, finder.iEnd = i, j+len(finder.R)-1
-		return []int{i + 1, j + len(finder.R)}, nil
+		finder.mis5 = amplicon_mismatches(finder.Seq[i:i+len(finder.F)], finder.F)
+		finder.mis3 = amplicon_mismatches(finder.Seq[j:j+len(finder.R)], finder.R)
+		return []int{i + 1, j + len(finder.R)},
+			[]int{finder.mis5, finder.mis3},
+			nil
 	}
 
 	// search F
 	locsI, err := finder.FMindex.Locate(finder.F, finder.MaxMismatch)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if len(locsI) == 0 { // F not found
 		finder.searched, finder.found = true, false
-		return nil, nil
+		return nil, nil, nil
 	}
 	if len(finder.R) == 0 { // returns location of F
 		sort.Ints(locsI) // remain the first location
 		finder.searched, finder.found = true, true
 		finder.iBegin, finder.iEnd = locsI[0], locsI[0]+len(finder.F)-1
-		return []int{locsI[0] + 1, locsI[0] + len(finder.F)}, nil
+		finder.mis5 = amplicon_mismatches(finder.Seq[locsI[0]:locsI[0]+len(finder.F)], finder.F)
+		finder.mis3 = 0
+		return []int{locsI[0] + 1, locsI[0] + len(finder.F)},
+			[]int{finder.mis5, finder.mis3},
+			nil
 	}
 
 	// search R
 	locsJ, err := finder.FMindex.Locate(finder.R, finder.MaxMismatch)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if len(locsJ) == 0 {
 		finder.searched, finder.found = true, false
-		return nil, nil
+		return nil, nil, nil
 	}
 	sort.Ints(locsI) // to remain the FIRST location
 	sort.Ints(locsJ) // to remain the LAST location
 	finder.searched, finder.found = true, true
 	finder.iBegin, finder.iEnd = locsI[0], locsJ[len(locsJ)-1]+len(finder.R)-1
-	return []int{locsI[0] + 1, locsJ[len(locsJ)-1] + len(finder.R)}, nil
+	finder.mis5 = amplicon_mismatches(finder.Seq[locsI[0]:locsI[0]+len(finder.F)], finder.F)
+	finder.mis3 = amplicon_mismatches(finder.Seq[locsJ[len(locsJ)-1]:locsJ[len(locsJ)-1]+len(finder.R)], finder.R)
+	return []int{locsI[0] + 1, locsJ[len(locsJ)-1] + len(finder.R)},
+		[]int{finder.mis5, finder.mis3},
+		nil
 }
 
 // Location returns location of amplicon.
 // Locations are 1-based, nil returns if not found.
-func (finder *AmpliconFinder) Location() ([]int, error) {
+func (finder *AmpliconFinder) Location() ([]int, []int, error) {
 	if !finder.searched {
-		_, err := finder.Locate()
+		_, _, err := finder.Locate()
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 	if !finder.found {
-		return nil, nil
+		return nil, nil, nil
 	}
 
-	return []int{finder.iBegin + 1, finder.iEnd + 1}, nil
+	return []int{finder.iBegin + 1, finder.iEnd + 1}, []int{finder.mis5, finder.mis3}, nil
 }

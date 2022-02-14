@@ -1997,6 +1997,7 @@ Flags:
   -I, --immediate-output       print output immediately, do not use write buffer
   -m, --max-mismatch int       max mismatch when matching primers, no degenerate bases allowed
   -P, --only-positive-strand   only search on positive strand
+  -M, --output-mismatches      output mismatches
   -p, --primer-file string     3- or 2-column tabular primer file, with first column as primer name
   -r, --region string          specify region to return. type "seqkit amplicon -h" for detail
   -R, --reverse string         reverse primer (5'-primer-3'), degenerate bases allowed
@@ -2030,6 +2031,23 @@ Examples
         $ echo -ne ">seq\nacgcccactgaaatga\n" \
             | seqkit amplicon -F ccR -R ttt --bed
         seq     4       13      .       0       +       ccactgaaa
+        
+1. Output mismatches:
+
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F ccc -R ttt -M
+        >seq mismatches=0(0+0)
+        cccactgaaa
+        
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F ccc -R ttt -m 1 -M
+        >seq mismatches=2(1+1)
+        cgcccactgaaat
+        
+        $ echo -ne ">seq\nacgcccactgaaatga\n" \
+            | seqkit amplicon -F ccc -R ttt -m 1 -M --bed
+        seq     1       14      .       0       +       cgcccactgaaat   2       1       1
+
         
 1. Load primers from 3- or 2-column tabular primer file, with first column as primer name.
         
