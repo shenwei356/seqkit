@@ -87,6 +87,7 @@ Examples:
 		lineWidth := config.LineWidth
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
+		usingDefaultIDRegexp := config.IDRegexp == fastx.DefaultIDRegexp
 		quiet := config.Quiet
 		runtime.GOMAXPROCS(config.Threads)
 
@@ -195,8 +196,14 @@ Examples:
 						continue
 					}
 
-					if !quiet && strings.IndexAny(p, "\t ") >= 0 {
-						log.Warningf("space found in pattern: %s", p)
+					if !quiet {
+						if p[0] == '>' {
+							log.Warningf(`symbol ">" detected, it should not be a part of the sequence ID/name: %s`, p)
+						} else if p[0] == '@' {
+							log.Warningf(`symbol "@" detected, it should not be a part of the sequence ID/name. %s`, p)
+						} else if !byName && usingDefaultIDRegexp && strings.ContainsAny(p, "\t ") {
+							log.Warningf("space found in pattern, you may need use -n/--by-name: %s", p)
+						}
 					}
 
 					if degenerate || useRegexp {
@@ -247,9 +254,16 @@ Examples:
 			}
 		} else {
 			for _, p := range pattern {
-				if !quiet && strings.IndexAny(p, "\t ") >= 0 {
-					log.Warningf("space found in pattern: '%s'", p)
+				if !quiet {
+					if p[0] == '>' {
+						log.Warningf(`symbol ">" detected, it should not be a part of the sequence ID/name: %s`, p)
+					} else if p[0] == '@' {
+						log.Warningf(`symbol "@" detected, it should not be a part of the sequence ID/name. %s`, p)
+					} else if !byName && usingDefaultIDRegexp && strings.ContainsAny(p, "\t ") {
+						log.Warningf("space found in pattern, you may need use -n/--by-name: %s", p)
+					}
 				}
+
 				if degenerate || useRegexp {
 					if degenerate {
 						pattern2seq, err = seq.NewSeq(alphabet, []byte(p))

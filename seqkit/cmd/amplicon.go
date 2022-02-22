@@ -523,7 +523,7 @@ func init() {
 	ampliconCmd.Flags().StringP("forward", "F", "", "forward primer (5'-primer-3'), degenerate bases allowed")
 	ampliconCmd.Flags().StringP("reverse", "R", "", "reverse primer (5'-primer-3'), degenerate bases allowed")
 	ampliconCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching primers, no degenerate bases allowed")
-	ampliconCmd.Flags().BoolP("output-mismatches", "M", false, "append the total mismatches and	mismatches of 5' end and 3' end")
+	ampliconCmd.Flags().BoolP("output-mismatches", "M", false, "append the total mismatches and mismatches of 5' end and 3' end")
 	ampliconCmd.Flags().StringP("primer-file", "p", "", "3- or 2-column tabular primer file, with first column as primer name")
 
 	ampliconCmd.Flags().StringP("region", "r", "", `specify region to return. type "seqkit amplicon -h" for detail`)
