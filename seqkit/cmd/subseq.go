@@ -200,6 +200,8 @@ Examples:
 			if !quiet {
 				log.Infof("%d BED features loaded", len(features))
 			}
+		} else {
+			checkError(fmt.Errorf("one of the options needed: -r/--region, --bed, --gtf"))
 		}
 
 		for _, file := range files {
