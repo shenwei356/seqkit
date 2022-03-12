@@ -1,5 +1,7 @@
 - [SeqKit v2.2.0](https://github.com/shenwei356/seqkit/releases/tag/v2.2.0) - 2021-11-15
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.2.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.2.0)
+    - `seqkit`:
+        - add support of `zx` and `zstd` input/output formats. [#274](https://github.com/shenwei356/seqkit/issues/274)
     - new command `seqkit sum`: computing message digest for all sequences in FASTA/Q files.
       The idea comes from @photocyte and the format borrowes from [seqhash](https://github.com/TimothyStiles/poly/tree/prime/seqhash) [#262](https://github.com/shenwei356/seqkit/issues/262)
     - new command `seqkit fa2fq`: retrieving corresponding FASTQ records by a FASTA file

@@ -19,6 +19,8 @@
 
 ### FASTA/Q format parsing and writing
 
+> **Seqkit also supports reading and writing xz (.xz) and zstd (.zst) formats since v2.2.0**.
+
 SeqKit uses the author's lightweight and high-performance bioinformatics package
 [bio](https://github.com/shenwei356/bio) for FASTA/Q parsing,
 which has [high performance](https://github.com/shenwei356/bio#fastaq-parsing)

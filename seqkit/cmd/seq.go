@@ -35,6 +35,9 @@ import (
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/spf13/cobra"
+
+	"github.com/klauspost/compress/zstd"
+	"github.com/ulikunitz/xz"
 )
 
 // seqCmd represents the seq command
@@ -155,10 +158,14 @@ var seqCmd = &cobra.Command{
 		}
 
 		gzippedOutfile := strings.HasSuffix(strings.ToLower(outFile), ".gz")
+		xzOutfile := strings.HasSuffix(strings.ToLower(outFile), ".xz")
+		zstdOutfile := strings.HasSuffix(strings.ToLower(outFile), ".zst")
 
 		var fh io.Writer
 		var outbw *bufio.Writer
 		var gw *gzip.Writer
+		var xw *xz.Writer
+		var zw *zstd.Encoder
 
 		if color {
 			fh = seqCol.WrapWriter(outfh)
@@ -166,20 +173,40 @@ var seqCmd = &cobra.Command{
 		} else if gzippedOutfile {
 			gw = gzip.NewWriter(outfh)
 			outbw = bufio.NewWriterSize(gw, bufSize)
+		} else if xzOutfile {
+			xw, err = xz.NewWriter(outfh)
+			if err != nil {
+				checkError(err)
+			}
+			outbw = bufio.NewWriterSize(xw, bufSize)
+		} else if zstdOutfile {
+			zw, err = zstd.NewWriter(outfh)
+			if err != nil {
+				checkError(err)
+			}
+			outbw = bufio.NewWriterSize(zw, bufSize)
 		} else {
 			fh = outfh
 			outbw = bufio.NewWriterSize(fh, bufSize)
 		}
 
 		defer func() {
-			outbw.Flush()
+			checkError(outbw.Flush())
+
 			if gzippedOutfile {
-				err = gw.Flush()
-				checkError(err)
-				gw.Close()
+				checkError(gw.Flush())
+				checkError(gw.Close())
+			}
+			if xzOutfile {
+				checkError(xw.Close())
 			}
 
-			outfh.Close()
+			if zstdOutfile {
+				checkError(zw.Flush())
+				checkError(zw.Close())
+			}
+
+			checkError(outfh.Close())
 		}()
 
 		var checkSeqType bool
