@@ -1584,6 +1584,7 @@ Flags:
   -n, --by-name                match by full name instead of just ID
   -s, --by-seq                 search subseq on seq, both positive and negative strand are searched, and mismatch allowed using flag -m/--max-mismatch
   -c, --circular               circular genome
+  -C, --count                  just print a count of matching records. with the -v/--invert-match flag, count non-matching records
   -d, --degenerate             pattern/motif contains degenerate base
       --delete-matched         delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions
   -h, --help                   help for grep
@@ -1608,6 +1609,10 @@ Examples
         
         # ignore case
         $ seqkit grep -i -f id.txt seqs.fq.gz -o result.fq.gz
+
+1. Just print the matched number, like GNU grep (`grep -c`) 
+
+       $ seqkit grep -f id.txt seqs.fq.gz -C
 
 1. Serching non-canonical sequence IDs, Using `--id-regexp` to capture IDs. 
    Refer to [section Sequence ID](#sequence-id) and [seqkit seq](#seq) for examples.

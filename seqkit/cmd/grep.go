@@ -95,6 +95,7 @@ Examples:
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
+		justCount := getFlagBool(cmd, "count")
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
 		useRegexp := getFlagBool(cmd, "use-regexp")
@@ -312,6 +313,8 @@ Examples:
 		var record *fastx.Record
 		strands := []byte{'+', '-'}
 
+		var count int
+
 		// -------------------------------------------------------------------
 		// only for searching with sequences and mismatch > 0, were FMI is very slow
 
@@ -335,6 +338,11 @@ Examples:
 
 				id = 1
 				for r := range ch {
+					if justCount {
+						count++
+						continue
+					}
+
 					_id = r.id
 
 					if _id == id { // right there
@@ -494,6 +502,9 @@ Examples:
 			close(ch)
 			<-done
 
+			if justCount {
+				fmt.Fprintf(outfh, "%d\n", count)
+			}
 			return
 		}
 
@@ -642,7 +653,11 @@ Examples:
 					}
 				}
 
-				record.FormatToWriter(outfh, config.LineWidth)
+				if justCount {
+					count++
+				} else {
+					record.FormatToWriter(outfh, config.LineWidth)
+				}
 
 				if immediateOutput {
 					outfh.Flush()
@@ -650,6 +665,10 @@ Examples:
 			}
 
 			config.LineWidth = lineWidth
+		}
+
+		if justCount {
+			fmt.Fprintf(outfh, "%d\n", count)
 		}
 	},
 }
@@ -672,6 +691,7 @@ func init() {
 		"e.g 1:12 for first 12 bases, -12:-1 for last 12 bases")
 	grepCmd.Flags().BoolP("circular", "c", false, "circular genome")
 	grepCmd.Flags().BoolP("immediate-output", "I", false, "print output immediately, do not use write buffer")
+	grepCmd.Flags().BoolP("count", "C", false, "just print a count of matching records. with the -v/--invert-match flag, count non-matching records")
 }
 
 var reUnquotedComma = regexp.MustCompile(`\{[^\}]*$|^[^\{]*\}`)

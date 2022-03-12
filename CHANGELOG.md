@@ -11,6 +11,7 @@
         - new flag `-M/--output-mismatches` to append the total mismatches and mismatches of 5' end and 3' end. [#286](https://github.com/shenwei356/seqkit/issues/286)
     - `seqkit grep`:
         - detect FASTA/Q symbol `@` and `>` in the searching patterns and show warnings.
+        - add new flag `-C/--count`, like `grep -c` in GNU grep. [#267](https://github.com/shenwei356/seqkit/issues/267)
     - `seqkit subseq`:
         - report error when no options were given.
     - update doc:
