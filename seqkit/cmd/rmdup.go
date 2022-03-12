@@ -42,10 +42,10 @@ var rmdupCmd = &cobra.Command{
 	Long: `remove duplicated sequences by ID/name/sequence
 
 Attentions:
-
   1. When comparing by sequences, both positive and negative strands are
      compared. Switch on -P/--only-positive-strand for considering the
      positive strand only.
+  2. Only the first record is saved for duplicates.
      
 `,
 	Run: func(cmd *cobra.Command, args []string) {

@@ -36,6 +36,9 @@ var headCmd = &cobra.Command{
 	Short: "print first N FASTA/Q records",
 	Long: `print first N FASTA/Q records
 
+For returning the last N records, use:
+    seqkit range -N:-1 seqs.fasta
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)

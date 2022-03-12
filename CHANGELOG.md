@@ -1,15 +1,19 @@
 - [SeqKit v2.2.0](https://github.com/shenwei356/seqkit/releases/tag/v2.2.0) - 2021-11-15
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.2.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.2.0)
-    - new command `seqkit sum`: computing message digest for all sequences in FASTA/Q files"
+    - new command `seqkit sum`: computing message digest for all sequences in FASTA/Q files.
+      The idea comes from @photocyte and the format borrowes from [seqhash](https://github.com/TimothyStiles/poly/tree/prime/seqhash) [#262](https://github.com/shenwei356/seqkit/issues/262)
     - new command `seqkit fa2fq`: retrieving corresponding FASTQ records by a FASTA file
     - `seqkit locate`:
         - parallelizing `-F/--use-fmi` and `-m` for large number of search patterns.
     - `seqkit amplicon`:
         - new flag `-M/--output-mismatches` to append the total mismatches and mismatches of 5' end and 3' end. [#286](https://github.com/shenwei356/seqkit/issues/286)
     - `seqkit grep`:
-        - detect FASTA/Q symbol `@` and `>` in the searching patterns and show warning.
+        - detect FASTA/Q symbol `@` and `>` in the searching patterns and show warnings.
     - `seqkit subseq`:
         - report error when no options were given.
+    - update doc:
+        - `seqkit head`: add doc for "seqkit tail": `seqkit range -N:-1 seqs.fasta`. [#272](https://github.com/shenwei356/seqkit/issues/272)
+        - `seqkit rmdup`: add the note of only the first record being saved for duplicates. [#265](https://github.com/shenwei356/seqkit/issues/265)
 - [SeqKit v2.1.0](https://github.com/shenwei356/seqkit/releases/tag/v2.1.0) - 2021-11-15
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.1.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.1.0)
     - `seqkit seq`:
