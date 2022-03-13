@@ -261,8 +261,8 @@ github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQD
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/ryanuber/columnize v0.0.0-20160712163229-9b3edd62028f/go.mod h1:sm1tb6uqfes/u+d4ooFouqFdy9/2g9QGwK3SQygK0Ts=
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg65j358z/aeFdxmN0P9QXhEzd20vsDc=
-github.com/shenwei356/bio v0.6.2 h1:2vcXdDsOyYZDnt7xvrwsPOyMvgoC8CB/BnZnJMmtlRk=
-github.com/shenwei356/bio v0.6.2/go.mod h1:LL8JBeJnKQ4esixngQZiTkZgO1/by1qI0XhMrUl7T8M=
+github.com/shenwei356/bio v0.6.4 h1:GE0KdaFfR/PN5nJk39hUD7ia7z6hKezGseSAzXVz9Ew=
+github.com/shenwei356/bio v0.6.4/go.mod h1:VsxsECxbPfi9DA9ZAjKX6K7pEAM0/waDYcwUMmAD/Gg=
 github.com/shenwei356/breader v0.3.1 h1:OjgfeHhpNGQPkS1+lgsl4eNuuO//Y16N6TkqG5oxO5U=
 github.com/shenwei356/breader v0.3.1/go.mod h1:UR11JJCxU9s7eUdU4xn3L/VodxoXzWhjJPh8WZbb+us=
 github.com/shenwei356/bwt v0.6.0 h1:CENEaKLF8iyxYdnYOM19ETIJLqROhBP/vnEAyrQy5Xo=
@@ -275,8 +275,8 @@ github.com/shenwei356/natsort v0.0.0-20190418160752-600d539c017d/go.mod h1:SiiGi
 github.com/shenwei356/util v0.5.0 h1:gbPuGYVggNLOSORuZLnpaB2DrIpyDFolHiZQkyja+XU=
 github.com/shenwei356/util v0.5.0/go.mod h1:goFN/u2HgvfbOsEgoHA2hUEet+9KjZpRavrVGz9cm30=
 github.com/shenwei356/xopen v0.1.0/go.mod h1:6EQUa6I7Zsl2GQKqcL9qGLrTzVE+oZyly+uhzovQYSk=
-github.com/shenwei356/xopen v0.2.0 h1:eGJa2p7mg2I8JfuHFhEx/YPdg6qQQo3li2A/1FjgeFY=
-github.com/shenwei356/xopen v0.2.0/go.mod h1:6EQUa6I7Zsl2GQKqcL9qGLrTzVE+oZyly+uhzovQYSk=
+github.com/shenwei356/xopen v0.2.1 h1:VYRcBmEa8PrZlxs0sJXNQ7BK9WbD3fkB/CP6zVlMnLE=
+github.com/shenwei356/xopen v0.2.1/go.mod h1:6EQUa6I7Zsl2GQKqcL9qGLrTzVE+oZyly+uhzovQYSk=
 github.com/shurcooL/sanitized_anchor_name v1.0.0/go.mod h1:1NzhyTcUVG4SuEtjjoZeVRXNmyL/1OwPU0+IJeTBvfc=
 github.com/smallfish/simpleyaml v0.1.0 h1:5uAZdLAiHxS9cmzkOxg7lH0dILXKTD7uRZbAhyHmyU0=
 github.com/smallfish/simpleyaml v0.1.0/go.mod h1:gU3WdNn44dQVAbVHD2SrSqKKCvmzFApWD2UURhgEj1M=

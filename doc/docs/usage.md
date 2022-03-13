@@ -2396,8 +2396,18 @@ split sequences into files by part size or number of parts
 This command supports FASTA and paired- or single-end FASTQ with low memory
 occupation and fast speed.
 
-The file extensions of output are automatically detected and created
-according to the input files.
+The prefix of output files:
+  1. For stdin: stdin
+  2. Others: same to the input file
+  3. Set via the option: -o/--out-file, e.g., outputting xxx.part_001.fasta:
+       cat ../tests/hairpin.fa | ./seqkit split2 -p 2 -O test -o xxx
+
+The extension of output files:
+  1. For stdin: .fast[aq]
+  2. Others: same to the input file
+  3. Additional extension via the option -e/--extension, e.g.， outputting
+     gzipped files for plain text input:
+         seqkit split2 -p 2 -O test tests/hairpin.fa -e .gz
 
 Usage:
   seqkit split2 [flags]
@@ -2406,6 +2416,7 @@ Flags:
   -l, --by-length string   split sequences into chunks of >=N bases, supports K/M/G suffix
   -p, --by-part int        split sequences into N parts
   -s, --by-size int        split sequences into multi parts with N sequences
+  -e, --extension string   set output file extension, e.g., ".gz", ".xz", or ".zst"
   -f, --force              overwrite output directory
   -h, --help               help for split2
   -O, --out-dir string     output directory (default value is $infile.split)
@@ -2415,14 +2426,58 @@ Flags:
 
 Examples
 
-1. Split sequences into parts with at most 10000 sequences
+1. Split sequences into parts with at most 10000 sequences:
 
-        $ seqkit split2 hairpin.fa.gz -s 10000 -f
+        $ seqkit split2 hairpin.fa -s 10000
+        [INFO] split seqs from hairpin.fa
         [INFO] split into 10000 seqs per file
-        [INFO] write 10000 sequences to file: hairpin.fa.part_001.gz
-        [INFO] write 10000 sequences to file: hairpin.fa.part_002.gz
-        [INFO] write 8645 sequences to file: hairpin.fa.part_003.gz
+        [INFO] write 10000 sequences to file: hairpin.fa.split/hairpin.part_001.fa
+        [INFO] write 10000 sequences to file: hairpin.fa.split/hairpin.part_002.fa
+        [INFO] write 8645 sequences to file: hairpin.fa.split/hairpin.part_003.fa
+        
+1. Force compression for plain text input by add an extra extension:
 
+        # gzip
+        $ seqkit split2 hairpin.fa -O test -f -s 10000 -e .gz
+        [INFO] split seqs from hairpin.fa
+        [INFO] split into 10000 seqs per file
+        [INFO] write 10000 sequences to file: test/hairpin.part_001.fa.gz
+        [INFO] write 10000 sequences to file: test/hairpin.part_002.fa.gz
+        [INFO] write 8645 sequences to file: test/hairpin.part_003.fa.gz
+        
+        # xz
+        $ seqkit split2 hairpin.fa -O test -f -s 10000 -e .xz
+        [INFO] split seqs from hairpin.fa
+        [INFO] split into 10000 seqs per file
+        [INFO] write 10000 sequences to file: test/hairpin.part_001.fa.xz
+        [INFO] write 10000 sequences to file: test/hairpin.part_002.fa.xz
+        [INFO] write 8645 sequences to file: test/hairpin.part_003.fa.xz
+        
+        # zstd
+        $ seqkit split2 hairpin.fa -O test -f -s 10000 -e .zst
+        [INFO] split seqs from hairpin.fa
+        [INFO] split into 10000 seqs per file
+        [INFO] write 10000 sequences to file: test/hairpin.part_001.fa.zst
+        [INFO] write 10000 sequences to file: test/hairpin.part_002.fa.zst
+        [INFO] write 8645 sequences to file: test/hairpin.part_003.fa.zst
+                
+1. Change the prefix of output files:
+
+        $ seqkit split2 hairpin.fa -O test -f -s 10000 -e .gz -o xxx
+        [INFO] split seqs from hairpin.fa
+        [INFO] split into 10000 seqs per file
+        [INFO] write 10000 sequences to file: test/xxx.part_001.fa.gz
+        [INFO] write 10000 sequences to file: test/xxx.part_002.fa.gz
+        [INFO] write 8645 sequences to file: test/xxx.part_003.fa.gz
+        
+        # here, we also change the compression format from xz to zstd
+        $ cat hairpin.fa.xz | seqkit split2 -O test -f -s 10000 -e .zst
+        [INFO] split seqs from stdin
+        [INFO] split into 10000 seqs per file
+        [INFO] write 10000 sequences to file: test/stdin.part_001.fasta.zst
+        [INFO] write 10000 sequences to file: test/stdin.part_002.fasta.zst
+        [INFO] write 8645 sequences to file: test/stdin.part_003.fasta.zst
+  
 1. Split sequences into 4 parts
 
         $ seqkit split hairpin.fa.gz -p 4 -f

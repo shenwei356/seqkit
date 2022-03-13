@@ -46,8 +46,18 @@ var split2Cmd = &cobra.Command{
 This command supports FASTA and paired- or single-end FASTQ with low memory
 occupation and fast speed.
 
-The file extensions of output are automatically detected and created
-according to the input files.
+The prefix of output files:
+  1. For stdin: stdin
+  2. Others: same to the input file
+  3. Set via the option: -o/--out-file, e.g., outputting xxx.part_001.fasta:
+       cat ../tests/hairpin.fa | ./seqkit split2 -p 2 -O test -o xxx
+
+The extension of output files:
+  1. For stdin: .fast[aq]
+  2. Others: same to the input file
+  3. Additional extension via the option -e/--extension, e.g.， outputting
+     gzipped files for plain text input:
+         seqkit split2 -p 2 -O test tests/hairpin.fa -e .gz
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -59,6 +69,7 @@ according to the input files.
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
 		// lineWidth := config.LineWidth
+		outFile := config.OutFile
 		quiet := config.Quiet
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
@@ -88,6 +99,7 @@ according to the input files.
 
 		outdir := getFlagString(cmd, "out-dir")
 		force := getFlagBool(cmd, "force")
+		extension := getFlagString(cmd, "extension")
 
 		if size == 0 && parts == 0 && length == 0 {
 			checkError(fmt.Errorf(`one of flags should be given: -s/-p/-l. type "seqkit split2 -h" for help`))
@@ -150,17 +162,27 @@ according to the input files.
 		var wg sync.WaitGroup
 		for _, file := range files {
 			isstdin := isStdin(file)
-			var fileName, fileExt string
+			var fileName, fileExt, fileExt2 string
 			if isstdin {
-				fileName, fileExt = "stdin", ".fastx"
+				fileName, fileExt = "stdin", extension
 				if outdir == "" {
 					outdir = "stdin.split"
 				}
 			} else {
-				fileName, fileExt = filepathTrimExtension(file)
+				fileName, fileExt, fileExt2 = filepathTrimExtension2(file, nil)
+				if extension != "" {
+					fileExt += extension
+				} else {
+					fileExt += fileExt2
+				}
+
 				if outdir == "" {
 					outdir = file + ".split"
 				}
+			}
+
+			if outFile != "-" {
+				fileName = filepath.Base(outFile)
 			}
 
 			pwd, _ := os.Getwd()
@@ -232,9 +254,9 @@ according to the input files.
 
 					if renameFileExt && isstdin {
 						if len(record.Seq.Qual) > 0 {
-							fileExt = suffixFQ
+							fileExt = suffixFQ + extension
 						} else {
-							fileExt = suffixFA
+							fileExt = suffixFA + extension
 						}
 						renameFileExt = false
 					}
@@ -379,4 +401,6 @@ func init() {
 	split2Cmd.Flags().StringP("by-length", "l", "", "split sequences into chunks of >=N bases, supports K/M/G suffix")
 	split2Cmd.Flags().StringP("out-dir", "O", "", "output directory (default value is $infile.split)")
 	split2Cmd.Flags().BoolP("force", "f", false, "overwrite output directory")
+
+	split2Cmd.Flags().StringP("extension", "e", "", `set output file extension, e.g., ".gz", ".xz", or ".zst"`)
 }

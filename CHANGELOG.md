@@ -5,6 +5,9 @@
     - new command `seqkit sum`: computing message digest for all sequences in FASTA/Q files.
       The idea comes from @photocyte and the format borrowes from [seqhash](https://github.com/TimothyStiles/poly/tree/prime/seqhash) [#262](https://github.com/shenwei356/seqkit/issues/262)
     - new command `seqkit fa2fq`: retrieving corresponding FASTQ records by a FASTA file
+    - `seqkit split2`:
+        - new flag `-e/--extension` for forcing compresson or changing compression format. [#276](https://github.com/shenwei356/seqkit/issues/276)
+        - support changing output prefix via `-o/--out-file`. [#275](https://github.com/shenwei356/seqkit/issues/275)
     - `seqkit locate`:
         - parallelizing `-F/--use-fmi` and `-m` for large number of search patterns.
     - `seqkit amplicon`:

@@ -78,6 +78,12 @@ Examples:
 		if strings.HasSuffix(strings.ToLower(file), ".gz") {
 			checkError(fmt.Errorf("gzipped file not supported"))
 		}
+		if strings.HasSuffix(strings.ToLower(file), ".xz") {
+			checkError(fmt.Errorf("xz compressed file not supported"))
+		}
+		if strings.HasSuffix(strings.ToLower(file), ".zst") {
+			checkError(fmt.Errorf("zstd compressed file not supported"))
+		}
 
 		var err error
 		regions := make([]string, 0, 256)
