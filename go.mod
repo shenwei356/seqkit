@@ -18,7 +18,7 @@ require (
 	github.com/mattn/go-isatty v0.0.14
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/errors v0.9.1
-	github.com/shenwei356/bio v0.6.4
+	github.com/shenwei356/bio v0.7.0
 	github.com/shenwei356/breader v0.3.1
 	github.com/shenwei356/bwt v0.6.0
 	github.com/shenwei356/go-logging v0.0.0-20171012171522-c6b9702d88ba
