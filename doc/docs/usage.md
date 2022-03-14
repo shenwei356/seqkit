@@ -3041,25 +3041,59 @@ Usage
 ``` text
 concatenate sequences with same ID from multiple files
 
-Example: concatenating leading 2 bases and last 2 bases
-
-    $ cat t.fa
-    >test
-    ACCTGATGT
-    >test2
-    TGATAGCTACTAGGGTGTCTATCG
-
-    $ seqkit concat <(seqkit subseq -r 1:2 t.fa) <(seqkit subseq -r -2:-1 t.fa)
-    >test
-    ACGT
-    >test2
-    TGCG
+Attentions:
+   1. By default, only sequences with IDs that appear in all files are outputted.
+      use -f/--full to output all sequences.
+   2. If there are more than one sequences of the same ID, we output the Cartesian
+      product of sequences.
+   3. Description are also concatenated with a separator (-s/--separator).
+   4. Order of sequences with different IDs are random.
 
 Usage:
   seqkit concat [flags]
 
+Aliases:
+  concat, concate
+
 Flags:
-  -h, --help   help for concat
+  -f, --full               keep all sequences, like full/outter join
+  -h, --help               help for concat
+  -s, --separator string   separator for descriptions of records with the same ID (default "|")
+
+```
+
+Examples
+
+```
+$ cat a.fa 
+>A 1
+a1-
+>A 2
+a2-
+>B 1
+b1-
+
+$ cat b.fa 
+>A x
+ax-
+>C 1
+c1-
+
+$ seqkit concat a.fa b.fa 
+>A 1|x
+a1-ax-
+>A 2|x
+a2-ax-
+
+$ seqkit concat a.fa b.fa --full
+>C 1
+c1-
+>A 1|x
+a1-ax-
+>A 2|x
+a2-ax-
+>B 1
+b1-
 
 ```
 
