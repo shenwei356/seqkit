@@ -39,6 +39,17 @@ var rangeCmd = &cobra.Command{
 	Short: "print FASTA/Q records in a range (start:end)",
 	Long: `print FASTA/Q records in a range (start:end)
 
+Examples:
+  1. leading 100 records (head -n 100)
+      seqkit range -r 1:100
+  2. last 100 records (tail -n 100)
+      seqkit range -r -100:-1
+  3. remove leading 100 records (tail -n +101)
+      seqkit range -r 101:-1
+  4. other ranges:
+      seqkit range -r 10:100
+      seqkit range -r -100:-10
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -66,7 +77,7 @@ var rangeCmd = &cobra.Command{
 		end, err = strconv.Atoi(r[1])
 		checkError(err)
 		if start == 0 || end == 0 {
-			checkError(fmt.Errorf("both start and end should not be 0"))
+			checkError(fmt.Errorf("either start and end should not be 0"))
 		}
 		if start < 0 && end > 0 {
 			checkError(fmt.Errorf("when start < 0, end should not > 0"))
@@ -74,10 +85,9 @@ var rangeCmd = &cobra.Command{
 		if start < 0 && end < 0 && start > end {
 			checkError(fmt.Errorf("when start < 0 and end < 0, start should be < end"))
 		}
-		if start > 0 && end < 0 {
-			checkError(fmt.Errorf("not supported range: %d:%d", start, end))
+		if start > 0 && end < 0 && end != -1 {
+			checkError(fmt.Errorf("not supported range: %d:%d, the end needs to be -1 when start > 0 and end < 0", start, end))
 		}
-
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		outfh, err := xopen.Wopen(outFile)
@@ -89,6 +99,19 @@ var rangeCmd = &cobra.Command{
 		var buf *RecordLoopBuffer
 		if start < 0 && end < 0 {
 			bufSize = -start
+		}
+
+		var rangePP bool
+		if start > 0 && end > 0 {
+			rangePP = true
+		}
+		var rangePN bool
+		if start > 0 && end == -1 {
+			rangePN = true
+		}
+		var rangeNN bool
+		if start < 0 && end < 0 {
+			rangeNN = true
 		}
 
 		var record *fastx.Record
@@ -120,7 +143,7 @@ var rangeCmd = &cobra.Command{
 
 				n++
 
-				if start > 0 && end > 0 {
+				if rangePP {
 					if n < start {
 						continue
 					}
@@ -131,19 +154,27 @@ var rangeCmd = &cobra.Command{
 					continue
 				}
 
-				if start < 0 && end < 0 {
+				if rangePN {
+					if n < start {
+						continue
+					}
+					record.FormatToWriter(outfh, config.LineWidth)
+					continue
+				}
+
+				if rangeNN {
 					buf.Add(record.Clone())
 				}
 			}
 
-			if start < 0 && end < 0 {
+			if rangeNN {
 				current0 := buf.Current
 				buf.Backward(-end - 1)
 				tail := buf.Current
 				// fmt.Println(current0, tail, buf.Size, buf.Capacity)
 				buf.Current = current0
 				var nextNode *RecordNode
-				for true {
+				for {
 					nextNode = buf.Next()
 					if nextNode == nil {
 						break

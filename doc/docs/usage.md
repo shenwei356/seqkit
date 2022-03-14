@@ -2435,7 +2435,7 @@ Examples
         [INFO] write 10000 sequences to file: hairpin.fa.split/hairpin.part_002.fa
         [INFO] write 8645 sequences to file: hairpin.fa.split/hairpin.part_003.fa
         
-1. Force compression for plain text input by add an extra extension:
+1. Force compression for plain text input by adding an extra extension:
 
         # gzip
         $ seqkit split2 hairpin.fa -O test -f -s 10000 -e .gz
@@ -2711,6 +2711,17 @@ Usage
 ```text
 print FASTA/Q records in a range (start:end)
 
+Examples:
+  1. leading 100 records (head -n 100)
+      seqkit range -r 1:100
+  2. last 100 records (tail -n 100)
+      seqkit range -r -100:-1
+  3. remove leading 100 records (tail -n +101)
+      seqkit range -r 101:-1
+  4. other ranges:
+      seqkit range -r 10:100
+      seqkit range -r -100:-10
+
 Usage:
   seqkit range [flags]
 
@@ -2733,6 +2744,14 @@ Examples
         $ cat tests/hairpin.fa | seqkit range -r -100:-1 | seqkit stats
         file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
         -     FASTA   RNA        100    8,656       58     86.6      172
+
+1. remove leading 100 records (tail -n +101)
+
+        $ seqkit range -r 101:-1 tests/hairpin.fa | seqkit sum -a
+        seqkit.v0.1_RLS_k0_e1feced9bb0be653afa8205dec4987db     -       28545   2940929
+        
+        $ seqkit fx2tab tests/hairpin.fa | tail -n +101 | seqkit tab2fx | seqkit sum -a
+        seqkit.v0.1_RLS_k0_e1feced9bb0be653afa8205dec4987db     -       28545   2940929
 
 1. Other ranges
 
