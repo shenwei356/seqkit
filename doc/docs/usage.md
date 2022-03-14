@@ -179,7 +179,7 @@ Available Commands:
   amplicon        extract amplicon (or specific region around it) via primer(s)
   bam             monitoring and online histograms of BAM record features
   common          find common sequences of multiple files by id/name/sequence
-  concat          concatenate sequences with same ID from multiple files
+  concat          concatenate sequences with the same ID from multiple files
   convert         convert FASTQ quality encoding between Sanger, Solexa and Illumina
   duplicate       duplicate sequences N times
   fa2fq           retrieve corresponding FASTQ records by a FASTA file

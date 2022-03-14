@@ -1,4 +1,4 @@
-- [SeqKit v2.2.0](https://github.com/shenwei356/seqkit/releases/tag/v2.2.0) - 2021-11-15
+- [SeqKit v2.2.0](https://github.com/shenwei356/seqkit/releases/tag/v2.2.0) - 2021-13-14
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.2.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.2.0)
     - `seqkit`:
         - **add support of `zx` and `zstd` input/output formats**. [#274](https://github.com/shenwei356/seqkit/issues/274)
@@ -10,7 +10,6 @@
         - new flag `-e/--extension` for forcing compresson or changing compression format. [#276](https://github.com/shenwei356/seqkit/issues/276)
         - support changing output prefix via `-o/--out-file`. [#275](https://github.com/shenwei356/seqkit/issues/275)
     - `seqkit concat`: 
-        - rewrite
         - fix handling of multiple seqs with the same ID in one file. [#269](https://github.com/shenwei356/seqkit/issues/269)
         - performaning out/full join. [#270](https://github.com/shenwei356/seqkit/issues/270)
         - preserve the comments. [#271](https://github.com/shenwei356/seqkit/issues/271)

@@ -27,12 +27,12 @@ and
 - **Easy to use** 
     - Ultrafast (see [technical-details](http://bioinf.shenwei.me/seqkit/usage/#technical-details-and-guides-for-use) and [benchmark](http://bioinf.shenwei.me/seqkit/benchmark))
     - Seamlessly parsing both FASTA and FASTQ formats
-    - Supporting (gzip/xz/zstd compressed) STDIN/STDOUT and input/output file, easily integrated in pipe
+    - Supporting (`gzip`/`xz`/`zstd` compressed) STDIN/STDOUT and input/output file, easily integrated in pipe
     - Reproducible results (configurable rand seed in `sample` and `shuffle`)
     - Supporting custom sequence ID via regular expression
     - Supporting [Bash/Zsh completion](http://bioinf.shenwei.me/seqkit/download/#shell-completion)
 - **Versatile commands** ([usages and examples](http://bioinf.shenwei.me/seqkit/usage/))
-    - Practical functions supported by [36 subcommands](#subcommands)
+    - Practical functions supported by [37 subcommands](#subcommands)
 
 
 ## Installation
@@ -56,6 +56,7 @@ install via conda:
 |                 |[sana](https://bioinf.shenwei.me/seqkit/usage/#sana)               |sanitize broken single line FASTQ files                                                 |FASTQ          |                  |             |               |
 |                 |[scat ](https://bioinf.shenwei.me/seqkit/usage/#scat )             |real time concatenation and streaming of fastx files                                    |FASTA/Q        |                  |✓            |               |
 |format conversion|[fq2fa](https://bioinf.shenwei.me/seqkit/usage/#fq2fa)             |convert FASTQ to FASTA                                                                  |FASTQ          |                  |             |★★             |
+|                 |[fa2fq](https://bioinf.shenwei.me/seqkit/usage/#fa2fq)             |retrieve corresponding FASTQ records by a FASTA file                                    |FASTA/Q        |                  |             |                |
 |                 |[fx2tab](https://bioinf.shenwei.me/seqkit/usage/#fx2tab-tab2fx)    |convert FASTA/Q to tabular format                                                       |FASTA/Q        |                  |             |★★             |
 |                 |[tab2fx](https://bioinf.shenwei.me/seqkit/usage/#fx2tab-tab2fx)    |convert tabular format to FASTA/Q format                                                |FASTA/Q        |                  |             |               |
 |                 |[convert](https://bioinf.shenwei.me/seqkit/usage/#convert)         |convert FASTQ quality encoding between Sanger, Solexa and Illumina                      |FASTA/Q        |                  |             |               |
@@ -74,7 +75,7 @@ install via conda:
 |                 |[head-genome](https://bioinf.shenwei.me/seqkit/usage/#head-genome) |print sequences of the first genome with common prefixes in name                        |FASTA/Q        |                  |             |               |
 |                 |[range](https://bioinf.shenwei.me/seqkit/usage/#range)             |print FASTA/Q records in a range (start:end)                                            |FASTA/Q        |                  |             |               |
 |                 |[pair](https://bioinf.shenwei.me/seqkit/usage/#pair)               |match up paired-end reads from two fastq files                                          |FASTA/Q        |                  |             |               |
-|edit             |[concat](https://bioinf.shenwei.me/seqkit/usage/#concat)           |concatenate sequences with same ID from multiple files                                  |FASTA/Q        |+ only            |             |★★★            |
+|edit             |[concat](https://bioinf.shenwei.me/seqkit/usage/#concat)           |concatenate sequences with same the ID from multiple files                                  |FASTA/Q        |+ only            |             |★★★            |
 |                 |[replace](https://bioinf.shenwei.me/seqkit/usage/#replace)         |replace name/sequence by regular expression                                             |FASTA/Q        |+ only            |             |★★             |
 |                 |[restart](https://bioinf.shenwei.me/seqkit/usage/#restart)         |reset start position for circular genome                                                |FASTA/Q        |+ only            |             |★              |
 |                 |[mutate](https://bioinf.shenwei.me/seqkit/usage/#mutate)           |edit sequence (point mutation, insertion, deletion)                                     |FASTA/Q        |+ only            |             |               |
