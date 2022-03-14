@@ -9,12 +9,11 @@
         <meta name="description" content="SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation">
       
       
-      
         <meta name="author" content="Wei Shen">
       
       
-      <link rel="shortcut icon" href="../files/favicon.ico">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.2.4">
+      <link rel="icon" href="../files/favicon.ico">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.5">
     
     
       
@@ -22,10 +21,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.15aa0b43.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ee0f47ba.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.75751829.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.e6a45f82.min.css">
         
           
           
@@ -39,19 +38,14 @@
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
-        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono",SFMono-Regular,Consolas,Menlo,monospace}</style>
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
     
-      <link rel="manifest" href="../manifest.webmanifest" crossorigin="use-credentials">
-    
-    
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
-        
-<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-28948626-9","bioinf.shenwei.me/seqkit"),ga("set","anonymizeIp",!0),ga("send","pageview"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}),document.addEventListener("DOMContentSwitch",function(){ga("send","pageview",document.location.pathname)})</script>
-<script async src="https://www.google-analytics.com/analytics.js"></script>
-      
+
     
     
   </head>
@@ -63,8 +57,8 @@
     
     
     <body dir="ltr" data-md-color-scheme="" data-md-color-primary="teal" data-md-color-accent="blue-grey">
-      
   
+    
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -81,27 +75,28 @@
       
     </div>
     
+    
       
 
 <header class="md-header" data-md-component="header">
-  <nav class="md-header-nav md-grid" aria-label="Header">
-    <a href=".." title="SeqKit - Ultrafast FASTA/Q kit" class="md-header-nav__button md-logo" aria-label="SeqKit - Ultrafast FASTA/Q kit">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="SeqKit - Ultrafast FASTA/Q kit" class="md-header__button md-logo" aria-label="SeqKit - Ultrafast FASTA/Q kit" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3 1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
 
     </a>
-    <label class="md-header-nav__button md-icon" for="__drawer">
+    <label class="md-header__button md-icon" for="__drawer">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
     </label>
-    <div class="md-header-nav__title" data-md-component="header-title">
-      <div class="md-header-nav__ellipsis">
-        <div class="md-header-nav__topic">
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
           <span class="md-ellipsis">
             SeqKit - Ultrafast FASTA/Q kit
           </span>
         </div>
-        <div class="md-header-nav__topic">
+        <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
               Usage
@@ -111,22 +106,27 @@
       </div>
     </div>
     
-      <label class="md-header-nav__button md-icon" for="__search">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
       </label>
-      
-<div class="md-search" data-md-component="search" role="dialog">
+      <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
       </label>
-      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
-      </button>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
     </form>
     <div class="md-search__output">
       <div class="md-search__scrollwrap" data-md-scrollfix>
@@ -142,12 +142,11 @@
 </div>
     
     
-      <div class="md-header-nav__source">
-        
-<a href="https://github.com/shenwei356/seqkit/" title="Go to repository" class="md-source">
+      <div class="md-header__source">
+        <a href="https://github.com/shenwei356/seqkit/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -156,11 +155,14 @@
       </div>
     
   </nav>
+  
 </header>
     
     <div class="md-container" data-md-component="container">
       
       
+        
+          
         
       
       <main class="md-main" data-md-component="main">
@@ -168,31 +170,28 @@
           
             
               
-              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" >
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
 
 
-
-
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="SeqKit - Ultrafast FASTA/Q kit" class="md-nav__button md-logo" aria-label="SeqKit - Ultrafast FASTA/Q kit">
+    <a href=".." title="SeqKit - Ultrafast FASTA/Q kit" class="md-nav__button md-logo" aria-label="SeqKit - Ultrafast FASTA/Q kit" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3 1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
 
     </a>
     SeqKit - Ultrafast FASTA/Q kit
   </label>
   
     <div class="md-nav__source">
-      
-<a href="https://github.com/shenwei356/seqkit/" title="Go to repository" class="md-source">
+      <a href="https://github.com/shenwei356/seqkit/" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -206,80 +205,90 @@
       
       
 
-
-
-  <li class="md-nav__item">
-    <a href=".." class="md-nav__link">
-      Home
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-
-  <li class="md-nav__item">
-    <a href="../download/" class="md-nav__link">
-      Download
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
   
 
+    
+      
+      
+      
 
   
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+  
+  
+    <li class="md-nav__item">
+      <a href="../download/" class="md-nav__link">
+        Download
+      </a>
+    </li>
+  
+
     
+      
+      
+      
+
+  
+  
     
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+  
+  
     
-    <label class="md-nav__link" for="nav-3">
-      Documents
-      <span class="md-nav__icon md-icon"></span>
-    </label>
-    <nav class="md-nav" aria-label="Documents" data-md-level="1">
-      <label class="md-nav__title" for="nav-3">
-        <span class="md-nav__icon md-icon"></span>
-        Documents
-      </label>
-      <ul class="md-nav__list" data-md-scrollfix>
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Documents
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Documents" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Documents
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
         
-        
-          
-          
-          
-
-
-  
-
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
       
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Usage
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Usage
-        <span class="md-nav__icon md-icon"></span>
-      </label>
-    
-    <a href="./" class="md-nav__link md-nav__link--active">
-      Usage
-    </a>
-    
+      </a>
       
+        
+
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
   
   
     
@@ -289,7 +298,7 @@
       <span class="md-nav__icon md-icon"></span>
       Table of contents
     </label>
-    <ul class="md-nav__list" data-md-scrollfix>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
   <a href="#quick-guide" class="md-nav__link">
@@ -416,6 +425,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#sum" class="md-nav__link">
+    sum
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#faidx" class="md-nav__link">
     faidx
   </a>
@@ -446,6 +462,13 @@
         <li class="md-nav__item">
   <a href="#fq2fa" class="md-nav__link">
     fq2fa
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fa2fq" class="md-nav__link">
+    fa2fq
   </a>
   
 </li>
@@ -635,78 +658,87 @@
     </ul>
   
 </nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../faq/" class="md-nav__link">
+        FAQ
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/" class="md-nav__link">
+        Tutorial
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmark/" class="md-nav__link">
+        Benchmark
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../note/" class="md-nav__link">
+        Notes
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
     
-  </li>
-
-        
-          
-          
-          
-
-
-
-  <li class="md-nav__item">
-    <a href="../faq/" class="md-nav__link">
-      FAQ
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-
-  <li class="md-nav__item">
-    <a href="../tutorial/" class="md-nav__link">
-      Tutorial
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-
-  <li class="md-nav__item">
-    <a href="../benchmark/" class="md-nav__link">
-      Benchmark
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-
-  <li class="md-nav__item">
-    <a href="../note/" class="md-nav__link">
-      Notes
-    </a>
-  </li>
-
-        
-      </ul>
-    </nav>
-  </li>
-
-    
       
       
       
 
-
-
-  <li class="md-nav__item">
-    <a href="https://github.com/shenwei356" class="md-nav__link">
-      More tools
-    </a>
-  </li>
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/shenwei356" class="md-nav__link">
+        More tools
+      </a>
+    </li>
+  
 
     
   </ul>
@@ -717,11 +749,13 @@
             
             
               
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" >
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
+
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
   
   
     
@@ -731,7 +765,7 @@
       <span class="md-nav__icon md-icon"></span>
       Table of contents
     </label>
-    <ul class="md-nav__list" data-md-scrollfix>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
   <a href="#quick-guide" class="md-nav__link">
@@ -858,6 +892,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#sum" class="md-nav__link">
+    sum
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#faidx" class="md-nav__link">
     faidx
   </a>
@@ -888,6 +929,13 @@
         <li class="md-nav__item">
   <a href="#fq2fa" class="md-nav__link">
     fq2fa
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fa2fq" class="md-nav__link">
+    fa2fq
   </a>
   
 </li>
@@ -1082,21 +1130,21 @@
               </div>
             
           
-          <div class="md-content">
+          <div class="md-content" data-md-component="content">
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/shenwei356/seqkit/edit/master/docs/usage.md" title="Edit this page" class="md-content__button md-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
-                  </a>
-                
-                
-                <h1 id="usage-and-examples">Usage and Examples</h1>
+<a href="https://github.com/shenwei356/seqkit/edit/master/docs/usage.md" title="Edit this page" class="md-content__button md-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+</a>
+
+
+<h1 id="usage-and-examples">Usage and Examples</h1>
 <h2 id="quick-guide">Quick Guide</h2>
 <ul>
-<li>Basic: <a href="#seq">seq</a>, <a href="#stats">stats</a>, <a href="#subseq">subseq</a>, <a href="#sliding">sliding</a>,
+<li>Basic: <a href="#seq">seq</a>, <a href="#stats">stats</a>, <a href="#sum">sum</a>, <a href="#subseq">subseq</a>, <a href="#sliding">sliding</a>,
   <a href="#faidx">faidx</a>, <a href="#watch">watch</a>, <a href="#sana">sana</a>, <a href="#scat">scat</a></li>
-<li>Format conversion: <a href="#fq2fa">fq2fa</a>, <a href="#fx2tab-tab2fx">fx2tab</a>, <a href="#fx2tab-tab2fx">tab2fx</a>,
+<li>Format conversion: <a href="#fq2fa">fq2fa</a>, <a href="#fa2fq">fa2fq</a>, <a href="#fx2tab-tab2fx">fx2tab</a>, <a href="#fx2tab-tab2fx">tab2fx</a>,
   <a href="#convert">convert</a>, <a href="#translate">translate</a></li>
 <li>Searching: <a href="#grep">grep</a>, <a href="#locate">locate</a>, <a href="#amplicon">amplicon</a>, <a href="#fish">fish</a></li>
 <li>Set operation: <a href="#sample">sample</a>, <a href="#rmdup">rmdup</a>, <a href="#common">common</a>,
@@ -1109,6 +1157,9 @@
 </ul>
 <h2 id="technical-details-and-guides-for-use">Technical details and guides for use</h2>
 <h3 id="fastaq-format-parsing-and-writing">FASTA/Q format parsing and writing</h3>
+<blockquote>
+<p><strong>Seqkit also supports reading and writing xz (.xz) and zstd (.zst) formats since v2.2.0</strong>.</p>
+</blockquote>
 <p>SeqKit uses the author's lightweight and high-performance bioinformatics package
 <a href="https://github.com/shenwei356/bio">bio</a> for FASTA/Q parsing,
 which has <a href="https://github.com/shenwei356/bio#fastaq-parsing">high performance</a>
@@ -1228,7 +1279,7 @@ reproduced in different environments with same random seed.</p>
 <h2 id="seqkit">seqkit</h2>
 <pre><code class="language-text">SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 2.0.0
+Version: 2.2.0
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -1251,10 +1302,10 @@ Available Commands:
   amplicon        extract amplicon (or specific region around it) via primer(s)
   bam             monitoring and online histograms of BAM record features
   common          find common sequences of multiple files by id/name/sequence
-  completion      generate the autocompletion script for the specified shell
-  concat          concatenate sequences with same ID from multiple files
+  concat          concatenate sequences with the same ID from multiple files
   convert         convert FASTQ quality encoding between Sanger, Solexa and Illumina
   duplicate       duplicate sequences N times
+  fa2fq           retrieve corresponding FASTQ records by a FASTA file
   faidx           create FASTA index file and extract subsequence
   fish            look for short sequences in larger sequences using local alignment
   fq2fa           convert FASTQ to FASTA
@@ -1263,7 +1314,6 @@ Available Commands:
   grep            search sequences by ID/name/sequence/sequence motifs, mismatch allowed
   head            print first N FASTA/Q records
   head-genome     print sequences of the first genome with common prefixes in name
-  help            Help about any command
   locate          locate subsequences/motifs, mismatch allowed
   mutate          edit sequence (point mutation, insertion, deletion)
   pair            match up paired-end reads from two fastq files
@@ -1283,6 +1333,7 @@ Available Commands:
   split2          split sequences into files by size/parts (FASTA, PE/SE FASTQ)
   stats           simple statistics of FASTA/Q files
   subseq          get subsequences by region/gtf/bed, including flanking sequences
+  sum             compute message digest for all sequences in FASTA/Q files
   tab2fx          convert tabular format to FASTA/Q format
   translate       translate DNA/RNA to protein sequence (supporting ambiguous bases)
   version         print version information and check for update
@@ -1881,6 +1932,119 @@ tests/reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224    
 <p>Output basename instead of full path (<code>-b/--basename</code>)</p>
 </li>
 </ol>
+<h2 id="sum">sum</h2>
+<p>Usage</p>
+<pre><code class="language-text">compute message digest for all sequences in FASTA/Q files
+
+Attentions:
+  1. Sequence headers and qualities are skipped, only sequences matter.
+  2. The order of sequences records does not matter.
+  3. Circular complete genomes are supported with the flag -c/--circular.
+     - The same double-stranded genomes with different start positions or
+       in reverse complement strand will not affect the result.
+     - For single-stranded genomes like ssRNA genomes, use -s/--single-strand.
+     - The message digest would change with different values of k-mer size.
+  4. Multiple files are processed in parallel (-j/--threads).
+
+Method:
+  1. Converting the sequences to low cases, optionally removing gaps (-g).
+  2. Computing the hash (xxhash) for all sequences or k-mers of a circular
+     complete genome (-c/--circular).
+  3. Sorting all hash values, for ignoring the order of sequences.
+  4. Computing MD5 digest from the hash values, sequences length, and
+     the number of sequences.
+
+Following the seqhash in Poly (https://github.com/TimothyStiles/poly/),
+We add meta information to the message digest, with the format of:
+
+    seqkit.&lt;version&gt;_&lt;seq type&gt;&lt;seq structure&gt;&lt;strand&gt;_&lt;kmer size&gt;_&lt;seq digest&gt;
+
+    &lt;version&gt;:       digest version
+    &lt;seq type&gt;:      'D' for DNA, 'R' for RNA, 'P' for protein, 'N' for others
+    &lt;seq structure&gt;: 'L' for linear sequence, 'C' for circular genome
+    &lt;strand&gt;:        'D' for double-stranded, 'S' for single-stranded
+    &lt;kmer size&gt;:     0 for linear sequence, other values for circular genome
+
+Examples:
+
+    seqkit.v0.1_DLS_k0_176250c8d1cde6c385397df525aa1a94    DNA.fq.gz
+    seqkit.v0.1_PLS_k0_c244954e4960dd2a1409cd8ee53d92b9    Protein.fasta
+    seqkit.v0.1_RLS_k0_0f1fb263f0c05a259ae179a61a80578d    single-stranded RNA.fasta
+
+    seqkit.v0.1_DCD_k31_e59dad6d561f1f1f28ebf185c6f4c183   double-stranded-circular DNA.fasta
+    seqkit.v0.1_DCS_k31_dd050490cd62ea5f94d73d4d636b7d60   single-stranded-circular DNA.fasta
+
+Usage:
+  seqkit sum [flags]
+
+Flags:
+  -a, --all                  show all information, including the sequences length and the number of sequences
+  -b, --basename             only output basename of files
+  -c, --circular             the file contains a single cicular genome sequence
+  -G, --gap-letters string   gap letters (default &quot;- \t.*&quot;)
+  -h, --help                 help for sum
+  -k, --kmer-size int        k-mer size for processing circular genomes (default 1000)
+  -g, --remove-gaps          remove gaps
+      --rna2dna              convert RNA to DNA
+  -s, --single-strand        only consider the positive strand of a circular genome, e.g., ssRNA virus genomes
+
+</code></pre>
+<p>Examples:</p>
+<p>A, B, C, D are the same vircular genomes with different starting positions or strands:</p>
+<pre><code>$ cat virus-{A,B,C,D}.fasta
+&gt;seq
+TGGTAGGGAGTTGAGTAGCATGGGTATAGTATAGTGTCATGATGCCAGATTTTAAAAAAA
+&gt;seq.revcom
+TTTTTTTAAAATCTGGCATCATGACACTATACTATACCCATGCTACTCAACTCCCTACCA
+&gt;seq.new-start
+GGTAGGGAGTTGAGTAGCATGGGTATAGTATAGTGTCATGATGCCAGATTTTAAAAAAAT
+&gt;seq.revcom.new-start
+TTTTTTAAAATCTGGCATCATGACACTATACTATACCCATGCTACTCAACTCCCTACCAT
+
+# cat to one file
+$ cat virus-{A,B,C,D}.fasta &gt; virues.fasta
+
+# shuffle and rename
+$ cat virus-{A,B,C,D}.fasta \
+    | seqkit shuffle \
+    | seqkit replace -p '.*' -r '{nr}' \
+    | tee virues.shuffled.fasta
+&gt;1
+TTTTTTAAAATCTGGCATCATGACACTATACTATACCCATGCTACTCAACTCCCTACCAT
+&gt;2
+TGGTAGGGAGTTGAGTAGCATGGGTATAGTATAGTGTCATGATGCCAGATTTTAAAAAAA
+&gt;3
+GGTAGGGAGTTGAGTAGCATGGGTATAGTATAGTGTCATGATGCCAGATTTTAAAAAAAT
+&gt;4
+TTTTTTTAAAATCTGGCATCATGACACTATACTATACCCATGCTACTCAACTCCCTACCA
+</code></pre>
+<p>Sum of all files (the sequences order does not matter):</p>
+<pre><code>$ seqkit sum viru*.fasta
+seqkit.v0.1_DLS_k0_9bbe0abefc26013dffdde952a6725b17    virues.fasta
+seqkit.v0.1_DLS_k0_9bbe0abefc26013dffdde952a6725b17    virues.shuffled.fasta
+seqkit.v0.1_DLS_k0_176250c8d1cde6c385397df525aa1a94    virus-A.fasta
+seqkit.v0.1_DLS_k0_7a813339f9ae686b376b1df55cd596ca    virus-B.fasta
+seqkit.v0.1_DLS_k0_0fd51028bfbfa85ddbdd2b86ef7bd1c1    virus-C.fasta
+seqkit.v0.1_DLS_k0_88b1d20dd0fe0dbf41c00b075fee4e4e    virus-D.fasta
+</code></pre>
+<p>Circular genomes (the same genomes with different start positions or in reverse
+complement strand will not affect the result):</p>
+<pre><code>$ seqkit sum -c -k 21  virus-*.fasta
+seqkit.v0.1_DCD_k21_7efd18ce33380268d3aa335ffd2dd1cc   virus-A.fasta
+seqkit.v0.1_DCD_k21_7efd18ce33380268d3aa335ffd2dd1cc   virus-B.fasta
+seqkit.v0.1_DCD_k21_7efd18ce33380268d3aa335ffd2dd1cc   virus-C.fasta
+seqkit.v0.1_DCD_k21_7efd18ce33380268d3aa335ffd2dd1cc   virus-D.fasta
+
+$ seqkit sum -c -k 51  virus-*.fasta
+seqkit.v0.1_DCD_k51_39e267864fddeafd7a5cacd77e0a6a11   virus-A.fasta
+seqkit.v0.1_DCD_k51_39e267864fddeafd7a5cacd77e0a6a11   virus-B.fasta
+seqkit.v0.1_DCD_k51_39e267864fddeafd7a5cacd77e0a6a11   virus-C.fasta
+seqkit.v0.1_DCD_k51_39e267864fddeafd7a5cacd77e0a6a11   virus-D.fasta
+
+# collect files with the same genomes
+$ seqkit sum -c -k 51  virus-*.fasta | csvtk fold -Ht -f 1 -v 2 
+seqkit.v0.1_DCD_k51_39e267864fddeafd7a5cacd77e0a6a11   virus-A.fasta; virus-B.fasta; virus-C.fasta; virus-D.fasta
+</code></pre>
 <h2 id="faidx">faidx</h2>
 <p>Usage</p>
 <pre><code class="language-text">create FASTA index file and extract subsequence
@@ -2098,6 +2262,23 @@ Usage:
 </code></pre>
 <p>Examples</p>
 <pre><code>seqkit fq2fa reads_1.fq.gz -o reads_1.fa.gz
+</code></pre>
+<h2 id="fa2fq">fa2fq</h2>
+<p>Usage</p>
+<pre><code class="language-text">retrieve corresponding FASTQ records by a FASTA file
+
+Attention:
+  1. We assume the FASTA file comes from the FASTQ file,
+     so they share sequence IDs, and sequences in FASTA
+     should be subseq of sequences in FASTQ file.
+
+Usage:
+  seqkit fa2fq [flags]
+
+Flags:
+  -f, --fasta-file string      FASTA file)
+  -h, --help                   help for fa2fq
+  -P, --only-positive-strand   only search on positive strand
 </code></pre>
 <h2 id="fx2tab-tab2fx">fx2tab &amp; tab2fx</h2>
 <p>Usage (fx2tab)</p>
@@ -2543,6 +2724,7 @@ Flags:
   -n, --by-name                match by full name instead of just ID
   -s, --by-seq                 search subseq on seq, both positive and negative strand are searched, and mismatch allowed using flag -m/--max-mismatch
   -c, --circular               circular genome
+  -C, --count                  just print a count of matching records. with the -v/--invert-match flag, count non-matching records
   -d, --degenerate             pattern/motif contains degenerate base
       --delete-matched         delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions
   -h, --help                   help for grep
@@ -2566,6 +2748,10 @@ Flags:
 # ignore case
 $ seqkit grep -i -f id.txt seqs.fq.gz -o result.fq.gz
 </code></pre>
+</li>
+<li>
+<p>Just print the matched number, like GNU grep (<code>grep -c</code>) </p>
+<p>$ seqkit grep -f id.txt seqs.fq.gz -C</p>
 </li>
 <li>
 <p>Serching non-canonical sequence IDs, Using <code>--id-regexp</code> to capture IDs. 
@@ -2967,6 +3153,7 @@ Flags:
   -I, --immediate-output       print output immediately, do not use write buffer
   -m, --max-mismatch int       max mismatch when matching primers, no degenerate bases allowed
   -P, --only-positive-strand   only search on positive strand
+  -M, --output-mismatches      output mismatches
   -p, --primer-file string     3- or 2-column tabular primer file, with first column as primer name
   -r, --region string          specify region to return. type &quot;seqkit amplicon -h&quot; for detail
   -R, --reverse string         reverse primer (5'-primer-3'), degenerate bases allowed
@@ -2999,6 +3186,23 @@ seq     3       13      .       0       +       cccactgaaa
 $ echo -ne "&gt;seq\nacgcccactgaaatga\n" \
     | seqkit amplicon -F ccR -R ttt --bed
 seq     4       13      .       0       +       ccactgaaa
+</code></pre>
+</li>
+<li>
+<p>Output mismatches:</p>
+<pre><code>$ echo -ne "&gt;seq\nacgcccactgaaatga\n" \
+    | seqkit amplicon -F ccc -R ttt -M
+&gt;seq mismatches=0(0+0)
+cccactgaaa
+
+$ echo -ne "&gt;seq\nacgcccactgaaatga\n" \
+    | seqkit amplicon -F ccc -R ttt -m 1 -M
+&gt;seq mismatches=2(1+1)
+cgcccactgaaat
+
+$ echo -ne "&gt;seq\nacgcccactgaaatga\n" \
+    | seqkit amplicon -F ccc -R ttt -m 1 -M --bed
+seq     1       14      .       0       +       cgcccactgaaat   2       1       1
 </code></pre>
 </li>
 <li>
@@ -3133,10 +3337,10 @@ UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 <pre><code class="language-text">remove duplicated sequences by ID/name/sequence
 
 Attentions:
-
   1. When comparing by sequences, both positive and negative strands are
      compared. Switch on -P/--only-positive-strand for considering the
      positive strand only.
+  2. Only the first record is saved for duplicates.
 
 Usage:
   seqkit rmdup [flags]
@@ -3334,8 +3538,18 @@ Flags:
 This command supports FASTA and paired- or single-end FASTQ with low memory
 occupation and fast speed.
 
-The file extensions of output are automatically detected and created
-according to the input files.
+The prefix of output files:
+  1. For stdin: stdin
+  2. Others: same to the input file
+  3. Set via the option: -o/--out-file, e.g., outputting xxx.part_001.fasta:
+       cat ../tests/hairpin.fa | ./seqkit split2 -p 2 -O test -o xxx
+
+The extension of output files:
+  1. For stdin: .fast[aq]
+  2. Others: same to the input file
+  3. Additional extension via the option -e/--extension, e.g.， outputting
+     gzipped files for plain text input:
+         seqkit split2 -p 2 -O test tests/hairpin.fa -e .gz
 
 Usage:
   seqkit split2 [flags]
@@ -3344,6 +3558,7 @@ Flags:
   -l, --by-length string   split sequences into chunks of &gt;=N bases, supports K/M/G suffix
   -p, --by-part int        split sequences into N parts
   -s, --by-size int        split sequences into multi parts with N sequences
+  -e, --extension string   set output file extension, e.g., &quot;.gz&quot;, &quot;.xz&quot;, or &quot;.zst&quot;
   -f, --force              overwrite output directory
   -h, --help               help for split2
   -O, --out-dir string     output directory (default value is $infile.split)
@@ -3353,12 +3568,58 @@ Flags:
 <p>Examples</p>
 <ol>
 <li>
-<p>Split sequences into parts with at most 10000 sequences</p>
-<pre><code>$ seqkit split2 hairpin.fa.gz -s 10000 -f
+<p>Split sequences into parts with at most 10000 sequences:</p>
+<pre><code>$ seqkit split2 hairpin.fa -s 10000
+[INFO] split seqs from hairpin.fa
 [INFO] split into 10000 seqs per file
-[INFO] write 10000 sequences to file: hairpin.fa.part_001.gz
-[INFO] write 10000 sequences to file: hairpin.fa.part_002.gz
-[INFO] write 8645 sequences to file: hairpin.fa.part_003.gz
+[INFO] write 10000 sequences to file: hairpin.fa.split/hairpin.part_001.fa
+[INFO] write 10000 sequences to file: hairpin.fa.split/hairpin.part_002.fa
+[INFO] write 8645 sequences to file: hairpin.fa.split/hairpin.part_003.fa
+</code></pre>
+</li>
+<li>
+<p>Force compression for plain text input by adding an extra extension:</p>
+<pre><code># gzip
+$ seqkit split2 hairpin.fa -O test -f -s 10000 -e .gz
+[INFO] split seqs from hairpin.fa
+[INFO] split into 10000 seqs per file
+[INFO] write 10000 sequences to file: test/hairpin.part_001.fa.gz
+[INFO] write 10000 sequences to file: test/hairpin.part_002.fa.gz
+[INFO] write 8645 sequences to file: test/hairpin.part_003.fa.gz
+
+# xz
+$ seqkit split2 hairpin.fa -O test -f -s 10000 -e .xz
+[INFO] split seqs from hairpin.fa
+[INFO] split into 10000 seqs per file
+[INFO] write 10000 sequences to file: test/hairpin.part_001.fa.xz
+[INFO] write 10000 sequences to file: test/hairpin.part_002.fa.xz
+[INFO] write 8645 sequences to file: test/hairpin.part_003.fa.xz
+
+# zstd
+$ seqkit split2 hairpin.fa -O test -f -s 10000 -e .zst
+[INFO] split seqs from hairpin.fa
+[INFO] split into 10000 seqs per file
+[INFO] write 10000 sequences to file: test/hairpin.part_001.fa.zst
+[INFO] write 10000 sequences to file: test/hairpin.part_002.fa.zst
+[INFO] write 8645 sequences to file: test/hairpin.part_003.fa.zst
+</code></pre>
+</li>
+<li>
+<p>Change the prefix of output files:</p>
+<pre><code>$ seqkit split2 hairpin.fa -O test -f -s 10000 -e .gz -o xxx
+[INFO] split seqs from hairpin.fa
+[INFO] split into 10000 seqs per file
+[INFO] write 10000 sequences to file: test/xxx.part_001.fa.gz
+[INFO] write 10000 sequences to file: test/xxx.part_002.fa.gz
+[INFO] write 8645 sequences to file: test/xxx.part_003.fa.gz
+
+# here, we also change the compression format from xz to zstd
+$ cat hairpin.fa.xz | seqkit split2 -O test -f -s 10000 -e .zst
+[INFO] split seqs from stdin
+[INFO] split into 10000 seqs per file
+[INFO] write 10000 sequences to file: test/stdin.part_001.fasta.zst
+[INFO] write 10000 sequences to file: test/stdin.part_002.fasta.zst
+[INFO] write 8645 sequences to file: test/stdin.part_003.fasta.zst
 </code></pre>
 </li>
 <li>
@@ -3522,6 +3783,9 @@ flag <code>-s</code> (<code>--rand-seed</code>)</p>
 <p>Usage</p>
 <pre><code class="language-text">print first N FASTA/Q records
 
+For returning the last N records, use:
+    seqkit range -N:-1 seqs.fasta
+
 Usage:
   seqkit head [flags]
 
@@ -3583,6 +3847,17 @@ Flags:
 <p>Usage</p>
 <pre><code class="language-text">print FASTA/Q records in a range (start:end)
 
+Examples:
+  1. leading 100 records (head -n 100)
+      seqkit range -r 1:100
+  2. last 100 records (tail -n 100)
+      seqkit range -r -100:-1
+  3. remove leading 100 records (tail -n +101)
+      seqkit range -r 101:-1
+  4. other ranges:
+      seqkit range -r 10:100
+      seqkit range -r -100:-10
+
 Usage:
   seqkit range [flags]
 
@@ -3605,6 +3880,15 @@ f65116af7d9298d93ba4b3d19077bbf1  -
 <pre><code>$ cat tests/hairpin.fa | seqkit range -r -100:-1 | seqkit stats
 file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
 -     FASTA   RNA        100    8,656       58     86.6      172
+</code></pre>
+</li>
+<li>
+<p>remove leading 100 records (tail -n +101)</p>
+<pre><code>$ seqkit range -r 101:-1 tests/hairpin.fa | seqkit sum -a
+seqkit.v0.1_RLS_k0_e1feced9bb0be653afa8205dec4987db     -       28545   2940929
+
+$ seqkit fx2tab tests/hairpin.fa | tail -n +101 | seqkit tab2fx | seqkit sum -a
+seqkit.v0.1_RLS_k0_e1feced9bb0be653afa8205dec4987db     -       28545   2940929
 </code></pre>
 </li>
 <li>
@@ -3887,25 +4171,56 @@ Flags:
 <p>Usage</p>
 <pre><code class="language-text">concatenate sequences with same ID from multiple files
 
-Example: concatenating leading 2 bases and last 2 bases
-
-    $ cat t.fa
-    &gt;test
-    ACCTGATGT
-    &gt;test2
-    TGATAGCTACTAGGGTGTCTATCG
-
-    $ seqkit concat &lt;(seqkit subseq -r 1:2 t.fa) &lt;(seqkit subseq -r -2:-1 t.fa)
-    &gt;test
-    ACGT
-    &gt;test2
-    TGCG
+Attentions:
+   1. By default, only sequences with IDs that appear in all files are outputted.
+      use -f/--full to output all sequences.
+   2. If there are more than one sequences of the same ID, we output the Cartesian
+      product of sequences.
+   3. Description are also concatenated with a separator (-s/--separator).
+   4. Order of sequences with different IDs are random.
 
 Usage:
   seqkit concat [flags]
 
+Aliases:
+  concat, concate
+
 Flags:
-  -h, --help   help for concat
+  -f, --full               keep all sequences, like full/outter join
+  -h, --help               help for concat
+  -s, --separator string   separator for descriptions of records with the same ID (default &quot;|&quot;)
+
+</code></pre>
+<p>Examples</p>
+<pre><code>$ cat a.fa 
+&gt;A 1
+a1-
+&gt;A 2
+a2-
+&gt;B 1
+b1-
+
+$ cat b.fa 
+&gt;A x
+ax-
+&gt;C 1
+c1-
+
+$ seqkit concat a.fa b.fa 
+&gt;A 1|x
+a1-ax-
+&gt;A 2|x
+a2-ax-
+
+$ seqkit concat a.fa b.fa --full
+&gt;C 1
+c1-
+&gt;A 1|x
+a1-ax-
+&gt;A 2|x
+a2-ax-
+&gt;B 1
+b1-
 
 </code></pre>
 <h2 id="mutate">mutate</h2>
@@ -4455,84 +4770,75 @@ s.setAttribute('data-timestamp', +new Date());
 })();
 </script>
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-                
-              
-              
-                
-
 
               
             </article>
           </div>
         </div>
+        
       </main>
       
-        
-<footer class="md-footer">
+        <footer class="md-footer">
   
-    <div class="md-footer-nav">
-      <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
         
-          <a href="../download/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
-            <div class="md-footer-nav__button md-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        <a href="../download/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Download" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Download
             </div>
-            <div class="md-footer-nav__title">
-              <div class="md-ellipsis">
-                <span class="md-footer-nav__direction">
-                  Previous
-                </span>
-                Download
-              </div>
-            </div>
-          </a>
+          </div>
+        </a>
+      
+      
         
-        
-          <a href="../faq/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
-            <div class="md-footer-nav__title">
-              <div class="md-ellipsis">
-                <span class="md-footer-nav__direction">
-                  Next
-                </span>
-                FAQ
-              </div>
+        <a href="../faq/" class="md-footer__link md-footer__link--next" aria-label="Next: FAQ" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              FAQ
             </div>
-            <div class="md-footer-nav__button md-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
-            </div>
-          </a>
-        
-      </nav>
-    </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
-      <div class="md-footer-copyright">
-        
-        Made with
-        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-          Material for MkDocs
-        </a>
-      </div>
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
       
     </div>
   </div>
 </footer>
       
     </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.b6ff8c07.min.js"}</script>
     
-      <script src="../assets/javascripts/vendor.93c04032.min.js"></script>
-      <script src="../assets/javascripts/bundle.83e5331e.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
-      
-      <script>
-        app = initialize({
-          base: "..",
-          features: [],
-          search: Object.assign({
-            worker: "../assets/javascripts/worker/search.8c7e0a7e.min.js"
-          }, typeof search !== "undefined" && search)
-        })
-      </script>
+    
+      <script src="../assets/javascripts/bundle.5e13d264.min.js"></script>
       
     
   </body>
