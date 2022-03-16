@@ -47,7 +47,7 @@ var splitCmd = &cobra.Command{
 part size or number of parts.
 
 If you just want to split by parts or sizes, please use "seqkit split2",
-which also apply for paired- and single-end FASTQ.
+which also applies for paired- and single-end FASTQ.
 
 The definition of region is 1-based and with some custom design.
 
@@ -282,6 +282,9 @@ Examples:
 			}
 			if j > 0 && !quiet {
 				log.Infof("write %d sequences to file: %s\n", j, outfile)
+			}
+			if j == 0 {
+				os.Remove(outfile)
 			}
 			if !dryRun {
 				outfh.Close()

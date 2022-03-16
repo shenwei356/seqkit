@@ -1,3 +1,7 @@
+- [SeqKit v2.2.1](https://github.com/shenwei356/seqkit/releases/tag/v2.2.1) - 2022-03-14
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.2.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.2.1)
+    - `seqkit split`
+        - fix outputting an empty file when the number of sequence equal to the split size. [#293](https://github.com/shenwei356/seqkit/issues/293)
 - [SeqKit v2.2.0](https://github.com/shenwei356/seqkit/releases/tag/v2.2.0) - 2022-03-14
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.2.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.2.0)
     - `seqkit`:
