@@ -1,7 +1,7 @@
 - [SeqKit v2.2.0](https://github.com/shenwei356/seqkit/releases/tag/v2.2.0) - 2022-03-14
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.2.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.2.0)
     - `seqkit`:
-        - **add support of `zx` and `zstd` input/output formats**. [#274](https://github.com/shenwei356/seqkit/issues/274)
+        - **add support of `xz` and `zstd` input/output formats**. [#274](https://github.com/shenwei356/seqkit/issues/274)
         - fix panic when reading records with header of `ID` + blanks.
     - **new command `seqkit sum`: computing message digest for all sequences in FASTA/Q files**.
       The idea comes from @photocyte and the format borrows from [seqhash](https://github.com/TimothyStiles/poly/tree/prime/seqhash) [#262](https://github.com/shenwei356/seqkit/issues/262)
