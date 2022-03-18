@@ -242,7 +242,7 @@ Attentions:
 func init() {
 	RootCmd.AddCommand(concateCmd)
 
-	concateCmd.Flags().BoolP("full", "f", false, "keep all sequences, like full/outter join")
+	concateCmd.Flags().BoolP("full", "f", false, "keep all sequences, like full/outer join")
 	concateCmd.Flags().StringP("separator", "s", "|", "separator for descriptions of records with the same ID")
 }
 

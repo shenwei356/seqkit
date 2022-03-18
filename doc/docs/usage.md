@@ -3056,7 +3056,7 @@ Aliases:
   concat, concate
 
 Flags:
-  -f, --full               keep all sequences, like full/outter join
+  -f, --full               keep all sequences, like full/outer join
   -h, --help               help for concat
   -s, --separator string   separator for descriptions of records with the same ID (default "|")
 
