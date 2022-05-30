@@ -11,7 +11,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/iafan/cwalk v0.0.0-20210125030640-586a8832a711
-	github.com/klauspost/compress v1.15.1
+	github.com/klauspost/compress v1.15.5
 	github.com/klauspost/pgzip v1.2.5
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mattn/go-colorable v0.1.11

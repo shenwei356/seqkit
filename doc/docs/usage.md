@@ -1612,7 +1612,7 @@ Examples
 
 1. Just print the matched number, like GNU grep (`grep -c`) 
 
-       $ seqkit grep -f id.txt seqs.fq.gz -C
+        $ seqkit grep -f id.txt seqs.fq.gz -C
 
 1. Serching non-canonical sequence IDs, Using `--id-regexp` to capture IDs. 
    Refer to [section Sequence ID](#sequence-id) and [seqkit seq](#seq) for examples.

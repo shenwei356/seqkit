@@ -218,12 +218,13 @@ The extension of output files:
 				var counts []int
 				var outfiles []string
 
+				// by size or by length
+				var outfhPre *xopen.Writer
+				var outfilePre string
+
 				var flag bool
 
 				if bySize || byLength { // by size or by length
-					outfhs = make([]*xopen.Writer, 0, 10)
-					counts = make([]int, 0, 10)
-					outfiles = make([]string, 0, 10)
 				} else if byParts { // by part
 					outfhs = make([]*xopen.Writer, 0, parts)
 					counts = make([]int, 0, parts)
@@ -237,6 +238,7 @@ The extension of output files:
 				i := 0 // nth part
 				j := 0
 				var n int64 // length sum
+				once := true
 				for {
 					record, err = fastxReader.Read()
 					if err != nil {
@@ -247,30 +249,103 @@ The extension of output files:
 						break
 					}
 
-					if fastxReader.IsFastq {
-						config.LineWidth = 0
-						fastx.ForcelyOutputFastq = true
+					if once {
+						if fastxReader.IsFastq {
+							config.LineWidth = 0
+							fastx.ForcelyOutputFastq = true
+						}
+
+						if renameFileExt && isstdin {
+							if len(record.Seq.Qual) > 0 {
+								fileExt = suffixFQ + extension
+							} else {
+								fileExt = suffixFA + extension
+							}
+							renameFileExt = false
+						}
+						once = false
 					}
 
-					if renameFileExt && isstdin {
-						if len(record.Seq.Qual) > 0 {
-							fileExt = suffixFQ + extension
-						} else {
-							fileExt = suffixFA + extension
-						}
-						renameFileExt = false
-					}
 					n += int64(len(record.Seq.Seq))
 
 					if bySize {
 						if j == size {
-							outfhs[i].Close()
+							outfhPre.Close()
 							if !quiet {
-								log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
+								log.Infof("write %d sequences to file: %s\n", j, outfilePre)
 							}
-							outfhs[i] = nil
 
 							i++
+
+							outfilePre = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
+							outfhPre, err = xopen.Wopen(outfilePre)
+							checkError(err)
+
+							j = 0
+						}
+					} else if byLength {
+						flag = false
+
+						if outfhPre == nil { // first record
+							var outfh2 *xopen.Writer
+							outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
+							outfh2, err = xopen.Wopen(outfile)
+							checkError(err)
+
+							outfhPre = outfh2
+							outfilePre = outfile
+
+							j = 0
+						}
+
+						if n >= length {
+							record.FormatToWriter(outfhPre, config.LineWidth)
+							j++
+
+							outfhPre.Close()
+							if !quiet {
+								log.Infof("write %d sequences to file: %s\n", j, outfilePre)
+							}
+							i++
+
+							var outfh2 *xopen.Writer
+							outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
+							outfh2, err = xopen.Wopen(outfile)
+							checkError(err)
+
+							outfhPre = outfh2
+							outfilePre = outfile
+
+							j = 0
+							n = 0
+							flag = false
+						} else { // write this record later
+							flag = true
+						}
+					}
+
+					if bySize {
+						// first record, for bySize
+						if outfhPre == nil {
+							outfilePre = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
+							outfhPre, err = xopen.Wopen(outfilePre)
+							checkError(err)
+
+							j = 0
+						}
+
+						record.FormatToWriter(outfhPre, config.LineWidth)
+
+						j++ // increase size
+					} else if byLength {
+						if flag {
+							record.FormatToWriter(outfhPre, config.LineWidth)
+
+							j++
+						}
+					} else {
+						// first record, for byParts
+						if i+1 > len(outfhs) {
 							var outfh2 *xopen.Writer
 							outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
 							outfh2, err = xopen.Wopen(outfile)
@@ -279,108 +354,38 @@ The extension of output files:
 							outfhs = append(outfhs, outfh2)
 							counts = append(counts, 0)
 							outfiles = append(outfiles, outfile)
-
-							j = 0
 						}
-					} else if byLength {
-						flag = false
-						if n >= length {
-							if len(outfhs) == 0 { // order is different
-								var outfh2 *xopen.Writer
-								outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
-								outfh2, err = xopen.Wopen(outfile)
-								checkError(err)
 
-								outfhs = append(outfhs, outfh2)
-								counts = append(counts, 0)
-								outfiles = append(outfiles, outfile)
-
-								record.FormatToWriter(outfhs[i], config.LineWidth)
-								counts[i]++
-
-								outfhs[i].Close()
-								if !quiet {
-									log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
-								}
-								outfhs[i] = nil
-								i++
-
-								n = 0
-							} else {
-								record.FormatToWriter(outfhs[i], config.LineWidth)
-								counts[i]++
-
-								outfhs[i].Close()
-								if !quiet {
-									log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
-								}
-								outfhs[i] = nil
-								i++
-
-								var outfh2 *xopen.Writer
-								outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
-								outfh2, err = xopen.Wopen(outfile)
-								checkError(err)
-
-								outfhs = append(outfhs, outfh2)
-								counts = append(counts, 0)
-								outfiles = append(outfiles, outfile)
-
-								n = 0
-							}
-							flag = false
-						} else { // write this record later
-							flag = true
-						}
-					}
-
-					if i+1 > len(outfhs) || outfhs[i] == nil {
-						var outfh2 *xopen.Writer
-						outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
-						outfh2, err = xopen.Wopen(outfile)
-						checkError(err)
-
-						outfhs = append(outfhs, outfh2)
-						counts = append(counts, 0)
-						outfiles = append(outfiles, outfile)
-					}
-
-					if byLength {
-						if flag {
-							record.FormatToWriter(outfhs[i], config.LineWidth)
-							counts[i]++
-						}
-					} else {
 						record.FormatToWriter(outfhs[i], config.LineWidth)
 						counts[i]++
-					}
 
-					if bySize {
-						j++ // increase size
-					} else if byParts {
 						i++
 						if i == parts { // reset index
 							i = 0
 						}
-					} else {
-
 					}
+
 				}
 
-				// for by-size: only log last part,
-				// for by-parts: log all parts.
-				for i, outfh := range outfhs {
-					if outfh == nil {
-						continue
-					}
-					outfh.Close()
+				if byParts {
+					for i, outfh := range outfhs {
+						outfh.Close()
 
-					if !quiet {
-						if counts[i] == 0 {
-							os.Remove(outfiles[i])
-						} else {
-							log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
+						if !quiet {
+							if counts[i] == 0 {
+
+							} else {
+								log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
+							}
 						}
+					}
+				} else {
+					outfhPre.Close()
+
+					if j == 0 {
+						os.Remove(outfilePre)
+					} else {
+						log.Infof("write %d sequences to file: %s\n", j, outfilePre)
 					}
 				}
 
