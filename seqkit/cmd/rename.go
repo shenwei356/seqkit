@@ -27,6 +27,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/cespare/xxhash/v2"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/util/pathutil"
@@ -119,10 +120,9 @@ Example:
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
 		var newID string
-		var k string
+		var k uint64
 		var ok bool
-		var numbers map[string]int
-		numbers = make(map[string]int)
+		numbers := make(map[uint64]int, 1<<20)
 		for _, file := range files {
 			func(file string) {
 				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
@@ -149,9 +149,9 @@ Example:
 					}
 
 					if byName {
-						k = string(record.Name)
+						k = xxhash.Sum64(record.Name)
 					} else {
-						k = string(record.ID)
+						k = xxhash.Sum64(record.ID)
 					}
 
 					if _, ok = numbers[k]; ok {

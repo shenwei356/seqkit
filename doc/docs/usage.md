@@ -2521,15 +2521,15 @@ Usage
 ```text
 match up paired-end reads from two fastq files
 
-Attensions:
+Attentions:
 1. Orders of headers in the two files better be the same (not shuffled),
-   otherwise it consumes huge number of memory for buffering reads in memory.
+   otherwise, it consumes a huge number of memory for buffering reads in memory.
 2. Unpaired reads are optional outputted with the flag -u/--save-unpaired.
-3. If the flag -O/--out-dir not given, output will be saved in the same directory
-   of input, with suffix "paired", e.g., read_1.paired.fq.gz.
-   Otherwise names are kept untouched in the given output directory.
+3. If the flag -O/--out-dir is not given, the output will be saved in the same directory
+   of input, with the suffix "paired", e.g., read_1.paired.fq.gz.
+   Otherwise, names are kept untouched in the given output directory.
 4. Paired gzipped files may be slightly larger than original files, because
-   of using different gzip package/library, don't worry.
+   of using a different gzip package/library, don't worry.
 
 Usage:
   seqkit pair [flags]
