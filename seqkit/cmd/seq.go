@@ -43,8 +43,8 @@ import (
 // seqCmd represents the seq command
 var seqCmd = &cobra.Command{
 	Use:   "seq",
-	Short: "transform sequences (extract ID, filter by length, remove gaps...)",
-	Long: `transform sequences (extract ID, filter by length, remove gaps...)
+	Short: "transform sequences (extract ID, filter by length, remove gaps, reverse complement...)",
+	Long: `transform sequences (extract ID, filter by length, remove gaps, reverse complement...)
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
