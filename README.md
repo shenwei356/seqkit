@@ -46,7 +46,7 @@ install via conda:
 
 |category         |command                                                            |function                                                                                |input          |strand-sensitivity|multi-threads|popularity     |
 |:----------------|:------------------------------------------------------------------|:---------------------------------------------------------------------------------------|:--------------|:-----------------|:------------|:--------------|
-|basic            |[seq](https://bioinf.shenwei.me/seqkit/usage/#seq)                 |transform sequences: extract ID/seq, filter by length/quality, remove gaps…             |FASTA/Q        |                  |             |★★★★★          |
+|basic            |[seq](https://bioinf.shenwei.me/seqkit/usage/#seq)                 |transform sequences: extract ID/seq, filter by length/quality, remove gaps, reverse complement…             |FASTA/Q        |                  |             |★★★★★          |
 |                 |[stats](https://bioinf.shenwei.me/seqkit/usage/#stats)             |simple statistics: #seqs, min/max_len, N50, Q20%, Q30%…                                 |FASTA/Q        |                  |✓            |★★★★★          |
 |                 |[sum](https://bioinf.shenwei.me/seqkit/usage/#sum)                  |compute message digest for all sequences in FASTA/Q files                               |FASTA/Q        |+ or both         |✓            |          |
 |                 |[subseq](https://bioinf.shenwei.me/seqkit/usage/#subseq)           |extract subsequences or flanking sequences by region/gtf/bed,                           |FASTA/Q        |+ or/and -        |             |★★★            |

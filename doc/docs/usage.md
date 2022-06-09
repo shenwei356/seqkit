@@ -272,7 +272,7 @@ Only DNA and gtf/bed data of Chr1 were used:
 Usage
 
 ``` text
-transform sequences (extract ID, filter by length, remove gaps...)
+transform sequences (extract ID, filter by length, remove gaps, reverse complement...)
 
 Usage:
   seqkit seq [flags]
