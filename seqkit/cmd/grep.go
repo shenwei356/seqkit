@@ -30,6 +30,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/cespare/xxhash/v2"
 	"github.com/shenwei356/bwt"
 	"github.com/twotwotwo/sorts/sortutil"
 
@@ -182,7 +183,10 @@ Examples:
 		}
 
 		// prepare pattern
-		patterns := make(map[string]*regexp.Regexp)
+		patternsR := make(map[uint64]*regexp.Regexp, 1<<10)
+		patternsN := make(map[uint64]interface{}, 1<<20)
+		patternsS := make(map[string]interface{}, 1<<10)
+
 		var pattern2seq *seq.Seq
 		var pbyte []byte
 		if patternFile != "" {
@@ -220,7 +224,7 @@ Examples:
 						}
 						r, err := regexp.Compile(p)
 						checkError(err)
-						patterns[p] = r
+						patternsR[xxhash.Sum64String(p)] = r
 					} else if bySeq {
 						pbyte = []byte(p)
 						if mismatches > 0 && mismatches > len(p) {
@@ -230,27 +234,27 @@ Examples:
 							seq.RNAredundant.IsValid(pbyte) == nil ||
 							seq.Protein.IsValid(pbyte) == nil { // legal sequence
 							if ignoreCase {
-								patterns[strings.ToLower(p)] = nil
+								patternsS[strings.ToLower(p)] = struct{}{}
 							} else {
-								patterns[p] = nil
+								patternsS[p] = struct{}{}
 							}
 						} else {
 							checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", p))
 						}
 					} else {
 						if ignoreCase {
-							patterns[strings.ToLower(p)] = nil
+							patternsN[xxhash.Sum64String(strings.ToLower(p))] = struct{}{}
 						} else {
-							patterns[p] = nil
+							patternsN[xxhash.Sum64String(p)] = struct{}{}
 						}
 					}
 				}
 			}
 			if !quiet {
-				if len(patterns) == 0 {
-					log.Warningf("%d patterns loaded from file", len(patterns))
+				if len(patternsR)+len(patternsN)+len(patternsS) == 0 {
+					log.Warningf("%d patterns loaded from file", 0)
 				} else {
-					log.Infof("%d patterns loaded from file", len(patterns))
+					log.Infof("%d patterns loaded from file", len(patternsR)+len(patternsN)+len(patternsS))
 				}
 			}
 		} else {
@@ -278,7 +282,7 @@ Examples:
 					}
 					r, err := regexp.Compile(p)
 					checkError(err)
-					patterns[p] = r
+					patternsR[xxhash.Sum64String(p)] = r
 				} else if bySeq {
 					pbyte = []byte(p)
 					if mismatches > 0 && mismatches > len(p) {
@@ -288,18 +292,18 @@ Examples:
 						seq.RNAredundant.IsValid(pbyte) == nil ||
 						seq.Protein.IsValid(pbyte) == nil { // legal sequence
 						if ignoreCase {
-							patterns[strings.ToLower(p)] = nil
+							patternsS[strings.ToLower(p)] = struct{}{}
 						} else {
-							patterns[p] = nil
+							patternsS[p] = struct{}{}
 						}
 					} else {
 						checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", p))
 					}
 				} else {
 					if ignoreCase {
-						patterns[strings.ToLower(p)] = nil
+						patternsN[xxhash.Sum64String(strings.ToLower(p))] = struct{}{}
 					} else {
-						patterns[p] = nil
+						patternsN[xxhash.Sum64String(p)] = struct{}{}
 					}
 				}
 			}
@@ -468,7 +472,7 @@ Examples:
 							if err != nil {
 								checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
 							}
-							for k = range patterns {
+							for k = range patternsS {
 								hit, err = sfmi.Match([]byte(k), mismatches)
 								if err != nil {
 									checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", k, record.Name, err))
@@ -515,7 +519,7 @@ Examples:
 		var ok, hit bool
 		var k string
 		var re *regexp.Regexp
-		var p string
+		var h uint64
 		var strand byte
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
@@ -587,11 +591,11 @@ Examples:
 					}
 
 					if degenerate || useRegexp {
-						for p, re = range patterns {
+						for h, re = range patternsR {
 							if re.Match(target) {
 								hit = true
 								if deleteMatched && !invertMatch {
-									delete(patterns, p)
+									delete(patternsR, h)
 								}
 								break
 							}
@@ -601,11 +605,11 @@ Examples:
 							target = bytes.ToLower(target)
 						}
 						if mismatches == 0 {
-							for k = range patterns {
+							for k = range patternsS {
 								if bytes.Contains(target, []byte(k)) {
 									hit = true
 									if deleteMatched && !invertMatch {
-										delete(patterns, k)
+										delete(patternsS, k)
 									}
 									break
 								}
@@ -615,28 +619,28 @@ Examples:
 							if err != nil {
 								checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
 							}
-							for k = range patterns {
+							for k = range patternsS {
 								hit, err = sfmi.Match([]byte(k), mismatches)
 								if err != nil {
 									checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", k, record.Name, err))
 								}
 								if hit {
 									if deleteMatched && !invertMatch {
-										delete(patterns, k)
+										delete(patternsS, k)
 									}
 									break
 								}
 							}
 						}
 					} else {
-						k = string(target)
+						h = xxhash.Sum64(target)
 						if ignoreCase {
-							k = strings.ToLower(k)
+							h = xxhash.Sum64(bytes.ToLower(target))
 						}
-						if _, ok = patterns[k]; ok {
+						if _, ok = patternsN[h]; ok {
 							hit = true
 							if deleteMatched && !invertMatch {
-								delete(patterns, k)
+								delete(patternsN, h)
 							}
 						}
 					}
