@@ -75,6 +75,44 @@ Run the following commands:
     cd seqkit
     docker build -t shenwei356/seqkit .
     docker run -it shenwei356/seqkit:latest
+    
+#### Method 5: Compiling from source (latest stable/dev version)
+
+    # ------------------- install golang -----------------
+
+    # download Go from https://go.dev/dl
+    wget https://go.dev/dl/go1.17.12.linux-amd64.tar.gz
+    
+    tar -zxf go1.17.12.linux-amd64.tar.gz -C $HOME/
+    
+    # or 
+    #   echo "export PATH=$PATH:$HOME/go/bin" >> ~/.bashrc
+    #   source ~/.bashrc
+    export PATH=$PATH:$HOME/go/bin
+    
+
+    # ------------- the latest stable version -------------
+
+    go get -v -u github.com/shenwei356/seqkit/seqkit
+
+    # The executable binary file is located in:
+    #   ~/go/bin/seqkit
+    # You can also move it to anywhere in the $PATH
+    mkdir -p $HOME/bin
+    cp ~/go/bin/seqkit $HOME/bin/
+
+    # --------------- the devlopment version --------------
+
+    git clone https://github.com/shenwei356/seqkit
+    cd seqkit/seqkit/
+    go build
+
+    # The executable binary file is located in:
+    #   ./seqkit
+    # You can also move it to anywhere in the $PATH
+    mkdir -p $HOME/bin
+    cp ./seqkit $HOME/bin/
+
 
 ## Shell-completion
 
