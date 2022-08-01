@@ -6,6 +6,7 @@
         - reduce memory consumption. [#304](https://github.com/shenwei356/seqkit/issues/304)
     - `seqkit grep/rename`:
         - reduce memory comsumption for a lot of searching patterns, and it's faster. [#305](https://github.com/shenwei356/seqkit/issues/305)
+        - faster `-s/--by-seq`.
 - [SeqKit v2.2.0](https://github.com/shenwei356/seqkit/releases/tag/v2.2.0) - 2022-03-14
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.2.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.2.0)
     - `seqkit`:

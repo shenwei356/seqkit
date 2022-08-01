@@ -185,7 +185,8 @@ Examples:
 		// prepare pattern
 		patternsR := make(map[uint64]*regexp.Regexp, 1<<10)
 		patternsN := make(map[uint64]interface{}, 1<<20)
-		patternsS := make(map[string]interface{}, 1<<10)
+		// patternsS := make(map[string]interface{}, 1<<10)
+		patternsS := make([][]byte, 0, 16)
 
 		var pattern2seq *seq.Seq
 		var pbyte []byte
@@ -234,9 +235,11 @@ Examples:
 							seq.RNAredundant.IsValid(pbyte) == nil ||
 							seq.Protein.IsValid(pbyte) == nil { // legal sequence
 							if ignoreCase {
-								patternsS[strings.ToLower(p)] = struct{}{}
+								// patternsS[strings.ToLower(p)] = struct{}{}
+								patternsS = append(patternsS, bytes.ToLower(pbyte))
 							} else {
-								patternsS[p] = struct{}{}
+								// patternsS[p] = struct{}{}
+								patternsS = append(patternsS, pbyte)
 							}
 						} else {
 							checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", p))
@@ -292,9 +295,11 @@ Examples:
 						seq.RNAredundant.IsValid(pbyte) == nil ||
 						seq.Protein.IsValid(pbyte) == nil { // legal sequence
 						if ignoreCase {
-							patternsS[strings.ToLower(p)] = struct{}{}
+							// patternsS[strings.ToLower(p)] = struct{}{}
+							patternsS = append(patternsS, bytes.ToLower(pbyte))
 						} else {
-							patternsS[p] = struct{}{}
+							// patternsS[p] = struct{}{}
+							patternsS = append(patternsS, pbyte)
 						}
 					} else {
 						checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", p))
@@ -436,7 +441,8 @@ Examples:
 						var sequence *seq.Seq
 						var target []byte
 						var hit bool
-						var k string
+						// var k string
+						var k []byte
 
 						sfmi := fmi.NewFMIndex()
 
@@ -472,8 +478,10 @@ Examples:
 							if err != nil {
 								checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
 							}
-							for k = range patternsS {
-								hit, err = sfmi.Match([]byte(k), mismatches)
+							// for k = range patternsS {
+							for _, k = range patternsS {
+								// hit, err = sfmi.Match([]byte(k), mismatches)
+								hit, err = sfmi.Match(k, mismatches)
 								if err != nil {
 									checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", k, record.Name, err))
 								}
@@ -517,7 +525,8 @@ Examples:
 		var sequence *seq.Seq
 		var target []byte
 		var ok, hit bool
-		var k string
+		// var k string
+		var k []byte
 		var re *regexp.Regexp
 		var h uint64
 		var strand byte
@@ -605,12 +614,14 @@ Examples:
 							target = bytes.ToLower(target)
 						}
 						if mismatches == 0 {
-							for k = range patternsS {
-								if bytes.Contains(target, []byte(k)) {
+							// for k = range patternsS {
+							for _, k = range patternsS {
+								// if bytes.Contains(target, []byte(k)) {
+								if bytes.Contains(target, k) {
 									hit = true
-									if deleteMatched && !invertMatch {
-										delete(patternsS, k)
-									}
+									// if deleteMatched && !invertMatch {
+									// 	delete(patternsS, k)
+									// }
 									break
 								}
 							}
@@ -619,15 +630,14 @@ Examples:
 							if err != nil {
 								checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
 							}
-							for k = range patternsS {
-								hit, err = sfmi.Match([]byte(k), mismatches)
+							// for k = range patternsS {
+							for _, k = range patternsS {
+								// hit, err = sfmi.Match([]byte(k), mismatches)
+								hit, err = sfmi.Match(k, mismatches)
 								if err != nil {
 									checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", k, record.Name, err))
 								}
 								if hit {
-									if deleteMatched && !invertMatch {
-										delete(patternsS, k)
-									}
 									break
 								}
 							}
