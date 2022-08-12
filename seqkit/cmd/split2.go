@@ -49,8 +49,7 @@ occupation and fast speed.
 The prefix of output files:
   1. For stdin: stdin
   2. Others: same to the input file
-  3. Set via the option: -o/--out-file, e.g., outputting xxx.part_001.fasta:
-       cat ../tests/hairpin.fa | ./seqkit split2 -p 2 -O test -o xxx
+  3. Set via the options: --by-length-prefix, --by-part-prefix, or --by-size-prefix
 
 The extension of output files:
   1. For stdin: .fast[aq]

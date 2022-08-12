@@ -2287,7 +2287,7 @@ split sequences into files by name ID, subsequence of given region,
 part size or number of parts.
 
 If you just want to split by parts or sizes, please use "seqkit split2",
-which also apply for paired- and single-end FASTQ.
+which also applies for paired- and single-end FASTQ.
 
 The definition of region is 1-based and with some custom design.
 
@@ -2310,16 +2310,21 @@ Usage:
   seqkit split [flags]
 
 Flags:
-  -i, --by-id              split squences according to sequence ID
-  -p, --by-part int        split sequences into N parts
-  -r, --by-region string   split squences according to subsequence of given region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type "seqkit split -h" for more examples
-  -s, --by-size int        split sequences into multi parts with N sequences
-  -d, --dry-run            dry run, just print message and no files will be created.
-  -f, --force              overwrite output directory
-  -h, --help               help for split
-  -k, --keep-temp          keep tempory FASTA and .fai file when using 2-pass mode
-  -O, --out-dir string     output directory (default value is $infile.split)
-  -2, --two-pass           two-pass mode read files twice to lower memory usage. (only for FASTA format)
+  -i, --by-id                     split squences according to sequence ID
+      --by-id-prefix string       file prefix for --by-id
+  -p, --by-part int               split sequences into N parts
+      --by-part-prefix string     file prefix for --by-part
+  -r, --by-region string          split squences according to subsequence of given region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type "seqkit split -h" for more examples
+      --by-region-prefix string   file prefix for --by-region
+  -s, --by-size int               split sequences into multi parts with N sequences
+      --by-size-prefix string     file prefix for --by-size
+  -d, --dry-run                   dry run, just print message and no files will be created.
+  -e, --extension string          set output file extension, e.g., ".gz", ".xz", or ".zst"
+  -f, --force                     overwrite output directory
+  -h, --help                      help for split
+  -k, --keep-temp                 keep temporary FASTA and .fai file when using 2-pass mode
+  -O, --out-dir string            output directory (default value is $infile.split)
+  -2, --two-pass                  two-pass mode read files twice to lower memory usage. (only for FASTA format)
 
 ```
 
@@ -2413,15 +2418,18 @@ Usage:
   seqkit split2 [flags]
 
 Flags:
-  -l, --by-length string   split sequences into chunks of >=N bases, supports K/M/G suffix
-  -p, --by-part int        split sequences into N parts
-  -s, --by-size int        split sequences into multi parts with N sequences
-  -e, --extension string   set output file extension, e.g., ".gz", ".xz", or ".zst"
-  -f, --force              overwrite output directory
-  -h, --help               help for split2
-  -O, --out-dir string     output directory (default value is $infile.split)
-  -1, --read1 string       (gzipped) read1 file
-  -2, --read2 string       (gzipped) read2 file
+  -l, --by-length string          split sequences into chunks of >=N bases, supports K/M/G suffix
+      --by-length-prefix string   file prefix for --by-length
+  -p, --by-part int               split sequences into N parts
+      --by-part-prefix string     file prefix for --by-part
+  -s, --by-size int               split sequences into multi parts with N sequences
+      --by-size-prefix string     file prefix for --by-size
+  -e, --extension string          set output file extension, e.g., ".gz", ".xz", or ".zst"
+  -f, --force                     overwrite output directory
+  -h, --help                      help for split2
+  -O, --out-dir string            output directory (default value is $infile.split)
+  -1, --read1 string              (gzipped) read1 file
+  -2, --read2 string              (gzipped) read2 file
 ```
 
 Examples
