@@ -99,7 +99,16 @@ The extension of output files:
 
 		outdir := getFlagString(cmd, "out-dir")
 		force := getFlagBool(cmd, "force")
+
 		extension := getFlagString(cmd, "extension")
+
+		prefixBySize := getFlagString(cmd, "by-size-prefix")
+		prefixByPart := getFlagString(cmd, "by-part-prefix")
+		prefixByLength := getFlagString(cmd, "by-length-prefix")
+
+		prefixBySizeSet := cmd.Flags().Lookup("by-size-prefix").Changed
+		prefixByPartSet := cmd.Flags().Lookup("by-part-prefix").Changed
+		prefixByLengthSet := cmd.Flags().Lookup("by-length-prefix").Changed
 
 		if size == 0 && parts == 0 && length == 0 {
 			checkError(fmt.Errorf(`one of flags should be given: -s/-p/-l. type "seqkit split2 -h" for help`))
@@ -220,6 +229,7 @@ The extension of output files:
 
 				// by size or by length
 				var outfhPre *xopen.Writer
+				var prefix string
 				var outfilePre string
 
 				var flag bool
@@ -277,7 +287,12 @@ The extension of output files:
 
 							i++
 
-							outfilePre = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
+							if prefixBySizeSet {
+								prefix = prefixBySize
+							} else {
+								prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+							}
+							outfilePre = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
 							outfhPre, err = xopen.Wopen(outfilePre)
 							checkError(err)
 
@@ -288,7 +303,12 @@ The extension of output files:
 
 						if outfhPre == nil { // first record
 							var outfh2 *xopen.Writer
-							outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
+							if prefixByLengthSet {
+								prefix = prefixByLength
+							} else {
+								prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+							}
+							outfile := filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
 							outfh2, err = xopen.Wopen(outfile)
 							checkError(err)
 
@@ -309,7 +329,13 @@ The extension of output files:
 							i++
 
 							var outfh2 *xopen.Writer
-							outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
+
+							if prefixByLengthSet {
+								prefix = prefixByLength
+							} else {
+								prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+							}
+							outfile := filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
 							outfh2, err = xopen.Wopen(outfile)
 							checkError(err)
 
@@ -327,7 +353,12 @@ The extension of output files:
 					if bySize {
 						// first record, for bySize
 						if outfhPre == nil {
-							outfilePre = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
+							if prefixBySizeSet {
+								prefix = prefixBySize
+							} else {
+								prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+							}
+							outfilePre = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
 							outfhPre, err = xopen.Wopen(outfilePre)
 							checkError(err)
 
@@ -347,7 +378,12 @@ The extension of output files:
 						// first record, for byParts
 						if i+1 > len(outfhs) {
 							var outfh2 *xopen.Writer
-							outfile := filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i+1, fileExt))
+							if prefixByPartSet {
+								prefix = prefixByPart
+							} else {
+								prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+							}
+							outfile := filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
 							outfh2, err = xopen.Wopen(outfile)
 							checkError(err)
 
@@ -406,6 +442,10 @@ func init() {
 	split2Cmd.Flags().StringP("by-length", "l", "", "split sequences into chunks of >=N bases, supports K/M/G suffix")
 	split2Cmd.Flags().StringP("out-dir", "O", "", "output directory (default value is $infile.split)")
 	split2Cmd.Flags().BoolP("force", "f", false, "overwrite output directory")
+
+	split2Cmd.Flags().StringP("by-size-prefix", "", "", "file prefix for --by-size")
+	split2Cmd.Flags().StringP("by-part-prefix", "", "", "file prefix for --by-part")
+	split2Cmd.Flags().StringP("by-length-prefix", "", "", "file prefix for --by-length")
 
 	split2Cmd.Flags().StringP("extension", "e", "", `set output file extension, e.g., ".gz", ".xz", or ".zst"`)
 }

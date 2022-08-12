@@ -90,17 +90,35 @@ Examples:
 		outdir := getFlagString(cmd, "out-dir")
 		force := getFlagBool(cmd, "force")
 
+		extension := getFlagString(cmd, "extension")
+
+		prefixBySize := getFlagString(cmd, "by-size-prefix")
+		prefixByPart := getFlagString(cmd, "by-part-prefix")
+		prefixByID := getFlagString(cmd, "by-id-prefix")
+		prefixByRegion := getFlagString(cmd, "by-region-prefix")
+
+		prefixBySizeSet := cmd.Flags().Lookup("by-size-prefix").Changed
+		prefixByPartSet := cmd.Flags().Lookup("by-part-prefix").Changed
+		prefixByIDSet := cmd.Flags().Lookup("by-id-prefix").Changed
+		prefixByRegionSet := cmd.Flags().Lookup("by-region-prefix").Changed
+
 		file := files[0]
 		isstdin := isStdin(file)
 
-		var fileName, fileExt string
+		var fileName, fileExt, fileExt2 string
 		if isstdin {
-			fileName, fileExt = "stdin", ".fastx"
+			fileName, fileExt = "stdin", extension
 			if outdir == "" {
 				outdir = "stdin.split"
 			}
 		} else {
-			fileName, fileExt = filepathTrimExtension(file)
+			fileName, fileExt, fileExt2 = filepathTrimExtension2(file, nil)
+			if extension != "" {
+				fileExt += extension
+			} else {
+				fileExt += fileExt2
+			}
+
 			if outdir == "" {
 				outdir = file + ".split"
 			}
@@ -108,6 +126,7 @@ Examples:
 
 		renameFileExt := true
 		var outfile string
+		var prefix string
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
 
@@ -163,22 +182,33 @@ Examples:
 
 					if renameFileExt && isstdin {
 						if len(record.Seq.Qual) > 0 {
-							fileExt = suffixFQ
+							fileExt = suffixFQ + extension
 						} else {
-							fileExt = suffixFA
+							fileExt = suffixFA + extension
 						}
 						renameFileExt = false
 					}
 					records = append(records, record.Clone())
 					if len(records) == size {
-						outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
+						if prefixBySizeSet {
+							prefix = prefixBySize
+						} else {
+							prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+						}
+						outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i, fileExt))
 						writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 						i++
 						records = []*fastx.Record{}
 					}
 				}
 				if len(records) > 0 {
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
+					// outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
+					if prefixBySizeSet {
+						prefix = prefixBySize
+					} else {
+						prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+					}
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i, fileExt))
 					writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 				}
 
@@ -212,9 +242,9 @@ Examples:
 				checkError(err)
 				if renameFileExt && isstdin {
 					if isFastq {
-						fileExt = suffixFQ
+						fileExt = suffixFQ + extension
 					} else {
-						fileExt = suffixFA
+						fileExt = suffixFA + extension
 					}
 					renameFileExt = false
 				}
@@ -244,7 +274,13 @@ Examples:
 
 			n := 1
 			if len(IDs) > 0 {
-				outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
+				// outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
+				if prefixBySizeSet {
+					prefix = prefixBySize
+				} else {
+					prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+				}
+				outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, n, fileExt))
 				if !dryRun {
 					outfh, err = xopen.Wopen(outfile)
 					checkError(err)
@@ -271,7 +307,13 @@ Examples:
 						log.Infof("write %d sequences to file: %s\n", j, outfile)
 					}
 					n++
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
+					// outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
+					if prefixBySizeSet {
+						prefix = prefixBySize
+					} else {
+						prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+					}
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, n, fileExt))
 					if !dryRun {
 						outfh.Close()
 						outfh, err = xopen.Wopen(outfile)
@@ -333,22 +375,34 @@ Examples:
 				for _, record := range allRecords {
 					if renameFileExt && isstdin {
 						if len(record.Seq.Qual) > 0 {
-							fileExt = suffixFQ
+							fileExt = suffixFQ + extension
 						} else {
-							fileExt = suffixFA
+							fileExt = suffixFA + extension
 						}
 						renameFileExt = false
 					}
 					records = append(records, record)
 					if len(records) == size {
-						outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
+						// outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
+						if prefixByPartSet {
+							prefix = prefixByPart
+						} else {
+							prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+						}
+						outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i, fileExt))
 						writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 						i++
 						records = []*fastx.Record{}
 					}
 				}
 				if len(records) > 0 {
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
+					// outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
+					if prefixByPartSet {
+						prefix = prefixByPart
+					} else {
+						prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+					}
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i, fileExt))
 					writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 				}
 				return
@@ -381,9 +435,9 @@ Examples:
 				checkError(err)
 				if renameFileExt && isstdin {
 					if isFastq {
-						fileExt = suffixFQ
+						fileExt = suffixFQ + extension
 					} else {
-						fileExt = suffixFA
+						fileExt = suffixFA + extension
 					}
 					renameFileExt = false
 				}
@@ -425,7 +479,13 @@ Examples:
 
 			n := 1
 			if len(IDs) > 0 {
-				outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
+				// outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
+				if prefixByPartSet {
+					prefix = prefixByPart
+				} else {
+					prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+				}
+				outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, n, fileExt))
 				if !dryRun {
 					outfh, err = xopen.Wopen(outfile)
 					checkError(err)
@@ -452,7 +512,13 @@ Examples:
 						log.Infof("write %d sequences to file: %s\n", j, outfile)
 					}
 					n++
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
+					// outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
+					if prefixByPartSet {
+						prefix = prefixByPart
+					} else {
+						prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+					}
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, n, fileExt))
 					if !dryRun {
 						outfh.Close()
 						outfh, err = xopen.Wopen(outfile)
@@ -506,9 +572,9 @@ Examples:
 				for _, record := range allRecords {
 					if renameFileExt && isstdin {
 						if len(record.Seq.Qual) > 0 {
-							fileExt = suffixFQ
+							fileExt = suffixFQ + extension
 						} else {
-							fileExt = suffixFA
+							fileExt = suffixFA + extension
 						}
 						renameFileExt = false
 					}
@@ -521,8 +587,16 @@ Examples:
 
 				var outfile string
 				for id, records := range recordsByID {
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s",
-						filepath.Base(fileName),
+					// outfile = filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s",
+					// 	filepath.Base(fileName),
+					// 	pathutil.RemoveInvalidPathChars(id, "__"), fileExt))
+					if prefixByIDSet {
+						prefix = prefixByID
+					} else {
+						prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+					}
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s%s%s",
+						prefix,
 						pathutil.RemoveInvalidPathChars(id, "__"), fileExt))
 					writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 				}
@@ -556,9 +630,9 @@ Examples:
 				checkError(err)
 				if renameFileExt && isstdin {
 					if isFastq {
-						fileExt = suffixFQ
+						fileExt = suffixFQ + extension
 					} else {
-						fileExt = suffixFA
+						fileExt = suffixFA + extension
 					}
 					renameFileExt = false
 				}
@@ -615,8 +689,16 @@ Examples:
 					}()
 					var outfh *xopen.Writer
 					var err error
-					outfile := filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s",
-						filepath.Base(fileName),
+					// outfile := filepath.Join(outdir, fmt.Sprintf("%s.id_%s%s",
+					// 	filepath.Base(fileName),
+					// 	pathutil.RemoveInvalidPathChars(id, "__"), fileExt))
+					if prefixByIDSet {
+						prefix = prefixByID
+					} else {
+						prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+					}
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s%s%s",
+						prefix,
 						pathutil.RemoveInvalidPathChars(id, "__"), fileExt))
 
 					if !dryRun {
@@ -695,9 +777,9 @@ Examples:
 				for _, record := range allRecords {
 					if renameFileExt && isstdin {
 						if len(record.Seq.Qual) > 0 {
-							fileExt = suffixFQ
+							fileExt = suffixFQ + extension
 						} else {
-							fileExt = suffixFA
+							fileExt = suffixFA + extension
 						}
 						renameFileExt = false
 					}
@@ -714,7 +796,13 @@ Examples:
 
 				var outfile string
 				for subseq, records := range recordsBySeqs {
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s.region_%d:%d_%s%s", filepath.Base(fileName), start, end, subseq, fileExt))
+					// outfile = filepath.Join(outdir, fmt.Sprintf("%s.region_%d:%d_%s%s", filepath.Base(fileName), start, end, subseq, fileExt))
+					if prefixByRegionSet {
+						prefix = prefixByRegion
+					} else {
+						prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+					}
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s%d:%d_%s%s", prefix, start, end, subseq, fileExt))
 					writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 				}
 				return
@@ -746,16 +834,16 @@ Examples:
 				alphabet2, isFastq, err = fastx.GuessAlphabet(newFile)
 				if renameFileExt && isstdin {
 					if isFastq {
-						fileExt = suffixFQ
+						fileExt = suffixFQ + extension
 					} else {
-						fileExt = suffixFA
+						fileExt = suffixFA + extension
 					}
 					renameFileExt = false
 				}
 				checkError(err)
 				if isFastq {
 					checkError(os.Remove(newFile))
-					checkError(fmt.Errorf("Sorry, two-pass mode does not support FASTQ format"))
+					checkError(fmt.Errorf("sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
 			fileExt = suffixFA
@@ -817,7 +905,13 @@ Examples:
 					var outfh *xopen.Writer
 					var err error
 
-					outfile := filepath.Join(outdir, fmt.Sprintf("%s.region_%d:%d_%s%s", filepath.Base(fileName), start, end, subseq, fileExt))
+					// outfile := filepath.Join(outdir, fmt.Sprintf("%s.region_%d:%d_%s%s", filepath.Base(fileName), start, end, subseq, fileExt))
+					if prefixByRegionSet {
+						prefix = prefixByRegion
+					} else {
+						prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+					}
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s%d:%d_%s%s", prefix, start, end, subseq, fileExt))
 
 					if !dryRun {
 						outfh, err = xopen.Wopen(outfile)
@@ -866,6 +960,13 @@ func init() {
 	splitCmd.Flags().BoolP("keep-temp", "k", false, "keep temporary FASTA and .fai file when using 2-pass mode")
 	splitCmd.Flags().StringP("out-dir", "O", "", "output directory (default value is $infile.split)")
 	splitCmd.Flags().BoolP("force", "f", false, "overwrite output directory")
+
+	splitCmd.Flags().StringP("by-size-prefix", "", "", "file prefix for --by-size")
+	splitCmd.Flags().StringP("by-part-prefix", "", "", "file prefix for --by-part")
+	splitCmd.Flags().StringP("by-id-prefix", "", "", "file prefix for --by-id")
+	splitCmd.Flags().StringP("by-region-prefix", "", "", "file prefix for --by-region")
+
+	splitCmd.Flags().StringP("extension", "e", "", `set output file extension, e.g., ".gz", ".xz", or ".zst"`)
 }
 
 var suffixFA = ".fasta"
