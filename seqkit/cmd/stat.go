@@ -72,6 +72,7 @@ Tips:
 			}
 		}
 		gapLettersBytes := []byte(gapLetters)
+		gcLettersBytes := []byte{'g', 'c', 'G', 'C'}
 
 		all := getFlagBool(cmd, "all")
 		tabular := getFlagBool(cmd, "tabular")
@@ -100,7 +101,7 @@ Tips:
 				"max_len",
 			}
 			if all {
-				colnames = append(colnames, []string{"Q1", "Q2", "Q3", "sum_gap", "N50", "Q20(%)", "Q30(%)"}...)
+				colnames = append(colnames, []string{"Q1", "Q2", "Q3", "sum_gap", "N50", "Q20(%)", "Q30(%)", "GC(%)"}...)
 			}
 			outfh.WriteString(strings.Join(colnames, "\t") + "\n")
 		}
@@ -142,7 +143,7 @@ Tips:
 								info.lenAvg,
 								info.lenMax))
 						} else {
-							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\n",
+							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f\n",
 								info.file,
 								info.format,
 								info.t,
@@ -157,7 +158,8 @@ Tips:
 								info.gapSum,
 								info.N50,
 								info.q20,
-								info.q30))
+								info.q30,
+								info.gc))
 						}
 					}
 					id++
@@ -178,7 +180,7 @@ Tips:
 										info1.lenAvg,
 										info1.lenMax))
 								} else {
-									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\n",
+									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f\n",
 										info1.file,
 										info1.format,
 										info1.t,
@@ -193,7 +195,8 @@ Tips:
 										info1.gapSum,
 										info1.N50,
 										info1.q20,
-										info1.q30))
+										info1.q30,
+										info1.gc))
 								}
 							}
 
@@ -231,7 +234,7 @@ Tips:
 								info.lenAvg,
 								info.lenMax))
 						} else {
-							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\n",
+							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f\n",
 								info.file,
 								info.format,
 								info.t,
@@ -246,7 +249,8 @@ Tips:
 								info.gapSum,
 								info.N50,
 								info.q20,
-								info.q30))
+								info.q30,
+								info.gc))
 						}
 					}
 				}
@@ -290,6 +294,7 @@ Tips:
 				}()
 
 				var gapSum uint64
+				var gcSum uint64
 
 				lensStats := util.NewLengthStats()
 
@@ -361,6 +366,7 @@ Tips:
 						}
 
 						gapSum += uint64(byteutil.CountBytes(record.Seq.Seq, gapLettersBytes))
+						gcSum += uint64(byteutil.CountBytes(record.Seq.Seq, gcLettersBytes))
 					}
 				}
 
@@ -399,7 +405,7 @@ Tips:
 						0, 0, 0, 0,
 						0, 0, 0, 0,
 						0, 0, 0,
-						0, 0,
+						0, 0, 0,
 						nil, id}
 				} else {
 					if basename {
@@ -413,6 +419,7 @@ Tips:
 						math.Round(lensStats.Mean(), 1), lensStats.Max(), n50, l50,
 						q1, q2, q3,
 						math.Round(float64(q20)/float64(lensStats.Sum())*100, 2), math.Round(float64(q30)/float64(lensStats.Sum())*100, 2),
+						math.Round(float64(gcSum)/float64(lensStats.Sum())*100, 2),
 						nil, id}
 				}
 			}(file, id)
@@ -453,6 +460,7 @@ Tips:
 				{Header: "N50", AlignRight: true},
 				{Header: "Q20(%)", AlignRight: true},
 				{Header: "Q30(%)", AlignRight: true},
+				{Header: "GC(%)", AlignRight: true},
 				// {Header: "L50", AlignRight: true},
 			}...)
 		}
@@ -490,6 +498,7 @@ Tips:
 					humanize.Comma(int64(info.N50)),
 					humanize.Commaf(info.q20),
 					humanize.Commaf(info.q30),
+					humanize.Commaf(info.gc),
 					// humanize.Comma(info.L50),
 				)
 			}
@@ -519,6 +528,8 @@ type statInfo struct {
 
 	q20 float64
 	q30 float64
+
+	gc float64
 
 	err error
 	id  uint64

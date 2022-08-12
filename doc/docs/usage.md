@@ -703,12 +703,13 @@ Eexamples
 1. Extra information
 
         $ seqkit stats *.f{a,q}.gz -a
-        file               format  type  num_seqs    sum_len  min_len  avg_len  max_len   Q1   Q2   Q3  sum_gap  N50  Q20(%)  Q30(%)
-        hairpin.fa.gz      FASTA   RNA     28,645  2,949,871       39      103    2,354   76   91  111        0  101       0       0
-        mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34   21   22   22        0   22       0       0
-        Illimina1.8.fq.gz  FASTQ   DNA     10,000  1,500,000      150      150      150  150  150  150        0  150   96.16   89.71
-        reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229  227  227  227        0  227   91.24   86.62
-        reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225  224  224  224        0  224   91.06   87.66
+        file               format  type  num_seqs    sum_len  min_len  avg_len  max_len   Q1   Q2   Q3  sum_gap  N50  Q20(%)  Q30(%)  GC(%)
+        hairpin.fa.gz      FASTA   RNA     28,645  2,949,871       39      103    2,354   76   91  111        0  101       0       0  45.77
+        mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34   21   22   22        0   22       0       0   47.6
+        Illimina1.8.fq.gz  FASTQ   DNA     10,000  1,500,000      150      150      150   75  150   75        0  150   96.16   89.71  49.91
+        nanopore.fq.gz     FASTQ   DNA      4,000  1,798,723      153    449.7    6,006  271  318  391        0  395   40.79   12.63  46.66
+        reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229  227  227  227        0  227   91.24   86.62  53.63
+        reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225  224  224  224        0  224   91.06   87.66  54.77
 
 1. **Parallelize counting files, it's much faster for lots of small files, especially for files on SSD**
 

@@ -76,14 +76,14 @@ Run the following commands:
     docker build -t shenwei356/seqkit .
     docker run -it shenwei356/seqkit:latest
     
-#### Method 5: Compiling from source (latest stable/dev version)
+#### Method 6: Compiling from source (latest stable/dev version)
 
     # ------------------- install golang -----------------
 
     # download Go from https://go.dev/dl
-    wget https://go.dev/dl/go1.17.12.linux-amd64.tar.gz
+    wget https://go.dev/dl/go1.17.13.linux-amd64.tar.gz
     
-    tar -zxf go1.17.12.linux-amd64.tar.gz -C $HOME/
+    tar -zxf go1.17.13.linux-amd64.tar.gz -C $HOME/
     
     # or 
     #   echo "export PATH=$PATH:$HOME/go/bin" >> ~/.bashrc
