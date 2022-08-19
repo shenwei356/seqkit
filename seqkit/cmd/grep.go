@@ -417,6 +417,10 @@ Examples:
 						break
 					}
 
+					if len(record.Seq.Seq) == 0 {
+						continue
+					}
+
 					if checkAlphabet {
 						if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
 							onlyPositiveStrand = true
@@ -543,6 +547,10 @@ Examples:
 					}
 					checkError(err)
 					break
+				}
+
+				if len(record.Seq.Seq) == 0 {
+					continue
 				}
 
 				if checkAlphabet {

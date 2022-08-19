@@ -358,6 +358,10 @@ Attentions:
 						break
 					}
 
+					if len(record.Seq.Seq) == 0 {
+						continue
+					}
+
 					if checkAlphabet {
 						if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
 							_onlyPositiveStrand = true
@@ -604,6 +608,10 @@ Attentions:
 					}
 					checkError(err)
 					break
+				}
+
+				if len(record.Seq.Seq) == 0 {
+					continue
 				}
 
 				if checkAlphabet {
