@@ -125,7 +125,7 @@ Examples:
 			idRegexp = "^(.+)$"
 		} else {
 			fileFai = file + ".fai"
-			idRegexp = fastx.DefaultIDRegexp
+			idRegexp = config.IDRegexp
 		}
 		if fileNotExists(fileFai) {
 			if !quiet {
@@ -153,7 +153,7 @@ Examples:
 		id2head := make(map[string]string)
 		var idRe *regexp.Regexp
 		if fullHead {
-			idRe, _ = regexp.Compile(fastx.DefaultIDRegexp)
+			idRe, _ = regexp.Compile(config.IDRegexp)
 		}
 		var id string
 		for head := range idx {
