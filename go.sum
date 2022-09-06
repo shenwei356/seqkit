@@ -68,8 +68,8 @@ github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 h1:OdAsTTz6O
 github.com/rivo/uniseg v0.2.0 h1:S1pD9weZBuJdFmowNwbpi7BJ8TNftyUImj/0WQi72jY=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
-github.com/shenwei356/bio v0.7.0 h1:hj+sZHPhLWuCqSa9sy6g88Si8PvdHAdE+U9ebho7wXs=
-github.com/shenwei356/bio v0.7.0/go.mod h1:VsxsECxbPfi9DA9ZAjKX6K7pEAM0/waDYcwUMmAD/Gg=
+github.com/shenwei356/bio v0.8.1 h1:V9GHoteiXtpX8Wy7jSs1M81TDRBqGju++DCzHJ8aBYY=
+github.com/shenwei356/bio v0.8.1/go.mod h1:neE5KTtMM9fqM41UgzoPUUxhs/sL7Ck1CIeDoYz+nQI=
 github.com/shenwei356/breader v0.3.2 h1:GLy2clIMck6FdTwj8WLnmhv0PW/7Pp+Wcx7TVEHG0ks=
 github.com/shenwei356/breader v0.3.2/go.mod h1:BimwolkMTIr/O4iX7xXtjEB1z5y39G+8I5Tsm9guC3E=
 github.com/shenwei356/bwt v0.6.1 h1:BDS1nhhIxiC284OKtLBUgy+U5L/7WrvT/ehOExB/DSA=
