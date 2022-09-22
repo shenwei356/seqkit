@@ -1,4 +1,4 @@
-- [SeqKit v2.3.1](https://github.com/shenwei356/seqkit/releases/tag/v2.3.1) - 2022-08-12
+- [SeqKit v2.3.1](https://github.com/shenwei356/seqkit/releases/tag/v2.3.1) - 2022-09-22
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.3.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.3.1)
     - `seqkit grep/locate`: fix bug of FMIndex building for empty sequences. [#321](https://github.com/shenwei356/seqkit/issues/321)
     - `seqkit split2`: fix bug of splitting two FASTA files. [#325](https://github.com/shenwei356/seqkit/issues/325)
