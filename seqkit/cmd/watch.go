@@ -30,7 +30,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bsipos/thist"
+	"github.com/botond-sipos/thist"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/xopen"

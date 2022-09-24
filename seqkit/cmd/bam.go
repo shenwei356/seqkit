@@ -35,7 +35,7 @@ import (
 
 	"github.com/biogo/hts/bam"
 	"github.com/biogo/hts/sam"
-	"github.com/bsipos/thist"
+	"github.com/botond-sipos/thist"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
