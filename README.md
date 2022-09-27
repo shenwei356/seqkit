@@ -103,7 +103,7 @@ Notes:
 ## Contributors
 
 - [Wei Shen](https://github.com/shenwei356)
-- [Botond Sipos](https://github.com/bsipos): `bam`, `scat`, `fish`, `sana`, `watch`.
+- [Botond Sipos](https://github.com/botond-sipos): `bam`, `scat`, `fish`, `sana`, `watch`.
 - [others](https://github.com/shenwei356/seqkit/graphs/contributors)
 
 ## Acknowledgements

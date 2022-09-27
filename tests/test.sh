@@ -522,7 +522,7 @@ rm corr.tsv seqkit.tsv joint.tsv
 fun(){
     rm -fr tests/bundler_test tests/bundler_merged.bam
     $app bam -N -1 $SPLICE_BAM -o tests/bundler_test
-    ($app bam -s $SPLICE_BAM 2>&1) | cut -f 1,8 | sed '1d' - > tests/bundler_stats_bulk.tsv
+    ($app bam -s $SPLICE_BAM 2>&1) | cut -f 1,8 | sed '1d' > tests/bundler_stats_bulk.tsv
     ($app bam -s tests/bundler_test/*.bam 2>&1) \
     | cut -f 1,8 | sed '1d' | $CSVTK -H -t summary -w 0 -g 1 -f "2:sum" > tests/bundler_stats_merged.tsv
 }
