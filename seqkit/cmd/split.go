@@ -253,7 +253,7 @@ Examples:
 					checkError(fmt.Errorf("Sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
-			fileExt = suffixFA
+			fileExt = suffixFA + extension
 
 			if !quiet {
 				log.Infof("create and read FASTA index ...")
@@ -446,7 +446,7 @@ Examples:
 					checkError(fmt.Errorf("Sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
-			fileExt = suffixFA
+			fileExt = suffixFA + extension
 
 			if !quiet {
 				log.Infof("create and read FASTA index ...")
@@ -641,7 +641,7 @@ Examples:
 					checkError(fmt.Errorf("sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
-			fileExt = suffixFA
+			fileExt = suffixFA + extension
 
 			if !quiet {
 				log.Infof("create and read FASTA index ...")
@@ -846,7 +846,7 @@ Examples:
 					checkError(fmt.Errorf("sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
-			fileExt = suffixFA
+			fileExt = suffixFA + extension
 
 			if !quiet {
 				log.Infof("read sequence IDs and sequence region from FASTA file ...")
