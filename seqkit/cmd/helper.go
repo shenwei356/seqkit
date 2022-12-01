@@ -69,9 +69,15 @@ func getFileList(args []string, checkFile bool) []string {
 }
 
 func getFileListFromFile(file string, checkFile bool) ([]string, error) {
-	fh, err := os.Open(file)
-	if err != nil {
-		return nil, fmt.Errorf("read file list from '%s': %s", file, err)
+	var fh *os.File
+	var err error
+	if file == "-" {
+		fh = os.Stdin
+	} else {
+		fh, err = os.Open(file)
+		if err != nil {
+			return nil, fmt.Errorf("read file list from '%s': %s", file, err)
+		}
 	}
 
 	var _file string

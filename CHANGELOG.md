@@ -1,5 +1,7 @@
 - [SeqKit v2.3.2](https://github.com/shenwei356/seqkit/releases/tag/v2.3.2) - 2022-09-22
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.3.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.3.2)
+    - `seqkit`:
+        - the global flag `--infile-list` accepts stdin "-" now.
     - `seqkit split`: forgot to add extension for --two-pass. [#332](https://github.com/shenwei356/seqkit/issues/332)
     - `seqkit faidx`: allow empty lines at the end of sequences.
 - [SeqKit v2.3.1](https://github.com/shenwei356/seqkit/releases/tag/v2.3.1) - 2022-09-22
