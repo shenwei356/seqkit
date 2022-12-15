@@ -284,9 +284,9 @@ Flags:
   -G, --gap-letters string        gap letters (default "- \t.")
   -h, --help                      help for seq
   -l, --lower-case                print sequences in lower case
-  -M, --max-len int               only print sequences shorter than the maximum length (-1 for no limit) (default -1)
+  -M, --max-len int               only print sequences shorter than or equal to the maximum length (-1 for no limit) (default -1)
   -R, --max-qual float            only print sequences with average quality less than this limit (-1 for no limit) (default -1)
-  -m, --min-len int               only print sequences longer than the minimum length (-1 for no limit) (default -1)
+  -m, --min-len int               only print sequences longer than or equal to the minimum length (-1 for no limit) (default -1)
   -Q, --min-qual float            only print sequences with average quality qreater or equal than this limit (-1 for no limit) (default -1)
   -n, --name                      only print names
   -i, --only-id                   print ID instead of full head
@@ -626,9 +626,35 @@ Usage
 ``` text
 simple statistics of FASTA/Q files
 
+Columns:
+
+  1.  file      input file, "-" for STDIN
+  2.  format    FASTA or FASTQ
+  3.  type      DNA, RNA, Protein or Unlimit
+  4.  num_seqs  number of sequences
+  5.  sum_len   number of bases or residues       , with gaps or spaces counted
+  6.  min_len   minimal sequence length           , with gaps or spaces counted
+  7.  avg_len   average sequence length           , with gaps or spaces counted
+  8.  max_len   miximal sequence length           , with gaps or spaces counted
+  9.  Q1        first quartile of sequence length , with gaps or spaces counted
+  10. Q2        median of sequence length         , with gaps or spaces counted
+  11. Q3        third quartile of sequence length , with gaps or spaces counted
+  12. sum_gap   number of gaps
+  13. N50       N50. https://en.wikipedia.org/wiki/N50,_L50,_and_related_statistics#N50
+  14. Q20(%)    percentage of bases with the quality score greater than 20
+  15. Q30(%)    percentage of bases with the quality score greater than 30
+  16. GC(%)     percentage of GC content
+  
+Attentions:
+  1. Sequence length metrics (sum_len, min_len, avg_len, max_len, Q1, Q2, Q3)
+     count the number of gaps or spaces. You can remove them with "seqkit seq -g":
+         seqkit seq -g input.fasta | seqkit stats
+
 Tips:
   1. For lots of small files (especially on SDD), use big value of '-j' to
      parallelize counting.
+  2. Extract one metric with csvtk (https://github.com/shenwei356/csvtk):
+         seqkit stats -Ta input.fastq.gz | csvtk cut -t -f "Q30(%)" | csvtk del-header
 
 Usage:
   seqkit stats [flags]

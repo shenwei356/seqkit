@@ -78,8 +78,8 @@ var seqCmd = &cobra.Command{
 		minQual := getFlagFloat64(cmd, "min-qual")
 		maxQual := getFlagFloat64(cmd, "max-qual")
 
-		filterMinLen := minLen > 0
-		filterMaxLen := maxLen > 0
+		filterMinLen := minLen >= 0
+		filterMaxLen := maxLen >= 0
 		filterMinQual := minQual > 0
 		filterMaxQual := maxQual > 0
 
@@ -428,8 +428,8 @@ func init() {
 	seqCmd.Flags().BoolP("color", "k", false, "colorize sequences - to be piped into \"less -R\"")
 	seqCmd.Flags().BoolP("validate-seq", "v", false, "validate bases according to the alphabet")
 	seqCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
-	seqCmd.Flags().IntP("min-len", "m", -1, "only print sequences longer than the minimum length (-1 for no limit)")
-	seqCmd.Flags().IntP("max-len", "M", -1, "only print sequences shorter than the maximum length (-1 for no limit)")
+	seqCmd.Flags().IntP("min-len", "m", -1, "only print sequences longer than or equal to the minimum length (-1 for no limit)")
+	seqCmd.Flags().IntP("max-len", "M", -1, "only print sequences shorter than or equal to the maximum length (-1 for no limit)")
 	seqCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
 	seqCmd.Flags().Float64P("min-qual", "Q", -1, "only print sequences with average quality qreater or equal than this limit (-1 for no limit)")
 	seqCmd.Flags().Float64P("max-qual", "R", -1, "only print sequences with average quality less than this limit (-1 for no limit)")
