@@ -73,11 +73,12 @@ Example:
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		byName := getFlagBool(cmd, "by-name")
-		// inPlace := getFlagBool(cmd, "inplace")
-		inPlace := true
 		mOutputs := getFlagBool(cmd, "multiple-outfiles")
 		outdir := getFlagString(cmd, "out-dir")
 		force := getFlagBool(cmd, "force")
+
+		separator := getFlagString(cmd, "separator")
+		startNum := getFlagNonNegativeInt(cmd, "start-num")
 
 		var outfh *xopen.Writer
 		var err error
@@ -156,11 +157,11 @@ Example:
 
 					if _, ok = numbers[k]; ok {
 						numbers[k]++
-						newID = fmt.Sprintf("%s_%d", record.ID, numbers[k])
-						if inPlace {
+						newID = fmt.Sprintf("%s%s%d", record.ID, separator, numbers[k]-2+startNum)
+						if len(record.Desc) > 0 {
 							record.Name = []byte(fmt.Sprintf("%s %s", newID, record.Desc))
 						} else {
-							record.Name = []byte(fmt.Sprintf("%s %s", newID, record.Name))
+							record.Name = []byte(newID)
 						}
 					} else {
 						numbers[k] = 1
@@ -177,9 +178,11 @@ Example:
 func init() {
 	RootCmd.AddCommand(renameCmd)
 
+	renameCmd.Flags().StringP("separator", "s", "_", "separater between original ID/name and the counter")
+	renameCmd.Flags().IntP("start-num", "N", 2, "starting count number for duplicated IDs/names")
+
 	renameCmd.Flags().BoolP("by-name", "n", false, "check duplication by full name instead of just id")
 	renameCmd.Flags().BoolP("multiple-outfiles", "m", false, "write results into separated files for multiple input files")
 	renameCmd.Flags().StringP("out-dir", "O", "renamed", "output directory")
 	renameCmd.Flags().BoolP("force", "f", false, "overwrite output directory")
-	// renameCmd.Flags().BoolP("inplace", "i", false, "rename ID in-place")
 }

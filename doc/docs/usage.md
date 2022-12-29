@@ -3016,6 +3016,8 @@ Flags:
   -h, --help                help for rename
   -m, --multiple-outfiles   write results into separated files for multiple input files
   -O, --out-dir string      output directory (default "renamed")
+  -s, --separator string    separater between original ID/name and the counter (default "_")
+  -N, --start-num int       starting count number for duplicated IDs/names (default 2)
 
 ```
 
@@ -3037,6 +3039,15 @@ acgt
 >b comment of b
 ACTG
 >a_2 comment
+aaaa
+
+$ echo -e ">a comment\nacgt\n>b comment of b\nACTG\n>a comment\naaaa"  \
+    | seqkit rename -s '|' -N 1
+>a comment
+acgt
+>b comment of b
+ACTG
+>a|1 comment
 aaaa
 ```
 
