@@ -7,7 +7,7 @@
     - `seqkit stats`: fix compute Q1 and Q3 of sequence length for one record. [#353](https://github.com/shenwei356/seqkit/issues/353)
     - `seqkit seq`: allow filtering sequences of length zero. thanks to @penglbio.
     - `seqkit rename`:
-        - new flag `-s/--separator` for setting separater between original ID/name and the counter. [#360](https://github.com/shenwei356/seqkit/issues/360)
+        - new flag `-s/--separator` for setting separator between original ID/name and the counter. [#360](https://github.com/shenwei356/seqkit/issues/360)
         - new flag `-N/--start-num` for starting count number for duplicated IDs/names. [#360](https://github.com/shenwei356/seqkit/issues/360)
         - new flag `-1/--rename-1st-rec` for renaming the first record as well. [#360](https://github.com/shenwei356/seqkit/issues/360)
         - do not append space if there's no description after the sequene ID.

@@ -3017,7 +3017,7 @@ Flags:
   -m, --multiple-outfiles   write results into separated files for multiple input files
   -O, --out-dir string      output directory (default "renamed")
   -1, --rename-1st-rec      rename the first record as well
-  -s, --separator string    separater between original ID/name and the counter (default "_")
+  -s, --separator string    separator between original ID/name and the counter (default "_")
   -N, --start-num int       starting count number for *duplicated* IDs/names, should be greater than zero (default 2)
 
 ```

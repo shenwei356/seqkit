@@ -187,7 +187,7 @@ Example:
 func init() {
 	RootCmd.AddCommand(renameCmd)
 
-	renameCmd.Flags().StringP("separator", "s", "_", "separater between original ID/name and the counter")
+	renameCmd.Flags().StringP("separator", "s", "_", "separator between original ID/name and the counter")
 	renameCmd.Flags().IntP("start-num", "N", 2, `starting count number for *duplicated* IDs/names, should be greater than zero`)
 	renameCmd.Flags().BoolP("rename-1st-rec", "1", false, "rename the first record as well")
 
