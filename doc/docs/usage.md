@@ -568,6 +568,7 @@ Flags:
   -g, --greedy            greedy mode, i.e., exporting last subsequences even shorter than windows size
   -h, --help              help for sliding
   -s, --step int          step size
+  -S, --sufix string      suffix added to the sequence ID
   -W, --window int        window size
 
 ```

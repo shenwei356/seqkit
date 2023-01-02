@@ -11,6 +11,8 @@
         - new flag `-N/--start-num` for starting count number for duplicated IDs/names. [#360](https://github.com/shenwei356/seqkit/issues/360)
         - new flag `-1/--rename-1st-rec` for renaming the first record as well. [#360](https://github.com/shenwei356/seqkit/issues/360)
         - do not append space if there's no description after the sequene ID.
+    - `seqkit sliding`:
+        - new flag `-S/--suffix` for change the suffix added to the sequence ID (default: _sliding).
 - [SeqKit v2.3.1](https://github.com/shenwei356/seqkit/releases/tag/v2.3.1) - 2022-09-22
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.3.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.3.1)
     - `seqkit grep/locate`: fix bug of FMIndex building for empty sequences. [#321](https://github.com/shenwei356/seqkit/issues/321)

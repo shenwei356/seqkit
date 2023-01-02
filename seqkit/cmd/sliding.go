@@ -64,6 +64,8 @@ var slidingCmd = &cobra.Command{
 			checkError(fmt.Errorf("value of flag -W (--window) should be greater than 0: %d ", window))
 		}
 
+		suffix := getFlagString(cmd, "suffix")
+
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Close()
@@ -127,10 +129,10 @@ var slidingCmd = &cobra.Command{
 
 					if len(qual) > 0 {
 						r, _ = fastx.NewRecordWithQualWithoutValidation(record.Seq.Alphabet,
-							[]byte{}, []byte(fmt.Sprintf("%s_sliding:%d-%d", record.ID, i+1, e)), []byte{}, s, q)
+							[]byte{}, []byte(fmt.Sprintf("%s%s:%d-%d", record.ID, suffix, i+1, e)), []byte{}, s, q)
 					} else {
 						r, _ = fastx.NewRecordWithoutValidation(record.Seq.Alphabet,
-							[]byte{}, []byte(fmt.Sprintf("%s_sliding:%d-%d", record.ID, i+1, e)), []byte{}, s)
+							[]byte{}, []byte(fmt.Sprintf("%s%s:%d-%d", record.ID, suffix, i+1, e)), []byte{}, s)
 					}
 					r.FormatToWriter(outfh, config.LineWidth)
 				}
@@ -149,4 +151,5 @@ func init() {
 	slidingCmd.Flags().BoolP("greedy", "g", false, "greedy mode, i.e., exporting last subsequences even shorter than windows size")
 	slidingCmd.Flags().BoolP("circular-genome", "C", false, "circular genome (same to -c/--circular)")
 	slidingCmd.Flags().BoolP("circular", "c", false, "circular genome (same to -C/--circular-genome)")
+	slidingCmd.Flags().StringP("suffix", "S", "_sliding", "suffix added to the sequence ID")
 }
