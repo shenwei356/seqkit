@@ -433,7 +433,8 @@ Attentions:
      "seqkit grep -f id.txt seqs.fasta"
 
 Recommendation:
-  1. use plain FASTA file, so seqkit could utilize FASTA index.
+  1. Use plain FASTA file, so seqkit could utilize FASTA index.
+  2. The flag -U/--update-faidx is recommended to ensure the .fai file matches the FASTA file.
 
 The definition of region is 1-based and with some custom design.
 
@@ -466,6 +467,7 @@ Flags:
   -f, --only-flank        only return up/down stream sequence
   -r, --region string     by region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases, 13:-1 for cutting first 12 bases. type "seqkit subseq -h" for more examples
   -u, --up-stream int     up stream length
+  -U, --update-faidx      update the fasta index file if it exists. Use this if you are not sure whether the fasta file changed
 
 ```
 
@@ -899,6 +901,9 @@ This command is similar with "samtools faidx" but has some extra features:
   3. if you have large number of IDs, you can use:
         seqkit faidx seqs.fasta -l IDs.txt
 
+Attentions:
+  1. The flag -U/--update-faidx is recommended to ensure the .fai file matches the FASTA file.
+
 The definition of region is 1-based and with some custom design.
 
 Examples:
@@ -925,7 +930,8 @@ Flags:
   -i, --ignore-case          ignore case
   -I, --immediate-output     print output immediately, do not use write buffer
   -l, --region-file string   file containing a list of regions
-  -r, --use-regexp           IDs are regular expression. But subseq region is not suppored here.
+  -U, --update-faidx         update the fasta index file if it exists. Use this if you are not sure whether the fasta file changed
+  -r, --use-regexp           IDs are regular expression. But subseq region is not supported here.
 
 ```
 
@@ -2314,6 +2320,10 @@ Usage
 split sequences into files by name ID, subsequence of given region,
 part size or number of parts.
 
+Attentions:
+  1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
+     ensure the .fai file matches the FASTA file.
+
 If you just want to split by parts or sizes, please use "seqkit split2",
 which also applies for paired- and single-end FASTQ.
 
@@ -2353,6 +2363,7 @@ Flags:
   -k, --keep-temp                 keep temporary FASTA and .fai file when using 2-pass mode
   -O, --out-dir string            output directory (default value is $infile.split)
   -2, --two-pass                  two-pass mode read files twice to lower memory usage. (only for FASTA format)
+  -U, --update-faidx              update the fasta index file if it exists. Use this if you are not sure whether the fasta file changed
 
 ```
 
@@ -2382,10 +2393,11 @@ Examples
 
         $ seqkit split hairpin.fa.gz -p 4 -2
         [INFO] split into 4 parts
-        [INFO] read and write sequences to tempory file: hairpin.fa.gz.fa ...
-        [INFO] create and read FASTA index ...
-        [INFO] read sequence IDs from FASTA index ...
-        [INFO] 28645 sequences loaded
+        [INFO] read and write sequences to temporary file: hairpin.fa.gz.fastx ...
+        [INFO] 28645 sequences saved
+        [INFO] create or read FASTA index ...
+        [INFO] create FASTA index for hairpin.fa.gz.fastx
+        [INFO]   28645 records loaded from hairpin.fa.gz.fastx.seqkit.fai
         [INFO] write 7162 sequences to file: hairpin.part_001.fa.gz
         [INFO] write 7162 sequences to file: hairpin.part_002.fa.gz
         [INFO] write 7162 sequences to file: hairpin.part_003.fa.gz
@@ -2395,11 +2407,11 @@ Examples
 
         $ seqkit split hairpin.fa.gz -i --id-regexp "^([\w]+)\-" -2
         [INFO] split by ID. idRegexp: ^([\w]+)\-
-        [INFO] read and write sequences to tempory file: hairpin.fa.gz.fa ...
-        [INFO] create and read FASTA index ...
-        [INFO] create FASTA index for hairpin.fa.gz.fa
-        [INFO] read sequence IDs from FASTA index ...
-        [INFO] 28645 sequences loaded
+        [INFO] read and write sequences to temporary file: hairpin.fa.gz.fastx ...
+        [INFO] 28645 sequences saved
+        [INFO] create or read FASTA index ...
+        [INFO] create FASTA index for hairpin.fa.gz.fastx
+        [INFO]   28645 records loaded from hairpin.fa.gz.fastx.seqkit.fai
         [INFO] write 48 sequences to file: hairpin.id_cca.fa.gz
         [INFO] write 3 sequences to file: hairpin.id_hci.fa.gz
         [INFO] write 106 sequences to file: hairpin.id_str.fa.gz
@@ -2410,9 +2422,12 @@ Examples
 
         $ seqkit split hairpin.fa.gz -r 1:3 -2
         [INFO] split by region: 1:3
-        [INFO] read and write sequences to tempory file: hairpin.fa.gz.fa ...
+        [INFO] read and write sequences to temporary file: hairpin.fa.gz.fastx ...
+        [INFO] 28645 sequences saved
         [INFO] read sequence IDs and sequence region from FASTA file ...
-        [INFO] create and read FASTA index ...
+        [INFO] create or read FASTA index ...
+        [INFO] create FASTA index for hairpin.fa.gz.fastx
+        [INFO]   28645 records loaded from hairpin.fa.gz.fastx.seqkit.fai
         [INFO] write 463 sequences to file: hairpin.region_1:3_AUG.fa.gz
         [INFO] write 349 sequences to file: hairpin.region_1:3_ACU.fa.gz
         [INFO] write 311 sequences to file: hairpin.region_1:3_CGG.fa.gz
@@ -3356,17 +3371,23 @@ For FASTA format, use flag -2 (--two-pass) to reduce memory usage. FASTQ not
 supported.
 
 Firstly, seqkit reads the sequence IDs. If the file is not plain FASTA file,
-seqkit will write the sequences to tempory files, and create FASTA index.
+seqkit will write the sequences to temporary files, and create FASTA index.
 
 Secondly, seqkit shuffles sequence IDs and extract sequences by FASTA index.
+
+Attentions:
+  1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
+     ensure the .fai file matches the FASTA file.
 
 Usage:
   seqkit shuffle [flags]
 
 Flags:
-  -k, --keep-temp       keep tempory FASTA and .fai file when using 2-pass mode
+  -h, --help            help for shuffle
+  -k, --keep-temp       keep temporary FASTA and .fai file when using 2-pass mode
   -s, --rand-seed int   rand seed for shuffle (default 23)
   -2, --two-pass        two-pass mode read files twice to lower memory usage. (only for FASTA format)
+  -U, --update-faidx    update the fasta index file if it exists. Use this if you are not sure whether the fasta file changed
 
 ```
 
@@ -3411,10 +3432,14 @@ supported.
 
 Firstly, seqkit reads the sequence head and length information.
 If the file is not plain FASTA file,
-seqkit will write the sequences to tempory files, and create FASTA index.
+seqkit will write the sequences to temporary files, and create FASTA index.
 
 Secondly, seqkit sorts sequence by head and length information
 and extracts sequences by FASTA index.
+
+Attentions:
+  1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
+     ensure the .fai file matches the FASTA file.
 
 Usage:
   seqkit sort [flags]
@@ -3427,11 +3452,12 @@ Flags:
   -G, --gap-letters string      gap letters (default "- \t.")
   -h, --help                    help for sort
   -i, --ignore-case             ignore case
-  -k, --keep-temp               keep tempory FASTA and .fai file when using 2-pass mode
+  -k, --keep-temp               keep temporary FASTA and .fai file when using 2-pass mode
   -N, --natural-order           sort in natural order, when sorting by IDs/full name
   -r, --reverse                 reverse the result
   -L, --seq-prefix-length int   length of sequence prefix on which seqkit sorts by sequences (0 for whole sequence) (default 10000)
   -2, --two-pass                two-pass mode read files twice to lower memory usage. (only for FASTA format)
+  -U, --update-faidx            update the fasta index file if it exists. Use this if you are not sure whether the fasta file changed
 
 ```
 

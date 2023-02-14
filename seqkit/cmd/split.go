@@ -46,6 +46,10 @@ var splitCmd = &cobra.Command{
 	Long: fmt.Sprintf(`split sequences into files by name ID, subsequence of given region,
 part size or number of parts.
 
+Attentions:
+  1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
+     ensure the .fai file matches the FASTA file.
+
 If you just want to split by parts or sizes, please use "seqkit split2",
 which also applies for paired- and single-end FASTQ.
 
@@ -81,10 +85,15 @@ Examples:
 		byID := getFlagBool(cmd, "by-id")
 		region := getFlagString(cmd, "by-region")
 		twoPass := getFlagBool(cmd, "two-pass")
+		updateFaidx := getFlagBool(cmd, "update-faidx")
 		keepTemp := getFlagBool(cmd, "keep-temp")
 		if keepTemp && !twoPass {
 			checkError(fmt.Errorf("flag -k (--keep-temp) must be used with flag -2 (--two-pass)"))
 		}
+		if updateFaidx && !twoPass {
+			checkError(fmt.Errorf("flag -U (--update-faidx) must be used with flag -2 (--two-pass)"))
+		}
+
 		dryRun := getFlagBool(cmd, "dry-run")
 
 		outdir := getFlagString(cmd, "out-dir")
@@ -255,22 +264,32 @@ Examples:
 			}
 			fileExt = suffixFA + extension
 
-			if !quiet {
-				log.Infof("create and read FASTA index ...")
+			fileFai := newFile + ".seqkit.fai"
+
+			if FileExists(fileFai) && updateFaidx {
+				checkError(os.RemoveAll(fileFai))
+				if !quiet {
+					log.Infof("delete the old FASTA index file: %s", fileFai)
+				}
 			}
-			faidx := getFaidx(newFile, `^(.+)$`)
+
+			if !quiet {
+				log.Infof("create or read FASTA index ...")
+			}
+			faidx := getFaidx(newFile, `^(.+)$`, quiet)
 			defer func() {
 				checkError(faidx.Close())
 			}()
 
-			if !quiet {
-				log.Infof("read sequence IDs from FASTA index ...")
+			if len(faidx.Index) == 0 {
+				log.Warningf("  0 records loaded from %s, please check if it matches the fasta file, or switch on the flag -U/--update-faidx", fileFai)
+				return
+			} else if !quiet {
+				log.Infof("  %d records loaded from %s", len(faidx.Index), fileFai)
 			}
-			IDs, _, err := getSeqIDAndLengthFromFaidxFile(newFile + ".seqkit.fai")
+
+			IDs, _, err := getSeqIDAndLengthFromFaidxFile(fileFai)
 			checkError(err)
-			if !quiet {
-				log.Infof("%d sequences loaded", len(IDs))
-			}
 
 			n := 1
 			if len(IDs) > 0 {
@@ -448,22 +467,32 @@ Examples:
 			}
 			fileExt = suffixFA + extension
 
-			if !quiet {
-				log.Infof("create and read FASTA index ...")
+			fileFai := newFile + ".seqkit.fai"
+
+			if FileExists(fileFai) && updateFaidx {
+				checkError(os.RemoveAll(fileFai))
+				if !quiet {
+					log.Infof("delete the old FASTA index file: %s", fileFai)
+				}
 			}
-			faidx := getFaidx(newFile, `^(.+)$`)
+
+			if !quiet {
+				log.Infof("create or read FASTA index ...")
+			}
+			faidx := getFaidx(newFile, `^(.+)$`, quiet)
 			defer func() {
 				checkError(faidx.Close())
 			}()
 
-			if !quiet {
-				log.Infof("read sequence IDs from FASTA index ...")
+			if len(faidx.Index) == 0 {
+				log.Warningf("  0 records loaded from %s, please check if it matches the fasta file, or switch on the flag -U/--update-faidx", fileFai)
+				return
+			} else if !quiet {
+				log.Infof("  %d records loaded from %s", len(faidx.Index), fileFai)
 			}
-			IDs, _, err := getSeqIDAndLengthFromFaidxFile(newFile + ".seqkit.fai")
+
+			IDs, _, err := getSeqIDAndLengthFromFaidxFile(fileFai)
 			checkError(err)
-			if !quiet {
-				log.Infof("%d sequences loaded", len(IDs))
-			}
 
 			N := len(IDs)
 			if N%part > 0 {
@@ -643,22 +672,32 @@ Examples:
 			}
 			fileExt = suffixFA + extension
 
-			if !quiet {
-				log.Infof("create and read FASTA index ...")
+			fileFai := newFile + ".seqkit.fai"
+
+			if FileExists(fileFai) && updateFaidx {
+				checkError(os.RemoveAll(fileFai))
+				if !quiet {
+					log.Infof("delete the old FASTA index file: %s", fileFai)
+				}
 			}
-			faidx := getFaidx(newFile, `^(.+)$`)
+
+			if !quiet {
+				log.Infof("create or read FASTA index ...")
+			}
+			faidx := getFaidx(newFile, `^(.+)$`, quiet)
 			defer func() {
 				checkError(faidx.Close())
 			}()
 
-			if !quiet {
-				log.Infof("read sequence IDs from FASTA index ...")
+			if len(faidx.Index) == 0 {
+				log.Warningf("  0 records loaded from %s, please check if it matches the fasta file, or switch on the flag -U/--update-faidx", fileFai)
+				return
+			} else if !quiet {
+				log.Infof("  %d records loaded from %s", len(faidx.Index), fileFai)
 			}
-			IDs, _, err := getSeqIDAndLengthFromFaidxFile(newFile + ".seqkit.fai")
+
+			IDs, _, err := getSeqIDAndLengthFromFaidxFile(fileFai)
 			checkError(err)
-			if !quiet {
-				log.Infof("%d sequences loaded", len(IDs))
-			}
 
 			idRe, err := regexp.Compile(idRegexp)
 			if err != nil {
@@ -881,13 +920,29 @@ Examples:
 				region2name[subseq] = append(region2name[subseq], name)
 			}
 
-			if !quiet {
-				log.Infof("create and read FASTA index ...")
+			fileFai := newFile + ".seqkit.fai"
+
+			if FileExists(fileFai) && updateFaidx {
+				checkError(os.RemoveAll(fileFai))
+				if !quiet {
+					log.Infof("delete the old FASTA index file: %s", fileFai)
+				}
 			}
-			faidx := getFaidx(newFile, `^(.+)$`)
+
+			if !quiet {
+				log.Infof("create or read FASTA index ...")
+			}
+			faidx := getFaidx(newFile, `^(.+)$`, quiet)
 			defer func() {
 				checkError(faidx.Close())
 			}()
+
+			if len(faidx.Index) == 0 {
+				log.Warningf("  0 records loaded from %s, please check if it matches the fasta file, or switch on the flag -U/--update-faidx", fileFai)
+				return
+			} else if !quiet {
+				log.Infof("  %d records loaded from %s", len(faidx.Index), fileFai)
+			}
 
 			var wg sync.WaitGroup
 			tokens := make(chan int, config.Threads)
@@ -956,6 +1011,7 @@ func init() {
 	splitCmd.Flags().StringP("by-region", "r", "", "split squences according to subsequence of given region. "+
 		`e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type "seqkit split -h" for more examples`)
 	splitCmd.Flags().BoolP("two-pass", "2", false, "two-pass mode read files twice to lower memory usage. (only for FASTA format)")
+	splitCmd.Flags().BoolP("update-faidx", "U", false, "update the fasta index file if it exists. Use this if you are not sure whether the fasta file changed")
 	splitCmd.Flags().BoolP("dry-run", "d", false, "dry run, just print message and no files will be created.")
 	splitCmd.Flags().BoolP("keep-temp", "k", false, "keep temporary FASTA and .fai file when using 2-pass mode")
 	splitCmd.Flags().StringP("out-dir", "O", "", "output directory (default value is $infile.split)")

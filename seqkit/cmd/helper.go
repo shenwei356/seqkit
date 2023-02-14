@@ -362,15 +362,20 @@ func copySeqs(file, newFile string) (int, error) {
 	return n, nil
 }
 
-func getFaidx(file string, idRegexp string) *fai.Faidx {
+func getFaidx(file string, idRegexp string, quiet bool) *fai.Faidx {
 	var idx fai.Index
 	var err error
 	fileFai := file + ".seqkit.fai"
 	if fileNotExists(fileFai) {
-		log.Infof("create FASTA index for %s", file)
+		if !quiet {
+			log.Infof("create FASTA index for %s", file)
+		}
 		idx, err = fai.CreateWithIDRegexp(file, fileFai, idRegexp)
 		checkError(err)
 	} else {
+		if !quiet {
+			log.Infof("read FASTA index from %s", fileFai)
+		}
 		idx, err = fai.Read(fileFai)
 		checkError(err)
 	}

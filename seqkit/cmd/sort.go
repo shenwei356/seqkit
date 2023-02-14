@@ -55,6 +55,10 @@ seqkit will write the sequences to temporary files, and create FASTA index.
 Secondly, seqkit sorts sequence by head and length information
 and extracts sequences by FASTA index.
 
+Attentions:
+  1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
+     ensure the .fai file matches the FASTA file.
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -79,11 +83,16 @@ and extracts sequences by FASTA index.
 		reverse := getFlagBool(cmd, "reverse")
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		twoPass := getFlagBool(cmd, "two-pass")
+		updateFaidx := getFlagBool(cmd, "update-faidx")
 		seqPrefixLength := getFlagNonNegativeInt(cmd, "seq-prefix-length")
 		keepTemp := getFlagBool(cmd, "keep-temp")
 		if keepTemp && !twoPass {
 			checkError(fmt.Errorf("flag -k (--keep-temp) must be used with flag -2 (--two-pass)"))
 		}
+		if updateFaidx && !twoPass {
+			checkError(fmt.Errorf("flag -U (--update-faidx) must be used with flag -2 (--two-pass)"))
+		}
+
 		if byBases {
 			byLength = true
 
@@ -275,14 +284,30 @@ and extracts sequences by FASTA index.
 			}
 		}
 
-		if !quiet {
-			log.Infof("create and read FASTA index ...")
+		fileFai := newFile + ".seqkit.fai"
+
+		if FileExists(fileFai) && updateFaidx {
+			checkError(os.RemoveAll(fileFai))
+			if !quiet {
+				log.Infof("delete the old FASTA index file: %s", fileFai)
+			}
 		}
 
-		faidx := getFaidx(newFile, `^(.+)$`)
+		if !quiet {
+			log.Infof("create or read FASTA index ...")
+		}
+
+		faidx := getFaidx(newFile, `^(.+)$`, quiet)
 		defer func() {
 			checkError(faidx.Close())
 		}()
+
+		if len(faidx.Index) == 0 {
+			log.Warningf("  0 records loaded from %s, please check if it matches the fasta file, or switch on the flag -U/--update-faidx", fileFai)
+			return
+		} else if !quiet {
+			log.Infof("  %d records loaded from %s", len(faidx.Index), fileFai)
+		}
 
 		if !bySeq { // if not by seq, just read faidx
 			if !quiet {
@@ -296,6 +321,7 @@ and extracts sequences by FASTA index.
 
 			ids, lengths, err := getSeqIDAndLengthFromFaidxFile(newFile + ".seqkit.fai")
 			checkError(err)
+
 			var name string
 			for i, head := range ids {
 				if byName {
@@ -463,6 +489,7 @@ func init() {
 	sortCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 
 	sortCmd.Flags().BoolP("two-pass", "2", false, "two-pass mode read files twice to lower memory usage. (only for FASTA format)")
+	sortCmd.Flags().BoolP("update-faidx", "U", false, "update the fasta index file if it exists. Use this if you are not sure whether the fasta file changed")
 	sortCmd.Flags().BoolP("keep-temp", "k", false, "keep temporary FASTA and .fai file when using 2-pass mode")
 	sortCmd.Flags().IntP("seq-prefix-length", "L", 10000, "length of sequence prefix on which seqkit sorts by sequences (0 for whole sequence)")
 }

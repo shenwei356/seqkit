@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"os"
 	"regexp"
 	"runtime"
 	"strconv"
@@ -49,7 +50,8 @@ Attentions:
      "seqkit grep -f id.txt seqs.fasta"
 
 Recommendation:
-  1. use plain FASTA file, so seqkit could utilize FASTA index.
+  1. Use plain FASTA file, so seqkit could utilize FASTA index.
+  2. The flag -U/--update-faidx is recommended to ensure the .fai file matches the FASTA file.
 
 The definition of region is 1-based and with some custom design.
 
@@ -111,6 +113,8 @@ Examples:
 					" any of flags -u (--up-stream), -d (--down-stream) and -f (--only-flank) is not allowed"))
 			}
 		}
+
+		updateFaidx := getFlagBool(cmd, "update-faidx")
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
@@ -214,9 +218,29 @@ Examples:
 				id2name := make(map[string][]byte)
 
 				if !isFastq { // ok, it's fasta!
+					fileFai := file + ".seqkit.fai"
+
+					if FileExists(fileFai) && updateFaidx {
+						if !quiet {
+							checkError(os.RemoveAll(fileFai))
+							log.Infof("delete the old FASTA index file: %s", fileFai)
+						}
+					}
+
+					if !quiet {
+						log.Infof("create or read FASTA index ...")
+					}
+
 					// faidx, err := fai.New(file)
 					// checkError(err)
-					faidx := getFaidx(file, "^(.+)$")
+					faidx := getFaidx(file, "^(.+)$", quiet)
+
+					if len(faidx.Index) == 0 {
+						log.Warningf("  0 records loaded from %s, please check if it matches the fasta file, or switch on the flag -U/--update-faidx", fileFai)
+						return
+					} else if !quiet {
+						log.Infof("  %d records loaded from %s", len(faidx.Index), fileFai)
+					}
 
 					var id string
 					for head := range faidx.Index {
@@ -303,6 +327,7 @@ Examples:
 
 					checkError(faidx.Close())
 				}
+
 			}
 
 			var record *fastx.Record
@@ -310,6 +335,10 @@ Examples:
 			// Parse all sequences
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
+
+			var seqname string
+			var ok bool
+			noChrs := len(chrs) == 0
 
 			for {
 				record, err = fastxReader.Read()
@@ -326,11 +355,16 @@ Examples:
 				}
 
 				if region != "" {
-					subseqByRegion(outfh, record, config.LineWidth, start, end)
-
+					if noChrs {
+						subseqByRegion(outfh, record, config.LineWidth, start, end)
+					} else {
+						if _, ok = chrsMap[strings.ToLower(string(record.ID))]; ok {
+							subseqByRegion(outfh, record, config.LineWidth, start, end)
+						}
+					}
 				} else if gtfFile != "" {
-					seqname := strings.ToLower(string(record.ID))
-					if _, ok := gtfFeaturesMap[seqname]; !ok {
+					seqname = strings.ToLower(string(record.ID))
+					if _, ok = gtfFeaturesMap[seqname]; !ok {
 						continue
 					}
 
@@ -339,8 +373,8 @@ Examples:
 						onlyFlank, upStream, downStream, gtfTag)
 
 				} else if bedFile != "" {
-					seqname := strings.ToLower(string(record.ID))
-					if _, ok := bedFeatureMap[seqname]; !ok {
+					seqname = strings.ToLower(string(record.ID))
+					if _, ok = bedFeatureMap[seqname]; !ok {
 						continue
 					}
 
@@ -580,4 +614,6 @@ func init() {
 	subseqCmd.Flags().BoolP("only-flank", "f", false, "only return up/down stream sequence")
 	subseqCmd.Flags().StringP("bed", "", "", "by tab-delimited BED file")
 	subseqCmd.Flags().StringP("gtf-tag", "", "gene_id", `output this tag as sequence comment`)
+
+	subseqCmd.Flags().BoolP("update-faidx", "U", false, "update the fasta index file if it exists. Use this if you are not sure whether the fasta file changed")
 }

@@ -23,6 +23,7 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"regexp"
 	"runtime"
 	"strconv"
@@ -49,6 +50,9 @@ This command is similar with "samtools faidx" but has some extra features:
   3. if you have large number of IDs, you can use:
         seqkit faidx seqs.fasta -l IDs.txt
 
+Attentions:
+  1. The flag -U/--update-faidx is recommended to ensure the .fai file matches the FASTA file.
+
 The definition of region is 1-based and with some custom design.
 
 Examples:
@@ -66,6 +70,8 @@ Examples:
 		regionFile := getFlagString(cmd, "region-file")
 
 		immediateOutput := getFlagBool(cmd, "immediate-output")
+
+		updateFaidx := getFlagBool(cmd, "update-faidx")
 
 		files := getFileListFromArgsAndFile(cmd, args, false, "infile-list", false)
 
@@ -127,6 +133,18 @@ Examples:
 			fileFai = file + ".fai"
 			idRegexp = config.IDRegexp
 		}
+
+		if !quiet {
+			log.Infof("create or read FASTA index ...")
+		}
+
+		if FileExists(fileFai) && updateFaidx {
+			checkError(os.RemoveAll(fileFai))
+			if !quiet {
+				log.Infof("delete the old FASTA index file: %s", fileFai)
+			}
+		}
+
 		if fileNotExists(fileFai) {
 			if !quiet {
 				log.Infof("create FASTA index for %s", file)
@@ -134,8 +152,18 @@ Examples:
 			idx, err = fai.CreateWithIDRegexp(file, fileFai, idRegexp)
 			checkError(err)
 		} else {
+			if !quiet {
+				log.Infof("read FASTA index from %s", fileFai)
+			}
 			idx, err = fai.Read(fileFai)
 			checkError(err)
+
+			if len(idx) == 0 {
+				log.Warningf("0 records loaded from %s, please check if it matches the FASTA file, or switch on the flag -U/--update-faidx", fileFai)
+				return
+			} else if !quiet {
+				log.Infof("  %d records loaded from %s", len(idx), fileFai)
+			}
 		}
 
 		if len(files) == 1 { // just creat .fai file
@@ -276,6 +304,7 @@ func init() {
 	faidxCmd.Flags().StringP("region-file", "l", "", "file containing a list of regions")
 
 	faidxCmd.Flags().BoolP("immediate-output", "I", false, "print output immediately, do not use write buffer")
+	faidxCmd.Flags().BoolP("update-faidx", "U", false, "update the fasta index file if it exists. Use this if you are not sure whether the fasta file changed")
 
 	faidxCmd.SetUsageTemplate(`Usage:{{if .Runnable}}
   {{if .HasAvailableFlags}}{{appendIfNotPresent .UseLine "[flags]"}}{{else}}{{.UseLine}}{{end}}{{end}}{{if .HasAvailableSubCommands}}

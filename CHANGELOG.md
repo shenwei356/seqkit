@@ -2,10 +2,17 @@
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.3.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.3.2)
     - `seqkit`:
         - the global flag `--infile-list` accepts stdin "-" now.
-    - `seqkit split`: forgot to add extension for --two-pass. [#332](https://github.com/shenwei356/seqkit/issues/332)
-    - `seqkit faidx`: allow empty lines at the end of sequences.
-    - `seqkit stats`: fix compute Q1 and Q3 of sequence length for one record. [#353](https://github.com/shenwei356/seqkit/issues/353)
-    - `seqkit seq`: allow filtering sequences of length zero. thanks to @penglbio.
+    - `seqkit split`:
+        - forgot to add extension for --two-pass. [#332](https://github.com/shenwei356/seqkit/issues/332)
+    - `seqkit faidx`:
+        - allow empty lines at the end of sequences.
+    - `seqkit faidx/sort/shuffle/split/subseq`:
+        - new flag `-U/--update-faidx`: update the FASTA index file if it exists. [#364](https://github.com/shenwei356/seqkit/issues/364)
+        - improve log info and update help message. [#365](https://github.com/shenwei356/seqkit/issues/365)
+    - `seqkit stats`:
+        - fix compute Q1 and Q3 of sequence length for one record. [#353](https://github.com/shenwei356/seqkit/issues/353)
+    - `seqkit seq`: 
+        - allow filtering sequences of length zero. thanks to @penglbio.
     - `seqkit rename`:
         - new flag `-s/--separator` for setting separator between original ID/name and the counter. [#360](https://github.com/shenwei356/seqkit/issues/360)
         - new flag `-N/--start-num` for starting count number for duplicated IDs/names. [#360](https://github.com/shenwei356/seqkit/issues/360)
