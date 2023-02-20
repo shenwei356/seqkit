@@ -2114,7 +2114,7 @@ Examples
         seq1    3       13      p1      0       +       CCCACTGAAA
         seq1    1       7       p4      0       +       CGCCCA
         seq1    3       13      p2      0       -       TTTCAGTGGG
-        seq1    3       6       p3      0       -       TTT
+        seq1    10      13      p3      0       -       TTT
         seq2    1       17      p4      0       +       CGTACGGTCAGATCCA
         seq2    1       15      P5      0       +       CGTACGGTCAGATC
         seq2    3       17      p6      0       +       TACGGTCAGATCCA

@@ -310,6 +310,7 @@ Examples:
 						var strand string
 						var tmpSeq *seq.Seq
 						var primer [3][]byte
+						var start1, end1 int
 
 						results := make([]string, 0, 2)
 						var s []byte
@@ -339,12 +340,16 @@ Examples:
 								}
 
 								if outFmtBED {
+									start1, end1 = loc[0]-1, loc[1]
+									if strand == "-" {
+										start1, end1 = len(record.Seq.Seq)-loc[1], len(record.Seq.Seq)-loc[0]+1
+									}
 									if outputMismatches {
 										s = record.Seq.SubSeq(loc[0], loc[1]).Seq
 										results = append(results, fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\t%s\t%d\t%d\t%d\n",
 											record.ID,
-											loc[0]-1,
-											loc[1],
+											start1,
+											end1,
 											primer[0],
 											0,
 											strand,
@@ -356,8 +361,8 @@ Examples:
 									} else {
 										results = append(results, fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\t%s\n",
 											record.ID,
-											loc[0]-1,
-											loc[1],
+											start1,
+											end1,
 											primer[0],
 											0,
 											strand,
@@ -416,6 +421,7 @@ Examples:
 		var primer [3][]byte
 		var matched bool
 		var name0 string
+		var start1, end1 int
 
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
@@ -464,12 +470,16 @@ Examples:
 						matched = true
 
 						if outFmtBED {
+							start1, end1 = loc[0]-1, loc[1]
+							if strand == "-" {
+								start1, end1 = len(record.Seq.Seq)-loc[1], len(record.Seq.Seq)-loc[0]+1
+							}
 							if outputMismatches {
 								fmt.Fprintf(outfh,
 									"%s\t%d\t%d\t%s\t%d\t%s\t%s\t%d\t%d\t%d\n",
 									record.ID,
-									loc[0]-1,
-									loc[1],
+									start1,
+									end1,
 									primer[0],
 									0,
 									strand,
@@ -482,8 +492,8 @@ Examples:
 								fmt.Fprintf(outfh,
 									"%s\t%d\t%d\t%s\t%d\t%s\t%s\n",
 									record.ID,
-									loc[0]-1,
-									loc[1],
+									start1,
+									end1,
 									primer[0],
 									0,
 									strand,
@@ -713,21 +723,20 @@ func (finder *AmpliconFinder) LocateRange(begin, end int, flanking bool, strictM
 // end: relative location to 3' end of amplicon.
 // Returned locations are 1-based.
 //
-//                     F
-//         -----===============-----
-//              1 3 5                    x/y
-//                       -5-3-1          x/y
-//              F             R
-//         -----=====-----=====-----     x:y
+//	            F
+//	-----===============-----
+//	     1 3 5                    x/y
+//	              -5-3-1          x/y
+//	     F             R
+//	-----=====-----=====-----     x:y
 //
-//              ===============          1:-1
-//              =======                  1:7
-//                =====                  3:7
-//                   =====               6:10
-//                   =====             -10:-6
-//                      =====           -7:-3
-//                                      -x:y (invalid)
-//
+//	     ===============          1:-1
+//	     =======                  1:7
+//	       =====                  3:7
+//	          =====               6:10
+//	          =====             -10:-6
+//	             =====           -7:-3
+//	                             -x:y (invalid)
 func SubLocationInner(length, B, E, begin, end int, strictMode bool) (int, int, bool) {
 	if begin == 0 || end == 0 {
 		return 0, 0, false
@@ -790,20 +799,19 @@ func SubLocationInner(length, B, E, begin, end int, strictMode bool) (int, int, 
 // end: relative location to 3' end of amplicon.
 // Returned locations are 1-based.
 //
-//                     F
-//         -----===============-----
-//          -3-1                        x/y
-//                             1 3 5    x/y
-//              F             R
-//         -----=====-----=====-----
-//         =====                        -5:-1
-//         ===                          -5:-3
-//                             =====     1:5
-//                               ===     3:5
-//             =================        -1:1
-//         =========================    -5:5
-//                                       x:-y (invalid)
-//
+//	            F
+//	-----===============-----
+//	 -3-1                        x/y
+//	                    1 3 5    x/y
+//	     F             R
+//	-----=====-----=====-----
+//	=====                        -5:-1
+//	===                          -5:-3
+//	                    =====     1:5
+//	                      ===     3:5
+//	    =================        -1:1
+//	=========================    -5:5
+//	                              x:-y (invalid)
 func SubLocationFlanking(length, B, E, begin, end int, strictMode bool) (int, int, bool) {
 	if begin == 0 || end == 0 {
 		return 0, 0, false
