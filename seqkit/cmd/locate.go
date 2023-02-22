@@ -584,9 +584,11 @@ Attentions:
 		var seqRP *seq.Seq
 		var offset, l, lpatten int
 		var loc []int
-		var locs, locsNeg [][2]int
+		// var locs, locsNeg [][2]int
+		// locs = make([][2]int, 0, 1024)
+		// locsNeg = make([][2]int, 0, 1024)
 		var i, begin, end int
-		var flag bool
+		// var flag bool
 		var pSeq, p []byte
 		var pName string
 		var re *regexp.Regexp
@@ -770,7 +772,7 @@ Attentions:
 				}
 
 				for pName = range patterns {
-					locs = make([][2]int, 0, 1000)
+					// locs = locs[:0]
 
 					offset = 0
 					if !(useRegexp || degenerate) {
@@ -800,58 +802,58 @@ Attentions:
 
 						end = offset + loc[1]
 
-						flag = true // check "duplicated" region
-						if useRegexp || degenerate {
-							for i = len(locs) - 1; i >= 0; i-- {
-								if locs[i][0] <= begin && locs[i][1] >= end {
-									flag = false
-									break
-								}
-							}
-						}
+						// flag = true // check "embedded" region
+						// if useRegexp || degenerate {
+						// 	for i = len(locs) - 1; i >= 0; i-- {
+						// 		if locs[i][0] <= begin && locs[i][1] >= end {
+						// 			flag = false
+						// 			break
+						// 		}
+						// 	}
+						// }
 
-						if flag {
-							if outFmtGTF {
-								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%s\tgene_id \"%s\"; \n",
+						// if flag {
+						if outFmtGTF {
+							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%s\tgene_id \"%s\"; \n",
+								record.ID,
+								"SeqKit",
+								"location",
+								begin,
+								end,
+								0,
+								"+",
+								".",
+								pName))
+						} else if outFmtBED {
+							outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
+								record.ID,
+								begin-1,
+								end,
+								pName,
+								0,
+								"+"))
+						} else {
+							if hideMatched {
+								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
 									record.ID,
-									"SeqKit",
-									"location",
+									pName,
+									patterns[pName],
+									"+",
+									begin,
+									end))
+							} else {
+								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+									record.ID,
+									pName,
+									patterns[pName],
+									"+",
 									begin,
 									end,
-									0,
-									"+",
-									".",
-									pName))
-							} else if outFmtBED {
-								outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
-									record.ID,
-									begin-1,
-									end,
-									pName,
-									0,
-									"+"))
-							} else {
-								if hideMatched {
-									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
-										record.ID,
-										pName,
-										patterns[pName],
-										"+",
-										begin,
-										end))
-								} else {
-									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-										record.ID,
-										pName,
-										patterns[pName],
-										"+",
-										begin,
-										end,
-										record.Seq.Seq[begin-1:end]))
-								}
+									record.Seq.Seq[begin-1:end]))
 							}
-							locs = append(locs, [2]int{begin, end})
 						}
+						// locs = append(locs, [2]int{begin, end})
+						// }
 
 						if nonGreedy {
 							offset = offset + loc[1] + 1
@@ -869,7 +871,7 @@ Attentions:
 
 					seqRP = record.Seq.RevCom()
 
-					locsNeg = make([][2]int, 0, 1000)
+					// locsNeg = locsNeg[:0]
 
 					offset = 0
 
@@ -899,58 +901,58 @@ Attentions:
 							end += l
 						}
 
-						flag = true
-						if useRegexp || degenerate {
-							for i = len(locsNeg) - 1; i >= 0; i-- {
-								if locsNeg[i][0] <= begin && locsNeg[i][1] >= end {
-									flag = false
-									break
-								}
-							}
-						}
+						// flag = true
+						// if useRegexp || degenerate {
+						// 	for i = len(locsNeg) - 1; i >= 0; i-- {
+						// 		if locsNeg[i][0] <= begin && locsNeg[i][1] >= end {
+						// 			flag = false
+						// 			break
+						// 		}
+						// 	}
+						// }
 
-						if flag {
-							if outFmtGTF {
-								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%s\tgene_id \"%s\"; \n",
+						// if flag {
+						if outFmtGTF {
+							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%s\tgene_id \"%s\"; \n",
+								record.ID,
+								"SeqKit",
+								"location",
+								begin,
+								end,
+								0,
+								"-",
+								".",
+								pName))
+						} else if outFmtBED {
+							outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
+								record.ID,
+								begin-1,
+								end,
+								pName,
+								0,
+								"-"))
+						} else {
+							if hideMatched {
+								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
 									record.ID,
-									"SeqKit",
-									"location",
+									pName,
+									patterns[pName],
+									"-",
+									begin,
+									end))
+							} else {
+								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
+									record.ID,
+									pName,
+									patterns[pName],
+									"-",
 									begin,
 									end,
-									0,
-									"-",
-									".",
-									pName))
-							} else if outFmtBED {
-								outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
-									record.ID,
-									begin-1,
-									end,
-									pName,
-									0,
-									"-"))
-							} else {
-								if hideMatched {
-									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
-										record.ID,
-										pName,
-										patterns[pName],
-										"-",
-										begin,
-										end))
-								} else {
-									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
-										record.ID,
-										pName,
-										patterns[pName],
-										"-",
-										begin,
-										end,
-										seqRP.Seq[offset+loc[0]:offset+loc[1]]))
-								}
+									seqRP.Seq[offset+loc[0]:offset+loc[1]]))
 							}
-							locsNeg = append(locsNeg, [2]int{begin, end})
 						}
+						// locsNeg = append(locsNeg, [2]int{begin, end})
+						// }
 
 						if nonGreedy {
 							offset = offset + loc[1] + 1

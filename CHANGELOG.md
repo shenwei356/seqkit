@@ -1,16 +1,20 @@
-- [SeqKit v2.3.2](https://github.com/shenwei356/seqkit/releases/tag/v2.3.2) - 2022-09-22
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.3.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.3.2)
+- [SeqKit v2.4.0](https://github.com/shenwei356/seqkit/releases/tag/v2.4.0) - 2022-09-22
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.4.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.4.0)
     - `seqkit`:
         - the global flag `--infile-list` accepts stdin "-" now.
+    - `seqkit locate`:
+        - **do not remove embeded region when searching with regular expressions**. [#368](https://github.com/shenwei356/seqkit/issues/368)
+    - `seqkit amplicon`:
+        - fix BED coordinates for amplicons found in the minus strand. [#367](https://github.com/shenwei356/seqkit/issues/367)
     - `seqkit split`:
-        - forgot to add extension for --two-pass. [#332](https://github.com/shenwei356/seqkit/issues/332)
+        - fix forgetting to add extension for --two-pass. [#332](https://github.com/shenwei356/seqkit/issues/332)
+    - `seqkit stats`:
+        - fix compute Q1 and Q3 of sequence length for one record. [#353](https://github.com/shenwei356/seqkit/issues/353)
     - `seqkit faidx`:
-        - allow empty lines at the end of sequences.
+        - *allow empty lines at the end of sequences*.
     - `seqkit faidx/sort/shuffle/split/subseq`:
         - new flag `-U/--update-faidx`: update the FASTA index file if it exists. [#364](https://github.com/shenwei356/seqkit/issues/364)
         - improve log info and update help message. [#365](https://github.com/shenwei356/seqkit/issues/365)
-    - `seqkit stats`:
-        - fix compute Q1 and Q3 of sequence length for one record. [#353](https://github.com/shenwei356/seqkit/issues/353)
     - `seqkit seq`: 
         - allow filtering sequences of length zero. thanks to @penglbio.
     - `seqkit rename`:
@@ -20,8 +24,6 @@
         - do not append space if there's no description after the sequene ID.
     - `seqkit sliding`:
         - new flag `-S/--suffix` for change the suffix added to the sequence ID (default: _sliding).
-    - `seqkit amplicon`:
-        - fix BED coordinates for amplicons found in the minus strand. [#367](https://github.com/shenwei356/seqkit/issues/367)
 - [SeqKit v2.3.1](https://github.com/shenwei356/seqkit/releases/tag/v2.3.1) - 2022-09-22
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.3.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.3.1)
     - `seqkit grep/locate`: fix bug of FMIndex building for empty sequences. [#321](https://github.com/shenwei356/seqkit/issues/321)
