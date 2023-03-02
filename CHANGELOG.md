@@ -3,13 +3,15 @@
     - `seqkit`:
         - the global flag `--infile-list` accepts stdin "-" now.
     - `seqkit locate`:
-        - **do not remove embeded region when searching with regular expressions**. [#368](https://github.com/shenwei356/seqkit/issues/368)
+        - **do not remove embeded regions when searching with regular expressions**. [#368](https://github.com/shenwei356/seqkit/issues/368)
     - `seqkit amplicon`:
         - fix BED coordinates for amplicons found in the minus strand. [#367](https://github.com/shenwei356/seqkit/issues/367)
     - `seqkit split`:
         - fix forgetting to add extension for --two-pass. [#332](https://github.com/shenwei356/seqkit/issues/332)
     - `seqkit stats`:
         - fix compute Q1 and Q3 of sequence length for one record. [#353](https://github.com/shenwei356/seqkit/issues/353)
+    - `seqkit grep`:
+        - fix count number (`-C`) for matching with mismatch (`-m > 0`). [#370](https://github.com/shenwei356/seqkit/issues/370)
     - `seqkit faidx`:
         - *allow empty lines at the end of sequences*.
     - `seqkit faidx/sort/shuffle/split/subseq`:

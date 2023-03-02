@@ -348,7 +348,9 @@ Examples:
 				id = 1
 				for r := range ch {
 					if justCount {
-						count++
+						if r.ok {
+							count++
+						}
 						continue
 					}
 
