@@ -238,6 +238,7 @@ type Config struct {
 	Quiet                  bool
 	AlphabetGuessSeqLength int
 	ValidateSeqLength      int
+	CompressionLevel       int
 }
 
 func getConfigs(cmd *cobra.Command) Config {
@@ -245,6 +246,37 @@ func getConfigs(cmd *cobra.Command) Config {
 	if threads >= 1000 {
 		checkError(fmt.Errorf("are your seriously? %d threads? It will exhaust your RAM", threads))
 	}
+	outfile := getFlagString(cmd, "out-file")
+
+	level := getFlagInt(cmd, "compress-level")
+
+	f := strings.ToLower(outfile)
+	var ranges [3]int
+	var format string
+	checkCompressLevel := true
+	if strings.HasSuffix(f, ".gz") {
+		format = "gzip"
+		ranges = [3]int{1, 9, 5}
+	} else if strings.HasSuffix(f, ".xz") {
+		checkCompressLevel = false
+	} else if strings.HasSuffix(f, ".zst") {
+		format = "zstd"
+		ranges = [3]int{1, 4, 2}
+	} else if strings.HasSuffix(f, ".bz2") {
+		format = "bzip2"
+		ranges = [3]int{1, 9, 6}
+	} else {
+		checkCompressLevel = false
+	}
+	if checkCompressLevel {
+		if level == -1 {
+			level = ranges[2]
+		}
+		if level < ranges[0] || level > ranges[1] {
+			checkError(fmt.Errorf("compression level out of range for %s format (%d-%d): %d", format, ranges[0], ranges[1], level))
+		}
+	}
+	xopen.Level = level
 
 	return Config{
 		Alphabet:               getAlphabet(cmd, "seq-type"),
@@ -252,9 +284,10 @@ func getConfigs(cmd *cobra.Command) Config {
 		LineWidth:              getFlagNonNegativeInt(cmd, "line-width"),
 		IDRegexp:               getIDRegexp(cmd, "id-regexp"),
 		IDNCBI:                 getFlagBool(cmd, "id-ncbi"),
-		OutFile:                getFlagString(cmd, "out-file"),
+		OutFile:                outfile,
 		Quiet:                  getFlagBool(cmd, "quiet"),
 		AlphabetGuessSeqLength: getFlagAlphabetGuessSeqLength(cmd, "alphabet-guess-seq-length"),
+		CompressionLevel:       level,
 	}
 
 }

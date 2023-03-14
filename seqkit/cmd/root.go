@@ -53,6 +53,14 @@ Seqkit writes gzip files very fast, much faster than the multi-threaded pigz,
 therefore there's no need to pipe the result to gzip/pigz.
 
 Seqkit also supports reading and writing xz (.xz) and zstd (.zst) formats since v2.2.0.
+Bzip2 format is supported since v2.4.0.
+
+Compression level:
+  format   range   default  comment
+  gzip     1-9     5        https://github.com/klauspost/pgzip sets 5 as the default value.
+  xz       NA      NA       https://github.com/ulikunitz/xz does not support.
+  zstd     1-4     2        roughly equals to zstd 1, 3, 7, 11, respectively.
+  bzip     1-9     6        https://github.com/dsnet/compress
 
 `, VERSION),
 }
@@ -90,6 +98,7 @@ func init() {
 	RootCmd.PersistentFlags().BoolP("quiet", "", false, "be quiet and do not show extra information")
 	RootCmd.PersistentFlags().IntP("alphabet-guess-seq-length", "", 10000, "length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq)")
 	RootCmd.PersistentFlags().StringP("infile-list", "", "", "file of input files list (one file per line), if given, they are appended to files from cli arguments")
+	RootCmd.PersistentFlags().IntP("compress-level", "", -1, `compression level for gzip, zstd, xz and bzip2. type "seqkit -h" for the range and default value for each format`)
 
 	RootCmd.CompletionOptions.DisableDefaultCmd = true
 	RootCmd.SetHelpCommand(&cobra.Command{Hidden: true})

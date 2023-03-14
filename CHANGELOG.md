@@ -1,6 +1,8 @@
 - [SeqKit v2.4.0](https://github.com/shenwei356/seqkit/releases/tag/v2.4.0) - 2022-09-22
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.4.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.4.0)
     - `seqkit`:
+        - support `bzip2` format. [#361](https://github.com/shenwei356/seqkit/issues/361)
+        - support setting compression level for `gzip`, `zstd`, and `bzip2` format via `--compress-level`. [#320](https://github.com/shenwei356/seqkit/issues/320)
         - the global flag `--infile-list` accepts stdin "-" now.
     - `seqkit locate`:
         - **do not remove embeded regions when searching with regular expressions**. [#368](https://github.com/shenwei356/seqkit/issues/368)

@@ -31,6 +31,7 @@ import (
 
 	// "runtime/debug"
 
+	"github.com/dsnet/compress/bzip2"
 	gzip "github.com/klauspost/pgzip"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
@@ -157,21 +158,27 @@ var seqCmd = &cobra.Command{
 			color = false
 		}
 
-		gzippedOutfile := strings.HasSuffix(strings.ToLower(outFile), ".gz")
-		xzOutfile := strings.HasSuffix(strings.ToLower(outFile), ".xz")
-		zstdOutfile := strings.HasSuffix(strings.ToLower(outFile), ".zst")
+		outFileLower := strings.ToLower(outFile)
+		gzippedOutfile := strings.HasSuffix(outFileLower, ".gz")
+		xzOutfile := strings.HasSuffix(outFileLower, ".xz")
+		zstdOutfile := strings.HasSuffix(outFileLower, ".zst")
+		bzip2Outfile := strings.HasSuffix(outFileLower, ".bz2")
 
 		var fh io.Writer
 		var outbw *bufio.Writer
 		var gw *gzip.Writer
 		var xw *xz.Writer
 		var zw *zstd.Encoder
+		var bz2 *bzip2.Writer
 
 		if color {
 			fh = seqCol.WrapWriter(outfh)
 			outbw = bufio.NewWriterSize(fh, bufSize)
 		} else if gzippedOutfile {
-			gw = gzip.NewWriter(outfh)
+			gw, err = gzip.NewWriterLevel(outfh, config.CompressionLevel)
+			if err != nil {
+				checkError(err)
+			}
 			outbw = bufio.NewWriterSize(gw, bufSize)
 		} else if xzOutfile {
 			xw, err = xz.NewWriter(outfh)
@@ -180,11 +187,17 @@ var seqCmd = &cobra.Command{
 			}
 			outbw = bufio.NewWriterSize(xw, bufSize)
 		} else if zstdOutfile {
-			zw, err = zstd.NewWriter(outfh)
+			zw, err = zstd.NewWriter(outfh, zstd.WithEncoderLevel(zstd.EncoderLevel(config.CompressionLevel)))
 			if err != nil {
 				checkError(err)
 			}
 			outbw = bufio.NewWriterSize(zw, bufSize)
+		} else if bzip2Outfile {
+			bz2, err = bzip2.NewWriter(outfh, &bzip2.WriterConfig{Level: config.CompressionLevel})
+			if err != nil {
+				checkError(err)
+			}
+			outbw = bufio.NewWriterSize(bz2, bufSize)
 		} else {
 			fh = outfh
 			outbw = bufio.NewWriterSize(fh, bufSize)
@@ -204,6 +217,10 @@ var seqCmd = &cobra.Command{
 			if zstdOutfile {
 				checkError(zw.Flush())
 				checkError(zw.Close())
+			}
+
+			if bzip2Outfile {
+				checkError(bz2.Close())
 			}
 
 			checkError(outfh.Close())
