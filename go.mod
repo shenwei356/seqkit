@@ -8,6 +8,7 @@ require (
 	github.com/botond-sipos/thist v1.1.0
 	github.com/cespare/xxhash/v2 v2.1.2
 	github.com/cznic/sortutil v0.0.0-20181122101858-f5f958428db8
+	github.com/dsnet/compress v0.0.1
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/iafan/cwalk v0.0.0-20210125030640-586a8832a711
@@ -36,7 +37,6 @@ replace github.com/miekg/dns v1.0.14 => github.com/miekg/dns v1.1.46
 require (
 	git.sr.ht/~sbinet/gg v0.3.1 // indirect
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b // indirect
-	github.com/dsnet/compress v0.0.1 // indirect
 	github.com/edsrzf/mmap-go v1.1.0 // indirect
 	github.com/go-fonts/liberation v0.2.0 // indirect
 	github.com/go-latex/latex v0.0.0-20210823091927-c0d11ff05a81 // indirect
@@ -52,7 +52,7 @@ require (
 	golang.org/x/image v0.0.0-20220902085622-e7cb96979f69 // indirect
 	golang.org/x/sys v0.0.0-20220919091848-fb04ddd9f9c8 // indirect
 	golang.org/x/term v0.0.0-20220919170432-7a66f970e087 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/text v0.3.8 // indirect
 	gonum.org/v1/plot v0.12.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
