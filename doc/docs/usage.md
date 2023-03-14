@@ -2860,21 +2860,32 @@ Special cases:
     b). If not, use '$$':
             -r 'xxx$$xx'
 
+Filtering records to edit:
+  You can use flags similar to those in "seqkit grep" to choose partly records to edit.
+
 Usage:
   seqkit replace [flags]
 
 Flags:
-  -s, --by-seq                 replace seq (only FASTA)
-  -h, --help                   help for replace
-  -i, --ignore-case            ignore case
-  -K, --keep-key               keep the key as value when no value found for the key (only for sequence name)
-  -U, --keep-untouch           do not change anything when no value found for the key (only for sequence name)
-  -I, --key-capt-idx int       capture variable index of key (1-based) (default 1)
-  -m, --key-miss-repl string   replacement for key with no corresponding value
-  -k, --kv-file string         tab-delimited key-value file for replacing key with value when using "{kv}" in -r (--replacement) (only for sequence name)
-      --nr-width int           minimum width for {nr} in flag -r/--replacement. e.g., formating "1" to "001" by --nr-width 3 (default 1)
-  -p, --pattern string         search regular expression
-  -r, --replacement string     replacement. supporting capture variables.  e.g. $1 represents the text of the first submatch. ATTENTION: for *nix OS, use SINGLE quote NOT double quotes or use the \ escape character. Record number is also supported by "{nr}".use ${1} instead of $1 when {kv} given!
+  -s, --by-seq                   replace seq (only FASTA)
+      --f-by-name                [target filter] match by full name instead of just ID
+      --f-by-seq                 [target filter] search subseq on seq, both positive and negative strand are searched, and mismatch allowed using flag -m/--max-mismatch
+      --f-ignore-case            [target filter] ignore case
+      --f-invert-match           [target filter] invert the sense of matching, to select non-matching records
+      --f-only-positive-strand   [target filter] only search on positive strand
+      --f-pattern strings        [target filter] search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
+      --f-pattern-file string    [target filter] pattern file (one record per line)
+      --f-use-regexp             [target filter] patterns are regular expression
+  -h, --help                     help for replace
+  -i, --ignore-case              ignore case
+  -K, --keep-key                 keep the key as value when no value found for the key (only for sequence name)
+  -U, --keep-untouch             do not change anything when no value found for the key (only for sequence name)
+  -I, --key-capt-idx int         capture variable index of key (1-based) (default 1)
+  -m, --key-miss-repl string     replacement for key with no corresponding value
+  -k, --kv-file string           tab-delimited key-value file for replacing key with value when using "{kv}" in -r (--replacement) (only for sequence name)
+      --nr-width int             minimum width for {nr} in flag -r/--replacement. e.g., formatting "1" to "001" by --nr-width 3 (default 1)
+  -p, --pattern string           search regular expression
+  -r, --replacement string       replacement. supporting capture variables.  e.g. $1 represents the text of the first submatch. ATTENTION: for *nix OS, use SINGLE quote NOT double quotes or use the \ escape character. Record number is also supported by "{nr}".use ${1} instead of $1 when {kv} given!
 
 ```
 

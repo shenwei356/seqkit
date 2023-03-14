@@ -16,6 +16,8 @@
         - fix count number (`-C`) for matching with mismatch (`-m > 0`). [#370](https://github.com/shenwei356/seqkit/issues/370)
     - `seqkit faidx`:
         - *allow empty lines at the end of sequences*.
+    - `seqkit replace`:
+        - add some flags to match only partly records to edit; these flags are similar to those in `seqkit grep`. [#348](https://github.com/shenwei356/seqkit/issues/348)
     - `seqkit faidx/sort/shuffle/split/subseq`:
         - new flag `-U/--update-faidx`: update the FASTA index file if it exists. [#364](https://github.com/shenwei356/seqkit/issues/364)
         - improve log info and update help message. [#365](https://github.com/shenwei356/seqkit/issues/365)

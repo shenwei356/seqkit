@@ -21,14 +21,17 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"regexp"
 	"runtime"
 	"strings"
 
+	"github.com/cespare/xxhash/v2"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/breader"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -66,6 +69,9 @@ Special cases:
     b). If not, use '$$':
             -r 'xxx$$xx'
 
+Filtering records to edit:
+  You can use flags similar to those in "seqkit grep" to choose partly records to edit.
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -94,6 +100,16 @@ Special cases:
 		if pattern == "" {
 			checkError(fmt.Errorf("flags -p (--pattern) needed"))
 		}
+
+		// check pattern with unquoted comma
+		if reUnquotedComma.MatchString(pattern) {
+			if outFile == "-" {
+				defer log.Warningf(helpUnquotedComma)
+			} else {
+				log.Warningf(helpUnquotedComma)
+			}
+		}
+
 		p := pattern
 		if ignoreCase {
 			p = "(?i)" + p
@@ -142,6 +158,151 @@ Special cases:
 			}
 		}
 
+		// -------------------
+		// filter for records to edit
+
+		fpattern := getFlagStringSlice(cmd, "f-pattern")
+		fpatternFile := getFlagString(cmd, "f-pattern-file")
+		fuseRegexp := getFlagBool(cmd, "f-use-regexp")
+		finvertMatch := getFlagBool(cmd, "f-invert-match")
+		fbySeq := getFlagBool(cmd, "f-by-seq")
+		fbyName := getFlagBool(cmd, "f-by-name")
+		fignoreCase := getFlagBool(cmd, "f-ignore-case")
+		fonlyPositiveStrand := getFlagBool(cmd, "f-only-positive-strand")
+
+		// check pattern with unquoted comma
+		hasUnquotedComma := false
+		for _, _pattern := range fpattern {
+			if reUnquotedComma.MatchString(_pattern) {
+				hasUnquotedComma = true
+				break
+			}
+		}
+		if hasUnquotedComma {
+			if outFile == "-" {
+				defer log.Warningf(helpUnquotedComma)
+			} else {
+				log.Warningf(helpUnquotedComma)
+			}
+		}
+
+		// prepare pattern
+		usingDefaultIDRegexp := config.IDRegexp == fastx.DefaultIDRegexp
+
+		patternsR := make(map[uint64]*regexp.Regexp, 1<<10)
+		patternsN := make(map[uint64]interface{}, 1<<20)
+		// patternsS := make(map[string]interface{}, 1<<10)
+		patternsS := make([][]byte, 0, 16)
+
+		var pbyte []byte
+		if fpatternFile != "" {
+			var reader *breader.BufferedReader
+			reader, err = breader.NewDefaultBufferedReader(fpatternFile)
+			checkError(err)
+			for chunk := range reader.Ch {
+				checkError(chunk.Err)
+				for _, data := range chunk.Data {
+					p := data.(string)
+					if p == "" {
+						continue
+					}
+
+					if !quiet {
+						if p[0] == '>' {
+							log.Warningf(`symbol ">" detected, it should not be a part of the sequence ID/name: %s`, p)
+						} else if p[0] == '@' {
+							log.Warningf(`symbol "@" detected, it should not be a part of the sequence ID/name. %s`, p)
+						} else if !fbyName && usingDefaultIDRegexp && strings.ContainsAny(p, "\t ") {
+							log.Warningf("space found in pattern, you may need use --f-by-name: %s", p)
+						}
+					}
+
+					if fuseRegexp {
+						if fignoreCase {
+							p = "(?i)" + p
+						}
+						r, err := regexp.Compile(p)
+						checkError(err)
+						patternsR[xxhash.Sum64String(p)] = r
+					} else if fbySeq {
+						pbyte = []byte(p)
+						if seq.DNAredundant.IsValid(pbyte) == nil ||
+							seq.RNAredundant.IsValid(pbyte) == nil ||
+							seq.Protein.IsValid(pbyte) == nil { // legal sequence
+							if fignoreCase {
+								// patternsS[strings.ToLower(p)] = struct{}{}
+								patternsS = append(patternsS, bytes.ToLower(pbyte))
+							} else {
+								// patternsS[p] = struct{}{}
+								patternsS = append(patternsS, pbyte)
+							}
+						} else {
+							checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", p))
+						}
+					} else {
+						if fignoreCase {
+							patternsN[xxhash.Sum64String(strings.ToLower(p))] = struct{}{}
+						} else {
+							patternsN[xxhash.Sum64String(p)] = struct{}{}
+						}
+					}
+				}
+			}
+			if !quiet {
+				if len(patternsR)+len(patternsN)+len(patternsS) == 0 {
+					log.Warningf("%d patterns loaded from file", 0)
+				} else {
+					log.Infof("%d patterns loaded from file", len(patternsR)+len(patternsN)+len(patternsS))
+				}
+			}
+		} else if len(fpattern) > 0 {
+			for _, p := range fpattern {
+				if !quiet {
+					if p[0] == '>' {
+						log.Warningf(`symbol ">" detected, it should not be a part of the sequence ID/name: %s`, p)
+					} else if p[0] == '@' {
+						log.Warningf(`symbol "@" detected, it should not be a part of the sequence ID/name. %s`, p)
+					} else if !fbyName && usingDefaultIDRegexp && strings.ContainsAny(p, "\t ") {
+						log.Warningf("space found in pattern, you may need use --f-by-name: %s", p)
+					}
+				}
+
+				if fuseRegexp {
+					if fignoreCase {
+						p = "(?i)" + p
+					}
+					r, err := regexp.Compile(p)
+					checkError(err)
+					patternsR[xxhash.Sum64String(p)] = r
+				} else if fbySeq {
+					pbyte = []byte(p)
+					if seq.DNAredundant.IsValid(pbyte) == nil ||
+						seq.RNAredundant.IsValid(pbyte) == nil ||
+						seq.Protein.IsValid(pbyte) == nil { // legal sequence
+						if fignoreCase {
+							// patternsS[strings.ToLower(p)] = struct{}{}
+							patternsS = append(patternsS, bytes.ToLower(pbyte))
+						} else {
+							// patternsS[p] = struct{}{}
+							patternsS = append(patternsS, pbyte)
+						}
+					} else {
+						checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", p))
+					}
+				} else {
+					if fignoreCase {
+						patternsN[xxhash.Sum64String(strings.ToLower(p))] = struct{}{}
+					} else {
+						patternsN[xxhash.Sum64String(p)] = struct{}{}
+					}
+				}
+			}
+		}
+
+		useFilter := len(fpattern) > 0 || fpatternFile != ""
+
+		// -------------------
+
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		outfh, err := xopen.Wopen(outFile)
@@ -157,6 +318,15 @@ Special cases:
 		var record *fastx.Record
 		var fastxReader *fastx.Reader
 		nrFormat := fmt.Sprintf("%%0%dd", nrWidth)
+
+		var count int
+		var target []byte
+		var hit bool
+		// var k string
+		var k2 []byte
+		var re *regexp.Regexp
+		var h uint64
+
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -176,6 +346,74 @@ Special cases:
 				}
 
 				nr++
+
+				// filter
+
+				if useFilter {
+					if fbyName {
+						target = record.Name
+					} else if fbySeq {
+						target = record.Seq.Seq
+					} else {
+						target = record.ID
+					}
+
+					hit = false
+
+					if fuseRegexp {
+						for h, re = range patternsR {
+							if re.Match(target) {
+								hit = true
+								break
+							}
+						}
+					} else if fbySeq {
+						if fignoreCase {
+							target = bytes.ToLower(target)
+						}
+						for _, k2 = range patternsS {
+							if bytes.Contains(target, k2) {
+								hit = true
+								break
+							}
+						}
+						// search the reverse complement seq
+						if !hit && !fonlyPositiveStrand {
+							target = record.Seq.RevCom().Seq
+							if fignoreCase {
+								target = bytes.ToLower(target)
+							}
+							for _, k2 = range patternsS {
+								if bytes.Contains(target, k2) {
+									hit = true
+									break
+								}
+							}
+						}
+					} else {
+						h = xxhash.Sum64(target)
+						if ignoreCase {
+							h = xxhash.Sum64(bytes.ToLower(target))
+						}
+						if _, ok = patternsN[h]; ok {
+							hit = true
+						}
+					}
+
+					if finvertMatch {
+						hit = !hit
+					}
+
+					if !hit {
+						record.FormatToWriter(outfh, config.LineWidth)
+						continue
+					}
+
+					count++
+				}
+
+				// edit
+
 				if bySeq {
 					if fastxReader.IsFastq {
 						checkError(fmt.Errorf("editing FASTQ is not supported"))
@@ -229,6 +467,10 @@ Special cases:
 
 			config.LineWidth = lineWidth
 		}
+
+		if !config.Quiet && useFilter {
+			log.Infof("%d records matched by the filter", count)
+		}
 	},
 }
 
@@ -251,6 +493,15 @@ func init() {
 	replaceCmd.Flags().BoolP("keep-key", "K", false, "keep the key as value when no value found for the key (only for sequence name)")
 	replaceCmd.Flags().IntP("key-capt-idx", "I", 1, "capture variable index of key (1-based)")
 	replaceCmd.Flags().StringP("key-miss-repl", "m", "", "replacement for key with no corresponding value")
+
+	replaceCmd.Flags().StringSliceP("f-pattern", "", []string{""}, `[target filter] search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')`)
+	replaceCmd.Flags().StringP("f-pattern-file", "", "", "[target filter] pattern file (one record per line)")
+	replaceCmd.Flags().BoolP("f-use-regexp", "", false, "[target filter] patterns are regular expression")
+	replaceCmd.Flags().BoolP("f-invert-match", "", false, "[target filter] invert the sense of matching, to select non-matching records")
+	replaceCmd.Flags().BoolP("f-by-name", "", false, "[target filter] match by full name instead of just ID")
+	replaceCmd.Flags().BoolP("f-by-seq", "", false, "[target filter] search subseq on seq, both positive and negative strand are searched, and mismatch allowed using flag -m/--max-mismatch")
+	replaceCmd.Flags().BoolP("f-ignore-case", "", false, "[target filter] ignore case")
+	replaceCmd.Flags().BoolP("f-only-positive-strand", "", false, "[target filter] only search on positive strand")
 }
 
 var reNR = regexp.MustCompile(`\{(NR|nr)\}`)

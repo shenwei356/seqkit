@@ -700,7 +700,7 @@ Examples:
 func init() {
 	RootCmd.AddCommand(grepCmd)
 
-	grepCmd.Flags().StringSliceP("pattern", "p", []string{""}, `search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"'))`)
+	grepCmd.Flags().StringSliceP("pattern", "p", []string{""}, `search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')`)
 	grepCmd.Flags().StringP("pattern-file", "f", "", "pattern file (one record per line)")
 	grepCmd.Flags().BoolP("use-regexp", "r", false, "patterns are regular expression")
 	grepCmd.Flags().BoolP("delete-matched", "", false, "delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions")
