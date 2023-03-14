@@ -1,7 +1,7 @@
 - [SeqKit v2.4.0](https://github.com/shenwei356/seqkit/releases/tag/v2.4.0) - 2022-09-22
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.4.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.4.0)
     - `seqkit`:
-        - support `bzip2` format. [#361](https://github.com/shenwei356/seqkit/issues/361)
+        - **support `bzip2` format**. [#361](https://github.com/shenwei356/seqkit/issues/361)
         - support setting compression level for `gzip`, `zstd`, and `bzip2` format via `--compress-level`. [#320](https://github.com/shenwei356/seqkit/issues/320)
         - the global flag `--infile-list` accepts stdin "-" now.
     - `seqkit locate`:
@@ -15,11 +15,11 @@
     - `seqkit grep`:
         - fix count number (`-C`) for matching with mismatch (`-m > 0`). [#370](https://github.com/shenwei356/seqkit/issues/370)
     - `seqkit faidx`:
-        - *allow empty lines at the end of sequences*.
+        - **allow empty lines at the end of sequences**.
     - `seqkit replace`:
-        - add some flags to match only partly records to edit; these flags are similar to those in `seqkit grep`. [#348](https://github.com/shenwei356/seqkit/issues/348)
+        - **add some flags to match only partly records to edit**; these flags are transplanted from `seqkit grep`. [#348](https://github.com/shenwei356/seqkit/issues/348)
     - `seqkit faidx/sort/shuffle/split/subseq`:
-        - new flag `-U/--update-faidx`: update the FASTA index file if it exists. [#364](https://github.com/shenwei356/seqkit/issues/364)
+        - **new flag `-U/--update-faidx`: update the FASTA index file if it exists, to guarantee the index file matches the FASTA files**. [#364](https://github.com/shenwei356/seqkit/issues/364)
         - improve log info and update help message. [#365](https://github.com/shenwei356/seqkit/issues/365)
     - `seqkit seq`: 
         - allow filtering sequences of length zero. thanks to @penglbio.
