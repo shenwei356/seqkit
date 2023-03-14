@@ -20,6 +20,7 @@
 ### FASTA/Q format parsing and writing
 
 > **Seqkit also supports reading and writing xz (.xz) and zstd (.zst) formats since v2.2.0**.
+> **Bzip2 format is supported since v2.4.0**.
 
 SeqKit uses the author's lightweight and high-performance bioinformatics package
 [bio](https://github.com/shenwei356/bio) for FASTA/Q parsing,
@@ -2891,6 +2892,30 @@ Flags:
 
 Examples
 
+1. Prepend or append to the header
+
+        $ echo -e ">seq1 abc-123\nACGT-ACGT"
+        >seq1 abc-123
+        ACGT-ACGT
+        
+        # prefix
+        $ echo -e ">seq1 abc-123\nACGT-ACGT" \
+            | seqkit replace -p ^ -r _prefix_
+        >_prefix_seq1 abc-123
+        ACGT-ACGT
+        
+        # suffix
+        $ echo -e ">seq1 abc-123\nACGT-ACGT" \
+            | seqkit replace -p $ -r _suffix_
+        >seq1 abc-123_suffix_
+        ACGT-ACGT
+        $ echo -e ">seq1 abc-123\nACGT-ACGT" \
+            | seqkit seq -i \
+            | seqkit replace -p $ -r _suffix_
+        >seq1_suffix_
+        ACGT-ACGT
+
+
 1. Remove descriptions
 
         $ echo -e ">seq1 abc-123\nACGT-ACGT"
@@ -3020,6 +3045,35 @@ Examples
                61 CCAGCAATTG CGTGTTTCTC CGGCAGGCAA AAGGTTGTCG AGAACCGGTG TCGAGGCTGT
               121 TTCCTTCCTG AGCGAAGCCT GGGGATGAAC G
 
+1. only edit some of the records via patterns. Eight flags starting with `--f-` (with the same usage to these in `seqkit grep`) can be used 
+  to filter records to edit.
+  
+        # prepend some text to header
+        $ echo -e ">abc\nACTG\n>123\nATTT" \
+            | seqkit replace -p ^ -r _
+        >_abc
+        ACTG
+        >_123
+        ATTT
+
+        # only edit some records
+        $ echo -e ">abc\nACTG\n>123\nATTT" \
+            | seqkit replace -p ^ -r _ --f-use-regexp --f-pattern abc
+        [INFO] 1 records matched by the filter
+        >_abc
+        ACTG
+        >123
+        ATTT
+        
+        $ echo -e ">abc\nACTG\n>123\nATTT" \
+            | seqkit replace -p ^ -r _ --f-use-regexp --f-invert-match --f-pattern abc 
+        [INFO] 1 records matched by the filter
+        >abc
+        ACTG
+        >_123
+        ATTT
+  
+              
 ## rename
 
 Usage
