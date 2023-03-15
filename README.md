@@ -24,13 +24,14 @@ and
 - **Easy to install** ([download](http://bioinf.shenwei.me/seqkit/download/))
     - Providing statically linked executable binaries for multiple platforms (Linux/Windows/macOS, amd64/arm64) 
     - Light weight and out-of-the-box, no dependencies, no compilation, no configuration
+    - `conda install -c bioconda seqkit`
 - **Easy to use** 
     - Ultrafast (see [technical-details](http://bioinf.shenwei.me/seqkit/usage/#technical-details-and-guides-for-use) and [benchmark](http://bioinf.shenwei.me/seqkit/benchmark))
     - Seamlessly parsing both FASTA and FASTQ formats
     - Supporting (`gzip`/`xz`/`zstd`/`bzip2` compressed) STDIN/STDOUT and input/output file, easily integrated in pipe
     - Reproducible results (configurable rand seed in `sample` and `shuffle`)
     - Supporting custom sequence ID via regular expression
-    - Supporting [Bash/Zsh completion](http://bioinf.shenwei.me/seqkit/download/#shell-completion)
+    - Supporting [Bash/Zsh autocompletion](http://bioinf.shenwei.me/seqkit/download/#shell-completion)
 - **Versatile commands** ([usages and examples](http://bioinf.shenwei.me/seqkit/usage/))
     - Practical functions supported by [37 subcommands](#subcommands)
 

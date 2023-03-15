@@ -4,6 +4,7 @@
         - **support `bzip2` format**. [#361](https://github.com/shenwei356/seqkit/issues/361)
         - support setting compression level for `gzip`, `zstd`, and `bzip2` format via `--compress-level`. [#320](https://github.com/shenwei356/seqkit/issues/320)
         - the global flag `--infile-list` accepts stdin "-" now.
+        - wrap the help message of flags.
     - `seqkit locate`:
         - **do not remove embeded regions when searching with regular expressions**. [#368](https://github.com/shenwei356/seqkit/issues/368)
     - `seqkit amplicon`:
