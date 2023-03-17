@@ -184,7 +184,7 @@ Compression level:
   bzip     1-9     6        https://github.com/dsnet/compress
 
 Usage:
-  seqkit [command]
+  seqkit [command] 
 
 Available Commands:
   amplicon        extract amplicon (or specific region around it) via primer(s)
@@ -228,17 +228,24 @@ Available Commands:
   watch           monitoring and online histograms of sequence features
 
 Flags:
-      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq) (default 10000)
-      --compress-level int              compression level for gzip, zstd, xz and bzip2. type "seqkit -h" for the range and default value for each format (default -1)
+      --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on
+                                        which seqkit guesses the sequence type (0 for whole seq)
+                                        (default 10000)
+      --compress-level int              compression level for gzip, zstd, xz and bzip2. type "seqkit -h"
+                                        for the range and default value for each format (default -1)
   -h, --help                            help for seqkit
-      --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2| Pseud...
+      --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2|
+                                        Pseud...
       --id-regexp string                regular expression for parsing ID (default "^(\\S+)\\s?")
-      --infile-list string              file of input files list (one file per line), if given, they are appended to files from cli arguments
+      --infile-list string              file of input files list (one file per line), if given, they are
+                                        appended to files from cli arguments
   -w, --line-width int                  line width when outputting FASTA format (0 for no wrap) (default 60)
   -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")
       --quiet                           be quiet and do not show extra information
-  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it automatically detect by the first sequence) (default "auto")
-  -j, --threads int                     number of CPUs. can also set with environment variable SEQKIT_THREADS) (default 4)
+  -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it
+                                        automatically detect by the first sequence) (default "auto")
+  -j, --threads int                     number of CPUs. can also set with environment variable
+                                        SEQKIT_THREADS) (default 4)
 
 Use "seqkit [command] --help" for more information about a command.
 ```
@@ -287,7 +294,7 @@ Usage
 transform sequences (extract ID, filter by length, remove gaps, reverse complement...)
 
 Usage:
-  seqkit seq [flags]
+  seqkit seq [flags] 
 
 Flags:
   -k, --color                     colorize sequences - to be piped into "less -R"
@@ -296,10 +303,14 @@ Flags:
   -G, --gap-letters string        gap letters (default "- \t.")
   -h, --help                      help for seq
   -l, --lower-case                print sequences in lower case
-  -M, --max-len int               only print sequences shorter than or equal to the maximum length (-1 for no limit) (default -1)
-  -R, --max-qual float            only print sequences with average quality less than this limit (-1 for no limit) (default -1)
-  -m, --min-len int               only print sequences longer than or equal to the minimum length (-1 for no limit) (default -1)
-  -Q, --min-qual float            only print sequences with average quality qreater or equal than this limit (-1 for no limit) (default -1)
+  -M, --max-len int               only print sequences shorter than or equal to the maximum length (-1
+                                  for no limit) (default -1)
+  -R, --max-qual float            only print sequences with average quality less than this limit (-1 for
+                                  no limit) (default -1)
+  -m, --min-len int               only print sequences longer than or equal to the minimum length (-1
+                                  for no limit) (default -1)
+  -Q, --min-qual float            only print sequences with average quality qreater or equal than this
+                                  limit (-1 for no limit) (default -1)
   -n, --name                      only print names
   -i, --only-id                   print ID instead of full head
   -q, --qual                      only print qualities
@@ -466,20 +477,24 @@ negative index    0-9-8-7-6-5-4-3-2-1
         -12:-1    A C G T N a c g t n
 
 Usage:
-  seqkit subseq [flags]
+  seqkit subseq [flags] 
 
 Flags:
       --bed string        by tab-delimited BED file
-      --chr strings       select limited sequence with sequence IDs when using --gtf or --bed (multiple value supported, case ignored)
+      --chr strings       select limited sequence with sequence IDs when using --gtf or --bed (multiple
+                          value supported, case ignored)
   -d, --down-stream int   down stream length
-      --feature strings   select limited feature types (multiple value supported, case ignored, only works with GTF)
+      --feature strings   select limited feature types (multiple value supported, case ignored, only
+                          works with GTF)
       --gtf string        by GTF (version 2.2) file
       --gtf-tag string    output this tag as sequence comment (default "gene_id")
   -h, --help              help for subseq
   -f, --only-flank        only return up/down stream sequence
-  -r, --region string     by region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases, 13:-1 for cutting first 12 bases. type "seqkit subseq -h" for more examples
+  -r, --region string     by region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases, 13:-1 for
+                          cutting first 12 bases. type "seqkit subseq -h" for more examples
   -u, --up-stream int     up stream length
-  -U, --update-faidx      update the fasta index file if it exists. Use this if you are not sure whether the fasta file changed
+  -U, --update-faidx      update the fasta index file if it exists. Use this if you are not sure whether
+                          the fasta file changed
 
 ```
 
@@ -680,12 +695,14 @@ Aliases:
 Flags:
   -a, --all                  all statistics, including quartiles of seq length, sum_gap, N50
   -b, --basename             only output basename of files
-  -E, --fq-encoding string   fastq quality encoding. available values: 'sanger', 'solexa', 'illumina-1.3+', 'illumina-1.5+', 'illumina-1.8+'. (default "sanger")
+  -E, --fq-encoding string   fastq quality encoding. available values: 'sanger', 'solexa',
+                             'illumina-1.3+', 'illumina-1.5+', 'illumina-1.8+'. (default "sanger")
   -G, --gap-letters string   gap letters (default "- .")
   -h, --help                 help for stats
   -e, --skip-err             skip error, only show warning message
   -i, --stdin-label string   label for replacing default "-" for stdin (default "-")
   -T, --tabular              output in machine-friendly tabular format
+
 ```
 
 Eexamples
@@ -835,7 +852,8 @@ Flags:
   -k, --kmer-size int        k-mer size for processing circular genomes (default 1000)
   -g, --remove-gaps          remove gaps
       --rna2dna              convert RNA to DNA
-  -s, --single-strand        only consider the positive strand of a circular genome, e.g., ssRNA virus genomes
+  -s, --single-strand        only consider the positive strand of a circular genome, e.g., ssRNA virus
+                             genomes
 
 ```
 
@@ -937,12 +955,14 @@ Usage:
   seqkit faidx [flags] <fasta-file> [regions...]
 
 Flags:
-  -f, --full-head            print full header line instead of just ID. New fasta index file ending with .seqkit.fai will be created
+  -f, --full-head            print full header line instead of just ID. New fasta index file ending with
+                             .seqkit.fai will be created
   -h, --help                 help for faidx
   -i, --ignore-case          ignore case
   -I, --immediate-output     print output immediately, do not use write buffer
   -l, --region-file string   file containing a list of regions
-  -U, --update-faidx         update the fasta index file if it exists. Use this if you are not sure whether the fasta file changed
+  -U, --update-faidx         update the fasta index file if it exists. Use this if you are not sure
+                             whether the fasta file changed
   -r, --use-regexp           IDs are regular expression. But subseq region is not supported here.
 
 ```
@@ -1010,7 +1030,8 @@ Flags:
   -B, --bins int                  number of histogram bins (default -1)
   -W, --delay int                 sleep this many seconds after online plotting (default 1)
   -y, --dump                      print histogram data to stderr instead of plotting
-  -f, --fields string             target fields, available values: ReadLen, MeanQual, GC, GCSkew (default "ReadLen")
+  -f, --fields string             target fields, available values: ReadLen, MeanQual, GC, GCSkew
+                                  (default "ReadLen")
   -h, --help                      help for watch
   -O, --img string                save histogram to this PDF/image file
   -H, --list-fields               print out a list of available fields
@@ -1195,10 +1216,12 @@ Usage (tab2fx)
 convert tabular format (first two/three columns) to FASTA/Q format
 
 Usage:
-  seqkit tab2fx [flags]
+  seqkit tab2fx [flags] 
 
 Flags:
-  -b, --buffer-size string            size of buffer, supported unit: K, M, G. You need increase the value when "bufio.Scanner: token too long" error reported (default "1G")
+  -b, --buffer-size string            size of buffer, supported unit: K, M, G. You need increase the
+                                      value when "bufio.Scanner: token too long" error reported (default
+                                      "1G")
   -p, --comment-line-prefix strings   comment line prefix (default [#,//])
   -h, --help                          help for tab2fx
 
@@ -1279,8 +1302,10 @@ Flags:
       --from string                     source quality encoding. if not given, we'll guess it
   -h, --help                            help for convert
   -n, --nrecords int                    number of records for guessing quality encoding (default 1000)
-  -N, --thresh-B-in-n-most-common int   threshold of 'B' in top N most common quality for guessing Illumina 1.5. (default 4)
-  -F, --thresh-illumina1.5-frac float   threshold of faction of Illumina 1.5 in the leading N records (default 0.1)
+  -N, --thresh-B-in-n-most-common int   threshold of 'B' in top N most common quality for guessing
+                                        Illumina 1.5. (default 2)
+  -F, --thresh-illumina1.5-frac float   threshold of faction of Illumina 1.5 in the leading N records
+                                        (default 0.1)
       --to string                       target quality encoding (default "Sanger")
 ```
 
@@ -1439,16 +1464,22 @@ Usage:
   seqkit translate [flags]
 
 Flags:
-  -x, --allow-unknown-codon                     translate unknown code to 'X'. And you may not use flag --trim which removes 'X'
+  -x, --allow-unknown-codon                     translate unknown code to 'X'. And you may not use flag
+                                                --trim which removes 'X'
   -F, --append-frame                            append frame information to sequence ID
-      --clean                                   change all STOP codon positions from the '*' character to 'X' (an unknown residue)
-  -f, --frame strings                           frame(s) to translate, available value: 1, 2, 3, -1, -2, -3, and 6 for all six frames (default [1])
+      --clean                                   change all STOP codon positions from the '*' character
+                                                to 'X' (an unknown residue)
+  -f, --frame strings                           frame(s) to translate, available value: 1, 2, 3, -1, -2,
+                                                -3, and 6 for all six frames (default [1])
   -h, --help                                    help for translate
   -M, --init-codon-as-M                         translate initial codon at beginning to 'M'
   -l, --list-transl-table int                   show details of translate table N, 0 for all (default -1)
-  -L, --list-transl-table-with-amb-codons int   show details of translate table N (including ambigugous codons), 0 for all.  (default -1)
-  -T, --transl-table int                        translate table/genetic code, type 'seqkit translate --help' for more details (default 1)
-      --trim                                    remove all 'X' and '*' characters from the right end of the translation
+  -L, --list-transl-table-with-amb-codons int   show details of translate table N (including ambigugous
+                                                codons), 0 for all.  (default -1)
+  -T, --transl-table int                        translate table/genetic code, type 'seqkit translate
+                                                --help' for more details (default 1)
+      --trim                                    remove all 'X' and '*' characters from the right end of
+                                                the translation
 
 ```
 
@@ -1628,20 +1659,26 @@ Usage:
 
 Flags:
   -n, --by-name                match by full name instead of just ID
-  -s, --by-seq                 search subseq on seq, both positive and negative strand are searched, and mismatch allowed using flag -m/--max-mismatch
+  -s, --by-seq                 search subseq on seq, both positive and negative strand are searched, and
+                               mismatch allowed using flag -m/--max-mismatch
   -c, --circular               circular genome
-  -C, --count                  just print a count of matching records. with the -v/--invert-match flag, count non-matching records
+  -C, --count                  just print a count of matching records. with the -v/--invert-match flag,
+                               count non-matching records
   -d, --degenerate             pattern/motif contains degenerate base
-      --delete-matched         delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions
+      --delete-matched         delete a pattern right after being matched, this keeps the firstly
+                               matched data and speedups when using regular expressions
   -h, --help                   help for grep
   -i, --ignore-case            ignore case
   -I, --immediate-output       print output immediately, do not use write buffer
   -v, --invert-match           invert the sense of matching, to select non-matching records
-  -m, --max-mismatch int       max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster
+  -m, --max-mismatch int       max mismatch when matching by seq. For large genomes like human genome,
+                               using mapping/alignment tools would be faster
   -P, --only-positive-strand   only search on positive strand
-  -p, --pattern strings        search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"'))
+  -p, --pattern strings        search pattern (multiple values supported. Attention: use double
+                               quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
   -f, --pattern-file string    pattern file (one record per line)
-  -R, --region string          specify sequence region for searching. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases
+  -R, --region string          specify sequence region for searching. e.g 1:12 for first 12 bases,
+                               -12:-1 for last 12 bases
   -r, --use-regexp             patterns are regular expression
 
 ```
@@ -1786,10 +1823,12 @@ Flags:
   -M, --hide-matched              do not show matched sequences
   -i, --ignore-case               ignore case
   -I, --immediate-output          print output immediately, do not use write buffer
-  -m, --max-mismatch int          max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster
+  -m, --max-mismatch int          max mismatch when matching by seq. For large genomes like human
+                                  genome, using mapping/alignment tools would be faster
   -G, --non-greedy                non-greedy mode, faster but may miss motifs overlapping with others
   -P, --only-positive-strand      only search on positive strand
-  -p, --pattern strings           pattern/motif (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
+  -p, --pattern strings           pattern/motif (multiple values supported. Attention: use double
+                                  quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
   -f, --pattern-file string       pattern/motif file (FASTA format)
   -F, --use-fmi                   use FM-index for much faster search of lots of sequence patterns
   -r, --use-regexp                patterns/motifs are regular expression
@@ -1936,7 +1975,8 @@ Usage:
 
 Flags:
   -a, --all                       search all
-  -p, --aln-params string         alignment parameters in format "<match>,<mismatch>,<gap_open>,<gap_extend>" (default "4,-4,-2,-1")
+  -p, --aln-params string         alignment parameters in format
+                                  "<match>,<mismatch>,<gap_open>,<gap_extend>" (default "4,-4,-2,-1")
   -h, --help                      help for fish
   -i, --invert                    print out references not matching with any query
   -q, --min-qual float            minimum mapping quality (default 5)
@@ -2050,12 +2090,13 @@ Flags:
   -I, --immediate-output       print output immediately, do not use write buffer
   -m, --max-mismatch int       max mismatch when matching primers, no degenerate bases allowed
   -P, --only-positive-strand   only search on positive strand
-  -M, --output-mismatches      output mismatches
+  -M, --output-mismatches      append the total mismatches and mismatches of 5' end and 3' end
   -p, --primer-file string     3- or 2-column tabular primer file, with first column as primer name
   -r, --region string          specify region to return. type "seqkit amplicon -h" for detail
   -R, --reverse string         reverse primer (5'-primer-3'), degenerate bases allowed
   -u, --save-unmatched         also save records that do not match any primer
-  -s, --strict-mode            strict mode, i.e., discarding seqs not fully matching (shorter) given region range
+  -s, --strict-mode            strict mode, i.e., discarding seqs not fully matching (shorter) given
+                               region range
 
 ```
 
@@ -2364,7 +2405,9 @@ Flags:
       --by-id-prefix string       file prefix for --by-id
   -p, --by-part int               split sequences into N parts
       --by-part-prefix string     file prefix for --by-part
-  -r, --by-region string          split squences according to subsequence of given region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type "seqkit split -h" for more examples
+  -r, --by-region string          split squences according to subsequence of given region. e.g 1:12 for
+                                  first 12 bases, -12:-1 for last 12 bases. type "seqkit split -h" for
+                                  more examples
       --by-region-prefix string   file prefix for --by-region
   -s, --by-size int               split sequences into multi parts with N sequences
       --by-size-prefix string     file prefix for --by-size
@@ -2374,9 +2417,10 @@ Flags:
   -h, --help                      help for split
   -k, --keep-temp                 keep temporary FASTA and .fai file when using 2-pass mode
   -O, --out-dir string            output directory (default value is $infile.split)
-  -2, --two-pass                  two-pass mode read files twice to lower memory usage. (only for FASTA format)
-  -U, --update-faidx              update the fasta index file if it exists. Use this if you are not sure whether the fasta file changed
-
+  -2, --two-pass                  two-pass mode read files twice to lower memory usage. (only for FASTA
+                                  format)
+  -U, --update-faidx              update the fasta index file if it exists. Use this if you are not sure
+                                  whether the fasta file changed
 ```
 
 Examples
@@ -2656,7 +2700,8 @@ Flags:
   -n, --number int         sample by number (result may not exactly match), DO NOT use on large FASTQ files.
   -p, --proportion float   sample by proportion
   -s, --rand-seed int      rand seed (default 11)
-  -2, --two-pass           2-pass mode read files twice to lower memory usage. Not allowed when reading from stdin
+  -2, --two-pass           2-pass mode read files twice to lower memory usage. Not allowed when reading
+                           from stdin
 
 ```
 
@@ -2870,23 +2915,33 @@ Usage:
 Flags:
   -s, --by-seq                   replace seq (only FASTA)
       --f-by-name                [target filter] match by full name instead of just ID
-      --f-by-seq                 [target filter] search subseq on seq, both positive and negative strand are searched, and mismatch allowed using flag -m/--max-mismatch
+      --f-by-seq                 [target filter] search subseq on seq, both positive and negative strand
+                                 are searched, and mismatch allowed using flag -m/--max-mismatch
       --f-ignore-case            [target filter] ignore case
       --f-invert-match           [target filter] invert the sense of matching, to select non-matching records
       --f-only-positive-strand   [target filter] only search on positive strand
-      --f-pattern strings        [target filter] search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
+      --f-pattern strings        [target filter] search pattern (multiple values supported. Attention:
+                                 use double quotation marks for patterns containing comma, e.g., -p
+                                 '"A{2,}"')
       --f-pattern-file string    [target filter] pattern file (one record per line)
       --f-use-regexp             [target filter] patterns are regular expression
   -h, --help                     help for replace
   -i, --ignore-case              ignore case
-  -K, --keep-key                 keep the key as value when no value found for the key (only for sequence name)
-  -U, --keep-untouch             do not change anything when no value found for the key (only for sequence name)
+  -K, --keep-key                 keep the key as value when no value found for the key (only for
+                                 sequence name)
+  -U, --keep-untouch             do not change anything when no value found for the key (only for
+                                 sequence name)
   -I, --key-capt-idx int         capture variable index of key (1-based) (default 1)
   -m, --key-miss-repl string     replacement for key with no corresponding value
-  -k, --kv-file string           tab-delimited key-value file for replacing key with value when using "{kv}" in -r (--replacement) (only for sequence name)
-      --nr-width int             minimum width for {nr} in flag -r/--replacement. e.g., formatting "1" to "001" by --nr-width 3 (default 1)
+  -k, --kv-file string           tab-delimited key-value file for replacing key with value when using
+                                 "{kv}" in -r (--replacement) (only for sequence name)
+      --nr-width int             minimum width for {nr} in flag -r/--replacement. e.g., formatting "1"
+                                 to "001" by --nr-width 3 (default 1)
   -p, --pattern string           search regular expression
-  -r, --replacement string       replacement. supporting capture variables.  e.g. $1 represents the text of the first submatch. ATTENTION: for *nix OS, use SINGLE quote NOT double quotes or use the \ escape character. Record number is also supported by "{nr}".use ${1} instead of $1 when {kv} given!
+  -r, --replacement string       replacement. supporting capture variables.  e.g. $1 represents the text
+                                 of the first submatch. ATTENTION: for *nix OS, use SINGLE quote NOT
+                                 double quotes or use the \ escape character. Record number is also
+                                 supported by "{nr}".use ${1} instead of $1 when {kv} given!
 
 ```
 
@@ -3110,7 +3165,8 @@ Flags:
   -O, --out-dir string      output directory (default "renamed")
   -1, --rename-1st-rec      rename the first record as well
   -s, --separator string    separator between original ID/name and the counter (default "_")
-  -N, --start-num int       starting count number for *duplicated* IDs/names, should be greater than zero (default 2)
+  -N, --start-num int       starting count number for *duplicated* IDs/names, should be greater than
+                            zero (default 2
 
 ```
 
@@ -3277,14 +3333,20 @@ Usage:
 
 Flags:
   -n, --by-name               [match seqs to mutate] match by full name instead of just id
-  -d, --deletion string       deletion mutation: deleting subsequence in a range. e.g., -d 1:2 for deleting leading two bases, -d -3:-1 for removing last 3 bases
+  -d, --deletion string       deletion mutation: deleting subsequence in a range. e.g., -d 1:2 for
+                              deleting leading two bases, -d -3:-1 for removing last 3 bases
   -h, --help                  help for mutate
   -I, --ignore-case           [match seqs to mutate] ignore case of search pattern
-  -i, --insertion string      insertion mutation: inserting bases behind of given position, e.g., -i 0:ACGT for inserting ACGT at the beginning, -1:* for add * to the end
-  -v, --invert-match          [match seqs to mutate] invert the sense of matching, to select non-matching records
-  -s, --pattern strings       [match seqs to mutate] search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"'))
+  -i, --insertion string      insertion mutation: inserting bases behind of given position, e.g., -i
+                              0:ACGT for inserting ACGT at the beginning, -1:* for add * to the end
+  -v, --invert-match          [match seqs to mutate] invert the sense of matching, to select
+                              non-matching records
+  -s, --pattern strings       [match seqs to mutate] search pattern (multiple values supported.
+                              Attention: use double quotation marks for patterns containing comma, e.g.,
+                              -p '"A{2,}"'))
   -f, --pattern-file string   [match seqs to mutate] pattern file (one record per line)
-  -p, --point strings         point mutation: changing base at given position. e.g., -p 2:C for setting 2nd base as C, -p -1:A for change last base as A
+  -p, --point strings         point mutation: changing base at given position. e.g., -p 2:C for setting
+                              2nd base as C, -p -1:A for change last base as A
   -r, --use-regexp            [match seqs to mutate] search patterns are regular expression
 
 ```
@@ -3463,7 +3525,8 @@ Flags:
   -k, --keep-temp       keep temporary FASTA and .fai file when using 2-pass mode
   -s, --rand-seed int   rand seed for shuffle (default 23)
   -2, --two-pass        two-pass mode read files twice to lower memory usage. (only for FASTA format)
-  -U, --update-faidx    update the fasta index file if it exists. Use this if you are not sure whether the fasta file changed
+  -U, --update-faidx    update the fasta index file if it exists. Use this if you are not sure whether
+                        the fasta file changed
 
 ```
 
@@ -3531,9 +3594,11 @@ Flags:
   -k, --keep-temp               keep temporary FASTA and .fai file when using 2-pass mode
   -N, --natural-order           sort in natural order, when sorting by IDs/full name
   -r, --reverse                 reverse the result
-  -L, --seq-prefix-length int   length of sequence prefix on which seqkit sorts by sequences (0 for whole sequence) (default 10000)
+  -L, --seq-prefix-length int   length of sequence prefix on which seqkit sorts by sequences (0 for
+                                whole sequence) (default 10000)
   -2, --two-pass                two-pass mode read files twice to lower memory usage. (only for FASTA format)
-  -U, --update-faidx            update the fasta index file if it exists. Use this if you are not sure whether the fasta file changed
+  -U, --update-faidx            update the fasta index file if it exists. Use this if you are not sure
+                                whether the fasta file changed
 
 ```
 
