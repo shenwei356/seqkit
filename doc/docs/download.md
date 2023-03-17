@@ -30,7 +30,7 @@ Please cite: **W Shen**, S Le, Y Li\*, F Hu\*. SeqKit: a cross-platform and ultr
         - **add some flags to match partly records to edit**; these flags are transplanted from `seqkit grep`. [#348](https://github.com/shenwei356/seqkit/issues/348)
     - `seqkit faidx`:
         - **allow empty lines at the end of sequences**.
-  - `seqkit faidx/sort/shuffle/split/subseq`:
+    - `seqkit faidx/sort/shuffle/split/subseq`:
         - **new flag `-U/--update-faidx`: update the FASTA index file if it exists, to guarantee the index file matches the FASTA files**. [#364](https://github.com/shenwei356/seqkit/issues/364)
         - improve log info and update help message. [#365](https://github.com/shenwei356/seqkit/issues/365)
     - `seqkit seq`: 
