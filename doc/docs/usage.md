@@ -3084,6 +3084,14 @@ Examples
         CCCCAAAACCCCATGGCATCATTCA
         >seq3 Hello
         CCCCAAAACCCCATGTTGCTACTAG
+        
+    If the target to replace is the sequence ID, meanwhile you would like to keep the description. 
+    Please use this:
+        
+        # ^(\S+)   # ID
+        # (.+)$    # description
+        seqkit replace -p '^(\S+)(.+?)$' -r '{kv}$2' -k alias.txt test.fa
+    
 
 1. convert fasta to genbank style
         
