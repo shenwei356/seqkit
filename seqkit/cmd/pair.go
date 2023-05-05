@@ -154,9 +154,9 @@ Tips:
 		checkError(errors.Wrap(err, read2))
 
 		// require fastq
-		if !reader1.IsFastq || !reader2.IsFastq {
-			checkError(fmt.Errorf("fastq files needed"))
-		}
+		// if !reader1.IsFastq || !reader2.IsFastq {
+		// checkError(fmt.Errorf("fastq files needed"))
+		// }
 
 		// buffer for saving unpaired reads
 		m1 := make(map[uint64]*fastx.Record, 1024)
