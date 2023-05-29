@@ -120,7 +120,7 @@ Tips:
 		var chDuration chan time.Duration
 		var doneDuration chan int
 
-		if !config.Quiet {
+		if !config.Quiet && len(files) > 1 {
 			pbs = mpb.New(mpb.WithWidth(40), mpb.WithOutput(os.Stderr))
 			bar = pbs.AddBar(int64(len(files)),
 				mpb.BarStyle("[=>-]<+"),
@@ -360,7 +360,7 @@ Tips:
 					wg.Done()
 					<-token
 
-					if !config.Quiet {
+					if !config.Quiet && len(files) > 1 {
 						chDuration <- time.Duration(float64(time.Since(startTime)) / threadsFloat)
 					}
 				}()
@@ -500,7 +500,7 @@ Tips:
 		<-doneSendFile
 		wg.Wait()
 
-		if !config.Quiet {
+		if !config.Quiet && len(files) > 1 {
 			close(chDuration)
 			<-doneDuration
 			pbs.Wait()
