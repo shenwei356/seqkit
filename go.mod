@@ -30,12 +30,15 @@ require (
 	github.com/tatsushid/go-prettytable v0.0.0-20141013043238-ed2d14c29939
 	github.com/twotwotwo/sorts v0.0.0-20160814051341-bf5c1f2b8553
 	github.com/ulikunitz/xz v0.5.10
+	github.com/vbauerster/mpb/v5 v5.4.0
 )
 
 replace github.com/miekg/dns v1.0.14 => github.com/miekg/dns v1.1.46
 
 require (
 	git.sr.ht/~sbinet/gg v0.3.1 // indirect
+	github.com/VividCortex/ewma v1.1.1 // indirect
+	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d // indirect
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b // indirect
 	github.com/edsrzf/mmap-go v1.1.0 // indirect
 	github.com/go-fonts/liberation v0.3.0 // indirect

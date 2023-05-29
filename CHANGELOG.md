@@ -1,5 +1,10 @@
 - [SeqKit v2.4.1](https://github.com/shenwei356/seqkit/releases/tag/v2.4.1) - 2023-03-17
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.4.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.4.1)
+    - `seqkit stats`:
+        - added a progress bar.
+        - write the result of each file immediately (no output buffer).
+    - `seqkit sum`:
+        - added a progress bar.
     - `seqkit pair`: remove the restriction of requiring FASTQ format, i.e., FASTA files are also supported.
 - [SeqKit v2.4.0](https://github.com/shenwei356/seqkit/releases/tag/v2.4.0) - 2023-03-17
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.4.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.4.0)

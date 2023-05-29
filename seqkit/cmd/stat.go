@@ -23,11 +23,13 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/cznic/sortutil"
 	"github.com/dustin/go-humanize"
@@ -39,6 +41,8 @@ import (
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 	"github.com/tatsushid/go-prettytable"
+	"github.com/vbauerster/mpb/v5"
+	"github.com/vbauerster/mpb/v5/decor"
 )
 
 // statCmd represents the stat command
@@ -73,7 +77,7 @@ Attentions:
          seqkit seq -g input.fasta | seqkit stats
 
 Tips:
-  1. For lots of small files (especially on SDD), use big value of '-j' to
+  1. For lots of small files (especially on SDD), use a big value of '-j' to
      parallelize counting.
   2. Extract one metric with csvtk (https://github.com/shenwei356/csvtk):
          seqkit stats -Ta input.fastq.gz | csvtk cut -t -f "Q30(%)" | csvtk del-header 
@@ -109,6 +113,40 @@ Tips:
 		replaceStdinLabel := stdinLabel != "-"
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+
+		// process bar
+		var pbs *mpb.Progress
+		var bar *mpb.Bar
+		var chDuration chan time.Duration
+		var doneDuration chan int
+
+		if !config.Quiet {
+			pbs = mpb.New(mpb.WithWidth(40), mpb.WithOutput(os.Stderr))
+			bar = pbs.AddBar(int64(len(files)),
+				mpb.BarStyle("[=>-]<+"),
+				mpb.PrependDecorators(
+					decor.Name("processed files: ", decor.WC{W: len("processed files: "), C: decor.DidentRight}),
+					decor.Name("", decor.WCSyncSpaceR),
+					decor.CountersNoUnit("%d / %d", decor.WCSyncWidth),
+				),
+				mpb.AppendDecorators(
+					decor.Name("ETA: ", decor.WC{W: len("ETA: ")}),
+					decor.EwmaETA(decor.ET_STYLE_GO, 5),
+					decor.OnComplete(decor.Name(""), ". done"),
+				),
+			)
+
+			chDuration = make(chan time.Duration, config.Threads)
+			doneDuration = make(chan int)
+			go func() {
+				for t := range chDuration {
+					bar.Increment()
+					bar.DecoratorEwmaUpdate(t)
+				}
+				doneDuration <- 1
+			}()
+		}
+		// process bar
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
@@ -159,7 +197,7 @@ Tips:
 						statInfos = append(statInfos, info)
 					} else {
 						if !all {
-							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\n",
+							fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\n",
 								info.file,
 								info.format,
 								info.t,
@@ -167,9 +205,9 @@ Tips:
 								info.lenSum,
 								info.lenMin,
 								info.lenAvg,
-								info.lenMax))
+								info.lenMax)
 						} else {
-							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f\n",
+							fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f\n",
 								info.file,
 								info.format,
 								info.t,
@@ -185,54 +223,55 @@ Tips:
 								info.N50,
 								info.q20,
 								info.q30,
-								info.gc))
+								info.gc)
 						}
+						outfh.Flush()
 					}
 					id++
-				} else { // check bufferd result
-					for true {
-						if info1, ok := buf[id]; ok {
-							if !tabular {
-								statInfos = append(statInfos, info1)
-							} else {
-								if !all {
-									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\n",
-										info1.file,
-										info1.format,
-										info1.t,
-										info1.num,
-										info1.lenSum,
-										info1.lenMin,
-										info1.lenAvg,
-										info1.lenMax))
-								} else {
-									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f\n",
-										info1.file,
-										info1.format,
-										info1.t,
-										info1.num,
-										info1.lenSum,
-										info1.lenMin,
-										info1.lenAvg,
-										info1.lenMax,
-										info1.Q1,
-										info1.Q2,
-										info1.Q3,
-										info1.gapSum,
-										info1.N50,
-										info1.q20,
-										info1.q30,
-										info1.gc))
-								}
-							}
+					continue
+				}
 
-							delete(buf, info1.id)
-							id++
+				buf[info.id] = info // save for later check
+
+				// check bufferd results
+				if info1, ok := buf[id]; ok {
+					if !tabular {
+						statInfos = append(statInfos, info1)
+					} else {
+						if !all {
+							fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\n",
+								info1.file,
+								info1.format,
+								info1.t,
+								info1.num,
+								info1.lenSum,
+								info1.lenMin,
+								info1.lenAvg,
+								info1.lenMax)
 						} else {
-							break
+							fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f\n",
+								info1.file,
+								info1.format,
+								info1.t,
+								info1.num,
+								info1.lenSum,
+								info1.lenMin,
+								info1.lenAvg,
+								info1.lenMax,
+								info1.Q1,
+								info1.Q2,
+								info1.Q3,
+								info1.gapSum,
+								info1.N50,
+								info1.q20,
+								info1.q30,
+								info1.gc)
 						}
+						outfh.Flush()
 					}
-					buf[info.id] = info
+
+					delete(buf, info1.id)
+					id++
 				}
 			}
 
@@ -250,7 +289,7 @@ Tips:
 						statInfos = append(statInfos, info)
 					} else {
 						if !all {
-							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\n",
+							fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\n",
 								info.file,
 								info.format,
 								info.t,
@@ -258,9 +297,9 @@ Tips:
 								info.lenSum,
 								info.lenMin,
 								info.lenAvg,
-								info.lenMax))
+								info.lenMax)
 						} else {
-							outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f\n",
+							fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f\n",
 								info.file,
 								info.format,
 								info.t,
@@ -276,8 +315,9 @@ Tips:
 								info.N50,
 								info.q20,
 								info.q30,
-								info.gc))
+								info.gc)
 						}
+						outfh.Flush()
 					}
 				}
 			}
@@ -302,6 +342,7 @@ Tips:
 
 		var wg sync.WaitGroup
 		token := make(chan int, config.Threads)
+		threadsFloat := float64(config.Threads) // just avoid repeated type conversion
 		var id uint64
 		for file := range chFile {
 			select {
@@ -314,9 +355,14 @@ Tips:
 			wg.Add(1)
 			id++
 			go func(file string, id uint64) {
+				startTime := time.Now()
 				defer func() {
 					wg.Done()
 					<-token
+
+					if !config.Quiet {
+						chDuration <- time.Duration(float64(time.Since(startTime)) / threadsFloat)
+					}
 				}()
 
 				var gapSum uint64
@@ -453,6 +499,13 @@ Tips:
 
 		<-doneSendFile
 		wg.Wait()
+
+		if !config.Quiet {
+			close(chDuration)
+			<-doneDuration
+			pbs.Wait()
+		}
+
 		close(ch)
 		<-done
 

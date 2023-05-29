@@ -134,7 +134,7 @@ Run the following commands:
     mkdir -p $HOME/bin
     cp ~/go/bin/seqkit $HOME/bin/
 
-    # --------------- the devlopment version --------------
+    # --------------- the development version --------------
 
     git clone https://github.com/shenwei356/seqkit
     cd seqkit/seqkit/

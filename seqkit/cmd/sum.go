@@ -27,10 +27,12 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/cespare/xxhash/v2"
 	"github.com/shenwei356/bio/seq"
@@ -38,6 +40,8 @@ import (
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 	"github.com/twotwotwo/sorts/sortutil"
+	"github.com/vbauerster/mpb/v5"
+	"github.com/vbauerster/mpb/v5/decor"
 )
 
 // sumCmd represents the sum command
@@ -106,12 +110,47 @@ Examples:
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
+		// process bar
+		var pbs *mpb.Progress
+		var bar *mpb.Bar
+		var chDuration chan time.Duration
+		var doneDuration chan int
+
+		if !config.Quiet {
+			pbs = mpb.New(mpb.WithWidth(40), mpb.WithOutput(os.Stderr))
+			bar = pbs.AddBar(int64(len(files)),
+				mpb.BarStyle("[=>-]<+"),
+				mpb.PrependDecorators(
+					decor.Name("processed files: ", decor.WC{W: len("processed files: "), C: decor.DidentRight}),
+					decor.Name("", decor.WCSyncSpaceR),
+					decor.CountersNoUnit("%d / %d", decor.WCSyncWidth),
+				),
+				mpb.AppendDecorators(
+					decor.Name("ETA: ", decor.WC{W: len("ETA: ")}),
+					decor.EwmaETA(decor.ET_STYLE_GO, 5),
+					decor.OnComplete(decor.Name(""), ". done"),
+				),
+			)
+
+			chDuration = make(chan time.Duration, config.Threads)
+			doneDuration = make(chan int)
+			go func() {
+				for t := range chDuration {
+					bar.Increment()
+					bar.DecoratorEwmaUpdate(t)
+				}
+				doneDuration <- 1
+			}()
+		}
+		// process bar
+
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Close()
 
 		tokens := make(chan int, config.Threads)
 		done := make(chan int)
+		threadsFloat := float64(config.Threads) // just avoid repeated type conversion
 		var wg sync.WaitGroup
 
 		type Aresult struct {
@@ -192,9 +231,14 @@ Examples:
 			id++
 
 			go func(file string, id uint64) {
+				startTime := time.Now()
 				defer func() {
 					<-tokens
 					wg.Done()
+
+					if !config.Quiet {
+						chDuration <- time.Duration(float64(time.Since(startTime)) / threadsFloat)
+					}
 				}()
 
 				var n int    // number of sequences
@@ -512,6 +556,13 @@ Examples:
 		}
 
 		wg.Wait()
+
+		if !config.Quiet {
+			close(chDuration)
+			<-doneDuration
+			pbs.Wait()
+		}
+
 		close(ch)
 		<-done
 	},
