@@ -300,7 +300,7 @@ Flags:
   -k, --color                     colorize sequences - to be piped into "less -R"
   -p, --complement                complement sequence, flag '-v' is recommended to switch on
       --dna2rna                   DNA to RNA
-  -G, --gap-letters string        gap letters (default "- \t.")
+  -G, --gap-letters string        gap letters to be removed with -g/--remove-gaps (default "- \t.")
   -h, --help                      help for seq
   -l, --lower-case                print sequences in lower case
   -M, --max-len int               only print sequences shorter than or equal to the maximum length (-1
@@ -311,11 +311,12 @@ Flags:
                                   for no limit) (default -1)
   -Q, --min-qual float            only print sequences with average quality qreater or equal than this
                                   limit (-1 for no limit) (default -1)
-  -n, --name                      only print names
-  -i, --only-id                   print ID instead of full head
+  -n, --name                      only print names/sequence headers
+  -i, --only-id                   print IDs instead of full headers
   -q, --qual                      only print qualities
   -b, --qual-ascii-base int       ASCII BASE, 33 for Phred+33 (default 33)
-  -g, --remove-gaps               remove gaps
+  -g, --remove-gaps               remove gaps letters set by -G/--gap-letters, e.g., spaces, tabs, and
+                                  dashes (gaps "-" in aligned sequences)
   -r, --reverse                   reverse sequence
       --rna2dna                   RNA to DNA
   -s, --seq                       only print sequences
