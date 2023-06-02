@@ -31,72 +31,16 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elliotwutingfeng/asciiset"
 	au "github.com/logrusorgru/aurora"
 	colorable "github.com/mattn/go-colorable"
 	isatty "github.com/mattn/go-isatty"
 )
 
-var IUPACBases map[byte]bool
-var IUPACAminoAcids map[byte]bool
+var IUPACBases, _ = asciiset.MakeASCIISet("ACGTRYSWKMBDHVNUacgtryswkmbdhvnu")
+var IUPACAminoAcids, _ = asciiset.MakeASCIISet("ACDEFGHIKLMNPQRSTVWY")
 
 func init() {
-	IUPACBases = map[byte]bool{
-		'A': true,
-		'C': true,
-		'G': true,
-		'T': true,
-		'R': true,
-		'Y': true,
-		'S': true,
-		'W': true,
-		'K': true,
-		'M': true,
-		'B': true,
-		'D': true,
-		'H': true,
-		'V': true,
-		'N': true,
-		'U': true,
-		'a': true,
-		'c': true,
-		'g': true,
-		't': true,
-		'r': true,
-		'y': true,
-		's': true,
-		'w': true,
-		'k': true,
-		'm': true,
-		'b': true,
-		'd': true,
-		'h': true,
-		'v': true,
-		'n': true,
-		'u': true,
-	}
-
-	IUPACAminoAcids = map[byte]bool{
-		'A': true,
-		'C': true,
-		'D': true,
-		'E': true,
-		'F': true,
-		'G': true,
-		'H': true,
-		'I': true,
-		'K': true,
-		'L': true,
-		'M': true,
-		'N': true,
-		'P': true,
-		'Q': true,
-		'R': true,
-		'S': true,
-		'T': true,
-		'V': true,
-		'W': true,
-		'Y': true,
-	}
 }
 
 // ColorCycler is a utilty object to cycle between colors and colorize text.
@@ -206,7 +150,7 @@ func NewSeqColorizer(alphabet string) *SeqColorizer {
 	}
 	res.Alphabet = alphabet
 	i := auStart
-	for base, _ := range IUPACBases {
+	IUPACBases.Visit(func(base byte) bool {
 		switch base {
 		case 'A', 'a':
 			res.NucPalette[base] = au.GreenFg
@@ -224,10 +168,11 @@ func NewSeqColorizer(alphabet string) *SeqColorizer {
 			res.NucPalette[base] = i<<auShiftFg | auFlagFg
 			i += auSkip
 		}
-	}
+		return false
+	})
 
 	// The Lesk color scheme from http://www.bioinformatics.nl/~berndb/aacolour.html
-	for aa, _ := range IUPACAminoAcids {
+	IUPACAminoAcids.Visit(func(aa byte) bool {
 		switch aa {
 		case 'G', 'A', 'S', 'T': // Small nonpolar
 			res.ProtPalette[aa] = au.YellowFg
@@ -244,8 +189,8 @@ func NewSeqColorizer(alphabet string) *SeqColorizer {
 		case '-', '*': // Gap
 			res.ProtPalette[aa] = au.WhiteFg
 		}
-
-	}
+		return false
+	})
 
 	gb := uint8(239)
 	for i := 33; i < 90; i++ {
