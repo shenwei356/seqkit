@@ -191,7 +191,7 @@ func (s *simpleSeq) FastaString() string {
 func validateSeqBytes(dna []byte, gaps bool) error {
 	for i, base := range dna {
 		if base == '-' && gaps {
-		} else if !IUPACBases[base] {
+		} else if !IUPACBases.Contains(base) {
 			return errors.New(fmt.Sprintf("Illegal base '%s' at position %d", string(base), i))
 		}
 	}
