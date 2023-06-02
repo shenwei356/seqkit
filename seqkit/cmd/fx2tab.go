@@ -30,6 +30,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/elliotwutingfeng/asciiset"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/xopen"
@@ -253,16 +254,14 @@ func init() {
 }
 
 func alphabetStr(s []byte) string {
-	m := make(map[byte]struct{})
-	for _, b := range s {
-		m[b] = struct{}{}
-	}
-	alphabet := make([]string, len(m))
+	m, _ := asciiset.MakeASCIISet(string(s))
+	alphabet := make([]string, m.Size())
 	i := 0
-	for a := range m {
+	m.Visit(func(a byte) bool {
 		alphabet[i] = string([]byte{a})
 		i++
-	}
+		return false
+	})
 	sort.Strings(alphabet)
 	return strings.Join(alphabet, "")
 }
