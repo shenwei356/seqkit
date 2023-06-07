@@ -2374,12 +2374,18 @@ Usage
 split sequences into files by name ID, subsequence of given region,
 part size or number of parts.
 
+If you just want to split by parts or sizes, please use "seqkit split2",
+which can apply to paired- and single-end FASTQ.
+
+If you want to cut a sequence into multiple segments, please use 'kmcp utils split-genomes'
+(https://bioinf.shenwei.me/kmcp/usage/#split-genomes). E.g., cutting into 4 segments of
+equal size, with no overlap between adjacent segments:
+
+    kmcp utils split-genomes -m 1 -k 1 --split-number 4 --split-overlap 0 input.fasta -O out
+
 Attentions:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
-
-If you just want to split by parts or sizes, please use "seqkit split2",
-which also applies for paired- and single-end FASTQ.
 
 The definition of region is 1-based and with some custom design.
 
@@ -2504,8 +2510,7 @@ occupation and fast speed.
 The prefix of output files:
   1. For stdin: stdin
   2. Others: same to the input file
-  3. Set via the option: -o/--out-file, e.g., outputting xxx.part_001.fasta:
-       cat ../tests/hairpin.fa | ./seqkit split2 -p 2 -O test -o xxx
+  3. Set via the options: --by-length-prefix, --by-part-prefix, or --by-size-prefix
 
 The extension of output files:
   1. For stdin: .fast[aq]
@@ -2513,6 +2518,13 @@ The extension of output files:
   3. Additional extension via the option -e/--extension, e.g.， outputting
      gzipped files for plain text input:
          seqkit split2 -p 2 -O test tests/hairpin.fa -e .gz
+
+
+If you want to cut a sequence into multiple segments, please use 'kmcp utils split-genomes'
+(https://bioinf.shenwei.me/kmcp/usage/#split-genomes). E.g., cutting into 4 segments of
+equal size, with no overlap between adjacent segments:
+
+    kmcp utils split-genomes -m 1 -k 1 --split-number 4 --split-overlap 0 input.fasta -O out
 
 Usage:
   seqkit split2 [flags]

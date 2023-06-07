@@ -46,12 +46,18 @@ var splitCmd = &cobra.Command{
 	Long: fmt.Sprintf(`split sequences into files by name ID, subsequence of given region,
 part size or number of parts.
 
+If you just want to split by parts or sizes, please use "seqkit split2",
+which can apply to paired- and single-end FASTQ.
+
+If you want to cut a sequence into multiple segments, please use 'kmcp utils split-genomes'
+(https://bioinf.shenwei.me/kmcp/usage/#split-genomes). E.g., cutting into 4 segments of
+equal size, with no overlap between adjacent segments:
+
+    kmcp utils split-genomes -m 1 -k 1 --split-number 4 --split-overlap 0 input.fasta -O out
+
 Attentions:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
-
-If you just want to split by parts or sizes, please use "seqkit split2",
-which also applies for paired- and single-end FASTQ.
 
 The definition of region is 1-based and with some custom design.
 

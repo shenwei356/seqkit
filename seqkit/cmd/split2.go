@@ -58,6 +58,13 @@ The extension of output files:
      gzipped files for plain text input:
          seqkit split2 -p 2 -O test tests/hairpin.fa -e .gz
 
+
+If you want to cut a sequence into multiple segments, please use 'kmcp utils split-genomes'
+(https://bioinf.shenwei.me/kmcp/usage/#split-genomes). E.g., cutting into 4 segments of
+equal size, with no overlap between adjacent segments:
+
+    kmcp utils split-genomes -m 1 -k 1 --split-number 4 --split-overlap 0 input.fasta -O out
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
@@ -437,7 +444,7 @@ func init() {
 	split2Cmd.Flags().StringP("read1", "1", "", "(gzipped) read1 file")
 	split2Cmd.Flags().StringP("read2", "2", "", "(gzipped) read2 file")
 	split2Cmd.Flags().IntP("by-size", "s", 0, "split sequences into multi parts with N sequences")
-	split2Cmd.Flags().IntP("by-part", "p", 0, "split sequences into N parts")
+	split2Cmd.Flags().IntP("by-part", "p", 0, "split sequences into N parts with the round robin distribution")
 	split2Cmd.Flags().StringP("by-length", "l", "", "split sequences into chunks of >=N bases, supports K/M/G suffix")
 	split2Cmd.Flags().StringP("out-dir", "O", "", "output directory (default value is $infile.split)")
 	split2Cmd.Flags().BoolP("force", "f", false, "overwrite output directory")
