@@ -49,11 +49,14 @@ part size or number of parts.
 If you just want to split by parts or sizes, please use "seqkit split2",
 which can apply to paired- and single-end FASTQ.
 
-If you want to cut a sequence into multiple segments, please use 'kmcp utils split-genomes'
-(https://bioinf.shenwei.me/kmcp/usage/#split-genomes). E.g., cutting into 4 segments of
-equal size, with no overlap between adjacent segments:
-
-    kmcp utils split-genomes -m 1 -k 1 --split-number 4 --split-overlap 0 input.fasta -O out
+If you want to cut a sequence into multiple segments.
+  1. For cutting into even chunks, please use 'kmcp utils split-genomes'
+     (https://bioinf.shenwei.me/kmcp/usage/#split-genomes).
+     E.g., cutting into 4 segments of equal size, with no overlap between adjacent segments:
+        kmcp utils split-genomes -m 1 -k 1 --split-number 4 --split-overlap 0 input.fasta -O out
+  2. For cutting into multiple chunks of fixed size, please using 'seqkit sliding'.
+     E.g., cutting into segments of 40 bp and keeping the last segment which can be shorter than 40 bp.
+        seqkit sliding -g -s 40 -W 40 input.fasta -o out.fasta
 
 Attentions:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to

@@ -148,7 +148,7 @@ func init() {
 
 	slidingCmd.Flags().IntP("step", "s", 0, "step size")
 	slidingCmd.Flags().IntP("window", "W", 0, "window size")
-	slidingCmd.Flags().BoolP("greedy", "g", false, "greedy mode, i.e., exporting last subsequences even shorter than windows size")
+	slidingCmd.Flags().BoolP("greedy", "g", false, "greedy mode, i.e., exporting last subsequences even shorter than the windows size")
 	slidingCmd.Flags().BoolP("circular-genome", "C", false, "circular genome (same to -c/--circular)")
 	slidingCmd.Flags().BoolP("circular", "c", false, "circular genome (same to -C/--circular-genome)")
 	slidingCmd.Flags().StringP("suffix", "S", "_sliding", "suffix added to the sequence ID")
