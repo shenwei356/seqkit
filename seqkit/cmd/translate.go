@@ -125,6 +125,12 @@ Translate Tables/Genetic Codes:
 		listTableAmb := getFlagInt(cmd, "list-transl-table-with-amb-codons")
 		appendFrame := getFlagBool(cmd, "append-frame")
 
+		outSubseqs := getFlagBool(cmd, "out-subseqs")
+		minLen := getFlagNonNegativeInt(cmd, "min-len")
+		if outSubseqs && !appendFrame {
+			appendFrame = true
+		}
+
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Close()
@@ -160,6 +166,8 @@ Translate Tables/Genetic Codes:
 		var _seq *seq.Seq
 		var frame int
 		once := true
+		var i, start, _start, _end, _len int
+		var a byte
 		for _, file := range files {
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -193,6 +201,61 @@ Translate Tables/Genetic Codes:
 					}
 					checkError(err)
 
+					if outSubseqs {
+						start = -1
+						_len = len(record.Seq.Seq)
+						for i, a = range _seq.Seq {
+							if a == '*' {
+								if start >= 0 && i-start >= minLen {
+									if appendFrame {
+										switch frame {
+										case 1, 2, 3:
+											_start, _end = start*3+frame, i*3+frame-1
+
+											outfh.WriteString(fmt.Sprintf(">%s_frame=%d_begin=%d_end=%d %s\n",
+												record.ID, frame, _start, _end, record.Desc))
+										case -1, -2, -3:
+											_start, _end = _len-start*3+frame+1, _len-i*3+frame+1
+
+											outfh.WriteString(fmt.Sprintf(">%s_frame=%d_begin=%d_end=%d %s\n",
+												record.ID, frame, _end, _start, record.Desc))
+										}
+									} else {
+										outfh.WriteString(">" + string(record.Name) + "\n")
+									}
+									outfh.Write(byteutil.WrapByteSlice(_seq.Seq[start:i], config.LineWidth))
+									outfh.WriteString("\n")
+								}
+								start = -1
+							} else if start < 0 {
+								start = i
+							}
+						}
+						if start >= 0 && i+1-start >= minLen {
+							if appendFrame {
+								switch frame {
+								case 1, 2, 3:
+									_start, _end = start*3+frame, i*3+frame+2
+
+									outfh.WriteString(fmt.Sprintf(">%s_frame=%d_begin=%d_end=%d %s\n",
+										record.ID, frame, _start, _end, record.Desc))
+								case -1, -2, -3:
+									_start = _len - start*3 + frame + 1
+									_end = _start - (len(_seq.Seq)-start)*3 + 1
+
+									outfh.WriteString(fmt.Sprintf(">%s_frame=%d_begin=%d_end=%d %s\n",
+										record.ID, frame, _end, _start, record.Desc))
+								}
+							} else {
+								outfh.WriteString(">" + string(record.Name) + "\n")
+							}
+							outfh.Write(byteutil.WrapByteSlice(_seq.Seq[start:], config.LineWidth))
+							outfh.WriteString("\n")
+						}
+
+						continue
+					}
+
 					if appendFrame {
 						outfh.WriteString(fmt.Sprintf(">%s_frame=%d %s\n", record.ID, frame, record.Desc))
 					} else {
@@ -219,4 +282,6 @@ func init() {
 	translateCmd.Flags().IntP("list-transl-table", "l", -1, "show details of translate table N, 0 for all")
 	translateCmd.Flags().IntP("list-transl-table-with-amb-codons", "L", -1, "show details of translate table N (including ambigugous codons), 0 for all. ")
 	translateCmd.Flags().BoolP("append-frame", "F", false, "append frame information to sequence ID")
+	translateCmd.Flags().BoolP("out-subseqs", "s", false, `output individual amino acid subsequences seperated by the stop symbol "*"`)
+	translateCmd.Flags().IntP("min-len", "m", 0, `the minimum length of amino acid sequence`)
 }
