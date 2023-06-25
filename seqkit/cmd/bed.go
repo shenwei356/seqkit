@@ -42,6 +42,10 @@ type BedFeature struct {
 // Threads for bread.NewBufferedReader()
 var Threads = runtime.NumCPU()
 
+var strandPositive = "+"
+var strandNegative = "-"
+var strandNotspecified = "."
+
 // ReadBedFeatures returns gtf BedFeatures of a file
 func ReadBedFeatures(file string) ([]BedFeature, error) {
 	return ReadBedFilteredFeatures(file, []string{})
@@ -84,20 +88,37 @@ func ReadBedFilteredFeatures(file string, chrs []string) ([]BedFeature, error) {
 		if err != nil {
 			return nil, false, fmt.Errorf("%s: bad end: %s", items[0], items[2])
 		}
-		if start >= end {
-			return nil, false, fmt.Errorf("%s: start (%d) must be <= end (%d)", items[0], start, end)
+		if start == end {
+			return nil, false, fmt.Errorf("%s: start (%d) should not be equal to end (%d)", items[0], start, end)
 		}
 
 		var name *string
 		if n >= 4 {
-			name = &items[3]
+			_name := items[3]
+			name = &_name
 		}
 		var strand *string
 		if n >= 6 {
-			if items[5] != "+" && items[5] != "-" && items[5] != "." {
+			switch items[5] {
+			case "+":
+				strand = &strandPositive
+				if start > end {
+					return nil, false, fmt.Errorf(`%s: start (%d) should be < end (%d) when the strand is "+"`, items[0], start, end)
+				}
+			case "-":
+				strand = &strandNegative
+			case ".":
+				strand = &strandNotspecified
+			default:
 				return nil, false, fmt.Errorf("bad strand: %s", items[5])
 			}
-			strand = &items[5]
+		}
+
+		if start > end {
+			strand = &strandNegative
+			tmp := start
+			start = end
+			end = tmp
 		}
 
 		return BedFeature{items[0], start + 1, end, name, strand}, true, nil
