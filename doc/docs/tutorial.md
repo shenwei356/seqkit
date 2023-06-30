@@ -1,5 +1,72 @@
 # Tutorial
 
+## Removing duplicated and nested sequences
+
+https://twitter.com/bentemperton/status/1673999868933599232
+
+
+sample data
+
+    $ cat contigs.fa
+    >big
+    ACTGACGATCGATACGCAGCACAGCAG
+    >small_in_big_rc
+    TGCTGCGTATCG
+    >small2
+    ACTACGACTACGACT
+    >small2_alias
+    ACTACGACTACGACT
+    >small2_rc
+    AGTCGTAGTCGTAGT
+    >another
+    ACTAACGA
+
+    $ seqkit fx2tab -Q contigs.fa  | csvtk pretty -Ht -W 40 --clip
+    big               ACTGACGATCGATACGCAGCACAGCAG
+    small_in_big_rc   TGCTGCGTATCG
+    small2            ACTACGACTACGACT
+    small2_alias      ACTACGACTACGACT
+    small2_rc         AGTCGTAGTCGTAGT
+    another           ACTAACGA
+
+Step 1. remove exactly duplicated sequences.
+
+    $ seqkit rmdup -s -i contigs.fa -o contigs.uniq1.fa
+    [INFO] 2 duplicated records removed
+
+Step 2. remove nested seqs.
+
+    # pair-wise exactly searching
+    seqkit locate -M -f contigs.uniq1.fa contigs.uniq1.fa -o match.tsv
+
+    $ csvtk pretty  -W 40 --clip -t match.tsv
+    seqID             patternName       pattern                       strand   start   end
+    ---------------   ---------------   ---------------------------   ------   -----   ---
+    big               small_in_big_rc   TGCTGCGTATCG                  -        10      21
+    big               big               ACTGACGATCGATACGCAGCACAGCAG   +        1       27
+    small_in_big_rc   small_in_big_rc   TGCTGCGTATCG                  +        1       12
+    small2            small2            ACTACGACTACGACT               +        1       15
+    another           another           ACTAACGA                      +        1       8
+
+    # IDs of embeded/nested sequences
+    $ sed 1d match.tsv \
+        | awk '$2 != $1' \
+        | cut -f 2 \
+        | tee nested.txt
+    small_in_big_rc
+
+    # remove nested sequences
+    $ seqkit grep -v -f nested.txt contigs.uniq1.fa \
+        -o contigs.uniq2.fa
+
+Result
+
+    $ seqkit fx2tab -Q contigs.uniq2.fa | csvtk pretty -Ht -W 40 --clip
+    big       ACTGACGATCGATACGCAGCACAGCAG
+    small2    ACTACGACTACGACT
+    another   ACTAACGA
+
+
 ## Some manipulations on big genomes
 
 A script [memusg](https://github.com/shenwei356/memusg) is
