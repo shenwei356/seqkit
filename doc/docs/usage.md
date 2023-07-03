@@ -694,6 +694,8 @@ Aliases:
   stats, stat
 
 Flags:
+  -N, --N strings            other N50-like stats. value range [0, 100], multiple values supported,
+                             e.g., -N 50,90 or -N 50 -N 90
   -a, --all                  all statistics, including quartiles of seq length, sum_gap, N50
   -b, --basename             only output basename of files
   -E, --fq-encoding string   fastq quality encoding. available values: 'sanger', 'solexa',

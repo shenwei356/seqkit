@@ -27,6 +27,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -111,15 +112,28 @@ Tips:
 		basename := getFlagBool(cmd, "basename")
 		stdinLabel := getFlagString(cmd, "stdin-label")
 		replaceStdinLabel := stdinLabel != "-"
-		// NX := getFlagFloat64Slice(cmd, "N")
+		_NX := getFlagStringSlice(cmd, "N")
+		hasNX := len(_NX) > 0
+
+		NX := make([]float64, len(_NX))
+		var err error
+		for i, x := range _NX {
+			NX[i], err = strconv.ParseFloat(x, 64)
+			if err != nil {
+				checkError(fmt.Errorf("the value of -N/--N should be a float: %s", x))
+			}
+			if NX[i] < 0 || NX[i] > 100 {
+				checkError(fmt.Errorf("the value of -N/--N should be in the range of [0, 100]: %s", x))
+			}
+		}
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		style := &stable.TableStyle{
 			Name: "plain",
 
-			HeaderRow: stable.RowStyle{"", "  ", ""},
-			DataRow:   stable.RowStyle{"", "  ", ""},
+			HeaderRow: stable.RowStyle{Begin: "", Sep: "  ", End: ""},
+			DataRow:   stable.RowStyle{Begin: "", Sep: "  ", End: ""},
 			Padding:   "",
 		}
 
@@ -176,6 +190,12 @@ Tips:
 			if all {
 				colnames = append(colnames, []string{"Q1", "Q2", "Q3", "sum_gap", "N50", "Q20(%)", "Q30(%)", "GC(%)"}...)
 			}
+
+			if hasNX {
+				for _, x := range _NX {
+					colnames = append(colnames, "N"+x)
+				}
+			}
 			outfh.WriteString(strings.Join(colnames, "\t") + "\n")
 		}
 
@@ -185,6 +205,7 @@ Tips:
 		cancel := make(chan struct{})
 
 		done := make(chan int)
+		var x float64
 		go func() {
 			var id uint64 = 1 // for keepping order
 			buf := make(map[uint64]statInfo)
@@ -225,6 +246,11 @@ Tips:
 								info.q30,
 								info.gc)
 						}
+						if hasNX {
+							for _, x = range info.nx {
+								fmt.Fprintf(outfh, "\t%.0f", x)
+							}
+						}
 						outfh.WriteString("\n")
 						outfh.Flush()
 					}
@@ -258,6 +284,11 @@ Tips:
 								info.q20,
 								info.q30,
 								info.gc)
+						}
+						if hasNX {
+							for _, x = range info.nx {
+								fmt.Fprintf(outfh, "\t%.0f", x)
+							}
 						}
 						outfh.WriteString("\n")
 						outfh.Flush()
@@ -300,6 +331,11 @@ Tips:
 								info.q20,
 								info.q30,
 								info.gc)
+						}
+						if hasNX {
+							for _, x = range info.nx {
+								fmt.Fprintf(outfh, "\t%.0f", x)
+							}
 						}
 						outfh.WriteString("\n")
 						outfh.Flush()
@@ -445,6 +481,13 @@ Tips:
 					l50 = lensStats.L50()
 					q1, q2, q3 = lensStats.Q1(), lensStats.Q2(), lensStats.Q3()
 				}
+				var nx []float64
+				if hasNX {
+					nx = make([]float64, len(NX))
+					for i, x := range NX {
+						nx[i] = float64(lensStats.NX(x))
+					}
+				}
 
 				select {
 				case <-cancel:
@@ -463,6 +506,7 @@ Tips:
 						0, 0, 0, 0,
 						0, 0, 0,
 						0, 0, 0,
+						nx,
 						nil, id}
 				} else {
 					if basename {
@@ -477,6 +521,7 @@ Tips:
 						q1, q2, q3,
 						math.Round(float64(q20)/float64(lensStats.Sum())*100, 2), math.Round(float64(q30)/float64(lensStats.Sum())*100, 2),
 						math.Round(float64(gcSum)/float64(lensStats.Sum())*100, 2),
+						nx,
 						nil, id}
 				}
 			}(file, id)
@@ -529,6 +574,11 @@ Tips:
 				// {Header: "L50", AlignRight: true},
 			}...)
 		}
+		if hasNX {
+			for _, x := range _NX {
+				columns = append(columns, stable.Column{Header: "N" + x, Align: stable.AlignRight, HumanizeNumbers: true})
+			}
+		}
 
 		tbl := stable.New()
 		tbl.HeaderWithFormat(columns)
@@ -554,6 +604,11 @@ Tips:
 				row = append(row, info.q20)
 				row = append(row, info.q30)
 				row = append(row, info.gc)
+			}
+			if hasNX {
+				for _, x = range info.nx {
+					row = append(row, x)
+				}
 			}
 
 			tbl.AddRow(row)
@@ -586,7 +641,7 @@ type statInfo struct {
 
 	gc float64
 
-	// nx []float64
+	nx []float64
 
 	err error
 	id  uint64
@@ -602,7 +657,7 @@ func init() {
 	statCmd.Flags().StringP("fq-encoding", "E", "sanger", `fastq quality encoding. available values: 'sanger', 'solexa', 'illumina-1.3+', 'illumina-1.5+', 'illumina-1.8+'.`)
 	statCmd.Flags().BoolP("basename", "b", false, "only output basename of files")
 	statCmd.Flags().StringP("stdin-label", "i", "-", `label for replacing default "-" for stdin`)
-	statCmd.Flags().Float64SliceP("N", "N", []float64{}, `other N50-like stats. range [0, 100]`)
+	statCmd.Flags().StringSliceP("N", "N", []string{}, `append other N50-like stats as new columns. value range [0, 100], multiple values supported, e.g., -N 50,90 or -N 50 -N 90`)
 }
 
 func median(sorted []int64) int64 {

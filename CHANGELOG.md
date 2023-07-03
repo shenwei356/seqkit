@@ -1,8 +1,11 @@
 - [SeqKit v2.4.1](https://github.com/shenwei356/seqkit/releases/tag/v2.4.1) - 2023-03-17
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.4.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.4.1)
     - `seqkit stats`:
+        - a new flag `-N/--N` for appending other N50-like stats as new columns. [#393](https://github.com/shenwei356/seqkit/issues/393)
         - added a progress bar for > 1 input files.
         - write the result of each file immediately (no output buffer).
+    - `seqkit translate`:
+        - add options `-s/--out-subseqs` and `-m/--min-len` to write ORFs longer than `x` amino acids as individual records. [#389](https://github.com/shenwei356/seqkit/issues/389)
     - `seqkit sum`:
         - added a progress bar for > 1 input files.
     - `seqkit pair`:
@@ -11,8 +14,6 @@
         - update help message. [#387](https://github.com/shenwei356/seqkit/issues/387)
     - `seqkit fxtab`:
         - faster alphabet computation (`-a/--alphabet`) with a new data structure. Thanks to @elliotwutingfeng [#388](https://github.com/shenwei356/seqkit/pull/388)
-    - `seqkit translate`:
-        - add options `-s/--out-subseqs` and `-m/--min-len` to write ORFs longer than `x` amino acids as individual records. [#389](https://github.com/shenwei356/seqkit/issues/389)
     - `seqkit subseq`:
         - accept reverse coordinates in BED/GTF. [#392](https://github.com/shenwei356/seqkit/issues/392)
 - [SeqKit v2.4.0](https://github.com/shenwei356/seqkit/releases/tag/v2.4.0) - 2023-03-17
