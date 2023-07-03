@@ -36,11 +36,11 @@ import (
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/bio/util"
+	"github.com/shenwei356/stable"
 	"github.com/shenwei356/util/byteutil"
 	"github.com/shenwei356/util/math"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
-	"github.com/tatsushid/go-prettytable"
 	"github.com/vbauerster/mpb/v5"
 	"github.com/vbauerster/mpb/v5/decor"
 )
@@ -111,8 +111,17 @@ Tips:
 		basename := getFlagBool(cmd, "basename")
 		stdinLabel := getFlagString(cmd, "stdin-label")
 		replaceStdinLabel := stdinLabel != "-"
+		// NX := getFlagFloat64Slice(cmd, "N")
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+
+		style := &stable.TableStyle{
+			Name: "plain",
+
+			HeaderRow: stable.RowStyle{"", "  ", ""},
+			DataRow:   stable.RowStyle{"", "  ", ""},
+			Padding:   "",
+		}
 
 		// process bar
 		var pbs *mpb.Progress
@@ -196,26 +205,17 @@ Tips:
 					if !tabular {
 						statInfos = append(statInfos, info)
 					} else {
-						if !all {
-							fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\n",
-								info.file,
-								info.format,
-								info.t,
-								info.num,
-								info.lenSum,
-								info.lenMin,
-								info.lenAvg,
-								info.lenMax)
-						} else {
-							fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f\n",
-								info.file,
-								info.format,
-								info.t,
-								info.num,
-								info.lenSum,
-								info.lenMin,
-								info.lenAvg,
-								info.lenMax,
+						fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d",
+							info.file,
+							info.format,
+							info.t,
+							info.num,
+							info.lenSum,
+							info.lenMin,
+							info.lenAvg,
+							info.lenMax)
+						if all {
+							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f",
 								info.Q1,
 								info.Q2,
 								info.Q3,
@@ -225,6 +225,7 @@ Tips:
 								info.q30,
 								info.gc)
 						}
+						outfh.WriteString("\n")
 						outfh.Flush()
 					}
 					id++
@@ -238,35 +239,27 @@ Tips:
 					if !tabular {
 						statInfos = append(statInfos, info1)
 					} else {
-						if !all {
-							fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\n",
-								info1.file,
-								info1.format,
-								info1.t,
-								info1.num,
-								info1.lenSum,
-								info1.lenMin,
-								info1.lenAvg,
-								info1.lenMax)
-						} else {
-							fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f\n",
-								info1.file,
-								info1.format,
-								info1.t,
-								info1.num,
-								info1.lenSum,
-								info1.lenMin,
-								info1.lenAvg,
-								info1.lenMax,
-								info1.Q1,
-								info1.Q2,
-								info1.Q3,
-								info1.gapSum,
-								info1.N50,
-								info1.q20,
-								info1.q30,
-								info1.gc)
+						fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d",
+							info.file,
+							info.format,
+							info.t,
+							info.num,
+							info.lenSum,
+							info.lenMin,
+							info.lenAvg,
+							info.lenMax)
+						if all {
+							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f",
+								info.Q1,
+								info.Q2,
+								info.Q3,
+								info.gapSum,
+								info.N50,
+								info.q20,
+								info.q30,
+								info.gc)
 						}
+						outfh.WriteString("\n")
 						outfh.Flush()
 					}
 
@@ -288,26 +281,17 @@ Tips:
 					if !tabular {
 						statInfos = append(statInfos, info)
 					} else {
-						if !all {
-							fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\n",
-								info.file,
-								info.format,
-								info.t,
-								info.num,
-								info.lenSum,
-								info.lenMin,
-								info.lenAvg,
-								info.lenMax)
-						} else {
-							fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f\n",
-								info.file,
-								info.format,
-								info.t,
-								info.num,
-								info.lenSum,
-								info.lenMin,
-								info.lenAvg,
-								info.lenMax,
+						fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d",
+							info.file,
+							info.format,
+							info.t,
+							info.num,
+							info.lenSum,
+							info.lenMin,
+							info.lenAvg,
+							info.lenMax)
+						if all {
+							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f",
 								info.Q1,
 								info.Q2,
 								info.Q3,
@@ -317,6 +301,7 @@ Tips:
 								info.q30,
 								info.gc)
 						}
+						outfh.WriteString("\n")
 						outfh.Flush()
 					}
 				}
@@ -520,69 +505,60 @@ Tips:
 		}
 
 		// format output
-		columns := []prettytable.Column{
+		columns := []stable.Column{
 			{Header: "file"},
 			{Header: "format"},
 			{Header: "type"},
-			{Header: "num_seqs", AlignRight: true},
-			{Header: "sum_len", AlignRight: true},
-			{Header: "min_len", AlignRight: true},
-			{Header: "avg_len", AlignRight: true},
-			{Header: "max_len", AlignRight: true}}
+			{Header: "num_seqs", Align: stable.AlignRight, HumanizeNumbers: true},
+			{Header: "sum_len", Align: stable.AlignRight, HumanizeNumbers: true},
+			{Header: "min_len", Align: stable.AlignRight, HumanizeNumbers: true},
+			{Header: "avg_len", Align: stable.AlignRight, HumanizeNumbers: true},
+			{Header: "max_len", Align: stable.AlignRight, HumanizeNumbers: true},
+		}
 
 		if all {
-			columns = append(columns, []prettytable.Column{
-				{Header: "Q1", AlignRight: true},
-				{Header: "Q2", AlignRight: true},
-				{Header: "Q3", AlignRight: true},
-				{Header: "sum_gap", AlignRight: true},
-				{Header: "N50", AlignRight: true},
-				{Header: "Q20(%)", AlignRight: true},
-				{Header: "Q30(%)", AlignRight: true},
-				{Header: "GC(%)", AlignRight: true},
+			columns = append(columns, []stable.Column{
+				{Header: "Q1", Align: stable.AlignRight, HumanizeNumbers: true},
+				{Header: "Q2", Align: stable.AlignRight, HumanizeNumbers: true},
+				{Header: "Q3", Align: stable.AlignRight, HumanizeNumbers: true},
+				{Header: "sum_gap", Align: stable.AlignRight, HumanizeNumbers: true},
+				{Header: "N50", Align: stable.AlignRight, HumanizeNumbers: true},
+				{Header: "Q20(%)", Align: stable.AlignRight, HumanizeNumbers: true},
+				{Header: "Q30(%)", Align: stable.AlignRight, HumanizeNumbers: true},
+				{Header: "GC(%)", Align: stable.AlignRight, HumanizeNumbers: true},
 				// {Header: "L50", AlignRight: true},
 			}...)
 		}
 
-		tbl, err := prettytable.NewTable(columns...)
+		tbl := stable.New()
+		tbl.HeaderWithFormat(columns)
 
 		checkError(err)
-		tbl.Separator = "  "
-
+		row := make([]interface{}, 0, len(columns))
 		for _, info := range statInfos {
-			if !all {
-				tbl.AddRow(
-					info.file,
-					info.format,
-					info.t,
-					humanize.Comma(int64(info.num)),
-					humanize.Comma(int64(info.lenSum)),
-					humanize.Comma(int64(info.lenMin)),
-					humanize.Commaf(info.lenAvg),
-					humanize.Comma(int64(info.lenMax)))
-			} else {
-				tbl.AddRow(
-					info.file,
-					info.format,
-					info.t,
-					humanize.Comma(int64(info.num)),
-					humanize.Comma(int64(info.lenSum)),
-					humanize.Comma(int64(info.lenMin)),
-					humanize.Commaf(info.lenAvg),
-					humanize.Comma(int64(info.lenMax)),
-					humanize.Commaf(info.Q1),
-					humanize.Commaf(info.Q2),
-					humanize.Commaf(info.Q3),
-					humanize.Comma(int64(info.gapSum)),
-					humanize.Comma(int64(info.N50)),
-					humanize.Commaf(info.q20),
-					humanize.Commaf(info.q30),
-					humanize.Commaf(info.gc),
-					// humanize.Comma(info.L50),
-				)
+			row = append(row, info.file)
+			row = append(row, info.format)
+			row = append(row, info.t)
+			row = append(row, humanize.Comma(int64(info.num)))
+			row = append(row, info.lenSum)
+			row = append(row, info.lenMin)
+			row = append(row, info.lenAvg)
+			row = append(row, info.lenMax)
+
+			if all {
+				row = append(row, info.Q1)
+				row = append(row, info.Q2)
+				row = append(row, info.Q3)
+				row = append(row, info.gapSum)
+				row = append(row, info.N50)
+				row = append(row, info.q20)
+				row = append(row, info.q30)
+				row = append(row, info.gc)
 			}
+
+			tbl.AddRow(row)
 		}
-		outfh.Write(tbl.Bytes())
+		outfh.Write(tbl.Render(style))
 	},
 }
 
@@ -610,6 +586,8 @@ type statInfo struct {
 
 	gc float64
 
+	// nx []float64
+
 	err error
 	id  uint64
 }
@@ -624,6 +602,7 @@ func init() {
 	statCmd.Flags().StringP("fq-encoding", "E", "sanger", `fastq quality encoding. available values: 'sanger', 'solexa', 'illumina-1.3+', 'illumina-1.5+', 'illumina-1.8+'.`)
 	statCmd.Flags().BoolP("basename", "b", false, "only output basename of files")
 	statCmd.Flags().StringP("stdin-label", "i", "-", `label for replacing default "-" for stdin`)
+	statCmd.Flags().Float64SliceP("N", "N", []float64{}, `other N50-like stats. range [0, 100]`)
 }
 
 func median(sorted []int64) int64 {

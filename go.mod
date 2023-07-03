@@ -9,7 +9,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.2
 	github.com/cznic/sortutil v0.0.0-20181122101858-f5f958428db8
 	github.com/dsnet/compress v0.0.1
-	github.com/dustin/go-humanize v1.0.0
+	github.com/dustin/go-humanize v1.0.1
 	github.com/elliotwutingfeng/asciiset v0.0.0-20230602022725-51bbb787efab
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/iafan/cwalk v0.0.0-20210125030640-586a8832a711
@@ -24,11 +24,11 @@ require (
 	github.com/shenwei356/breader v0.3.2
 	github.com/shenwei356/bwt v0.6.1
 	github.com/shenwei356/go-logging v0.0.0-20171012171522-c6b9702d88ba
+	github.com/shenwei356/stable v0.1.2
 	github.com/shenwei356/util v0.5.1
 	github.com/shenwei356/xopen v0.3.1
 	github.com/smallfish/simpleyaml v0.1.0
 	github.com/spf13/cobra v1.6.1
-	github.com/tatsushid/go-prettytable v0.0.0-20141013043238-ed2d14c29939
 	github.com/twotwotwo/sorts v0.0.0-20160814051341-bf5c1f2b8553
 	github.com/ulikunitz/xz v0.5.11
 	github.com/vbauerster/mpb/v5 v5.4.0

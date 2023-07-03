@@ -175,6 +175,12 @@ func getFlagStringSlice(cmd *cobra.Command, flag string) []string {
 	return value
 }
 
+func getFlagFloat64Slice(cmd *cobra.Command, flag string) []float64 {
+	value, err := cmd.Flags().GetFloat64Slice(flag)
+	checkError(err)
+	return value
+}
+
 func getIDRegexp(cmd *cobra.Command, flag string) string {
 	var idRegexp string
 	f := getFlagBool(cmd, "id-ncbi")
