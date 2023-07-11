@@ -200,7 +200,7 @@ Tips:
 		}
 
 		ch := make(chan statInfo, config.Threads)
-		statInfos := make([]statInfo, 0, 1000)
+		statInfos := make([]statInfo, 0, 1024)
 
 		cancel := make(chan struct{})
 
@@ -582,10 +582,8 @@ Tips:
 
 		tbl := stable.New()
 		tbl.HeaderWithFormat(columns)
-
-		checkError(err)
-		row := make([]interface{}, 0, len(columns))
 		for _, info := range statInfos {
+			row := make([]interface{}, 0, len(columns))
 			row = append(row, info.file)
 			row = append(row, info.format)
 			row = append(row, info.t)
