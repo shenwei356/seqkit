@@ -84,8 +84,8 @@ Output (BED3 format):
 		maxGap := getFlagNonNegativeInt(cmd, "max-gap")
 		limitGap := maxGap > 0
 		minOverlap := getFlagPositiveInt(cmd, "min-overlap")
-		if minOverlap == 1 {
-			log.Warningf("you may set -l/--min-overlap as $sliding_step_size -1")
+		if !config.Quiet && minOverlap == 1 {
+			log.Warningf("you may set -l/--min-overlap as $sliding_step_size - 1")
 		}
 
 		reQueryStr := getFlagString(cmd, "regexp")
