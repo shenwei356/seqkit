@@ -1,5 +1,6 @@
-- [SeqKit v2.4.1](https://github.com/shenwei356/seqkit/releases/tag/v2.4.1) - 2023-03-17
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.4.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.4.1)
+- [SeqKit v2.5.0](https://github.com/shenwei356/seqkit/releases/tag/v2.5.0) - 2023-03-17
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.5.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.5.0)
+    - new command `seqkit merge-slides`: merge sliding windows generated from seqkit sliding. [#390](https://github.com/shenwei356/seqkit/issues/390)
     - `seqkit stats`:
         - a new flag `-N/--N` for appending other N50-like stats as new columns. [#393](https://github.com/shenwei356/seqkit/issues/393)
         - added a progress bar for > 1 input files.

@@ -14,6 +14,7 @@
   [rename](#rename)
 - Ordering: [sort](#sort), [shuffle](#shuffle)
 - BAM processing: [bam](#bam)
+- Others: [sum](#sum), [merge-slides](#merge-slides)
 
 ## Technical details and guides for use
 
@@ -3845,6 +3846,57 @@ AccStats:
 If the "Sink" parameter is not specified in the last pipeline step, the output BAM records are streamed to the standard output and can be piped into standard tools, for example:
 ```text
 seqkit bam -T '{Yaml: "bam_tool_pipeline.yml"}' ../pcs109_5k_spliced.bam | samtools flagstat -
+```
+
+## merge-slides
+
+Usage
+
+```text
+merge sliding windows generated from seqkit sliding
+
+For example,
+
+    ref.contig00001_sliding:454531-454680
+    ref.contig00001_sliding:454561-454710
+    ref.contig00001_sliding:454591-454740
+    ref.contig00002_sliding:362281-362430
+    ref.contig00002_sliding:362311-362460
+    ref.contig00002_sliding:362341-362490
+    ref.contig00002_sliding:495991-496140
+    ref.contig00044_sliding:1-150
+    ref.contig00044_sliding:31-180
+    ref.contig00044_sliding:61-210
+    ref.contig00044_sliding:91-240
+
+could be merged into
+
+    ref.contig00001 454530  454740
+    ref.contig00002 362280  362490
+    ref.contig00002 495990  496140
+    ref.contig00044 0       240
+
+Output (BED3 format):
+    1. chrom      - chromosome name
+    2. chromStart - starting position (0-based)
+    3. chromEnd   - ending position (0-based)
+
+Usage:
+  seqkit merge-slides [flags]
+
+Flags:
+  -b, --buffer-size string            size of buffer, supported unit: K, M, G. You need increase the
+                                      value when "bufio.Scanner: token too long" error reported (default
+                                      "1G")
+  -p, --comment-line-prefix strings   comment line prefix (default [#,//])
+  -h, --help                          help for merge-slides
+  -g, --max-gap int                   maximum distance of starting positions of two adjacent regions, 0
+                                      for no limitation, 1 for no merging.
+  -l, --min-overlap int               minimum overlap of two adjacent regions, recommend
+                                      $sliding_step_size - 1. (default 1)
+  -r, --regexp string                 regular expression for extract the reference name and window
+                                      position. (default "^(.+)_sliding:(\\d+)\\-(\\d+)")
+
 ```
 
 ## genautocomplete
