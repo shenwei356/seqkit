@@ -464,7 +464,7 @@ Examples:
 										gapLetters += "*"
 									}
 									removeGaps = true
-									log.Infof(`the flag -g/--remove-gaps is switched on for removing the possible stop condon '*' character for protein sequences`)
+									log.Infof(`the flag -g/--remove-gaps is switched on for removing the possible stop codon '*' character for protein sequences`)
 								}
 							} else if ab == seq.RNA || ab == seq.RNAredundant {
 								seqType = "R"
