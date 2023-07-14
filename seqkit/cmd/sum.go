@@ -328,12 +328,6 @@ Examples:
 							return
 						}
 
-						if removeGaps {
-							_seq.RemoveGapsInplace(gapLetters)
-						}
-
-						_seq.Seq = bytes.ToLower(_seq.Seq)
-
 						if checkAlphabet {
 							ab = fastxReader.Alphabet()
 							if ab == seq.Protein {
@@ -357,6 +351,12 @@ Examples:
 
 							checkAlphabet = false
 						}
+
+						if removeGaps {
+							_seq.RemoveGapsInplace(gapLetters)
+						}
+
+						_seq.Seq = bytes.ToLower(_seq.Seq)
 
 						if rna2dna {
 							if !(ab == seq.RNA || ab == seq.RNAredundant) {
@@ -455,12 +455,6 @@ Examples:
 
 						_seq = record.Seq
 
-						if removeGaps {
-							_seq.RemoveGapsInplace(gapLetters)
-						}
-
-						_seq.Seq = bytes.ToLower(_seq.Seq)
-
 						if checkAlphabet {
 							ab = fastxReader.Alphabet()
 							if ab == seq.Protein {
@@ -469,7 +463,8 @@ Examples:
 									if !strings.Contains(gapLetters, "*") {
 										gapLetters += "*"
 									}
-									log.Infof(`the flag -g/--remove-gaps is switched on for removing the stop condon '*' character for protein sequences`)
+									removeGaps = true
+									log.Infof(`the flag -g/--remove-gaps is switched on for removing the possible stop condon '*' character for protein sequences`)
 								}
 							} else if ab == seq.RNA || ab == seq.RNAredundant {
 								seqType = "R"
@@ -481,6 +476,12 @@ Examples:
 
 							checkAlphabet = false
 						}
+
+						if removeGaps {
+							_seq.RemoveGapsInplace(gapLetters)
+						}
+
+						_seq.Seq = bytes.ToLower(_seq.Seq)
 
 						if rna2dna {
 							if !(ab == seq.RNA || ab == seq.RNAredundant) {

@@ -8,6 +8,7 @@
     - `seqkit translate`:
         - add options `-s/--out-subseqs` and `-m/--min-len` to write ORFs longer than `x` amino acids as individual records. [#389](https://github.com/shenwei356/seqkit/issues/389)
     - `seqkit sum`:
+        - fix the logic: if `-g/--remove gaps` is not on for proteins, we'll forcely switch it on to remove possible '*'.
         - added a progress bar for > 1 input files.
     - `seqkit pair`:
         - remove the restriction of requiring FASTQ format, i.e., FASTA files are also supported.
