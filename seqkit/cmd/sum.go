@@ -469,7 +469,7 @@ Examples:
 									if !strings.Contains(gapLetters, "*") {
 										gapLetters += "*"
 									}
-									log.Infof(`the flag -g/--remove-gaps is switched on for removing the stop condon '*' character for protein sequences`)
+									log.Infof(`the flag -g/--remove-gaps is switched off. The stop codon '*' character is currently not being removed from protein sequences`)
 								}
 							} else if ab == seq.RNA || ab == seq.RNAredundant {
 								seqType = "R"
