@@ -30,7 +30,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 	"sync"
 	"time"
 
@@ -459,13 +458,6 @@ Examples:
 							ab = fastxReader.Alphabet()
 							if ab == seq.Protein {
 								seqType = "P"
-								if !removeGaps {
-									if !strings.Contains(gapLetters, "*") {
-										gapLetters += "*"
-									}
-									removeGaps = true
-									log.Infof(`the flag -g/--remove-gaps is switched on for removing the possible stop codon '*' character for protein sequences`)
-								}
 							} else if ab == seq.RNA || ab == seq.RNAredundant {
 								seqType = "R"
 							} else if ab == seq.DNA || ab == seq.DNAredundant {
@@ -575,8 +567,8 @@ func init() {
 	sumCmd.Flags().BoolP("circular", "c", false, "the file contains a single cicular genome sequence")
 	sumCmd.Flags().IntP("kmer-size", "k", 1000, "k-mer size for processing circular genomes")
 	sumCmd.Flags().BoolP("basename", "b", false, "only output basename of files")
-	sumCmd.Flags().BoolP("remove-gaps", "g", false, "remove gaps")
-	sumCmd.Flags().StringP("gap-letters", "G", "- 	.*", "gap letters")
+	sumCmd.Flags().BoolP("remove-gaps", "g", false, "remove gap characters set in the option -G/gap-letters")
+	sumCmd.Flags().StringP("gap-letters", "G", "- 	.*", "gap letters to delete with the flag -g/--remove-gaps")
 	sumCmd.Flags().BoolP("all", "a", false, "show all information, including the sequences length and the number of sequences")
 	sumCmd.Flags().BoolP("rna2dna", "", false, "convert RNA to DNA")
 	sumCmd.Flags().BoolP("single-strand", "s", false, "only consider the positive strand of a circular genome, e.g., ssRNA virus genomes")

@@ -851,10 +851,10 @@ Flags:
   -a, --all                  show all information, including the sequences length and the number of sequences
   -b, --basename             only output basename of files
   -c, --circular             the file contains a single cicular genome sequence
-  -G, --gap-letters string   gap letters (default "- \t.*")
+  -G, --gap-letters string   gap letters to delete with the flag -g/--remove-gaps (default "- \t.*")
   -h, --help                 help for sum
   -k, --kmer-size int        k-mer size for processing circular genomes (default 1000)
-  -g, --remove-gaps          remove gaps
+  -g, --remove-gaps          remove gap characters set in the option -G/gap-letters
       --rna2dna              convert RNA to DNA
   -s, --single-strand        only consider the positive strand of a circular genome, e.g., ssRNA virus
                              genomes
