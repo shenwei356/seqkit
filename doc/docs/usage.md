@@ -158,7 +158,7 @@ reproduced in different environments with same random seed.
 ``` text
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 2.4.0
+Version: 2.5.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -185,7 +185,7 @@ Compression level:
   bzip     1-9     6        https://github.com/dsnet/compress
 
 Usage:
-  seqkit [command] 
+  seqkit [command]
 
 Available Commands:
   amplicon        extract amplicon (or specific region around it) via primer(s)
@@ -204,6 +204,7 @@ Available Commands:
   head            print first N FASTA/Q records
   head-genome     print sequences of the first genome with common prefixes in name
   locate          locate subsequences/motifs, mismatch allowed
+  merge-slides    merge sliding windows generated from seqkit sliding
   mutate          edit sequence (point mutation, insertion, deletion)
   pair            match up paired-end reads from two fastq files
   range           print FASTA/Q records in a range (start:end)
@@ -266,7 +267,7 @@ Human genome from [ensembl](http://uswest.ensembl.org/info/data/ftp/index.html)
 - [`Homo_sapiens.GRCh38.84.gtf.gz`](ftp://ftp.ensembl.org/pub/release-84/gtf/homo_sapiens/Homo_sapiens.GRCh38.84.gtf.gz)
 - `Homo_sapiens.GRCh38.84.bed.gz` is converted from `Homo_sapiens.GRCh38.84.gtf.gz`
 by [`gtf2bed`](http://bedops.readthedocs.org/en/latest/content/reference/file-management/conversion/gtf2bed.html?highlight=gtf2bed)
-with command
+with the command
 
         zcat Homo_sapiens.GRCh38.84.gtf.gz \
             | gtf2bed --do-not-sort \
@@ -3898,6 +3899,10 @@ Flags:
                                       position. (default "^(.+)_sliding:(\\d+)\\-(\\d+)")
 
 ```
+
+Example:
+
+    seqkit merge-slides sliding_windows.tsv -l 50 -o sliding_windows.merged.tsv
 
 ## genautocomplete
 

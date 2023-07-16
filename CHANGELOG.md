@@ -1,19 +1,19 @@
-- [SeqKit v2.5.0](https://github.com/shenwei356/seqkit/releases/tag/v2.5.0) - 2023-03-17
+- [SeqKit v2.5.0](https://github.com/shenwei356/seqkit/releases/tag/v2.5.0) - 2023-07-16
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.5.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.5.0)
     - new command `seqkit merge-slides`: merge sliding windows generated from seqkit sliding. [#390](https://github.com/shenwei356/seqkit/issues/390)
     - `seqkit stats`:
-        - a new flag `-N/--N` for appending other N50-like stats as new columns. [#393](https://github.com/shenwei356/seqkit/issues/393)
+        - added a new flag `-N/--N` for appending other N50-like stats as new columns. [#393](https://github.com/shenwei356/seqkit/issues/393)
         - added a progress bar for > 1 input files.
-        - write the result of each file immediately (no output buffer).
+        - write the result of each file immediately (no output buffer) when using `-T/--tabular`.
     - `seqkit translate`:
         - add options `-s/--out-subseqs` and `-m/--min-len` to write ORFs longer than `x` amino acids as individual records. [#389](https://github.com/shenwei356/seqkit/issues/389)
     - `seqkit sum`:
-        - do not remove possible '*' by default. Thanks to @photocyte. [#399](https://github.com/shenwei356/seqkit/issues/399)
+        - do not remove possible '*' by default and delete confusing warnings. Thanks to @photocyte. [#399](https://github.com/shenwei356/seqkit/issues/399)
         - added a progress bar for > 1 input files.
     - `seqkit pair`:
         - remove the restriction of requiring FASTQ format, i.e., FASTA files are also supported.
     - `seqkit seq`:
-        - update help message. [#387](https://github.com/shenwei356/seqkit/issues/387)
+        - update help messages. [#387](https://github.com/shenwei356/seqkit/issues/387)
     - `seqkit fxtab`:
         - faster alphabet computation (`-a/--alphabet`) with a new data structure. Thanks to @elliotwutingfeng [#388](https://github.com/shenwei356/seqkit/pull/388)
     - `seqkit subseq`:
