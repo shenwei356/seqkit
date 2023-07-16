@@ -649,6 +649,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#merge-slides" class="md-nav__link">
+    merge-slides
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#genautocomplete" class="md-nav__link">
     genautocomplete
   </a>
@@ -1116,6 +1123,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#merge-slides" class="md-nav__link">
+    merge-slides
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#genautocomplete" class="md-nav__link">
     genautocomplete
   </a>
@@ -1154,6 +1168,7 @@
   <a href="#rename">rename</a></li>
 <li>Ordering: <a href="#sort">sort</a>, <a href="#shuffle">shuffle</a></li>
 <li>BAM processing: <a href="#bam">bam</a></li>
+<li>Others: <a href="#sum">sum</a>, <a href="#merge-slides">merge-slides</a></li>
 </ul>
 <h2 id="technical-details-and-guides-for-use">Technical details and guides for use</h2>
 <h3 id="fastaq-format-parsing-and-writing">FASTA/Q format parsing and writing</h3>
@@ -1280,7 +1295,7 @@ reproduced in different environments with same random seed.</p>
 <h2 id="seqkit">seqkit</h2>
 <pre><code class="language-text">SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 2.4.0
+Version: 2.5.0
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -1307,7 +1322,7 @@ Compression level:
   bzip     1-9     6        https://github.com/dsnet/compress
 
 Usage:
-  seqkit [command] 
+  seqkit [command]
 
 Available Commands:
   amplicon        extract amplicon (or specific region around it) via primer(s)
@@ -1326,6 +1341,7 @@ Available Commands:
   head            print first N FASTA/Q records
   head-genome     print sequences of the first genome with common prefixes in name
   locate          locate subsequences/motifs, mismatch allowed
+  merge-slides    merge sliding windows generated from seqkit sliding
   mutate          edit sequence (point mutation, insertion, deletion)
   pair            match up paired-end reads from two fastq files
   range           print FASTA/Q records in a range (start:end)
@@ -1386,7 +1402,7 @@ Use &quot;seqkit [command] --help&quot; for more information about a command.
 <li><a href="ftp://ftp.ensembl.org/pub/release-84/gtf/homo_sapiens/Homo_sapiens.GRCh38.84.gtf.gz"><code>Homo_sapiens.GRCh38.84.gtf.gz</code></a></li>
 <li><code>Homo_sapiens.GRCh38.84.bed.gz</code> is converted from <code>Homo_sapiens.GRCh38.84.gtf.gz</code>
 by <a href="http://bedops.readthedocs.org/en/latest/content/reference/file-management/conversion/gtf2bed.html?highlight=gtf2bed"><code>gtf2bed</code></a>
-with command<pre><code>zcat Homo_sapiens.GRCh38.84.gtf.gz \
+with the command<pre><code>zcat Homo_sapiens.GRCh38.84.gtf.gz \
     | gtf2bed --do-not-sort \
     | gzip -c &gt; Homo_sapiens.GRCh38.84.bed.gz
 </code></pre>
@@ -1421,7 +1437,7 @@ Flags:
   -k, --color                     colorize sequences - to be piped into &quot;less -R&quot;
   -p, --complement                complement sequence, flag '-v' is recommended to switch on
       --dna2rna                   DNA to RNA
-  -G, --gap-letters string        gap letters (default &quot;- \t.&quot;)
+  -G, --gap-letters string        gap letters to be removed with -g/--remove-gaps (default &quot;- \t.&quot;)
   -h, --help                      help for seq
   -l, --lower-case                print sequences in lower case
   -M, --max-len int               only print sequences shorter than or equal to the maximum length (-1
@@ -1432,11 +1448,12 @@ Flags:
                                   for no limit) (default -1)
   -Q, --min-qual float            only print sequences with average quality qreater or equal than this
                                   limit (-1 for no limit) (default -1)
-  -n, --name                      only print names
-  -i, --only-id                   print ID instead of full head
+  -n, --name                      only print names/sequence headers
+  -i, --only-id                   print IDs instead of full headers
   -q, --qual                      only print qualities
   -b, --qual-ascii-base int       ASCII BASE, 33 for Phred+33 (default 33)
-  -g, --remove-gaps               remove gaps
+  -g, --remove-gaps               remove gaps letters set by -G/--gap-letters, e.g., spaces, tabs, and
+                                  dashes (gaps &quot;-&quot; in aligned sequences)
   -r, --reverse                   reverse sequence
       --rna2dna                   RNA to DNA
   -s, --seq                       only print sequences
@@ -1727,7 +1744,7 @@ Usage:
 Flags:
   -c, --circular          circular genome (same to -C/--circular-genome)
   -C, --circular-genome   circular genome (same to -c/--circular)
-  -g, --greedy            greedy mode, i.e., exporting last subsequences even shorter than windows size
+  -g, --greedy            greedy mode, i.e., exporting last subsequences even shorter than the windows size
   -h, --help              help for sliding
   -s, --step int          step size
   -S, --sufix string      suffix added to the sequence ID
@@ -1827,6 +1844,8 @@ Aliases:
   stats, stat
 
 Flags:
+  -N, --N strings            other N50-like stats. value range [0, 100], multiple values supported,
+                             e.g., -N 50,90 or -N 50 -N 90
   -a, --all                  all statistics, including quartiles of seq length, sum_gap, N50
   -b, --basename             only output basename of files
   -E, --fq-encoding string   fastq quality encoding. available values: 'sanger', 'solexa',
@@ -2040,10 +2059,10 @@ Flags:
   -a, --all                  show all information, including the sequences length and the number of sequences
   -b, --basename             only output basename of files
   -c, --circular             the file contains a single cicular genome sequence
-  -G, --gap-letters string   gap letters (default &quot;- \t.*&quot;)
+  -G, --gap-letters string   gap letters to delete with the flag -g/--remove-gaps (default &quot;- \t.*&quot;)
   -h, --help                 help for sum
   -k, --kmer-size int        k-mer size for processing circular genomes (default 1000)
-  -g, --remove-gaps          remove gaps
+  -g, --remove-gaps          remove gap characters set in the option -G/gap-letters
       --rna2dna              convert RNA to DNA
   -s, --single-strand        only consider the positive strand of a circular genome, e.g., ssRNA virus
                              genomes
@@ -3518,12 +3537,21 @@ Flags:
 <pre><code class="language-text">split sequences into files by name ID, subsequence of given region,
 part size or number of parts.
 
+If you just want to split by parts or sizes, please use &quot;seqkit split2&quot;,
+which can apply to paired- and single-end FASTQ.
+
+If you want to cut a sequence into multiple segments.
+  1. For cutting into even chunks, please use 'kmcp utils split-genomes'
+     (https://bioinf.shenwei.me/kmcp/usage/#split-genomes).
+     E.g., cutting into 4 segments of equal size, with no overlap between adjacent segments:
+        kmcp utils split-genomes -m 1 -k 1 --split-number 4 --split-overlap 0 input.fasta -O out
+  2. For cutting into multiple chunks of fixed size, please using 'seqkit sliding'.
+     E.g., cutting into segments of 40 bp and keeping the last segment which can be shorter than 40 bp.
+        seqkit sliding -g -s 40 -W 40 input.fasta -o out.fasta
+
 Attentions:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
-
-If you just want to split by parts or sizes, please use &quot;seqkit split2&quot;,
-which also applies for paired- and single-end FASTQ.
 
 The definition of region is 1-based and with some custom design.
 
@@ -3646,8 +3674,7 @@ occupation and fast speed.
 The prefix of output files:
   1. For stdin: stdin
   2. Others: same to the input file
-  3. Set via the option: -o/--out-file, e.g., outputting xxx.part_001.fasta:
-       cat ../tests/hairpin.fa | ./seqkit split2 -p 2 -O test -o xxx
+  3. Set via the options: --by-length-prefix, --by-part-prefix, or --by-size-prefix
 
 The extension of output files:
   1. For stdin: .fast[aq]
@@ -3655,6 +3682,16 @@ The extension of output files:
   3. Additional extension via the option -e/--extension, e.g.， outputting
      gzipped files for plain text input:
          seqkit split2 -p 2 -O test tests/hairpin.fa -e .gz
+
+
+If you want to cut a sequence into multiple segments.
+  1. For cutting into even chunks, please use 'kmcp utils split-genomes'
+     (https://bioinf.shenwei.me/kmcp/usage/#split-genomes).
+     E.g., cutting into 4 segments of equal size, with no overlap between adjacent segments:
+        kmcp utils split-genomes -m 1 -k 1 --split-number 4 --split-overlap 0 input.fasta -O out
+  2. For cutting into multiple chunks of fixed size, please using 'seqkit sliding'.
+     E.g., cutting into segments of 40 bp and keeping the last segment which can be shorter than 40 bp.
+        seqkit sliding -g -s 40 -W 40 input.fasta -o out.fasta
 
 Usage:
   seqkit split2 [flags]
@@ -4945,6 +4982,56 @@ AccStats:
 </code></pre>
 <p>If the "Sink" parameter is not specified in the last pipeline step, the output BAM records are streamed to the standard output and can be piped into standard tools, for example:</p>
 <pre><code class="language-text">seqkit bam -T '{Yaml: &quot;bam_tool_pipeline.yml&quot;}' ../pcs109_5k_spliced.bam | samtools flagstat -
+</code></pre>
+<h2 id="merge-slides">merge-slides</h2>
+<p>Usage</p>
+<pre><code class="language-text">merge sliding windows generated from seqkit sliding
+
+For example,
+
+    ref.contig00001_sliding:454531-454680
+    ref.contig00001_sliding:454561-454710
+    ref.contig00001_sliding:454591-454740
+    ref.contig00002_sliding:362281-362430
+    ref.contig00002_sliding:362311-362460
+    ref.contig00002_sliding:362341-362490
+    ref.contig00002_sliding:495991-496140
+    ref.contig00044_sliding:1-150
+    ref.contig00044_sliding:31-180
+    ref.contig00044_sliding:61-210
+    ref.contig00044_sliding:91-240
+
+could be merged into
+
+    ref.contig00001 454530  454740
+    ref.contig00002 362280  362490
+    ref.contig00002 495990  496140
+    ref.contig00044 0       240
+
+Output (BED3 format):
+    1. chrom      - chromosome name
+    2. chromStart - starting position (0-based)
+    3. chromEnd   - ending position (0-based)
+
+Usage:
+  seqkit merge-slides [flags]
+
+Flags:
+  -b, --buffer-size string            size of buffer, supported unit: K, M, G. You need increase the
+                                      value when &quot;bufio.Scanner: token too long&quot; error reported (default
+                                      &quot;1G&quot;)
+  -p, --comment-line-prefix strings   comment line prefix (default [#,//])
+  -h, --help                          help for merge-slides
+  -g, --max-gap int                   maximum distance of starting positions of two adjacent regions, 0
+                                      for no limitation, 1 for no merging.
+  -l, --min-overlap int               minimum overlap of two adjacent regions, recommend
+                                      $sliding_step_size - 1. (default 1)
+  -r, --regexp string                 regular expression for extract the reference name and window
+                                      position. (default &quot;^(.+)_sliding:(\\d+)\\-(\\d+)&quot;)
+
+</code></pre>
+<p>Example:</p>
+<pre><code>seqkit merge-slides sliding_windows.tsv -l 50 -o sliding_windows.merged.tsv
 </code></pre>
 <h2 id="genautocomplete">genautocomplete</h2>
 <p>Usage</p>
