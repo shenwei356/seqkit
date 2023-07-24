@@ -81,7 +81,7 @@ Examples:
 		chrs = chrs2
 		chrsMap := make(map[string]struct{}, len(chrs))
 		for _, chr := range chrs {
-			chrsMap[strings.ToLower(chr)] = struct{}{}
+			chrsMap[chr] = struct{}{}
 		}
 		region := getFlagString(cmd, "region")
 
@@ -91,7 +91,7 @@ Examples:
 		choosedFeatures := getFlagStringSlice(cmd, "feature")
 		choosedFeatures2 := make([]string, len(choosedFeatures))
 		for i, f := range choosedFeatures {
-			choosedFeatures2[i] = strings.ToLower(f)
+			choosedFeatures2[i] = f
 		}
 		choosedFeatures = choosedFeatures2
 
@@ -162,11 +162,11 @@ Examples:
 
 			var chr, feat string
 			for _, feature := range features {
-				chr = strings.ToLower(feature.SeqName)
+				chr = feature.SeqName
 				if _, ok := gtfFeaturesMap[chr]; !ok {
 					gtfFeaturesMap[chr] = make(map[string][]gtf.Feature)
 				}
-				feat = strings.ToLower(feature.Feature)
+				feat = feature.Feature
 				if _, ok := gtfFeaturesMap[chr][feat]; !ok {
 					gtfFeaturesMap[chr][feat] = []gtf.Feature{}
 				}
@@ -195,7 +195,7 @@ Examples:
 
 			var chr string
 			for _, feature := range features {
-				chr = strings.ToLower(feature.Chr)
+				chr = feature.Chr
 				if _, ok := bedFeatureMap[chr]; !ok {
 					bedFeatureMap[chr] = []BedFeature{}
 				}
@@ -244,7 +244,7 @@ Examples:
 
 					var id string
 					for head := range faidx.Index {
-						id = strings.ToLower(string(fastx.ParseHeadID(idRe, []byte(head))))
+						id = string(fastx.ParseHeadID(idRe, []byte(head)))
 						id2name[id] = []byte(head)
 					}
 
@@ -252,7 +252,7 @@ Examples:
 					if region != "" {
 						if len(chrs) > 0 {
 							for _, chr := range chrs {
-								chr2 = string(id2name[strings.ToLower(chr)])
+								chr2 = string(id2name[chr])
 								r, ok := faidx.Index[chr2]
 								if !ok {
 									log.Warningf(`sequence (%s) not found in file: %s`, chr2, file)
@@ -274,7 +274,7 @@ Examples:
 					} else if gtfFile != "" {
 						for chr := range gtfFeaturesMap {
 							if len(chrs) > 0 { // selected chrs
-								if _, ok := chrsMap[strings.ToLower(chr)]; !ok {
+								if _, ok := chrsMap[chr]; !ok {
 									continue
 								}
 							}
@@ -300,7 +300,7 @@ Examples:
 					} else if bedFile != "" {
 						for chr := range bedFeatureMap {
 							if len(chrs) > 0 { // selected chrs
-								if _, ok := chrsMap[strings.ToLower(chr)]; !ok {
+								if _, ok := chrsMap[chr]; !ok {
 									continue
 								}
 							}
@@ -358,12 +358,12 @@ Examples:
 					if noChrs {
 						subseqByRegion(outfh, record, config.LineWidth, start, end)
 					} else {
-						if _, ok = chrsMap[strings.ToLower(string(record.ID))]; ok {
+						if _, ok = chrsMap[string(record.ID)]; ok {
 							subseqByRegion(outfh, record, config.LineWidth, start, end)
 						}
 					}
 				} else if gtfFile != "" {
-					seqname = strings.ToLower(string(record.ID))
+					seqname = string(record.ID)
 					if _, ok = gtfFeaturesMap[seqname]; !ok {
 						continue
 					}
@@ -373,7 +373,7 @@ Examples:
 						onlyFlank, upStream, downStream, gtfTag)
 
 				} else if bedFile != "" {
-					seqname = strings.ToLower(string(record.ID))
+					seqname = string(record.ID)
 					if _, ok = bedFeatureMap[seqname]; !ok {
 						continue
 					}
@@ -400,7 +400,7 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 	gtfFeaturesMap map[string]type2gtfFeatures, choosedFeatures []string,
 	onlyFlank bool, upStream int, downStream int, gtfTag string) {
 
-	seqname := strings.ToLower(string(record.ID))
+	seqname := string(record.ID)
 
 	var strand, tag, outname, flankInfo string
 	var s, e int
@@ -413,7 +413,7 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 
 	for featureType := range gtfFeaturesMap[seqname] {
 		if len(choosedFeatures) > 0 {
-			if _, ok := featsMap[strings.ToLower(featureType)]; !ok {
+			if _, ok := featsMap[featureType]; !ok {
 				continue
 			}
 		}
@@ -509,7 +509,7 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 	bedFeatureMap map[string][]BedFeature,
 	onlyFlank bool, upStream, downStream int) {
-	seqname := strings.ToLower(string(record.ID))
+	seqname := string(record.ID)
 
 	var strand, geneID, outname, flankInfo string
 	var s, e int
