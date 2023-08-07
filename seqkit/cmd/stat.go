@@ -261,9 +261,9 @@ Tips:
 				buf[info.id] = info // save for later check
 
 				// check bufferd results
-				if info1, ok := buf[id]; ok {
+				if info, ok := buf[id]; ok {
 					if !tabular {
-						statInfos = append(statInfos, info1)
+						statInfos = append(statInfos, info)
 					} else {
 						fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d",
 							info.file,
@@ -294,7 +294,7 @@ Tips:
 						outfh.Flush()
 					}
 
-					delete(buf, info1.id)
+					delete(buf, info.id)
 					id++
 				}
 			}

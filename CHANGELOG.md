@@ -1,5 +1,7 @@
 - [SeqKit v2.5.1](https://github.com/shenwei356/seqkit/releases/tag/v2.5.1) - 2023-07-16
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.5.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.5.1)
+    - `seqkit stats`:
+        - fix concurrency bug introduced in v2.5.0. [#405](https://github.com/shenwei356/seqkit/issues/405)
     - `seqkit subseq`:
         - sequence/chromosome IDs are case-sensitive now. [#400)(https://github.com/shenwei356/seqkit/issues/400)
 - [SeqKit v2.5.0](https://github.com/shenwei356/seqkit/releases/tag/v2.5.0) - 2023-07-16
