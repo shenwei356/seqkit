@@ -9,39 +9,24 @@ Please cite: **W Shen**, S Le, Y Li\*, F Hu\*. SeqKit: a cross-platform and ultr
 
 ## Current Version
 
-- [SeqKit v2.5.0](https://github.com/shenwei356/seqkit/releases/tag/v2.5.0) - 2023-07-16
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.5.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.5.0)
-    - new command `seqkit merge-slides`: merge sliding windows generated from seqkit sliding. [#390](https://github.com/shenwei356/seqkit/issues/390)
+- [SeqKit v2.5.1](https://github.com/shenwei356/seqkit/releases/tag/v2.5.1) - 2023-08-09
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.5.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.5.1)
     - `seqkit stats`:
-        - added a new flag `-N/--N` for appending other N50-like stats as new columns. [#393](https://github.com/shenwei356/seqkit/issues/393)
-        - added a progress bar for > 1 input files.
-        - write the result of each file immediately (no output buffer) when using `-T/--tabular`.
-    - `seqkit translate`:
-        - add options `-s/--out-subseqs` and `-m/--min-len` to write ORFs longer than `x` amino acids as individual records. [#389](https://github.com/shenwei356/seqkit/issues/389)
-    - `seqkit sum`:
-        - do not remove possible '*' by default and delete confusing warnings. Thanks to @photocyte. [#399](https://github.com/shenwei356/seqkit/issues/399)
-        - added a progress bar for > 1 input files.
-    - `seqkit pair`:
-        - remove the restriction of requiring FASTQ format, i.e., FASTA files are also supported.
-    - `seqkit seq`:
-        - update help messages. [#387](https://github.com/shenwei356/seqkit/issues/387)
-    - `seqkit fxtab`:
-        - faster alphabet computation (`-a/--alphabet`) with a new data structure. Thanks to @elliotwutingfeng [#388](https://github.com/shenwei356/seqkit/pull/388)
+        - **fix a concurrency bug (file name error) introduced in v2.5.0**. [#405](https://github.com/shenwei356/seqkit/issues/405)
     - `seqkit subseq`:
-        - accept reverse coordinates in BED/GTF. [#392](https://github.com/shenwei356/seqkit/issues/392)
-
+        - sequence/chromosome IDs are case-sensitive now. [#400)(https://github.com/shenwei356/seqkit/issues/400)
         
 ### Links
 
 OS     |Arch      |File, 中国镜像                                                                                                                                                                                  |Download Count
 :------|:---------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Linux  |32-bit    |[seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v2.5.0/seqkit_linux_386.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_linux_386.tar.gz)                            |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v2.5.0/seqkit_linux_386.tar.gz)
-Linux  |**64-bit**|[**seqkit_linux_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v2.5.0/seqkit_linux_amd64.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_linux_amd64.tar.gz)                  |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v2.5.0/seqkit_linux_amd64.tar.gz)
-Linux  |**arm64** |[**seqkit_linux_arm64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v2.5.0/seqkit_linux_arm64.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_linux_arm64.tar.gz)                  |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_arm64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v2.5.0/seqkit_linux_arm64.tar.gz)
-macOS  |**64-bit**|[**seqkit_darwin_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v2.5.0/seqkit_darwin_amd64.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_darwin_amd64.tar.gz)               |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v2.5.0/seqkit_darwin_amd64.tar.gz)
-macOS  |**arm64** |[**seqkit_darwin_arm64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v2.5.0/seqkit_darwin_arm64.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_darwin_arm64.tar.gz)               |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_arm64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v2.5.0/seqkit_darwin_arm64.tar.gz)
-Windows|32-bit    |[seqkit_windows_386.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v2.5.0/seqkit_windows_386.exe.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_windows_386.exe.tar.gz)          |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_386.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v2.5.0/seqkit_windows_386.exe.tar.gz)
-Windows|**64-bit**|[**seqkit_windows_amd64.exe.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v2.5.0/seqkit_windows_amd64.exe.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_windows_amd64.exe.tar.gz)|[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_amd64.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v2.5.0/seqkit_windows_amd64.exe.tar.gz)
+Linux  |32-bit    |[seqkit_linux_386.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v2.5.1/seqkit_linux_386.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_linux_386.tar.gz)                            |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_386.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v2.5.1/seqkit_linux_386.tar.gz)
+Linux  |**64-bit**|[**seqkit_linux_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v2.5.1/seqkit_linux_amd64.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_linux_amd64.tar.gz)                  |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v2.5.1/seqkit_linux_amd64.tar.gz)
+Linux  |**arm64** |[**seqkit_linux_arm64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v2.5.1/seqkit_linux_arm64.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_linux_arm64.tar.gz)                  |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_linux_arm64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v2.5.1/seqkit_linux_arm64.tar.gz)
+macOS  |**64-bit**|[**seqkit_darwin_amd64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v2.5.1/seqkit_darwin_amd64.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_darwin_amd64.tar.gz)               |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_amd64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v2.5.1/seqkit_darwin_amd64.tar.gz)
+macOS  |**arm64** |[**seqkit_darwin_arm64.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v2.5.1/seqkit_darwin_arm64.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_darwin_arm64.tar.gz)               |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_darwin_arm64.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v2.5.1/seqkit_darwin_arm64.tar.gz)
+Windows|32-bit    |[seqkit_windows_386.exe.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v2.5.1/seqkit_windows_386.exe.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_windows_386.exe.tar.gz)          |[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_386.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v2.5.1/seqkit_windows_386.exe.tar.gz)
+Windows|**64-bit**|[**seqkit_windows_amd64.exe.tar.gz**](https://github.com/shenwei356/seqkit/releases/download/v2.5.1/seqkit_windows_amd64.exe.tar.gz), <br/> [中国镜像](http://app.shenwei.me/data/seqkit/seqkit_windows_amd64.exe.tar.gz)|[![Github Releases (by Asset)](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/seqkit_windows_amd64.exe.tar.gz.svg?maxAge=3600)](https://github.com/shenwei356/seqkit/releases/download/v2.5.1/seqkit_windows_amd64.exe.tar.gz)
 
 
 *Notes*
@@ -163,6 +148,26 @@ fish:
 
 ## Release history
 
+- [SeqKit v2.5.0](https://github.com/shenwei356/seqkit/releases/tag/v2.5.0) - 2023-07-16
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.5.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.5.0)
+    - new command `seqkit merge-slides`: merge sliding windows generated from seqkit sliding. [#390](https://github.com/shenwei356/seqkit/issues/390)
+    - `seqkit stats`:
+        - added a new flag `-N/--N` for appending other N50-like stats as new columns. [#393](https://github.com/shenwei356/seqkit/issues/393)
+        - added a progress bar for > 1 input files.
+        - write the result of each file immediately (no output buffer) when using `-T/--tabular`.
+    - `seqkit translate`:
+        - add options `-s/--out-subseqs` and `-m/--min-len` to write ORFs longer than `x` amino acids as individual records. [#389](https://github.com/shenwei356/seqkit/issues/389)
+    - `seqkit sum`:
+        - do not remove possible '*' by default and delete confusing warnings. Thanks to @photocyte. [#399](https://github.com/shenwei356/seqkit/issues/399)
+        - added a progress bar for > 1 input files.
+    - `seqkit pair`:
+        - remove the restriction of requiring FASTQ format, i.e., FASTA files are also supported.
+    - `seqkit seq`:
+        - update help messages. [#387](https://github.com/shenwei356/seqkit/issues/387)
+    - `seqkit fxtab`:
+        - faster alphabet computation (`-a/--alphabet`) with a new data structure. Thanks to @elliotwutingfeng [#388](https://github.com/shenwei356/seqkit/pull/388)
+    - `seqkit subseq`:
+        - accept reverse coordinates in BED/GTF. [#392](https://github.com/shenwei356/seqkit/issues/392)
 - [SeqKit v2.4.0](https://github.com/shenwei356/seqkit/releases/tag/v2.4.0) - 2023-03-17
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.4.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.4.0)
     - `seqkit`:
