@@ -27,6 +27,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/cespare/xxhash/v2"
 	"github.com/pkg/errors"
@@ -70,7 +71,7 @@ Tips:
 		runtime.GOMAXPROCS(config.Threads)
 
 		if len(args) > 0 {
-			checkError(errors.New("no positional arguments are allowed"))
+			checkError(errors.New("no positional arguments are allowed: " + strings.Join(args, " ")))
 		}
 
 		read1 := getFlagString(cmd, "read1")

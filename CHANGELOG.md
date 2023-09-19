@@ -1,3 +1,7 @@
+- [SeqKit v2.5.2](https://github.com/shenwei356/seqkit/releases/tag/v2.5.2) - 2023-08-09
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.5.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.5.2)
+    - `seqkit split2`:
+        - fix the panic for invalid input.
 - [SeqKit v2.5.1](https://github.com/shenwei356/seqkit/releases/tag/v2.5.1) - 2023-08-09
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.5.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.5.1)
     - `seqkit stats`:

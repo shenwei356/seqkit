@@ -425,7 +425,9 @@ If you want to cut a sequence into multiple segments.
 						}
 					}
 				} else {
-					outfhPre.Close()
+					if outfhPre != nil {
+						outfhPre.Close()
+					}
 
 					if j == 0 {
 						os.Remove(outfilePre)
