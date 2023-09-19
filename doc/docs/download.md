@@ -14,7 +14,7 @@ Please cite: **W Shen**, S Le, Y Li\*, F Hu\*. SeqKit: a cross-platform and ultr
     - `seqkit stats`:
         - **fix a concurrency bug (file name error) introduced in v2.5.0**. [#405](https://github.com/shenwei356/seqkit/issues/405)
     - `seqkit subseq`:
-        - sequence/chromosome IDs are case-sensitive now. [#400)(https://github.com/shenwei356/seqkit/issues/400)
+        - sequence/chromosome IDs are case-sensitive now. [#400](https://github.com/shenwei356/seqkit/issues/400)
         
 ### Links
 
