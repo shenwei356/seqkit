@@ -155,13 +155,13 @@ func NewSeqColorizer(alphabet string) *SeqColorizer {
 		case 'A', 'a':
 			res.NucPalette[base] = au.GreenFg
 		case 'C', 'c':
-			res.NucPalette[base] = au.BlueFg
+			res.NucPalette[base] = au.RedFg
 		case 'G', 'g':
 			res.NucPalette[base] = au.YellowFg
 		case 'T', 't':
-			res.NucPalette[base] = au.RedFg
+			res.NucPalette[base] = au.BlueFg
 		case 'U', 'u':
-			res.NucPalette[base] = au.RedFg
+			res.NucPalette[base] = au.BlueFg
 		case '-', '*':
 			res.NucPalette[base] = au.WhiteFg
 		default:
