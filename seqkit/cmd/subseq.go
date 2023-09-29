@@ -84,6 +84,7 @@ Examples:
 			chrsMap[chr] = struct{}{}
 		}
 		region := getFlagString(cmd, "region")
+		appendRegionCoord := getFlagBool(cmd, "region-coord")
 
 		gtfFile := getFlagString(cmd, "gtf")
 		bedFile := getFlagString(cmd, "bed")
@@ -356,10 +357,10 @@ Examples:
 
 				if region != "" {
 					if noChrs {
-						subseqByRegion(outfh, record, config.LineWidth, start, end)
+						subseqByRegion(outfh, record, config.LineWidth, start, end, appendRegionCoord)
 					} else {
 						if _, ok = chrsMap[string(record.ID)]; ok {
-							subseqByRegion(outfh, record, config.LineWidth, start, end)
+							subseqByRegion(outfh, record, config.LineWidth, start, end, appendRegionCoord)
 						}
 					}
 				} else if gtfFile != "" {
@@ -391,8 +392,11 @@ Examples:
 
 type type2gtfFeatures map[string][]gtf.Feature
 
-func subseqByRegion(outfh *xopen.Writer, record *fastx.Record, lineWidth int, start, end int) {
+func subseqByRegion(outfh *xopen.Writer, record *fastx.Record, lineWidth int, start, end int, appendRegionCoord bool) {
 	record.Seq = record.Seq.SubSeq(start, end)
+	if appendRegionCoord {
+		record.Name = []byte(fmt.Sprintf("%s:%d-%d %s", record.ID, start, end, record.Desc))
+	}
 	record.FormatToWriter(outfh, lineWidth)
 }
 
@@ -606,6 +610,7 @@ func init() {
 	subseqCmd.Flags().StringP("region", "r", "", "by region. "+
 		"e.g 1:12 for first 12 bases, -12:-1 for last 12 bases,"+
 		` 13:-1 for cutting first 12 bases. type "seqkit subseq -h" for more examples`)
+	subseqCmd.Flags().BoolP("region-coord", "R", false, "append coordinates to sequence ID for -r/--region")
 
 	subseqCmd.Flags().StringP("gtf", "", "", "by GTF (version 2.2) file")
 	subseqCmd.Flags().StringSliceP("feature", "", []string{}, `select limited feature types (multiple value supported, case ignored, only works with GTF)`)

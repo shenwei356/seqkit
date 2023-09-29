@@ -2,6 +2,8 @@
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.5.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.5.2)
     - `seqkit split2`:
         - fix the panic for invalid input.
+    - `seqkit subseq`:
+        - add a new flag `-R/--region-coord` for appending coordinates to sequence ID for `-r/--region`. [#413](https://github.com/shenwei356/seqkit/issues/413)
 - [SeqKit v2.5.1](https://github.com/shenwei356/seqkit/releases/tag/v2.5.1) - 2023-08-09
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.5.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.5.1)
     - `seqkit stats`:

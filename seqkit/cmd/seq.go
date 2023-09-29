@@ -448,7 +448,7 @@ func init() {
 	seqCmd.Flags().IntP("min-len", "m", -1, "only print sequences longer than or equal to the minimum length (-1 for no limit)")
 	seqCmd.Flags().IntP("max-len", "M", -1, "only print sequences shorter than or equal to the maximum length (-1 for no limit)")
 	seqCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
-	seqCmd.Flags().Float64P("min-qual", "Q", -1, "only print sequences with average quality qreater or equal than this limit (-1 for no limit)")
+	seqCmd.Flags().Float64P("min-qual", "Q", -1, "only print sequences with average quality greater or equal than this limit (-1 for no limit)")
 	seqCmd.Flags().Float64P("max-qual", "R", -1, "only print sequences with average quality less than this limit (-1 for no limit)")
 }
 

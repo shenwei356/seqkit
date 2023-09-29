@@ -311,7 +311,7 @@ Flags:
                                   no limit) (default -1)
   -m, --min-len int               only print sequences longer than or equal to the minimum length (-1
                                   for no limit) (default -1)
-  -Q, --min-qual float            only print sequences with average quality qreater or equal than this
+  -Q, --min-qual float            only print sequences with average quality greater or equal than this
                                   limit (-1 for no limit) (default -1)
   -n, --name                      only print names/sequence headers
   -i, --only-id                   print IDs instead of full headers
@@ -495,6 +495,7 @@ Flags:
   -f, --only-flank        only return up/down stream sequence
   -r, --region string     by region. e.g 1:12 for first 12 bases, -12:-1 for last 12 bases, 13:-1 for
                           cutting first 12 bases. type "seqkit subseq -h" for more examples
+  -R, --region-coord      append coordinates to sequence ID for -r/--region
   -u, --up-stream int     up stream length
   -U, --update-faidx      update the fasta index file if it exists. Use this if you are not sure whether
                           the fasta file changed
