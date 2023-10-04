@@ -46,8 +46,10 @@ Note:
      compared. Switch on -P/--only-positive-strand for considering the
      positive strand only.
   3. For 2 files, 'seqkit grep' is much faster and consumes lesser memory:
-     seqkit grep -f <(seqkit seq -n -i small.fq.gz) big.fq.gz # by seq ID
-     seqkit grep -s -f <(seqkit seq -s small.fq.gz) big.fq.gz # by seq
+       seqkit grep -f <(seqkit seq -n -i small.fq.gz) big.fq.gz # by seq ID
+     But note that searching by sequence would be much slower, as it's partly
+     string matching.
+       seqkit grep -s -f <(seqkit seq -s small.fq.gz) big.fq.gz # much slower!!!!
   4. Some records in one file may have same sequences/IDs. They will ALL be
      retrieved if the sequence/ID was shared in multiple files.
      So the records number may be larger than that of the smallest file.
@@ -102,6 +104,7 @@ Note:
 
 		// read all files
 		var subject uint64
+		var subjectRC uint64 // hash value of reverse complement sequence
 		var checkFirstFile = true
 		var isFirstFile = true
 		var firstFile string
@@ -143,6 +146,16 @@ Note:
 					} else {
 						subject = xxhash.Sum64(record.Seq.Seq)
 					}
+					if bySeq && revcom {
+						if ignoreCase {
+							subjectRC = xxhash.Sum64(bytes.ToLower(record.Seq.RevComInplace().Seq))
+						} else {
+							subjectRC = xxhash.Sum64(record.Seq.RevComInplace().Seq)
+						}
+						if subjectRC < subject { // only save the smaller one, like keeping canonical k-mers
+							subject = subjectRC
+						}
+					}
 				} else if byName {
 					if ignoreCase {
 						subject = xxhash.Sum64(bytes.ToLower(record.Name))
@@ -169,20 +182,6 @@ Note:
 					}
 					names[subject] = append(names[subject], string(record.Name))
 				}
-
-				if bySeq && revcom {
-					if ignoreCase {
-						subject = xxhash.Sum64(bytes.ToLower(record.Seq.RevComInplace().Seq))
-					} else {
-						subject = xxhash.Sum64(record.Seq.RevComInplace().Seq)
-					}
-
-					if _counter, ok = counter[subject]; !ok {
-						_counter = make(map[string]struct{})
-						counter[subject] = _counter
-					}
-					_counter[file] = struct{}{}
-				}
 			}
 			if isFirstFile {
 				isFirstFile = false
@@ -202,9 +201,10 @@ Note:
 				continue
 			}
 
-			n++
+			n++                       // number of hash values
+			n2 += len(names[subject]) // number of records
+
 			for _, seqname = range names[subject] {
-				n2++
 				namesOK[seqname] = struct{}{}
 			}
 		}
@@ -227,7 +227,7 @@ Note:
 		}
 
 		if !quiet {
-			log.Infof("retrieve seqs from the first file: %s", firstFile)
+			log.Infof("retrieve %d seqs from the first file: %s", n2, firstFile)
 		}
 
 		// retrieve
@@ -261,6 +261,6 @@ func init() {
 	commonCmd.Flags().BoolP("by-seq", "s", false, "match by sequence")
 	commonCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	// commonCmd.Flags().BoolP("consider-revcom", "r", false, "considering the reverse compelment sequence")
-	commonCmd.Flags().BoolP("only-positive-strand", "P", false, "only considering positive strand when comparing by sequence")
+	commonCmd.Flags().BoolP("only-positive-strand", "P", false, "only considering the positive strand when comparing by sequence")
 
 }

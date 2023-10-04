@@ -2339,8 +2339,10 @@ Note:
      compared. Switch on -P/--only-positive-strand for considering the
      positive strand only.
   3. For 2 files, 'seqkit grep' is much faster and consumes lesser memory:
-     seqkit grep -f <(seqkit seq -n -i small.fq.gz) big.fq.gz # by seq ID
-     seqkit grep -s -f <(seqkit seq -s small.fq.gz) big.fq.gz # by seq
+       seqkit grep -f <(seqkit seq -n -i small.fq.gz) big.fq.gz # by seq ID
+     But note that searching by sequence would be much slower, as it's partly
+     string matching.
+       seqkit grep -s -f <(seqkit seq -s small.fq.gz) big.fq.gz # much slower!!!!
   4. Some records in one file may have same sequences/IDs. They will ALL be
      retrieved if the sequence/ID was shared in multiple files.
      So the records number may be larger than that of the smallest file.
@@ -2353,7 +2355,7 @@ Flags:
   -s, --by-seq                 match by sequence
   -h, --help                   help for common
   -i, --ignore-case            ignore case
-  -P, --only-positive-strand   only considering positive strand when comparing by sequence
+  -P, --only-positive-strand   only considering the positive strand when comparing by sequence
 
 ```
 
@@ -2371,6 +2373,8 @@ Examples
 
         seqkit common file*.fa -s -i -o common.fasta
 
+        # seqkit common file*.fa -s -i -o common.fasta
+        seqkit common file*.fa -s -i -o common.fasta -P
 
 ## split
 
