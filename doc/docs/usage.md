@@ -2335,9 +2335,14 @@ find common sequences of multiple files by id/name/sequence
 
 Note:
   1. 'seqkit common' is designed to support 2 and MORE files.
-  2. When comparing by sequences, both positive and negative strands are
-     compared. Switch on -P/--only-positive-strand for considering the
-     positive strand only.
+  2. When comparing by sequences,
+     a) Both positive and negative strands are compared. You can switch on
+        -P/--only-positive-strand for considering the positive strand only.
+     b) You can switch on -e/--check-embedded-seqs to check embedded sequences.
+          e.g, GGGG from file A is a part of TTGGGGTT from file B, we will output
+          GGGG as a shared sequence in both file.
+        It is recommended to put the smallest file as the first file, for saving
+        memory usage.
   3. For 2 files, 'seqkit grep' is much faster and consumes lesser memory:
        seqkit grep -f <(seqkit seq -n -i small.fq.gz) big.fq.gz # by seq ID
      But note that searching by sequence would be much slower, as it's partly
@@ -2353,6 +2358,8 @@ Usage:
 Flags:
   -n, --by-name                match by full name instead of just id
   -s, --by-seq                 match by sequence
+  -e, --check-embedded-seqs    check embedded sequences, e.g., if a sequence is part of another one,
+                               we'll keep the shorter one
   -h, --help                   help for common
   -i, --ignore-case            ignore case
   -P, --only-positive-strand   only considering the positive strand when comparing by sequence
@@ -2375,6 +2382,84 @@ Examples
 
         # seqkit common file*.fa -s -i -o common.fasta
         seqkit common file*.fa -s -i -o common.fasta -P
+
+1. Since v2.6.0, we can use the new flag `-e/--check-embedded-seqs` to detect embedded sequences.
+
+        $ cat common_a.fasta
+        >A_a
+        ACTTTGA
+        >A_b
+        ACC
+        >A_c
+        GGG
+        >A_d
+        CCCCCCCCCCCCC
+        >A_c1
+        AGGGCCC
+        >A_x
+        gggg
+
+        $ cat common_b.fasta
+        >B_a
+        AAA
+        >B_b
+        GGT
+        >B_c
+        AGGGCC
+        >B_e
+        ACCCCCGGGAACC
+        >B_z
+        TTT
+
+        # excactly same sequences
+
+        $ seqkit common -s -i common_a.fasta common_b.fasta
+        [INFO] read file 1/2: common_a.fasta
+        [INFO] read file 2/2: common_b.fasta
+        [INFO] find common seqs ...
+        [INFO] 1 unique sequences found in 2 files, which belong to 1 records in the first file: common_a.fasta
+        [INFO] retrieve 1 seqs from the first file: common_a.fasta
+        >A_b
+        ACC
+
+        # with -e
+
+        $ seqkit common -s -i common_a.fasta common_b.fasta -e
+        [INFO] read file 1/2: common_a.fasta
+        [INFO]   6 seqs loaded
+        [INFO] read file 2/2: common_b.fasta
+        [INFO]   5 seqs left
+        [INFO] 5 unique sequences found in 2 files, which belong to 5 records in the first file: common_a.fasta
+        >A_a:3-5
+        TTT
+        >A_b
+        ACC
+        >A_c
+        GGG
+        >A_c1:1-6
+        AGGGCC
+        >A_x
+        gggg
+
+        # change the order of file
+
+        $ seqkit common -s -i common_b.fasta common_a.fasta -e
+        [INFO] read file 1/2: common_b.fasta
+        [INFO]   5 seqs loaded
+        [INFO] read file 2/2: common_a.fasta
+        [INFO]   5 seqs left
+        [INFO] 5 unique sequences found in 2 files, which belong to 5 records in the first file: common_b.fasta
+        >B_a
+        AAA
+        >B_b
+        GGT
+        >B_c
+        AGGGCC
+        >B_e:2-5
+        CCCC
+        >B_z
+        TTT
+
 
 ## split
 

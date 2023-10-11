@@ -29,7 +29,7 @@ import (
 )
 
 // VERSION of seqkit
-const VERSION = "2.5.2"
+const VERSION = "2.6.0"
 
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
