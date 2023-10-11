@@ -91,13 +91,13 @@ Note:
 		checkError(err)
 		defer outfh.Close()
 
-		// target -> file -> struct{}
-		counter := make(map[uint64]map[string]struct{}, 1000)
-		var _counter map[string]struct{}
+		// target -> file idx -> struct{}
+		counter := make(map[uint64]map[int]struct{}, 1000)
+		var _counter map[int]struct{} // file idx -> struct{}
 
 		// target -> seqnames in firstFile
 		// note that it's []string, i.e., records may have same sequences
-		names := make(map[uint64][]string, 1000)
+		names := make(map[uint64][]string, 1024)
 
 		var fastxReader *fastx.Reader
 		var record *fastx.Record
@@ -108,9 +108,9 @@ Note:
 		var checkFirstFile = true
 		var isFirstFile = true
 		var firstFile string
-		var filenames = make(map[string]int)
 		var ok bool
-		for _, file := range files {
+
+		for i, file := range files {
 			if !quiet {
 				log.Infof("read file: %s", file)
 			}
@@ -121,14 +121,6 @@ Note:
 
 			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
-
-			// allowing finding common records in ONE file
-			if _, ok = filenames[file]; !ok {
-				filenames[file] = 1
-			} else {
-				filenames[file]++
-				file = fmt.Sprintf("%s_%d", file, filenames[file])
-			}
 
 			for {
 				record, err = fastxReader.Read()
@@ -171,10 +163,10 @@ Note:
 				}
 
 				if _counter, ok = counter[subject]; !ok {
-					_counter = make(map[string]struct{})
+					_counter = make(map[int]struct{})
 					counter[subject] = _counter
 				}
-				_counter[file] = struct{}{}
+				_counter[i] = struct{}{}
 
 				if isFirstFile {
 					if _, ok = names[subject]; !ok {
