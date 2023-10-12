@@ -239,7 +239,7 @@ Flags:
       --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2|
                                         Pseud...
       --id-regexp string                regular expression for parsing ID (default "^(\\S+)\\s?")
-      --infile-list string              file of input files list (one file per line), if given, they are
+  -X  --infile-list string              file of input files list (one file per line), if given, they are
                                         appended to files from cli arguments
   -w, --line-width int                  line width when outputting FASTA format (0 for no wrap) (default 60)
   -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")

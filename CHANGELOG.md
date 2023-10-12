@@ -1,5 +1,7 @@
-- [SeqKit v2.5.2](https://github.com/shenwei356/seqkit/releases/tag/v2.5.2) - 2023-08-09
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.5.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.5.2)
+- [SeqKit v2.6.0](https://github.com/shenwei356/seqkit/releases/tag/v2.6.0) - 2023-08-09
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.6.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.6.0)
+    - `seqkit`:
+        - add the shortcut `-X` for the flag `--infile-list`.
     - `seqkit common`:
         - **add a new flag `-e/--check-embedded-seqs` for detecting embedded sequences.**
         - for matching by sequences: reduced the memory occupation and corrected numbers in the log. [#416](https://github.com/shenwei356/seqkit/issues/416)
