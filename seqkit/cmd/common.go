@@ -137,7 +137,7 @@ Note:
 		var _record *fastx.Record
 		var loc2hashes *[]*loc2hash
 		var _loc2hash *loc2hash
-		var j, begin, end int
+		var j, begin, end, _begin, _end int
 		var hash uint64
 		var foundSameSeq bool
 		var foundSubseq bool // found a subsequence for the previous seq
@@ -264,14 +264,12 @@ Note:
 									if _loc2hash.id != seqid { // subseq of other seqs
 										continue
 									}
-									begin, end, _ = seq.SubLocation(len(_record.Seq.Seq), _loc2hash.begin, _loc2hash.end)
-									_seq0 = _record.Seq.Seq[begin-1 : end]
+									_begin, _end, _ = seq.SubLocation(len(_record.Seq.Seq), _loc2hash.begin, _loc2hash.end)
+									_seq0 = _record.Seq.Seq[_begin-1 : _end]
 
 									if j = bytes.Index(_seq0, _seq); j >= 0 { // current seq is part of one previous seq
-										begin, end = begin+j, begin+j+len(_seq)-1
-										hash = subject
+										begin, end = _begin+j, _begin+j+len(_seq)-1
 										foundSubseq = true
-										hitSeqs[seqid] = struct{}{}
 
 										// if debug {
 										// 	fmt.Printf("    1) Previous seq (%s):%d-%d contains this one (%s)\n", seqid, begin, end, record.ID)
@@ -281,15 +279,13 @@ Note:
 										hitHashes[hash] = struct{}{} // mark hashes with matches
 
 										// if debug {
-										// 	begin, end = begin+j, begin+j+len(_seq0)-1 // just for debug
+										// 	begin, end = _begin+j, _begin+j+len(_seq0)-1 // just for debug
 										// 	fmt.Printf("    3) This seq (%s) countains previous one (%s):%d-%d\n", record.ID, seqid, begin, end)
 										// }
 									} else if revcom {
 										if j = bytes.Index(_seq0, _seqRC); j >= 0 { // current seq is part of one previous seq
-											begin, end = begin+j, begin+j+len(_seq)-1
-											hash = subject
+											begin, end = _begin+j, _begin+j+len(_seq)-1
 											foundSubseq = true
-											hitSeqs[seqid] = struct{}{}
 
 											// if debug {
 											// 	fmt.Printf("    2) Previous seq (%s):%d-%d contains this one (%s) (RC)\n", seqid, begin, end, record.ID)
@@ -299,7 +295,7 @@ Note:
 											hitHashes[hash] = struct{}{} // mark hashes with matches
 
 											// if debug {
-											// 	begin, end = begin+j, begin+j+len(_seq0)-1 // just for debug
+											// 	begin, end = _begin+j, _begin+j+len(_seq0)-1 // just for debug
 											// 	fmt.Printf("    4) This seq (%s) RC countains previous one (%s):%d-%d\n", record.ID, seqid, begin, end)
 											// }
 										}
@@ -309,13 +305,18 @@ Note:
 										continue
 									}
 
-									seqid2Hashes[seqid][subject] = struct{}{} // add new record
+									// if debug {
+									// 	fmt.Printf("  > add new record %d for %s\n", subject, seqid)
+									// }
+
+									hitSeqs[seqid] = struct{}{}               // mark the sequence with matches
 									hitHashes[subject] = struct{}{}           // mark hashes with matches
+									seqid2Hashes[seqid][subject] = struct{}{} // add new record
 
 									// add a new record for subsequence
-									if loc2hashes, ok = hashes[hash]; !ok {
+									if loc2hashes, ok = hashes[subject]; !ok {
 										loc2hashes = &[]*loc2hash{}
-										hashes[hash] = loc2hashes
+										hashes[subject] = loc2hashes
 									}
 									*loc2hashes = append(*loc2hashes, &loc2hash{
 										id:    seqid,
