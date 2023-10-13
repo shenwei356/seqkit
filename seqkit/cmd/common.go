@@ -143,7 +143,7 @@ Note:
 		var foundSubseq bool // found a subsequence for the previous seq
 		var foundSubseqID string
 
-		debug := false
+		// debug := false
 
 		if bySeq && checkembeddedSeqs {
 			seqs = make(map[string]*fastx.Record, 1024)
@@ -225,9 +225,9 @@ Note:
 					}
 
 					// 2+ files
-					if debug {
-						fmt.Printf("check seq: %s\n", seqid)
-					}
+					// if debug {
+					// 	fmt.Printf("check seq: %s\n", seqid)
+					// }
 					if loc2hashes, ok = hashes[subject]; ok { // existed
 						foundSameSeq = false
 						for _, _loc2hash = range *loc2hashes {
@@ -241,9 +241,9 @@ Note:
 							hitHashes[subject] = struct{}{}
 							hitSeqs[foundSubseqID] = struct{}{}
 
-							if debug {
-								fmt.Printf("    0) exactly the same seq (%s) vs (%s)\n", record.ID, _loc2hash.id)
-							}
+							// if debug {
+							// 	fmt.Printf("    0) exactly the same seq (%s) vs (%s)\n", record.ID, _loc2hash.id)
+							// }
 						}
 					} else {
 						for _, _record = range seqs {
@@ -251,15 +251,15 @@ Note:
 
 							seqid = string(_record.ID)
 
-							if debug {
-								fmt.Printf("  - compare to %s\n", seqid)
-							}
+							// if debug {
+							// 	fmt.Printf("  - compare to %s\n", seqid)
+							// }
 
 						THESEQ:
 							for hash = range seqid2Hashes[seqid] { // this seqs has many subseqs
-								if debug {
-									fmt.Printf("  - check hash %d\n", hash)
-								}
+								// if debug {
+								// 	fmt.Printf("  - check hash %d\n", hash)
+								// }
 								for _, _loc2hash = range *(hashes[hash]) { // for each record
 									if _loc2hash.id != seqid { // subseq of other seqs
 										continue
@@ -273,17 +273,17 @@ Note:
 										foundSubseq = true
 										hitSeqs[seqid] = struct{}{}
 
-										if debug {
-											fmt.Printf("    1) Previous seq (%s):%d-%d contains this one (%s)\n", seqid, begin, end, record.ID)
-										}
+										// if debug {
+										// 	fmt.Printf("    1) Previous seq (%s):%d-%d contains this one (%s)\n", seqid, begin, end, record.ID)
+										// }
 									} else if j = bytes.Index(_seq, _seq0); j >= 0 { // one previous seq is part of current seq
 										hitSeqs[seqid] = struct{}{}
 										hitHashes[hash] = struct{}{} // mark hashes with matches
 
-										if debug {
-											begin, end = begin+j, begin+j+len(_seq0)-1 // just for debug
-											fmt.Printf("    3) This seq (%s) countains previous one (%s):%d-%d\n", record.ID, seqid, begin, end)
-										}
+										// if debug {
+										// 	begin, end = begin+j, begin+j+len(_seq0)-1 // just for debug
+										// 	fmt.Printf("    3) This seq (%s) countains previous one (%s):%d-%d\n", record.ID, seqid, begin, end)
+										// }
 									} else if revcom {
 										if j = bytes.Index(_seq0, _seqRC); j >= 0 { // current seq is part of one previous seq
 											begin, end = begin+j, begin+j+len(_seq)-1
@@ -291,17 +291,17 @@ Note:
 											foundSubseq = true
 											hitSeqs[seqid] = struct{}{}
 
-											if debug {
-												fmt.Printf("    2) Previous seq (%s):%d-%d contains this one (%s) (RC)\n", seqid, begin, end, record.ID)
-											}
+											// if debug {
+											// 	fmt.Printf("    2) Previous seq (%s):%d-%d contains this one (%s) (RC)\n", seqid, begin, end, record.ID)
+											// }
 										} else if j = bytes.Index(_seqRC, _seq0); j >= 0 { // one previous seq is part of current seq
 											hitSeqs[seqid] = struct{}{}
 											hitHashes[hash] = struct{}{} // mark hashes with matches
 
-											if debug {
-												begin, end = begin+j, begin+j+len(_seq0)-1 // just for debug
-												fmt.Printf("    4) This seq (%s) RC countains previous one (%s):%d-%d\n", record.ID, seqid, begin, end)
-											}
+											// if debug {
+											// 	begin, end = begin+j, begin+j+len(_seq0)-1 // just for debug
+											// 	fmt.Printf("    4) This seq (%s) RC countains previous one (%s):%d-%d\n", record.ID, seqid, begin, end)
+											// }
 										}
 									}
 
@@ -327,7 +327,6 @@ Note:
 									break THESEQ // just need one hit in the same sequence
 								}
 							} // all subsequences of a target seq
-
 						} // target seqs to compare
 					} // compare seqs by bytes.index
 				} // all input seqs
@@ -383,12 +382,13 @@ Note:
 
 					if !quiet {
 						log.Infof("  %d seqs left", len(seqs))
-						if debug {
-							fmt.Printf("   %d seqs left\n", len(seqs))
-							for seqid = range seqs {
-								fmt.Printf("    %s\n", seqid)
-							}
-						}
+
+						// if debug {
+						// 	fmt.Printf("   %d seqs left\n", len(seqs))
+						// 	for seqid = range seqs {
+						// 		fmt.Printf("    %s\n", seqid)
+						// 	}
+						// }
 					}
 				}
 
@@ -398,22 +398,22 @@ Note:
 				}
 
 				// list hashes
-				if debug {
-					fmt.Println("-----------------------------------")
-					var _hashes map[uint64]interface{}
-					for seqid, _hashes = range seqid2Hashes {
-						fmt.Printf("%s\n", seqid)
-						for hash = range _hashes {
-							fmt.Printf("  %d\n", hash)
-						}
-					}
-					for subject, loc2hashes = range hashes {
-						fmt.Println(subject)
-						for _, _loc2hash = range *loc2hashes {
-							fmt.Printf("  %s:%d-%d=%d %s\n", _loc2hash.id, _loc2hash.begin, _loc2hash.end, _loc2hash.len, seqs[_loc2hash.id].Seq.SubSeq(_loc2hash.begin, _loc2hash.end).Seq)
-						}
-					}
-				}
+				// if debug {
+				// 	fmt.Println("-----------------------------------")
+				// 	var _hashes map[uint64]interface{}
+				// 	for seqid, _hashes = range seqid2Hashes {
+				// 		fmt.Printf("%s\n", seqid)
+				// 		for hash = range _hashes {
+				// 			fmt.Printf("  %d\n", hash)
+				// 		}
+				// 	}
+				// 	for subject, loc2hashes = range hashes {
+				// 		fmt.Println(subject)
+				// 		for _, _loc2hash = range *loc2hashes {
+				// 			fmt.Printf("  %s:%d-%d=%d %s\n", _loc2hash.id, _loc2hash.begin, _loc2hash.end, _loc2hash.len, seqs[_loc2hash.id].Seq.SubSeq(_loc2hash.begin, _loc2hash.end).Seq)
+				// 		}
+				// 	}
+				// }
 			}
 
 			// retrieve
