@@ -105,7 +105,7 @@ Note:
 		var record *fastx.Record
 		var rc *seq.Seq
 
-		var _seq, _seqRC []byte
+		var _seq0, _seq, _seqRC []byte
 		var subject uint64
 		var subjectRC uint64 // hash value of reverse complement sequence
 		var checkFirstFile = true
@@ -119,11 +119,14 @@ Note:
 			id    string
 			begin int
 			end   int
+			len   int
 		}
 
-		var seqs map[string]*fastx.Record // seqid -> record, sequences in the first file
-		var seqid2Hash map[string]uint64  // seqid -> hash
-		var hashes map[uint64]*[]loc2hash // hash -> [(id,begin,end,isRC)]
+		// relation structures
+		var seqs map[string]*fastx.Record                  // seqid -> record, sequences in the first file
+		var hashes map[uint64]*[]*loc2hash                 // hash -> [(id,begin,end,len)]
+		var seqid2Hashes map[string]map[uint64]interface{} // seqid -> hashes of subseqs
+
 		var hitSeqs map[string]interface{}
 		var hitHashes map[uint64]interface{}
 		rmSeqs := make([]string, 0, 1024)
@@ -132,16 +135,20 @@ Note:
 
 		var seqid string
 		var _record *fastx.Record
-		var loc2hashes *[]loc2hash
-		var _loc2hash loc2hash
+		var loc2hashes *[]*loc2hash
+		var _loc2hash *loc2hash
 		var j, begin, end int
 		var hash uint64
+		var foundSameSeq bool
 		var foundSubseq bool // found a subsequence for the previous seq
+		var foundSubseqID string
+
+		debug := false
 
 		if bySeq && checkembeddedSeqs {
 			seqs = make(map[string]*fastx.Record, 1024)
-			hashes = make(map[uint64]*[]loc2hash, 1024)
-			seqid2Hash = make(map[string]uint64, 1024)
+			hashes = make(map[uint64]*[]*loc2hash, 1024)
+			seqid2Hashes = make(map[string]map[uint64]interface{}, 1024)
 
 			for i, file := range files {
 				if !quiet {
@@ -199,77 +206,131 @@ Note:
 						}
 
 						if loc2hashes, ok = hashes[subject]; !ok {
-							loc2hashes = &[]loc2hash{}
+							loc2hashes = &[]*loc2hash{}
 							hashes[subject] = loc2hashes
 						}
-						*loc2hashes = append(*loc2hashes, loc2hash{
+						*loc2hashes = append(*loc2hashes, &loc2hash{
 							id:    seqid,
 							begin: 1,
 							end:   -1,
+							len:   len(record.Seq.Seq),
 						})
 
-						seqid2Hash[seqid] = subject
+						if _, ok = seqid2Hashes[seqid]; !ok {
+							seqid2Hashes[seqid] = make(map[uint64]interface{})
+						}
+						seqid2Hashes[seqid][subject] = struct{}{}
 
 						continue
 					}
 
 					// 2+ files
-					// fmt.Printf("check seq: %s\n", seqid)
-					if loc2hashes, ok = hashes[subject]; ok { // exactly the same sequence
-						hitHashes[subject] = struct{}{}
+					if debug {
+						fmt.Printf("check seq: %s\n", seqid)
+					}
+					if loc2hashes, ok = hashes[subject]; ok { // existed
+						foundSameSeq = false
 						for _, _loc2hash = range *loc2hashes {
-							hitSeqs[_loc2hash.id] = struct{}{}
+							if _loc2hash.len == len(record.Seq.Seq) { // hash and seqlen both matched
+								foundSameSeq = true
+								foundSubseqID = _loc2hash.id
+								break
+							}
 						}
-						// fmt.Printf("  0) exactly the same seq (%s) vs (%s)\n", record.ID, _loc2hash.id)
+						if foundSameSeq {
+							hitHashes[subject] = struct{}{}
+							hitSeqs[foundSubseqID] = struct{}{}
+
+							if debug {
+								fmt.Printf("    0) exactly the same seq (%s) vs (%s)\n", record.ID, _loc2hash.id)
+							}
+						}
 					} else {
 						for _, _record = range seqs {
 							foundSubseq = false
 
 							seqid = string(_record.ID)
 
-							if j = bytes.Index(_record.Seq.Seq, _seq); j >= 0 { // current seq is part of one previous seq
-								begin, end = j+1, j+len(_seq)
-								hash = subject
-								foundSubseq = true
-								hitSeqs[seqid] = struct{}{}
-								// fmt.Printf("  1) Previous seq (%s) contains this one (%s)\n", seqid, record.ID)
-							} else if j = bytes.Index(_seq, _record.Seq.Seq); j >= 0 { // one previous is part of current seq
-								hitSeqs[seqid] = struct{}{}
-								hitHashes[seqid2Hash[seqid]] = struct{}{} // mark hashes with matches
-								// fmt.Printf("  3) This seq (%s) countains previous one (%s)\n", record.ID, seqid)
-							} else if revcom {
-								if j = bytes.Index(_record.Seq.Seq, _seqRC); j >= 0 { // current seq is part of one previous seq
-									begin, end = j+1, j+len(_seq)
-									hash = subject
-									foundSubseq = true
-									hitSeqs[seqid] = struct{}{}
-									// fmt.Printf("  2) Previous seq (%s) contains this one (%s) (RC)\n", seqid, record.ID)
-								} else if j = bytes.Index(_seqRC, _record.Seq.Seq); j >= 0 { // one previous is part of current seq
-									hitSeqs[seqid] = struct{}{}
-									hitHashes[seqid2Hash[seqid]] = struct{}{} // mark hashes with matches
-									// fmt.Printf("  4) This seq (%s) RC countains previous one (%s)\n", record.ID, seqid)
+							if debug {
+								fmt.Printf("  - compare to %s\n", seqid)
+							}
+
+						THESEQ:
+							for hash = range seqid2Hashes[seqid] { // this seqs has many subseqs
+								if debug {
+									fmt.Printf("  - check hash %d\n", hash)
 								}
-							}
+								for _, _loc2hash = range *(hashes[hash]) { // for each record
+									if _loc2hash.id != seqid { // subseq of other seqs
+										continue
+									}
+									begin, end, _ = seq.SubLocation(len(_record.Seq.Seq), _loc2hash.begin, _loc2hash.end)
+									_seq0 = _record.Seq.Seq[begin-1 : end]
 
-							if !foundSubseq {
-								continue
-							}
+									if j = bytes.Index(_seq0, _seq); j >= 0 { // current seq is part of one previous seq
+										begin, end = begin+j, begin+j+len(_seq)-1
+										hash = subject
+										foundSubseq = true
+										hitSeqs[seqid] = struct{}{}
 
-							hitHashes[subject] = struct{}{} // mark hashes with matches
+										if debug {
+											fmt.Printf("    1) Previous seq (%s):%d-%d contains this one (%s)\n", seqid, begin, end, record.ID)
+										}
+									} else if j = bytes.Index(_seq, _seq0); j >= 0 { // one previous seq is part of current seq
+										hitSeqs[seqid] = struct{}{}
+										hitHashes[hash] = struct{}{} // mark hashes with matches
 
-							// add a new record for subsequence
-							if loc2hashes, ok = hashes[hash]; !ok {
-								loc2hashes = &[]loc2hash{}
-								hashes[hash] = loc2hashes
-							}
-							*loc2hashes = append(*loc2hashes, loc2hash{
-								id:    seqid,
-								begin: begin,
-								end:   end,
-							})
-						}
-					}
-				}
+										if debug {
+											begin, end = begin+j, begin+j+len(_seq0)-1 // just for debug
+											fmt.Printf("    3) This seq (%s) countains previous one (%s):%d-%d\n", record.ID, seqid, begin, end)
+										}
+									} else if revcom {
+										if j = bytes.Index(_seq0, _seqRC); j >= 0 { // current seq is part of one previous seq
+											begin, end = begin+j, begin+j+len(_seq)-1
+											hash = subject
+											foundSubseq = true
+											hitSeqs[seqid] = struct{}{}
+
+											if debug {
+												fmt.Printf("    2) Previous seq (%s):%d-%d contains this one (%s) (RC)\n", seqid, begin, end, record.ID)
+											}
+										} else if j = bytes.Index(_seqRC, _seq0); j >= 0 { // one previous seq is part of current seq
+											hitSeqs[seqid] = struct{}{}
+											hitHashes[hash] = struct{}{} // mark hashes with matches
+
+											if debug {
+												begin, end = begin+j, begin+j+len(_seq0)-1 // just for debug
+												fmt.Printf("    4) This seq (%s) RC countains previous one (%s):%d-%d\n", record.ID, seqid, begin, end)
+											}
+										}
+									}
+
+									if !foundSubseq {
+										continue
+									}
+
+									seqid2Hashes[seqid][subject] = struct{}{} // add new record
+									hitHashes[subject] = struct{}{}           // mark hashes with matches
+
+									// add a new record for subsequence
+									if loc2hashes, ok = hashes[hash]; !ok {
+										loc2hashes = &[]*loc2hash{}
+										hashes[hash] = loc2hashes
+									}
+									*loc2hashes = append(*loc2hashes, &loc2hash{
+										id:    seqid,
+										begin: begin,
+										end:   end,
+										len:   end - begin + 1,
+									})
+
+									break THESEQ // just need one hit in the same sequence
+								}
+							} // all subsequences of a target seq
+
+						} // target seqs to compare
+					} // compare seqs by bytes.index
+				} // all input seqs
 
 				if isFirstFile {
 					if !quiet {
@@ -278,23 +339,10 @@ Note:
 
 					isFirstFile = false
 				} else {
-
-					// clean seqs and seqid2hash
+					rmHashes = rmHashes[:0]
 					rmSeqs = rmSeqs[:0]
 
-					for seqid = range seqs {
-						if _, ok = hitSeqs[seqid]; !ok {
-							rmSeqs = append(rmSeqs, seqid)
-						}
-					}
-					for _, seqid = range rmSeqs {
-						delete(seqs, seqid)
-						blackHashes[seqid2Hash[seqid]] = struct{}{}
-						delete(seqid2Hash, seqid)
-					}
-
 					// clean hashes
-					rmHashes = rmHashes[:0]
 					for hash, loc2hashes = range hashes {
 						if _, ok = blackHashes[hash]; ok {
 							rmHashes = append(rmHashes, hash)
@@ -302,13 +350,45 @@ Note:
 						if _, ok = hitHashes[hash]; !ok {
 							rmHashes = append(rmHashes, hash)
 						}
+
+						for _, _loc2hash = range *loc2hashes { // some seus do not exist anymore
+							if _, ok = hitSeqs[_loc2hash.id]; !ok {
+								rmSeqs = append(rmSeqs, seqid)
+							}
+						}
 					}
 					for _, hash = range rmHashes {
+						blackHashes[hash] = struct{}{}
 						delete(hashes, hash)
+					}
+
+					// clean seqs and seqid2Hashes
+
+					for seqid = range seqs {
+						if _, ok = hitSeqs[seqid]; !ok {
+							rmSeqs = append(rmSeqs, seqid)
+						}
+
+						for hash = range seqid2Hashes[seqid] {
+							if _, ok = blackHashes[hash]; ok {
+								delete(seqid2Hashes[seqid], hash)
+							}
+						}
+					}
+
+					for _, seqid = range rmSeqs {
+						delete(seqs, seqid)
+						delete(seqid2Hashes, seqid)
 					}
 
 					if !quiet {
 						log.Infof("  %d seqs left", len(seqs))
+						if debug {
+							fmt.Printf("   %d seqs left\n", len(seqs))
+							for seqid = range seqs {
+								fmt.Printf("    %s\n", seqid)
+							}
+						}
 					}
 				}
 
@@ -318,13 +398,22 @@ Note:
 				}
 
 				// list hashes
-				// for subject, loc2hashes = range hashes {
-				// 	fmt.Println(subject)
-				// 	for _, _loc2hash = range *loc2hashes {
-				// 		fmt.Printf("  %s:%d-%d\n", _loc2hash.id, _loc2hash.begin, _loc2hash.end)
-				// 	}
-				// }
-
+				if debug {
+					fmt.Println("-----------------------------------")
+					var _hashes map[uint64]interface{}
+					for seqid, _hashes = range seqid2Hashes {
+						fmt.Printf("%s\n", seqid)
+						for hash = range _hashes {
+							fmt.Printf("  %d\n", hash)
+						}
+					}
+					for subject, loc2hashes = range hashes {
+						fmt.Println(subject)
+						for _, _loc2hash = range *loc2hashes {
+							fmt.Printf("  %s:%d-%d=%d %s\n", _loc2hash.id, _loc2hash.begin, _loc2hash.end, _loc2hash.len, seqs[_loc2hash.id].Seq.SubSeq(_loc2hash.begin, _loc2hash.end).Seq)
+						}
+					}
+				}
 			}
 
 			// retrieve

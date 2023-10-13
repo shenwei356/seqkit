@@ -2398,6 +2398,8 @@ Examples
         AGGGCCC
         >A_x
         gggg
+        >A_y
+        ACGTAC
 
         $ cat common_b.fasta
         >B_a
@@ -2411,25 +2413,44 @@ Examples
         >B_z
         TTT
 
+        $ cat common_c.fasta
+        >C_a
+        ACTTTGA
+        >C_b
+        ACC
+        >C_c
+        GGG
+        >C_d
+        CCCCCCCCCCCCC
+        >C_c1
+        AGGGCCC
+        >C_x
+        gggg
+        >C_y
+        ACGTAC
+
         # excactly same sequences
 
-        $ seqkit common -s -i common_a.fasta common_b.fasta
-        [INFO] read file 1/2: common_a.fasta
-        [INFO] read file 2/2: common_b.fasta
+        $ seqkit common -s -i common_a.fasta common_b.fasta common_c.fasta
+        [INFO] read file 1/3: common_a.fasta
+        [INFO] read file 2/3: common_b.fasta
+        [INFO] read file 3/3: common_c.fasta
         [INFO] find common seqs ...
-        [INFO] 1 unique sequences found in 2 files, which belong to 1 records in the first file: common_a.fasta
+        [INFO] 1 unique sequences found in 3 files, which belong to 1 records in the first file: common_a.fasta
         [INFO] retrieve 1 seqs from the first file: common_a.fasta
         >A_b
         ACC
 
         # with -e
 
-        $ seqkit common -s -i common_a.fasta common_b.fasta -e
-        [INFO] read file 1/2: common_a.fasta
-        [INFO]   6 seqs loaded
-        [INFO] read file 2/2: common_b.fasta
+        $ seqkit common -s -i common_a.fasta common_b.fasta common_c.fasta -e
+        [INFO] read file 1/3: common_a.fasta
+        [INFO]   7 seqs loaded
+        [INFO] read file 2/3: common_b.fasta
         [INFO]   5 seqs left
-        [INFO] 5 unique sequences found in 2 files, which belong to 5 records in the first file: common_a.fasta
+        [INFO] read file 3/3: common_c.fasta
+        [INFO]   5 seqs left
+        [INFO] 5 unique sequences found in 3 files, which belong to 5 records in the first file: common_a.fasta
         >A_a:3-5
         TTT
         >A_b
@@ -2441,24 +2462,26 @@ Examples
         >A_x
         gggg
 
-        # change the order of file
+        # change the order of file, the sequences are the same
 
-        $ seqkit common -s -i common_b.fasta common_a.fasta -e
-        [INFO] read file 1/2: common_b.fasta
-        [INFO]   5 seqs loaded
-        [INFO] read file 2/2: common_a.fasta
+        $ seqkit common -s -i common_c.fasta common_b.fasta common_a.fasta -e
+        [INFO] read file 1/3: common_c.fasta
+        [INFO]   7 seqs loaded
+        [INFO] read file 2/3: common_b.fasta
         [INFO]   5 seqs left
-        [INFO] 5 unique sequences found in 2 files, which belong to 5 records in the first file: common_b.fasta
-        >B_a
-        AAA
-        >B_b
-        GGT
-        >B_c
-        AGGGCC
-        >B_e:2-5
-        CCCC
-        >B_z
+        [INFO] read file 3/3: common_a.fasta
+        [INFO]   5 seqs left
+        [INFO] 5 unique sequences found in 3 files, which belong to 5 records in the first file: common_c.fasta
+        >C_a:3-5
         TTT
+        >C_b
+        ACC
+        >C_c
+        GGG
+        >C_c1:1-6
+        AGGGCC
+        >C_x
+        gggg
 
 
 ## split
