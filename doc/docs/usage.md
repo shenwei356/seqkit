@@ -2339,8 +2339,10 @@ Note:
      a) Both positive and negative strands are compared. You can switch on
         -P/--only-positive-strand for considering the positive strand only.
      b) You can switch on -e/--check-embedded-seqs to check embedded sequences.
-          e.g, GGGG from file A is a part of TTGGGGTT from file B, we will output
-          GGGG as a shared sequence in both file.
+          e.g, for file A and B, the reverse complement sequence of CCCC from file B
+          is a part of TTGGGGTT from file A, we will extract and output GGGG from file A.
+          If sequences CCC exist in other files except file A, we will skip it,
+          as it is an embedded subsequence of GGGG.
         It is recommended to put the smallest file as the first file, for saving
         memory usage.
   3. For 2 files, 'seqkit grep' is much faster and consumes lesser memory:
@@ -2451,6 +2453,7 @@ Examples
         [INFO] read file 3/3: common_c.fasta
         [INFO]   5 seqs left
         [INFO] 5 unique sequences found in 3 files, which belong to 5 records in the first file: common_a.fasta
+        [INFO] 5 common/shared sequences saved to: -
         >A_a:3-5
         TTT
         >A_b
@@ -2472,6 +2475,7 @@ Examples
         [INFO] read file 3/3: common_a.fasta
         [INFO]   5 seqs left
         [INFO] 5 unique sequences found in 3 files, which belong to 5 records in the first file: common_c.fasta
+        [INFO] 5 common/shared sequences saved to: -
         >C_a:3-5
         TTT
         >C_b
