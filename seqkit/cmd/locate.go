@@ -92,6 +92,7 @@ Attentions:
 		mismatches := getFlagNonNegativeInt(cmd, "max-mismatch")
 		hideMatched := getFlagBool(cmd, "hide-matched")
 		circular := getFlagBool(cmd, "circular")
+		len2show := getFlagNonNegativeInt(cmd, "max-len-to-show")
 
 		immediateOutput := getFlagBool(cmd, "immediate-output")
 
@@ -456,7 +457,7 @@ Attentions:
 											_ch <- fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
 												record.ID,
 												pName,
-												patterns[pName],
+												prune(patterns[pName], len2show), // patterns[pName],
 												"+",
 												begin,
 												end)
@@ -464,11 +465,11 @@ Attentions:
 											_ch <- fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 												record.ID,
 												pName,
-												patterns[pName],
+												prune(patterns[pName], len2show), // patterns[pName],
 												"+",
 												begin,
 												end,
-												record.Seq.Seq[i:i+len(pSeq)])
+												prune(record.Seq.Seq[i:i+len(pSeq)], len2show)) // record.Seq.Seq[i:i+len(pSeq)])
 										}
 									}
 								}
@@ -541,7 +542,7 @@ Attentions:
 											_ch <- fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
 												record.ID,
 												pName,
-												patterns[pName],
+												prune(patterns[pName], len2show), // patterns[pName],
 												"-",
 												begin,
 												end)
@@ -549,11 +550,11 @@ Attentions:
 											_ch <- fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 												record.ID,
 												pName,
-												patterns[pName],
+												prune(patterns[pName], len2show), // patterns[pName],
 												"-",
 												begin,
 												end,
-												seqRP.Seq[i:i+len(pSeq)])
+												prune(seqRP.Seq[i:i+len(pSeq)], len2show)) // seqRP.Seq[i:i+len(pSeq)])
 										}
 									}
 								}
@@ -679,7 +680,7 @@ Attentions:
 									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
 										record.ID,
 										pName,
-										patterns[pName],
+										prune(patterns[pName], len2show), // patterns[pName],
 										"+",
 										begin,
 										end))
@@ -687,11 +688,11 @@ Attentions:
 									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 										record.ID,
 										pName,
-										patterns[pName],
+										prune(patterns[pName], len2show), // patterns[pName],
 										"+",
 										begin,
 										end,
-										record.Seq.Seq[i:i+len(pSeq)]))
+										prune(record.Seq.Seq[i:i+len(pSeq)], len2show))) // record.Seq.Seq[i:i+len(pSeq)]))
 								}
 							}
 						}
@@ -746,7 +747,7 @@ Attentions:
 									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
 										record.ID,
 										pName,
-										patterns[pName],
+										prune(patterns[pName], len2show), // patterns[pName],
 										"-",
 										begin,
 										end))
@@ -754,11 +755,11 @@ Attentions:
 									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 										record.ID,
 										pName,
-										patterns[pName],
+										prune(patterns[pName], len2show), // patterns[pName],
 										"-",
 										begin,
 										end,
-										seqRP.Seq[i:i+len(pSeq)]))
+										prune(seqRP.Seq[i:i+len(pSeq)], len2show))) // seqRP.Seq[i:i+len(pSeq)]))
 								}
 							}
 						}
@@ -837,7 +838,7 @@ Attentions:
 								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
 									record.ID,
 									pName,
-									patterns[pName],
+									prune(patterns[pName], len2show), // patterns[pName],
 									"+",
 									begin,
 									end))
@@ -845,11 +846,11 @@ Attentions:
 								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 									record.ID,
 									pName,
-									patterns[pName],
+									prune(patterns[pName], len2show), // patterns[pName],
 									"+",
 									begin,
 									end,
-									record.Seq.Seq[begin-1:end]))
+									prune(record.Seq.Seq[begin-1:end], len2show))) // record.Seq.Seq[begin-1:end]))
 							}
 						}
 						// locs = append(locs, [2]int{begin, end})
@@ -936,7 +937,7 @@ Attentions:
 								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
 									record.ID,
 									pName,
-									patterns[pName],
+									prune(patterns[pName], len2show), // patterns[pName],
 									"-",
 									begin,
 									end))
@@ -944,11 +945,11 @@ Attentions:
 								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 									record.ID,
 									pName,
-									patterns[pName],
+									prune(patterns[pName], len2show), // patterns[pName],
 									"-",
 									begin,
 									end,
-									seqRP.Seq[offset+loc[0]:offset+loc[1]]))
+									prune(seqRP.Seq[offset+loc[0]:offset+loc[1]], len2show))) // seqRP.Seq[offset+loc[0]:offset+loc[1]]))
 							}
 						}
 						// locsNeg = append(locsNeg, [2]int{begin, end})
@@ -990,6 +991,20 @@ func init() {
 	locateCmd.Flags().BoolP("bed", "", false, "output in BED6 format")
 	locateCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster")
 	locateCmd.Flags().BoolP("hide-matched", "M", false, "do not show matched sequences")
+	locateCmd.Flags().IntP("max-len-to-show", "s", 0, "show at most X characters for the search pattern or matched sequences")
 	locateCmd.Flags().BoolP("circular", "c", false, `circular genome. type "seqkit locate -h" for details`)
 	locateCmd.Flags().BoolP("immediate-output", "I", false, "print output immediately, do not use write buffer")
+}
+
+func prune(s []byte, n int) []byte {
+	if n == 0 {
+		return s
+	}
+
+	n0 := len(s)
+	if n0 < n {
+		return s
+	}
+
+	return []byte(string(s[:n]) + "...")
 }

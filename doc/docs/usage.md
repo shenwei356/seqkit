@@ -1830,6 +1830,7 @@ Flags:
   -M, --hide-matched              do not show matched sequences
   -i, --ignore-case               ignore case
   -I, --immediate-output          print output immediately, do not use write buffer
+  -s, --max-len-to-show int       show at most X characters for the search pattern or matched sequences
   -m, --max-mismatch int          max mismatch when matching by seq. For large genomes like human
                                   genome, using mapping/alignment tools would be faster
   -G, --non-greedy                non-greedy mode, faster but may miss motifs overlapping with others
