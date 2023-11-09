@@ -158,7 +158,7 @@ reproduced in different environments with same random seed.
 ``` text
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 2.5.0
+Version: 2.6.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -190,7 +190,7 @@ Usage:
 Available Commands:
   amplicon        extract amplicon (or specific region around it) via primer(s)
   bam             monitoring and online histograms of BAM record features
-  common          find common sequences of multiple files by id/name/sequence
+  common          find common/shared sequences of multiple files by id/name/sequence
   concat          concatenate sequences with the same ID from multiple files
   convert         convert FASTQ quality encoding between Sanger, Solexa and Illumina
   duplicate       duplicate sequences N times
@@ -239,7 +239,7 @@ Flags:
       --id-ncbi                         FASTA head is NCBI-style, e.g. >gi|110645304|ref|NC_002516.2|
                                         Pseud...
       --id-regexp string                regular expression for parsing ID (default "^(\\S+)\\s?")
-  -X  --infile-list string              file of input files list (one file per line), if given, they are
+  -X, --infile-list string              file of input files list (one file per line), if given, they are
                                         appended to files from cli arguments
   -w, --line-width int                  line width when outputting FASTA format (0 for no wrap) (default 60)
   -o, --out-file string                 out file ("-" for stdout, suffix .gz for gzipped out) (default "-")

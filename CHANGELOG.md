@@ -1,4 +1,4 @@
-- [SeqKit v2.6.0](https://github.com/shenwei356/seqkit/releases/tag/v2.6.0) - 2023-08-09
+- [SeqKit v2.6.0](https://github.com/shenwei356/seqkit/releases/tag/v2.6.0) - 2023-11-09
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.6.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.6.0)
     - `seqkit`:
         - add the shortcut `-X` for the flag `--infile-list`.
