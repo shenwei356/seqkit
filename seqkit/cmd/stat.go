@@ -549,14 +549,14 @@ Tips:
 		<-doneSendFile
 		wg.Wait()
 
+		close(ch)
+		<-done
+
 		if !config.Quiet && len(files) > 1 {
 			close(chDuration)
 			<-doneDuration
 			pbs.Wait()
 		}
-
-		close(ch)
-		<-done
 
 		select {
 		case <-cancel:
