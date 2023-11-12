@@ -1,8 +1,9 @@
 - [SeqKit v2.6.1](https://github.com/shenwei356/seqkit/releases/tag/v2.6.1) - 2023-11-09
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.6.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.6.1)
+    - `seqkit`:
+        - fix panic of nil pointer introduced in v2.6.0, which happens when handling multiple input files and some of them have file sizes of zero.
     - `seqkit seq`:
         - fix panic (close of closed channel) when using `-v` to checking sequences.
-        - fix panic of nil pointer introduced in v2.6.0, which happens when handing multiple input files and some of them has size of zero.
 - [SeqKit v2.6.0](https://github.com/shenwei356/seqkit/releases/tag/v2.6.0) - 2023-11-09
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.6.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.6.0)
     - `seqkit`:
