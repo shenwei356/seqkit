@@ -2902,7 +2902,7 @@ Usage
 print first N FASTA/Q records
 
 For returning the last N records, use:
-    seqkit range -N:-1 seqs.fasta
+    seqkit range -r -N:-1 seqs.fasta
 
 Usage:
   seqkit head [flags]
