@@ -13,7 +13,7 @@ require (
 	github.com/elliotwutingfeng/asciiset v0.0.0-20230602022725-51bbb787efab
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/iafan/cwalk v0.0.0-20210125030640-586a8832a711
-	github.com/klauspost/compress v1.16.3
+	github.com/klauspost/compress v1.17.3
 	github.com/klauspost/pgzip v1.2.6
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mattn/go-colorable v0.1.13
