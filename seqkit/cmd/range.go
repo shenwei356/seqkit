@@ -115,9 +115,8 @@ Examples:
 		}
 
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			if start < 0 && end < 0 {
@@ -166,6 +165,7 @@ Examples:
 					buf.Add(record.Clone())
 				}
 			}
+			fastxReader.Close()
 
 			if rangeNN {
 				current0 := buf.Current

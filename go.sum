@@ -123,8 +123,8 @@ github.com/rogpeppe/go-internal v1.9.0/go.mod h1:WtVeX8xhTBvf0smdhujwtBcq4Qrzq/f
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/ruudk/golang-pdf417 v0.0.0-20181029194003-1af4ab5afa58/go.mod h1:6lfFZQK844Gfx8o5WFuvpxWRwnSoipWe/p622j1v06w=
 github.com/ruudk/golang-pdf417 v0.0.0-20201230142125-a7e3863a1245/go.mod h1:pQAZKsJ8yyVxGRWYNEm9oFB8ieLgKFnamEyDmSA0BRk=
-github.com/shenwei356/bio v0.11.0 h1:+8hebKNNnf4vR88TvnqvJbV+zOl/LUsb7afoEu2HA7A=
-github.com/shenwei356/bio v0.11.0/go.mod h1:JjWavkWha/UzK0K7dqTVuzkHEBgGNad9yC1hv0YJrG0=
+github.com/shenwei356/bio v0.12.0 h1:oU6VPoXJ1mxfdlI1cqGbO+kMgDRvlEY714sBg5uC6Js=
+github.com/shenwei356/bio v0.12.0/go.mod h1:JjWavkWha/UzK0K7dqTVuzkHEBgGNad9yC1hv0YJrG0=
 github.com/shenwei356/breader v0.3.2 h1:GLy2clIMck6FdTwj8WLnmhv0PW/7Pp+Wcx7TVEHG0ks=
 github.com/shenwei356/breader v0.3.2/go.mod h1:BimwolkMTIr/O4iX7xXtjEB1z5y39G+8I5Tsm9guC3E=
 github.com/shenwei356/bwt v0.6.1 h1:BDS1nhhIxiC284OKtLBUgy+U5L/7WrvT/ehOExB/DSA=

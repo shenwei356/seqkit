@@ -89,10 +89,9 @@ var convertCmd = &cobra.Command{
 		}
 
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		var once = true
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 			once = true
 			for {
@@ -291,6 +290,7 @@ var convertCmd = &cobra.Command{
 				checkError(err)
 				record.FormatToWriter(outfh, config.LineWidth)
 			}
+			fastxReader.Close()
 		}
 	},
 }

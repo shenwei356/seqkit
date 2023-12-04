@@ -91,7 +91,6 @@ Attention:
 
 		n := int64(0)
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		if number > 0 { // by number
 			if !quiet {
 				log.Info("sample by number")
@@ -115,7 +114,7 @@ Attention:
 				if !quiet {
 					log.Info("second pass: reading and sampling")
 				}
-				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 			LOOP:
 				for {
@@ -141,6 +140,7 @@ Attention:
 						}
 					}
 				}
+				fastxReader.Close()
 			} else {
 				if !quiet {
 					log.Info("loading all sequences into memory...")
@@ -170,7 +170,7 @@ Attention:
 				log.Info("sample by proportion")
 			}
 
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 			for {
 				record, err = fastxReader.Read()
@@ -192,6 +192,7 @@ Attention:
 					record.FormatToWriter(outfh, config.LineWidth)
 				}
 			}
+			fastxReader.Close()
 		}
 
 		if !quiet {

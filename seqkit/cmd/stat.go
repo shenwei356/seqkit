@@ -474,6 +474,8 @@ Tips:
 					}
 				}
 
+				fastxReader.Close()
+
 				if fastxReader.Alphabet() == seq.DNAredundant {
 					t = "DNA"
 				} else if fastxReader.Alphabet() == seq.RNAredundant {

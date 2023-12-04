@@ -54,9 +54,8 @@ var fq2faCmd = &cobra.Command{
 		defer outfh.Close()
 
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			for {
@@ -73,6 +72,7 @@ var fq2faCmd = &cobra.Command{
 				// record.FormatToWriter(outfh, lineWidth)
 				record.FormatToWriter(outfh, 0)
 			}
+			fastxReader.Close()
 		}
 	},
 }

@@ -234,10 +234,9 @@ var seqCmd = &cobra.Command{
 		var text []byte
 		var buffer *bytes.Buffer
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			checkSeqType = true
@@ -418,6 +417,7 @@ var seqCmd = &cobra.Command{
 					outbw.Write(_mark_newline)
 				}
 			}
+			fastxReader.Close()
 
 			config.LineWidth = lineWidth
 		}

@@ -204,7 +204,6 @@ Examples:
 		defer outfh.Close()
 
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		var checkFQ = true
 		var mp _mutatePoint
 		var seqLen int
@@ -215,7 +214,7 @@ Examples:
 		var k string
 		var re *regexp.Regexp
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			for {
@@ -326,6 +325,7 @@ Examples:
 				}
 				record.FormatToWriter(outfh, lineWidth)
 			}
+			fastxReader.Close()
 		}
 	},
 }

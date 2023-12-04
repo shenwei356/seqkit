@@ -169,7 +169,6 @@ var watchCmd = &cobra.Command{
 		var text []byte
 		var buffer *bytes.Buffer
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		var count int
 
 		field := fields[0]
@@ -177,7 +176,7 @@ var watchCmd = &cobra.Command{
 		h := thist.NewHist([]float64{}, fmap[field].Title, binMode, printBins, true)
 
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			checkSeqType = true
@@ -253,8 +252,8 @@ var watchCmd = &cobra.Command{
 					outfh.Write(text)
 					outfh.Write(_mark_newline)
 				}
-
 			} // record
+			fastxReader.Close()
 			config.LineWidth = lineWidth
 
 		} //file

@@ -258,7 +258,7 @@ Examples:
 				var seqStructure string // "L" for linear, "C" for circular
 				var strand string       // "D" for double strands, "S" for single strand
 
-				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				// checkError(err)
 				if err != nil {
 					ch <- &Aresult{
@@ -269,6 +269,7 @@ Examples:
 					log.Warningf(fmt.Sprintf("skip file: %s: %s", file, err))
 					return
 				}
+				defer fastxReader.Close()
 
 				checkAlphabet := true
 

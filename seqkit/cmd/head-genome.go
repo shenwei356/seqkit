@@ -75,14 +75,12 @@ Attention:
 		defer outfh.Close()
 
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
-
 		var prefixes, words []string
 		var i, N int
 		var nSharedWords, pNSharedWords int
 
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			for {
@@ -138,6 +136,7 @@ Attention:
 
 				record.FormatToWriter(outfh, config.LineWidth)
 			}
+			fastxReader.Close()
 
 			config.LineWidth = lineWidth
 		}

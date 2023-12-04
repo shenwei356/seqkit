@@ -134,7 +134,6 @@ Attentions:
 		// for indexing when output and duplicated sequences checking
 		id2name := make(map[string][]byte)
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		var err error
 
 		if !twoPass { // read all records into memory
@@ -146,7 +145,7 @@ Attentions:
 			var name string
 			var length int
 			for _, file := range files {
-				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 				for {
 					record, err = fastxReader.Read()
@@ -197,6 +196,7 @@ Attentions:
 						}
 					}
 				}
+				fastxReader.Close()
 			}
 
 			if !quiet {
@@ -399,6 +399,7 @@ Attentions:
 				name2length = append(name2length,
 					stringutil.StringCount{Key: name, Count: len(record.Seq.Seq)})
 			}
+			fastxReader.Close()
 		}
 
 		if !quiet {

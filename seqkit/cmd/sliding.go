@@ -74,9 +74,8 @@ var slidingCmd = &cobra.Command{
 		var r *fastx.Record
 		var originalLen, l, end, e int
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 			for {
 				record, err = fastxReader.Read()
@@ -137,6 +136,7 @@ var slidingCmd = &cobra.Command{
 					r.FormatToWriter(outfh, config.LineWidth)
 				}
 			}
+			fastxReader.Close()
 
 			config.LineWidth = lineWidth
 		}

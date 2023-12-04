@@ -261,7 +261,6 @@ Attentions:
 		// only for m > 0, where FMI is slow
 
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		_onlyPositiveStrand := onlyPositiveStrand
 
 		if mismatches > 0 || useFMI {
@@ -345,7 +344,7 @@ Attentions:
 
 			var id uint64
 			for _, file := range files {
-				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 
 				checkAlphabet := true
@@ -571,6 +570,7 @@ Attentions:
 						ch <- &Arecord{record: results, id: id, ok: len(results) > 0}
 					}(record.Clone(), id)
 				}
+				fastxReader.Close()
 			}
 
 			wg.Wait()
@@ -599,7 +599,7 @@ Attentions:
 		}
 
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			checkAlphabet := true
@@ -970,6 +970,7 @@ Attentions:
 					outfh.Flush()
 				}
 			}
+			fastxReader.Close()
 		}
 
 	},

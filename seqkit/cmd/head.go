@@ -59,10 +59,9 @@ For returning the last N records, use:
 		defer outfh.Close()
 
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		i := 0
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			for {
@@ -85,6 +84,7 @@ For returning the last N records, use:
 					return
 				}
 			}
+			fastxReader.Close()
 
 			config.LineWidth = lineWidth
 		}

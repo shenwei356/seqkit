@@ -59,10 +59,9 @@ You may need "seqkit rename" to make the the sequence IDs unique.
 		defer outfh.Close()
 
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		var i int
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			for {
@@ -81,6 +80,7 @@ You may need "seqkit rename" to make the the sequence IDs unique.
 					record.FormatToWriter(outfh, lineWidth)
 				}
 			}
+			fastxReader.Close()
 		}
 	},
 }

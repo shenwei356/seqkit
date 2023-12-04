@@ -120,14 +120,13 @@ Example:
 		}
 
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		var newID string
 		var k uint64
 		var ok bool
 		numbers := make(map[uint64]int, 1<<20)
 		for _, file := range files {
 			func(file string) {
-				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 
 				if mOutputs {
@@ -178,6 +177,7 @@ Example:
 
 					record.FormatToWriter(outfh, config.LineWidth)
 				}
+				fastxReader.Close()
 				config.LineWidth = lineWidth
 			}(file)
 		}

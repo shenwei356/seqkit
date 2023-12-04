@@ -276,9 +276,8 @@ Examples:
 			var id uint64
 			for _, file := range files {
 				var record *fastx.Record
-				var fastxReader *fastx.Reader
 
-				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 
 				for {
@@ -399,6 +398,7 @@ Examples:
 
 					}(record.Clone(), id)
 				}
+				fastxReader.Close()
 
 				config.LineWidth = lineWidth
 			}
@@ -411,7 +411,6 @@ Examples:
 		}
 
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 
 		var finder *AmpliconFinder
 		var loc []int
@@ -424,7 +423,7 @@ Examples:
 		var start1, end1 int
 
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			for {
@@ -521,6 +520,7 @@ Examples:
 					record.FormatToWriter(outfh, config.LineWidth)
 				}
 			}
+			fastxReader.Close()
 
 			config.LineWidth = lineWidth
 		}

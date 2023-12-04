@@ -334,7 +334,7 @@ Examples:
 			var record *fastx.Record
 			var fastxReader *fastx.Reader
 			// Parse all sequences
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			var seqname string
@@ -384,6 +384,7 @@ Examples:
 						onlyFlank, upStream, downStream)
 				}
 			}
+			fastxReader.Close()
 
 			config.LineWidth = lineWidth
 		}

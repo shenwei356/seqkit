@@ -121,8 +121,10 @@ Tips:
 		var err error
 		reader1, err = fastx.NewReader(alphabet, read1, idRegexp)
 		checkError(errors.Wrap(err, read1))
+		defer reader1.Close()
 		reader2, err = fastx.NewReader(alphabet, read2, idRegexp)
 		checkError(errors.Wrap(err, read2))
+		defer reader2.Close()
 
 		// out file 1
 		var outFile1, base1, suffix1 string

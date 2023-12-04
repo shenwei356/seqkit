@@ -75,13 +75,12 @@ Attention:
 		defer outfh.Close()
 
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		var ok bool
 		var fa *fastx.Record
 		var i, j int
 		checkingFastq := true
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			for {
@@ -136,6 +135,7 @@ Attention:
 					outfh.Write(_mark_newline)
 				}
 			}
+			fastxReader.Close()
 		}
 	},
 }

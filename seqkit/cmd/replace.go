@@ -316,7 +316,6 @@ Filtering records to edit:
 		var ok bool
 		var doNotChange bool
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		nrFormat := fmt.Sprintf("%%0%dd", nrWidth)
 
 		var count int
@@ -328,7 +327,7 @@ Filtering records to edit:
 		var h uint64
 
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 			nr := 0
 			for {
@@ -464,6 +463,7 @@ Filtering records to edit:
 
 				record.FormatToWriter(outfh, config.LineWidth)
 			}
+			fastxReader.Close()
 
 			config.LineWidth = lineWidth
 		}

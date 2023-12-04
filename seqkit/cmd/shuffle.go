@@ -84,7 +84,6 @@ Attentions:
 
 		index2name := make(map[int]string)
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		var err error
 
 		if !twoPass { // read all records into memory
@@ -95,7 +94,7 @@ Attentions:
 			}
 			i := 0
 			for _, file := range files {
-				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 				for {
 					record, err = fastxReader.Read()
@@ -115,6 +114,7 @@ Attentions:
 					index2name[i] = string(record.Name)
 					i++
 				}
+				fastxReader.Close()
 			}
 
 			if !quiet {

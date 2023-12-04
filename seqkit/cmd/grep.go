@@ -318,7 +318,6 @@ Examples:
 		checkError(err)
 		defer outfh.Close()
 
-		var fastxReader *fastx.Reader
 		var record *fastx.Record
 		strands := []byte{'+', '-'}
 
@@ -405,7 +404,7 @@ Examples:
 
 			var id uint64
 			for _, file := range files {
-				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 
 				checkAlphabet := true
@@ -514,6 +513,7 @@ Examples:
 
 					}(record.Clone(), id)
 				}
+				fastxReader.Close()
 			}
 
 			wg.Wait()
@@ -537,7 +537,7 @@ Examples:
 		var h uint64
 		var strand byte
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			checkAlphabet := true
@@ -687,6 +687,7 @@ Examples:
 					outfh.Flush()
 				}
 			}
+			fastxReader.Close()
 
 			config.LineWidth = lineWidth
 		}

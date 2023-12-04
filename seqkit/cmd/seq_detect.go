@@ -219,8 +219,8 @@ func (d *SeqDetector) LoadQueries(fx string) {
 		if !d.Stranded {
 			d.Queries = append(d.Queries, &Query{name, RevCompDNA(seq), "-", ns})
 		}
-
 	}
+	fastxReader.Close()
 }
 
 // AddAnonQueries adds anonymous queries from a list of comma separated strings.

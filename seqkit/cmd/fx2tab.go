@@ -137,10 +137,9 @@ Attention:
 		var name []byte
 		var g, c float64
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		var sum [md5.Size]byte
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 			for {
 				record, err = fastxReader.Read()
@@ -229,6 +228,7 @@ Attention:
 				// outfh.WriteString("\n")
 				outfh.Write(_mark_newline)
 			}
+			fastxReader.Close()
 		}
 	},
 }

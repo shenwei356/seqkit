@@ -162,14 +162,13 @@ Translate Tables/Genetic Codes:
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
 
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 		var _seq *seq.Seq
 		var frame int
 		once := true
 		var i, start, _start, _end, _len int
 		var a byte
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			for {
@@ -264,8 +263,8 @@ Translate Tables/Genetic Codes:
 					outfh.Write(byteutil.WrapByteSlice(_seq.Seq, config.LineWidth))
 					outfh.WriteString("\n")
 				}
-
 			}
+			fastxReader.Close()
 
 		}
 	},

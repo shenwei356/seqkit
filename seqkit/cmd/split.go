@@ -146,7 +146,6 @@ Examples:
 		var outfile string
 		var prefix string
 		var record *fastx.Record
-		var fastxReader *fastx.Reader
 
 		if !dryRun {
 			pwd, _ := os.Getwd()
@@ -182,7 +181,7 @@ Examples:
 				i := 1
 				records := []*fastx.Record{}
 
-				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 				for {
 					record, err = fastxReader.Read()
@@ -219,6 +218,7 @@ Examples:
 						records = []*fastx.Record{}
 					}
 				}
+				fastxReader.Close()
 				if len(records) > 0 {
 					// outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
 					if prefixBySizeSet {
@@ -901,7 +901,7 @@ Examples:
 			}
 			region2name := make(map[string][]string)
 
-			fastxReader, err = fastx.NewReader(alphabet2, newFile, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet2, newFile, idRegexp)
 			checkError(err)
 			var name string
 			var subseq string
@@ -928,6 +928,7 @@ Examples:
 				}
 				region2name[subseq] = append(region2name[subseq], name)
 			}
+			fastxReader.Close()
 
 			fileFai := newFile + ".seqkit.fai"
 

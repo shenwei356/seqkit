@@ -229,7 +229,6 @@ If you want to cut a sequence into multiple segments.
 
 				renameFileExt := true
 				var record *fastx.Record
-				var fastxReader *fastx.Reader
 				var err error
 
 				var outfhs []*xopen.Writer
@@ -252,7 +251,7 @@ If you want to cut a sequence into multiple segments.
 					checkError(fmt.Errorf(`one of flags should be given: -s/-p/-l. type "seqkit split2 -h" for help`))
 				}
 
-				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 				i := 0 // nth part
 				j := 0
@@ -409,8 +408,8 @@ If you want to cut a sequence into multiple segments.
 							i = 0
 						}
 					}
-
 				}
+				fastxReader.Close()
 
 				if byParts {
 					for i, outfh := range outfhs {

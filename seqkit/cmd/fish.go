@@ -189,7 +189,6 @@ Attention:
 		var buffer *bytes.Buffer
 		var record *fastx.Record
 		var sequence *seq.Seq
-		var fastxReader *fastx.Reader
 		var count int
 		var refMap map[string]int
 		var samRefs []*sam.Reference
@@ -201,7 +200,7 @@ Attention:
 		first := true
 
 		for _, file := range files {
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			checkSeqType = true
@@ -292,8 +291,8 @@ Attention:
 
 					outfh.Write(_mark_newline)
 				}
-
 			} // record
+			fastxReader.Close()
 			config.LineWidth = lineWidth
 
 		} //file

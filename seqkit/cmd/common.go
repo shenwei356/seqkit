@@ -167,7 +167,7 @@ Note:
 					hitHashes = make(map[uint64]interface{}, 1024)
 				}
 
-				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 
 				for {
@@ -334,6 +334,7 @@ Note:
 						} // target seqs to compare
 					} // compare seqs by bytes.index
 				} // all input seqs
+				fastxReader.Close()
 
 				if isFirstFile {
 					if !quiet {
@@ -444,7 +445,7 @@ Note:
 			var text []byte
 			var buffer *bytes.Buffer
 
-			fastxReader, err = fastx.NewReader(alphabet, firstFile, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, firstFile, idRegexp)
 			checkError(err)
 			checkFormat := true
 			var isFastq bool
@@ -516,6 +517,7 @@ Note:
 					}
 				}
 			}
+			fastxReader.Close()
 
 			fileNum := len(files)
 			t := "sequences"
@@ -551,7 +553,7 @@ Note:
 				checkFirstFile = false
 			}
 
-			fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
 			for {
@@ -610,6 +612,8 @@ Note:
 					names[subject] = append(names[subject], string(record.Name))
 				}
 			}
+			fastxReader.Close()
+
 			if isFirstFile {
 				isFirstFile = false
 			}
@@ -680,6 +684,7 @@ Note:
 				record.FormatToWriter(outfh, config.LineWidth)
 			}
 		}
+		fastxReader.Close()
 
 		if !quiet {
 			log.Infof("%d common/shared sequences saved to: %s", nOutput, outFile)
