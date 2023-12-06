@@ -2850,7 +2850,8 @@ Flags:
   -h, --help               help for sample
   -n, --number int         sample by number (result may not exactly match), DO NOT use on large FASTQ files.
   -p, --proportion float   sample by proportion
-  -s, --rand-seed int      rand seed (default 11)
+  -s, --rand-seed int      random seed. For paired-end data, use the same seed across fastq files to
+                           sample the same read pairs (default 11)
   -2, --two-pass           2-pass mode read files twice to lower memory usage. Not allowed when reading
                            from stdin
 
