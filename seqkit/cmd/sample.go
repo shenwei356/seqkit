@@ -204,7 +204,7 @@ Attention:
 func init() {
 	RootCmd.AddCommand(sampleCmd)
 
-	sampleCmd.Flags().Int64P("rand-seed", "s", 11, "rand seed")
+	sampleCmd.Flags().Int64P("rand-seed", "s", 11, "random seed. For paired-end data, use the same seed across fastq files to sample the same read pairs")
 	sampleCmd.Flags().Int64P("number", "n", 0, "sample by number (result may not exactly match), DO NOT use on large FASTQ files.")
 	sampleCmd.Flags().Float64P("proportion", "p", 0, "sample by proportion")
 	sampleCmd.Flags().BoolP("two-pass", "2", false, "2-pass mode read files twice to lower memory usage. Not allowed when reading from stdin")
