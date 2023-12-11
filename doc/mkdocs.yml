@@ -2,12 +2,11 @@ site_name: SeqKit - Ultrafast FASTA/Q kit
 nav:
 - Home: index.md
 - Download: download.md
-- Documents:
-    - Usage: usage.md
-    - FAQ: faq.md
-    - Tutorial: tutorial.md
-    - Benchmark: benchmark.md
-    - Notes: note.md
+- Usage: usage.md
+- FAQ: faq.md
+- Tutorial: tutorial.md
+- Benchmark: benchmark.md
+- Notes: note.md
 - More tools: https://github.com/shenwei356
 # theme: cinder
 
