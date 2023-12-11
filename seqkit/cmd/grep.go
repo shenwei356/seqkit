@@ -110,6 +110,7 @@ Examples:
 		degenerate := getFlagBool(cmd, "degenerate")
 		region := getFlagString(cmd, "region")
 		circular := getFlagBool(cmd, "circular")
+		allowDups := getFlagBool(cmd, "allow-duplicated-patterns")
 
 		immediateOutput := getFlagBool(cmd, "immediate-output")
 
@@ -184,7 +185,7 @@ Examples:
 
 		// prepare pattern
 		patternsR := make(map[uint64]*regexp.Regexp, 1<<10)
-		patternsN := make(map[uint64]interface{}, 1<<20)
+		patternsN := make(map[uint64]int, 1<<20)
 		// patternsS := make(map[string]interface{}, 1<<10)
 		patternsS := make([][]byte, 0, 16)
 
@@ -246,9 +247,9 @@ Examples:
 						}
 					} else {
 						if ignoreCase {
-							patternsN[xxhash.Sum64String(strings.ToLower(p))] = struct{}{}
+							patternsN[xxhash.Sum64String(strings.ToLower(p))]++
 						} else {
-							patternsN[xxhash.Sum64String(p)] = struct{}{}
+							patternsN[xxhash.Sum64String(p)]++
 						}
 					}
 				}
@@ -306,9 +307,9 @@ Examples:
 					}
 				} else {
 					if ignoreCase {
-						patternsN[xxhash.Sum64String(strings.ToLower(p))] = struct{}{}
+						patternsN[xxhash.Sum64String(strings.ToLower(p))]++
 					} else {
-						patternsN[xxhash.Sum64String(p)] = struct{}{}
+						patternsN[xxhash.Sum64String(p)]++
 					}
 				}
 			}
@@ -536,6 +537,7 @@ Examples:
 		var re *regexp.Regexp
 		var h uint64
 		var strand byte
+		var i, n int // for output records multiple times when duplicated patterns are given.
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -576,6 +578,8 @@ Examples:
 				}
 
 				hit = false
+
+				n = 1
 
 				for _, strand = range strands {
 					if hit {
@@ -657,7 +661,7 @@ Examples:
 						if ignoreCase {
 							h = xxhash.Sum64(bytes.ToLower(target))
 						}
-						if _, ok = patternsN[h]; ok {
+						if n, ok = patternsN[h]; ok {
 							hit = true
 							if deleteMatched && !invertMatch {
 								delete(patternsN, h)
@@ -679,8 +683,16 @@ Examples:
 
 				if justCount {
 					count++
+					if allowDups && n > 1 {
+						count += n - 1
+					}
 				} else {
 					record.FormatToWriter(outfh, config.LineWidth)
+					if allowDups && n > 1 {
+						for i = 0; i < n-1; i++ {
+							record.FormatToWriter(outfh, config.LineWidth)
+						}
+					}
 				}
 
 				if immediateOutput {
@@ -702,6 +714,7 @@ func init() {
 	RootCmd.AddCommand(grepCmd)
 
 	grepCmd.Flags().StringSliceP("pattern", "p", []string{""}, `search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')`)
+	grepCmd.Flags().BoolP("allow-duplicated-patterns", "D", false, "output records multiple times when duplicated patterns are given")
 	grepCmd.Flags().StringP("pattern-file", "f", "", "pattern file (one record per line)")
 	grepCmd.Flags().BoolP("use-regexp", "r", false, "patterns are regular expression")
 	grepCmd.Flags().BoolP("delete-matched", "", false, "delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions")

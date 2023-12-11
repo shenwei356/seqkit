@@ -1665,28 +1665,29 @@ Usage:
   seqkit grep [flags]
 
 Flags:
-  -n, --by-name                match by full name instead of just ID
-  -s, --by-seq                 search subseq on seq, both positive and negative strand are searched, and
-                               mismatch allowed using flag -m/--max-mismatch
-  -c, --circular               circular genome
-  -C, --count                  just print a count of matching records. with the -v/--invert-match flag,
-                               count non-matching records
-  -d, --degenerate             pattern/motif contains degenerate base
-      --delete-matched         delete a pattern right after being matched, this keeps the firstly
-                               matched data and speedups when using regular expressions
-  -h, --help                   help for grep
-  -i, --ignore-case            ignore case
-  -I, --immediate-output       print output immediately, do not use write buffer
-  -v, --invert-match           invert the sense of matching, to select non-matching records
-  -m, --max-mismatch int       max mismatch when matching by seq. For large genomes like human genome,
-                               using mapping/alignment tools would be faster
-  -P, --only-positive-strand   only search on positive strand
-  -p, --pattern strings        search pattern (multiple values supported. Attention: use double
-                               quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
-  -f, --pattern-file string    pattern file (one record per line)
-  -R, --region string          specify sequence region for searching. e.g 1:12 for first 12 bases,
-                               -12:-1 for last 12 bases
-  -r, --use-regexp             patterns are regular expression
+  -D, --allow-duplicated-patterns   output records multiple times when duplicated patterns are given
+  -n, --by-name                     match by full name instead of just ID
+  -s, --by-seq                      search subseq on seq, both positive and negative strand are
+                                    searched, and mismatch allowed using flag -m/--max-mismatch
+  -c, --circular                    circular genome
+  -C, --count                       just print a count of matching records. with the -v/--invert-match
+                                    flag, count non-matching records
+  -d, --degenerate                  pattern/motif contains degenerate base
+      --delete-matched              delete a pattern right after being matched, this keeps the firstly
+                                    matched data and speedups when using regular expressions
+  -h, --help                        help for grep
+  -i, --ignore-case                 ignore case
+  -I, --immediate-output            print output immediately, do not use write buffer
+  -v, --invert-match                invert the sense of matching, to select non-matching records
+  -m, --max-mismatch int            max mismatch when matching by seq. For large genomes like human
+                                    genome, using mapping/alignment tools would be faster
+  -P, --only-positive-strand        only search on positive strand
+  -p, --pattern strings             search pattern (multiple values supported. Attention: use double
+                                    quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
+  -f, --pattern-file string         pattern file (one record per line)
+  -R, --region string               specify sequence region for searching. e.g 1:12 for first 12 bases,
+                                    -12:-1 for last 12 bases
+  -r, --use-regexp                  patterns are regular expression
 
 ```
 
