@@ -5,7 +5,7 @@ Thanks!
 ### Prerequisites
 
 - [ ] Make sure you've installed the correct executable binary file.
-    For Mac users, Please download 
+    For Mac users, Please download
     - `seqkit_darwin_amd64.tar.gz` for Mac with Intel CPUs.
     - `seqkit_darwin_arm64.tar.gz` for Mac with M series CPUs.
 - [ ] Make sure you are using the latest version by `seqkit version -u`.
@@ -15,8 +15,10 @@ Thanks!
 
 - [ ] Please copy and paste the command you ran and the error information if reported.
 - [ ] It would be more helpful to provide as much information as you can:
+    - [ ] Are you running on a personal computer or a server?
+    - [ ] What's the operating system, and how much RAM (memory) is available?
     - [ ] Show the types and sizes of input files with `file xxx` and `ls -lh xxx`.
     - [ ] Show some lines of input files with `head -n 5 xxx` or `zcat xxx.gz | head -n 5`.
 - [ ] Provide a reproducible example.
-    - [ ] Has this problem happened many times? 
+    - [ ] Has this problem happened many times?
     - [ ] Or it only failed with this input file or/and these command/parameters.
