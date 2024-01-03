@@ -234,7 +234,7 @@ Examples:
 
 					// faidx, err := fai.New(file)
 					// checkError(err)
-					faidx := getFaidx(file, "^(.+)$", quiet)
+					faidx := getFaidx(file, idRegexp, quiet)
 
 					if len(faidx.Index) == 0 {
 						log.Warningf("  0 records loaded from %s, please check if it matches the fasta file, or switch on the flag -U/--update-faidx", fileFai)

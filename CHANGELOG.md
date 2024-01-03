@@ -2,6 +2,10 @@
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.6.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.6.2)
     - `seqkit grep`:
         - new flag: `-D/--allow-duplicated-patterns` for outputting records multiple times when duplicated patterns are given. [#427](https://github.com/shenwei356/seqkit/issues/427)
+    - `seqkit subseq`:
+        - Use the ID regular expression from the option `--id-regexp` to create FASTA index file. This solves the panic happened for sequences containing tabs in the headers. [#432](https://github.com/shenwei356/seqkit/issues/432)
+    - `seqkit split/sort/shuffle`:
+        - When using two-pass mode (`-2/--two-pass`), replace possible tabs in the sequence header.
 - [SeqKit v2.6.1](https://github.com/shenwei356/seqkit/releases/tag/v2.6.1) - 2023-11-18
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.6.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.6.1)
     - `seqkit`:
