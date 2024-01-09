@@ -38,6 +38,8 @@ import (
 
 // replaceCmd represents the replace command
 var replaceCmd = &cobra.Command{
+	GroupID: "edit",
+
 	Use:   "replace",
 	Short: "replace name/sequence by regular expression",
 	Long: `replace name/sequence by regular expression.

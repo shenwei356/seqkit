@@ -37,6 +37,8 @@ import (
 
 // translateCmd represents the head command
 var translateCmd = &cobra.Command{
+	GroupID: "format",
+
 	Use:   "translate",
 	Short: "translate DNA/RNA to protein sequence (supporting ambiguous bases)",
 	Long: `translate DNA/RNA to protein sequence (supporting ambiguous bases)

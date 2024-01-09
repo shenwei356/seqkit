@@ -44,6 +44,8 @@ import (
 
 // grepCmd represents the grep command
 var grepCmd = &cobra.Command{
+	GroupID: "search",
+
 	Use:   "grep",
 	Short: "search sequences by ID/name/sequence/sequence motifs, mismatch allowed",
 	Long: fmt.Sprintf(`search sequences by ID/name/sequence/sequence motifs, mismatch allowed

@@ -50,6 +50,8 @@ const BIG_SLEEP = 100 * time.Millisecond
 
 // sanaCmd represents the sana command
 var sanaCmd = &cobra.Command{
+	GroupID: "edit",
+
 	Use:   "sana",
 	Short: "sanitize broken single line FASTQ files",
 	Long:  "sanitize broken single line FASTQ files",

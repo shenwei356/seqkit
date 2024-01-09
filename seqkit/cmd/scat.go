@@ -22,10 +22,6 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/fsnotify/fsnotify"
-	"github.com/iafan/cwalk"
-	"github.com/shenwei356/xopen"
-	"github.com/spf13/cobra"
 	"os"
 	"os/signal"
 	ospath "path"
@@ -33,6 +29,11 @@ import (
 	"runtime"
 	"sync"
 	"time"
+
+	"github.com/fsnotify/fsnotify"
+	"github.com/iafan/cwalk"
+	"github.com/shenwei356/xopen"
+	"github.com/spf13/cobra"
 )
 
 type WatchCtrl int
@@ -41,6 +42,8 @@ type WatchCtrlChan chan WatchCtrl
 
 // scatCmd represents the fish command
 var scatCmd = &cobra.Command{
+	GroupID: "basic",
+
 	Use:   "scat",
 	Short: "real time recursive concatenation and streaming of fastx files",
 	Long:  "real time recursive concatenation and streaming of fastx files",

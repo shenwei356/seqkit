@@ -32,6 +32,8 @@ import (
 
 // dupCmd represents the fq2fa command
 var dupCmd = &cobra.Command{
+	GroupID: "set",
+
 	Use:     "duplicate",
 	Aliases: []string{"dup"},
 	Short:   "duplicate sequences N times",

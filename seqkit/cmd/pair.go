@@ -41,6 +41,8 @@ import (
 
 // pairCmd represents the pair command
 var pairCmd = &cobra.Command{
+	GroupID: "set",
+
 	Use:   "pair",
 	Short: "match up paired-end reads from two fastq files",
 	Long: `match up paired-end reads from two fastq files

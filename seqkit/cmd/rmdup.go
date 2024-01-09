@@ -37,6 +37,8 @@ import (
 
 // rmdupCmd represents the rmdup command
 var rmdupCmd = &cobra.Command{
+	GroupID: "set",
+
 	Use:   "rmdup",
 	Short: "remove duplicated sequences by ID/name/sequence",
 	Long: `remove duplicated sequences by ID/name/sequence

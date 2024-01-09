@@ -32,6 +32,8 @@ import (
 
 // headCmd represents the head command
 var headCmd = &cobra.Command{
+	GroupID: "set",
+
 	Use:   "head",
 	Short: "print first N FASTA/Q records",
 	Long: `print first N FASTA/Q records

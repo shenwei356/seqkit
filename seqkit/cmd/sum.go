@@ -45,6 +45,8 @@ import (
 
 // sumCmd represents the sum command
 var sumCmd = &cobra.Command{
+	GroupID: "misc",
+
 	Use:   "sum",
 	Short: "compute message digest for all sequences in FASTA/Q files",
 	Long: `compute message digest for all sequences in FASTA/Q files

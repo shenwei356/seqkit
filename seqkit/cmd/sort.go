@@ -40,6 +40,8 @@ import (
 
 // sortCmd represents the sort command
 var sortCmd = &cobra.Command{
+	GroupID: "order",
+
 	Use:   "sort",
 	Short: "sort sequences by id/name/sequence/length",
 	Long: `sort sequences by id/name/sequence/length.

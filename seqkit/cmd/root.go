@@ -75,6 +75,41 @@ func Execute() {
 }
 
 func init() {
+	RootCmd.AddGroup(
+		&cobra.Group{
+			ID:    "basic",
+			Title: "Commands for Basic Operation:",
+		},
+		&cobra.Group{
+			ID:    "format",
+			Title: "Commands for Format Conversion:",
+		},
+		&cobra.Group{
+			ID:    "search",
+			Title: "Commands for Searching:",
+		},
+		&cobra.Group{
+			ID:    "set",
+			Title: "Commands for Set Operation:",
+		},
+		&cobra.Group{
+			ID:    "edit",
+			Title: "Commands for Edit:",
+		},
+		&cobra.Group{
+			ID:    "order",
+			Title: "Commands for Ordering:",
+		},
+		&cobra.Group{
+			ID:    "bam",
+			Title: "Commands for BAM Processing:",
+		},
+		&cobra.Group{
+			ID:    "misc",
+			Title: "Commands for Miscellaneous:",
+		},
+	)
+
 	defaultThreads := runtime.NumCPU()
 	if defaultThreads > 4 {
 		defaultThreads = 4
@@ -104,6 +139,7 @@ func init() {
 	RootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
 
 	RootCmd.SetUsageTemplate(usageTemplate(""))
+
 }
 
 func usageTemplate(s string) string {
@@ -115,10 +151,16 @@ Aliases:
   {{.NameAndAliases}}{{end}}{{if .HasExample}}
 
 Examples:
-{{.Example}}{{end}}{{if .HasAvailableSubCommands}}
+{{.Example}}{{end}}{{if .HasAvailableSubCommands}}{{$cmds := .Commands}}{{if eq (len .Groups) 0}}
 
-Available Commands:{{range .Commands}}{{if (or .IsAvailableCommand (eq .Name "help"))}}
-  {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}{{end}}{{if .HasAvailableLocalFlags}}
+Available Commands:{{range $cmds}}{{if (or .IsAvailableCommand (eq .Name "help"))}}
+  {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}{{else}}{{range $group := .Groups}}
+
+{{.Title}}{{range $cmds}}{{if (and (eq .GroupID $group.ID) (or .IsAvailableCommand (eq .Name "help")))}}
+  {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}{{end}}{{if not .AllChildCommandsHaveGroup}}
+
+Additional Commands:{{range $cmds}}{{if (and (eq .GroupID "") (or .IsAvailableCommand (eq .Name "help")))}}
+  {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}{{end}}{{end}}{{end}}{{if .HasAvailableLocalFlags}}
 
 Flags:
 {{.LocalFlags.FlagUsagesWrapped 110 | trimTrailingWhitespaces}}{{end}}{{if .HasAvailableInheritedFlags}}

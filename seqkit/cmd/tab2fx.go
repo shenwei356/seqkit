@@ -33,6 +33,8 @@ import (
 
 // tab2faCmd represents the tab2fx command
 var tab2faCmd = &cobra.Command{
+	GroupID: "format",
+
 	Use:   "tab2fx",
 	Short: "convert tabular format to FASTA/Q format",
 	Long: `convert tabular format (first two/three columns) to FASTA/Q format

@@ -34,6 +34,8 @@ import (
 
 // fa2fqCmd represents the fq2fa command
 var fa2fqCmd = &cobra.Command{
+	GroupID: "format",
+
 	Use:   "fa2fq",
 	Short: "retrieve corresponding FASTQ records by a FASTA file",
 	Long: `retrieve corresponding FASTQ records by a FASTA file

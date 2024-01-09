@@ -49,6 +49,8 @@ import (
 
 // statCmd represents the stat command
 var statCmd = &cobra.Command{
+	GroupID: "basic",
+
 	Use:     "stats",
 	Aliases: []string{"stat"},
 	Short:   "simple statistics of FASTA/Q files",

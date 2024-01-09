@@ -35,6 +35,8 @@ import (
 
 // mergeSlidesCmd represents the mergeSlides command
 var mergeSlidesCmd = &cobra.Command{
+	GroupID: "misc",
+
 	Use:   "merge-slides",
 	Short: "merge sliding windows generated from seqkit sliding",
 	Long: `merge sliding windows generated from seqkit sliding

@@ -39,6 +39,8 @@ import (
 
 // split2Cmd represents the split command
 var split2Cmd = &cobra.Command{
+	GroupID: "set",
+
 	Use:   "split2",
 	Short: "split sequences into files by size/parts (FASTA, PE/SE FASTQ)",
 	Long: `split sequences into files by part size or number of parts

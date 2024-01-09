@@ -37,6 +37,8 @@ import (
 
 // mutateCmd represents the mutate command
 var mutateCmd = &cobra.Command{
+	GroupID: "edit",
+
 	Use:   "mutate",
 	Short: "edit sequence (point mutation, insertion, deletion)",
 	Long: fmt.Sprintf(`edit sequence (point mutation, insertion, deletion)

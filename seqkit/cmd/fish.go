@@ -111,6 +111,8 @@ func parseRanges(rf string) Ranges {
 
 // fishCmd represents the fish command
 var fishCmd = &cobra.Command{
+	GroupID: "search",
+
 	Use:   "fish",
 	Short: "look for short sequences in larger sequences using local alignment",
 	Long: `look for short sequences in larger sequences using local alignment

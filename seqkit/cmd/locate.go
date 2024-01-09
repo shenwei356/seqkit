@@ -39,6 +39,8 @@ import (
 
 // locateCmd represents the locate command
 var locateCmd = &cobra.Command{
+	GroupID: "search",
+
 	Use:   "locate",
 	Short: "locate subsequences/motifs, mismatch allowed",
 	Long: `locate subsequences/motifs, mismatch allowed

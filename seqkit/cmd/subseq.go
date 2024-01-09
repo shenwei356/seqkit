@@ -40,6 +40,8 @@ import (
 
 // subseqCmd represents the subseq command
 var subseqCmd = &cobra.Command{
+	GroupID: "basic",
+
 	Use:   "subseq",
 	Short: "get subsequences by region/gtf/bed, including flanking sequences",
 	Long: fmt.Sprintf(`get subsequences by region/gtf/bed, including flanking sequences.

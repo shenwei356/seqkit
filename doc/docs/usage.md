@@ -158,7 +158,7 @@ reproduced in different environments with same random seed.
 ``` text
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 2.6.0
+Version: 2.6.2
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -187,47 +187,63 @@ Compression level:
 Usage:
   seqkit [command]
 
-Available Commands:
-  amplicon        extract amplicon (or specific region around it) via primer(s)
-  bam             monitoring and online histograms of BAM record features
-  common          find common/shared sequences of multiple files by id/name/sequence
-  concat          concatenate sequences with the same ID from multiple files
-  convert         convert FASTQ quality encoding between Sanger, Solexa and Illumina
-  duplicate       duplicate sequences N times
-  fa2fq           retrieve corresponding FASTQ records by a FASTA file
+Commands for Basic Operation:
   faidx           create FASTA index file and extract subsequence
-  fish            look for short sequences in larger sequences using local alignment
+  scat            real time recursive concatenation and streaming of fastx files
+  seq             transform sequences (extract ID, filter by length, remove gaps, reverse complement...)
+  sliding         extract subsequences in sliding windows
+  stats           simple statistics of FASTA/Q files
+  subseq          get subsequences by region/gtf/bed, including flanking sequences
+  watch           monitoring and online histograms of sequence features
+
+Commands for Format Conversion:
+  convert         convert FASTQ quality encoding between Sanger, Solexa and Illumina
+  fa2fq           retrieve corresponding FASTQ records by a FASTA file
   fq2fa           convert FASTQ to FASTA
   fx2tab          convert FASTA/Q to tabular format (and length, GC content, average quality...)
-  genautocomplete generate shell autocompletion script (bash|zsh|fish|powershell)
+  tab2fx          convert tabular format to FASTA/Q format
+  translate       translate DNA/RNA to protein sequence (supporting ambiguous bases)
+
+Commands for Searching:
+  amplicon        extract amplicon (or specific region around it) via primer(s)
+  fish            look for short sequences in larger sequences using local alignment
   grep            search sequences by ID/name/sequence/sequence motifs, mismatch allowed
+  locate          locate subsequences/motifs, mismatch allowed
+
+Commands for Set Operation:
+  common          find common/shared sequences of multiple files by id/name/sequence
+  duplicate       duplicate sequences N times
   head            print first N FASTA/Q records
   head-genome     print sequences of the first genome with common prefixes in name
-  locate          locate subsequences/motifs, mismatch allowed
-  merge-slides    merge sliding windows generated from seqkit sliding
-  mutate          edit sequence (point mutation, insertion, deletion)
   pair            match up paired-end reads from two fastq files
   range           print FASTA/Q records in a range (start:end)
+  rmdup           remove duplicated sequences by ID/name/sequence
+  sample          sample sequences by number or proportion
+  split           split sequences into files by id/seq region/size/parts (mainly for FASTA)
+  split2          split sequences into files by size/parts (FASTA, PE/SE FASTQ)
+
+Commands for Edit:
+  concat          concatenate sequences with the same ID from multiple files
+  mutate          edit sequence (point mutation, insertion, deletion)
   rename          rename duplicated IDs
   replace         replace name/sequence by regular expression
   restart         reset start position for circular genome
-  rmdup           remove duplicated sequences by ID/name/sequence
-  sample          sample sequences by number or proportion
   sana            sanitize broken single line FASTQ files
-  scat            real time recursive concatenation and streaming of fastx files
-  seq             transform sequences (extract ID, filter by length, remove gaps, reverse complement...)
+
+Commands for Ordering:
   shuffle         shuffle sequences
-  sliding         extract subsequences in sliding windows
   sort            sort sequences by id/name/sequence/length
-  split           split sequences into files by id/seq region/size/parts (mainly for FASTA)
-  split2          split sequences into files by size/parts (FASTA, PE/SE FASTQ)
-  stats           simple statistics of FASTA/Q files
-  subseq          get subsequences by region/gtf/bed, including flanking sequences
+
+Commands for BAM Processing:
+  bam             monitoring and online histograms of BAM record features
+
+Commands for Miscellaneous:
+  merge-slides    merge sliding windows generated from seqkit sliding
   sum             compute message digest for all sequences in FASTA/Q files
-  tab2fx          convert tabular format to FASTA/Q format
-  translate       translate DNA/RNA to protein sequence (supporting ambiguous bases)
+
+Additional Commands:
+  genautocomplete generate shell autocompletion script (bash|zsh|fish|powershell)
   version         print version information and check for update
-  watch           monitoring and online histograms of sequence features
 
 Flags:
       --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on

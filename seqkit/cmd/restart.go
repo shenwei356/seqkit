@@ -34,8 +34,11 @@ import (
 
 // restartCmd represents the sliding command
 var restartCmd = &cobra.Command{
-	Use:   "restart",
-	Short: "reset start position for circular genome",
+	GroupID: "edit",
+
+	Use:     "restart",
+	Aliases: []string{"rotate"},
+	Short:   "reset start position for circular genome",
 	Long: `reset start position for circular genome
 
 Examples

@@ -1,5 +1,7 @@
 - [SeqKit v2.6.2](https://github.com/shenwei356/seqkit/releases/tag/v2.6.2) - 2023-11-18
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.6.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.6.2)
+    - `seqkit`:
+        - grouping subcommands in help message.
     - `seqkit grep`:
         - new flag: `-D/--allow-duplicated-patterns` for outputting records multiple times when duplicated patterns are given. [#427](https://github.com/shenwei356/seqkit/issues/427)
     - `seqkit subseq`:

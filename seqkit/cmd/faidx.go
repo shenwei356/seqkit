@@ -39,6 +39,8 @@ import (
 
 // faidxCmd represents the faidx command
 var faidxCmd = &cobra.Command{
+	GroupID: "basic",
+
 	Use:   "faidx",
 	Short: "create FASTA index file and extract subsequence",
 	Long: fmt.Sprintf(`create FASTA index file and extract subsequence

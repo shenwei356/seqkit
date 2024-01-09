@@ -37,6 +37,8 @@ import (
 
 // commonCmd represents the common command
 var commonCmd = &cobra.Command{
+	GroupID: "set",
+
 	Use:   "common",
 	Short: "find common/shared sequences of multiple files by id/name/sequence",
 	Long: `find common/shared sequences of multiple files by id/name/sequence

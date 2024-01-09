@@ -41,6 +41,8 @@ import (
 
 // splitCmd represents the split command
 var splitCmd = &cobra.Command{
+	GroupID: "set",
+
 	Use:   "split",
 	Short: "split sequences into files by id/seq region/size/parts (mainly for FASTA)",
 	Long: fmt.Sprintf(`split sequences into files by name ID, subsequence of given region,

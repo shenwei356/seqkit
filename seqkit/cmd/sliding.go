@@ -33,6 +33,8 @@ import (
 
 // slidingCmd represents the sliding command
 var slidingCmd = &cobra.Command{
+	GroupID: "basic",
+
 	Use:   "sliding",
 	Short: "extract subsequences in sliding windows",
 	Long: `extract subsequences in sliding windows

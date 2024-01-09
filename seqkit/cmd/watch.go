@@ -39,6 +39,8 @@ import (
 
 // watchCmd represents the watch command
 var watchCmd = &cobra.Command{
+	GroupID: "basic",
+
 	Use:   "watch",
 	Short: "monitoring and online histograms of sequence features",
 	Long:  "monitoring and online histograms of sequence features",

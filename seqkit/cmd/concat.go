@@ -36,6 +36,8 @@ import (
 
 // concateCmd represents the concatenate command
 var concateCmd = &cobra.Command{
+	GroupID: "edit",
+
 	Use:     "concat",
 	Aliases: []string{"concate"},
 	Short:   "concatenate sequences with the same ID from multiple files",

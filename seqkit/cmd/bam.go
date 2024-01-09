@@ -489,6 +489,8 @@ type TopBuffer []topEntry
 
 // bamCmd represents the bam command
 var bamCmd = &cobra.Command{
+	GroupID: "bam",
+
 	Use:   "bam",
 	Short: "monitoring and online histograms of BAM record features",
 	Long:  "monitoring and online histograms of BAM record features",

@@ -34,6 +34,8 @@ import (
 
 // convertCmd represents the convert command
 var convertCmd = &cobra.Command{
+	GroupID: "format",
+
 	Use:   "convert",
 	Short: "convert FASTQ quality encoding between Sanger, Solexa and Illumina",
 	Long: `convert FASTQ quality encoding between Sanger, Solexa and Illumina

@@ -32,6 +32,8 @@ import (
 
 // fq2faCmd represents the fq2fa command
 var fq2faCmd = &cobra.Command{
+	GroupID: "format",
+
 	Use:   "fq2fa",
 	Short: "convert FASTQ to FASTA",
 	Long: `convert FASTQ to FASTA

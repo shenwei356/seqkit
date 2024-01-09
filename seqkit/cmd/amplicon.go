@@ -46,6 +46,8 @@ import (
 
 // ampliconCmd represents the amplicon command
 var ampliconCmd = &cobra.Command{
+	GroupID: "search",
+
 	Use:   "amplicon",
 	Short: "extract amplicon (or specific region around it) via primer(s)",
 	Long: `extract amplicon (or specific region around it) via primer(s).

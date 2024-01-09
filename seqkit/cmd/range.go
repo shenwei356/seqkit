@@ -35,6 +35,8 @@ import (
 
 // rangeCmd represents the range command
 var rangeCmd = &cobra.Command{
+	GroupID: "set",
+
 	Use:   "range",
 	Short: "print FASTA/Q records in a range (start:end)",
 	Long: `print FASTA/Q records in a range (start:end)

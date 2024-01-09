@@ -34,6 +34,8 @@ import (
 
 // sampleCmd represents the sample command
 var sampleCmd = &cobra.Command{
+	GroupID: "set",
+
 	Use:   "sample",
 	Short: "sample sequences by number or proportion",
 	Long: `sample sequences by number or proportion.

@@ -37,6 +37,8 @@ import (
 
 // shuffleCmd represents the shuffle command
 var shuffleCmd = &cobra.Command{
+	GroupID: "order",
+
 	Use:   "shuffle",
 	Short: "shuffle sequences",
 	Long: `shuffle sequences.

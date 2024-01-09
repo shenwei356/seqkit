@@ -34,6 +34,8 @@ import (
 
 // headGenomeCmd represents the head command
 var headGenomeCmd = &cobra.Command{
+	GroupID: "set",
+
 	Use:   "head-genome",
 	Short: "print sequences of the first genome with common prefixes in name",
 	Long: `print sequences of the first genome with common prefixes in name

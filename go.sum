@@ -29,7 +29,7 @@ github.com/botond-sipos/thist v1.1.0 h1:qyeA1ApRa6gi3GX+3b40RIBjcL+Z5NdIJNFoRT3Y
 github.com/botond-sipos/thist v1.1.0/go.mod h1:ipLIWUSdMnkmjEzNDsfh2QkC+nV735nTh4w1ZwGF4aM=
 github.com/cespare/xxhash/v2 v2.1.2 h1:YRXhKfTDauu4ajMg1TPgFO5jnlC2HCbmLXMcTG5cbYE=
 github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
-github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
+github.com/cpuguy83/go-md2man/v2 v2.0.3/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/cznic/mathutil v0.0.0-20181122101859-297441e03548 h1:iwZdTE0PVqJCos1vaoKsclOGD3ADKpshg3SRtYBbwso=
 github.com/cznic/sortutil v0.0.0-20181122101858-f5f958428db8 h1:LpMLYGyy67BoAFGda1NeOBQwqlv7nUXpm+rIVHGxZZ4=
 github.com/cznic/sortutil v0.0.0-20181122101858-f5f958428db8/go.mod h1:q2w6Bg5jeox1B+QkJ6Wp/+Vn0G/bo3f1uY7Fn3vivIQ=
@@ -141,8 +141,8 @@ github.com/shenwei356/xopen v0.3.2 h1:gD/0EvcMa6m2Y1XSdALs9WdhIgiZmn5wVZTjKldCCQ
 github.com/shenwei356/xopen v0.3.2/go.mod h1:6EQUa6I7Zsl2GQKqcL9qGLrTzVE+oZyly+uhzovQYSk=
 github.com/smallfish/simpleyaml v0.1.0 h1:5uAZdLAiHxS9cmzkOxg7lH0dILXKTD7uRZbAhyHmyU0=
 github.com/smallfish/simpleyaml v0.1.0/go.mod h1:gU3WdNn44dQVAbVHD2SrSqKKCvmzFApWD2UURhgEj1M=
-github.com/spf13/cobra v1.7.0 h1:hyqWnYt1ZQShIddO5kBpj3vu05/++x6tJ6dg8EC572I=
-github.com/spf13/cobra v1.7.0/go.mod h1:uLxZILRyS/50WlhOIKD7W6V5bgeIt+4sICxh6uRMrb0=
+github.com/spf13/cobra v1.8.0 h1:7aJaZx1B85qltLMc546zn58BxxfZdR/W22ej9CFoEf0=
+github.com/spf13/cobra v1.8.0/go.mod h1:WXLWApfZ71AjXPya3WOlMsY9yMs7YeiHhFVlvLyhcho=
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
 github.com/spf13/pflag v1.0.5/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
