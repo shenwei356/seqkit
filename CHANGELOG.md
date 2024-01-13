@@ -1,5 +1,5 @@
-- [SeqKit v2.6.2](https://github.com/shenwei356/seqkit/releases/tag/v2.6.2) - 2023-11-18
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.6.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.6.2)
+- [SeqKit v2.7.0](https://github.com/shenwei356/seqkit/releases/tag/v2.7.0) - 2024-xx-xx
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.7.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.7.0)
     - `seqkit`:
         - grouping subcommands in help message.
     - `seqkit grep`:
