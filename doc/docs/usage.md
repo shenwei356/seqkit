@@ -1499,6 +1499,9 @@ Flags:
   -l, --list-transl-table int                   show details of translate table N, 0 for all (default -1)
   -L, --list-transl-table-with-amb-codons int   show details of translate table N (including ambigugous
                                                 codons), 0 for all.  (default -1)
+  -m, --min-len int                             the minimum length of amino acid sequence
+  -s, --out-subseqs                             output individual amino acid subsequences seperated by
+                                                the stop symbol "*"
   -T, --transl-table int                        translate table/genetic code, type 'seqkit translate
                                                 --help' for more details (default 1)
       --trim                                    remove all 'X' and '*' characters from the right end of
