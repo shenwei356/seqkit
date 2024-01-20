@@ -1642,18 +1642,20 @@ Attentions:
      for partly matching.
   2. When searching by sequences, it's partly matching, and both positive
      and negative strands are searched.
+     Please switch on "-P/--only-positive-strand" if you would like to
+     search only on the positive strand.
      Mismatch is allowed using flag "-m/--max-mismatch", you can increase
      the value of "-j/--threads" to accelerate processing.
   3. Degenerate bases/residues like "RYMM.." are also supported by flag -d.
      But do not use degenerate bases/residues in regular expression, you need
      convert them to regular expression, e.g., change "N" or "X"  to ".".
   4. When providing search patterns (motifs) via flag '-p',
-     please use double quotation marks for patterns containing comma, 
+     please use double quotation marks for patterns containing comma,
      e.g., -p '"A{2,}"' or -p "\"A{2,}\"". Because the command line argument
      parser accepts comma-separated-values (CSV) for multiple values (motifs).
      Patterns in file do not follow this rule.
   5. The order of sequences in result is consistent with that in original
-     file, not the order of the query patterns. 
+     file, not the order of the query patterns.
      But for FASTA file, you can use:
         seqkit faidx seqs.fasta --infile-list IDs.txt
   6. For multiple patterns, you can either set "-p" multiple times, i.e.,
@@ -1683,8 +1685,9 @@ Usage:
 Flags:
   -D, --allow-duplicated-patterns   output records multiple times when duplicated patterns are given
   -n, --by-name                     match by full name instead of just ID
-  -s, --by-seq                      search subseq on seq, both positive and negative strand are
-                                    searched, and mismatch allowed using flag -m/--max-mismatch
+  -s, --by-seq                      search subseq on seq. Both positive and negative strand are searched
+                                    by default, you might use -P/--only-positive-strand. Mismatch
+                                    allowed using flag -m/--max-mismatch
   -c, --circular                    circular genome
   -C, --count                       just print a count of matching records. with the -v/--invert-match
                                     flag, count non-matching records
@@ -1697,7 +1700,7 @@ Flags:
   -v, --invert-match                invert the sense of matching, to select non-matching records
   -m, --max-mismatch int            max mismatch when matching by seq. For large genomes like human
                                     genome, using mapping/alignment tools would be faster
-  -P, --only-positive-strand        only search on positive strand
+  -P, --only-positive-strand        only search on the positive strand
   -p, --pattern strings             search pattern (multiple values supported. Attention: use double
                                     quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
   -f, --pattern-file string         pattern file (one record per line)

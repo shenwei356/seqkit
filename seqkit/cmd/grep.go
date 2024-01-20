@@ -59,6 +59,8 @@ Attentions:
      for partly matching.
   2. When searching by sequences, it's partly matching, and both positive
      and negative strands are searched.
+     Please switch on "-P/--only-positive-strand" if you would like to
+     search only on the positive strand.
      Mismatch is allowed using flag "-m/--max-mismatch", you can increase
      the value of "-j/--threads" to accelerate processing.
   3. Degenerate bases/residues like "RYMM.." are also supported by flag -d.
@@ -722,8 +724,8 @@ func init() {
 	grepCmd.Flags().BoolP("delete-matched", "", false, "delete a pattern right after being matched, this keeps the firstly matched data and speedups when using regular expressions")
 	grepCmd.Flags().BoolP("invert-match", "v", false, "invert the sense of matching, to select non-matching records")
 	grepCmd.Flags().BoolP("by-name", "n", false, "match by full name instead of just ID")
-	grepCmd.Flags().BoolP("by-seq", "s", false, "search subseq on seq, both positive and negative strand are searched, and mismatch allowed using flag -m/--max-mismatch")
-	grepCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on positive strand")
+	grepCmd.Flags().BoolP("by-seq", "s", false, "search subseq on seq. Both positive and negative strand are searched by default, you might use -P/--only-positive-strand. Mismatch allowed using flag -m/--max-mismatch")
+	grepCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on the positive strand")
 	grepCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when matching by seq. For large genomes like human genome, using mapping/alignment tools would be faster")
 	grepCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	grepCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
