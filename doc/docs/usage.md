@@ -158,7 +158,7 @@ reproduced in different environments with same random seed.
 ``` text
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 2.6.2
+Version: 2.7.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -2319,7 +2319,7 @@ Usage:
 Flags:
   -n, --by-name                by full name instead of just id
   -s, --by-seq                 by seq
-  -D, --dup-num-file string    file to save number and list of duplicated seqs
+  -D, --dup-num-file string    file to save numbers and ID lists of duplicated seqs
   -d, --dup-seqs-file string   file to save duplicated seqs
   -h, --help                   help for rmdup
   -i, --ignore-case            ignore case

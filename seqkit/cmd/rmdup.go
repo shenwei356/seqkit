@@ -67,6 +67,9 @@ Attentions:
 		dupFile := getFlagString(cmd, "dup-seqs-file")
 		numFile := getFlagString(cmd, "dup-num-file")
 
+		saveDupFile := dupFile != ""
+		saveNumFile := numFile != ""
+
 		// revcom := getFlagBool(cmd, "consider-revcom")
 		revcom := !getFlagBool(cmd, "only-positive-strand")
 
@@ -85,7 +88,7 @@ Attentions:
 		defer outfh.Close()
 
 		var outfhDup *xopen.Writer
-		if len(dupFile) > 0 {
+		if saveDupFile {
 			outfhDup, err = xopen.Wopen(dupFile)
 			checkError(err)
 			defer outfhDup.Close()
@@ -137,10 +140,10 @@ Attentions:
 				if _, ok := counter[subject]; ok { // duplicated
 					counter[subject]++
 					removed++
-					if len(dupFile) > 0 {
+					if saveDupFile {
 						outfhDup.Write(record.Format(config.LineWidth))
 					}
-					if len(numFile) > 0 {
+					if saveNumFile {
 						names[subject] = append(names[subject], string(record.ID))
 					}
 
@@ -157,10 +160,10 @@ Attentions:
 					if _, ok := counter[subject]; ok { // duplicated
 						counter[subject]++
 						removed++
-						if len(dupFile) > 0 {
+						if saveDupFile {
 							outfhDup.Write(record.Format(config.LineWidth))
 						}
-						if len(numFile) > 0 {
+						if saveNumFile {
 							names[subject] = append(names[subject], string(record.ID))
 						}
 						continue
@@ -170,7 +173,7 @@ Attentions:
 				record.FormatToWriter(outfh, config.LineWidth)
 				counter[subject]++
 
-				if len(numFile) > 0 {
+				if saveNumFile {
 					names[subject] = []string{string(record.ID)}
 				}
 			}
@@ -178,11 +181,14 @@ Attentions:
 
 			config.LineWidth = lineWidth
 		}
-		if removed > 0 && len(numFile) > 0 {
-			outfhNum, err := xopen.Wopen(numFile)
+
+		var outfhNum *xopen.Writer
+		if saveNumFile {
+			outfhNum, err = xopen.Wopen(numFile)
 			checkError(err)
 			defer outfhNum.Close()
-
+		}
+		if removed > 0 {
 			list := new(listOfStringSlice)
 			for _, l := range names {
 				if len(l) > 1 {
@@ -208,7 +214,7 @@ func init() {
 	rmdupCmd.Flags().BoolP("by-seq", "s", false, "by seq")
 	rmdupCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	rmdupCmd.Flags().StringP("dup-seqs-file", "d", "", "file to save duplicated seqs")
-	rmdupCmd.Flags().StringP("dup-num-file", "D", "", "file to save number and list of duplicated seqs")
+	rmdupCmd.Flags().StringP("dup-num-file", "D", "", "file to save numbers and ID lists of duplicated seqs")
 	// rmdupCmd.Flags().BoolP("consider-revcom", "r", false, "considering the reverse compelment sequence")
 	rmdupCmd.Flags().BoolP("only-positive-strand", "P", false, "only considering positive strand when comparing by sequence")
 }
