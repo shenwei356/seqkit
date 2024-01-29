@@ -109,6 +109,7 @@ Tips:
 		gapLettersBytes := []byte(gapLetters)
 		gcLettersBytes := []byte{'g', 'c', 'G', 'C'}
 
+		skipFileCheck := getFlagBool(cmd, "skip-file-check")
 		all := getFlagBool(cmd, "all")
 		tabular := getFlagBool(cmd, "tabular")
 		skipErr := getFlagBool(cmd, "skip-err")
@@ -131,7 +132,7 @@ Tips:
 			}
 		}
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, !skipFileCheck, "infile-list", !skipFileCheck)
 
 		style := &stable.TableStyle{
 			Name: "plain",
@@ -682,6 +683,8 @@ func init() {
 	statCmd.Flags().BoolP("basename", "b", false, "only output basename of files")
 	statCmd.Flags().StringP("stdin-label", "i", "-", `label for replacing default "-" for stdin`)
 	statCmd.Flags().StringSliceP("N", "N", []string{}, `append other N50-like stats as new columns. value range [0, 100], multiple values supported, e.g., -N 50,90 or -N 50 -N 90`)
+	statCmd.Flags().BoolP("skip-file-check", "S", false, `skip input file checking when given files or a file list.`)
+
 }
 
 func median(sorted []int64) int64 {

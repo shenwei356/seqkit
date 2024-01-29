@@ -10,6 +10,8 @@
         - When using two-pass mode (`-2/--two-pass`), replace possible tabs in the sequence header.
     - `seqkit rmdup`:
         - Write empty file of duplicate numbers and lists of IDs even if there's no duplicates when using `-D/--dup-num-file`. [#436](https://github.com/shenwei356/seqkit/issues/436)
+    - `seqkit stats`:
+        - new flag `-S/--skip-file-check` to skip input file checking when given files or a file list.
 - [SeqKit v2.6.1](https://github.com/shenwei356/seqkit/releases/tag/v2.6.1) - 2023-11-18
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.6.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.6.1)
     - `seqkit`:

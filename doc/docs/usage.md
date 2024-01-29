@@ -723,6 +723,7 @@ Flags:
   -G, --gap-letters string   gap letters (default "- .")
   -h, --help                 help for stats
   -e, --skip-err             skip error, only show warning message
+  -S, --skip-file-check      skip input file checking when given files or a file list.
   -i, --stdin-label string   label for replacing default "-" for stdin (default "-")
   -T, --tabular              output in machine-friendly tabular format
 
