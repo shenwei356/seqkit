@@ -20,7 +20,7 @@ Finally, `seqkit bam` is used to display detailed alignment statistics from the 
 
     # Define reference and data URL:
     REF_URL="https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?tool=portal&save=file&log$=seqview&db=nuccore&report=fasta&id=1798174254&extrafeat=null&conwithfeat=on&hide-cdd=on&ncbi_phid=CE8B108356DDCF110000000005B10489"
-    DATA_URL="ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR145/055/SRR14560555/SRR14560555_1.fastq.gz"
+    DATA_URL="http://ftp.sra.ebi.ac.uk/vol1/fastq/SRR145/055/SRR14560555/SRR14560555_1.fastq.gz"
 
     # Map SARS-CoV-2 amplicon reads to reference followed by these steps:
     # - keep only primary reads with mapping quality greater than 1.

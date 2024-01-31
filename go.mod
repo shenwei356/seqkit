@@ -13,7 +13,7 @@ require (
 	github.com/elliotwutingfeng/asciiset v0.0.0-20230602022725-51bbb787efab
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/iafan/cwalk v0.0.0-20210125030640-586a8832a711
-	github.com/klauspost/compress v1.17.3
+	github.com/klauspost/compress v1.17.5
 	github.com/klauspost/pgzip v1.2.6
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mattn/go-colorable v0.1.13
@@ -25,7 +25,7 @@ require (
 	github.com/shenwei356/bwt v0.6.1
 	github.com/shenwei356/go-logging v0.0.0-20171012171522-c6b9702d88ba
 	github.com/shenwei356/stable v0.1.2
-	github.com/shenwei356/util v0.5.1
+	github.com/shenwei356/util v0.5.2
 	github.com/shenwei356/xopen v0.3.2
 	github.com/smallfish/simpleyaml v0.1.0
 	github.com/spf13/cobra v1.8.0
