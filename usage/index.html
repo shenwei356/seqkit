@@ -1183,10 +1183,10 @@
 <h1 id="usage-and-examples">Usage and Examples</h1>
 <h2 id="quick-guide">Quick Guide</h2>
 <ul>
-<li>Basic: <a href="#seq">seq</a>, <a href="#stats">stats</a>, <a href="#sum">sum</a>, <a href="#subseq">subseq</a>, <a href="#sliding">sliding</a>,
-  <a href="#faidx">faidx</a>, <a href="#watch">watch</a>, <a href="#sana">sana</a>, <a href="#scat">scat</a></li>
+<li>Basic: <a href="#seq">seq</a>, <a href="#stats">stats</a>, <a href="#subseq">subseq</a>, <a href="#sliding">sliding</a>,
+  <a href="#faidx">faidx</a>, <a href="#translate">translate</a>, <a href="#watch">watch</a>, <a href="#sana">sana</a>, <a href="#scat">scat</a></li>
 <li>Format conversion: <a href="#fq2fa">fq2fa</a>, <a href="#fa2fq">fa2fq</a>, <a href="#fx2tab-tab2fx">fx2tab</a>, <a href="#fx2tab-tab2fx">tab2fx</a>,
-  <a href="#convert">convert</a>, <a href="#translate">translate</a></li>
+  <a href="#convert">convert</a></li>
 <li>Searching: <a href="#grep">grep</a>, <a href="#locate">locate</a>, <a href="#amplicon">amplicon</a>, <a href="#fish">fish</a></li>
 <li>Set operation: <a href="#sample">sample</a>, <a href="#rmdup">rmdup</a>, <a href="#common">common</a>,
   <a href="#duplicate">duplicate</a>, <a href="#split">split</a>, <a href="#split2">split2</a>, <a href="#head">head</a>,
@@ -1322,7 +1322,7 @@ reproduced in different environments with same random seed.</p>
 <h2 id="seqkit">seqkit</h2>
 <pre><code class="language-text">SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 2.6.0
+Version: 2.7.0
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -1351,47 +1351,63 @@ Compression level:
 Usage:
   seqkit [command]
 
-Available Commands:
-  amplicon        extract amplicon (or specific region around it) via primer(s)
-  bam             monitoring and online histograms of BAM record features
-  common          find common/shared sequences of multiple files by id/name/sequence
-  concat          concatenate sequences with the same ID from multiple files
+Commands for Basic Operation:
+  faidx           create the FASTA index file and extract subsequences
+  scat            real time recursive concatenation and streaming of fastx files
+  seq             transform sequences (extract ID, filter by length, remove gaps, reverse complement...)
+  sliding         extract subsequences in sliding windows
+  stats           simple statistics of FASTA/Q files
+  subseq          get subsequences by region/gtf/bed, including flanking sequences
+  translate       translate DNA/RNA to protein sequence (supporting ambiguous bases)
+  watch           monitoring and online histograms of sequence features
+
+Commands for Format Conversion:
   convert         convert FASTQ quality encoding between Sanger, Solexa and Illumina
-  duplicate       duplicate sequences N times
   fa2fq           retrieve corresponding FASTQ records by a FASTA file
-  faidx           create FASTA index file and extract subsequence
-  fish            look for short sequences in larger sequences using local alignment
   fq2fa           convert FASTQ to FASTA
   fx2tab          convert FASTA/Q to tabular format (and length, GC content, average quality...)
-  genautocomplete generate shell autocompletion script (bash|zsh|fish|powershell)
+  tab2fx          convert tabular format to FASTA/Q format
+
+Commands for Searching:
+  amplicon        extract amplicon (or specific region around it) via primer(s)
+  fish            look for short sequences in larger sequences using local alignment
   grep            search sequences by ID/name/sequence/sequence motifs, mismatch allowed
+  locate          locate subsequences/motifs, mismatch allowed
+
+Commands for Set Operation:
+  common          find common/shared sequences of multiple files by id/name/sequence
+  duplicate       duplicate sequences N times
   head            print first N FASTA/Q records
   head-genome     print sequences of the first genome with common prefixes in name
-  locate          locate subsequences/motifs, mismatch allowed
-  merge-slides    merge sliding windows generated from seqkit sliding
-  mutate          edit sequence (point mutation, insertion, deletion)
   pair            match up paired-end reads from two fastq files
   range           print FASTA/Q records in a range (start:end)
+  rmdup           remove duplicated sequences by ID/name/sequence
+  sample          sample sequences by number or proportion
+  split           split sequences into files by id/seq region/size/parts (mainly for FASTA)
+  split2          split sequences into files by size/parts (FASTA, PE/SE FASTQ)
+
+Commands for Edit:
+  concat          concatenate sequences with the same ID from multiple files
+  mutate          edit sequence (point mutation, insertion, deletion)
   rename          rename duplicated IDs
   replace         replace name/sequence by regular expression
   restart         reset start position for circular genome
-  rmdup           remove duplicated sequences by ID/name/sequence
-  sample          sample sequences by number or proportion
   sana            sanitize broken single line FASTQ files
-  scat            real time recursive concatenation and streaming of fastx files
-  seq             transform sequences (extract ID, filter by length, remove gaps, reverse complement...)
+
+Commands for Ordering:
   shuffle         shuffle sequences
-  sliding         extract subsequences in sliding windows
   sort            sort sequences by id/name/sequence/length
-  split           split sequences into files by id/seq region/size/parts (mainly for FASTA)
-  split2          split sequences into files by size/parts (FASTA, PE/SE FASTQ)
-  stats           simple statistics of FASTA/Q files
-  subseq          get subsequences by region/gtf/bed, including flanking sequences
+
+Commands for BAM Processing:
+  bam             monitoring and online histograms of BAM record features
+
+Commands for Miscellaneous:
+  merge-slides    merge sliding windows generated from seqkit sliding
   sum             compute message digest for all sequences in FASTA/Q files
-  tab2fx          convert tabular format to FASTA/Q format
-  translate       translate DNA/RNA to protein sequence (supporting ambiguous bases)
+
+Additional Commands:
+  genautocomplete generate shell autocompletion script (bash|zsh|fish|powershell)
   version         print version information and check for update
-  watch           monitoring and online histograms of sequence features
 
 Flags:
       --alphabet-guess-seq-length int   length of sequence prefix of the first FASTA record based on
@@ -1882,6 +1898,7 @@ Flags:
   -G, --gap-letters string   gap letters (default &quot;- .&quot;)
   -h, --help                 help for stats
   -e, --skip-err             skip error, only show warning message
+  -S, --skip-file-check      skip input file checking when given files or a file list.
   -i, --stdin-label string   label for replacing default &quot;-&quot; for stdin (default &quot;-&quot;)
   -T, --tabular              output in machine-friendly tabular format
 
@@ -2155,7 +2172,7 @@ seqkit.v0.1_DCD_k51_39e267864fddeafd7a5cacd77e0a6a11   virus-A.fasta; virus-B.fa
 </code></pre>
 <h2 id="faidx">faidx</h2>
 <p>Usage</p>
-<pre><code class="language-text">create FASTA index file and extract subsequence
+<pre><code class="language-text">create the FASTA index file and extract subsequences
 
 This command is similar with &quot;samtools faidx&quot; but has some extra features:
 
@@ -2661,6 +2678,9 @@ Flags:
   -l, --list-transl-table int                   show details of translate table N, 0 for all (default -1)
   -L, --list-transl-table-with-amb-codons int   show details of translate table N (including ambigugous
                                                 codons), 0 for all.  (default -1)
+  -m, --min-len int                             the minimum length of amino acid sequence
+  -s, --out-subseqs                             output individual amino acid subsequences seperated by
+                                                the stop symbol &quot;*&quot;
   -T, --transl-table int                        translate table/genetic code, type 'seqkit translate
                                                 --help' for more details (default 1)
       --trim                                    remove all 'X' and '*' characters from the right end of
@@ -2807,18 +2827,20 @@ Attentions:
      for partly matching.
   2. When searching by sequences, it's partly matching, and both positive
      and negative strands are searched.
+     Please switch on &quot;-P/--only-positive-strand&quot; if you would like to
+     search only on the positive strand.
      Mismatch is allowed using flag &quot;-m/--max-mismatch&quot;, you can increase
      the value of &quot;-j/--threads&quot; to accelerate processing.
   3. Degenerate bases/residues like &quot;RYMM..&quot; are also supported by flag -d.
      But do not use degenerate bases/residues in regular expression, you need
      convert them to regular expression, e.g., change &quot;N&quot; or &quot;X&quot;  to &quot;.&quot;.
   4. When providing search patterns (motifs) via flag '-p',
-     please use double quotation marks for patterns containing comma, 
+     please use double quotation marks for patterns containing comma,
      e.g., -p '&quot;A{2,}&quot;' or -p &quot;\&quot;A{2,}\&quot;&quot;. Because the command line argument
      parser accepts comma-separated-values (CSV) for multiple values (motifs).
      Patterns in file do not follow this rule.
   5. The order of sequences in result is consistent with that in original
-     file, not the order of the query patterns. 
+     file, not the order of the query patterns.
      But for FASTA file, you can use:
         seqkit faidx seqs.fasta --infile-list IDs.txt
   6. For multiple patterns, you can either set &quot;-p&quot; multiple times, i.e.,
@@ -2846,28 +2868,30 @@ Usage:
   seqkit grep [flags]
 
 Flags:
-  -n, --by-name                match by full name instead of just ID
-  -s, --by-seq                 search subseq on seq, both positive and negative strand are searched, and
-                               mismatch allowed using flag -m/--max-mismatch
-  -c, --circular               circular genome
-  -C, --count                  just print a count of matching records. with the -v/--invert-match flag,
-                               count non-matching records
-  -d, --degenerate             pattern/motif contains degenerate base
-      --delete-matched         delete a pattern right after being matched, this keeps the firstly
-                               matched data and speedups when using regular expressions
-  -h, --help                   help for grep
-  -i, --ignore-case            ignore case
-  -I, --immediate-output       print output immediately, do not use write buffer
-  -v, --invert-match           invert the sense of matching, to select non-matching records
-  -m, --max-mismatch int       max mismatch when matching by seq. For large genomes like human genome,
-                               using mapping/alignment tools would be faster
-  -P, --only-positive-strand   only search on positive strand
-  -p, --pattern strings        search pattern (multiple values supported. Attention: use double
-                               quotation marks for patterns containing comma, e.g., -p '&quot;A{2,}&quot;')
-  -f, --pattern-file string    pattern file (one record per line)
-  -R, --region string          specify sequence region for searching. e.g 1:12 for first 12 bases,
-                               -12:-1 for last 12 bases
-  -r, --use-regexp             patterns are regular expression
+  -D, --allow-duplicated-patterns   output records multiple times when duplicated patterns are given
+  -n, --by-name                     match by full name instead of just ID
+  -s, --by-seq                      search subseq on seq. Both positive and negative strand are searched
+                                    by default, you might use -P/--only-positive-strand. Mismatch
+                                    allowed using flag -m/--max-mismatch
+  -c, --circular                    circular genome
+  -C, --count                       just print a count of matching records. with the -v/--invert-match
+                                    flag, count non-matching records
+  -d, --degenerate                  pattern/motif contains degenerate base
+      --delete-matched              delete a pattern right after being matched, this keeps the firstly
+                                    matched data and speedups when using regular expressions
+  -h, --help                        help for grep
+  -i, --ignore-case                 ignore case
+  -I, --immediate-output            print output immediately, do not use write buffer
+  -v, --invert-match                invert the sense of matching, to select non-matching records
+  -m, --max-mismatch int            max mismatch when matching by seq. For large genomes like human
+                                    genome, using mapping/alignment tools would be faster
+  -P, --only-positive-strand        only search on the positive strand
+  -p, --pattern strings             search pattern (multiple values supported. Attention: use double
+                                    quotation marks for patterns containing comma, e.g., -p '&quot;A{2,}&quot;')
+  -f, --pattern-file string         pattern file (one record per line)
+  -R, --region string               specify sequence region for searching. e.g 1:12 for first 12 bases,
+                                    -12:-1 for last 12 bases
+  -r, --use-regexp                  patterns are regular expression
 
 </code></pre>
 <p>Examples</p>
@@ -3485,7 +3509,7 @@ Usage:
 Flags:
   -n, --by-name                by full name instead of just id
   -s, --by-seq                 by seq
-  -D, --dup-num-file string    file to save number and list of duplicated seqs
+  -D, --dup-num-file string    file to save numbers and ID lists of duplicated seqs
   -d, --dup-seqs-file string   file to save duplicated seqs
   -h, --help                   help for rmdup
   -i, --ignore-case            ignore case

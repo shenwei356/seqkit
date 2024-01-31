@@ -630,131 +630,53 @@ install via conda:</p>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">category</th>
-<th style="text-align: left;">command</th>
-<th style="text-align: left;">function</th>
-<th style="text-align: left;">input</th>
-<th style="text-align: left;">strand-sensitivity</th>
-<th style="text-align: left;">multi-threads</th>
-<th style="text-align: left;">popularity</th>
+<th style="text-align: left;">Category</th>
+<th style="text-align: left;">Command</th>
+<th style="text-align: left;">Function</th>
+<th style="text-align: left;">Input</th>
+<th style="text-align: left;">Strand-sensitivity</th>
+<th style="text-align: left;">Multi-threads</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: left;">basic</td>
+<td style="text-align: left;">Basic operation</td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#seq">seq</a></td>
-<td style="text-align: left;">transform sequences: extract ID/seq, filter by length/quality, remove gaps…</td>
+<td style="text-align: left;">Transform sequences: extract ID/seq, filter by length/quality, remove gaps…</td>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
-<td style="text-align: left;">★★★★★</td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#stats">stats</a></td>
-<td style="text-align: left;">simple statistics: #seqs, min/max_len, N50, Q20%, Q30%…</td>
+<td style="text-align: left;">Simple statistics: #seqs, min/max_len, N50, Q20%, Q30%…</td>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;">✓</td>
-<td style="text-align: left;">★★★★★</td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#subseq">subseq</a></td>
-<td style="text-align: left;">get subsequences by region/gtf/bed, including flanking sequences</td>
+<td style="text-align: left;">Get subsequences by region/gtf/bed, including flanking sequences</td>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;">+ or/and -</td>
 <td style="text-align: left;"></td>
-<td style="text-align: left;">★★★</td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#sliding">sliding</a></td>
-<td style="text-align: left;">extract subsequences in sliding windows</td>
+<td style="text-align: left;">Extract subsequences in sliding windows</td>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;">+ only</td>
 <td style="text-align: left;"></td>
-<td style="text-align: left;">★★</td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#faidx">faidx</a></td>
-<td style="text-align: left;">create FASTA index file and extract subsequence (with more features than samtools faidx)</td>
+<td style="text-align: left;">Create the FASTA index file and extract subsequences (with more features than samtools faidx)</td>
 <td style="text-align: left;">FASTA</td>
 <td style="text-align: left;">+ or/and -</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-</tr>
-<tr>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#watch">watch </a></td>
-<td style="text-align: left;">monitoring and online histograms of sequence features</td>
-<td style="text-align: left;">FASTA/Q</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-</tr>
-<tr>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#sana">sana</a></td>
-<td style="text-align: left;">sanitize broken single line FASTQ files</td>
-<td style="text-align: left;">FASTQ</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-</tr>
-<tr>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#scat">scat </a></td>
-<td style="text-align: left;">real time concatenation and streaming of fastx files</td>
-<td style="text-align: left;">FASTA/Q</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;">✓</td>
-<td style="text-align: left;"></td>
-</tr>
-<tr>
-<td style="text-align: left;">format conversion</td>
-<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#fq2fa">fq2fa</a></td>
-<td style="text-align: left;">convert FASTQ to FASTA</td>
-<td style="text-align: left;">FASTQ</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;">★★</td>
-</tr>
-<tr>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#fx2tab">fx2tab</a></td>
-<td style="text-align: left;">convert FASTA/Q to tabular format</td>
-<td style="text-align: left;">FASTA/Q</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;">★★</td>
-</tr>
-<tr>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#fa2fq">fa2fq</a></td>
-<td style="text-align: left;">retrieve corresponding FASTQ records by a FASTA file</td>
-<td style="text-align: left;">FASTA/Q</td>
-<td style="text-align: left;">+ only</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-</tr>
-<tr>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#tab2fx">tab2fx</a></td>
-<td style="text-align: left;">convert tabular format to FASTA/Q format</td>
-<td style="text-align: left;">FASTA/Q</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-</tr>
-<tr>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#convert">convert</a></td>
-<td style="text-align: left;">convert FASTQ quality encoding between Sanger, Solexa and Illumina</td>
-<td style="text-align: left;">FASTA/Q</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 </tr>
 <tr>
@@ -764,221 +686,260 @@ install via conda:</p>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;">+ or/and -</td>
 <td style="text-align: left;"></td>
-<td style="text-align: left;">★★</td>
 </tr>
 <tr>
-<td style="text-align: left;">searching</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#watch">watch </a></td>
+<td style="text-align: left;">Monitoring and online histograms of sequence features</td>
+<td style="text-align: left;">FASTA/Q</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#scat">scat </a></td>
+<td style="text-align: left;">Real time concatenation and streaming of fastx files</td>
+<td style="text-align: left;">FASTA/Q</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">✓</td>
+</tr>
+<tr>
+<td style="text-align: left;">Format conversion</td>
+<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#fq2fa">fq2fa</a></td>
+<td style="text-align: left;">Convert FASTQ to FASTA format</td>
+<td style="text-align: left;">FASTQ</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#fx2tab">fx2tab</a></td>
+<td style="text-align: left;">Convert FASTA/Q to tabular format</td>
+<td style="text-align: left;">FASTA/Q</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#fa2fq">fa2fq</a></td>
+<td style="text-align: left;">Retrieve corresponding FASTQ records by a FASTA file</td>
+<td style="text-align: left;">FASTA/Q</td>
+<td style="text-align: left;">+ only</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#tab2fx">tab2fx</a></td>
+<td style="text-align: left;">Convert tabular format to FASTA/Q format</td>
+<td style="text-align: left;">TSV</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#convert">convert</a></td>
+<td style="text-align: left;">Convert FASTQ quality encoding between Sanger, Solexa and Illumina</td>
+<td style="text-align: left;">FASTA/Q</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Searching</td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#grep">grep</a></td>
-<td style="text-align: left;">search sequences by ID/name/sequence/sequence motifs, mismatch allowed</td>
+<td style="text-align: left;">Search sequences by ID/name/sequence/sequence motifs, mismatch allowed</td>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;">+ and -</td>
 <td style="text-align: left;">partly, -m</td>
-<td style="text-align: left;">★★★★★</td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#locate">locate</a></td>
-<td style="text-align: left;">locate subsequences/motifs, mismatch allowed</td>
+<td style="text-align: left;">Locate subsequences/motifs, mismatch allowed</td>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;">+ and -</td>
 <td style="text-align: left;">partly, -m</td>
-<td style="text-align: left;">★★★★★</td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#amplicon">amplicon</a></td>
-<td style="text-align: left;">extract amplicon (or specific region around it), mismatch allowed</td>
+<td style="text-align: left;">Extract amplicon (or specific region around it), mismatch allowed</td>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;">+ and -</td>
 <td style="text-align: left;">partly, -m</td>
-<td style="text-align: left;">★</td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#fish">fish</a></td>
-<td style="text-align: left;">look for short sequences in larger sequences</td>
+<td style="text-align: left;">Look for short sequences in larger sequences</td>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;">+ and -</td>
 <td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
 </tr>
 <tr>
-<td style="text-align: left;">set operation</td>
+<td style="text-align: left;">Set operation</td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#sample">sample</a></td>
-<td style="text-align: left;">sample sequences by number or proportion</td>
+<td style="text-align: left;">Sample sequences by number or proportion</td>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
-<td style="text-align: left;">★★★★</td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#rmdup">rmdup</a></td>
-<td style="text-align: left;">remove duplicated sequences by ID/name/sequence</td>
+<td style="text-align: left;">Remove duplicated sequences by ID/name/sequence</td>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;">+ and -</td>
 <td style="text-align: left;"></td>
-<td style="text-align: left;">★★★</td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#common">common</a></td>
-<td style="text-align: left;">find common sequences of multiple files by id/name/sequence</td>
+<td style="text-align: left;">Find common sequences of multiple files by id/name/sequence</td>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;">+ and -</td>
-<td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#duplicate">duplicate</a></td>
-<td style="text-align: left;">duplicate sequences N times</td>
+<td style="text-align: left;">Duplicate sequences N times</td>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
-<td style="text-align: left;">★</td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#split">split</a></td>
-<td style="text-align: left;">split sequences into files by id/seq region/size/parts (mainly for FASTA)</td>
+<td style="text-align: left;">Split sequences into files by id/seq region/size/parts (mainly for FASTA)</td>
 <td style="text-align: left;">FASTA preffered</td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
-<td style="text-align: left;">★</td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#split2">split2</a></td>
-<td style="text-align: left;">split sequences into files by size/parts (FASTA, PE/SE FASTQ)</td>
+<td style="text-align: left;">Split sequences into files by size/parts (FASTA, PE/SE FASTQ)</td>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
-<td style="text-align: left;">★★</td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#head">head</a></td>
-<td style="text-align: left;">print first N FASTA/Q records</td>
+<td style="text-align: left;">Print first N FASTA/Q records</td>
 <td style="text-align: left;">FASTA/Q</td>
-<td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#head-genome">head-genome</a></td>
-<td style="text-align: left;">print sequences of the first genome with common prefixes in name</td>
+<td style="text-align: left;">Print sequences of the first genome with common prefixes in name</td>
 <td style="text-align: left;">FASTA/Q</td>
-<td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#range">range</a></td>
-<td style="text-align: left;">print FASTA/Q records in a range (start:end)</td>
+<td style="text-align: left;">Print FASTA/Q records in a range (start:end)</td>
 <td style="text-align: left;">FASTA/Q</td>
-<td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#pair">pair</a></td>
-<td style="text-align: left;">match up paired-end reads from two fastq files</td>
+<td style="text-align: left;">Patch up paired-end reads from two fastq files</td>
 <td style="text-align: left;">FASTA/Q</td>
-<td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 </tr>
 <tr>
-<td style="text-align: left;">edit</td>
-<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#concat">concat</a></td>
-<td style="text-align: left;">concatenate sequences with same ID from multiple files</td>
-<td style="text-align: left;">FASTA/Q</td>
-<td style="text-align: left;">+ only</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;">★★★</td>
-</tr>
-<tr>
-<td style="text-align: left;"></td>
+<td style="text-align: left;">Edit</td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#replace">replace</a></td>
-<td style="text-align: left;">replace name/sequence by regular expression</td>
+<td style="text-align: left;">Replace name/sequence by regular expression</td>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;">+ only</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;">★★</td>
-</tr>
-<tr>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#restart">restart</a></td>
-<td style="text-align: left;">reset start position for circular genome</td>
-<td style="text-align: left;">FASTA/Q</td>
-<td style="text-align: left;">+ only</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;">★</td>
-</tr>
-<tr>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#mutate">mutate</a></td>
-<td style="text-align: left;">edit sequence (point mutation, insertion, deletion)</td>
-<td style="text-align: left;">FASTA/Q</td>
-<td style="text-align: left;">+ only</td>
-<td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#rename">rename</a></td>
-<td style="text-align: left;">rename duplicated IDs</td>
+<td style="text-align: left;">Rename duplicated IDs</td>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
-<td style="text-align: left;">★</td>
 </tr>
 <tr>
-<td style="text-align: left;">ordering</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#concat">concat</a></td>
+<td style="text-align: left;">Concatenate sequences with same ID from multiple files</td>
+<td style="text-align: left;">FASTA/Q</td>
+<td style="text-align: left;">+ only</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#restart">restart</a></td>
+<td style="text-align: left;">Reset start position for circular genome</td>
+<td style="text-align: left;">FASTA/Q</td>
+<td style="text-align: left;">+ only</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#mutate">mutate</a></td>
+<td style="text-align: left;">Edit sequence (point mutation, insertion, deletion)</td>
+<td style="text-align: left;">FASTA/Q</td>
+<td style="text-align: left;">+ only</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#sana">sana</a></td>
+<td style="text-align: left;">Sanitize broken single line FASTQ files</td>
+<td style="text-align: left;">FASTQ</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Ordering</td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#sort">sort</a></td>
-<td style="text-align: left;">sort sequences by id/name/sequence/length</td>
+<td style="text-align: left;">Sort sequences by id/name/sequence/length</td>
 <td style="text-align: left;">FASTA preffered</td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
-<td style="text-align: left;">★★</td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#shuffle">shuffle</a></td>
-<td style="text-align: left;">shuffle sequences</td>
+<td style="text-align: left;">Shuffle sequences</td>
 <td style="text-align: left;">FASTA preffered</td>
-<td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 </tr>
 <tr>
 <td style="text-align: left;">BAM processing</td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#bam">bam</a></td>
-<td style="text-align: left;">monitoring and online histograms of BAM record features</td>
+<td style="text-align: left;">Monitoring and online histograms of BAM record features</td>
 <td style="text-align: left;">BAM</td>
-<td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 </tr>
 <tr>
-<td style="text-align: left;">others</td>
+<td style="text-align: left;">Miscellaneous</td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#sum">sum</a></td>
-<td style="text-align: left;">compute message digest for all sequences in FASTA/Q files</td>
+<td style="text-align: left;">Compute message digest for all sequences in FASTA/Q files</td>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;">✓</td>
-<td style="text-align: left;"></td>
 </tr>
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#merge-slides">merge-slides</a></td>
-<td style="text-align: left;">merge sliding windows generated from seqkit sliding</td>
-<td style="text-align: left;">text</td>
-<td style="text-align: left;"></td>
+<td style="text-align: left;">Merge sliding windows generated from seqkit sliding</td>
+<td style="text-align: left;">TSV</td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 </tr>
@@ -993,7 +954,6 @@ install via conda:</p>
 </ul>
 </li>
 <li>Multiple-threads: Using the default 4 threads is fast enough for most commands, some commands can benefit from extra threads.</li>
-<li>Popularity: Bases on statistics of 227 publications citing seqkit since 2020.</li>
 </ul>
 <h2 id="citation">Citation</h2>
 <p><strong>W Shen</strong>, S Le, Y Li*, F Hu*. SeqKit: a cross-platform and ultrafast toolkit for FASTA/Q file manipulation.
