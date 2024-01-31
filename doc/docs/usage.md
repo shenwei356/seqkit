@@ -946,7 +946,7 @@ complement strand will not affect the result):
 Usage
 
 ``` text
-create FASTA index file and extract subsequence
+create the FASTA index file and extract subsequences
 
 This command is similar with "samtools faidx" but has some extra features:
 

@@ -42,8 +42,8 @@ var faidxCmd = &cobra.Command{
 	GroupID: "basic",
 
 	Use:   "faidx",
-	Short: "create FASTA index file and extract subsequence",
-	Long: fmt.Sprintf(`create FASTA index file and extract subsequence
+	Short: "create the FASTA index file and extract subsequences",
+	Long: fmt.Sprintf(`create the FASTA index file and extract subsequences
 
 This command is similar with "samtools faidx" but has some extra features:
 

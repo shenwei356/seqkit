@@ -1,17 +1,17 @@
-- [SeqKit v2.7.0](https://github.com/shenwei356/seqkit/releases/tag/v2.7.0) - 2024-xx-xx
+- [SeqKit v2.7.0](https://github.com/shenwei356/seqkit/releases/tag/v2.7.0) - 2024-01-31
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.7.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.7.0)
     - `seqkit`:
-        - grouping subcommands in help message.
+        - Grouping subcommands in help message, which is intuitive for beginners.
     - `seqkit grep`:
-        - new flag: `-D/--allow-duplicated-patterns` for outputting records multiple times when duplicated patterns are given. [#427](https://github.com/shenwei356/seqkit/issues/427)
+        - New flag: `-D/--allow-duplicated-patterns` for outputting records multiple times when duplicated patterns are given. [#427](https://github.com/shenwei356/seqkit/issues/427)
     - `seqkit subseq`:
         - Use the ID regular expression from the option `--id-regexp` to create FASTA index file. This solves the panic happened for sequences containing tabs in the headers. [#432](https://github.com/shenwei356/seqkit/issues/432)
     - `seqkit split/sort/shuffle`:
-        - When using two-pass mode (`-2/--two-pass`), replace possible tabs in the sequence header.
+        - When using the two-pass mode (`-2/--two-pass`), replace possible tabs in the sequence header.
     - `seqkit rmdup`:
-        - Write empty file of duplicate numbers and lists of IDs even if there's no duplicates when using `-D/--dup-num-file`. [#436](https://github.com/shenwei356/seqkit/issues/436)
+        - Write an empty file of duplicate numbers and lists of IDs even if there's no duplicates when using `-D/--dup-num-file`. [#436](https://github.com/shenwei356/seqkit/issues/436)
     - `seqkit stats`:
-        - new flag `-S/--skip-file-check` to skip input file checking when given files or a file list. It's very useful if you will run on millions of files.
+        - New flag `-S/--skip-file-check` to skip input file checking when given files or a file list. It's very useful if you run it with millions of files.
 - [SeqKit v2.6.1](https://github.com/shenwei356/seqkit/releases/tag/v2.6.1) - 2023-11-18
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.6.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.6.1)
     - `seqkit`:
