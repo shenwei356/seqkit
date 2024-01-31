@@ -2,10 +2,10 @@
 
 ## Quick Guide
 
-- Basic: [seq](#seq), [stats](#stats), [sum](#sum), [subseq](#subseq), [sliding](#sliding),
-  [faidx](#faidx), [watch](#watch), [sana](#sana), [scat](#scat)
+- Basic: [seq](#seq), [stats](#stats), [subseq](#subseq), [sliding](#sliding),
+  [faidx](#faidx), [translate](#translate), [watch](#watch), [sana](#sana), [scat](#scat)
 - Format conversion: [fq2fa](#fq2fa), [fa2fq](#fa2fq), [fx2tab](#fx2tab-tab2fx), [tab2fx](#fx2tab-tab2fx),
-  [convert](#convert), [translate](#translate)
+  [convert](#convert)
 - Searching: [grep](#grep), [locate](#locate), [amplicon](#amplicon), [fish](#fish)
 - Set operation: [sample](#sample), [rmdup](#rmdup), [common](#common),
   [duplicate](#duplicate), [split](#split), [split2](#split2), [head](#head),
@@ -188,12 +188,13 @@ Usage:
   seqkit [command]
 
 Commands for Basic Operation:
-  faidx           create FASTA index file and extract subsequence
+  faidx           create the FASTA index file and extract subsequences
   scat            real time recursive concatenation and streaming of fastx files
   seq             transform sequences (extract ID, filter by length, remove gaps, reverse complement...)
   sliding         extract subsequences in sliding windows
   stats           simple statistics of FASTA/Q files
   subseq          get subsequences by region/gtf/bed, including flanking sequences
+  translate       translate DNA/RNA to protein sequence (supporting ambiguous bases)
   watch           monitoring and online histograms of sequence features
 
 Commands for Format Conversion:
@@ -202,7 +203,6 @@ Commands for Format Conversion:
   fq2fa           convert FASTQ to FASTA
   fx2tab          convert FASTA/Q to tabular format (and length, GC content, average quality...)
   tab2fx          convert tabular format to FASTA/Q format
-  translate       translate DNA/RNA to protein sequence (supporting ambiguous bases)
 
 Commands for Searching:
   amplicon        extract amplicon (or specific region around it) via primer(s)

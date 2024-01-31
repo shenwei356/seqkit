@@ -1,5 +1,45 @@
 # Tutorial
 
+## Real-time monitoring mapping results with seqkit bam in time-critical situations
+
+Some of SeqKit subcommands, including `watch`, `fish`, `scat`, `bam`, aid the real-time, streaming processing of data in FASTQ/FASTA and BAM formats,
+enabling the development of analysis pipelines in time-critical situations.
+To illustrate the possibilities opened up by the these features, we present a small pipeline which maps a dataset of SARS-CoV-2
+amplicon reads to the reference sequence using `minimap2` as they are being downloaded.
+The stream of SAM alignments is then converted into a stream of BAM records and passed to `seqkit bam`,
+which filters for records with aligned reference lengths between `310` and `410` and displays the distribution of aligned
+reference lengths after every `5000` records also saving it to a PDF file.
+The next element of the pipeline is another instance of the `seqkit bam` subcommand, which displays the distribution of alignment
+accuracies after every 10000 records.
+The stream of BAM records is then passed on to samtools sort to produce the final sorted BAM file.
+Finally, `seqkit bam` is used to display detailed alignment statistics from the final sorted BAM file in a pretty format.
+
+
+    #!/bin/bash
+    set -o nounset
+
+    # Define reference and data URL:
+    REF_URL="https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?tool=portal&save=file&log$=seqview&db=nuccore&report=fasta&id=1798174254&extrafeat=null&conwithfeat=on&hide-cdd=on&ncbi_phid=CE8B108356DDCF110000000005B10489"
+    DATA_URL="ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR145/055/SRR14560555/SRR14560555_1.fastq.gz"
+
+    # Map SARS-CoV-2 amplicon reads to reference followed by these steps:
+    # - keep only primary reads with mapping quality greater than 1.
+    # - Keep only alignments which align to a reference segments with lengths between 310 and 420.
+    #   Show an approximate histogram of aligned reference lengths after every 5000 records.
+    # - Show an approximate histogram of alignment accuracy after every 10000 records.
+    # - Pipe the BAM into samtools for sorting.
+    minimap2 -K 10M -t 8 -ax map-ont \
+            <(wget -q -O - "$REF_URL") \
+            <(wget -q -O - "$DATA_URL") 2>/dev/null \
+        | samtools view -F 2304 -q 1 -b - \
+        | seqkit bam -O aln_len.pdf -f RefAln -m 310 -M 410 -p 5000 -x - \
+        | seqkit bam -O aln_acc.pdf -f Acc  -p 10000 -x - \
+        | samtools sort -o sars_artic_sorted.bam -
+
+    # Show statistics from the sorted BAM:
+    seqkit bam -s -k sars_artic_sorted.bam
+
+
 ## Removing duplicated and nested sequences
 
 https://twitter.com/bentemperton/status/1673999868933599232
