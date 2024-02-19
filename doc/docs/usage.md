@@ -315,32 +315,31 @@ Usage:
   seqkit seq [flags] 
 
 Flags:
-  -k, --color                     colorize sequences - to be piped into "less -R"
-  -p, --complement                complement sequence, flag '-v' is recommended to switch on
-      --dna2rna                   DNA to RNA
-  -G, --gap-letters string        gap letters to be removed with -g/--remove-gaps (default "- \t.")
-  -h, --help                      help for seq
-  -l, --lower-case                print sequences in lower case
-  -M, --max-len int               only print sequences shorter than or equal to the maximum length (-1
-                                  for no limit) (default -1)
-  -R, --max-qual float            only print sequences with average quality less than this limit (-1 for
-                                  no limit) (default -1)
-  -m, --min-len int               only print sequences longer than or equal to the minimum length (-1
-                                  for no limit) (default -1)
-  -Q, --min-qual float            only print sequences with average quality greater or equal than this
-                                  limit (-1 for no limit) (default -1)
-  -n, --name                      only print names/sequence headers
-  -i, --only-id                   print IDs instead of full headers
-  -q, --qual                      only print qualities
-  -b, --qual-ascii-base int       ASCII BASE, 33 for Phred+33 (default 33)
-  -g, --remove-gaps               remove gaps letters set by -G/--gap-letters, e.g., spaces, tabs, and
-                                  dashes (gaps "-" in aligned sequences)
-  -r, --reverse                   reverse sequence
-      --rna2dna                   RNA to DNA
-  -s, --seq                       only print sequences
-  -u, --upper-case                print sequences in upper case
-  -v, --validate-seq              validate bases according to the alphabet
-  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+  -k, --color                 colorize sequences - to be piped into "less -R"
+  -p, --complement            complement sequence, flag '-v' is recommended to switch on
+      --dna2rna               DNA to RNA
+  -G, --gap-letters string    gap letters to be removed with -g/--remove-gaps (default "- \t.")
+  -h, --help                  help for seq
+  -l, --lower-case            print sequences in lower case
+  -M, --max-len int           only print sequences shorter than or equal to the maximum length (-1 for
+                              no limit) (default -1)
+  -R, --max-qual float        only print sequences with average quality less than this limit (-1 for no
+                              limit) (default -1)
+  -m, --min-len int           only print sequences longer than or equal to the minimum length (-1 for no
+                              limit) (default -1)
+  -Q, --min-qual float        only print sequences with average quality greater or equal than this limit
+                              (-1 for no limit) (default -1)
+  -n, --name                  only print names/sequence headers
+  -i, --only-id               print IDs instead of full headers
+  -q, --qual                  only print qualities
+  -b, --qual-ascii-base int   ASCII BASE, 33 for Phred+33 (default 33)
+  -g, --remove-gaps           remove gaps letters set by -G/--gap-letters, e.g., spaces, tabs, and
+                              dashes (gaps "-" in aligned sequences)
+  -r, --reverse               reverse sequence
+      --rna2dna               RNA to DNA
+  -s, --seq                   only print sequences
+  -u, --upper-case            print sequences in upper case
+  -v, --validate-seq          validate bases according to the alphabet
 
 ```
 
@@ -1051,22 +1050,21 @@ Usage:
   seqkit watch [flags]
 
 Flags:
-  -B, --bins int                  number of histogram bins (default -1)
-  -W, --delay int                 sleep this many seconds after online plotting (default 1)
-  -y, --dump                      print histogram data to stderr instead of plotting
-  -f, --fields string             target fields, available values: ReadLen, MeanQual, GC, GCSkew
-                                  (default "ReadLen")
-  -h, --help                      help for watch
-  -O, --img string                save histogram to this PDF/image file
-  -H, --list-fields               print out a list of available fields
-  -L, --log                       log10(x+1) transform numeric values
-  -x, --pass                      pass through mode (write input to stdout)
-  -p, --print-freq int            print/report after this many records (-1 for print after EOF) (default -1)
-  -b, --qual-ascii-base int       ASCII BASE, 33 for Phred+33 (default 33)
-  -Q, --quiet-mode                supress all plotting to stderr
-  -R, --reset                     reset histogram after every report
-  -v, --validate-seq              validate bases according to the alphabet
-  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+  -B, --bins int              number of histogram bins (default -1)
+  -W, --delay int             sleep this many seconds after online plotting (default 1)
+  -y, --dump                  print histogram data to stderr instead of plotting
+  -f, --fields string         target fields, available values: ReadLen, MeanQual, GC, GCSkew (default
+                              "ReadLen")
+  -h, --help                  help for watch
+  -O, --img string            save histogram to this PDF/image file
+  -H, --list-fields           print out a list of available fields
+  -L, --log                   log10(x+1) transform numeric values
+  -x, --pass                  pass through mode (write input to stdout)
+  -p, --print-freq int        print/report after this many records (-1 for print after EOF) (default -1)
+  -b, --qual-ascii-base int   ASCII BASE, 33 for Phred+33 (default 33)
+  -Q, --quiet-mode            supress all plotting to stderr
+  -R, --reset                 reset histogram after every report
+  -v, --validate-seq          validate bases according to the alphabet
 
 ```
 
@@ -1846,25 +1844,24 @@ Usage:
   seqkit locate [flags]
 
 Flags:
-      --bed                       output in BED6 format
-  -c, --circular                  circular genome. type "seqkit locate -h" for details
-  -d, --degenerate                pattern/motif contains degenerate base
-      --gtf                       output in GTF format
-  -h, --help                      help for locate
-  -M, --hide-matched              do not show matched sequences
-  -i, --ignore-case               ignore case
-  -I, --immediate-output          print output immediately, do not use write buffer
-  -s, --max-len-to-show int       show at most X characters for the search pattern or matched sequences
-  -m, --max-mismatch int          max mismatch when matching by seq. For large genomes like human
-                                  genome, using mapping/alignment tools would be faster
-  -G, --non-greedy                non-greedy mode, faster but may miss motifs overlapping with others
-  -P, --only-positive-strand      only search on positive strand
-  -p, --pattern strings           pattern/motif (multiple values supported. Attention: use double
-                                  quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
-  -f, --pattern-file string       pattern/motif file (FASTA format)
-  -F, --use-fmi                   use FM-index for much faster search of lots of sequence patterns
-  -r, --use-regexp                patterns/motifs are regular expression
-  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+      --bed                    output in BED6 format
+  -c, --circular               circular genome. type "seqkit locate -h" for details
+  -d, --degenerate             pattern/motif contains degenerate base
+      --gtf                    output in GTF format
+  -h, --help                   help for locate
+  -M, --hide-matched           do not show matched sequences
+  -i, --ignore-case            ignore case
+  -I, --immediate-output       print output immediately, do not use write buffer
+  -s, --max-len-to-show int    show at most X characters for the search pattern or matched sequences
+  -m, --max-mismatch int       max mismatch when matching by seq. For large genomes like human genome,
+                               using mapping/alignment tools would be faster
+  -G, --non-greedy             non-greedy mode, faster but may miss motifs overlapping with others
+  -P, --only-positive-strand   only search on positive strand
+  -p, --pattern strings        pattern/motif (multiple values supported. Attention: use double quotation
+                               marks for patterns containing comma, e.g., -p '"A{2,}"')
+  -f, --pattern-file string    pattern/motif file (FASTA format)
+  -F, --use-fmi                use FM-index for much faster search of lots of sequence patterns
+  -r, --use-regexp             patterns/motifs are regular expression
 
 ```
 
@@ -2006,22 +2003,21 @@ Usage:
   seqkit fish [flags]
 
 Flags:
-  -a, --all                       search all
-  -p, --aln-params string         alignment parameters in format
-                                  "<match>,<mismatch>,<gap_open>,<gap_extend>" (default "4,-4,-2,-1")
-  -h, --help                      help for fish
-  -i, --invert                    print out references not matching with any query
-  -q, --min-qual float            minimum mapping quality (default 5)
-  -b, --out-bam string            save aligmnets to this BAM file (memory intensive)
-  -x, --pass                      pass through mode (write input to stdout)
-  -g, --print-aln                 print sequence alignments
-  -D, --print-desc                print full sequence header
-  -f, --query-fastx string        query fasta
-  -F, --query-sequences string    query sequences
-  -r, --ranges string             target ranges, for example: ":10,30:40,-20:"
-  -s, --stranded                  search + strand only
-  -v, --validate-seq              validate bases according to the alphabet
-  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+  -a, --all                      search all
+  -p, --aln-params string        alignment parameters in format
+                                 "<match>,<mismatch>,<gap_open>,<gap_extend>" (default "4,-4,-2,-1")
+  -h, --help                     help for fish
+  -i, --invert                   print out references not matching with any query
+  -q, --min-qual float           minimum mapping quality (default 5)
+  -b, --out-bam string           save aligmnets to this BAM file (memory intensive)
+  -x, --pass                     pass through mode (write input to stdout)
+  -g, --print-aln                print sequence alignments
+  -D, --print-desc               print full sequence header
+  -f, --query-fastx string       query fasta
+  -F, --query-sequences string   query sequences
+  -r, --ranges string            target ranges, for example: ":10,30:40,-20:"
+  -s, --stranded                 search + strand only
+  -v, --validate-seq             validate bases according to the alphabet
 
 ```
 

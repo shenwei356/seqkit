@@ -193,6 +193,16 @@ Examples:
 
 		strands := []string{"+", "-"}
 
+		// -----------
+		// finder pools
+		finderPools := make([]*sync.Pool, len(primers))
+		for i, primer := range primers {
+			finderPools[i] = &sync.Pool{New: func() interface{} {
+				finder, _ := NewAmpliconFinder([]byte{'A'}, primer[1], primer[2], maxMismatch)
+				return finder
+			}}
+		}
+
 		// -------------------------------------------------------------------
 		// only for m > 0, where FMI is slow
 
@@ -305,6 +315,7 @@ Examples:
 							<-tokens
 						}()
 
+						var j int
 						var finder *AmpliconFinder
 						var loc []int
 						var mis []int
@@ -325,9 +336,11 @@ Examples:
 								record.Seq.RevComInplace()
 							}
 
-							for _, primer = range primers {
-								finder, err = NewAmpliconFinder(record.Seq.Seq, primer[1], primer[2], maxMismatch)
-								checkError(err)
+							for j, primer = range primers {
+								// finder, err = NewAmpliconFinder(record.Seq.Seq, primer[1], primer[2], maxMismatch)
+								// checkError(err)
+								finder = finderPools[j].Get().(*AmpliconFinder)
+								finder.Reset(record.Seq.Seq, maxMismatch)
 
 								if usingRegion {
 									loc, mis, err = finder.LocateRange(begin, end, fregion, strict)
@@ -381,6 +394,8 @@ Examples:
 								results = append(results, string(record.Format(config.LineWidth)))
 
 								record.Seq = tmpSeq
+
+								finderPools[j].Put(finder)
 							}
 						}
 
@@ -414,6 +429,7 @@ Examples:
 
 		var record *fastx.Record
 
+		var j int
 		var finder *AmpliconFinder
 		var loc []int
 
@@ -453,9 +469,11 @@ Examples:
 						record.Seq.RevComInplace()
 					}
 
-					for _, primer = range primers {
-						finder, err = NewAmpliconFinder(record.Seq.Seq, primer[1], primer[2], maxMismatch)
-						checkError(err)
+					for j, primer = range primers {
+						// finder, err = NewAmpliconFinder(record.Seq.Seq, primer[1], primer[2], maxMismatch)
+						// checkError(err)
+						finder = finderPools[j].Get().(*AmpliconFinder)
+						finder.Reset(record.Seq.Seq, maxMismatch)
 
 						if usingRegion {
 							loc, _, err = finder.LocateRange(begin, end, fregion, strict)
@@ -512,6 +530,8 @@ Examples:
 						record.FormatToWriter(outfh, config.LineWidth)
 
 						record.Seq = tmpSeq
+
+						finderPools[j].Put(finder)
 					}
 				}
 
@@ -630,6 +650,25 @@ type AmpliconFinder struct {
 	mis5, mis3      int
 
 	rF, rR *regexp.Regexp
+}
+
+func (finder *AmpliconFinder) Reset(sequence []byte, maxMismatch int) error {
+	if len(sequence) == 0 {
+		return fmt.Errorf("non-blank sequence needed")
+	}
+	finder.Seq = bytes.ToUpper(sequence)
+	if maxMismatch > 0 { // using FM-index
+		index := fmi.NewFMIndex()
+		_, err := index.Transform(finder.Seq)
+		if err != nil {
+			return err
+		}
+		finder.MaxMismatch = maxMismatch
+		finder.FMindex = index
+	}
+
+	finder.searched, finder.found = false, false
+	return nil
 }
 
 // NewAmpliconFinder returns a AmpliconFinder struct.
