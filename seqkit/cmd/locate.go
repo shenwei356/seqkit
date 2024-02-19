@@ -70,8 +70,6 @@ Attentions:
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = true
-		seq.ValidateWholeSeq = false
-		seq.ValidSeqLengthThreshold = getFlagValidateSeqLength(cmd, "validate-seq-length")
 		seq.ValidSeqThreads = config.Threads
 		seq.ComplementThreads = config.Threads
 		quiet := config.Quiet
@@ -988,7 +986,6 @@ func init() {
 	locateCmd.Flags().BoolP("use-fmi", "F", false, "use FM-index for much faster search of lots of sequence patterns")
 	locateCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	locateCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on positive strand")
-	locateCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
 	locateCmd.Flags().BoolP("non-greedy", "G", false, "non-greedy mode, faster but may miss motifs overlapping with others")
 	locateCmd.Flags().BoolP("gtf", "", false, "output in GTF format")
 	locateCmd.Flags().BoolP("bed", "", false, "output in BED6 format")

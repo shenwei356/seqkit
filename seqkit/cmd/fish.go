@@ -154,11 +154,8 @@ Attention:
 		alnParams := parseAlnParams(flagAlnParams)
 
 		validateSeq := getFlagBool(cmd, "validate-seq")
-		validateSeqLength := getFlagValidateSeqLength(cmd, "validate-seq-length")
 
 		seq.ValidateSeq = validateSeq
-		seq.ValidateWholeSeq = false
-		seq.ValidSeqLengthThreshold = validateSeqLength
 		seq.ValidSeqThreads = config.Threads
 
 		if !(alphabet == nil || alphabet == seq.Unlimit) {
@@ -360,7 +357,6 @@ func init() {
 	fishCmd.Flags().BoolP("print-desc", "D", false, "print full sequence header")
 	fishCmd.Flags().BoolP("print-aln", "g", false, "print sequence alignments")
 	fishCmd.Flags().BoolP("invert", "i", false, "print out references not matching with any query")
-	fishCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
 	fishCmd.Flags().Float64P("min-qual", "q", 5.0, "minimum mapping quality")
 }
 

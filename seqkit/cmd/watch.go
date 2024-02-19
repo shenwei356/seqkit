@@ -73,7 +73,6 @@ var watchCmd = &cobra.Command{
 		_ = logMode
 		fieldsText := getFlagString(cmd, "fields")
 		validateSeq := getFlagBool(cmd, "validate-seq")
-		validateSeqLength := getFlagValidateSeqLength(cmd, "validate-seq-length")
 		qBase := getFlagPositiveInt(cmd, "qual-ascii-base")
 		_ = qBase
 
@@ -148,8 +147,6 @@ var watchCmd = &cobra.Command{
 		}
 
 		seq.ValidateSeq = validateSeq
-		seq.ValidateWholeSeq = false
-		seq.ValidSeqLengthThreshold = validateSeqLength
 		seq.ValidSeqThreads = config.Threads
 		seq.ComplementThreads = config.Threads
 
@@ -285,7 +282,6 @@ func init() {
 	watchCmd.Flags().BoolP("pass", "x", false, "pass through mode (write input to stdout)")
 	watchCmd.Flags().BoolP("log", "L", false, "log10(x+1) transform numeric values")
 	watchCmd.Flags().StringP("fields", "f", "ReadLen", "target fields, available values: ReadLen, MeanQual, GC, GCSkew")
-	watchCmd.Flags().IntP("validate-seq-length", "V", 10000, "length of sequence to validate (0 for whole seq)")
 	watchCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
 	watchCmd.Flags().IntP("bins", "B", -1, "number of histogram bins")
 	watchCmd.Flags().IntP("print-freq", "p", -1, "print/report after this many records (-1 for print after EOF)")

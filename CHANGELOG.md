@@ -1,3 +1,9 @@
+- [SeqKit v2.7.1](https://github.com/shenwei356/seqkit/releases/tag/v2.7.1) - 2024-01-31
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.7.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.7.1)
+    - `seqkit seq/locate/fish/watch`:
+        - Removing the flag `-V/--validate-seq-length`. Now the whole sequence will be checked if `-v/--validate-seq` is given.
+    - `seqkit amplicon`:
+        - Fix the speed problem, introduced in v2.7.0. [#439](https://github.com/shenwei356/seqkit/issues/439).
 - [SeqKit v2.7.0](https://github.com/shenwei356/seqkit/releases/tag/v2.7.0) - 2024-01-31
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.7.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.7.0)
     - `seqkit`:
