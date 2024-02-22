@@ -1,5 +1,7 @@
-- [SeqKit v2.7.1](https://github.com/shenwei356/seqkit/releases/tag/v2.7.1) - 2024-01-31
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.7.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.7.1)
+- [SeqKit v2.8.0](https://github.com/shenwei356/seqkit/releases/tag/v2.8.0) - 2024-01-31
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.8.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.8.0)
+    - `seqkit stats`:
+        - Add column `N50_num`, an alias of L50, [#15](https://github.com/shenwei356/seqkit/issues/15).
     - `seqkit seq/locate/fish/watch`:
         - Removing the flag `-V/--validate-seq-length`. Now the whole sequence will be checked if `-v/--validate-seq` is given.
     - `seqkit amplicon`:

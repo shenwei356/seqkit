@@ -71,10 +71,11 @@ Columns:
   11. Q3        third quartile of sequence length , with gaps or spaces counted
   12. sum_gap   number of gaps
   13. N50       N50. https://en.wikipedia.org/wiki/N50,_L50,_and_related_statistics#N50
-  14. Q20(%)    percentage of bases with the quality score greater than 20
-  15. Q30(%)    percentage of bases with the quality score greater than 30
-  16. AvgQual   average quality
-  17. GC(%)     percentage of GC content
+  14. N50_num   N50_num or L50. https://en.wikipedia.org/wiki/N50,_L50,_and_related_statistics#L50
+  15. Q20(%)    percentage of bases with the quality score greater than 20
+  16. Q30(%)    percentage of bases with the quality score greater than 30
+  17. AvgQual   average quality
+  18. GC(%)     percentage of GC content
   
 Attentions:
   1. Sequence length metrics (sum_len, min_len, avg_len, max_len, Q1, Q2, Q3)
@@ -193,7 +194,7 @@ Tips:
 				"max_len",
 			}
 			if all {
-				colnames = append(colnames, []string{"Q1", "Q2", "Q3", "sum_gap", "N50", "Q20(%)", "Q30(%)", "AvgQual", "GC(%)"}...)
+				colnames = append(colnames, []string{"Q1", "Q2", "Q3", "sum_gap", "N50", "N50_num", "Q20(%)", "Q30(%)", "AvgQual", "GC(%)"}...)
 			}
 
 			if hasNX {
@@ -241,12 +242,13 @@ Tips:
 							info.lenAvg,
 							info.lenMax)
 						if all {
-							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f",
+							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f",
 								info.Q1,
 								info.Q2,
 								info.Q3,
 								info.gapSum,
 								info.N50,
+								info.L50,
 								info.q20,
 								info.q30,
 								info.avgQual,
@@ -281,12 +283,13 @@ Tips:
 							info.lenAvg,
 							info.lenMax)
 						if all {
-							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f",
+							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f",
 								info.Q1,
 								info.Q2,
 								info.Q3,
 								info.gapSum,
 								info.N50,
+								info.L50,
 								info.q20,
 								info.q30,
 								info.avgQual,
@@ -329,12 +332,13 @@ Tips:
 							info.lenAvg,
 							info.lenMax)
 						if all {
-							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f",
+							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f",
 								info.Q1,
 								info.Q2,
 								info.Q3,
 								info.gapSum,
 								info.N50,
+								info.L50,
 								info.q20,
 								info.q30,
 								info.avgQual,
@@ -592,6 +596,7 @@ Tips:
 				{Header: "Q3", Align: stable.AlignRight, HumanizeNumbers: true},
 				{Header: "sum_gap", Align: stable.AlignRight, HumanizeNumbers: true},
 				{Header: "N50", Align: stable.AlignRight, HumanizeNumbers: true},
+				{Header: "N50_num", Align: stable.AlignRight, HumanizeNumbers: true},
 				{Header: "Q20(%)", Align: stable.AlignRight, HumanizeNumbers: true},
 				{Header: "Q30(%)", Align: stable.AlignRight, HumanizeNumbers: true},
 				{Header: "AvgQual", Align: stable.AlignRight, HumanizeNumbers: true},
@@ -624,6 +629,7 @@ Tips:
 				row = append(row, info.Q3)
 				row = append(row, info.gapSum)
 				row = append(row, info.N50)
+				row = append(row, info.L50)
 				row = append(row, info.q20)
 				row = append(row, info.q30)
 				row = append(row, info.avgQual)
