@@ -54,7 +54,17 @@ var sanaCmd = &cobra.Command{
 
 	Use:   "sana",
 	Short: "sanitize broken single line FASTQ files",
-	Long:  "sanitize broken single line FASTQ files",
+	Long: `sanitize broken single line FASTQ files
+
+Sana is a resilient FASTQ/FASTA parser. Unlike many parsers,
+it won't stop at the first error. Instead, it skips malformed records
+and continues processing the file.
+
+Sana currently supports this FASTQ dialect:
+
+	- One line for each sequence and quality value
+	- No identifiers in separator (+) lines
+	`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
