@@ -62,8 +62,9 @@ and continues processing the file.
 
 Sana currently supports this FASTQ dialect:
 
-	- One line for each sequence and quality value
-	- No identifiers in separator (+) lines
+  - One line for each sequence and quality value
+  - No identifiers in separator (+) lines
+
 	`,
 
 	Run: func(cmd *cobra.Command, args []string) {
