@@ -125,7 +125,7 @@ Attentions:
 				checkError(fmt.Errorf("flag -d (--degenerate) not allowed when giving flag -m (--max-mismatch)"))
 			}
 			if useRegexp {
-				checkError(fmt.Errorf("flag -r (--use-regexp) not allowed when giving flag -m (--use-regexp)"))
+				checkError(fmt.Errorf("flag -r (--use-regexp) not allowed when giving flag -m (--max-mismatch)"))
 			}
 			if nonGreedy && !quiet {
 				log.Infof("flag -G (--non-greedy) ignored when giving flag -m (--max-mismatch)")
