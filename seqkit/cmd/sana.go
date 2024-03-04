@@ -278,7 +278,7 @@ type FqLine struct {
 type FqLines []FqLine
 
 // guessFqlState tries to infer the type of a fastq line.
-func guessFqlState(line []byte) FqlState {
+func guessFqlState(line []byte, prevLine *FqLine) FqlState {
 	state := FqlState{}
 	switch line[0] {
 	case '@':
@@ -286,6 +286,8 @@ func guessFqlState(line []byte) FqlState {
 		state.Qual = true
 	case '+':
 		if len(line) == 1 {
+			state.Plus = true
+		} else if prevLine != nil && prevLine.FqlState.Seq {
 			state.Plus = true
 		} else {
 			state.Qual = true
@@ -359,8 +361,12 @@ func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 	var line []byte
 	var spaceShift int
 	var lastLine *FqLine
+	var prevLine *FqLine
 	if len(sbuff) > 0 {
 		lastLine = &sbuff[len(sbuff)-1]
+	}
+	if len(sbuff) > 1 {
+		prevLine = &sbuff[len(sbuff)-1]
 	}
 	var err error
 	for {
@@ -379,12 +385,18 @@ func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 			if lastLine != nil && lastLine.FqlState.Partial {
 				*lineCounter++
 				lastLine.Line += string(line)
-				lastLine.FqlState = guessFqlState([]byte(lastLine.Line))
+				lastLine.FqlState = guessFqlState([]byte(lastLine.Line), prevLine)
 			} else {
 				*lineCounter++
 				lineStr := string(line)
-				sbuff = append(sbuff, FqLine{lineStr, guessFqlState(line)})
+				if len(sbuff) > 1 {
+					prevLine = &sbuff[len(sbuff)-2]
+				}
+				sbuff = append(sbuff, FqLine{lineStr, guessFqlState(line, prevLine)})
 				lastLine = &sbuff[len(sbuff)-1]
+				if len(sbuff) > 1 {
+					prevLine = &sbuff[len(sbuff)-2]
+				}
 			}
 			if len(sbuff) == 4 && !lastLine.FqlState.Partial {
 				seq, err := FqLinesToSimpleSeq(sbuff, qBase, gaps)
@@ -427,8 +439,9 @@ func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 			}
 			if final && len(sbuff) == 4 {
 				last := len(sbuff) - 1
+				prevLine = &sbuff[len(sbuff)-2]
 				sbuff[last].FqlState.Partial = false
-				sbuff[last].FqlState = guessFqlState([]byte(sbuff[last].Line))
+				sbuff[last].FqlState = guessFqlState([]byte(sbuff[last].Line), prevLine)
 				seq, err := FqLinesToSimpleSeq(sbuff, qBase, gaps)
 				if err != nil {
 					for il, l := range sbuff {
