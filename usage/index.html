@@ -1322,7 +1322,7 @@ reproduced in different environments with same random seed.</p>
 <h2 id="seqkit">seqkit</h2>
 <pre><code class="language-text">SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 2.7.0
+Version: 2.8.0
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -1477,32 +1477,31 @@ Usage:
   seqkit seq [flags] 
 
 Flags:
-  -k, --color                     colorize sequences - to be piped into &quot;less -R&quot;
-  -p, --complement                complement sequence, flag '-v' is recommended to switch on
-      --dna2rna                   DNA to RNA
-  -G, --gap-letters string        gap letters to be removed with -g/--remove-gaps (default &quot;- \t.&quot;)
-  -h, --help                      help for seq
-  -l, --lower-case                print sequences in lower case
-  -M, --max-len int               only print sequences shorter than or equal to the maximum length (-1
-                                  for no limit) (default -1)
-  -R, --max-qual float            only print sequences with average quality less than this limit (-1 for
-                                  no limit) (default -1)
-  -m, --min-len int               only print sequences longer than or equal to the minimum length (-1
-                                  for no limit) (default -1)
-  -Q, --min-qual float            only print sequences with average quality greater or equal than this
-                                  limit (-1 for no limit) (default -1)
-  -n, --name                      only print names/sequence headers
-  -i, --only-id                   print IDs instead of full headers
-  -q, --qual                      only print qualities
-  -b, --qual-ascii-base int       ASCII BASE, 33 for Phred+33 (default 33)
-  -g, --remove-gaps               remove gaps letters set by -G/--gap-letters, e.g., spaces, tabs, and
-                                  dashes (gaps &quot;-&quot; in aligned sequences)
-  -r, --reverse                   reverse sequence
-      --rna2dna                   RNA to DNA
-  -s, --seq                       only print sequences
-  -u, --upper-case                print sequences in upper case
-  -v, --validate-seq              validate bases according to the alphabet
-  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+  -k, --color                 colorize sequences - to be piped into &quot;less -R&quot;
+  -p, --complement            complement sequence, flag '-v' is recommended to switch on
+      --dna2rna               DNA to RNA
+  -G, --gap-letters string    gap letters to be removed with -g/--remove-gaps (default &quot;- \t.&quot;)
+  -h, --help                  help for seq
+  -l, --lower-case            print sequences in lower case
+  -M, --max-len int           only print sequences shorter than or equal to the maximum length (-1 for
+                              no limit) (default -1)
+  -R, --max-qual float        only print sequences with average quality less than this limit (-1 for no
+                              limit) (default -1)
+  -m, --min-len int           only print sequences longer than or equal to the minimum length (-1 for no
+                              limit) (default -1)
+  -Q, --min-qual float        only print sequences with average quality greater or equal than this limit
+                              (-1 for no limit) (default -1)
+  -n, --name                  only print names/sequence headers
+  -i, --only-id               print IDs instead of full headers
+  -q, --qual                  only print qualities
+  -b, --qual-ascii-base int   ASCII BASE, 33 for Phred+33 (default 33)
+  -g, --remove-gaps           remove gaps letters set by -G/--gap-letters, e.g., spaces, tabs, and
+                              dashes (gaps &quot;-&quot; in aligned sequences)
+  -r, --reverse               reverse sequence
+      --rna2dna               RNA to DNA
+  -s, --seq                   only print sequences
+  -u, --upper-case            print sequences in upper case
+  -v, --validate-seq          validate bases according to the alphabet
 
 </code></pre>
 <p>Examples</p>
@@ -1647,7 +1646,7 @@ file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
 <p>Usage</p>
 <pre><code class="language-text">get subsequences by region/gtf/bed, including flanking sequences.
 
-Attentions:
+Attention:
   1. Use &quot;seqkit grep&quot; for extract subsets of sequences.
      &quot;seqtk subseq seqs.fasta id.txt&quot; equals to
      &quot;seqkit grep -f id.txt seqs.fasta&quot;
@@ -1866,12 +1865,13 @@ Columns:
   11. Q3        third quartile of sequence length , with gaps or spaces counted
   12. sum_gap   number of gaps
   13. N50       N50. https://en.wikipedia.org/wiki/N50,_L50,_and_related_statistics#N50
-  14. Q20(%)    percentage of bases with the quality score greater than 20
-  15. Q30(%)    percentage of bases with the quality score greater than 30
-  16. AvgQual   average quality
-  17. GC(%)     percentage of GC content
+  14. N50_num   N50_num or L50. https://en.wikipedia.org/wiki/N50,_L50,_and_related_statistics#L50
+  15. Q20(%)    percentage of bases with the quality score greater than 20
+  16. Q30(%)    percentage of bases with the quality score greater than 30
+  17. AvgQual   average quality
+  18. GC(%)     percentage of GC content
 
-Attentions:
+Attention:
   1. Sequence length metrics (sum_len, min_len, avg_len, max_len, Q1, Q2, Q3)
      count the number of gaps or spaces. You can remove them with &quot;seqkit seq -g&quot;:
          seqkit seq -g input.fasta | seqkit stats
@@ -2017,13 +2017,13 @@ $ seqkit stats *.f{a,q}.gz -T | csvtk csv2md -t
 <li>
 <p>Extra information</p>
 <pre><code>$ seqkit stats *.f{a,q}.gz -a
-file               format  type  num_seqs    sum_len  min_len  avg_len  max_len   Q1   Q2   Q3  sum_gap  N50  Q20(%)  Q30(%)  AvgQual  GC(%)
-hairpin.fa.gz      FASTA   RNA     28,645  2,949,871       39      103    2,354   76   91  111        0  101       0       0        0  45.77
-mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34   21   22   22        0   22       0       0        0   47.6
-Illimina1.8.fq.gz  FASTQ   DNA     10,000  1,500,000      150      150      150  150  150  150        0  150   96.16   89.71    24.82  49.91
-nanopore.fq.gz     FASTQ   DNA      4,000  1,798,723      153    449.7    6,006  271  318  391        0  395   40.79   12.63     9.48  46.66
-reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229  227  227  227        0  227   91.24   86.62    15.45  53.63
-reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225  224  224  224        0  224   91.06   87.66    14.62  54.77
+file               format  type  num_seqs    sum_len  min_len  avg_len  max_len   Q1   Q2   Q3  sum_gap  N50  N50_num  Q20(%)  Q30(%)  AvgQual  GC(%)
+hairpin.fa.gz      FASTA   RNA     28,645  2,949,871       39      103    2,354   76   91  111        0  101      380       0       0        0  45.77
+mature.fa.gz       FASTA   RNA     35,828    781,222       15     21.8       34   21   22   22        0   22       12       0       0        0   47.6
+Illimina1.8.fq.gz  FASTQ   DNA     10,000  1,500,000      150      150      150  150  150  150        0  150        1   96.16   89.71    24.82  49.91
+nanopore.fq.gz     FASTQ   DNA      4,000  1,798,723      153    449.7    6,006  271  318  391        0  395      585   40.79   12.63     9.48  46.66
+reads_1.fq.gz      FASTQ   DNA      2,500    567,516      226      227      229  227  227  227        0  227        3   91.24   86.62    15.45  53.63
+reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224      225  224  224  224        0  224        2   91.06   87.66    14.62  54.77
 </code></pre>
 </li>
 <li>
@@ -2060,7 +2060,7 @@ tests/reads_2.fq.gz      FASTQ   DNA      2,500    560,002      223      224    
 <p>Usage</p>
 <pre><code class="language-text">compute message digest for all sequences in FASTA/Q files
 
-Attentions:
+Attention:
   1. Sequence headers and qualities are skipped, only sequences matter.
   2. The order of sequences records does not matter.
   3. Circular complete genomes are supported with the flag -c/--circular.
@@ -2181,7 +2181,7 @@ This command is similar with &quot;samtools faidx&quot; but has some extra featu
   3. if you have large number of IDs, you can use:
         seqkit faidx seqs.fasta -l IDs.txt
 
-Attentions:
+Attention:
   1. The flag -U/--update-faidx is recommended to ensure the .fai file matches the FASTA file.
 
 The definition of region is 1-based and with some custom design.
@@ -2278,22 +2278,21 @@ Usage:
   seqkit watch [flags]
 
 Flags:
-  -B, --bins int                  number of histogram bins (default -1)
-  -W, --delay int                 sleep this many seconds after online plotting (default 1)
-  -y, --dump                      print histogram data to stderr instead of plotting
-  -f, --fields string             target fields, available values: ReadLen, MeanQual, GC, GCSkew
-                                  (default &quot;ReadLen&quot;)
-  -h, --help                      help for watch
-  -O, --img string                save histogram to this PDF/image file
-  -H, --list-fields               print out a list of available fields
-  -L, --log                       log10(x+1) transform numeric values
-  -x, --pass                      pass through mode (write input to stdout)
-  -p, --print-freq int            print/report after this many records (-1 for print after EOF) (default -1)
-  -b, --qual-ascii-base int       ASCII BASE, 33 for Phred+33 (default 33)
-  -Q, --quiet-mode                supress all plotting to stderr
-  -R, --reset                     reset histogram after every report
-  -v, --validate-seq              validate bases according to the alphabet
-  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+  -B, --bins int              number of histogram bins (default -1)
+  -W, --delay int             sleep this many seconds after online plotting (default 1)
+  -y, --dump                  print histogram data to stderr instead of plotting
+  -f, --fields string         target fields, available values: ReadLen, MeanQual, GC, GCSkew (default
+                              &quot;ReadLen&quot;)
+  -h, --help                  help for watch
+  -O, --img string            save histogram to this PDF/image file
+  -H, --list-fields           print out a list of available fields
+  -L, --log                   log10(x+1) transform numeric values
+  -x, --pass                  pass through mode (write input to stdout)
+  -p, --print-freq int        print/report after this many records (-1 for print after EOF) (default -1)
+  -b, --qual-ascii-base int   ASCII BASE, 33 for Phred+33 (default 33)
+  -Q, --quiet-mode            supress all plotting to stderr
+  -R, --reset                 reset histogram after every report
+  -v, --validate-seq          validate bases according to the alphabet
 
 </code></pre>
 <p>Examples</p>
@@ -2818,7 +2817,7 @@ Stranslate Table:
 <p>Usage</p>
 <pre><code class="language-text">search sequences by ID/name/sequence/sequence motifs, mismatch allowed
 
-Attentions:
+Attention:
 
   0. By default, we match sequence ID with patterns, use &quot;-n/--by-name&quot;
      for matching full name instead of just ID.
@@ -3017,7 +3016,7 @@ sys     0m0.158s
 <p>Usage</p>
 <pre><code class="language-text">locate subsequences/motifs, mismatch allowed
 
-Attentions:
+Attention:
 
   1. Motifs could be EITHER plain sequence containing &quot;ACTGN&quot; OR regular
      expression like &quot;A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)&quot; for ORFs.     
@@ -3038,25 +3037,24 @@ Usage:
   seqkit locate [flags]
 
 Flags:
-      --bed                       output in BED6 format
-  -c, --circular                  circular genome. type &quot;seqkit locate -h&quot; for details
-  -d, --degenerate                pattern/motif contains degenerate base
-      --gtf                       output in GTF format
-  -h, --help                      help for locate
-  -M, --hide-matched              do not show matched sequences
-  -i, --ignore-case               ignore case
-  -I, --immediate-output          print output immediately, do not use write buffer
-  -s, --max-len-to-show int       show at most X characters for the search pattern or matched sequences
-  -m, --max-mismatch int          max mismatch when matching by seq. For large genomes like human
-                                  genome, using mapping/alignment tools would be faster
-  -G, --non-greedy                non-greedy mode, faster but may miss motifs overlapping with others
-  -P, --only-positive-strand      only search on positive strand
-  -p, --pattern strings           pattern/motif (multiple values supported. Attention: use double
-                                  quotation marks for patterns containing comma, e.g., -p '&quot;A{2,}&quot;')
-  -f, --pattern-file string       pattern/motif file (FASTA format)
-  -F, --use-fmi                   use FM-index for much faster search of lots of sequence patterns
-  -r, --use-regexp                patterns/motifs are regular expression
-  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+      --bed                    output in BED6 format
+  -c, --circular               circular genome. type &quot;seqkit locate -h&quot; for details
+  -d, --degenerate             pattern/motif contains degenerate base
+      --gtf                    output in GTF format
+  -h, --help                   help for locate
+  -M, --hide-matched           do not show matched sequences
+  -i, --ignore-case            ignore case
+  -I, --immediate-output       print output immediately, do not use write buffer
+  -s, --max-len-to-show int    show at most X characters for the search pattern or matched sequences
+  -m, --max-mismatch int       max mismatch when matching by seq. For large genomes like human genome,
+                               using mapping/alignment tools would be faster
+  -G, --non-greedy             non-greedy mode, faster but may miss motifs overlapping with others
+  -P, --only-positive-strand   only search on positive strand
+  -p, --pattern strings        pattern/motif (multiple values supported. Attention: use double quotation
+                               marks for patterns containing comma, e.g., -p '&quot;A{2,}&quot;')
+  -f, --pattern-file string    pattern/motif file (FASTA format)
+  -F, --use-fmi                use FM-index for much faster search of lots of sequence patterns
+  -r, --use-regexp             patterns/motifs are regular expression
 
 </code></pre>
 <p>Examples</p>
@@ -3200,22 +3198,21 @@ Usage:
   seqkit fish [flags]
 
 Flags:
-  -a, --all                       search all
-  -p, --aln-params string         alignment parameters in format
-                                  &quot;&lt;match&gt;,&lt;mismatch&gt;,&lt;gap_open&gt;,&lt;gap_extend&gt;&quot; (default &quot;4,-4,-2,-1&quot;)
-  -h, --help                      help for fish
-  -i, --invert                    print out references not matching with any query
-  -q, --min-qual float            minimum mapping quality (default 5)
-  -b, --out-bam string            save aligmnets to this BAM file (memory intensive)
-  -x, --pass                      pass through mode (write input to stdout)
-  -g, --print-aln                 print sequence alignments
-  -D, --print-desc                print full sequence header
-  -f, --query-fastx string        query fasta
-  -F, --query-sequences string    query sequences
-  -r, --ranges string             target ranges, for example: &quot;:10,30:40,-20:&quot;
-  -s, --stranded                  search + strand only
-  -v, --validate-seq              validate bases according to the alphabet
-  -V, --validate-seq-length int   length of sequence to validate (0 for whole seq) (default 10000)
+  -a, --all                      search all
+  -p, --aln-params string        alignment parameters in format
+                                 &quot;&lt;match&gt;,&lt;mismatch&gt;,&lt;gap_open&gt;,&lt;gap_extend&gt;&quot; (default &quot;4,-4,-2,-1&quot;)
+  -h, --help                     help for fish
+  -i, --invert                   print out references not matching with any query
+  -q, --min-qual float           minimum mapping quality (default 5)
+  -b, --out-bam string           save aligmnets to this BAM file (memory intensive)
+  -x, --pass                     pass through mode (write input to stdout)
+  -g, --print-aln                print sequence alignments
+  -D, --print-desc               print full sequence header
+  -f, --query-fastx string       query fasta
+  -F, --query-sequences string   query sequences
+  -r, --ranges string            target ranges, for example: &quot;:10,30:40,-20:&quot;
+  -s, --stranded                 search + strand only
+  -v, --validate-seq             validate bases according to the alphabet
 
 </code></pre>
 <p>Examples</p>
@@ -3250,7 +3247,7 @@ seq   0          4        q0      0            4          +        60.00     16 
 <p>Usage</p>
 <pre><code class="language-text">extract amplicon (or specific region around it) via primer(s).
 
-Attentions:
+Attention:
   1. Only one (the longest) matching location is returned for every primer pair.
   2. Mismatch is allowed, but the mismatch location (5' or 3') is not controled. 
      You can increase the value of &quot;-j/--threads&quot; to accelerate processing.
@@ -3497,7 +3494,7 @@ UAUGCAAUUUUCUACCUUACCGGAGACAGAACUCUUCGA
 <p>Usage</p>
 <pre><code class="language-text">remove duplicated sequences by ID/name/sequence
 
-Attentions:
+Attention:
   1. When comparing by sequences, both positive and negative strands are
      compared. Switch on -P/--only-positive-strand for considering the
      positive strand only.
@@ -3720,7 +3717,7 @@ If you want to cut a sequence into multiple segments.
      E.g., cutting into segments of 40 bp and keeping the last segment which can be shorter than 40 bp.
         seqkit sliding -g -s 40 -W 40 input.fasta -o out.fasta
 
-Attentions:
+Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
 
@@ -3982,7 +3979,7 @@ $ seqkit split2 reads_1.fq.gz -p 2 -O out -f
 <p>Usage</p>
 <pre><code class="language-text">match up paired-end reads from two fastq files
 
-Attentions:
+Attention:
 1. Orders of headers in the two files better be the same (not shuffled),
    otherwise, it consumes a huge number of memory for buffering reads in memory.
 2. Unpaired reads are optional outputted with the flag -u/--save-unpaired.
@@ -4594,7 +4591,7 @@ Flags:
 <p>Usage</p>
 <pre><code class="language-text">concatenate sequences with same ID from multiple files
 
-Attentions:
+Attention:
    1. By default, only sequences with IDs that appear in all files are outputted.
       use -f/--full to output all sequences.
    2. If there are more than one sequences of the same ID, we output the Cartesian
@@ -4650,7 +4647,7 @@ b1-
 <p>Usage</p>
 <pre><code class="language-text">edit sequence (point mutation, insertion, deletion)
 
-Attentions:
+Attention:
 
   1. Mutiple point mutations (-p/--point) are allowed, but only single 
      insertion (-i/--insertion) OR single deletion (-d/--deletion) is allowed.
@@ -4864,7 +4861,7 @@ seqkit will write the sequences to temporary files, and create FASTA index.
 
 Secondly, seqkit shuffles sequence IDs and extract sequences by FASTA index.
 
-Attentions:
+Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
 
@@ -4925,7 +4922,7 @@ seqkit will write the sequences to temporary files, and create FASTA index.
 Secondly, seqkit sorts sequence by head and length information
 and extracts sequences by FASTA index.
 
-Attentions:
+Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
 
