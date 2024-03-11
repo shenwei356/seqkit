@@ -7,6 +7,8 @@
     - `seqkit amplicon`:
         - Fix the speed problem, introduced in v2.7.0. [#439](https://github.com/shenwei356/seqkit/issues/439).
         - Slightly faster by reusing objects.
+    - `seqkit seq`:
+        - Change the threshold sequence length for parallelizing complement sequence computation, 1kb->1Mb.
 - [SeqKit v2.7.0](https://github.com/shenwei356/seqkit/releases/tag/v2.7.0) - 2024-01-31
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.7.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.7.0)
     - `seqkit`:

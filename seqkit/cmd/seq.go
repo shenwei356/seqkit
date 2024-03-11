@@ -58,6 +58,7 @@ var seqCmd = &cobra.Command{
 		outFile := config.OutFile
 		quiet := config.Quiet
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
+		seq.ComplementSeqLenThreshold = 1000000
 		runtime.GOMAXPROCS(config.Threads)
 
 		reverse := getFlagBool(cmd, "reverse")
