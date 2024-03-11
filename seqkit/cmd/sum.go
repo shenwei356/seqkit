@@ -51,7 +51,7 @@ var sumCmd = &cobra.Command{
 	Short: "compute message digest for all sequences in FASTA/Q files",
 	Long: `compute message digest for all sequences in FASTA/Q files
 
-Attentions:
+Attention:
   1. Sequence headers and qualities are skipped, only sequences matter.
   2. The order of sequences records does not matter.
   3. Circular complete genomes are supported with the flag -c/--circular.

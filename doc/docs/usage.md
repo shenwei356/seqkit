@@ -468,7 +468,7 @@ Usage
 ``` text
 get subsequences by region/gtf/bed, including flanking sequences.
 
-Attentions:
+Attention:
   1. Use "seqkit grep" for extract subsets of sequences.
      "seqtk subseq seqs.fasta id.txt" equals to
      "seqkit grep -f id.txt seqs.fasta"
@@ -696,7 +696,7 @@ Columns:
   17. AvgQual   average quality
   18. GC(%)     percentage of GC content
   
-Attentions:
+Attention:
   1. Sequence length metrics (sum_len, min_len, avg_len, max_len, Q1, Q2, Q3)
      count the number of gaps or spaces. You can remove them with "seqkit seq -g":
          seqkit seq -g input.fasta | seqkit stats
@@ -826,7 +826,7 @@ Usage
 ```text
 compute message digest for all sequences in FASTA/Q files
 
-Attentions:
+Attention:
   1. Sequence headers and qualities are skipped, only sequences matter.
   2. The order of sequences records does not matter.
   3. Circular complete genomes are supported with the flag -c/--circular.
@@ -955,7 +955,7 @@ This command is similar with "samtools faidx" but has some extra features:
   3. if you have large number of IDs, you can use:
         seqkit faidx seqs.fasta -l IDs.txt
 
-Attentions:
+Attention:
   1. The flag -U/--update-faidx is recommended to ensure the .fai file matches the FASTA file.
 
 The definition of region is 1-based and with some custom design.
@@ -1636,7 +1636,7 @@ Usage
 ``` text
 search sequences by ID/name/sequence/sequence motifs, mismatch allowed
 
-Attentions:
+Attention:
 
   0. By default, we match sequence ID with patterns, use "-n/--by-name"
      for matching full name instead of just ID.
@@ -1824,7 +1824,7 @@ Usage
 ``` text
 locate subsequences/motifs, mismatch allowed
 
-Attentions:
+Attention:
 
   1. Motifs could be EITHER plain sequence containing "ACTGN" OR regular
      expression like "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" for ORFs.     
@@ -2056,7 +2056,7 @@ Usage
 ``` text
 extract amplicon (or specific region around it) via primer(s).
 
-Attentions:
+Attention:
   1. Only one (the longest) matching location is returned for every primer pair.
   2. Mismatch is allowed, but the mismatch location (5' or 3') is not controled. 
      You can increase the value of "-j/--threads" to accelerate processing.
@@ -2305,7 +2305,7 @@ Usage
 ``` text
 remove duplicated sequences by ID/name/sequence
 
-Attentions:
+Attention:
   1. When comparing by sequences, both positive and negative strands are
      compared. Switch on -P/--only-positive-strand for considering the
      positive strand only.
@@ -2530,7 +2530,7 @@ If you want to cut a sequence into multiple segments.
      E.g., cutting into segments of 40 bp and keeping the last segment which can be shorter than 40 bp.
         seqkit sliding -g -s 40 -W 40 input.fasta -o out.fasta
 
-Attentions:
+Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
 
@@ -2791,7 +2791,7 @@ Usage
 ```text
 match up paired-end reads from two fastq files
 
-Attentions:
+Attention:
 1. Orders of headers in the two files better be the same (not shuffled),
    otherwise, it consumes a huge number of memory for buffering reads in memory.
 2. Unpaired reads are optional outputted with the flag -u/--save-unpaired.
@@ -3418,7 +3418,7 @@ Usage
 ``` text
 concatenate sequences with same ID from multiple files
 
-Attentions:
+Attention:
    1. By default, only sequences with IDs that appear in all files are outputted.
       use -f/--full to output all sequences.
    2. If there are more than one sequences of the same ID, we output the Cartesian
@@ -3481,7 +3481,7 @@ Usage
 ``` text
 edit sequence (point mutation, insertion, deletion)
 
-Attentions:
+Attention:
 
   1. Mutiple point mutations (-p/--point) are allowed, but only single 
      insertion (-i/--insertion) OR single deletion (-d/--deletion) is allowed.
@@ -3694,7 +3694,7 @@ seqkit will write the sequences to temporary files, and create FASTA index.
 
 Secondly, seqkit shuffles sequence IDs and extract sequences by FASTA index.
 
-Attentions:
+Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
 
@@ -3757,7 +3757,7 @@ seqkit will write the sequences to temporary files, and create FASTA index.
 Secondly, seqkit sorts sequence by head and length information
 and extracts sequences by FASTA index.
 
-Attentions:
+Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
 

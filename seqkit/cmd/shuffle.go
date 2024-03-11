@@ -52,7 +52,7 @@ seqkit will write the sequences to temporary files, and create FASTA index.
 
 Secondly, seqkit shuffles sequence IDs and extract sequences by FASTA index.
 
-Attentions:
+Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
 

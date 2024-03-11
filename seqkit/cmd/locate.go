@@ -45,7 +45,7 @@ var locateCmd = &cobra.Command{
 	Short: "locate subsequences/motifs, mismatch allowed",
 	Long: `locate subsequences/motifs, mismatch allowed
 
-Attentions:
+Attention:
 
   1. Motifs could be EITHER plain sequence containing "ACTGN" OR regular
      expression like "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" for ORFs.     

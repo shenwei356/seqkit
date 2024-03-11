@@ -50,7 +50,7 @@ var grepCmd = &cobra.Command{
 	Short: "search sequences by ID/name/sequence/sequence motifs, mismatch allowed",
 	Long: fmt.Sprintf(`search sequences by ID/name/sequence/sequence motifs, mismatch allowed
 
-Attentions:
+Attention:
 
   0. By default, we match sequence ID with patterns, use "-n/--by-name"
      for matching full name instead of just ID.

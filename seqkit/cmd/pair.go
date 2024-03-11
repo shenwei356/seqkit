@@ -47,7 +47,7 @@ var pairCmd = &cobra.Command{
 	Short: "match up paired-end reads from two fastq files",
 	Long: `match up paired-end reads from two fastq files
 
-Attentions:
+Attention:
 1. Orders of headers in the two files better be the same (not shuffled),
    otherwise, it consumes a huge number of memory for buffering reads in memory.
 2. Unpaired reads are optional outputted with the flag -u/--save-unpaired.

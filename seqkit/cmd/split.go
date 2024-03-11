@@ -60,7 +60,7 @@ If you want to cut a sequence into multiple segments.
      E.g., cutting into segments of 40 bp and keeping the last segment which can be shorter than 40 bp.
         seqkit sliding -g -s 40 -W 40 input.fasta -o out.fasta
 
-Attentions:
+Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
 

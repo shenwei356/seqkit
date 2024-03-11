@@ -52,7 +52,7 @@ This command is similar with "samtools faidx" but has some extra features:
   3. if you have large number of IDs, you can use:
         seqkit faidx seqs.fasta -l IDs.txt
 
-Attentions:
+Attention:
   1. The flag -U/--update-faidx is recommended to ensure the .fai file matches the FASTA file.
 
 The definition of region is 1-based and with some custom design.

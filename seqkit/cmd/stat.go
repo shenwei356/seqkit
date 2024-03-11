@@ -77,7 +77,7 @@ Columns:
   17. AvgQual   average quality
   18. GC(%)     percentage of GC content
   
-Attentions:
+Attention:
   1. Sequence length metrics (sum_len, min_len, avg_len, max_len, Q1, Q2, Q3)
      count the number of gaps or spaces. You can remove them with "seqkit seq -g":
          seqkit seq -g input.fasta | seqkit stats

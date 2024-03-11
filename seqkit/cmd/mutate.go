@@ -43,7 +43,7 @@ var mutateCmd = &cobra.Command{
 	Short: "edit sequence (point mutation, insertion, deletion)",
 	Long: fmt.Sprintf(`edit sequence (point mutation, insertion, deletion)
 
-Attentions:
+Attention:
 
   1. Multiple point mutations (-p/--point) are allowed, but only single
      insertion (-i/--insertion) OR single deletion (-d/--deletion) is allowed.

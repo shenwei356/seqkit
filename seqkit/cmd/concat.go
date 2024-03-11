@@ -43,7 +43,7 @@ var concateCmd = &cobra.Command{
 	Short:   "concatenate sequences with the same ID from multiple files",
 	Long: `concatenate sequences with same ID from multiple files
 
-Attentions:
+Attention:
    1. By default, only sequences with IDs that appear in all files are outputted.
       use -f/--full to output all sequences.
    2. If there are more than one sequences of the same ID, we output the Cartesian
