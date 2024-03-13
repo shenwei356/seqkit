@@ -453,25 +453,25 @@ For human miRNA hairpins
             | cut -f 4  \
             | csvtk -H plot hist --xlab Length --title "Human pre-miRNA length distribution"
 
-    ![hairpin.id_hsa.fa.gz.lendist.png](/files/hairpin/hairpin.id_hsa.fa.gz.lendist.png)
+    ![hairpin.id_hsa.fa.gz.lendist.png](files/hairpin/hairpin.id_hsa.fa.gz.lendist.png)
 
         $ seqkit grep -r -p '^hsa' hairpin.fa.gz \
             | seqkit fx2tab -l \
             | cut -f 4 \
             | csvtk -H plot box --xlab Length --horiz --height 1.5
         
-    ![hairpin.id_hsa.fa.gz.lenbox.png](/files/hairpin/hairpin.id_hsa.fa.gz.lenbox.png)
+    ![hairpin.id_hsa.fa.gz.lenbox.png](files/hairpin/hairpin.id_hsa.fa.gz.lenbox.png)
 
-## Bacteria genome
+## Bacteria genomes
 
 ### Dataset
 
 [Pseudomonas aeruginosa PAO1](http://www.ncbi.nlm.nih.gov/nuccore/110645304),
 files:
 
--  Genbank file [`PAO1.gb`](/files/PAO1/PAO1.gb)
--  Genome FASTA file [`PAO1.fasta`](/files/PAO1/PAO1.fasta)
--  GTF file [`PAO1.gtf`](/files/PAO1/PAO1.gtf) was created with [`extract_features_from_genbank_file.py`](https://github.com/shenwei356/bio_scripts/blob/master/file_formats/extract_features_from_genbank_file.py), by
+-  Genbank file [`PAO1.gb`](files/PAO1/PAO1.gb)
+-  Genome FASTA file [`PAO1.fasta`](files/PAO1/PAO1.fasta)
+-  GTF file [`PAO1.gtf`](files/PAO1/PAO1.gtf) was created with [`extract_features_from_genbank_file.py`](https://github.com/shenwei356/bio_scripts/blob/master/file_formats/extract_features_from_genbank_file.py), by
 
         extract_features_from_genbank_file.py  PAO1.gb -t . -f gtf > PAO1.gtf
 
@@ -502,7 +502,7 @@ Motifs
         $ seqkit locate --id-ncbi --ignore-case --degenerate \
             --pattern-file motifs.fa  PAO1.fasta.sliding.fa -o  PAO1.fasta.sliding.fa.motifs.tsv
 
-1. Ploting distribution ([plot_motif_distribution.R](/files/PAO1/plot_motif_distribution.R))
+1. Ploting distribution ([plot_motif_distribution.R](files/PAO1/plot_motif_distribution.R))
 
         # preproccess
         $ perl -ne 'if (/_sliding:(\d+)-(\d+)\t(.+)/) {$loc= $1 + 100000; print "$loc\t$3\n";} else {print}' PAO1.fasta.sliding.fa.motifs.tsv  > PAO1.fasta.sliding.fa.motifs.tsv2

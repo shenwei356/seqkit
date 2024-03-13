@@ -1,4 +1,4 @@
-# FAQ on FASTA/Q manipulations
+# FAQs on FASTA/Q manipulations
 
 **This page was originally written as the section [FASTA/Q manipulations](https://read.biostarhandbook.com/data/fastq-manipulation.html) of [The Biostar Handbook: A Beginner's Guide to Bioinformatics](https://read.biostarhandbook.com/) ([discussion on Biostars.org](https://www.biostars.org/p/225812/))**.
 
