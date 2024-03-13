@@ -107,20 +107,7 @@ Notes:
 
 ## Acknowledgements
 
-We thank [Lei Zhang](https://github.com/jameslz) for testing SeqKit,
-and also thank [Jim Hester](https://github.com/jimhester/),
-author of [fasta_utilities](https://github.com/jimhester/fasta_utilities),
-for advice on early performance improvements of for FASTA parsing
-and [Brian Bushnell](https://twitter.com/BBToolsBio),
-author of [BBMaps](https://sourceforge.net/projects/bbmap/),
-for advice on naming SeqKit and adding accuracy evaluation in benchmarks.
-We also thank Nicholas C. Wu from the Scripps Research Institute,
-USA for commenting on the manuscript
-and [Guangchuang Yu](http://guangchuangyu.github.io/)
-from State Key Laboratory of Emerging Infectious Diseases,
-The University of Hong Kong, HK for advice on the manuscript.
-
-We thank [Li Peng](https://github.com/penglbio) for reporting many bugs.
+We thank all users for their valuable feedback and suggestions. We thank all contributors for improving the code and documentation.
 
 We appreciate [Klaus Post](https://github.com/klauspost) for his fantastic packages (
 [compress](https://github.com/klauspost/compress) and [pgzip](https://github.com/klauspost/pgzip)
