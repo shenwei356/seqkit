@@ -287,7 +287,7 @@
         
   
   <span class="md-ellipsis">
-    FAQ
+    FAQs
   </span>
   
 
@@ -424,11 +424,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#bacteria-genome" class="md-nav__link">
-    Bacteria genome
+  <a href="#bacteria-genomes" class="md-nav__link">
+    Bacteria genomes
   </a>
   
-    <nav class="md-nav" aria-label="Bacteria genome">
+    <nav class="md-nav" aria-label="Bacteria genomes">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -632,11 +632,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#bacteria-genome" class="md-nav__link">
-    Bacteria genome
+  <a href="#bacteria-genomes" class="md-nav__link">
+    Bacteria genomes
   </a>
   
-    <nav class="md-nav" aria-label="Bacteria genome">
+    <nav class="md-nav" aria-label="Bacteria genomes">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1141,23 +1141,23 @@ is used to sort and view the result.</p>
     | cut -f 4  \
     | csvtk -H plot hist --xlab Length --title "Human pre-miRNA length distribution"
 </code></pre>
-<p><img alt="hairpin.id_hsa.fa.gz.lendist.png" src="/files/hairpin/hairpin.id_hsa.fa.gz.lendist.png" /></p>
+<p><img alt="hairpin.id_hsa.fa.gz.lendist.png" src="../files/hairpin/hairpin.id_hsa.fa.gz.lendist.png" /></p>
 <pre><code>$ seqkit grep -r -p '^hsa' hairpin.fa.gz \
     | seqkit fx2tab -l \
     | cut -f 4 \
     | csvtk -H plot box --xlab Length --horiz --height 1.5
 </code></pre>
-<p><img alt="hairpin.id_hsa.fa.gz.lenbox.png" src="/files/hairpin/hairpin.id_hsa.fa.gz.lenbox.png" /></p>
+<p><img alt="hairpin.id_hsa.fa.gz.lenbox.png" src="../files/hairpin/hairpin.id_hsa.fa.gz.lenbox.png" /></p>
 </li>
 </ol>
-<h2 id="bacteria-genome">Bacteria genome</h2>
+<h2 id="bacteria-genomes">Bacteria genomes</h2>
 <h3 id="dataset_1">Dataset</h3>
 <p><a href="http://www.ncbi.nlm.nih.gov/nuccore/110645304">Pseudomonas aeruginosa PAO1</a>,
 files:</p>
 <ul>
-<li>Genbank file <a href="/files/PAO1/PAO1.gb"><code>PAO1.gb</code></a></li>
-<li>Genome FASTA file <a href="/files/PAO1/PAO1.fasta"><code>PAO1.fasta</code></a></li>
-<li>GTF file <a href="/files/PAO1/PAO1.gtf"><code>PAO1.gtf</code></a> was created with <a href="https://github.com/shenwei356/bio_scripts/blob/master/file_formats/extract_features_from_genbank_file.py"><code>extract_features_from_genbank_file.py</code></a>, by<pre><code>extract_features_from_genbank_file.py  PAO1.gb -t . -f gtf &gt; PAO1.gtf
+<li>Genbank file <a href="../files/PAO1/PAO1.gb"><code>PAO1.gb</code></a></li>
+<li>Genome FASTA file <a href="../files/PAO1/PAO1.fasta"><code>PAO1.fasta</code></a></li>
+<li>GTF file <a href="../files/PAO1/PAO1.gtf"><code>PAO1.gtf</code></a> was created with <a href="https://github.com/shenwei356/bio_scripts/blob/master/file_formats/extract_features_from_genbank_file.py"><code>extract_features_from_genbank_file.py</code></a>, by<pre><code>extract_features_from_genbank_file.py  PAO1.gb -t . -f gtf &gt; PAO1.gtf
 </code></pre>
 </li>
 </ul>
@@ -1189,7 +1189,7 @@ PAO1.fasta.sliding.fa  FASTA   DNA        314  62,800,000  200,000  200,000  200
 </code></pre>
 </li>
 <li>
-<p>Ploting distribution (<a href="/files/PAO1/plot_motif_distribution.R">plot_motif_distribution.R</a>)</p>
+<p>Ploting distribution (<a href="../files/PAO1/plot_motif_distribution.R">plot_motif_distribution.R</a>)</p>
 <pre><code># preproccess
 $ perl -ne 'if (/_sliding:(\d+)-(\d+)\t(.+)/) {$loc= $1 + 100000; print "$loc\t$3\n";} else {print}' PAO1.fasta.sliding.fa.motifs.tsv  &gt; PAO1.fasta.sliding.fa.motifs.tsv2
 
