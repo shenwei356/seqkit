@@ -48,7 +48,7 @@ var pairCmd = &cobra.Command{
 	Long: `match up paired-end reads from two fastq files
 
 Attention:
-1. Orders of headers in the two files better be the same (not shuffled),
+1. Orders of headers in the two files should be the same (not shuffled),
    otherwise, it consumes a huge number of memory for buffering reads in memory.
 2. Unpaired reads are optional outputted with the flag -u/--save-unpaired.
 3. If the flag -O/--out-dir is not given, the output will be saved in the same directory
