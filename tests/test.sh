@@ -554,6 +554,15 @@ rm seqkit_fish.tsv
 #                       sana
 # ------------------------------------------------------------
 
+# sana/fastq test for IDs in separator
+fun(){
+	$app  sana tests/sana_sep_id.fq > tests/sana_output.fq
+}
+run sana_fastq_sep_id fun
+cmp tests/sana_output.fq <(tail -4 tests/sana_sep_id.fq)
+assert_equal $? 0
+rm -f tests/sana_output.fq
+
 # Regression test for sana/fasta
 fun(){
 	awk '{print ">" $1 "\n" $2}' tests/scat_test.tsv > tests/sana_test_input.fas
