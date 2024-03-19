@@ -63,7 +63,6 @@ and continues processing the file.
 Sana currently supports this FASTQ dialect:
 
   - One line for each sequence and quality value
-  - No identifiers in separator (+) lines
 
 	`,
 
@@ -147,6 +146,7 @@ func init() {
 type simpleSeq struct {
 	Id        string
 	Seq       string
+	Sep       string
 	Qual      []int
 	QBase     int
 	Err       error
@@ -166,7 +166,7 @@ func (s *simpleSeq) String() string {
 	for i, qq := range s.Qual {
 		qs[i] = string(qq + s.QBase)
 	}
-	return fmt.Sprintf("@%s\n%s\n+\n%s", s.Id, s.Seq, strings.Join(qs, ""))
+	return fmt.Sprintf("@%s\n%s\n%s\n%s", s.Id, s.Seq, s.Sep, strings.Join(qs, ""))
 }
 
 // Format generates a string representation in the specified format of a pointer to simpleSeq.
@@ -189,7 +189,7 @@ func (s *simpleSeq) FastqString() string {
 	for i, qq := range s.Qual {
 		qs[i] = string(qq + s.QBase)
 	}
-	return fmt.Sprintf("@%s\n%s\n+\n%s", s.Id, s.Seq, strings.Join(qs, ""))
+	return fmt.Sprintf("@%s\n%s\n%s\n%s", s.Id, s.Seq, s.Sep, strings.Join(qs, ""))
 }
 
 // String generates a fasta string representation of a pointer to simpleSeq.
@@ -278,7 +278,7 @@ type FqLine struct {
 type FqLines []FqLine
 
 // guessFqlState tries to infer the type of a fastq line.
-func guessFqlState(line []byte) FqlState {
+func guessFqlState(line []byte, prevLine *FqLine) FqlState {
 	state := FqlState{}
 	switch line[0] {
 	case '@':
@@ -287,8 +287,11 @@ func guessFqlState(line []byte) FqlState {
 	case '+':
 		if len(line) == 1 {
 			state.Plus = true
+		} else if prevLine != nil && prevLine.FqlState.Seq {
+			state.Plus = true
 		} else {
 			state.Qual = true
+			state.Plus = true
 		}
 	default:
 		state.Seq = true
@@ -324,7 +327,7 @@ func FqLinesToSimpleSeq(lines FqLines, qBase int, gaps bool) (*simpleSeq, error)
 	}
 	lh, ls, lp, lq := &lines[0], &lines[1], &lines[2], &lines[3]
 	if lh.FqlState.Header && ls.FqlState.Seq && lp.FqlState.Plus && lq.FqlState.Qual {
-		seq := &simpleSeq{lh.Line[1:], ls.Line, parseQuals(lq.Line, qBase), qBase, nil, -1, ""}
+		seq := &simpleSeq{lh.Line[1:], ls.Line, lp.Line, parseQuals(lq.Line, qBase), qBase, nil, -1, ""}
 		seq.Err = ValidateSeq(seq, gaps)
 		if seq.Err != nil {
 			return nil, seq.Err
@@ -359,8 +362,12 @@ func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 	var line []byte
 	var spaceShift int
 	var lastLine *FqLine
+	var prevLine *FqLine
 	if len(sbuff) > 0 {
 		lastLine = &sbuff[len(sbuff)-1]
+	}
+	if len(sbuff) > 1 {
+		prevLine = &sbuff[len(sbuff)-2]
 	}
 	var err error
 	for {
@@ -379,11 +386,14 @@ func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 			if lastLine != nil && lastLine.FqlState.Partial {
 				*lineCounter++
 				lastLine.Line += string(line)
-				lastLine.FqlState = guessFqlState([]byte(lastLine.Line))
+				lastLine.FqlState = guessFqlState([]byte(lastLine.Line), prevLine)
 			} else {
 				*lineCounter++
 				lineStr := string(line)
-				sbuff = append(sbuff, FqLine{lineStr, guessFqlState(line)})
+				if len(sbuff) > 0 {
+					prevLine = &sbuff[len(sbuff)-1]
+				}
+				sbuff = append(sbuff, FqLine{lineStr, guessFqlState(line, prevLine)})
 				lastLine = &sbuff[len(sbuff)-1]
 			}
 			if len(sbuff) == 4 && !lastLine.FqlState.Partial {
@@ -427,8 +437,9 @@ func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 			}
 			if final && len(sbuff) == 4 {
 				last := len(sbuff) - 1
+				prevLine = &sbuff[len(sbuff)-2]
 				sbuff[last].FqlState.Partial = false
-				sbuff[last].FqlState = guessFqlState([]byte(sbuff[last].Line))
+				sbuff[last].FqlState = guessFqlState([]byte(sbuff[last].Line), prevLine)
 				seq, err := FqLinesToSimpleSeq(sbuff, qBase, gaps)
 				if err != nil {
 					for il, l := range sbuff {
@@ -585,7 +596,12 @@ func NewRawFastqStream(name string, inFh *xopen.Reader, inReader *bufio.Reader, 
 				} else if cmd == StreamQuit {
 					sbuff, err = streamFastq(name, inReader, sbuff, seqChan, ctrlChanIn, ctrlChanOut, &lineCounter, qBase, gaps, true)
 					for _, l := range sbuff {
-						ems := fmt.Sprintf("Discarded line: %s", err)
+						var ems string
+						if err != nil {
+							ems = fmt.Sprintf("Discarded line: %s", err)
+						} else {
+							ems = "Discarded final line"
+						}
 						serr := &simpleSeq{Err: errors.New(ems), StartLine: lineCounter, Seq: l.Line, File: name}
 						seqChan <- serr
 					}
