@@ -63,7 +63,6 @@ and continues processing the file.
 Sana currently supports this FASTQ dialect:
 
   - One line for each sequence and quality value
-  - No identifiers in separator (+) lines
 
 	`,
 
