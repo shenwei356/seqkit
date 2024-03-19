@@ -1095,6 +1095,14 @@ Usage
 ``` text
 sanitize broken single line FASTQ files
 
+Sana is a resilient FASTQ/FASTA parser. Unlike many parsers,
+it won't stop at the first error. Instead, it skips malformed records
+and continues processing the file.
+
+Sana currently supports this FASTQ dialect:
+
+  - One line for each sequence and quality value
+
 Usage:
   seqkit sana [flags]
 
@@ -1113,6 +1121,14 @@ Examples
 1. Rescue usable reads from fastq file with malformed records.
     
         seqkit sana broken.fq.gz -o rescued.fq.gz
+
+1. For paired reads, you can process both files and pair them with `pair`.
+
+        seqkit sana broken_1.fq.gz -o rescued_1.fq.gz
+        seqkit sana broken_2.fq.gz -o rescued_2.fq.gz
+
+        seqkit pair -1 rescued_1.fq.gz -2 rescued_2.fq.gz -O rescued/
+
 
 ## scat
 

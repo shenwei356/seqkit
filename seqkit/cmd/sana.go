@@ -70,7 +70,6 @@ Sana currently supports this FASTQ dialect:
 		config := getConfigs(cmd)
 		outFile := config.OutFile
 		quiet := config.Quiet // FIXME: add quiet mode
-		_ = quiet
 		qBase := getFlagPositiveInt(cmd, "qual-ascii-base")
 		inFmt := getFlagString(cmd, "in-format")
 		checkFileFormat(inFmt)
@@ -124,10 +123,14 @@ Sana currently supports this FASTQ dialect:
 					outfh.WriteString(rawSeq.Format(outFmt) + "\n")
 				default:
 					fail++
-					log.Info("File: " + rawSeq.File + "\t" + rawSeq.String() + "\n")
+					if !quiet {
+						log.Info("File: " + rawSeq.File + "\t" + rawSeq.String() + "\n")
+					}
 				}
 			}
-			log.Info(fmt.Sprintf("File: %s\tPass records: %d\tDiscarded lines: %d\n", file, pass, fail))
+			if !quiet {
+				log.Info(fmt.Sprintf("File: %s\tPass records: %d\tDiscarded lines: %d\n", file, pass, fail))
+			}
 		}
 
 	},
