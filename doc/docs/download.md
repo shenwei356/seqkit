@@ -3,9 +3,13 @@
 SeqKit is implemented in [Go](https://golang.org/) programming language,
 statically-linked executable binary files are [freely available](https://github.com/shenwei356/seqkit/releases).
 
-Please cite: **W Shen**, S Le, Y Li\*, F Hu\*. SeqKit: a cross-platform and ultrafast toolkit for FASTA/Q file manipulation.
+Please cite:
+
+1. Wei Shen\*, Botond Sipos, and Liuyang Zhao. 2024. SeqKit2: A Swiss Army Knife for Sequence and Alignment Processing. ***iMeta*** e191. [doi:10.1002/imt2.191](https://doi.org/10.1002/imt2.191).
+<span class="__dimensions_badge_embed__" data-doi="10.1002/imt2.191" data-style="small_rectangle"></span>
+2. Wei Shen, Shuai Le, Yan Li\*, and Fuquan Hu\*. SeqKit: a cross-platform and ultrafast toolkit for FASTA/Q file manipulation.
 ***PLOS ONE***. [doi:10.1371/journal.pone.0163962](https://doi.org/10.1371/journal.pone.0163962).
-[![Citation Badge](https://api.juleskreuer.eu/citation-badge.php?doi=10.1371/journal.pone.0163962)](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=wHF3Lm8AAAAJ&citation_for_view=wHF3Lm8AAAAJ:zYLM7Y9cAGgC)
+<span class="__dimensions_badge_embed__" data-doi="10.1371/journal.pone.0163962" data-style="small_rectangle"></span>
 
 ## Current Version
 
