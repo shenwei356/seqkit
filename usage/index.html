@@ -1647,7 +1647,10 @@ file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
 <pre><code class="language-text">get subsequences by region/gtf/bed, including flanking sequences.
 
 Attention:
-  1. Use &quot;seqkit grep&quot; for extract subsets of sequences.
+  1. When extracting with BED/GTF from plain text FASTA files, the order of output sequences
+     are random. To keep the order, just compress the FASTA file (input.fasta) and use the
+     compressed one (input.fasta.gz) as the input.
+  2. Use &quot;seqkit grep&quot; for extracting subsets of sequences.
      &quot;seqtk subseq seqs.fasta id.txt&quot; equals to
      &quot;seqkit grep -f id.txt seqs.fasta&quot;
 
