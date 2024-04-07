@@ -18,7 +18,7 @@ and
 [![Citation Badge](https://api.juleskreuer.eu/citation-badge.php?doi=10.1371/journal.pone.0163962)](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=wHF3Lm8AAAAJ&citation_for_view=wHF3Lm8AAAAJ:zYLM7Y9cAGgC)
 - **Others**: [![check in Biotreasury](https://img.shields.io/badge/Biotreasury-collected-brightgreen)](https://biotreasury.rjmart.cn/#/tool?id=10081)  
 
-<img src="seqkit2.jpg" alt="Subcommands of SeqKit2" width="700"/>
+<a href="https://doi.org/10.1002/imt2.191"><img src="seqkit2.jpg" alt="Subcommands of SeqKit2" width="700"/></a>
 
 ## Features
 

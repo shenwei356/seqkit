@@ -47,7 +47,10 @@ var subseqCmd = &cobra.Command{
 	Long: fmt.Sprintf(`get subsequences by region/gtf/bed, including flanking sequences.
 
 Attention:
-  1. Use "seqkit grep" for extract subsets of sequences.
+  1. When extracting with BED/GTF from plain text FASTA files, the order of output sequences
+     are random. To keep the order, just compress the FASTA file (input.fasta) and use the
+     compressed one (input.fasta.gz) as the input.
+  2. Use "seqkit grep" for extracting subsets of sequences.
      "seqtk subseq seqs.fasta id.txt" equals to
      "seqkit grep -f id.txt seqs.fasta"
 
