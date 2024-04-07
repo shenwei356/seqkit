@@ -1,7 +1,7 @@
 - [SeqKit v2.8.1](https://github.com/shenwei356/seqkit/releases/tag/v2.8.1) - 2024-01-31
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.8.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.8.1)
     - `seqkit sana`:
-        - Add support for IDs in separator (3rd) line. [#446](https://github.com/shenwei356/seqkit/pull/446), [#429](https://github.com/shenwei356/seqkit/issues/429), [#408](https://github.com/shenwei356/seqkit/issues/408)
+        - Add support for FASTQ files with IDs in the separator (`+`, 3rd) lines.. [#446](https://github.com/shenwei356/seqkit/pull/446), [#429](https://github.com/shenwei356/seqkit/issues/429), [#408](https://github.com/shenwei356/seqkit/issues/408)
     - `seqkit subseq`:
         - Add some docs to show how to keep the original order of sequences when extracting with BED: compress the input FASTA file. [#451](https://github.com/shenwei356/seqkit/issues/451)
 - [SeqKit v2.8.0](https://github.com/shenwei356/seqkit/releases/tag/v2.8.0) - 2024-01-31
