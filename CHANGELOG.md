@@ -1,3 +1,7 @@
+- [SeqKit v2.8.2](https://github.com/shenwei356/seqkit/releases/tag/v2.8.2) - 2024-04-07
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.8.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.8.2)
+    - `seqkit amplicon`:
+        - Fix a big introduced in v2.7.0. When more than one pairs of primers are given, only the last one is used. [#457](https://github.com/shenwei356/seqkit/issues/457)
 - [SeqKit v2.8.1](https://github.com/shenwei356/seqkit/releases/tag/v2.8.1) - 2024-04-07
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.8.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.8.1)
     - `seqkit sana`:

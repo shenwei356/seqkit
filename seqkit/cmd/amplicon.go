@@ -197,8 +197,14 @@ Examples:
 		// finder pools
 		finderPools := make([]*sync.Pool, len(primers))
 		for i, primer := range primers {
+			f := make([]byte, len(primer[1])) // copy the primer sequence
+			copy(f, primer[1])
+
+			r := make([]byte, len(primer[2])) // copy the primer sequence
+			copy(r, primer[2])
+
 			finderPools[i] = &sync.Pool{New: func() interface{} {
-				finder, _ := NewAmpliconFinder([]byte{'A'}, primer[1], primer[2], maxMismatch)
+				finder, _ := NewAmpliconFinder([]byte{'A'}, f, r, maxMismatch)
 				return finder
 			}}
 		}
