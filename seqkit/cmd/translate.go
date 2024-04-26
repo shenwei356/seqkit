@@ -126,6 +126,7 @@ Translate Tables/Genetic Codes:
 		listTable := getFlagInt(cmd, "list-transl-table")
 		listTableAmb := getFlagInt(cmd, "list-transl-table-with-amb-codons")
 		appendFrame := getFlagBool(cmd, "append-frame")
+		skipTranslateErrors := getFlagBool(cmd, "skip-translate-errors")
 
 		outSubseqs := getFlagBool(cmd, "out-subseqs")
 		minLen := getFlagNonNegativeInt(cmd, "min-len")
@@ -193,6 +194,11 @@ Translate Tables/Genetic Codes:
 
 				for _, frame = range frames {
 					_seq, err = record.Seq.Translate(translTable, frame, trim, clean, allowUnknownCodon, markInitCodonAsM)
+					if err != nil && skipTranslateErrors {
+						outfh.WriteString(fmt.Sprintf(">%s %s\n\n", record.ID, record.Desc))
+						continue
+					}
+
 					if err != nil {
 						if err == seq.ErrUnknownCodon {
 							log.Error("unknown codon detected, you can use flag -x/--allow-unknown-codon to translate it to 'X'.")
@@ -285,4 +291,5 @@ func init() {
 	translateCmd.Flags().BoolP("append-frame", "F", false, "append frame information to sequence ID")
 	translateCmd.Flags().BoolP("out-subseqs", "s", false, `output individual amino acid subsequences seperated by the stop symbol "*"`)
 	translateCmd.Flags().IntP("min-len", "m", 0, `the minimum length of amino acid sequence`)
+	translateCmd.Flags().BoolP("skip-translate-errors", "e", false, `skip errors during translate and output blank sequence`)
 }
