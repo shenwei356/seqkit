@@ -291,4 +291,5 @@ func init() {
 	translateCmd.Flags().BoolP("append-frame", "F", false, "append frame information to sequence ID")
 	translateCmd.Flags().BoolP("out-subseqs", "s", false, `output individual amino acid subsequences seperated by the stop symbol "*"`)
 	translateCmd.Flags().IntP("min-len", "m", 0, `the minimum length of amino acid sequence`)
+	translateCmd.Flags().BoolP("skip-translate-errors", "e", false, `skip errors during translate and output blank sequence`)
 }
