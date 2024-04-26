@@ -194,12 +194,12 @@ Translate Tables/Genetic Codes:
 
 				for _, frame = range frames {
 					_seq, err = record.Seq.Translate(translTable, frame, trim, clean, allowUnknownCodon, markInitCodonAsM)
-					if err != nil && skipTranslateErrors {
-						outfh.WriteString(fmt.Sprintf(">%s %s\n\n", record.ID, record.Desc))
-						continue
-					}
 
 					if err != nil {
+						if skipTranslateErrors {
+							outfh.WriteString(fmt.Sprintf(">%s %s\n\n", record.ID, record.Desc))
+							continue
+						}
 						if err == seq.ErrUnknownCodon {
 							log.Error("unknown codon detected, you can use flag -x/--allow-unknown-codon to translate it to 'X'.")
 							os.Exit(-1)
