@@ -94,6 +94,7 @@ Examples:
 		part := getFlagNonNegativeInt(cmd, "by-part")
 
 		byID := getFlagBool(cmd, "by-id")
+		ignoreCase := getFlagBool(cmd, "ignore-case")
 		region := getFlagString(cmd, "by-region")
 		twoPass := getFlagBool(cmd, "two-pass")
 		updateFaidx := getFlagBool(cmd, "update-faidx")
@@ -619,6 +620,9 @@ Examples:
 						renameFileExt = false
 					}
 					id = string(record.ID)
+					if ignoreCase {
+						id = strings.ToLower(id)
+					}
 					if _, ok := recordsByID[id]; !ok {
 						recordsByID[id] = []*fastx.Record{}
 					}
@@ -718,6 +722,9 @@ Examples:
 			idsMap := make(map[string][]string)
 			for _, ID := range IDs {
 				id := string(fastx.ParseHeadID(idRe, []byte(ID)))
+				if ignoreCase {
+					id = strings.ToLower(id)
+				}
 				if _, ok := idsMap[id]; !ok {
 					idsMap[id] = []string{}
 				}
@@ -1020,6 +1027,7 @@ func init() {
 	splitCmd.Flags().IntP("by-size", "s", 0, "split sequences into multi parts with N sequences")
 	splitCmd.Flags().IntP("by-part", "p", 0, "split sequences into N parts")
 	splitCmd.Flags().BoolP("by-id", "i", false, "split squences according to sequence ID")
+	splitCmd.Flags().BoolP("ignore-case", "", false, "ignore case when using -i/--by-id")
 	splitCmd.Flags().StringP("by-region", "r", "", "split squences according to subsequence of given region. "+
 		`e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type "seqkit split -h" for more examples`)
 	splitCmd.Flags().BoolP("two-pass", "2", false, "two-pass mode read files twice to lower memory usage. (only for FASTA format)")

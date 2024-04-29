@@ -2588,6 +2588,7 @@ Flags:
   -e, --extension string          set output file extension, e.g., ".gz", ".xz", or ".zst"
   -f, --force                     overwrite output directory
   -h, --help                      help for split
+      --ignore-case               ignore case when using -i/--by-id
   -k, --keep-temp                 keep temporary FASTA and .fai file when using 2-pass mode
   -O, --out-dir string            output directory (default value is $infile.split)
   -2, --two-pass                  two-pass mode read files twice to lower memory usage. (only for FASTA
