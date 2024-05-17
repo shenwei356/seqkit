@@ -63,6 +63,8 @@ If you want to cut a sequence into multiple segments.
 Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
+  2. For splitting by sequence IDs in Windows/MacOS, where the file systems might be case-insensitive,
+     output files might be overwritten if they are only different in cases, like Abc and ABC.
 
 The definition of region is 1-based and with some custom design.
 
