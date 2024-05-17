@@ -2554,6 +2554,7 @@ Attention:
      ensure the .fai file matches the FASTA file.
   2. For splitting by sequence IDs in Windows/MacOS, where the file systems might be case-insensitive,
      output files might be overwritten if they are only different in cases, like Abc and ABC.
+     To avoid this, please switch one -I/--ignore-case.
 
 The definition of region is 1-based and with some custom design.
 

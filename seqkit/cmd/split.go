@@ -65,6 +65,7 @@ Attention:
      ensure the .fai file matches the FASTA file.
   2. For splitting by sequence IDs in Windows/MacOS, where the file systems might be case-insensitive,
      output files might be overwritten if they are only different in cases, like Abc and ABC.
+     To avoid this, please switch one -I/--ignore-case.
 
 The definition of region is 1-based and with some custom design.
 
@@ -1029,7 +1030,7 @@ func init() {
 	splitCmd.Flags().IntP("by-size", "s", 0, "split sequences into multi parts with N sequences")
 	splitCmd.Flags().IntP("by-part", "p", 0, "split sequences into N parts")
 	splitCmd.Flags().BoolP("by-id", "i", false, "split squences according to sequence ID")
-	splitCmd.Flags().BoolP("ignore-case", "", false, "ignore case when using -i/--by-id")
+	splitCmd.Flags().BoolP("ignore-case", "I", false, "ignore case when using -i/--by-id")
 	splitCmd.Flags().StringP("by-region", "r", "", "split squences according to subsequence of given region. "+
 		`e.g 1:12 for first 12 bases, -12:-1 for last 12 bases. type "seqkit split -h" for more examples`)
 	splitCmd.Flags().BoolP("two-pass", "2", false, "two-pass mode read files twice to lower memory usage. (only for FASTA format)")
