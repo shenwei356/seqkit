@@ -99,7 +99,7 @@ func getFileListFromFile(file string, checkFile bool) ([]string, error) {
 		return nil, fmt.Errorf("read file list from '%s': %s", file, err)
 	}
 
-	return lists, nil
+	return lists, fh.Close()
 }
 
 func getFileListFromArgsAndFile(cmd *cobra.Command, args []string, checkFileFromArgs bool, flag string, checkFileFromFile bool) []string {

@@ -471,6 +471,9 @@ Examples:
 							}
 							if limitRegion {
 								target = sequence.SubSeq(start, end).Seq
+								if len(target) == 0 {
+									continue
+								}
 							} else if circular {
 								// concat two copies of sequence, and do not change orginal sequence
 								target = make([]byte, len(sequence.Seq)*2)
@@ -607,6 +610,9 @@ Examples:
 						}
 						if limitRegion {
 							target = sequence.SubSeq(start, end).Seq
+							if len(target) == 0 {
+								continue
+							}
 						} else if circular {
 							// concat two copies of sequence, and do not change orginal sequence
 							target = make([]byte, len(sequence.Seq)*2)
