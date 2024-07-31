@@ -43,8 +43,8 @@ var sortCmd = &cobra.Command{
 	GroupID: "order",
 
 	Use:   "sort",
-	Short: "sort sequences by id/name/sequence/length",
-	Long: `sort sequences by id/name/sequence/length.
+	Short: "sort sequences by id/name/sequence/length/quality",
+	Long: `sort sequences by id/name/sequence/length/quality.
 
 By default, all records will be readed into memory.
 For FASTA format, use flag -2 (--two-pass) to reduce memory usage. FASTQ not
@@ -81,6 +81,8 @@ Attention:
 		byName := getFlagBool(cmd, "by-name")
 		byLength := getFlagBool(cmd, "by-length")
 		byBases := getFlagBool(cmd, "by-bases")
+		byAvgQual := getFlagBool(cmd, "by-avg-qual")
+		qBase := getFlagPositiveInt(cmd, "qual-ascii-base")
 		gapLetters := getFlagString(cmd, "gap-letters")
 		reverse := getFlagBool(cmd, "reverse")
 		ignoreCase := getFlagBool(cmd, "ignore-case")
@@ -113,12 +115,15 @@ Attention:
 		if byLength {
 			n++
 		}
+		if byAvgQual {
+			n++
+		}
 		if n > 1 {
 			checkError(fmt.Errorf("only one of the flags -l (--by-length), -n (--by-name) and -s (--by-seq) is allowed"))
 		}
 
 		byID := true
-		if bySeq || byLength {
+		if bySeq || byLength || byAvgQual {
 			byID = false
 		}
 		if !quiet {
@@ -132,6 +137,7 @@ Attention:
 		name2name0 := make(map[string]string, 1000)
 		name2sequence := []stringutil.String2ByteSlice{}
 		name2length := []stringutil.StringCount{}
+		name2avgQual := []stringutil.StringFloat{}
 
 		// for indexing when output and duplicated sequences checking
 		id2name := make(map[string][]byte)
@@ -146,9 +152,13 @@ Attention:
 			}
 			var name string
 			var length int
+			var avgQual float64
 			for _, file := range files {
 				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
+				if byAvgQual && !fastxReader.IsFastq {
+					checkError(fmt.Errorf("sorting by average quality is not supported for FASTA format"))
+				}
 				for {
 					record, err = fastxReader.Read()
 					if err != nil {
@@ -165,7 +175,7 @@ Attention:
 
 					if byName {
 						name = string(record.Name)
-					} else if byID || bySeq || byLength {
+					} else if byID || bySeq || byLength || byAvgQual {
 						name = string(record.ID)
 					}
 
@@ -190,6 +200,9 @@ Attention:
 							length = len(record2.Seq.Seq)
 						}
 						name2length = append(name2length, stringutil.StringCount{Key: name, Count: length})
+					} else if byAvgQual {
+						avgQual = record2.Seq.AvgQual(qBase)
+						name2avgQual = append(name2avgQual, stringutil.StringFloat{Key: name, Value: avgQual})
 					} else if byID || byName || bySeq {
 						if ignoreCase {
 							name2sequence = append(name2sequence, stringutil.String2ByteSlice{Key: name, Value: bytes.ToLower(record2.Seq.Seq)})
@@ -218,6 +231,12 @@ Attention:
 				} else {
 					sort.Sort(stringutil.StringCountList(name2length))
 				}
+			} else if byAvgQual {
+				if reverse {
+					sort.Sort(stringutil.ReversedByValue{stringutil.StringFloatList(name2avgQual)})
+				} else {
+					sort.Sort(stringutil.ByValue{stringutil.StringFloatList(name2avgQual)})
+				}
 			} else if byName || byID { // by name/id
 				stringutil.NaturalOrder = inNaturalOrder
 				if reverse {
@@ -241,6 +260,11 @@ Attention:
 				}
 			} else if byLength {
 				for _, kv := range name2length {
+					record = sequences[kv.Key]
+					record.FormatToWriter(outfh, config.LineWidth)
+				}
+			} else if byAvgQual {
+				for _, kv := range name2avgQual {
 					record = sequences[kv.Key]
 					record.FormatToWriter(outfh, config.LineWidth)
 				}
@@ -328,7 +352,7 @@ Attention:
 			for i, head := range ids {
 				if byName {
 					name = head
-				} else if byID || bySeq || byLength {
+				} else if byID || bySeq || byLength || byAvgQual {
 					name = string(fastx.ParseHeadID(idRe, []byte(head)))
 				}
 
@@ -370,7 +394,7 @@ Attention:
 
 				if byName {
 					name = string(record.Name)
-				} else if byID || bySeq || byLength {
+				} else if byID || bySeq || byLength || byAvgQual {
 					name = string(record.ID)
 				}
 
@@ -420,6 +444,12 @@ Attention:
 				sort.Sort(stringutil.ReversedStringCountList{stringutil.StringCountList(name2length)})
 			} else {
 				sort.Sort(stringutil.StringCountList(name2length))
+			}
+		} else if byAvgQual {
+			if reverse {
+				sort.Sort(stringutil.ReversedByValue{stringutil.StringFloatList(name2avgQual)})
+			} else {
+				sort.Sort(stringutil.ByValue{stringutil.StringFloatList(name2avgQual)})
 			}
 		} else if byName || byID { // by name/id
 			stringutil.NaturalOrder = inNaturalOrder
@@ -471,6 +501,22 @@ Attention:
 					outfh.WriteString("\n")
 				}
 			}
+		} else if byAvgQual {
+			for _, kv := range name2avgQual {
+				chr = string(id2name[name2name0[kv.Key]])
+				r, ok := faidx.Index[chr]
+				if !ok {
+					checkError(fmt.Errorf(`sequence (%s) not found in file: %s`, chr, newFile))
+					continue
+				}
+
+				sequence := subseqByFaixNotCleaned(faidx, chr, r, 1, -1)
+				outfh.Write([]byte(fmt.Sprintf(">%s\n", chr)))
+				outfh.Write(sequence)
+				if len(sequence) > 0 && sequence[len(sequence)-1] != '\n' {
+					outfh.WriteString("\n")
+				}
+			}
 		}
 
 		if (isStdin(file) || !isPlainFile(file)) && !keepTemp {
@@ -487,6 +533,8 @@ func init() {
 	sortCmd.Flags().BoolP("by-seq", "s", false, "by sequence")
 	sortCmd.Flags().BoolP("by-length", "l", false, "by sequence length")
 	sortCmd.Flags().BoolP("by-bases", "b", false, "by non-gap bases")
+	sortCmd.Flags().BoolP("by-avg-qual", "q", false, "by average quality of sequences")
+	sortCmd.Flags().IntP("qual-ascii-base", "Q", 33, "ASCII base for quality scores")
 	sortCmd.Flags().StringP("gap-letters", "G", "- 	.", "gap letters")
 	sortCmd.Flags().BoolP("reverse", "r", false, "reverse the result")
 	sortCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
