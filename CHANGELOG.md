@@ -1,5 +1,7 @@
 - [SeqKit v2.9.0](https://github.com/shenwei356/seqkit/releases/tag/v2.9.0) - 2024-07-xx
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.9.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.9.0)
+    - `seqkit`:
+        - Fix sequence ID parsing with the default regular expression (in this case, we actually use bytes.Index instead) for a rare case: "xxx\tyyy zzz" was wrongly parsed as "xxx\tyyy". [#486](https://github.com/shenwei356/seqkit/issues/486)
     - `seqkit grep/subseq`:
         - Fix negative regions longer than sequence length. [#479](https://github.com/shenwei356/seqkit/issues/479).
 - [SeqKit v2.8.2](https://github.com/shenwei356/seqkit/releases/tag/v2.8.2) - 2024-05-17
