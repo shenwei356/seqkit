@@ -1,6 +1,6 @@
 # SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-
+- [**Try SeqKit in your browser**](https://sandbox.bio/tutorials/seqkit-intro) (Tutorials and Exercises provided by [sandbox.bio](https://sandbox.bio/tutorials/seqkit-intro))
 - **Documents:** [http://bioinf.shenwei.me/seqkit](http://bioinf.shenwei.me/seqkit)
 ([**Usage**](http://bioinf.shenwei.me/seqkit/usage/),
 [**FAQs**](http://bioinf.shenwei.me/seqkit/faq/),
@@ -17,6 +17,7 @@ and
 - **[Please cite](#citation):** [![doi](https://img.shields.io/badge/doi-10.1002%2Fimt2.191-blue.svg?style=flat)](https://doi.org/10.1002/imt2.191) [![Citation Badge](https://api.juleskreuer.eu/citation-badge.php?doi=10.1002/imt2.191)](https://doi.org/10.1002/imt2.191), [![doi](https://img.shields.io/badge/doi-10.1371%2Fjournal.pone.0163962-blue.svg?style=flat)](https://doi.org/10.1371/journal.pone.0163962)
 [![Citation Badge](https://api.juleskreuer.eu/citation-badge.php?doi=10.1371/journal.pone.0163962)](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=wHF3Lm8AAAAJ&citation_for_view=wHF3Lm8AAAAJ:zYLM7Y9cAGgC)
 - **Others**: [![check in Biotreasury](https://img.shields.io/badge/Biotreasury-collected-brightgreen)](https://biotreasury.rjmart.cn/#/tool?id=10081)  
+
 
 <a href="https://doi.org/10.1002/imt2.191"><img src="seqkit2.jpg" alt="Subcommands of SeqKit2" width="700"/></a>
 
