@@ -132,6 +132,11 @@ Filtering records to edit:
 			replaceWithNR = true
 		}
 
+		var replaceWithFN bool
+		if reFN.Match(replacement) {
+			replaceWithFN = true
+		}
+
 		var replaceWithKV bool
 		var kvs map[string]string
 		if reKV.Match(replacement) {
@@ -429,6 +434,10 @@ Filtering records to edit:
 						r = reNR.ReplaceAll(r, []byte(fmt.Sprintf(nrFormat, nr)))
 					}
 
+					if replaceWithFN {
+						r = reFN.ReplaceAll(r, []byte(file))
+					}
+
 					if replaceWithKV {
 						founds = patternRegexp.FindAllSubmatch(record.Name, -1)
 						if len(founds) > 1 {
@@ -483,7 +492,7 @@ func init() {
 		"replacement. supporting capture variables. "+
 			" e.g. $1 represents the text of the first submatch. "+
 			"ATTENTION: for *nix OS, use SINGLE quote NOT double quotes or "+
-			`use the \ escape character. Record number is also supported by "{nr}".`+
+			`use the \ escape character. Record number and file name is also supported by "{nr}" and "{fn}".`+
 			`use ${1} instead of $1 when {kv} given!`)
 	replaceCmd.Flags().IntP("nr-width", "", 1, `minimum width for {nr} in flag -r/--replacement. e.g., formatting "1" to "001" by --nr-width 3`)
 	// replaceCmd.Flags().BoolP("by-name", "n", false, "replace full name instead of just id")
@@ -508,3 +517,4 @@ func init() {
 
 var reNR = regexp.MustCompile(`\{(NR|nr)\}`)
 var reKV = regexp.MustCompile(`\{(KV|kv)\}`)
+var reFN = regexp.MustCompile(`\{(FN|fn)\}`)
