@@ -3091,7 +3091,9 @@ more on: http://bioinf.shenwei.me/seqkit/usage/#replace
 
 Special replacement symbols (only for replacing name not sequence):
 
-    {nr}    Record number, starting from 1
+    {fn}    File name
+    {fbn}   File base name
+    {fbne}  File base name without any extension
     {kv}    Corresponding value of the key (captured variable $n) by key-value file,
             n can be specified by flag -I (--key-capt-idx) (default: 1)
             
@@ -3235,6 +3237,13 @@ Examples
         ACTG
         >seq_00002
         ATTT
+
+1. Add file names.
+
+        $ seqkit replace ../tests/hairpin.fa -p '.+' -r '{fn}__{fbn}__{fbne}__{nr}' | seqkit seq -n | head -n 3
+        ../tests/hairpin.fa__hairpin.fa__hairpin__1
+        ../tests/hairpin.fa__hairpin.fa__hairpin__2
+        ../tests/hairpin.fa__hairpin.fa__hairpin__3
 
 1. Replace key with value by key-value file
 

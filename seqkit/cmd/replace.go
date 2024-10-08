@@ -24,6 +24,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strings"
@@ -61,6 +62,9 @@ more on: http://bioinf.shenwei.me/seqkit/usage/#replace
 Special replacement symbols (only for replacing name not sequence):
 
     {nr}    Record number, starting from 1
+    {fn}    File name
+    {fbn}   File base name
+    {fbne}  File base name without any extension
     {kv}    Corresponding value of the key (captured variable $n) by key-value file,
             n can be specified by flag -I (--key-capt-idx) (default: 1)
             
@@ -135,6 +139,16 @@ Filtering records to edit:
 		var replaceWithFN bool
 		if reFN.Match(replacement) {
 			replaceWithFN = true
+		}
+
+		var replaceWithFBN bool
+		if reFBN.Match(replacement) {
+			replaceWithFBN = true
+		}
+
+		var replaceWithFBNE bool
+		if reFN.Match(replacement) {
+			replaceWithFBNE = true
 		}
 
 		var replaceWithKV bool
@@ -333,10 +347,23 @@ Filtering records to edit:
 		var re *regexp.Regexp
 		var h uint64
 
+		var fileBase string
+
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
+
 			nr := 0
+			bFile := []byte(file)
+			fileBase = filepath.Base(file)
+			bFileBase := []byte(fileBase)
+			var bFileBaseWithoutExtension []byte
+			if i := strings.Index(fileBase, "."); i >= 0 {
+				bFileBaseWithoutExtension = []byte(fileBase[:i])
+			} else {
+				bFileBaseWithoutExtension = []byte(fileBase)
+			}
+
 			for {
 				record, err = fastxReader.Read()
 				if err != nil {
@@ -435,7 +462,13 @@ Filtering records to edit:
 					}
 
 					if replaceWithFN {
-						r = reFN.ReplaceAll(r, []byte(file))
+						r = reFN.ReplaceAll(r, bFile)
+					}
+					if replaceWithFBN {
+						r = reFBN.ReplaceAll(r, bFileBase)
+					}
+					if replaceWithFBNE {
+						r = reFBNE.ReplaceAll(r, bFileBaseWithoutExtension)
 					}
 
 					if replaceWithKV {
@@ -518,3 +551,5 @@ func init() {
 var reNR = regexp.MustCompile(`\{(NR|nr)\}`)
 var reKV = regexp.MustCompile(`\{(KV|kv)\}`)
 var reFN = regexp.MustCompile(`\{(FN|fn)\}`)
+var reFBN = regexp.MustCompile(`\{(FBN|fbn)\}`)
+var reFBNE = regexp.MustCompile(`\{(FBNE|fbne)\}`)
