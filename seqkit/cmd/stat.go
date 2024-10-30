@@ -76,6 +76,7 @@ Columns:
   16. Q30(%)    percentage of bases with the quality score greater than 30
   17. AvgQual   average quality
   18. GC(%)     percentage of GC content
+  19. sum_n     number of ambitious letters (N, n, X, x)
   
 Attention:
   1. Sequence length metrics (sum_len, min_len, avg_len, max_len, Q1, Q2, Q3)
@@ -109,6 +110,7 @@ Tips:
 		}
 		gapLettersBytes := []byte(gapLetters)
 		gcLettersBytes := []byte{'g', 'c', 'G', 'C'}
+		nLettersBytes := []byte{'X', 'x', 'N', 'n'}
 
 		skipFileCheck := getFlagBool(cmd, "skip-file-check")
 		all := getFlagBool(cmd, "all")
@@ -194,7 +196,7 @@ Tips:
 				"max_len",
 			}
 			if all {
-				colnames = append(colnames, []string{"Q1", "Q2", "Q3", "sum_gap", "N50", "N50_num", "Q20(%)", "Q30(%)", "AvgQual", "GC(%)"}...)
+				colnames = append(colnames, []string{"Q1", "Q2", "Q3", "sum_gap", "N50", "N50_num", "Q20(%)", "Q30(%)", "AvgQual", "GC(%)", "sum_n"}...)
 			}
 
 			if hasNX {
@@ -242,7 +244,7 @@ Tips:
 							info.lenAvg,
 							info.lenMax)
 						if all {
-							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f",
+							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%d",
 								info.Q1,
 								info.Q2,
 								info.Q3,
@@ -252,7 +254,9 @@ Tips:
 								info.q20,
 								info.q30,
 								info.avgQual,
-								info.gc)
+								info.gc,
+								info.nSum,
+							)
 						}
 						if hasNX {
 							for _, x = range info.nx {
@@ -283,7 +287,7 @@ Tips:
 							info.lenAvg,
 							info.lenMax)
 						if all {
-							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f",
+							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%d",
 								info.Q1,
 								info.Q2,
 								info.Q3,
@@ -293,7 +297,9 @@ Tips:
 								info.q20,
 								info.q30,
 								info.avgQual,
-								info.gc)
+								info.gc,
+								info.nSum,
+							)
 						}
 						if hasNX {
 							for _, x = range info.nx {
@@ -332,7 +338,7 @@ Tips:
 							info.lenAvg,
 							info.lenMax)
 						if all {
-							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f",
+							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%d",
 								info.Q1,
 								info.Q2,
 								info.Q3,
@@ -342,7 +348,9 @@ Tips:
 								info.q20,
 								info.q30,
 								info.avgQual,
-								info.gc)
+								info.gc,
+								info.nSum,
+							)
 						}
 						if hasNX {
 							for _, x = range info.nx {
@@ -400,6 +408,7 @@ Tips:
 
 				var gapSum uint64
 				var gcSum uint64
+				var nSum uint64
 
 				lensStats := util.NewLengthStats()
 
@@ -478,6 +487,7 @@ Tips:
 
 						gapSum += uint64(byteutil.CountBytes(record.Seq.Seq, gapLettersBytes))
 						gcSum += uint64(byteutil.CountBytes(record.Seq.Seq, gcLettersBytes))
+						nSum += uint64(byteutil.CountBytes(record.Seq.Seq, nLettersBytes))
 					}
 				}
 
@@ -528,7 +538,7 @@ Tips:
 						file = stdinLabel
 					}
 					ch <- statInfo{file, seqFormat, t,
-						0, 0, 0, 0,
+						0, 0, 0, 0, 0,
 						0, 0, 0, 0,
 						0, 0, 0,
 						0, 0, 0, 0,
@@ -542,7 +552,7 @@ Tips:
 						file = stdinLabel
 					}
 					ch <- statInfo{file, seqFormat, t,
-						lensStats.Count(), lensStats.Sum(), gapSum, lensStats.Min(),
+						lensStats.Count(), lensStats.Sum(), gapSum, lensStats.Min(), nSum,
 						mathutil.Round(lensStats.Mean(), 1), lensStats.Max(), n50, l50,
 						q1, q2, q3,
 						mathutil.Round(float64(q20)/float64(lensStats.Sum())*100, 2),
@@ -601,6 +611,7 @@ Tips:
 				{Header: "Q30(%)", Align: stable.AlignRight, HumanizeNumbers: true},
 				{Header: "AvgQual", Align: stable.AlignRight, HumanizeNumbers: true},
 				{Header: "GC(%)", Align: stable.AlignRight, HumanizeNumbers: true},
+				{Header: "sum_n", Align: stable.AlignRight, HumanizeNumbers: true},
 				// {Header: "L50", AlignRight: true},
 			}...)
 		}
@@ -634,6 +645,7 @@ Tips:
 				row = append(row, info.q30)
 				row = append(row, info.avgQual)
 				row = append(row, info.gc)
+				row = append(row, info.nSum)
 			}
 			if hasNX {
 				for _, x = range info.nx {
@@ -656,6 +668,7 @@ type statInfo struct {
 	lenSum uint64
 	gapSum uint64
 	lenMin uint64
+	nSum   uint64
 
 	lenAvg float64
 	lenMax uint64

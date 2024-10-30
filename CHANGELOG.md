@@ -4,6 +4,8 @@
         - Fix sequence ID parsing with the default regular expression (in this case, we actually use bytes.Index instead) for a rare case: "xxx\tyyy zzz" was wrongly parsed as "xxx\tyyy". [#486](https://github.com/shenwei356/seqkit/issues/486)
     - `seqkit grep/subseq`:
         - Fix negative regions longer than sequence length. [#479](https://github.com/shenwei356/seqkit/issues/479).
+    - `seqkit stats`:
+        - Add an extra column `sum_n` to count the number of ambiguous characters. [#490](https://github.com/shenwei356/seqkit/issues/490)
 - [SeqKit v2.8.2](https://github.com/shenwei356/seqkit/releases/tag/v2.8.2) - 2024-05-17
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.8.2/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.8.2)
     - `seqkit amplicon`:
