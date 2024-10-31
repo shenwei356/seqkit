@@ -857,7 +857,7 @@ Attention:
 						// }
 
 						if nonGreedy {
-							offset = offset + loc[1] + 1
+							offset = offset + loc[1]
 						} else {
 							offset = offset + loc[0] + 1
 						}
@@ -956,7 +956,7 @@ Attention:
 						// }
 
 						if nonGreedy {
-							offset = offset + loc[1] + 1
+							offset = offset + loc[1]
 						} else {
 							offset = offset + loc[0] + 1
 						}
