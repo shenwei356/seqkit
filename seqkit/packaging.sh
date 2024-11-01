@@ -17,3 +17,5 @@ for f in seqkit_*; do
     rm -rf $f;
     cd ..;
 done;
+
+ls binaries/*.tar.gz | rush 'cd {/}; md5sum {%} > {%}.md5.txt'
