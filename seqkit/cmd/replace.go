@@ -147,7 +147,7 @@ Filtering records to edit:
 		}
 
 		var replaceWithFBNE bool
-		if reFN.Match(replacement) {
+		if reFBNE.Match(replacement) {
 			replaceWithFBNE = true
 		}
 
