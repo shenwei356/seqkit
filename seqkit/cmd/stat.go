@@ -422,6 +422,8 @@ Tips:
 				var record *fastx.Record
 				var fastxReader *fastx.Reader
 				var err error
+				checkSeqType := true
+				var isNucleotide bool
 
 				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 				if err != nil {
@@ -460,12 +462,18 @@ Tips:
 						break
 					}
 
-					if seqFormat == "" {
+					if checkSeqType {
+						checkSeqType = false
+
 						if len(record.Seq.Qual) > 0 {
 							seqFormat = "FASTQ"
 						} else {
 							seqFormat = "FASTA"
 						}
+
+						isNucleotide = fastxReader.Alphabet() == seq.DNA ||
+							fastxReader.Alphabet() == seq.DNAredundant ||
+							fastxReader.Alphabet() == seq.RNA || fastxReader.Alphabet() == seq.RNAredundant
 					}
 
 					lensStats.Add(uint64(len(record.Seq.Seq)))
@@ -486,8 +494,10 @@ Tips:
 						}
 
 						gapSum += uint64(byteutil.CountBytes(record.Seq.Seq, gapLettersBytes))
-						gcSum += uint64(byteutil.CountBytes(record.Seq.Seq, gcLettersBytes))
-						nSum += uint64(byteutil.CountBytes(record.Seq.Seq, nLettersBytes))
+						if isNucleotide {
+							gcSum += uint64(byteutil.CountBytes(record.Seq.Seq, gcLettersBytes))
+							nSum += uint64(byteutil.CountBytes(record.Seq.Seq, nLettersBytes))
+						}
 					}
 				}
 
