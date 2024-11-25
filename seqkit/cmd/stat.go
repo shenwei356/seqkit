@@ -110,7 +110,8 @@ Tips:
 		}
 		gapLettersBytes := []byte(gapLetters)
 		gcLettersBytes := []byte{'g', 'c', 'G', 'C'}
-		nLettersBytes := []byte{'X', 'x', 'N', 'n'}
+		nLettersBytesNucl := []byte{'N', 'n'}
+		nLettersBytesProt := []byte{'X', 'x'}
 
 		skipFileCheck := getFlagBool(cmd, "skip-file-check")
 		all := getFlagBool(cmd, "all")
@@ -496,7 +497,9 @@ Tips:
 						gapSum += uint64(byteutil.CountBytes(record.Seq.Seq, gapLettersBytes))
 						if isNucleotide {
 							gcSum += uint64(byteutil.CountBytes(record.Seq.Seq, gcLettersBytes))
-							nSum += uint64(byteutil.CountBytes(record.Seq.Seq, nLettersBytes))
+							nSum += uint64(byteutil.CountBytes(record.Seq.Seq, nLettersBytesNucl))
+						} else {
+							nSum += uint64(byteutil.CountBytes(record.Seq.Seq, nLettersBytesProt))
 						}
 					}
 				}
