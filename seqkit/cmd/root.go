@@ -42,9 +42,7 @@ Author: Wei Shen <shenwei356@gmail.com>
 
 Documents  : http://bioinf.shenwei.me/seqkit
 Source code: https://github.com/shenwei356/seqkit
-Please cite:
-  1. https://doi.org/10.1002/imt2.191
-  2. https://doi.org/10.1371/journal.pone.0163962
+Please cite: https://doi.org/10.1002/imt2.191
 
 
 Seqkit utlizies the pgzip (https://github.com/klauspost/pgzip) package to

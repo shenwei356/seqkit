@@ -86,8 +86,8 @@ be checked.
 By default, most softwares, including `seqkit`, take the leading non-space
 letters as sequence identifier (ID). For example,
 
-|   FASTA header                                                |     ID                                            |
-|:--------------------------------------------------------------|:--------------------------------------------------|
+| FASTA header                                                  | ID                                                |
+| :------------------------------------------------------------ | :------------------------------------------------ |
 | >123456 gene name                                             | 123456                                            |
 | >longname                                                     | longname                                          |
 | >gi&#124;110645304&#124;ref&#124;NC_002516.2&#124; Pseudomona | gi&#124;110645304&#124;ref&#124;NC_002516.2&#124; |
@@ -164,7 +164,7 @@ Author: Wei Shen <shenwei356@gmail.com>
 
 Documents  : http://bioinf.shenwei.me/seqkit
 Source code: https://github.com/shenwei356/seqkit
-Please cite: https://doi.org/10.1371/journal.pone.0163962
+Please cite: https://doi.org/10.1002/imt2.191
 
 
 Seqkit utlizies the pgzip (https://github.com/klauspost/pgzip) package to
@@ -769,21 +769,21 @@ Eexamples
         # To markdown
 
         $ seqkit stats *.f{a,q}.gz -T | csvtk csv2md -t
-        |file             |format|type|num_seqs|sum_len|min_len|avg_len|max_len|
-        |:----------------|:-----|:---|:-------|:------|:------|:------|:------|
-        |hairpin.fa.gz    |FASTA |RNA |28645   |2949871|39     |103.0  |2354   |
-        |mature.fa.gz     |FASTA |RNA |35828   |781222 |15     |21.8   |34     |
-        |Illimina1.8.fq.gz|FASTQ |DNA |10000   |1500000|150    |150.0  |150    |
-        |reads_1.fq.gz    |FASTQ |DNA |2500    |567516 |226    |227.0  |229    |
-        |reads_2.fq.gz    |FASTQ |DNA |2500    |560002 |223    |224.0  |225    |
+        | file              | format | type | num_seqs | sum_len | min_len | avg_len | max_len |
+        | :---------------- | :----- | :--- | :------- | :------ | :------ | :------ | :------ |
+        | hairpin.fa.gz     | FASTA  | RNA  | 28645    | 2949871 | 39      | 103.0   | 2354    |
+        | mature.fa.gz      | FASTA  | RNA  | 35828    | 781222  | 15      | 21.8    | 34      |
+        | Illimina1.8.fq.gz | FASTQ  | DNA  | 10000    | 1500000 | 150     | 150.0   | 150     |
+        | reads_1.fq.gz     | FASTQ  | DNA  | 2500     | 567516  | 226     | 227.0   | 229     |
+        | reads_2.fq.gz     | FASTQ  | DNA  | 2500     | 560002  | 223     | 224.0   | 225     |
 
-    |file             |format|type|num_seqs|sum_len|min_len|avg_len|max_len|
-    |:----------------|:-----|:---|:-------|:------|:------|:------|:------|
-    |hairpin.fa.gz    |FASTA |RNA |28645   |2949871|39     |103.0  |2354   |
-    |mature.fa.gz     |FASTA |RNA |35828   |781222 |15     |21.8   |34     |
-    |Illimina1.8.fq.gz|FASTQ |DNA |10000   |1500000|150    |150.0  |150    |
-    |reads_1.fq.gz    |FASTQ |DNA |2500    |567516 |226    |227.0  |229    |
-    |reads_2.fq.gz    |FASTQ |DNA |2500    |560002 |223    |224.0  |225    |
+    | file              | format | type | num_seqs | sum_len | min_len | avg_len | max_len |
+    | :---------------- | :----- | :--- | :------- | :------ | :------ | :------ | :------ |
+    | hairpin.fa.gz     | FASTA  | RNA  | 28645    | 2949871 | 39      | 103.0   | 2354    |
+    | mature.fa.gz      | FASTA  | RNA  | 35828    | 781222  | 15      | 21.8    | 34      |
+    | Illimina1.8.fq.gz | FASTQ  | DNA  | 10000    | 1500000 | 150     | 150.0   | 150     |
+    | reads_1.fq.gz     | FASTQ  | DNA  | 2500     | 567516  | 226     | 227.0   | 229     |
+    | reads_2.fq.gz     | FASTQ  | DNA  | 2500     | 560002  | 223     | 224.0   | 225     |
 
 
 1. Extra information
