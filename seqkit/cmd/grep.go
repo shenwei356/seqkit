@@ -551,6 +551,10 @@ Examples:
 
 			checkAlphabet := true
 			for {
+				if len(patternsR)+len(patternsN)+len(patternsS) == 0 {
+					break
+				}
+
 				record, err = fastxReader.Read()
 				if err != nil {
 					if err == io.EOF {
