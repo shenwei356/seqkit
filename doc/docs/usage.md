@@ -1747,7 +1747,7 @@ Examples
 
         $ seqkit grep -f id.txt seqs.fq.gz -C
 
-1. Serching non-canonical sequence IDs, Using `--id-regexp` to capture IDs. 
+1. Searching non-canonical sequence IDs, Using `--id-regexp` to capture IDs. 
    Refer to [section Sequence ID](#sequence-id) and [seqkit seq](#seq) for examples.
 
 1. Searching with list of sequence names (they may contain whitespace).
@@ -1788,7 +1788,15 @@ Examples
 
 1. Extract sequences containing AGGCG
 
-        $ cat hairpin.fa.gz | seqkit grep -s -i -p aggcg
+        $ cat hairpin.fa.gz | seqkit grep -s -i -p aggcg    | seqkit stats
+        file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+        -     FASTA   RNA      2,147  262,831       43    122.4    2,354
+        
+1. Extract sequences containing AGGCG (only in the positive strand)
+
+        $ cat hairpin.fa.gz | seqkit grep -s -i -p aggcg -P
+        file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+        -     FASTA   RNA      1,181  145,789       49    123.4    2,354
 
 1. Circular genome
 
@@ -1796,9 +1804,9 @@ Examples
         >seq
         ACGTTGCA
         
-        $ echo -e ">seq\nACGTTGCA"  | seqkit grep -s -i -p AA
+        $ echo -e ">seq\nACGTTGCA"  | seqkit grep -s -i -P -p AA
         
-        $ echo -e ">seq\nACGTTGCA"  | seqkit grep -s -i -p AA -c
+        $ echo -e ">seq\nACGTTGCA"  | seqkit grep -s -i -P -p AA -c
         >seq
         ACGTTGCA
         
@@ -1806,19 +1814,20 @@ Examples
 
         $ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg | seqkit stats
         file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
-        -     FASTA   RNA      1,181  145,789       49    123.4    2,354
+        -     FASTA   RNA      2,147  262,831       43    122.4    2,354
 
-        real    0m0.058s
-        user    0m0.100s
-        sys     0m0.017s
+        real    0m0.068s
+        user    0m0.089s
+        sys     0m0.025s
+
 
         $ time zcat hairpin.fa.gz | seqkit grep -s -i -p aggcg -m 1 | seqkit stats
         file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
         -     FASTA   RNA     22,290  2,375,819       39    106.6    2,354
 
-        real    0m1.081s
-        user    0m1.305s
-        sys     0m0.158s
+        real    0m0.256s
+        user    0m0.781s
+        sys     0m0.082s
 
 
 1. Extract sequences starting with AGGCG
