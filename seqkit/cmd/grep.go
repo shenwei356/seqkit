@@ -551,7 +551,7 @@ Examples:
 
 			checkAlphabet := true
 			for {
-				if len(patternsR)+len(patternsN)+len(patternsS) == 0 {
+				if deleteMatched && len(patternsR)+len(patternsN)+len(patternsS) == 0 {
 					break
 				}
 
