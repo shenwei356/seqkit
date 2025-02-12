@@ -264,6 +264,10 @@ run grep_by_regexp_list $app grep -r -n -f list $file
 assert_equal $($app fx2tab $STDOUT_FILE | wc -l) $($app seq -n $file | grep -E "Homo|Mus" | wc -l)
 rm list
 
+# delete matched
+run grep_delete_matched $app grep --delete-matched -r -p "^hsa" $file
+assert_equal $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1) $($app fx2tab $file | grep -E "^hsa" | head -n 1 | $app tab2fx | md5sum | cut -d" " -f 1)
+
 # ------------------------------------------------------------
 #                       locate
 # ------------------------------------------------------------
