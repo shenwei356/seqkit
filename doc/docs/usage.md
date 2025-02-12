@@ -3454,6 +3454,9 @@ concatenate sequences with same ID from multiple files
 Attention:
    1. By default, only sequences with IDs that appear in all files are outputted.
       use -f/--full to output all sequences.
+      * If you are processing multiple-sequence-alignment results, you can use
+        -F/--fill to fill with N bases/residues for IDs missing in some files when
+        using -f/--full.
    2. If there are more than one sequences of the same ID, we output the Cartesian
       product of sequences.
    3. Description are also concatenated with a separator (-s/--separator).
@@ -3505,6 +3508,17 @@ a2-ax-
 >B 1
 b1-
 
+# https://github.com/shenwei356/seqkit/issues/510
+# fill with N bases/residues for IDs missing in some files when using -f/--full
+$ seqkit concat a.fa b.fa --full --fill "="
+>C 1
+===c1-
+>A 1|x
+a1-ax-
+>A 2|x
+a2-ax-
+>B 1
+b1-===
 ```
 
 ## mutate

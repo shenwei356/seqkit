@@ -31,7 +31,6 @@ import (
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
-	"github.com/twotwotwo/sorts/sortutil"
 )
 
 // concateCmd represents the concatenate command
@@ -46,6 +45,9 @@ var concateCmd = &cobra.Command{
 Attention:
    1. By default, only sequences with IDs that appear in all files are outputted.
       use -f/--full to output all sequences.
+      * If you are processing multiple-sequence-alignment results, you can use
+        -F/--fill to fill with N bases/residues for IDs missing in some files when
+        using -f/--full.
    2. If there are more than one sequences of the same ID, we output the Cartesian
       product of sequences.
    3. Description are also concatenated with a separator (-s/--separator).
@@ -64,6 +66,8 @@ Attention:
 		runtime.GOMAXPROCS(config.Threads)
 
 		full := getFlagBool(cmd, "full")
+		fillBase := getFlagString(cmd, "fill")
+		fill := fillBase != ""
 		separator := getFlagString(cmd, "separator")
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
@@ -78,13 +82,16 @@ Attention:
 		// id -> file_idx -> #seqs
 		ids0 := make(map[string]*map[int]int, 1024)
 
+		// lengths of sequence in all files
+		seqLens := make([]int, len(files))
+
 		// var record *fastx.Record
 
 		var isFastq bool
 		first := true
 
 		var idxFile int
-		for _, file := range files {
+		for i, file := range files {
 			if !quiet {
 				log.Infof("read file: %s", file)
 			}
@@ -118,7 +125,7 @@ Attention:
 			var id string
 			var list *[]*fastx.Record
 			var m *map[int]int
-			for _, _seq := range seqs {
+			for j, _seq := range seqs {
 				id = string(_seq.ID)
 
 				if list, ok = seqsM[id]; !ok {
@@ -134,6 +141,17 @@ Attention:
 					ids0[id] = m
 				}
 				(*m)[idxFile]++
+
+				if !fill {
+					continue
+				}
+				if j == 0 {
+					seqLens[i] = len(_seq.Seq.Seq)
+				} else if seqLens[i] != len(_seq.Seq.Seq) {
+					log.Warningf("records with different lengths (%d, %d) detected in file '%s' , -F/--fill is disabled",
+						seqLens[i], len(_seq.Seq.Seq), file)
+					fill = false
+				}
 			}
 
 			seqs0 = append(seqs0, seqsM)
@@ -147,6 +165,7 @@ Attention:
 
 		n := len(files)
 
+		lists := make([][]int, 0, 1024)
 		var bufName, bufSeq, bufQual bytes.Buffer
 		var buffer *bytes.Buffer
 		var _r *fastx.Record
@@ -158,24 +177,18 @@ Attention:
 				continue
 			}
 
-			if len(*m) == 1 { // only appear in one file, just print it
-				for idxFile = range *m {
-					for _, r := range *seqs0[idxFile][id] {
-						(*r).FormatToWriter(outfh, lineWidth)
-					}
+			lists = lists[:0]
+			for idx := 0; idx < n; idx++ {
+				if !full && (*m)[idx] == 0 {
+					continue
 				}
-				continue
-			}
 
-			// sort file indexes
-			idxes := make([]int, 0, len(*m))
-			for idx := range *m {
-				idxes = append(idxes, idx)
-			}
-			sortutil.Ints(idxes)
+				// use -1 to mark no exist
+				if (*m)[idx] == 0 {
+					lists = append(lists, []int{-1})
+					continue
+				}
 
-			lists := make([][]int, 0, len(*m))
-			for _, idx := range idxes {
 				vs := make([]int, 0, (*m)[idx])
 				for i := 0; i < (*m)[idx]; i++ {
 					vs = append(vs, i)
@@ -195,7 +208,18 @@ Attention:
 				bufName.WriteString(id)
 
 				for _i, _j := range locs {
-					_r = (*seqs0[idxes[_i]][id])[_j]
+					if _j < 0 { // no exist in this file
+						if !fill {
+							continue
+						}
+						bufSeq.WriteString(strings.Repeat(fillBase, seqLens[_i]))
+						if isFastq {
+							bufQual.WriteString(strings.Repeat("B", seqLens[_i]))
+						}
+						continue
+					}
+
+					_r = (*seqs0[_i][id])[_j]
 
 					if len(_r.Desc) > 0 {
 						hasDesc = true
@@ -203,7 +227,9 @@ Attention:
 					descs = append(descs, string(_r.Desc))
 
 					bufSeq.Write(_r.Seq.Seq)
-					bufQual.Write(_r.Seq.Qual)
+					if isFastq {
+						bufQual.Write(_r.Seq.Qual)
+					}
 				}
 
 				if isFastq {
@@ -231,7 +257,7 @@ Attention:
 					}
 					outfh.Write(_mark_newline)
 
-					text, buffer = wrapByteSlice(bufSeq.Bytes(), config.LineWidth, buffer)
+					text, buffer = wrapByteSlice(bufSeq.Bytes(), lineWidth, buffer)
 					outfh.Write(text)
 					outfh.Write(_mark_newline)
 				}
@@ -245,6 +271,7 @@ func init() {
 	RootCmd.AddCommand(concateCmd)
 
 	concateCmd.Flags().BoolP("full", "f", false, "keep all sequences, like full/outer join")
+	concateCmd.Flags().StringP("fill", "F", "", "fill with N bases/residues for IDs missing in some files when using -f/--full")
 	concateCmd.Flags().StringP("separator", "s", "|", "separator for descriptions of records with the same ID")
 }
 

@@ -1,7 +1,9 @@
-- [SeqKit v2.9.1](https://github.com/shenwei356/seqkit/releases/tag/v2.9.1) - 2024-11-01
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.9.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.9.1)
+- [SeqKit v2.10.0](https://github.com/shenwei356/seqkit/releases/tag/v2.10.0) - 2025-xx-xx
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.10.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.10.0)
     - `seqkit stat`:
         - do not compute GC content and N's for protein sequence. [#497](https://github.com/shenwei356/seqkit/issues/497)
+    - `seqkit concat`:
+        - add an option `-F/--fill` to use a sequence of "-" for IDs missing in some files, can be used in MSA results. [#510](https://github.com/shenwei356/seqkit/issues/510)
 - [SeqKit v2.9.0](https://github.com/shenwei356/seqkit/releases/tag/v2.9.0) - 2024-11-01
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.9.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.9.0)
     - `seqkit`:
