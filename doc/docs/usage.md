@@ -2714,11 +2714,14 @@ Usage:
 
 Flags:
   -l, --by-length string          split sequences into chunks of >=N bases, supports K/M/G suffix
-      --by-length-prefix string   file prefix for --by-length
-  -p, --by-part int               split sequences into N parts
-      --by-part-prefix string     file prefix for --by-part
+      --by-length-prefix string   file prefix for --by-length. The placeholder "{read}" is needed for
+                                  paired-end files.
+  -p, --by-part int               split sequences into N parts with the round robin distribution
+      --by-part-prefix string     file prefix for --by-part. The placeholder "{read}" is needed for
+                                  paired-end files.
   -s, --by-size int               split sequences into multi parts with N sequences
-      --by-size-prefix string     file prefix for --by-size
+      --by-size-prefix string     file prefix for --by-size. The placeholder "{read}" is needed for
+                                  paired-end files.
   -e, --extension string          set output file extension, e.g., ".gz", ".xz", or ".zst"
   -f, --force                     overwrite output directory
   -h, --help                      help for split2
@@ -2801,6 +2804,17 @@ Examples
         [INFO] write 1250 sequences to file: out/reads_2.part_002.fq.gz
         [INFO] write 1250 sequences to file: out/reads_1.part_001.fq.gz
         [INFO] write 1250 sequences to file: out/reads_1.part_002.fq.gz
+        
+   Custom prefix
+   
+        $ seqkit split2 -1 reads_1.fq.gz -2 reads_2.fq.gz -p 2 -O out -f --by-part-prefix "x_r{read}_"
+        [INFO] flag -1/--read1 and -2/--read2 given, ignore: -
+        [INFO] split seqs from reads_1.fq.gz and reads_2.fq.gz
+        [INFO] split into 2 parts
+        [INFO] write 1250 sequences to file: out/x_r2_001.fq.gz
+        [INFO] write 1250 sequences to file: out/x_r1_001.fq.gz
+        [INFO] write 1250 sequences to file: out/x_r2_002.fq.gz
+        [INFO] write 1250 sequences to file: out/x_r1_002.fq.gz
 
 1. For FASTA files (single-end)
 

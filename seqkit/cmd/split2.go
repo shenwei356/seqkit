@@ -25,7 +25,9 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -113,6 +115,8 @@ If you want to cut a sequence into multiple segments.
 
 		extension := getFlagString(cmd, "extension")
 
+		reRead := regexp.MustCompile(`\{read\}`)
+
 		prefixBySize := getFlagString(cmd, "by-size-prefix")
 		prefixByPart := getFlagString(cmd, "by-part-prefix")
 		prefixByLength := getFlagString(cmd, "by-length-prefix")
@@ -134,6 +138,7 @@ If you want to cut a sequence into multiple segments.
 		}
 
 		var source string
+		var pairedEnd bool
 		if read1 == "" {
 			if read2 == "" {
 				// single end from file or stdin
@@ -165,6 +170,17 @@ If you want to cut a sequence into multiple segments.
 				}
 				files = []string{read1, read2}
 				source = read1 + " and " + read2
+
+				pairedEnd = true
+				if prefixBySizeSet && !reRead.MatchString(prefixBySize) {
+					checkError(fmt.Errorf(`--by-size-prefix should contains the placeholder "{read}" when paired-end files are given, such as "sample_{read}.fq.gz`))
+				}
+				if prefixByPartSet && !reRead.MatchString(prefixByPart) {
+					checkError(fmt.Errorf(`--by-part-prefix should contains the placeholder "{read}" when paired-end files are given, such as "sample_{read}.fq.gz`))
+				}
+				if prefixByLengthSet && !reRead.MatchString(prefixByLength) {
+					checkError(fmt.Errorf(`--by-size-prefix should contains the placeholder "{read}" when paired-end files are given, such as "sample_{read}.fq.gz`))
+				}
 			}
 		}
 
@@ -180,7 +196,7 @@ If you want to cut a sequence into multiple segments.
 		}
 
 		var wg sync.WaitGroup
-		for _, file := range files {
+		for i, file := range files {
 			isstdin := isStdin(file)
 			var fileName, fileExt, fileExt2 string
 			if isstdin {
@@ -226,7 +242,7 @@ If you want to cut a sequence into multiple segments.
 			}
 
 			wg.Add(1)
-			go func(file string) {
+			go func(file string, pairedEnd bool, r int) {
 				defer wg.Done()
 
 				renameFileExt := true
@@ -299,6 +315,9 @@ If you want to cut a sequence into multiple segments.
 
 							if prefixBySizeSet {
 								prefix = prefixBySize
+								if pairedEnd {
+									prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
+								}
 							} else {
 								prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 							}
@@ -315,6 +334,9 @@ If you want to cut a sequence into multiple segments.
 							var outfh2 *xopen.Writer
 							if prefixByLengthSet {
 								prefix = prefixByLength
+								if pairedEnd {
+									prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
+								}
 							} else {
 								prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 							}
@@ -342,6 +364,9 @@ If you want to cut a sequence into multiple segments.
 
 							if prefixByLengthSet {
 								prefix = prefixByLength
+								if pairedEnd {
+									prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
+								}
 							} else {
 								prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 							}
@@ -365,6 +390,9 @@ If you want to cut a sequence into multiple segments.
 						if outfhPre == nil {
 							if prefixBySizeSet {
 								prefix = prefixBySize
+								if pairedEnd {
+									prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
+								}
 							} else {
 								prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 							}
@@ -390,6 +418,9 @@ If you want to cut a sequence into multiple segments.
 							var outfh2 *xopen.Writer
 							if prefixByPartSet {
 								prefix = prefixByPart
+								if pairedEnd {
+									prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
+								}
 							} else {
 								prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 							}
@@ -437,7 +468,7 @@ If you want to cut a sequence into multiple segments.
 					}
 				}
 
-			}(file)
+			}(file, pairedEnd, i+1)
 		}
 
 		wg.Wait()
@@ -455,9 +486,9 @@ func init() {
 	split2Cmd.Flags().StringP("out-dir", "O", "", "output directory (default value is $infile.split)")
 	split2Cmd.Flags().BoolP("force", "f", false, "overwrite output directory")
 
-	split2Cmd.Flags().StringP("by-size-prefix", "", "", "file prefix for --by-size")
-	split2Cmd.Flags().StringP("by-part-prefix", "", "", "file prefix for --by-part")
-	split2Cmd.Flags().StringP("by-length-prefix", "", "", "file prefix for --by-length")
+	split2Cmd.Flags().StringP("by-size-prefix", "", "", `file prefix for --by-size. The placeholder "{read}" is needed for paired-end files.`)
+	split2Cmd.Flags().StringP("by-part-prefix", "", "", `file prefix for --by-part. The placeholder "{read}" is needed for paired-end files.`)
+	split2Cmd.Flags().StringP("by-length-prefix", "", "", `file prefix for --by-length. The placeholder "{read}" is needed for paired-end files.`)
 
 	split2Cmd.Flags().StringP("extension", "e", "", `set output file extension, e.g., ".gz", ".xz", or ".zst"`)
 }
