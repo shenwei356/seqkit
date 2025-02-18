@@ -87,7 +87,7 @@ Sana currently supports this FASTQ dialect:
 		allowGaps := getFlagBool(cmd, "allow-gaps")
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

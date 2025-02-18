@@ -1,5 +1,8 @@
 - [SeqKit v2.10.0](https://github.com/shenwei356/seqkit/releases/tag/v2.10.0) - 2025-xx-xx
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.10.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.10.0)
+    - `seqkit`:
+        - add a global flag `--skip-file-check`: skip input file checking when given a file list if you believe these files do exist.
+        It helps to reduce file checking time when given a huge number of sequence files.
     - `seqkit split2`:
         - fix prefix checking when paired-end files are given. [#512](https://github.com/shenwei356/seqkit/issues/512)
     - `seqkit stat`:

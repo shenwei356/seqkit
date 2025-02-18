@@ -109,7 +109,7 @@ Examples:
 		rna2dna := getFlagBool(cmd, "rna2dna")
 		singleStrand := getFlagBool(cmd, "single-strand")
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		// process bar
 		var pbs *mpb.Progress

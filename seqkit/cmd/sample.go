@@ -60,7 +60,7 @@ Attention:
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		seed := getFlagInt64(cmd, "rand-seed")
 		twoPass := getFlagBool(cmd, "two-pass")

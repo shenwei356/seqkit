@@ -162,7 +162,7 @@ Attention:
 			seq.ValidateSeq = true
 		}
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		var alns []*AlignedSeq
 		if len(files) == 0 {

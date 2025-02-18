@@ -70,7 +70,7 @@ Attention:
 		fill := fillBase != ""
 		separator := getFlagString(cmd, "separator")
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		if len(files) < 2 {
 			checkError(errors.New("at least 2 files needed"))

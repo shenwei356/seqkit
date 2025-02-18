@@ -46,7 +46,7 @@ var tab2faCmd = &cobra.Command{
 		outFile := config.OutFile
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		commentPrefixes := getFlagStringSlice(cmd, "comment-line-prefix")
 		bufferSizeS := getFlagString(cmd, "buffer-size")

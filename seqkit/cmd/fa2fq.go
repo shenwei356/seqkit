@@ -62,7 +62,7 @@ Attention:
 		}
 		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		records, err := fastx.GetSeqsMap(fileFasta, seq.Unlimit, config.Threads, 10, "")
 		checkError(err)

@@ -74,7 +74,7 @@ Attention:
 		fai.MapWholeFile = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		inNaturalOrder := getFlagBool(cmd, "natural-order")
 		bySeq := getFlagBool(cmd, "by-seq")

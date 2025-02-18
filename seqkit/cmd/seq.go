@@ -131,7 +131,7 @@ var seqCmd = &cobra.Command{
 			checkError(fmt.Errorf("could not give both flags -l (--lower-case) and -u (--upper-case)"))
 		}
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		var seqCol *SeqColorizer
 		if color {

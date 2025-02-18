@@ -245,6 +245,7 @@ type Config struct {
 	AlphabetGuessSeqLength int
 	ValidateSeqLength      int
 	CompressionLevel       int
+	SkipFileCheck          bool
 }
 
 func getConfigs(cmd *cobra.Command) Config {
@@ -294,6 +295,7 @@ func getConfigs(cmd *cobra.Command) Config {
 		Quiet:                  getFlagBool(cmd, "quiet"),
 		AlphabetGuessSeqLength: getFlagAlphabetGuessSeqLength(cmd, "alphabet-guess-seq-length"),
 		CompressionLevel:       level,
+		SkipFileCheck:          getFlagBool(cmd, "skip-file-check"),
 	}
 
 }

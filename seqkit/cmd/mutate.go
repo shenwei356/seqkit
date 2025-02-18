@@ -70,7 +70,7 @@ Examples:
 		runtime.GOMAXPROCS(config.Threads)
 		quiet := config.Quiet
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 		var err error
 
 		mPoints := []_mutatePoint{}

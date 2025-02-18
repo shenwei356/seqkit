@@ -324,7 +324,7 @@ Filtering records to edit:
 
 		// -------------------
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

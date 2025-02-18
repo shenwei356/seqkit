@@ -94,7 +94,7 @@ Output (BED3 format):
 		reQuery, err := regexp.Compile(reQueryStr)
 		checkError(err)
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		if !config.Quiet {
 			if len(files) == 1 && isStdin(files[0]) {

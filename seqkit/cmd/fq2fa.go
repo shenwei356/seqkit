@@ -49,7 +49,7 @@ var fq2faCmd = &cobra.Command{
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

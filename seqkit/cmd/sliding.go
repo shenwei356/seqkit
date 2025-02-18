@@ -50,7 +50,7 @@ var slidingCmd = &cobra.Command{
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.BufferSize)
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		greedy := getFlagBool(cmd, "greedy")
 		circular := getFlagBool(cmd, "circular-genome") || getFlagBool(cmd, "circular")

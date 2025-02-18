@@ -136,7 +136,7 @@ Tips:
 			}
 		}
 
-		files := getFileListFromArgsAndFile(cmd, args, !skipFileCheck, "infile-list", !skipFileCheck)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !(skipFileCheck || config.SkipFileCheck))
 
 		style := &stable.TableStyle{
 			Name: "plain",

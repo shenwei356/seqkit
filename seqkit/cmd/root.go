@@ -133,6 +133,7 @@ func init() {
 	RootCmd.PersistentFlags().BoolP("quiet", "", false, "be quiet and do not show extra information")
 	RootCmd.PersistentFlags().IntP("alphabet-guess-seq-length", "", 10000, "length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq)")
 	RootCmd.PersistentFlags().StringP("infile-list", "X", "", "file of input files list (one file per line), if given, they are appended to files from cli arguments")
+	RootCmd.PersistentFlags().BoolP("skip-file-check", "", false, `skip input file checking when given a file list if you believe these files do exist`)
 	RootCmd.PersistentFlags().IntP("compress-level", "", -1, `compression level for gzip, zstd, xz and bzip2. type "seqkit -h" for the range and default value for each format`)
 
 	RootCmd.CompletionOptions.DisableDefaultCmd = true

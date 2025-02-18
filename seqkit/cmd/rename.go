@@ -72,7 +72,7 @@ Example:
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		byName := getFlagBool(cmd, "by-name")
 		mOutputs := getFlagBool(cmd, "multiple-outfiles")

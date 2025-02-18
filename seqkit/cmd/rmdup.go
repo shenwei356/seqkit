@@ -81,7 +81,7 @@ Attention:
 			checkError(fmt.Errorf("flag -s (--by-seq) needed when using -P (--only-positive-strand)"))
 		}
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

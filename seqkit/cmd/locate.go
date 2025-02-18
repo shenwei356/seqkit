@@ -77,7 +77,7 @@ Attention:
 
 		bwt.CheckEndSymbol = false
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
