@@ -158,7 +158,7 @@ reproduced in different environments with same random seed.
 ``` text
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 2.9.0
+Version: 2.10.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -262,6 +262,8 @@ Flags:
       --quiet                           be quiet and do not show extra information
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it
                                         automatically detect by the first sequence) (default "auto")
+      --skip-file-check                 skip input file checking when given a file list if you believe
+                                        these files do exist
   -j, --threads int                     number of CPUs. can also set with environment variable
                                         SEQKIT_THREADS) (default 4)
 
@@ -3492,6 +3494,7 @@ Aliases:
   concat, concate
 
 Flags:
+  -F, --fill string        fill with N bases/residues for IDs missing in some files when using -f/--full
   -f, --full               keep all sequences, like full/outer join
   -h, --help               help for concat
   -s, --separator string   separator for descriptions of records with the same ID (default "|")
