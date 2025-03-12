@@ -1322,7 +1322,7 @@ reproduced in different environments with same random seed.</p>
 <h2 id="seqkit">seqkit</h2>
 <pre><code class="language-text">SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 2.9.0
+Version: 2.10.0
 
 Author: Wei Shen &lt;shenwei356@gmail.com&gt;
 
@@ -1426,6 +1426,8 @@ Flags:
       --quiet                           be quiet and do not show extra information
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it
                                         automatically detect by the first sequence) (default &quot;auto&quot;)
+      --skip-file-check                 skip input file checking when given a file list if you believe
+                                        these files do exist
   -j, --threads int                     number of CPUs. can also set with environment variable
                                         SEQKIT_THREADS) (default 4)
 
@@ -2931,7 +2933,7 @@ $ seqkit grep -i -f id.txt seqs.fq.gz -o result.fq.gz
 </code></pre>
 </li>
 <li>
-<p>Serching non-canonical sequence IDs, Using <code>--id-regexp</code> to capture IDs. 
+<p>Searching non-canonical sequence IDs, Using <code>--id-regexp</code> to capture IDs. 
    Refer to <a href="#sequence-id">section Sequence ID</a> and <a href="#seq">seqkit seq</a> for examples.</p>
 </li>
 <li>
@@ -2980,7 +2982,16 @@ pmi-let-7
 </li>
 <li>
 <p>Extract sequences containing AGGCG</p>
-<pre><code>$ cat hairpin.fa.gz | seqkit grep -s -i -p aggcg
+<pre><code>$ cat hairpin.fa.gz | seqkit grep -s -i -p aggcg    | seqkit stats
+file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+-     FASTA   RNA      2,147  262,831       43    122.4    2,354
+</code></pre>
+</li>
+<li>
+<p>Extract sequences containing AGGCG (only in the positive strand)</p>
+<pre><code>$ cat hairpin.fa.gz | seqkit grep -s -i -p aggcg -P
+file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+-     FASTA   RNA      1,181  145,789       49    123.4    2,354
 </code></pre>
 </li>
 <li>
@@ -2989,9 +3000,9 @@ pmi-let-7
 &gt;seq
 ACGTTGCA
 
-$ echo -e "&gt;seq\nACGTTGCA"  | seqkit grep -s -i -p AA
+$ echo -e "&gt;seq\nACGTTGCA"  | seqkit grep -s -i -P -p AA
 
-$ echo -e "&gt;seq\nACGTTGCA"  | seqkit grep -s -i -p AA -c
+$ echo -e "&gt;seq\nACGTTGCA"  | seqkit grep -s -i -P -p AA -c
 &gt;seq
 ACGTTGCA
 </code></pre>
@@ -3000,19 +3011,19 @@ ACGTTGCA
 <p>Extract sequences containing AGGCG (allow mismatch)</p>
 <pre><code>$ time cat hairpin.fa.gz | seqkit grep -s -i -p aggcg | seqkit stats
 file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
--     FASTA   RNA      1,181  145,789       49    123.4    2,354
+-     FASTA   RNA      2,147  262,831       43    122.4    2,354
 
-real    0m0.058s
-user    0m0.100s
-sys     0m0.017s
+real    0m0.068s
+user    0m0.089s
+sys     0m0.025s
 
 $ time zcat hairpin.fa.gz | seqkit grep -s -i -p aggcg -m 1 | seqkit stats
 file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
 -     FASTA   RNA     22,290  2,375,819       39    106.6    2,354
 
-real    0m1.081s
-user    0m1.305s
-sys     0m0.158s
+real    0m0.256s
+user    0m0.781s
+sys     0m0.082s
 </code></pre>
 </li>
 <li>
@@ -3892,11 +3903,14 @@ Usage:
 
 Flags:
   -l, --by-length string          split sequences into chunks of &gt;=N bases, supports K/M/G suffix
-      --by-length-prefix string   file prefix for --by-length
-  -p, --by-part int               split sequences into N parts
-      --by-part-prefix string     file prefix for --by-part
+      --by-length-prefix string   file prefix for --by-length. The placeholder &quot;{read}&quot; is needed for
+                                  paired-end files.
+  -p, --by-part int               split sequences into N parts with the round robin distribution
+      --by-part-prefix string     file prefix for --by-part. The placeholder &quot;{read}&quot; is needed for
+                                  paired-end files.
   -s, --by-size int               split sequences into multi parts with N sequences
-      --by-size-prefix string     file prefix for --by-size
+      --by-size-prefix string     file prefix for --by-size. The placeholder &quot;{read}&quot; is needed for
+                                  paired-end files.
   -e, --extension string          set output file extension, e.g., &quot;.gz&quot;, &quot;.xz&quot;, or &quot;.zst&quot;
   -f, --force                     overwrite output directory
   -h, --help                      help for split2
@@ -3984,9 +3998,19 @@ $ cat hairpin.fa.xz | seqkit split2 -O test -f -s 10000 -e .zst
 [INFO] write 1250 sequences to file: out/reads_1.part_002.fq.gz
 </code></pre>
 </li>
-<li>
-<p>For FASTA files (single-end)</p>
-<pre><code>$ seqkit split2 -1 reads_1.fq.gz reads_2.fq.gz -p 2 -O out -f
+</ol>
+<p>Custom prefix</p>
+<pre><code>    $ seqkit split2 -1 reads_1.fq.gz -2 reads_2.fq.gz -p 2 -O out -f --by-part-prefix "x_r{read}_"
+    [INFO] flag -1/--read1 and -2/--read2 given, ignore: -
+    [INFO] split seqs from reads_1.fq.gz and reads_2.fq.gz
+    [INFO] split into 2 parts
+    [INFO] write 1250 sequences to file: out/x_r2_001.fq.gz
+    [INFO] write 1250 sequences to file: out/x_r1_001.fq.gz
+    [INFO] write 1250 sequences to file: out/x_r2_002.fq.gz
+    [INFO] write 1250 sequences to file: out/x_r1_002.fq.gz
+</code></pre>
+<ol>
+<li>For FASTA files (single-end)<pre><code>$ seqkit split2 -1 reads_1.fq.gz reads_2.fq.gz -p 2 -O out -f
 [INFO] flag -1/--read1 given, ignore: reads_2.fq.gz
 [INFO] split seqs from reads_1.fq.gz
 [INFO] split into 2 parts
@@ -4630,6 +4654,9 @@ Flags:
 Attention:
    1. By default, only sequences with IDs that appear in all files are outputted.
       use -f/--full to output all sequences.
+      * If you are processing multiple-sequence-alignment results, you can use
+        -F/--fill to fill with N bases/residues for IDs missing in some files when
+        using -f/--full.
    2. If there are more than one sequences of the same ID, we output the Cartesian
       product of sequences.
    3. Description are also concatenated with a separator (-s/--separator).
@@ -4642,6 +4669,7 @@ Aliases:
   concat, concate
 
 Flags:
+  -F, --fill string        fill with N bases/residues for IDs missing in some files when using -f/--full
   -f, --full               keep all sequences, like full/outer join
   -h, --help               help for concat
   -s, --separator string   separator for descriptions of records with the same ID (default &quot;|&quot;)
@@ -4678,6 +4706,17 @@ a2-ax-
 &gt;B 1
 b1-
 
+# https://github.com/shenwei356/seqkit/issues/510
+# fill with N bases/residues for IDs missing in some files when using -f/--full
+$ seqkit concat a.fa b.fa --full --fill &quot;=&quot;
+&gt;C 1
+===c1-
+&gt;A 1|x
+a1-ax-
+&gt;A 2|x
+a2-ax-
+&gt;B 1
+b1-===
 </code></pre>
 <h2 id="mutate">mutate</h2>
 <p>Usage</p>
