@@ -1,4 +1,4 @@
-- [SeqKit v2.10.0](https://github.com/shenwei356/seqkit/releases/tag/v2.10.0) - 2025-xx-xx
+- [SeqKit v2.10.0](https://github.com/shenwei356/seqkit/releases/tag/v2.10.0) - 2025-03-12
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.10.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.10.0)
     - `seqkit`:
         - add a global flag `--skip-file-check`: skip input file checking when given a file list if you believe these files do exist.
