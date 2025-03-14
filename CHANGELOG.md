@@ -2,6 +2,8 @@
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.10.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.10.1)
     - `stats`:
         - fix decimal places of some fields when using `-T`.
+    - `seqkit fx2tab`:
+        - fix the calculation of GC content (`--gc`). Previously, the denominator was the total sequence length, which could lead to inaccuracies due to the potential presence of gaps in the sequence. [#515](https://github.com/shenwei356/seqkit/issues/515)
 - [SeqKit v2.10.0](https://github.com/shenwei356/seqkit/releases/tag/v2.10.0) - 2025-03-12
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.10.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.10.0)
     - `seqkit`:

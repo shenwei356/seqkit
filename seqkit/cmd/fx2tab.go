@@ -137,7 +137,7 @@ Attention:
 		}
 
 		var name []byte
-		var g, c float64
+		var g, c, a, t int
 		var record *fastx.Record
 		var sum [md5.Size]byte
 		for _, file := range files {
@@ -177,15 +177,17 @@ Attention:
 					outfh.WriteString(fmt.Sprintf("\t%d", len(record.Seq.Seq)))
 				}
 				if printGC || printGCSkew {
-					g = record.Seq.BaseContent("G")
-					c = record.Seq.BaseContent("C")
+					g = record.Seq.BaseCount("G")
+					c = record.Seq.BaseCount("C")
+					a = record.Seq.BaseCount("A")
+					t = record.Seq.BaseCount("TU")
 				}
 
 				if printGC {
-					outfh.WriteString(fmt.Sprintf("\t%.2f", (g+c)*100))
+					outfh.WriteString(fmt.Sprintf("\t%.2f", float64(g+c)/float64(g+c+a+t)*100))
 				}
 				if printGCSkew {
-					outfh.WriteString(fmt.Sprintf("\t%.2f", (g-c)/(g+c)*100))
+					outfh.WriteString(fmt.Sprintf("\t%.2f", float64(g-c)/float64(g+c)*100))
 				}
 
 				if len(baseCounts) > 0 {
@@ -239,9 +241,9 @@ func init() {
 	RootCmd.AddCommand(fx2tabCmd)
 
 	fx2tabCmd.Flags().BoolP("length", "l", false, "print sequence length")
-	fx2tabCmd.Flags().BoolP("gc", "g", false, "print GC content")
+	fx2tabCmd.Flags().BoolP("gc", "g", false, "print GC content, i.e., (G+C)/(G+C+A+T)")
 	fx2tabCmd.Flags().BoolP("gc-skew", "G", false, "print GC-Skew")
-	fx2tabCmd.Flags().StringSliceP("base-content", "B", []string{}, "print base content. (case ignored, multiple values supported) e.g. -B AT -B N")
+	fx2tabCmd.Flags().StringSliceP("base-content", "B", []string{}, "print base content. (case ignored, multiple values supported) e.g. -B AT -B N. Note that the denominator is the sequence length")
 	fx2tabCmd.Flags().StringSliceP("base-count", "C", []string{}, "print base count. (case ignored, multiple values supported) e.g. -C AT -C N")
 	fx2tabCmd.Flags().BoolP("case-sensitive", "I", false, "calculate case sensitive base content/sequence hash")
 	fx2tabCmd.Flags().BoolP("only-id", "i", false, "print ID instead of full head")
