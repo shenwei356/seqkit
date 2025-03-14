@@ -245,7 +245,7 @@ Tips:
 							info.lenAvg,
 							info.lenMax)
 						if all {
-							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%d",
+							fmt.Fprintf(outfh, "\t%.0f\t%.0f\t%.0f\t%d\t%d\t%d\t%.0f\t%.0f\t%.2f\t%.2f\t%d",
 								info.Q1,
 								info.Q2,
 								info.Q3,
@@ -288,7 +288,7 @@ Tips:
 							info.lenAvg,
 							info.lenMax)
 						if all {
-							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%d",
+							fmt.Fprintf(outfh, "\t%.0f\t%.0f\t%.0f\t%d\t%d\t%d\t%.0f\t%.0f\t%.2f\t%.2f\t%d",
 								info.Q1,
 								info.Q2,
 								info.Q3,
@@ -339,7 +339,7 @@ Tips:
 							info.lenAvg,
 							info.lenMax)
 						if all {
-							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%d",
+							fmt.Fprintf(outfh, "\t%.0f\t%.0f\t%.0f\t%d\t%d\t%d\t%.0f\t%.0f\t%.2f\t%.2f\t%d",
 								info.Q1,
 								info.Q2,
 								info.Q3,
