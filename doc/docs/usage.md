@@ -1234,15 +1234,16 @@ Attention:
      or FASTQ, except when flag -n/--name is on. This is for format compatibility.
 
 Usage:
-  seqkit fx2tab [flags]
+  seqkit fx2tab [flags] 
 
 Flags:
   -a, --alphabet               print alphabet letters
   -q, --avg-qual               print average quality of a read
-  -B, --base-content strings   print base content. (case ignored, multiple values supported) e.g. -B AT -B N
+  -B, --base-content strings   print base content. (case ignored, multiple values supported) e.g. -B AT
+                               -B N. Note that the denominator is the sequence length
   -C, --base-count strings     print base count. (case ignored, multiple values supported) e.g. -C AT -C N
   -I, --case-sensitive         calculate case sensitive base content/sequence hash
-  -g, --gc                     print GC content
+  -g, --gc                     print GC content, i.e., (G+C)/(G+C+A+T)
   -G, --gc-skew                print GC-Skew
   -H, --header-line            print header line
   -h, --help                   help for fx2tab
