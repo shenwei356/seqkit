@@ -326,22 +326,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#method-2-install-via-conda-latest-stable-version" class="md-nav__link">
-    Method 2: Install via conda (latest stable version)
+  <a href="#method-2-install-via-conda-or-pixi-latest-stable-version" class="md-nav__link">
+    Method 2: Install via conda or pixi (latest stable version)
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#method-3-install-via-homebrew-might-not-be-latest-stable-version" class="md-nav__link">
-    Method 3: Install via homebrew (might not be latest stable version)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#method-4-for-go-developer-latest-stabledev-version" class="md-nav__link">
-    Method 4: For Go developer (latest stable/dev version)
+  <a href="#method-3-install-via-homebrew-latest-stable-version" class="md-nav__link">
+    Method 3: Install via homebrew (latest stable version)
   </a>
   
 </li>
@@ -563,22 +556,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#method-2-install-via-conda-latest-stable-version" class="md-nav__link">
-    Method 2: Install via conda (latest stable version)
+  <a href="#method-2-install-via-conda-or-pixi-latest-stable-version" class="md-nav__link">
+    Method 2: Install via conda or pixi (latest stable version)
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#method-3-install-via-homebrew-might-not-be-latest-stable-version" class="md-nav__link">
-    Method 3: Install via homebrew (might not be latest stable version)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#method-4-for-go-developer-latest-stabledev-version" class="md-nav__link">
-    Method 4: For Go developer (latest stable/dev version)
+  <a href="#method-3-install-via-homebrew-latest-stable-version" class="md-nav__link">
+    Method 3: Install via homebrew (latest stable version)
   </a>
   
 </li>
@@ -755,14 +741,15 @@ And then:</p>
 <p><strong>For windows</strong>, just copy <code>seqkit.exe</code> to <code>C:\WINDOWS\system32</code>.</p>
 </li>
 </ol>
-<h4 id="method-2-install-via-conda-latest-stable-version">Method 2: Install via conda (latest stable version)  <a href="https://anaconda.org/bioconda/seqkit"><img alt="Anaconda Cloud" src="https://anaconda.org/bioconda/seqkit/badges/version.svg" /></a> <a href="https://anaconda.org/bioconda/seqkit"><img alt="downloads" src="https://anaconda.org/bioconda/seqkit/badges/downloads.svg" /></a></h4>
-<pre><code>conda install -c bioconda seqkit
+<h4 id="method-2-install-via-conda-or-pixi-latest-stable-version">Method 2: Install via conda or pixi (latest stable version)  <a href="https://anaconda.org/bioconda/seqkit"><img alt="Anaconda Cloud" src="https://anaconda.org/bioconda/seqkit/badges/version.svg" /></a> <a href="https://anaconda.org/bioconda/seqkit"><img alt="downloads" src="https://anaconda.org/bioconda/seqkit/badges/downloads.svg" /></a></h4>
+<pre><code># conda or mamba
+conda install -c bioconda seqkit
+
+# pixi
+pixi global install -c bioconda seqkit
 </code></pre>
-<h4 id="method-3-install-via-homebrew-might-not-be-latest-stable-version">Method 3: Install via <a href="https://brew.sh/">homebrew</a> (might not be latest stable version)</h4>
+<h4 id="method-3-install-via-homebrew-latest-stable-version">Method 3: Install via <a href="https://brew.sh/">homebrew</a> (latest stable version)</h4>
 <pre><code>brew install seqkit
-</code></pre>
-<h4 id="method-4-for-go-developer-latest-stabledev-version">Method 4: For Go developer (latest stable/dev version)</h4>
-<pre><code>go get -u github.com/shenwei356/seqkit/v2/seqkit/
 </code></pre>
 <h4 id="method-5-docker-based-installation-might-not-be-latest-stable-versio">Method 5: Docker based installation (might not be latest stable versio)</h4>
 <p><a href="https://docs.docker.com/engine/installation/#supported-platforms">Install Docker</a></p>
@@ -787,22 +774,15 @@ tar -zxf go1.24.1.linux-amd64.tar.gz -C $HOME/
 #   source ~/.bashrc
 export PATH=$PATH:$HOME/go/bin
 
-
-# ------------- the latest stable version -------------
-
-go get -v -u github.com/shenwei356/seqkit/seqkit
-
-# The executable binary file is located in:
-#   ~/go/bin/seqkit
-# You can also move it to anywhere in the $PATH
-mkdir -p $HOME/bin
-cp ~/go/bin/seqkit $HOME/bin/
-
-# --------------- the development version --------------
+# --------------- the stable/development version --------------
 
 git clone https://github.com/shenwei356/seqkit
 cd seqkit/seqkit/
-go build
+
+# optionally choose a release
+# git check v2.10.0
+
+go build -trimpath -ldflags="-s -w" -tags netgo
 
 # The executable binary file is located in:
 #   ./seqkit
