@@ -39,10 +39,21 @@ and
 
 ## Installation
 
-Go to [Download Page](http://bioinf.shenwei.me/seqkit/download) for more download options and changelogs, or
-install via conda:
+#### Method 1: Download binaries
+
+Go to [Download Page](http://bioinf.shenwei.me/seqkit/download), where you can find download links to various platforms.
+
+#### Method 2: Install via Pixi
+
+    pixi global install -c bioconda seqkit
+
+#### Method 3: Install via conda
 
     conda install -c bioconda seqkit
+
+#### Method 4: Install via homebrew
+
+    brew install seqkit
 
 ## Subcommands
 
