@@ -65,17 +65,17 @@ And then:
 
 1. **For windows**, just copy `seqkit.exe` to `C:\WINDOWS\system32`.
 
-#### Method 2: Install via conda (latest stable version)  [![Anaconda Cloud](	https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit) [![downloads](https://anaconda.org/bioconda/seqkit/badges/downloads.svg)](https://anaconda.org/bioconda/seqkit)
-
+#### Method 2: Install via conda or pixi (latest stable version)  [![Anaconda Cloud](	https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit) [![downloads](https://anaconda.org/bioconda/seqkit/badges/downloads.svg)](https://anaconda.org/bioconda/seqkit)
+    
+    # conda or mamba
     conda install -c bioconda seqkit
+    
+    # pixi
+    pixi global install -c bioconda seqkit
 
-#### Method 3: Install via [homebrew](https://brew.sh/) (might not be latest stable version)
+#### Method 3: Install via [homebrew](https://brew.sh/) (latest stable version)
 
     brew install seqkit
-
-#### Method 4: For Go developer (latest stable/dev version)
-
-    go get -u github.com/shenwei356/seqkit/v2/seqkit/
 
 #### Method 5: Docker based installation (might not be latest stable versio)
 
@@ -105,22 +105,15 @@ Run the following commands:
     #   source ~/.bashrc
     export PATH=$PATH:$HOME/go/bin
     
-
-    # ------------- the latest stable version -------------
-
-    go get -v -u github.com/shenwei356/seqkit/seqkit
-
-    # The executable binary file is located in:
-    #   ~/go/bin/seqkit
-    # You can also move it to anywhere in the $PATH
-    mkdir -p $HOME/bin
-    cp ~/go/bin/seqkit $HOME/bin/
-
-    # --------------- the development version --------------
+    # --------------- the stable/development version --------------
 
     git clone https://github.com/shenwei356/seqkit
     cd seqkit/seqkit/
-    go build
+    
+    # optionally choose a release
+    # git check v2.10.0
+    
+    go build -trimpath -ldflags="-s -w" -tags netgo
 
     # The executable binary file is located in:
     #   ./seqkit
