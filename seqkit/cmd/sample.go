@@ -154,7 +154,7 @@ Attention:
 					config.LineWidth = 0
 				}
 
-				proportion = float64(number) / float64(len(records))
+				proportion = float64(number) / float64(len(records)) * 1.1
 
 				for _, record := range records {
 					// if <-randg <= proportion {
