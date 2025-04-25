@@ -172,7 +172,7 @@ Examples:
 				if _, ok := gtfFeaturesMap[chr]; !ok {
 					gtfFeaturesMap[chr] = make(map[string][]gtf.Feature)
 				}
-				feat = feature.Feature
+				feat = strings.ToLower(feature.Feature)
 				if _, ok := gtfFeaturesMap[chr][feat]; !ok {
 					gtfFeaturesMap[chr][feat] = []gtf.Feature{}
 				}
@@ -417,11 +417,12 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 	var subseq *seq.Seq
 
 	featsMap := make(map[string]struct{}, len(choosedFeatures))
-	for _, chr := range choosedFeatures {
-		featsMap[chr] = struct{}{}
+	for _, feat := range choosedFeatures {
+		featsMap[strings.ToLower(feat)] = struct{}{}
 	}
 
 	for featureType := range gtfFeaturesMap[seqname] {
+		featureType = strings.ToLower(featureType)
 		if len(choosedFeatures) > 0 {
 			if _, ok := featsMap[featureType]; !ok {
 				continue
