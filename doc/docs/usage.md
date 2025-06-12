@@ -1727,8 +1727,9 @@ Flags:
   -m, --max-mismatch int            max mismatch when matching by seq. For large genomes like human
                                     genome, using mapping/alignment tools would be faster
   -P, --only-positive-strand        only search on the positive strand
-  -p, --pattern strings             search pattern (multiple values supported. Attention: use double
-                                    quotation marks for patterns containing comma, e.g., -p '"A{2,}"')
+  -p, --pattern strings             search pattern. Multiple patterns supported: comma-separated
+                                    (e.g., -p "p1,p2") OR use -p multiple times (e.g., -p p1 -p p2).
+                                    Make sure to quote literal commas, e.g. in regex patterns '"A{2,}"'
   -f, --pattern-file string         pattern file (one record per line)
   -R, --region string               specify sequence region for searching. e.g 1:12 for first 12 bases,
                                     -12:-1 for last 12 bases
