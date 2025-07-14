@@ -1,5 +1,5 @@
-- [SeqKit v2.10.1](https://github.com/shenwei356/seqkit/releases/tag/v2.10.1) - 2025-03-12
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.10.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.10.1)
+- [SeqKit v2.11.0](https://github.com/shenwei356/seqkit/releases/tag/v2.11.0) - 2025-xx-xx
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.11.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.11.0)
     - `stats`:
         - fix decimal places of some fields when using `-T`.
     - `seqkit fx2tab`:
@@ -8,6 +8,8 @@
         - fix `-n` for in-memory mode. [#518](https://github.com/shenwei356/seqkit/issues/518)
     - `seqkit subseq`:
         - fix the bug that subseq --feature is not case insensitive. [#523](https://github.com/shenwei356/seqkit/issues/523)
+    - `seqkit grep/locate/mutate`:
+        - update help message for `-p/--pattern`, to show how to set multiple values. [#527](https://github.com/shenwei356/seqkit/pull/527) by @corneliusroemer
 - [SeqKit v2.10.0](https://github.com/shenwei356/seqkit/releases/tag/v2.10.0) - 2025-03-12
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.10.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.10.0)
     - `seqkit`:

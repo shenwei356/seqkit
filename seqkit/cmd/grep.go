@@ -727,9 +727,7 @@ Examples:
 func init() {
 	RootCmd.AddCommand(grepCmd)
 
-	grepCmd.Flags().StringSliceP("pattern", "p", []string{""}, `search pattern. Multiple patterns supported: comma-separated 
-(e.g., -p "p1,p2") OR use -p multiple times (e.g., -p p1 -p p2).
-Make sure to quote literal commas, e.g. in regex patterns '"A{2,}"'`)
+	grepCmd.Flags().StringSliceP("pattern", "p", []string{""}, `search pattern. `+helpMultipleValues)
 	grepCmd.Flags().BoolP("allow-duplicated-patterns", "D", false, "output records multiple times when duplicated patterns are given")
 	grepCmd.Flags().StringP("pattern-file", "f", "", "pattern file (one record per line)")
 	grepCmd.Flags().BoolP("use-regexp", "r", false, "patterns are regular expression")
@@ -750,3 +748,5 @@ Make sure to quote literal commas, e.g. in regex patterns '"A{2,}"'`)
 
 var reUnquotedComma = regexp.MustCompile(`\{[^\}]*$|^[^\{]*\}`)
 var helpUnquotedComma = `possible unquoted comma detected, please use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"' or -p "\"A{2,}\""`
+
+var helpMultipleValues = `Multiple values supported: comma-separated (e.g., -p "p1,p2") OR use -p multiple times (e.g., -p p1 -p p2). Make sure to quote literal commas, e.g. in regex patterns '"A{2,}"'`

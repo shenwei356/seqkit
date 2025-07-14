@@ -1,6 +1,6 @@
 module github.com/shenwei356/seqkit/v2
 
-go 1.17
+go 1.23.0
 
 require (
 	github.com/biogo/biogo v1.0.4

@@ -1727,9 +1727,9 @@ Flags:
   -m, --max-mismatch int            max mismatch when matching by seq. For large genomes like human
                                     genome, using mapping/alignment tools would be faster
   -P, --only-positive-strand        only search on the positive strand
-  -p, --pattern strings             search pattern. Multiple patterns supported: comma-separated
-                                    (e.g., -p "p1,p2") OR use -p multiple times (e.g., -p p1 -p p2).
-                                    Make sure to quote literal commas, e.g. in regex patterns '"A{2,}"'
+  -p, --pattern strings             search pattern. Multiple values supported: comma-separated (e.g., -p
+                                    "p1,p2") OR use -p multiple times (e.g., -p p1 -p p2). Make sure to
+                                    quote literal commas, e.g. in regex patterns '"A{2,}"'
   -f, --pattern-file string         pattern file (one record per line)
   -R, --region string               specify sequence region for searching. e.g 1:12 for first 12 bases,
                                     -12:-1 for last 12 bases
@@ -1891,8 +1891,9 @@ Flags:
                                using mapping/alignment tools would be faster
   -G, --non-greedy             non-greedy mode, faster but may miss motifs overlapping with others
   -P, --only-positive-strand   only search on positive strand
-  -p, --pattern strings        pattern/motif (multiple values supported. Attention: use double quotation
-                               marks for patterns containing comma, e.g., -p '"A{2,}"')
+  -p, --pattern strings        pattern/motif. Multiple values supported: comma-separated (e.g., -p
+                               "p1,p2") OR use -p multiple times (e.g., -p p1 -p p2). Make sure to quote
+                               literal commas, e.g. in regex patterns '"A{2,}"'
   -f, --pattern-file string    pattern/motif file (FASTA format)
   -F, --use-fmi                use FM-index for much faster search of lots of sequence patterns
   -r, --use-regexp             patterns/motifs are regular expression
@@ -3597,9 +3598,9 @@ Flags:
                               0:ACGT for inserting ACGT at the beginning, -1:* for add * to the end
   -v, --invert-match          [match seqs to mutate] invert the sense of matching, to select
                               non-matching records
-  -s, --pattern strings       [match seqs to mutate] search pattern (multiple values supported.
-                              Attention: use double quotation marks for patterns containing comma, e.g.,
-                              -p '"A{2,}"'))
+  -s, --pattern strings       [match seqs to mutate] search pattern .Multiple values supported:
+                              comma-separated (e.g., -p "p1,p2") OR use -p multiple times (e.g., -p p1
+                              -p p2). Make sure to quote literal commas, e.g. in regex patterns '"A{2,}"'
   -f, --pattern-file string   [match seqs to mutate] pattern file (one record per line)
   -p, --point strings         point mutation: changing base at given position. e.g., -p 2:C for setting
                               2nd base as C, -p -1:A for change last base as A

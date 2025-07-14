@@ -979,7 +979,7 @@ Attention:
 func init() {
 	RootCmd.AddCommand(locateCmd)
 
-	locateCmd.Flags().StringSliceP("pattern", "p", []string{""}, `pattern/motif (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')`)
+	locateCmd.Flags().StringSliceP("pattern", "p", []string{""}, `pattern/motif. `+helpMultipleValues)
 	locateCmd.Flags().StringP("pattern-file", "f", "", "pattern/motif file (FASTA format)")
 	locateCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
 	locateCmd.Flags().BoolP("use-regexp", "r", false, "patterns/motifs are regular expression")
