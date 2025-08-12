@@ -1,6 +1,8 @@
 - [SeqKit v2.11.0](https://github.com/shenwei356/seqkit/releases/tag/v2.11.0) - 2025-xx-xx
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.11.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.11.0)
-    - `stats`:
+    - `seqkit seq`:
+        - fix validing sequences: it failed to report error when the invalid sequence is not the last one in the input. [#536](https://github.com/shenwei356/seqkit/issues/536)
+    - `seqkit stats`:
         - fix decimal places of some fields when using `-T`.
     - `seqkit fx2tab`:
         - fix the calculation of GC content (`--gc`). Previously, the denominator was the total sequence length, which could lead to inaccuracies due to the potential presence of gaps in the sequence. [#515](https://github.com/shenwei356/seqkit/issues/515)
