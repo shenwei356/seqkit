@@ -1,7 +1,7 @@
 - [SeqKit v2.10.1](https://github.com/shenwei356/seqkit/releases/tag/v2.10.1) - 2025-08-19
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.10.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.10.1)
     - `seqkit seq`:
-        - fix validing sequences: it failed to report error when the invalid sequence is not the last one in the input. [#536](https://github.com/shenwei356/seqkit/issues/536)
+        - fix validating sequences: it failed to report an error when the invalid sequence is not the last one in the input. [#536](https://github.com/shenwei356/seqkit/issues/536)
     - `seqkit stats`:
         - fix decimal places of some fields when using `-T`.
     - `seqkit fx2tab`:

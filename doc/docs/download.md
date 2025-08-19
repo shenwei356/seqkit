@@ -13,7 +13,7 @@ Wei Shen\*, Botond Sipos, and Liuyang Zhao. 2024. SeqKit2: A Swiss Army Knife fo
 - [SeqKit v2.10.1](https://github.com/shenwei356/seqkit/releases/tag/v2.10.1) - 2025-08-19
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.10.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.10.1)
     - `seqkit seq`:
-        - fix validing sequences: it failed to report error when the invalid sequence is not the last one in the input. [#536](https://github.com/shenwei356/seqkit/issues/536)
+        - fix validating sequences: it failed to report an error when the invalid sequence is not the last one in the input. [#536](https://github.com/shenwei356/seqkit/issues/536)
     - `seqkit stats`:
         - fix decimal places of some fields when using `-T`.
     - `seqkit fx2tab`:
@@ -40,7 +40,7 @@ Wei Shen\*, Botond Sipos, and Liuyang Zhao. 2024. SeqKit2: A Swiss Army Knife fo
 
 *Notes*
 
-- please open an issuse to request binaries for other platforms.
+- please open an issue to request binaries for other platforms.
 - run `seqkit version` to check update !!!
 - run `seqkit genautocomplete` to update shell autocompletion script !!!
 
