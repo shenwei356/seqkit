@@ -51,6 +51,8 @@ part size or number of parts.
 If you just want to split by parts or sizes, please use "seqkit split2",
 which can apply to paired- and single-end FASTQ.
 
+If you want to split sequences by ID, please use "seqkit split2 -s 1 -N".
+
 If you want to cut a sequence into multiple segments.
   1. For cutting into even chunks, please use 'kmcp utils split-genomes'
      (https://bioinf.shenwei.me/kmcp/usage/#split-genomes).

@@ -2555,6 +2555,8 @@ part size or number of parts.
 If you just want to split by parts or sizes, please use "seqkit split2",
 which can apply to paired- and single-end FASTQ.
 
+If you want to split sequences by ID, please use "seqkit split2 -s 1 -N".
+
 If you want to cut a sequence into multiple segments.
   1. For cutting into even chunks, please use 'kmcp utils split-genomes'
      (https://bioinf.shenwei.me/kmcp/usage/#split-genomes).
@@ -2696,6 +2698,9 @@ The prefix of output files:
   1. For stdin: stdin
   2. Others: same to the input file
   3. Set via the options: --by-length-prefix, --by-part-prefix, or --by-size-prefix
+  4. Use the ID of the first sequence in each subset.
+     E.g, 'seqkit split2 --by-size 1 --seqid-as-filename' is equal to
+     'seqkit split --by-id', but it's much faster and uses less memory.
 
 The extension of output files:
   1. For stdin: .fast[aq]
@@ -2715,7 +2720,7 @@ If you want to cut a sequence into multiple segments.
         seqkit sliding -g -s 40 -W 40 input.fasta -o out.fasta
 
 Usage:
-  seqkit split2 [flags]
+  seqkit split2 [flags] 
 
 Flags:
   -l, --by-length string          split sequences into chunks of >=N bases, supports K/M/G suffix
@@ -2733,6 +2738,8 @@ Flags:
   -O, --out-dir string            output directory (default value is $infile.split)
   -1, --read1 string              (gzipped) read1 file
   -2, --read2 string              (gzipped) read2 file
+  -N, --seqid-as-filename         use the first sequence ID as the file name. E.g., using '-N -s 1' is
+                                  equal to 'seqkit split --by-id' but much faster and uses less memory.
 ```
 
 Examples
@@ -2835,6 +2842,17 @@ Examples
         [INFO] split into 2 parts
         [INFO] write 1250 sequences to file: out/reads_1.part_001.fq.gz
         [INFO] write 1250 sequences to file: out/reads_1.part_002.fq.gz
+        
+1. Splitting sequences into separated files, with the sequence ID as the file name.
+
+        $ seqkit head -n 5 ../tests/hairpin.fa | seqkit split2 -s 1 -N
+        [INFO] split seqs from stdin
+        [INFO] split into 1 seqs per file
+        [INFO] write 1 sequences to file: stdin.split/cel-let-7.fasta
+        [INFO] write 1 sequences to file: stdin.split/cel-lin-4.fasta
+        [INFO] write 1 sequences to file: stdin.split/cel-mir-1.fasta
+        [INFO] write 1 sequences to file: stdin.split/cel-mir-2.fasta
+        [INFO] write 1 sequences to file: stdin.split/cel-mir-34.fasta
 
 ## pair
 

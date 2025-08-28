@@ -54,6 +54,9 @@ The prefix of output files:
   1. For stdin: stdin
   2. Others: same to the input file
   3. Set via the options: --by-length-prefix, --by-part-prefix, or --by-size-prefix
+  4. Use the ID of the first sequence in each subset.
+     E.g, 'seqkit split2 --by-size 1 --seqid-as-filename' is equal to
+     'seqkit split --by-id', but it's much faster and uses less memory.
 
 The extension of output files:
   1. For stdin: .fast[aq]
@@ -125,6 +128,8 @@ If you want to cut a sequence into multiple segments.
 		prefixByPartSet := cmd.Flags().Lookup("by-part-prefix").Changed
 		prefixByLengthSet := cmd.Flags().Lookup("by-length-prefix").Changed
 
+		seqIDAsFileName := getFlagBool(cmd, "seqid-as-filename")
+
 		if size == 0 && parts == 0 && length == 0 {
 			checkError(fmt.Errorf(`one of flags should be given: -s/-p/-l. type "seqkit split2 -h" for help`))
 		}
@@ -182,6 +187,10 @@ If you want to cut a sequence into multiple segments.
 					checkError(fmt.Errorf(`--by-size-prefix should contains the placeholder "{read}" when paired-end files are given, such as "sample_{read}.fq.gz`))
 				}
 			}
+		}
+
+		if pairedEnd && seqIDAsFileName {
+			checkError(fmt.Errorf("the flag -N/--seqid-as-filename is not applicable for paired-end reads"))
 		}
 
 		if !quiet {
@@ -313,15 +322,19 @@ If you want to cut a sequence into multiple segments.
 
 							i++
 
-							if prefixBySizeSet {
-								prefix = prefixBySize
-								if pairedEnd {
-									prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
+							if !seqIDAsFileName {
+								if prefixBySizeSet {
+									prefix = prefixBySize
+									if pairedEnd {
+										prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
+									}
+								} else {
+									prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 								}
+								outfilePre = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
 							} else {
-								prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+								outfilePre = filepath.Join(outdir, fmt.Sprintf("%s%s", pathutil.RemoveInvalidPathChars(string(record.ID), "__"), fileExt))
 							}
-							outfilePre = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
 							outfhPre, err = xopen.Wopen(outfilePre)
 							checkError(err)
 
@@ -332,15 +345,20 @@ If you want to cut a sequence into multiple segments.
 
 						if outfhPre == nil { // first record
 							var outfh2 *xopen.Writer
-							if prefixByLengthSet {
-								prefix = prefixByLength
-								if pairedEnd {
-									prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
+							var outfile string
+							if !seqIDAsFileName {
+								if prefixByLengthSet {
+									prefix = prefixByLength
+									if pairedEnd {
+										prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
+									}
+								} else {
+									prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 								}
+								outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
 							} else {
-								prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+								outfile = filepath.Join(outdir, fmt.Sprintf("%s%s", pathutil.RemoveInvalidPathChars(string(record.ID), "__"), fileExt))
 							}
-							outfile := filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
 							outfh2, err = xopen.Wopen(outfile)
 							checkError(err)
 
@@ -361,16 +379,20 @@ If you want to cut a sequence into multiple segments.
 							i++
 
 							var outfh2 *xopen.Writer
-
-							if prefixByLengthSet {
-								prefix = prefixByLength
-								if pairedEnd {
-									prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
+							var outfile string
+							if !seqIDAsFileName {
+								if prefixByLengthSet {
+									prefix = prefixByLength
+									if pairedEnd {
+										prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
+									}
+								} else {
+									prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 								}
+								outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
 							} else {
-								prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+								outfile = filepath.Join(outdir, fmt.Sprintf("%s%s", pathutil.RemoveInvalidPathChars(string(record.ID), "__"), fileExt))
 							}
-							outfile := filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
 							outfh2, err = xopen.Wopen(outfile)
 							checkError(err)
 
@@ -388,15 +410,19 @@ If you want to cut a sequence into multiple segments.
 					if bySize {
 						// first record, for bySize
 						if outfhPre == nil {
-							if prefixBySizeSet {
-								prefix = prefixBySize
-								if pairedEnd {
-									prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
+							if !seqIDAsFileName {
+								if prefixBySizeSet {
+									prefix = prefixBySize
+									if pairedEnd {
+										prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
+									}
+								} else {
+									prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 								}
+								outfilePre = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
 							} else {
-								prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+								outfilePre = filepath.Join(outdir, fmt.Sprintf("%s%s", pathutil.RemoveInvalidPathChars(string(record.ID), "__"), fileExt))
 							}
-							outfilePre = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
 							outfhPre, err = xopen.Wopen(outfilePre)
 							checkError(err)
 
@@ -416,15 +442,20 @@ If you want to cut a sequence into multiple segments.
 						// first record, for byParts
 						if i+1 > len(outfhs) {
 							var outfh2 *xopen.Writer
-							if prefixByPartSet {
-								prefix = prefixByPart
-								if pairedEnd {
-									prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
+							var outfile string
+							if !seqIDAsFileName {
+								if prefixByLengthSet {
+									prefix = prefixByLength
+									if pairedEnd {
+										prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
+									}
+								} else {
+									prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 								}
+								outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
 							} else {
-								prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
+								outfile = filepath.Join(outdir, fmt.Sprintf("%s%s", pathutil.RemoveInvalidPathChars(string(record.ID), "__"), fileExt))
 							}
-							outfile := filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
 							outfh2, err = xopen.Wopen(outfile)
 							checkError(err)
 
@@ -489,6 +520,8 @@ func init() {
 	split2Cmd.Flags().StringP("by-size-prefix", "", "", `file prefix for --by-size. The placeholder "{read}" is needed for paired-end files.`)
 	split2Cmd.Flags().StringP("by-part-prefix", "", "", `file prefix for --by-part. The placeholder "{read}" is needed for paired-end files.`)
 	split2Cmd.Flags().StringP("by-length-prefix", "", "", `file prefix for --by-length. The placeholder "{read}" is needed for paired-end files.`)
+
+	split2Cmd.Flags().BoolP("seqid-as-filename", "N", false, "use the first sequence ID as the file name. E.g., using '-N -s 1' is equal to 'seqkit split --by-id' but much faster and uses less memory.")
 
 	split2Cmd.Flags().StringP("extension", "e", "", `set output file extension, e.g., ".gz", ".xz", or ".zst"`)
 }
