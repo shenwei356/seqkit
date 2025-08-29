@@ -30,7 +30,7 @@ require (
 	github.com/smallfish/simpleyaml v0.1.0
 	github.com/spf13/cobra v1.8.0
 	github.com/twotwotwo/sorts v0.0.0-20160814051341-bf5c1f2b8553
-	github.com/ulikunitz/xz v0.5.11
+	github.com/ulikunitz/xz v0.5.14
 	github.com/vbauerster/mpb/v5 v5.4.0
 )
 
