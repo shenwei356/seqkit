@@ -137,6 +137,9 @@ Tips:
 		}
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !(skipFileCheck || config.SkipFileCheck))
+		for _, file := range files {
+			checkIfFilesAreTheSame(file, outFile, "input", "output")
+		}
 
 		style := &stable.TableStyle{
 			Name: "plain",

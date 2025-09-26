@@ -75,6 +75,9 @@ Attention:
 		if len(files) < 2 {
 			checkError(errors.New("at least 2 files needed"))
 		}
+		for _, file := range files {
+			checkIfFilesAreTheSame(file, outFile, "input", "output")
+		}
 
 		// id -> seqs
 		seqs0 := make([]map[string]*[]*fastx.Record, 0, 1024)

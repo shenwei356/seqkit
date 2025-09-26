@@ -78,6 +78,10 @@ Examples:
 		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+		for _, file := range files {
+			checkIfFilesAreTheSame(file, outFile, "input", "output")
+		}
+
 		chrs := getFlagStringSlice(cmd, "chr")
 		chrs2 := make([]string, len(chrs))
 		for i, chr := range chrs {

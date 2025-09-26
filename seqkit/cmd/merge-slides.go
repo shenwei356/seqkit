@@ -95,6 +95,9 @@ Output (BED3 format):
 		checkError(err)
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+		for _, file := range files {
+			checkIfFilesAreTheSame(file, outFile, "input", "output")
+		}
 
 		if !config.Quiet {
 			if len(files) == 1 && isStdin(files[0]) {

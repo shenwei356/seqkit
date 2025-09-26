@@ -75,6 +75,9 @@ Attention:
 		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+		for _, file := range files {
+			checkIfFilesAreTheSame(file, outFile, "input", "output")
+		}
 
 		inNaturalOrder := getFlagBool(cmd, "natural-order")
 		bySeq := getFlagBool(cmd, "by-seq")

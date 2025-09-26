@@ -51,6 +51,9 @@ var slidingCmd = &cobra.Command{
 		runtime.GOMAXPROCS(config.BufferSize)
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+		for _, file := range files {
+			checkIfFilesAreTheSame(file, outFile, "input", "output")
+		}
 
 		greedy := getFlagBool(cmd, "greedy")
 		circular := getFlagBool(cmd, "circular-genome") || getFlagBool(cmd, "circular")

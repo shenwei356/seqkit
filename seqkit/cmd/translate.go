@@ -163,6 +163,9 @@ Translate Tables/Genetic Codes:
 		}
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+		for _, file := range files {
+			checkIfFilesAreTheSame(file, outFile, "input", "output")
+		}
 
 		var record *fastx.Record
 		var _seq *seq.Seq
