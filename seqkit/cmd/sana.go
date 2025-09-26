@@ -88,8 +88,10 @@ Sana currently supports this FASTQ dialect:
 		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		for _, file := range files {
-			checkIfFilesAreTheSame(file, outFile, "input", "output")
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
 		}
 
 		outfh, err := xopen.Wopen(outFile)
@@ -211,7 +213,7 @@ func validateSeqBytes(dna []byte, gaps bool) error {
 	for i, base := range dna {
 		if base == '-' && gaps {
 		} else if !IUPACBases.Contains(base) {
-			return errors.New(fmt.Sprintf("Illegal base '%s' at position %d", string(base), i))
+			return fmt.Errorf("illegal base '%s' at position %d", string(base), i)
 		}
 	}
 	return nil
@@ -226,7 +228,7 @@ func validateSeqString(dna string, gaps bool) error {
 func validateQuals(quals []int) error {
 	for i, qual := range quals {
 		if qual < 0 {
-			return errors.New(fmt.Sprintf("Illegal quality value '%d' at position %d", qual, i))
+			return fmt.Errorf("illegal quality value '%d' at position %d", qual, i)
 		}
 	}
 	return nil
@@ -235,7 +237,7 @@ func validateQuals(quals []int) error {
 // ValidateSeq validates simpleSeq objects.
 func ValidateSeq(seq *simpleSeq, gaps bool) error {
 	if len(seq.Seq) != len(seq.Qual) {
-		return errors.New(fmt.Sprintf("Sequence (%d) and quality (%d) length mismatch", len(seq.Seq), len(seq.Qual)))
+		return fmt.Errorf("sequence (%d) and quality (%d) length mismatch", len(seq.Seq), len(seq.Qual))
 	}
 	if seqErr := validateSeqString(seq.Seq, gaps); seqErr != nil {
 		return seqErr
@@ -255,7 +257,7 @@ func NewRawSeqStreamFromFile(inFastq string, seqChan chan *simpleSeq, qBase int,
 		bio = bufio.NewReaderSize(rio, buffSize)
 	}
 	ctrlChanIn := make(chan SeqStreamCtrl, 1000)
-	ctrlChanOut := make(chan SeqStreamCtrl, 0)
+	ctrlChanOut := make(chan SeqStreamCtrl)
 
 	switch format {
 	case "fastq":
@@ -280,12 +282,17 @@ type FqlState struct {
 type FqLine struct {
 	Line     string
 	FqlState FqlState
+	LineNr   int
 }
 type FqLines []FqLine
 
 // guessFqlState tries to infer the type of a fastq line.
 func guessFqlState(line []byte, prevLine *FqLine) FqlState {
 	state := FqlState{}
+	if len(line) == 0 {
+		state.Invalid = true
+		return state
+	}
 	switch line[0] {
 	case '@':
 		state.Header = true
@@ -348,15 +355,15 @@ func FqLinesToSimpleSeq(lines FqLines, qBase int, gaps bool) (*simpleSeq, error)
 // FasLinesToSimpleSeq attempts to construct a valid sequence record from a buffer of parsed lines.
 func FasLinesToSimpleSeq(lines FqLines) (*simpleSeq, error) {
 	if len(lines) < 2 {
-		return nil, errors.New("Line buffer must have at least 2 lines!")
+		return nil, fmt.Errorf("fasta record requires at least 2 lines, got %d", len(lines))
 	}
 	if !lines[0].FqlState.Header {
-		return nil, errors.New("Missing header line! -> " + lines[0].Line)
+		return nil, fmt.Errorf("line %d: expected header line, got: %s", lines[0].LineNr, lines[0].Line)
 	}
 	s := &simpleSeq{Id: lines[0].Line[1:]}
 	for i := 1; i < len(lines); i++ {
 		if lines[i].FqlState.Invalid && !lines[i].FqlState.Seq {
-			return nil, errors.New("Invalid line structure!")
+			return nil, fmt.Errorf("line %d: invalid sequence line: %s", lines[i].LineNr, lines[i].Line)
 		}
 		s.Seq += lines[i].Line
 	}
@@ -366,7 +373,6 @@ func FasLinesToSimpleSeq(lines FqLines) (*simpleSeq, error) {
 // streamFastq reads records from a potentially incomplete fastq file.
 func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSeq, ctrlChanIn, ctrlChanOut chan SeqStreamCtrl, lineCounter *int, qBase int, gaps bool, final bool) (FqLines, error) {
 	var line []byte
-	var spaceShift int
 	var lastLine *FqLine
 	var prevLine *FqLine
 	if len(sbuff) > 0 {
@@ -384,30 +390,23 @@ func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 		switch err {
 		case nil:
 			line = bytes.Trim(line, "\r\n\t ")
-			if len(line) == 0 {
-				*lineCounter++
-				spaceShift++
-				continue
-			}
+			(*lineCounter)++
 			if lastLine != nil && lastLine.FqlState.Partial {
-				*lineCounter++
 				lastLine.Line += string(line)
 				lastLine.FqlState = guessFqlState([]byte(lastLine.Line), prevLine)
 			} else {
-				*lineCounter++
 				lineStr := string(line)
 				if len(sbuff) > 0 {
 					prevLine = &sbuff[len(sbuff)-1]
 				}
-				sbuff = append(sbuff, FqLine{lineStr, guessFqlState(line, prevLine)})
+				sbuff = append(sbuff, FqLine{lineStr, guessFqlState(line, prevLine), *lineCounter})
 				lastLine = &sbuff[len(sbuff)-1]
 			}
 			if len(sbuff) == 4 && !lastLine.FqlState.Partial {
 				seq, err := FqLinesToSimpleSeq(sbuff, qBase, gaps)
 				if err == nil {
-					seq.StartLine = *lineCounter + spaceShift - 4
-					if seq == nil {
-						panic("Sequence is nil!")
+					if lineCounter != nil {
+						seq.StartLine = *lineCounter - 4
 					}
 					out <- seq
 					sbuff = sbuff[:0]
@@ -423,8 +422,12 @@ func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 						h = len(sbuff)
 					}
 					for j := 0; j < h; j++ {
-						ems := fmt.Sprintf("Discarded line: %s", err)
-						serr := &simpleSeq{StartLine: (spaceShift + *lineCounter - h + j + 1), Err: errors.New(ems), Seq: sbuff[j].Line, File: name}
+						serr := &simpleSeq{
+							StartLine: sbuff[j].LineNr,
+							Err:       fmt.Errorf("discarded line: %w", err),
+							Seq:       sbuff[j].Line,
+							File:      name,
+						}
 						out <- serr
 					}
 					sbuff = sbuff[h:]
@@ -433,9 +436,9 @@ func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 			} //sbuff == 4
 		case io.EOF:
 			line = bytes.TrimRight(line, "\n")
-			*lineCounter++
 			if len(line) > 0 {
-				sbuff = append(sbuff, FqLine{string(line), FqlState{Partial: true}})
+				(*lineCounter)++
+				sbuff = append(sbuff, FqLine{string(line), FqlState{Partial: true}, *lineCounter})
 			}
 			if !final {
 				ctrlChanOut <- StreamEOF
@@ -450,7 +453,7 @@ func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 				if err != nil {
 					for il, l := range sbuff {
 						ems := fmt.Sprintf("Discarded line: %s", err)
-						serr := &simpleSeq{StartLine: (spaceShift + *lineCounter - 4 + il + 1), Err: errors.New(ems), Seq: l.Line, File: name}
+						serr := &simpleSeq{StartLine: (*lineCounter - 4 + il + 1), Err: errors.New(ems), Seq: l.Line, File: name}
 						out <- serr
 						sbuff = sbuff[:0]
 					}
@@ -458,7 +461,7 @@ func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 					if seq == nil {
 						panic("Sequence is nil!")
 					}
-					seq.StartLine = *lineCounter + spaceShift - 4
+					seq.StartLine = *lineCounter - 4
 					out <- seq
 					sbuff = sbuff[:0]
 				}
@@ -490,7 +493,7 @@ func streamFasta(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 		case nil:
 			line = bytes.TrimRight(line, "\n\t ")
 			if len(line) == 0 {
-				*lineCounter++
+				(*lineCounter)++
 				spaceShift++
 				continue
 			}
@@ -501,7 +504,7 @@ func streamFasta(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 			} else {
 				*lineCounter++
 				lineStr := string(line)
-				sbuff = append(sbuff, FqLine{lineStr, guessFasState(line, gaps)})
+				sbuff = append(sbuff, FqLine{lineStr, guessFasState(line, gaps), *lineCounter})
 				lastLine = &sbuff[len(sbuff)-1]
 			}
 			if len(sbuff) >= 2 && !lastLine.FqlState.Partial {
@@ -532,7 +535,7 @@ func streamFasta(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 				if !final {
 					state.Partial = true
 				}
-				sbuff = append(sbuff, FqLine{string(line), state})
+				sbuff = append(sbuff, FqLine{string(line), state, *lineCounter})
 			}
 
 			if !final {
@@ -544,7 +547,7 @@ func streamFasta(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 				last := len(sbuff) - 1
 				sbuff[last].FqlState.Partial = false
 				sbuff[last].FqlState = guessFasState([]byte(sbuff[last].Line), gaps)
-				seq, err := FasLinesToSimpleSeq(sbuff[:len(sbuff)])
+				seq, err := FasLinesToSimpleSeq(sbuff)
 				if err == nil {
 					seq.StartLine = spaceShift + *lineCounter - len(sbuff) - 1
 					out <- seq

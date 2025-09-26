@@ -122,13 +122,25 @@ func getFileListFromArgsAndFile(cmd *cobra.Command, args []string, checkFileFrom
 }
 
 func isTheSameFile(path1, path2 string) (bool, error) {
+	var notfound bool
 	info1, err := os.Stat(path1)
 	if err != nil {
-		return false, err
+		if os.IsNotExist(err) {
+			notfound = true
+		} else {
+			return false, err
+		}
 	}
 	info2, err := os.Stat(path2)
 	if err != nil {
-		return false, err
+		if os.IsNotExist(err) {
+			notfound = true
+		} else {
+			return false, err
+		}
+	}
+	if notfound {
+		return path1 == path2, nil
 	}
 	return os.SameFile(info1, info2), nil
 }

@@ -75,8 +75,10 @@ Attention:
 		if len(files) < 2 {
 			checkError(errors.New("at least 2 files needed"))
 		}
-		for _, file := range files {
-			checkIfFilesAreTheSame(file, outFile, "input", "output")
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
 		}
 
 		// id -> seqs

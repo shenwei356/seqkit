@@ -325,8 +325,10 @@ Filtering records to edit:
 		// -------------------
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		for _, file := range files {
-			checkIfFilesAreTheSame(file, outFile, "input", "output")
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
 		}
 
 		outfh, err := xopen.Wopen(outFile)

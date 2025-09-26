@@ -67,8 +67,10 @@ Examples
 		runtime.GOMAXPROCS(config.BufferSize)
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		for _, file := range files {
-			checkIfFilesAreTheSame(file, outFile, "input", "output")
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
 		}
 
 		newstart := getFlagInt(cmd, "new-start")

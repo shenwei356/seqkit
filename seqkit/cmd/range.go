@@ -91,8 +91,10 @@ Examples:
 			checkError(fmt.Errorf("not supported range: %d:%d, the end needs to be -1 when start > 0 and end < 0", start, end))
 		}
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		for _, file := range files {
-			checkIfFilesAreTheSame(file, outFile, "input", "output")
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
 		}
 
 		outfh, err := xopen.Wopen(outFile)

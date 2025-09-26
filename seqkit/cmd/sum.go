@@ -110,10 +110,11 @@ Examples:
 		singleStrand := getFlagBool(cmd, "single-strand")
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		for _, file := range files {
-			checkIfFilesAreTheSame(file, outFile, "input", "output")
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
 		}
-
 		// process bar
 		var pbs *mpb.Progress
 		var bar *mpb.Bar

@@ -502,8 +502,10 @@ var bamCmd = &cobra.Command{
 		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		for _, file := range files {
-			checkIfFilesAreTheSame(file, outFile, "input", "output")
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
 		}
 
 		mapQual := getFlagInt(cmd, "map-qual")

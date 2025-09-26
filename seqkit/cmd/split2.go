@@ -98,8 +98,10 @@ If you want to cut a sequence into multiple segments.
 			checkError(fmt.Errorf("no more than one file should be given"))
 		}
 
-		for _, file := range files {
-			checkIfFilesAreTheSame(file, outFile, "input", "output")
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
 		}
 
 		read1 := getFlagString(cmd, "read1")
