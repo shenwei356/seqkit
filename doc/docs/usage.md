@@ -158,7 +158,7 @@ reproduced in different environments with same random seed.
 ``` text
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 2.10.0
+Version: 2.11.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -213,7 +213,7 @@ Commands for Searching:
 Commands for Set Operation:
   common          find common/shared sequences of multiple files by id/name/sequence
   duplicate       duplicate sequences N times
-  head            print first N FASTA/Q records
+  head            print the first N FASTA/Q records, or leading records whose total length >= L
   head-genome     print sequences of the first genome with common prefixes in name
   pair            match up paired-end reads from two fastq files
   range           print FASTA/Q records in a range (start:end)
@@ -2991,16 +2991,19 @@ flag `-s` (`--rand-seed`)
 Usage
 
 ``` text
-print first N FASTA/Q records
+print the first N FASTA/Q records, or leading records whose total length >= L
 
 For returning the last N records, use:
     seqkit range -r -N:-1 seqs.fasta
 
 Usage:
-  seqkit head [flags]
+  seqkit head [flags] 
 
 Flags:
-  -n, --number int   print first N FASTA/Q records (default 10)
+  -h, --help            help for head
+  -l, --length string   print leading FASTA/Q records whose total sequence length >= L (supports K/M/G
+                        suffix). This flag overides -n/--number
+  -n, --number int      print the first N FASTA/Q records (default 10)
 
 ```
 
@@ -3020,6 +3023,16 @@ Examples
         TGAGGAATATTGGTCAATGGGCGCGAGCCTGAACCAGCCAAGTAGCGTGAAGGATGACTGCCCTACGGGTTGTAA
         +
         HIHIIIIIHIIHGHHIHHIIIIIIIIIIIIIIIHHIIIIIHHIHIIIIIGIHIIIIHHHHHHGHIHIIIIIIIII
+        
+1. Leading FASTA/Q records whose total sequence length >= L
+
+        $ seqkit head -l 1k tests/hairpin.fa | seqkit stats 
+        file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+        -     FASTA   RNA         11    1,050       87     95.5       99
+
+        $ seqkit head -l 10k tests/hairpin.fa | seqkit stats 
+        file  format  type  num_seqs  sum_len  min_len  avg_len  max_len
+        -     FASTA   RNA        117   10,277       58     87.8      119
 
 ## head-genome
 

@@ -104,7 +104,7 @@ Attention:
 			byLength = true
 
 			if twoPass {
-				checkError(fmt.Errorf("-b/--by-bases is not incompatible with -2/--two-pass "))
+				checkError(fmt.Errorf("-b/--by-bases is incompatible with -2/--two-pass "))
 			}
 		}
 
