@@ -131,5 +131,5 @@ For returning the last N records, use:
 func init() {
 	RootCmd.AddCommand(headCmd)
 	headCmd.Flags().IntP("number", "n", 10, "print the first N FASTA/Q records")
-	headCmd.Flags().StringP("length", "l", "", "print leading FASTA/Q records whose total sequence length >= L (supports K/M/G suffix). This flag overides -n/--number")
+	headCmd.Flags().StringP("length", "l", "", "print leading FASTA/Q records whose total sequence length >= L (supports K/M/G suffix). This flag overrides -n/--number")
 }

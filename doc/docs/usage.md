@@ -3002,7 +3002,7 @@ Usage:
 Flags:
   -h, --help            help for head
   -l, --length string   print leading FASTA/Q records whose total sequence length >= L (supports K/M/G
-                        suffix). This flag overides -n/--number
+                        suffix). This flag overrides -n/--number
   -n, --number int      print the first N FASTA/Q records (default 10)
 
 ```
