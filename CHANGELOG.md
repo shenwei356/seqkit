@@ -1,6 +1,7 @@
 - [SeqKit v2.11.0](https://github.com/shenwei356/seqkit/releases/tag/v2.11.0) - 2025-xx-xx
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.11.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.11.0)
     - `seqkit`:
+        - **fix reading records with both empty id and sequence**. [#550](https://github.com/shenwei356/seqkit/issues/550)
         - check if the output file name equals to one of the input files. [#541](https://github.com/shenwei356/seqkit/issues/541)
     - `seqkit split2`:
         - add a new flag `-N, --seqid-as-filename` to use the first sequence ID as the file name. 
