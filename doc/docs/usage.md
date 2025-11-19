@@ -3151,6 +3151,8 @@ more on: http://bioinf.shenwei.me/seqkit/usage/#replace
 
 Special replacement symbols (only for replacing name not sequence):
 
+    {nr}    Record number, starting from 1
+    {uuid}  Random 16-character Universally unique identifier (UUID)
     {fn}    File name
     {fbn}   File base name
     {fbne}  File base name without any extension
@@ -3168,7 +3170,7 @@ Filtering records to edit:
   You can use flags similar to those in "seqkit grep" to choose partly records to edit.
 
 Usage:
-  seqkit replace [flags]
+  seqkit replace [flags] 
 
 Flags:
   -s, --by-seq                   replace seq (only FASTA)
@@ -3197,9 +3199,10 @@ Flags:
                                  to "001" by --nr-width 3 (default 1)
   -p, --pattern string           search regular expression
   -r, --replacement string       replacement. supporting capture variables.  e.g. $1 represents the text
-                                 of the first submatch. ATTENTION: for *nix OS, use SINGLE quote NOT
-                                 double quotes or use the \ escape character. Record number is also
-                                 supported by "{nr}".use ${1} instead of $1 when {kv} given!
+                                 of the first submatch (use ${1} instead of $1 when {kv} given!).
+                                 ATTENTION: for *nix OS, use SINGLE quote NOT double quotes or use the \
+                                 escape character. Record number and file name is also supported by
+                                 "{nr}" and "{fn}". Type "csvtk replace -h" for more replacement symbols.
 
 ```
 
@@ -3304,6 +3307,16 @@ Examples
         ../tests/hairpin.fa__hairpin.fa__hairpin__1
         ../tests/hairpin.fa__hairpin.fa__hairpin__2
         ../tests/hairpin.fa__hairpin.fa__hairpin__3
+        
+1. UUID
+
+        $ seqkit replace -p .+ -r '{uuid}' ../tests/hairpin.fa \
+                | seqkit head -n 5 | seqkit seq -n
+        a055ac21-c341-404f-9bfe-8086fff867ac
+        8a72af59-3ebe-4c0e-b9f9-2cca41140f15
+        5f195605-b39b-42ed-b5aa-e8cf42f3ef30
+        5b7cb64d-4399-4a38-914a-8f83f210fef3
+        f30c8cf5-6329-4469-b917-6a251ec97b02
 
 1. Replace key with value by key-value file
 

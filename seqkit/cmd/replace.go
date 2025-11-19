@@ -30,6 +30,7 @@ import (
 	"strings"
 
 	"github.com/cespare/xxhash/v2"
+	"github.com/google/uuid"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/breader"
@@ -62,6 +63,7 @@ more on: http://bioinf.shenwei.me/seqkit/usage/#replace
 Special replacement symbols (only for replacing name not sequence):
 
     {nr}    Record number, starting from 1
+    {uuid}  Random 16-character Universally unique identifier (UUID)
     {fn}    File name
     {fbn}   File base name
     {fbne}  File base name without any extension
@@ -134,6 +136,11 @@ Filtering records to edit:
 		var replaceWithNR bool
 		if reNR.Match(replacement) {
 			replaceWithNR = true
+		}
+
+		var replaceWithUUID bool
+		if reUUID.Match(replacement) {
+			replaceWithUUID = true
 		}
 
 		var replaceWithFN bool
@@ -466,6 +473,10 @@ Filtering records to edit:
 						r = reNR.ReplaceAll(r, []byte(fmt.Sprintf(nrFormat, nr)))
 					}
 
+					if replaceWithUUID {
+						r = reUUID.ReplaceAll(r, []byte(uuid.New().String()))
+					}
+
 					if replaceWithFN {
 						r = reFN.ReplaceAll(r, bFile)
 					}
@@ -528,10 +539,11 @@ func init() {
 	replaceCmd.Flags().StringP("pattern", "p", "", "search regular expression")
 	replaceCmd.Flags().StringP("replacement", "r", "",
 		"replacement. supporting capture variables. "+
-			" e.g. $1 represents the text of the first submatch. "+
+			" e.g. $1 represents the text of the first submatch (use ${1} instead of $1 when {kv} given!). "+
 			"ATTENTION: for *nix OS, use SINGLE quote NOT double quotes or "+
-			`use the \ escape character. Record number and file name is also supported by "{nr}" and "{fn}".`+
-			`use ${1} instead of $1 when {kv} given!`)
+			`use the \ escape character. `+
+			`Record number and file name is also supported by "{nr}" and "{fn}". `+
+			`Type "csvtk replace -h" for more replacement symbols.`)
 	replaceCmd.Flags().IntP("nr-width", "", 1, `minimum width for {nr} in flag -r/--replacement. e.g., formatting "1" to "001" by --nr-width 3`)
 	// replaceCmd.Flags().BoolP("by-name", "n", false, "replace full name instead of just id")
 	replaceCmd.Flags().BoolP("by-seq", "s", false, "replace seq (only FASTA)")
@@ -558,3 +570,4 @@ var reKV = regexp.MustCompile(`\{(KV|kv)\}`)
 var reFN = regexp.MustCompile(`\{(FN|fn)\}`)
 var reFBN = regexp.MustCompile(`\{(FBN|fbn)\}`)
 var reFBNE = regexp.MustCompile(`\{(FBNE|fbne)\}`)
+var reUUID = regexp.MustCompile(`\{(UUID|uuid)\}`)

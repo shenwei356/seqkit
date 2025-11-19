@@ -8,6 +8,8 @@
         E.g., using `-N -s 1` is equal to `seqkit split --by-id`, but it's much faster and uses less memory.
     - `seqkit head`:
         - add a new flag `-l, --length` to print heading FASTA/Q records with total sequence length >= N, e.g., `-l 2G`.
+    - `seqkit replace`:
+        - add a new replacement symbol `{uuid}` for random UUID. [#552](https://github.com/shenwei356/seqkit/issues/552)
 - [SeqKit v2.10.1](https://github.com/shenwei356/seqkit/releases/tag/v2.10.1) - 2025-08-19
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.10.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.10.1)
     - `seqkit seq`:

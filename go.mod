@@ -12,6 +12,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/elliotwutingfeng/asciiset v0.0.0-20230602022725-51bbb787efab
 	github.com/fsnotify/fsnotify v1.5.4
+	github.com/google/uuid v1.6.0
 	github.com/iafan/cwalk v0.0.0-20210125030640-586a8832a711
 	github.com/klauspost/compress v1.18.0
 	github.com/klauspost/pgzip v1.2.6
