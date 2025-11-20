@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 export GOEXPERIMENT=greenteagc # for go1.25
-CGO_ENABLED=0 gox -os="windows darwin linux freebsd" -arch="386 amd64 arm64" -tags netgo -ldflags '-w -s' -asmflags '-trimpath'
+CGO_ENABLED=0 gox -os="windows darwin linux freebsd" -arch="amd64 arm64" -tags netgo -ldflags '-w -s' -asmflags '-trimpath'
 
 dir=binaries
 mkdir -p $dir;

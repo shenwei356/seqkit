@@ -1,4 +1,4 @@
-- [SeqKit v2.11.0](https://github.com/shenwei356/seqkit/releases/tag/v2.11.0) - 2025-xx-xx
+- [SeqKit v2.11.0](https://github.com/shenwei356/seqkit/releases/tag/v2.11.0) - 2025-11-20
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.11.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.11.0)
     - `seqkit`:
         - **fix reading records with both empty id and sequence**. [#550](https://github.com/shenwei356/seqkit/issues/550)
