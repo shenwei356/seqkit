@@ -332,7 +332,7 @@ rm t.*
 file=tests/hairpin.fa
 
 testseq() {
-    cat $file | $app head -n 100 | $app rmdup
+    cat $file | $app head -n 100 | $app rmdup --quiet
 }
 fun() {
     testseq | $app split -i -f

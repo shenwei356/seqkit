@@ -30,7 +30,6 @@ import (
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
-	"github.com/shenwei356/util/randutil"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -128,12 +127,14 @@ Attention:
 				log.Infof("%d sequences loaded", len(sequences))
 				log.Infof("shuffle ...")
 			}
-			rand.Seed(seed)
 			indices := make([]int, len(index2name))
 			for i := 0; i < len(index2name); i++ {
 				indices[i] = i
 			}
-			randutil.Shuffle(indices)
+
+			rand.New(rand.NewSource(seed)).Shuffle(len(indices), func(i, j int) {
+				indices[i], indices[j] = indices[j], indices[i]
+			})
 
 			if !quiet {
 				log.Infof("output ...")
@@ -219,12 +220,14 @@ Attention:
 		if !quiet {
 			log.Infof("shuffle ...")
 		}
-		rand.Seed(seed)
 		indices := make([]int, len(index2name))
 		for i := 0; i < len(index2name); i++ {
 			indices[i] = i
 		}
-		randutil.Shuffle(indices)
+
+		rand.New(rand.NewSource(seed)).Shuffle(len(indices), func(i, j int) {
+			indices[i], indices[j] = indices[j], indices[i]
+		})
 
 		if !quiet {
 			log.Infof("output ...")

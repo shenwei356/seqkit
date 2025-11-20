@@ -93,7 +93,7 @@ Attention:
 		checkError(err)
 		defer outfh.Close()
 
-		rand.Seed(seed)
+		_rand := rand.New(rand.NewSource(seed))
 		// randg := randomFloat64Generator(seed)
 
 		n := int64(0)
@@ -139,7 +139,7 @@ Attention:
 					}
 
 					// if <-randg <= proportion {
-					if rand.Float64() <= proportion {
+					if _rand.Float64() <= proportion {
 						n++
 						record.FormatToWriter(outfh, config.LineWidth)
 						if n == number {
@@ -163,7 +163,7 @@ Attention:
 
 				for _, record := range records {
 					// if <-randg <= proportion {
-					if rand.Float64() <= proportion {
+					if _rand.Float64() <= proportion {
 						n++
 						record.FormatToWriter(outfh, config.LineWidth)
 						if n == number {
@@ -194,7 +194,7 @@ Attention:
 				}
 
 				// if <-randg <= proportion {
-				if rand.Float64() <= proportion {
+				if _rand.Float64() <= proportion {
 					n++
 					record.FormatToWriter(outfh, config.LineWidth)
 				}
