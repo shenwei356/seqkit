@@ -450,8 +450,8 @@ If you want to cut a sequence into multiple segments.
 							var outfh2 *xopen.Writer
 							var outfile string
 							if !seqIDAsFileName {
-								if prefixByLengthSet {
-									prefix = prefixByLength
+								if prefixByPartSet {
+									prefix = prefixByPart
 									if pairedEnd {
 										prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
 									}
