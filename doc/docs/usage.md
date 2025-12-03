@@ -1687,6 +1687,11 @@ Attention:
   6. For multiple patterns, you can either set "-p" multiple times, i.e.,
      -p pattern1 -p pattern2, or give a file of patterns via "-f/--pattern-file".
 
+Tips:
+  1. Empty patterns are allowed. So you can search records with empty ID or sequence.
+        seqkit grep    -p "" t.fa     # empty ID
+        seqkit grep -s -p "" t.fa     # empty sequence
+
 You can specify the sequence region for searching with the flag -R (--region).
 The definition of region is 1-based and with some custom design.
 
@@ -1849,6 +1854,30 @@ Examples
 1. Specify sequence regions for searching. e.g., leading 30 bases.
 
         $ seqkit grep -s -R 1:30 -i -r -p GCTGG
+        
+1. Find empty sequences
+
+        $ seqkit grep -s -p "" tests/empty_id_and_seq.fa 
+        >s2
+
+        >
+
+        >
+
+        >s8
+
+1. Find empty ids. Note that the ID of ` s10` is empty, where `s10` is the description.
+
+        $ seqkit grep -p "" tests/empty_id_and_seq.fa 
+        >
+
+        >
+
+        >
+        N
+        > s10
+        C
+
 
 ## locate
 

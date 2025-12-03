@@ -279,6 +279,32 @@ rm list
 run grep_delete_matched $app grep --delete-matched -r -p "^hsa" $file
 assert_equal $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1) $($app fx2tab $file | grep -E "^hsa" | head -n 1 | $app tab2fx | md5sum | cut -d" " -f 1)
 
+# --- empty id or seq ---
+file=empty_id_and_seq2.fa
+
+# empty id
+run grep_empty_id $app grep -p "" $file
+assert_equal $(cat $STDOUT_FILE | seqkit seq -ni) ""
+
+run grep_empty_id_r $app grep -r -p "" $file
+assert_equal $(cat $STDOUT_FILE | seqkit seq -ni) ""
+
+run grep_empty_id_r2 $app grep -r -p "^$" $file
+assert_equal $(cat $STDOUT_FILE | seqkit seq -ni) ""
+
+# empty seq
+run grep_empty_seq $app grep -p "" $file -s
+assert_equal $(cat $STDOUT_FILE | seqkit seq -s) ""
+
+run grep_empty_seq_r $app grep -r -p "" $file -s
+assert_equal $(cat $STDOUT_FILE | seqkit seq -s) ""
+
+run grep_empty_seq_r2 $app grep -d -p "" $file -s
+assert_equal $(cat $STDOUT_FILE | seqkit seq -s) ""
+
+run grep_empty_seq_r3 $app grep -r -p "^$" $file -s
+assert_equal $(cat $STDOUT_FILE | seqkit seq -s) ""
+
 # ------------------------------------------------------------
 #                       locate
 # ------------------------------------------------------------

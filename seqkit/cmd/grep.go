@@ -78,6 +78,11 @@ Attention:
   6. For multiple patterns, you can either set "-p" multiple times, i.e.,
      -p pattern1 -p pattern2, or give a file of patterns via "-f/--pattern-file".
 
+Tips:
+  1. Empty patterns are allowed. So you can search records with empty ID or sequence.
+        seqkit grep    -p "" t.fa     # empty ID
+        seqkit grep -s -p "" t.fa     # empty sequence
+
 You can specify the sequence region for searching with the flag -R (--region).
 The definition of region is 1-based and with some custom design.
 
@@ -124,7 +129,13 @@ Examples:
 		immediateOutput := getFlagBool(cmd, "immediate-output")
 
 		if len(pattern) == 0 && patternFile == "" {
-			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
+			if !cmd.Flags().Lookup("pattern").Changed {
+				checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
+			} else if region != "" {
+				checkError(fmt.Errorf("you shouldn't search an empty pattern in a region"))
+			} else { // -p ""
+				pattern = append(pattern, "")
+			}
 		}
 
 		// check pattern with unquoted comma
@@ -148,7 +159,6 @@ Examples:
 			bySeq = true
 		}
 
-		var sfmi *fmi.FMIndex
 		if mismatches > 0 {
 			if useRegexp || degenerate {
 				checkError(fmt.Errorf("flag -r (--use-regexp) or -d (--degenerate) not allowed when giving flag -m (--max-mismatch)"))
@@ -157,7 +167,6 @@ Examples:
 				log.Infof("when value of flag -m (--max-mismatch) > 0, flag -s (--by-seq) is automatically on")
 				bySeq = true
 			}
-			sfmi = fmi.NewFMIndex()
 			if mismatches > 4 {
 				log.Warningf("large value flag -m/--max-mismatch will slow down the search")
 			}
@@ -272,7 +281,7 @@ Examples:
 			}
 		} else {
 			for _, p := range pattern {
-				if !quiet {
+				if !quiet && len(p) > 0 {
 					if p[0] == '>' {
 						log.Warningf(`symbol ">" detected, it should not be a part of the sequence ID/name: %s`, p)
 					} else if p[0] == '@' {
@@ -283,15 +292,19 @@ Examples:
 				}
 
 				if degenerate || useRegexp {
-					if degenerate {
-						pattern2seq, err = seq.NewSeq(alphabet, []byte(p))
-						if err != nil {
-							checkError(fmt.Errorf("it seems that flag -d is given, but you provide regular expression instead of available %s sequence", alphabet.String()))
+					if p == "" {
+						p = `^$`
+					} else {
+						if degenerate {
+							pattern2seq, err = seq.NewSeq(alphabet, []byte(p))
+							if err != nil {
+								checkError(fmt.Errorf("it seems that flag -d is given, but you provide regular expression instead of available %s sequence", alphabet.String()))
+							}
+							p = pattern2seq.Degenerate2Regexp()
 						}
-						p = pattern2seq.Degenerate2Regexp()
-					}
-					if ignoreCase {
-						p = "(?i)" + p
+						if ignoreCase {
+							p = "(?i)" + p
+						}
 					}
 					r, err := regexp.Compile(p)
 					checkError(err)
@@ -428,10 +441,6 @@ Examples:
 						break
 					}
 
-					if len(record.Seq.Seq) == 0 {
-						continue
-					}
-
 					if checkAlphabet {
 						if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
 							onlyPositiveStrand = true
@@ -452,6 +461,15 @@ Examples:
 							wg.Done()
 							<-tokens
 						}()
+
+						if len(record.Seq.Seq) == 0 {
+							if invertMatch {
+								ch <- &Arecord{record: record, ok: true, id: id}
+							} else {
+								ch <- &Arecord{record: nil, ok: false, id: id}
+							}
+							return
+						}
 
 						var sequence *seq.Seq
 						var target []byte
@@ -569,10 +587,6 @@ Examples:
 					break
 				}
 
-				if len(record.Seq.Seq) == 0 {
-					continue
-				}
-
 				if checkAlphabet {
 					if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
 						onlyPositiveStrand = true
@@ -647,33 +661,14 @@ Examples:
 							target = bytes.ToLower(target)
 						}
 						if mismatches == 0 {
-							// for k = range patternsS {
 							for _, k = range patternsS {
-								// if bytes.Contains(target, []byte(k)) {
-								if bytes.Contains(target, k) {
+								if (len(k) == 0 && len(target) == 0) || // both target and pattern are empty
+									(len(k) > 0 && bytes.Contains(target, k)) { // non-empty target and pattern
 									hit = true
-									// if deleteMatched && !invertMatch {
-									// 	delete(patternsS, k)
-									// }
 									break
 								}
 							}
-						} else {
-							_, err = sfmi.Transform(target)
-							if err != nil {
-								checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.Name))
-							}
-							// for k = range patternsS {
-							for _, k = range patternsS {
-								// hit, err = sfmi.Match([]byte(k), mismatches)
-								hit, err = sfmi.Match(k, mismatches)
-								if err != nil {
-									checkError(fmt.Errorf("fail to search pattern '%s' on seq '%s': %s", k, record.Name, err))
-								}
-								if hit {
-									break
-								}
-							}
+						} else { // never reached here, as (bySeq && mismatches > 0) is handled in a early step
 						}
 					} else {
 						h = xxhash.Sum64(target)
