@@ -698,7 +698,12 @@ Columns:
   14. N50_num   N50_num or L50. https://en.wikipedia.org/wiki/N50,_L50,_and_related_statistics#L50
   15. Q20(%)    percentage of bases with the quality score greater than 20
   16. Q30(%)    percentage of bases with the quality score greater than 30
-  17. AvgQual   average quality
+  17. AvgQual   average quality.
+                Attention: It's not the arithmetic average of quartiles (some tools do that).
+                How to computate: 1) take the qscore for each base, 2) convert it back to
+                an error probability, 3) take the mean of those, 4) and then convert that
+                mean error back into a qscore.
+                Reference: https://github.com/shenwei356/seqkit/issues/448
   18. GC(%)     percentage of GC content
   19. sum_n     number of ambitious letters (N, n, X, x)
   
@@ -1232,6 +1237,11 @@ like sequence length, GC content/GC skew.
 Attention:
   1. Fixed three columns (ID, sequence, quality) are outputted for either FASTA
      or FASTQ, except when flag -n/--name is on. This is for format compatibility.
+  2. The average quality is not the arithmetic average of quartiles (some tools do that).
+     How to computate: 1) take the qscore for each base, 2) convert it back to
+     an error probability, 3) take the mean of those, 4) and then convert that
+     mean error back into a qscore.
+     Reference: https://github.com/shenwei356/seqkit/issues/448
 
 Usage:
   seqkit fx2tab [flags] 

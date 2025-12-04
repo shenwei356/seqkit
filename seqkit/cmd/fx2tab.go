@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2026 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,6 +49,11 @@ like sequence length, GC content/GC skew.
 Attention:
   1. Fixed three columns (ID, sequence, quality) are outputted for either FASTA
      or FASTQ, except when flag -n/--name is on. This is for format compatibility.
+  2. The average quality is not the arithmetic average of quartiles (some tools do that).
+     How to computate: 1) take the qscore for each base, 2) convert it back to
+     an error probability, 3) take the mean of those, 4) and then convert that
+     mean error back into a qscore.
+     Reference: https://github.com/shenwei356/seqkit/issues/448
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {

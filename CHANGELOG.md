@@ -1,4 +1,4 @@
-- [SeqKit v2.12.0](https://github.com/shenwei356/seqkit/releases/tag/v2.12.0) - 2025-xx-xx
+- [SeqKit v2.12.0](https://github.com/shenwei356/seqkit/releases/tag/v2.12.0) - 2025-12-04
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.12.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.12.0)
     - `seqkit grep`:
         - `-p/--pattern` accepts empty charactor (`""`) now. So it's able to **search records with empty IDs or sequences**. [#558](https://github.com/shenwei356/seqkit/issues/558)
@@ -6,6 +6,8 @@
         - fix a bug introduced in v2.11.0: `--by-part-prefix` options has no effect. [#554](https://github.com/shenwei356/seqkit/issues/554)
     - `seqkit replace`:
         - `{uuid}`: use the time-sortable UUIDv7 to replace v4.
+    - `seqkit stats/fx2tab`:
+        - add information about how the average quality is computed. [#448](https://github.com/shenwei356/seqkit/issues/448)
 - [SeqKit v2.11.0](https://github.com/shenwei356/seqkit/releases/tag/v2.11.0) - 2025-11-20
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.11.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.11.0)
     - `seqkit`:
