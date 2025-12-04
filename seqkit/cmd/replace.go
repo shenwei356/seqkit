@@ -360,6 +360,7 @@ Filtering records to edit:
 		var h uint64
 
 		var fileBase string
+		var _uuid uuid.UUID
 
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
@@ -474,7 +475,11 @@ Filtering records to edit:
 					}
 
 					if replaceWithUUID {
-						r = reUUID.ReplaceAll(r, []byte(uuid.New().String()))
+						_uuid, err = uuid.NewV7()
+						if err != nil {
+							_uuid = uuid.New()
+						}
+						r = reUUID.ReplaceAll(r, []byte(_uuid.String()))
 					}
 
 					if replaceWithFN {

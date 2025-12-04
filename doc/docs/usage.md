@@ -3341,11 +3341,11 @@ Examples
 
         $ seqkit replace -p .+ -r '{uuid}' ../tests/hairpin.fa \
                 | seqkit head -n 5 | seqkit seq -n
-        a055ac21-c341-404f-9bfe-8086fff867ac
-        8a72af59-3ebe-4c0e-b9f9-2cca41140f15
-        5f195605-b39b-42ed-b5aa-e8cf42f3ef30
-        5b7cb64d-4399-4a38-914a-8f83f210fef3
-        f30c8cf5-6329-4469-b917-6a251ec97b02
+        019ae6ba-1844-70d1-9cb4-60f036123cef
+        019ae6ba-1844-7100-8adb-627738db74f8
+        019ae6ba-1844-7116-9a04-b3b27a88b44c
+        019ae6ba-1844-7129-964a-4d6eb43040f0
+        019ae6ba-1844-713c-a3e8-cc84565b6cc8
 
 1. Replace key with value by key-value file
 
