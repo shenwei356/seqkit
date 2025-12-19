@@ -25,6 +25,7 @@ import (
 	"io"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/shenwei356/bio/seq"
@@ -80,6 +81,7 @@ Attention:
 		seed := getFlagInt64(cmd, "rand-seed")
 		twoPass := getFlagBool(cmd, "two-pass")
 		updateFaidx := getFlagBool(cmd, "update-faidx")
+		tmpDir := filepath.Clean(getFlagString(cmd, "tmp-dir"))
 		keepTemp := getFlagBool(cmd, "keep-temp")
 		if keepTemp && !twoPass {
 			checkError(fmt.Errorf("flag -k (--keep-temp) must be used with flag -2 (--two-pass)"))
@@ -162,9 +164,9 @@ Attention:
 		newFile := file
 		if isStdin(file) || !isPlainFile(file) {
 			if isStdin(file) {
-				newFile = "stdin" + ".fastx"
+				newFile = filepath.Join(tmpDir, "stdin") + ".fastx"
 			} else {
-				newFile = file + ".fastx"
+				newFile = filepath.Join(tmpDir, filepath.Base(file)) + ".fastx"
 			}
 			if !quiet {
 				log.Infof("read and write sequences to temporary file: %s ...", newFile)
@@ -265,6 +267,7 @@ func init() {
 	RootCmd.AddCommand(shuffleCmd)
 	shuffleCmd.Flags().Int64P("rand-seed", "s", 23, "rand seed for shuffle")
 	shuffleCmd.Flags().BoolP("two-pass", "2", false, "two-pass mode read files twice to lower memory usage. (only for FASTA format)")
+	shuffleCmd.Flags().StringP("tmp-dir", "", "./", "tmp directory for saving temporary FASTA and .fai file when using 2-pass mode")
 	shuffleCmd.Flags().BoolP("keep-temp", "k", false, "keep temporary FASTA and .fai file when using 2-pass mode")
 	shuffleCmd.Flags().BoolP("update-faidx", "U", false, "update the fasta index file if it exists. Use this if you are not sure whether the fasta file changed")
 }

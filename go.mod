@@ -6,7 +6,7 @@ require (
 	github.com/biogo/biogo v1.0.4
 	github.com/biogo/hts v1.4.4
 	github.com/botond-sipos/thist v1.1.0
-	github.com/cespare/xxhash/v2 v2.1.2
+	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/cznic/sortutil v0.0.0-20181122101858-f5f958428db8
 	github.com/dsnet/compress v0.0.1
 	github.com/dustin/go-humanize v1.0.1
