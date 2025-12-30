@@ -3844,29 +3844,33 @@ Usage
 ``` text
 shuffle sequences.
 
-By default, all records will be readed into memory.
-For FASTA format, use flag -2 (--two-pass) to reduce memory usage. FASTQ not
-supported.
-
-Firstly, seqkit reads the sequence IDs. If the file is not plain FASTA file,
-seqkit will write the sequences to temporary files, and create FASTA index.
-
-Secondly, seqkit shuffles sequence IDs and extract sequences by FASTA index.
+By default, all records will be read into memory.
+For FASTA format, you can use flag -2 (--two-pass) to reduce memory usage.
+While FASTQ is not supported. 
+  1. Seqkit reads the sequence IDs. If the file is not a plain FASTA file,
+     seqkit will write the sequences to temporary files, and create the FASTA index.
+  2. Secondly, seqkit shuffles sequence IDs and extracts sequences by FASTA index.
 
 Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
+  2. By default, the output is deterministic; that is, given the same input and random seed,
+     seqkit shuf will always generate identical results across different runs.
+     For 'true randomness', please add '-r/--non-deterministic', which uses a time-based seed.
 
 Usage:
-  seqkit shuffle [flags]
+  seqkit shuffle [flags] 
 
 Flags:
-  -h, --help            help for shuffle
-  -k, --keep-temp       keep temporary FASTA and .fai file when using 2-pass mode
-  -s, --rand-seed int   rand seed for shuffle (default 23)
-  -2, --two-pass        two-pass mode read files twice to lower memory usage. (only for FASTA format)
-  -U, --update-faidx    update the fasta index file if it exists. Use this if you are not sure whether
-                        the fasta file changed
+  -h, --help                help for shuffle
+  -k, --keep-temp           keep temporary FASTA and .fai file when using 2-pass mode
+  -r, --non-deterministic   use a time-based seed to generate non-deterministic (truly random) results
+  -s, --rand-seed int       rand seed for shuffle (default 23)
+      --tmp-dir string      tmp directory for saving temporary FASTA and .fai file when using 2-pass
+                            mode (default "./")
+  -2, --two-pass            two-pass mode read files twice to lower memory usage. (only for FASTA format)
+  -U, --update-faidx        update the fasta index file if it exists. Use this if you are not sure
+                            whether the fasta file changed
 
 ```
 

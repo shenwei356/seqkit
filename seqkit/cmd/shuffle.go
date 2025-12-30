@@ -27,6 +27,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"time"
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
@@ -43,20 +44,19 @@ var shuffleCmd = &cobra.Command{
 	Short: "shuffle sequences",
 	Long: `shuffle sequences.
 
-By default, all records will be readed into memory.
-For FASTA format, use flag -2 (--two-pass) to reduce memory usage. FASTQ not
-supported. 
-
-Firstly, seqkit reads the sequence IDs. If the file is not plain FASTA file,
-seqkit will write the sequences to temporary files, and create FASTA index.
-
-Secondly, seqkit shuffles sequence IDs and extract sequences by FASTA index.
+By default, all records will be read into memory.
+For FASTA format, you can use flag -2 (--two-pass) to reduce memory usage.
+While FASTQ is not supported. 
+  1. Seqkit reads the sequence IDs. If the file is not a plain FASTA file,
+     seqkit will write the sequences to temporary files, and create the FASTA index.
+  2. Secondly, seqkit shuffles sequence IDs and extracts sequences by FASTA index.
 
 Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
-
-
+  2. By default, the output is deterministic; that is, given the same input and random seed,
+     seqkit shuf will always generate identical results across different runs.
+     For 'true randomness', please add '-r/--non-deterministic', which uses a time-based seed.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -79,6 +79,19 @@ Attention:
 		}
 
 		seed := getFlagInt64(cmd, "rand-seed")
+		nonDeterministic := getFlagBool(cmd, "non-deterministic")
+
+		if nonDeterministic && cmd.Flags().Lookup("rand-seed").Changed {
+			checkError(fmt.Errorf("the flags -s/--rand-seed and -r/--non-deterministic are incompatible"))
+		}
+
+		var r *rand.Rand
+		if nonDeterministic {
+			r = rand.New(rand.NewSource(time.Now().UnixNano()))
+		} else {
+			r = rand.New(rand.NewSource(seed))
+		}
+
 		twoPass := getFlagBool(cmd, "two-pass")
 		updateFaidx := getFlagBool(cmd, "update-faidx")
 		tmpDir := filepath.Clean(getFlagString(cmd, "tmp-dir"))
@@ -134,7 +147,7 @@ Attention:
 				indices[i] = i
 			}
 
-			rand.New(rand.NewSource(seed)).Shuffle(len(indices), func(i, j int) {
+			r.Shuffle(len(indices), func(i, j int) {
 				indices[i], indices[j] = indices[j], indices[i]
 			})
 
@@ -227,7 +240,7 @@ Attention:
 			indices[i] = i
 		}
 
-		rand.New(rand.NewSource(seed)).Shuffle(len(indices), func(i, j int) {
+		r.Shuffle(len(indices), func(i, j int) {
 			indices[i], indices[j] = indices[j], indices[i]
 		})
 
@@ -266,6 +279,7 @@ Attention:
 func init() {
 	RootCmd.AddCommand(shuffleCmd)
 	shuffleCmd.Flags().Int64P("rand-seed", "s", 23, "rand seed for shuffle")
+	shuffleCmd.Flags().BoolP("non-deterministic", "r", false, "use a time-based seed to generate non-deterministic (truly random) results")
 	shuffleCmd.Flags().BoolP("two-pass", "2", false, "two-pass mode read files twice to lower memory usage. (only for FASTA format)")
 	shuffleCmd.Flags().StringP("tmp-dir", "", "./", "tmp directory for saving temporary FASTA and .fai file when using 2-pass mode")
 	shuffleCmd.Flags().BoolP("keep-temp", "k", false, "keep temporary FASTA and .fai file when using 2-pass mode")
