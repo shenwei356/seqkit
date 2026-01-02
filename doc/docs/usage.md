@@ -2972,18 +2972,22 @@ sample sequences by number or proportion.
 Attention:
 1. Do not use '-n' on large FASTQ files, it loads all seqs into memory!
    use 'seqkit sample -p 0.1 seqs.fq.gz | seqkit head -n N' instead!
+2. By default, the output is deterministic; that is, given the same input and random seed,
+   seqkit shuf will always generate identical results across different runs.
+   For 'true randomness', please add '-r/--non-deterministic', which uses a time-based seed.
 
 Usage:
-  seqkit sample [flags]
+  seqkit sample [flags] 
 
 Flags:
-  -h, --help               help for sample
-  -n, --number int         sample by number (result may not exactly match), DO NOT use on large FASTQ files.
-  -p, --proportion float   sample by proportion
-  -s, --rand-seed int      random seed. For paired-end data, use the same seed across fastq files to
-                           sample the same read pairs (default 11)
-  -2, --two-pass           2-pass mode read files twice to lower memory usage. Not allowed when reading
-                           from stdin
+  -h, --help                help for sample
+  -r, --non-deterministic   use a time-based seed to generate non-deterministic (truly random) results
+  -n, --number int          sample by number (result may not exactly match), DO NOT use on large FASTQ files.
+  -p, --proportion float    sample by proportion
+  -s, --rand-seed int       random seed. For paired-end data, use the same seed across fastq files to
+                            sample the same read pairs (default 11)
+  -2, --two-pass            2-pass mode read files twice to lower memory usage. Not allowed when reading
+                            from stdin
 
 ```
 

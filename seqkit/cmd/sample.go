@@ -25,6 +25,7 @@ import (
 	"io"
 	"math/rand"
 	"runtime"
+	"time"
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
@@ -43,6 +44,9 @@ var sampleCmd = &cobra.Command{
 Attention:
 1. Do not use '-n' on large FASTQ files, it loads all seqs into memory!
    use 'seqkit sample -p 0.1 seqs.fq.gz | seqkit head -n N' instead!
+2. By default, the output is deterministic; that is, given the same input and random seed,
+   seqkit shuf will always generate identical results across different runs.
+   For 'true randomness', please add '-r/--non-deterministic', which uses a time-based seed.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -68,6 +72,12 @@ Attention:
 		}
 
 		seed := getFlagInt64(cmd, "rand-seed")
+		nonDeterministic := getFlagBool(cmd, "non-deterministic")
+
+		if nonDeterministic && cmd.Flags().Lookup("rand-seed").Changed {
+			checkError(fmt.Errorf("the flags -s/--rand-seed and -r/--non-deterministic are incompatible"))
+		}
+
 		twoPass := getFlagBool(cmd, "two-pass")
 		number := getFlagInt64(cmd, "number")
 		proportion := getFlagFloat64(cmd, "proportion")
@@ -93,8 +103,12 @@ Attention:
 		checkError(err)
 		defer outfh.Close()
 
-		_rand := rand.New(rand.NewSource(seed))
-		// randg := randomFloat64Generator(seed)
+		var _rand *rand.Rand
+		if nonDeterministic {
+			_rand = rand.New(rand.NewSource(time.Now().UnixNano()))
+		} else {
+			_rand = rand.New(rand.NewSource(seed))
+		}
 
 		n := int64(0)
 		var record *fastx.Record
@@ -212,6 +226,7 @@ func init() {
 	RootCmd.AddCommand(sampleCmd)
 
 	sampleCmd.Flags().Int64P("rand-seed", "s", 11, "random seed. For paired-end data, use the same seed across fastq files to sample the same read pairs")
+	sampleCmd.Flags().BoolP("non-deterministic", "r", false, "use a time-based seed to generate non-deterministic (truly random) results")
 	sampleCmd.Flags().Int64P("number", "n", 0, "sample by number (result may not exactly match), DO NOT use on large FASTQ files.")
 	sampleCmd.Flags().Float64P("proportion", "p", 0, "sample by proportion")
 	sampleCmd.Flags().BoolP("two-pass", "2", false, "2-pass mode read files twice to lower memory usage. Not allowed when reading from stdin")
