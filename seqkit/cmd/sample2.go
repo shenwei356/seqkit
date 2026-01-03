@@ -26,6 +26,7 @@ import (
 	"math"
 	"math/rand"
 	"runtime"
+	"slices"
 	"time"
 
 	"github.com/shenwei356/bio/seq"
@@ -144,30 +145,15 @@ Attention:
 			if totalSeqs > 0 && len(records[0].Seq.Qual) > 0 {
 				config.LineWidth = 0
 			}
-
 			if number >= totalSeqs {
-				// if required number >= total, output directly
 				outputRecords(records)
 			} else {
-				// again, sampling using reservoir
-				reservoir := make([]*fastx.Record, number)
-
-				// load first k elements into reservoir
+				// Partial Shuffle 
 				for i := int64(0); i < number; i++ {
-					reservoir[i] = records[i]
+					j := i + _rand.Int63n(totalSeqs-i)
+					records[i], records[j] = records[j], records[i]
 				}
-
-				// i-th element replace by prob
-				for i := number; i < totalSeqs; i++ {
-					// current is (i+1)-th element, prob should be k/(i+1)
-					j := _rand.Int63n(i + 1)
-					if j < number {
-						reservoir[j] = records[i]
-					}
-				}
-
-				// output sequences
-				outputRecords(reservoir)
+				outputRecords(records[:number])
 			}
 			if !quiet {
 				log.Infof("%d sequences outputted", n)
@@ -248,11 +234,26 @@ Attention:
 			return
 		}
 
-		reservoir := make([]*fastx.Record, 0, number)
-		var count int64 = 0
 		// number < total, sampling using reservoir
 		// first load k samples to reservoir (k=desired sampling number)
 		// iterate, for i-th sample (i>k), replacing random one of reservoir with prob of k/i
+		savedIndices := make([]int64, number)
+		for i := int64(0); i < number; i++ {
+			savedIndices[i] = i
+		}
+
+		for i := number; i < int64(seqNum); i++ {
+			j := _rand.Int63n(i + 1)
+			if j < number {
+				savedIndices[j] = i
+			}
+		}
+
+		slices.Sort(savedIndices)
+
+		var idxPtr int = 0
+		var currentIdx int64 = 0
+
 		for {
 			record, err = fastxReader.Read()
 			if err != nil {
@@ -263,21 +264,15 @@ Attention:
 				break
 			}
 
-			count++
-			if count <= number {
-				// first k elements: add directly to reservoir
-				reservoir = append(reservoir, record.Clone())
-			} else {
-				// for element i (i > k), replace with probability k/i
-				// random int [0, count)
-				j := _rand.Int63n(count)
-				if j < number {
-					reservoir[j] = record.Clone()
-				}
+			if idxPtr < len(savedIndices) && currentIdx == savedIndices[idxPtr] {
+				outputRecord(record)
+				idxPtr++
+			}
+			currentIdx++
+			if idxPtr >= len(savedIndices) {
+				break
 			}
 		}
-		// output sequences
-		outputRecords(reservoir)
 
 		if !quiet {
 			log.Infof("%d sequences outputted", n)
