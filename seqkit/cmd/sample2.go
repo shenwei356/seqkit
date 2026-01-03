@@ -34,17 +34,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// sampleCmd represents the sample command
+// sample2Cmd represents the sample2 command
 var sample2Cmd = &cobra.Command{
 	GroupID: "set",
 
-	Use:   "sample",
-	Short: "sample sequences by number or proportion",
+	Use:   "sample2",
+	Short: "sample sequences by number or proportion (version 2)",
 	Long: `sample sequences by number or proportion.
 
 Attention:
-1. Do not use '-n' on large FASTQ files, it loads all seqs into memory!
-   use 'seqkit sample -p 0.1 seqs.fq.gz | seqkit head -n N' instead!
+1. '-n' SHOULD BE coupled with 2-pass mode (-2) when large FASTQ files, 
+   otherwise it loads ALL seqs into memory!
 2. By default, the output is deterministic; that is, given the same input and random seed,
    seqkit shuf will always generate identical results across different runs.
    For 'true randomness', please add '-r/--non-deterministic', which uses a time-based seed.
@@ -286,11 +286,11 @@ Attention:
 }
 
 func init() {
-	RootCmd.AddCommand(sampleCmd)
+	RootCmd.AddCommand(sample2Cmd)
 
-	sampleCmd.Flags().Int64P("rand-seed", "s", 11, "random seed. For paired-end data, use the same seed across fastq files to sample the same read pairs")
-	sampleCmd.Flags().BoolP("non-deterministic", "r", false, "use a time-based seed to generate non-deterministic (truly random) results")
-	sampleCmd.Flags().Int64P("number", "n", 0, "sample by number (result may not exactly match), DO NOT use on large FASTQ files.")
-	sampleCmd.Flags().Float64P("proportion", "p", 0, "sample by proportion")
-	sampleCmd.Flags().BoolP("two-pass", "2", false, "2-pass mode read files twice to lower memory usage. Not allowed when reading from stdin")
+	sample2Cmd.Flags().Int64P("rand-seed", "s", 11, "random seed. For paired-end data, use the same seed across fastq files to sample the same read pairs")
+	sample2Cmd.Flags().BoolP("non-deterministic", "r", false, "use a time-based seed to generate non-deterministic (truly random) results")
+	sample2Cmd.Flags().Int64P("number", "n", 0, "sample by number. SHOULD BE coupled with -2 flag (2-pass mode) when handling large FASTQ files.")
+	sample2Cmd.Flags().Float64P("proportion", "p", 0, "sample by proportion. Numbers would not be constant if not coupled with 2-pass mode.")
+	sample2Cmd.Flags().BoolP("two-pass", "2", false, "2-pass mode read files twice to lower memory usage. Not allowed when reading from stdin")
 }
