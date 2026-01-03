@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"math"
 	"math/rand"
 	"runtime"
 	"time"
@@ -34,7 +35,7 @@ import (
 )
 
 // sampleCmd represents the sample command
-var sampleCmd = &cobra.Command{
+var sample2Cmd = &cobra.Command{
 	GroupID: "set",
 
 	Use:   "sample",
@@ -117,6 +118,13 @@ Attention:
 				log.Info("sample by number")
 			}
 
+			outputRecords := func(recs []*fastx.Record) {
+				for _, rec := range recs {
+					rec.FormatToWriter(outfh, config.LineWidth)
+					n++
+				}
+			}
+
 			if twoPass {
 				// first pass, get seq number
 				if !quiet {
@@ -129,15 +137,186 @@ Attention:
 					log.Infof("seq number: %d", seqNum)
 				}
 
-				proportion = float64(number) / float64(seqNum) * 1.1
-
 				// second pass
 				if !quiet {
 					log.Info("second pass: reading and sampling")
 				}
 				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
-			LOOP:
+				defer fastxReader.Close()
+
+				if fastxReader.IsFastq {
+					config.LineWidth = 0
+					fastx.ForcelyOutputFastq = true
+				}
+
+				// temp fix for seqNum type
+				if number >= int64(seqNum) {
+					for {
+						record, err = fastxReader.Read()
+						if err != nil {
+							if err == io.EOF {
+								break
+							}
+							checkError(err)
+							break
+						}
+						record.FormatToWriter(outfh, config.LineWidth)
+						n++
+					}
+				} else {
+					reservoir := make([]*fastx.Record, 0, number)
+					var count int64 = 0
+					// number < total, sampling using reservoir
+					// first load k samples to reservoir (k=desired sampling number)
+					// iterate, for i-th sample (i>k), replacing random one of reservoir with prob of k/i
+					for {
+						record, err = fastxReader.Read()
+						if err != nil {
+							if err == io.EOF {
+								break
+							}
+							checkError(err)
+							break
+						}
+
+						count++
+						if count <= number {
+							// first k elements: add directly to reservoir
+							reservoir = append(reservoir, record.Clone())
+						} else {
+							// for element i (i > k), replace with probability k/i
+							// random int [0, count)
+							j := _rand.Int63n(count)
+							if j < number {
+								reservoir[j] = record.Clone()
+							}
+						}
+					}
+					// output sequences
+					outputRecords(reservoir)
+				}
+			} else {
+				if !quiet {
+					log.Info("loading all sequences into memory...")
+				}
+				records, err := fastx.GetSeqs(file, alphabet, config.Threads, 10, idRegexp)
+				checkError(err)
+
+				totalSeqs := int64(len(records))
+				if totalSeqs > 0 && len(records[0].Seq.Qual) > 0 {
+					config.LineWidth = 0
+				}
+
+				if number >= totalSeqs {
+					// if required number >= total, output directly
+					outputRecords(records)
+				} else {
+					// again, sampling using reservoir
+					reservoir := make([]*fastx.Record, number)
+
+					// load first k elements into reservoir
+					for i := int64(0); i < number; i++ {
+						reservoir[i] = records[i]
+					}
+
+					// i-th element replace by prob
+					for i := number; i < totalSeqs; i++ {
+						// current is (i+1)-th element, prob should be k/(i+1)
+						j := _rand.Int63n(i + 1)
+						if j < number {
+							reservoir[j] = records[i]
+						}
+					}
+
+					// output sequences
+					outputRecords(reservoir)
+				}
+			}
+		} else {
+			if !quiet {
+				log.Info("sample by proportion")
+			}
+
+			outputRecords := func(recs []*fastx.Record) {
+				for _, rec := range recs {
+					rec.FormatToWriter(outfh, config.LineWidth)
+					n++
+				}
+			}
+			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
+			checkError(err)
+			defer fastxReader.Close()
+
+			if fastxReader.IsFastq {
+				config.LineWidth = 0
+				fastx.ForcelyOutputFastq = true
+			}
+
+			if twoPass {
+				// first pass, get seq number
+				if !quiet {
+					log.Info("first pass: counting seq number")
+				}
+				seqNum, err := fastx.GetSeqNumber(file)
+				checkError(err)
+				number = int64(math.Floor(float64(seqNum) * proportion))
+
+				if !quiet {
+					log.Infof("seq number: %d", seqNum)
+				}
+
+				// second pass
+				if !quiet {
+					log.Info("second pass: reading and sampling")
+				}
+
+				if number >= int64(seqNum) {
+					for {
+						record, err = fastxReader.Read()
+						if err != nil {
+							if err == io.EOF {
+								break
+							}
+							checkError(err)
+							break
+						}
+						record.FormatToWriter(outfh, config.LineWidth)
+						n++
+					}
+				} else {
+					reservoir := make([]*fastx.Record, 0, number)
+					var count int64 = 0
+					// number < total, sampling using reservoir
+					// first load k samples to reservoir (k=desired sampling number)
+					// iterate, for i-th sample (i>k), replacing random one of reservoir with prob of k/i
+					for {
+						record, err = fastxReader.Read()
+						if err != nil {
+							if err == io.EOF {
+								break
+							}
+							checkError(err)
+							break
+						}
+
+						count++
+						if count <= number {
+							// first k elements: add directly to reservoir
+							reservoir = append(reservoir, record.Clone())
+						} else {
+							// for element i (i > k), replace with probability k/i
+							// random int [0, count)
+							j := _rand.Int63n(count)
+							if j < number {
+								reservoir[j] = record.Clone()
+							}
+						}
+					}
+					// output sequences
+					outputRecords(reservoir)
+				}
+			} else {
 				for {
 					record, err = fastxReader.Read()
 					if err != nil {
@@ -156,64 +335,9 @@ Attention:
 					if _rand.Float64() <= proportion {
 						n++
 						record.FormatToWriter(outfh, config.LineWidth)
-						if n == number {
-							break LOOP
-						}
-					}
-				}
-				fastxReader.Close()
-			} else {
-				if !quiet {
-					log.Info("loading all sequences into memory...")
-				}
-				records, err := fastx.GetSeqs(file, alphabet, config.Threads, 10, idRegexp)
-				checkError(err)
-
-				if len(records) > 0 && len(records[0].Seq.Qual) > 0 {
-					config.LineWidth = 0
-				}
-
-				proportion = float64(number) / float64(len(records)) * 1.1
-
-				for _, record := range records {
-					// if <-randg <= proportion {
-					if _rand.Float64() <= proportion {
-						n++
-						record.FormatToWriter(outfh, config.LineWidth)
-						if n == number {
-							break
-						}
 					}
 				}
 			}
-		} else {
-			if !quiet {
-				log.Info("sample by proportion")
-			}
-
-			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
-			checkError(err)
-			for {
-				record, err = fastxReader.Read()
-				if err != nil {
-					if err == io.EOF {
-						break
-					}
-					checkError(err)
-					break
-				}
-				if fastxReader.IsFastq {
-					config.LineWidth = 0
-					fastx.ForcelyOutputFastq = true
-				}
-
-				// if <-randg <= proportion {
-				if _rand.Float64() <= proportion {
-					n++
-					record.FormatToWriter(outfh, config.LineWidth)
-				}
-			}
-			fastxReader.Close()
 		}
 
 		if !quiet {
