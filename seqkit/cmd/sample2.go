@@ -41,7 +41,14 @@ var sample2Cmd = &cobra.Command{
 
 	Use:   "sample2",
 	Short: "sample sequences by number or proportion (version 2)",
-	Long: `sample sequences by number or proportion.
+	Long: `sample sequences by number or proportion (version 2).
+
+Differences to 'seqkit sample':
+1. Provides unbiased, fixed-size sampling with controlled memory usage.
+2. Guarantees exact target count with equal probability for each record.
+3. Memory efficient: tested on large datasets with minimal memory footprint.
+   -   2,195,354 records: <200 MB memory usage (output: 38 GB long read FASTQ)
+   - 124,437,023 records: 2.05 GB memory usage (output: 43 GB short read FASTQ)
 
 Attention:
 1. '-n' SHOULD BE coupled with 2-pass mode (-2) when large FASTQ files, 
@@ -148,7 +155,7 @@ Attention:
 			if number >= totalSeqs {
 				outputRecords(records)
 			} else {
-				// Partial Shuffle 
+				// Partial Shuffle
 				for i := int64(0); i < number; i++ {
 					j := i + _rand.Int63n(totalSeqs-i)
 					records[i], records[j] = records[j], records[i]

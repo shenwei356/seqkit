@@ -41,6 +41,8 @@ var sampleCmd = &cobra.Command{
 	Short: "sample sequences by number or proportion",
 	Long: `sample sequences by number or proportion.
 
+'seqkit sample2' is more accurate and memory efficient.
+
 Attention:
 1. Do not use '-n' on large FASTQ files, it loads all seqs into memory!
    use 'seqkit sample -p 0.1 seqs.fq.gz | seqkit head -n N' instead!

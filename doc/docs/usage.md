@@ -7,7 +7,7 @@
 - Format conversion: [fq2fa](#fq2fa), [fa2fq](#fa2fq), [fx2tab](#fx2tab-tab2fx), [tab2fx](#fx2tab-tab2fx),
   [convert](#convert)
 - Searching: [grep](#grep), [locate](#locate), [amplicon](#amplicon), [fish](#fish)
-- Set operation: [sample](#sample), [rmdup](#rmdup), [common](#common),
+- Set operation: [sample](#sample), [sample2](#sample2), [rmdup](#rmdup), [common](#common),
   [duplicate](#duplicate), [split](#split), [split2](#split2), [head](#head),
   [head-genome](#head-genome), [range](#range), [pair](#pair)
 - Edit: [concat](#concat), [replace](#replace), [restart](#restart), [mutate](#mutate),
@@ -2969,6 +2969,8 @@ Usage
 ``` text
 sample sequences by number or proportion.
 
+'seqkit sample2' is more accurate and memory efficient.
+
 Attention:
 1. Do not use '-n' on large FASTQ files, it loads all seqs into memory!
    use 'seqkit sample -p 0.1 seqs.fq.gz | seqkit head -n N' instead!
@@ -3005,8 +3007,6 @@ Examples
         [INFO] sample by number
         [INFO] 949 sequences outputed
 
-    949 != 1000 ??? see [Effect of random seed on results of `seqkit sample`](http:bioinf.shenwei.me/seqkit/note/#effect-of-random-seed-on-results-of-seqkit-sample)
-
     ***To reduce memory usage when spliting big file, we could use flag `--two-pass`***
 
     ***We can also use `seqkit sample -p` followed with `seqkit head -n`:***
@@ -3027,13 +3027,54 @@ Examples
             | seqkit shuffle -o sample.fa.gz
 
 Note that when sampling on FASTQ files, make sure using same random seed by
-flag `-s` (`--rand-seed`)
+flag `-s` (`--rand-seed`).
+
+`seqkit sample2` is more accurate and memory efficient.
+
+## sample2
+
+Usage
+
+```text
+sample sequences by number or proportion (version 2)".
+
+Differences to 'seqkit sample':
+1. Provides unbiased, fixed-size sampling with controlled memory usage.
+2. Guarantees exact target count with equal probability for each record.
+3. Memory efficient: tested on large datasets with minimal memory footprint.
+   -   2,195,354 records: <200 MB memory usage (output: 38 GB long read FASTQ)
+   - 124,437,023 records: 2.05 GB memory usage (output: 43 GB short read FASTQ)
+
+Attention:
+1. '-n' SHOULD BE coupled with 2-pass mode (-2) when large FASTQ files, 
+   otherwise it loads ALL seqs into memory!
+2. By default, the output is deterministic; that is, given the same input and random seed,
+   seqkit shuf will always generate identical results across different runs.
+   For 'true randomness', please add '-r/--non-deterministic', which uses a time-based seed.
+
+Usage:
+  seqkit sample2 [flags] 
+
+Flags:
+  -h, --help                help for sample2
+  -r, --non-deterministic   use a time-based seed to generate non-deterministic (truly random) results
+  -n, --number int          sample by number. SHOULD BE coupled with -2 flag (2-pass mode) when handling
+                            large FASTQ files.
+  -p, --proportion float    sample by proportion. Numbers would not be constant if not coupled with
+                            2-pass mode.
+  -s, --rand-seed int       random seed. For paired-end data, use the same seed across fastq files to
+                            sample the same read pairs (default 11)
+  -2, --two-pass            2-pass mode read files twice to lower memory usage. Not allowed when reading
+                            from stdin
+
+```
+
 
 ## head
 
 Usage
 
-``` text
+```text
 print the first N FASTA/Q records, or leading records whose total length >= L
 
 For returning the last N records, use:
