@@ -274,19 +274,23 @@ var seqCmd = &cobra.Command{
 				}
 
 				if filterMinLen && len(record.Seq.Seq) < minLen {
+					log.Info("sequence '%s' too short (%d < %d)", record.Seq.Id, len(record.Seq.Seq), minLen)
 					continue
 				}
 
 				if filterMaxLen && len(record.Seq.Seq) > maxLen {
+					log.Info("sequence '%s' too long (%d > %d)", record.Seq.Id, len(record.Seq.Seq), maxLen)
 					continue
 				}
 
 				if filterMinQual || filterMaxQual {
 					avgQual := record.Seq.AvgQual(qBase)
 					if filterMinQual && avgQual < minQual {
+						log.Info("average quality of sequence '%s' too low (%d < %d)", record.Seq.Id, avgQual, minQual)
 						continue
 					}
 					if filterMaxQual && avgQual >= maxQual {
+						log.Info("average quality of sequence '%s' too high (%d > %d)", record.Seq.Id, avgQual, maxQual)
 						continue
 					}
 				}
