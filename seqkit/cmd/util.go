@@ -24,7 +24,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"math/rand"
 	"os"
 	"os/exec"
 	"regexp"
@@ -490,18 +489,6 @@ func checkFileFormat(format string) {
 	default:
 		log.Fatal("Invalid format specified:", format)
 	}
-}
-
-// it's slow, do not use
-func randomFloat64Generator(seed int64) chan float64 {
-	rand.Seed(seed)
-	ch := make(chan float64, 1024)
-	go func() {
-		for {
-			ch <- rand.Float64()
-		}
-	}()
-	return ch
 }
 
 func wrapByteSlice(s []byte, width int, buffer *bytes.Buffer) ([]byte, *bytes.Buffer) {

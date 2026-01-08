@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2026 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -132,6 +132,11 @@ var seqCmd = &cobra.Command{
 		}
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
+		}
 
 		var seqCol *SeqColorizer
 		if color {

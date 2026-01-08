@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2026 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,7 @@
 package cmd
 
 import (
+	"fmt"
 	"io"
 	"runtime"
 
@@ -35,8 +36,8 @@ var headCmd = &cobra.Command{
 	GroupID: "set",
 
 	Use:   "head",
-	Short: "print first N FASTA/Q records",
-	Long: `print first N FASTA/Q records
+	Short: "print the first N FASTA/Q records, or leading records whose total length >= L",
+	Long: `print the first N FASTA/Q records, or leading records whose total length >= L
 
 For returning the last N records, use:
     seqkit range -r -N:-1 seqs.fasta
@@ -54,7 +55,33 @@ For returning the last N records, use:
 
 		number := getFlagPositiveInt(cmd, "number")
 
+		setLength := cmd.Flags().Lookup("length").Changed
+		lengthS := getFlagString(cmd, "length")
+
+		var length int64
+		var err error
+		if setLength && lengthS != "" {
+			length, err = ParseByteSize(lengthS)
+			if err != nil {
+				checkError(fmt.Errorf("parsing length: %s", lengthS))
+			}
+
+			if length > 0 {
+				number = 0
+			}
+		}
+
+		if number > 0 && length > 0 {
+			checkError(fmt.Errorf("-n/--number is incompatible with -l/--length"))
+		}
+		byRecords := number > 0
+
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
+		}
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
@@ -62,6 +89,7 @@ For returning the last N records, use:
 
 		var record *fastx.Record
 		i := 0
+		var l int64 = 0
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -80,10 +108,17 @@ For returning the last N records, use:
 					fastx.ForcelyOutputFastq = true
 				}
 				i++
+				l += int64(record.Seq.Length())
 				record.FormatToWriter(outfh, config.LineWidth)
 
-				if number == i {
-					return
+				if byRecords {
+					if number == i {
+						return
+					}
+				} else {
+					if l >= length {
+						return
+					}
 				}
 			}
 			fastxReader.Close()
@@ -95,5 +130,6 @@ For returning the last N records, use:
 
 func init() {
 	RootCmd.AddCommand(headCmd)
-	headCmd.Flags().IntP("number", "n", 10, "print first N FASTA/Q records")
+	headCmd.Flags().IntP("number", "n", 10, "print the first N FASTA/Q records")
+	headCmd.Flags().StringP("length", "l", "", "print leading FASTA/Q records whose total sequence length >= L (supports K/M/G suffix). This flag overrides -n/--number")
 }

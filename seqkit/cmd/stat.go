@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2026 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -74,10 +74,15 @@ Columns:
   14. N50_num   N50_num or L50. https://en.wikipedia.org/wiki/N50,_L50,_and_related_statistics#L50
   15. Q20(%)    percentage of bases with the quality score greater than 20
   16. Q30(%)    percentage of bases with the quality score greater than 30
-  17. AvgQual   average quality
+  17. AvgQual   average quality.
+                Attention: It's not the arithmetic average of quartiles (some tools do that).
+                How to computate: 1) take the qscore for each base, 2) convert it back to
+                an error probability, 3) take the mean of those, 4) and then convert that
+                mean error back into a qscore.
+                Reference: https://github.com/shenwei356/seqkit/issues/448
   18. GC(%)     percentage of GC content
   19. sum_n     number of ambitious letters (N, n, X, x)
-  
+
 Attention:
   1. Sequence length metrics (sum_len, min_len, avg_len, max_len, Q1, Q2, Q3)
      count the number of gaps or spaces. You can remove them with "seqkit seq -g":
@@ -87,7 +92,7 @@ Tips:
   1. For lots of small files (especially on SDD), use a big value of '-j' to
      parallelize counting.
   2. Extract one metric with csvtk (https://github.com/shenwei356/csvtk):
-         seqkit stats -Ta input.fastq.gz | csvtk cut -t -f "Q30(%)" | csvtk del-header 
+         seqkit stats -Ta input.fastq.gz | csvtk cut -t -f "Q30(%)" | csvtk del-header
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -137,6 +142,11 @@ Tips:
 		}
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !(skipFileCheck || config.SkipFileCheck))
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
+		}
 
 		style := &stable.TableStyle{
 			Name: "plain",

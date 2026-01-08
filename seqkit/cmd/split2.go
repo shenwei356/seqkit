@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2026 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -96,6 +96,12 @@ If you want to cut a sequence into multiple segments.
 
 		if len(files) > 1 {
 			checkError(fmt.Errorf("no more than one file should be given"))
+		}
+
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
 		}
 
 		read1 := getFlagString(cmd, "read1")
@@ -444,8 +450,8 @@ If you want to cut a sequence into multiple segments.
 							var outfh2 *xopen.Writer
 							var outfile string
 							if !seqIDAsFileName {
-								if prefixByLengthSet {
-									prefix = prefixByLength
+								if prefixByPartSet {
+									prefix = prefixByPart
 									if pairedEnd {
 										prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
 									}

@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2026 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ import (
 )
 
 // VERSION of seqkit
-const VERSION = "2.11.0"
+const VERSION = "2.13.0"
 
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{

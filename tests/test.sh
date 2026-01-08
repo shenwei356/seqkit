@@ -16,9 +16,20 @@ which csvtk || CSVTK=./csvtk/csvtk/csvtk; true
 
 STOP_ON_FAIL=1
 
-md5sum () { 
-	openssl dgst -sha256 $1  | cut -d $' ' -f 2; 
+md5sum () {
+	openssl dgst -sha256 $1  | cut -d $' ' -f 2;
 }
+
+# ------------------------------------------------------------
+#                        stats
+# ------------------------------------------------------------
+file=tests/empty_id_and_seq.fa
+run stats $app stats -T $file
+assert_equal $(grep -c "^>" $file) $(sed 1d $STDOUT_FILE | cut -f 4)
+
+file=tests/blank1.fx
+run stats $app stats -T $file
+assert_equal 0 $(sed 1d $STDOUT_FILE | cut -f 4)
 
 # ------------------------------------------------------------
 #                        seq
@@ -268,6 +279,32 @@ rm list
 run grep_delete_matched $app grep --delete-matched -r -p "^hsa" $file
 assert_equal $(cat $STDOUT_FILE | md5sum | cut -d" " -f 1) $($app fx2tab $file | grep -E "^hsa" | head -n 1 | $app tab2fx | md5sum | cut -d" " -f 1)
 
+# --- empty id or seq ---
+file=empty_id_and_seq2.fa
+
+# empty id
+run grep_empty_id $app grep -p "" $file
+assert_equal $(cat $STDOUT_FILE | seqkit seq -ni) ""
+
+run grep_empty_id_r $app grep -r -p "" $file
+assert_equal $(cat $STDOUT_FILE | seqkit seq -ni) ""
+
+run grep_empty_id_r2 $app grep -r -p "^$" $file
+assert_equal $(cat $STDOUT_FILE | seqkit seq -ni) ""
+
+# empty seq
+run grep_empty_seq $app grep -p "" $file -s
+assert_equal $(cat $STDOUT_FILE | seqkit seq -s) ""
+
+run grep_empty_seq_r $app grep -r -p "" $file -s
+assert_equal $(cat $STDOUT_FILE | seqkit seq -s) ""
+
+run grep_empty_seq_r2 $app grep -d -p "" $file -s
+assert_equal $(cat $STDOUT_FILE | seqkit seq -s) ""
+
+run grep_empty_seq_r3 $app grep -r -p "^$" $file -s
+assert_equal $(cat $STDOUT_FILE | seqkit seq -s) ""
+
 # ------------------------------------------------------------
 #                       locate
 # ------------------------------------------------------------
@@ -321,7 +358,7 @@ rm t.*
 file=tests/hairpin.fa
 
 testseq() {
-    cat $file | $app head -n 100 | $app rmdup
+    cat $file | $app head -n 100 | $app rmdup --quiet
 }
 fun() {
     testseq | $app split -i -f
@@ -533,7 +570,7 @@ fun(){
 run bam_bundler fun
 cmp tests/bundler_stats_merged.tsv tests/bundler_stats_bulk.tsv
 assert_equal $? 0
-rm -fr tests/bundler_test tests/bundler_stats_merged.tsv tests/bundler_stats_bulk.tsv 
+rm -fr tests/bundler_test tests/bundler_stats_merged.tsv tests/bundler_stats_bulk.tsv
 
 # ------------------------------------------------------------
 #                       fish
@@ -611,7 +648,7 @@ assert_equal $? 0
 # Regression test for scat/fasta
 fun(){
 	BASE=tests/scat_test_fasta
-	rm -fr $BASE 
+	rm -fr $BASE
 	rm -f tests/scat_test_all.fas tests/scat_output.fas
         mkdir -p $BASE
 	($app scat -j 4 -i fasta $BASE > tests/scat_output.fas)&
@@ -641,7 +678,7 @@ fun(){
 	kill -s INT $SCAT_PID
 	sync; sleep 0.5
 	wait $SCAT_PID
-	sync; 
+	sync;
 	$app scat -f -j 4 -i fasta $BASE | $app sort -n -j 1 - > tests/sorted_scat_find.fas
 	$app sort -n -j 1 tests/scat_output.fas > tests/sorted_scat_output.fas
 	rm -fr $BASE
@@ -658,7 +695,7 @@ rm -f tests/sorted_scat_output.fas tests/sorted_scat_test_all.fas tests/sorted_s
 # Regression test for scat/fastq
 fun(){
 	BASE=tests/scat_test_fastq
-	rm -fr $BASE 
+	rm -fr $BASE
 	rm -f tests/scat_test_all.fq tests/scat_output.fq
         mkdir -p $BASE
 	($app scat -j 4 -i fastq $BASE > tests/scat_output.fq)&

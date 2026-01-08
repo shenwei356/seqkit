@@ -1,8 +1,32 @@
-- [SeqKit v2.11.0](https://github.com/shenwei356/seqkit/releases/tag/v2.11.0) - 2025-xx-xx
+- [SeqKit v2.13.0](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0) - 2025-12-04
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.13.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0)
+    - new command: `seqkit sample2`: improved `seqkit sample` by [@stahiga](https://github.com/stahiga). [#566](https://github.com/shenwei356/seqkit/pull/566)
+    - `seqkit shuffle`:
+        - add a new option `--tmp-dir`, which can specify tmp dir for FASTA records from stdin or compressed FASTA files. [#562](https://github.com/shenwei356/seqkit/issues/562)
+    - `seqkit shuffle/sample`:
+        - add a new flag `-r/--non-deterministic`, which uses a time-based seed to generate non-deterministic (truely random) results. [#565](https://github.com/shenwei356/seqkit/issues/565)
+- [SeqKit v2.12.0](https://github.com/shenwei356/seqkit/releases/tag/v2.12.0) - 2025-12-04
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.12.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.12.0)
+    - `seqkit grep`:
+        - `-p/--pattern` accepts empty character (`""`) now. So it's able to **search records with empty IDs or sequences**. [#558](https://github.com/shenwei356/seqkit/issues/558)
+    - `seqkit split2`:
+        - fix a bug introduced in v2.11.0: `--by-part-prefix` options has no effect. [#554](https://github.com/shenwei356/seqkit/issues/554)
+    - `seqkit replace`:
+        - `{uuid}`: use the time-sortable UUIDv7 to replace v4.
+    - `seqkit stats/fx2tab`:
+        - add information about how the average quality is computed. [#448](https://github.com/shenwei356/seqkit/issues/448)
+- [SeqKit v2.11.0](https://github.com/shenwei356/seqkit/releases/tag/v2.11.0) - 2025-11-20
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.11.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.11.0)
-    - `seqkit split1`:
+    - `seqkit`:
+        - **fix reading records with both empty id and sequence**. [#550](https://github.com/shenwei356/seqkit/issues/550)
+        - check if the output file name equals to one of the input files. [#541](https://github.com/shenwei356/seqkit/issues/541)
+    - `seqkit split2`:
         - add a new flag `-N, --seqid-as-filename` to use the first sequence ID as the file name. 
         E.g., using `-N -s 1` is equal to `seqkit split --by-id`, but it's much faster and uses less memory.
+    - `seqkit head`:
+        - add a new flag `-l, --length` to print heading FASTA/Q records with total sequence length >= N, e.g., `-l 2G`.
+    - `seqkit replace`:
+        - add a new replacement symbol `{uuid}` for random UUID. [#552](https://github.com/shenwei356/seqkit/issues/552)
 - [SeqKit v2.10.1](https://github.com/shenwei356/seqkit/releases/tag/v2.10.1) - 2025-08-19
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.10.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.10.1)
     - `seqkit seq`:
