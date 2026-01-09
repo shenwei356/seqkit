@@ -590,7 +590,7 @@ func GetSamMapped(r *sam.Record) bool {
 }
 
 func GetSamReverse(r *sam.Record) bool {
-	return (r.Flags&sam.Reverse == 0)
+	return (r.Flags&sam.Reverse != 0)
 }
 
 func GetSamRef(r *sam.Record) string {
