@@ -322,7 +322,7 @@ type RefWithFaidx struct {
 }
 
 func (idx *RefWithFaidx) IdxSubSeq(chrom string, start, end int) (string, error) {
-	b, err := idx.faidx.SubSeq(chrom, start, end)
+	b, err := idx.faidx.SubSeq(chrom, start+1, end)
 	return string(b), err
 }
 
