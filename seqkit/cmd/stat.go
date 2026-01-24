@@ -476,7 +476,7 @@ Tips:
 					if checkSeqType {
 						checkSeqType = false
 
-						if len(record.Seq.Qual) > 0 {
+						if fastxReader.IsFastq {
 							seqFormat = "FASTQ"
 						} else {
 							seqFormat = "FASTA"

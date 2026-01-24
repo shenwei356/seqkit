@@ -7,6 +7,8 @@
         - add a new flag `-r/--non-deterministic`, which uses a time-based seed to generate non-deterministic (truely random) results. [#565](https://github.com/shenwei356/seqkit/issues/565)
     - `seqkit bam`:
         - fix a bug [#200](https://github.com/shenwei356/seqkit/issues/200) by @botond-sipos.
+    - `seqkit stats`:
+        - fix detecting file format type for FASTQ records with empty sequences. [#569](https://github.com/shenwei356/seqkit/issues/569)
 - [SeqKit v2.12.0](https://github.com/shenwei356/seqkit/releases/tag/v2.12.0) - 2025-12-04
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.12.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.12.0)
     - `seqkit grep`:
