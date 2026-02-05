@@ -313,35 +313,49 @@ Usage
 ``` text
 transform sequences (extract ID, filter by length, remove gaps, reverse complement...)
 
+Filtering records to edit:
+  You can use flags similar to those in "seqkit grep" to choose partly records to edit.
+
 Usage:
   seqkit seq [flags] 
 
 Flags:
-  -k, --color                 colorize sequences - to be piped into "less -R"
-  -p, --complement            complement sequence, flag '-v' is recommended to switch on
-      --dna2rna               DNA to RNA
-  -G, --gap-letters string    gap letters to be removed with -g/--remove-gaps (default "- \t.")
-  -h, --help                  help for seq
-  -l, --lower-case            print sequences in lower case
-  -M, --max-len int           only print sequences shorter than or equal to the maximum length (-1 for
-                              no limit) (default -1)
-  -R, --max-qual float        only print sequences with average quality less than this limit (-1 for no
-                              limit) (default -1)
-  -m, --min-len int           only print sequences longer than or equal to the minimum length (-1 for no
-                              limit) (default -1)
-  -Q, --min-qual float        only print sequences with average quality greater or equal than this limit
-                              (-1 for no limit) (default -1)
-  -n, --name                  only print names/sequence headers
-  -i, --only-id               print IDs instead of full headers
-  -q, --qual                  only print qualities
-  -b, --qual-ascii-base int   ASCII BASE, 33 for Phred+33 (default 33)
-  -g, --remove-gaps           remove gaps letters set by -G/--gap-letters, e.g., spaces, tabs, and
-                              dashes (gaps "-" in aligned sequences)
-  -r, --reverse               reverse sequence
-      --rna2dna               RNA to DNA
-  -s, --seq                   only print sequences
-  -u, --upper-case            print sequences in upper case
-  -v, --validate-seq          validate bases according to the alphabet
+  -k, --color                    colorize sequences - to be piped into "less -R"
+  -p, --complement               complement sequence, flag '-v' is recommended to switch on
+      --dna2rna                  DNA to RNA
+      --f-by-name                [target filter] match by full name instead of just ID
+      --f-by-seq                 [target filter] search subseq on seq, both positive and negative strand
+                                 are searched
+      --f-ignore-case            [target filter] ignore case
+      --f-invert-match           [target filter] invert the sense of matching, to select non-matching records
+      --f-only-positive-strand   [target filter] only search on positive strand
+      --f-pattern strings        [target filter] search pattern (multiple values supported. Attention:
+                                 use double quotation marks for patterns containing comma, e.g., -p
+                                 '"A{2,}"')
+      --f-pattern-file string    [target filter] pattern file (one record per line)
+      --f-use-regexp             [target filter] patterns are regular expression
+  -G, --gap-letters string       gap letters to be removed with -g/--remove-gaps (default "- \t.")
+  -h, --help                     help for seq
+  -l, --lower-case               print sequences in lower case
+  -M, --max-len int              only print sequences shorter than or equal to the maximum length (-1
+                                 for no limit) (default -1)
+  -R, --max-qual float           only print sequences with average quality less than this limit (-1 for
+                                 no limit) (default -1)
+  -m, --min-len int              only print sequences longer than or equal to the minimum length (-1 for
+                                 no limit) (default -1)
+  -Q, --min-qual float           only print sequences with average quality greater or equal than this
+                                 limit (-1 for no limit) (default -1)
+  -n, --name                     only print names/sequence headers
+  -i, --only-id                  print IDs instead of full headers
+  -q, --qual                     only print qualities
+  -b, --qual-ascii-base int      ASCII BASE, 33 for Phred+33 (default 33)
+  -g, --remove-gaps              remove gaps letters seft by -G/--gap-letters, e.g., spaces, tabs, and
+                                 dashes (gaps "-" in aligned sequences)
+  -r, --reverse                  reverse sequence
+      --rna2dna                  RNA to DNA
+  -s, --seq                      only print sequences
+  -u, --upper-case               print sequences in upper case
+  -v, --validate-seq             validate bases according to the alphabet
 
 ```
 
@@ -461,6 +475,21 @@ Examples
         $ cat hairpin.fa | seqkit seq -m 100 -M 1000 | seqkit stats
         file  format  type  num_seqs    sum_len  min_len  avg_len  max_len
         -     FASTA   RNA     10,972  1,560,270      100    142.2      938
+        
+1. Choose some sequences to edit.
+
+        $ echo -ne ">s1\na-c-t-g\n>s2 plasmid\naa-cc-tt-gg\n" 
+        >s1
+        a-c-t-g
+        >s2 plasmid
+        aa-cc-tt-gg
+
+        $ echo -ne ">s1\na-c-t-g\n>s2 plasmid\naa-cc-tt-gg\n" \
+                | ./seqkit seq --f-use-regexp --f-by-name  --f-pattern plasmid -r -p -g -u
+        >s1
+        a-c-t-g
+        >s2 plasmid
+        CCAAGGTT
 
 
 ## subseq

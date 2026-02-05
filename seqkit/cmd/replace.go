@@ -438,7 +438,7 @@ Filtering records to edit:
 						}
 					} else {
 						h = xxhash.Sum64(target)
-						if ignoreCase {
+						if fignoreCase {
 							h = xxhash.Sum64(bytes.ToLower(target))
 						}
 						if _, ok = patternsN[h]; ok {
@@ -560,12 +560,13 @@ func init() {
 	replaceCmd.Flags().IntP("key-capt-idx", "I", 1, "capture variable index of key (1-based)")
 	replaceCmd.Flags().StringP("key-miss-repl", "m", "", "replacement for key with no corresponding value")
 
+	// flags to choose which sequence to edit
 	replaceCmd.Flags().StringSliceP("f-pattern", "", []string{""}, `[target filter] search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')`)
 	replaceCmd.Flags().StringP("f-pattern-file", "", "", "[target filter] pattern file (one record per line)")
 	replaceCmd.Flags().BoolP("f-use-regexp", "", false, "[target filter] patterns are regular expression")
 	replaceCmd.Flags().BoolP("f-invert-match", "", false, "[target filter] invert the sense of matching, to select non-matching records")
 	replaceCmd.Flags().BoolP("f-by-name", "", false, "[target filter] match by full name instead of just ID")
-	replaceCmd.Flags().BoolP("f-by-seq", "", false, "[target filter] search subseq on seq, both positive and negative strand are searched, and mismatch allowed using flag -m/--max-mismatch")
+	replaceCmd.Flags().BoolP("f-by-seq", "", false, "[target filter] search subseq on seq, both positive and negative strand are searched")
 	replaceCmd.Flags().BoolP("f-ignore-case", "", false, "[target filter] ignore case")
 	replaceCmd.Flags().BoolP("f-only-positive-strand", "", false, "[target filter] only search on positive strand")
 }

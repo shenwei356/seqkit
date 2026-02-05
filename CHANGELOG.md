@@ -1,6 +1,8 @@
 - [SeqKit v2.13.0](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0) - 2025-12-04
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.13.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0)
     - new command: `seqkit sample2`: improved `seqkit sample` by [@stahiga](https://github.com/stahiga). [#566](https://github.com/shenwei356/seqkit/pull/566)
+    - `seqkit seq`:
+        - add flags to specify sequences to operate/transform. [#568](https://github.com/shenwei356/seqkit/issues/568)
     - `seqkit shuffle`:
         - add a new option `--tmp-dir`, which can specify tmp dir for FASTA records from stdin or compressed FASTA files. [#562](https://github.com/shenwei356/seqkit/issues/562)
     - `seqkit shuffle/sample`:

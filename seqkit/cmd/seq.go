@@ -26,15 +26,18 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"runtime"
 	"strings"
 
 	// "runtime/debug"
 
+	"github.com/cespare/xxhash/v2"
 	"github.com/dsnet/compress/bzip2"
 	gzip "github.com/klauspost/pgzip"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/breader"
 	"github.com/spf13/cobra"
 
 	"github.com/klauspost/compress/zstd"
@@ -48,6 +51,9 @@ var seqCmd = &cobra.Command{
 	Use:   "seq",
 	Short: "transform sequences (extract ID, filter by length, remove gaps, reverse complement...)",
 	Long: `transform sequences (extract ID, filter by length, remove gaps, reverse complement...)
+
+Filtering records to edit:
+  You can use flags similar to those in "seqkit grep" to choose partly records to edit.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -130,6 +136,154 @@ var seqCmd = &cobra.Command{
 		if lowerCase && upperCase {
 			checkError(fmt.Errorf("could not give both flags -l (--lower-case) and -u (--upper-case)"))
 		}
+
+		// -----------------------------------------------------------------------------
+		// filter for records to edit
+
+		fpattern := getFlagStringSlice(cmd, "f-pattern")
+		fpatternFile := getFlagString(cmd, "f-pattern-file")
+		fuseRegexp := getFlagBool(cmd, "f-use-regexp")
+		finvertMatch := getFlagBool(cmd, "f-invert-match")
+		fbySeq := getFlagBool(cmd, "f-by-seq")
+		fbyName := getFlagBool(cmd, "f-by-name")
+		fignoreCase := getFlagBool(cmd, "f-ignore-case")
+		fonlyPositiveStrand := getFlagBool(cmd, "f-only-positive-strand")
+
+		// check pattern with unquoted comma
+		hasUnquotedComma := false
+		for _, _pattern := range fpattern {
+			if reUnquotedComma.MatchString(_pattern) {
+				hasUnquotedComma = true
+				break
+			}
+		}
+		if hasUnquotedComma {
+			if outFile == "-" {
+				defer log.Warningf(helpUnquotedComma)
+			} else {
+				log.Warningf(helpUnquotedComma)
+			}
+		}
+
+		// prepare pattern
+		usingDefaultIDRegexp := config.IDRegexp == fastx.DefaultIDRegexp
+
+		patternsR := make(map[uint64]*regexp.Regexp, 1<<10)
+		patternsN := make(map[uint64]interface{}, 1<<20)
+		// patternsS := make(map[string]interface{}, 1<<10)
+		patternsS := make([][]byte, 0, 16)
+
+		var pbyte []byte
+		if fpatternFile != "" {
+			var reader *breader.BufferedReader
+			var err error
+			reader, err = breader.NewDefaultBufferedReader(fpatternFile)
+			checkError(err)
+			for chunk := range reader.Ch {
+				checkError(chunk.Err)
+				for _, data := range chunk.Data {
+					p := data.(string)
+					if p == "" {
+						continue
+					}
+
+					if !quiet {
+						if p[0] == '>' {
+							log.Warningf(`symbol ">" detected, it should not be a part of the sequence ID/name: %s`, p)
+						} else if p[0] == '@' {
+							log.Warningf(`symbol "@" detected, it should not be a part of the sequence ID/name. %s`, p)
+						} else if !fbyName && usingDefaultIDRegexp && strings.ContainsAny(p, "\t ") {
+							log.Warningf("space found in pattern, you may need use --f-by-name: %s", p)
+						}
+					}
+
+					if fuseRegexp {
+						if fignoreCase {
+							p = "(?i)" + p
+						}
+						r, err := regexp.Compile(p)
+						checkError(err)
+						patternsR[xxhash.Sum64String(p)] = r
+					} else if fbySeq {
+						pbyte = []byte(p)
+						if seq.DNAredundant.IsValid(pbyte) == nil ||
+							seq.RNAredundant.IsValid(pbyte) == nil ||
+							seq.Protein.IsValid(pbyte) == nil { // legal sequence
+							if fignoreCase {
+								// patternsS[strings.ToLower(p)] = struct{}{}
+								patternsS = append(patternsS, bytes.ToLower(pbyte))
+							} else {
+								// patternsS[p] = struct{}{}
+								patternsS = append(patternsS, pbyte)
+							}
+						} else {
+							checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", p))
+						}
+					} else {
+						if fignoreCase {
+							patternsN[xxhash.Sum64String(strings.ToLower(p))] = struct{}{}
+						} else {
+							patternsN[xxhash.Sum64String(p)] = struct{}{}
+						}
+					}
+				}
+			}
+			if !quiet {
+				if len(patternsR)+len(patternsN)+len(patternsS) == 0 {
+					log.Warningf("%d patterns loaded from file", 0)
+				} else {
+					log.Infof("%d patterns loaded from file", len(patternsR)+len(patternsN)+len(patternsS))
+				}
+			}
+		} else if len(fpattern) > 0 {
+			for _, p := range fpattern {
+				if !quiet {
+					if p[0] == '>' {
+						log.Warningf(`symbol ">" detected, it should not be a part of the sequence ID/name: %s`, p)
+					} else if p[0] == '@' {
+						log.Warningf(`symbol "@" detected, it should not be a part of the sequence ID/name. %s`, p)
+					} else if !fbyName && usingDefaultIDRegexp && strings.ContainsAny(p, "\t ") {
+						log.Warningf("space found in pattern, you may need use --f-by-name: %s", p)
+					}
+				}
+
+				if fuseRegexp {
+					if fignoreCase {
+						p = "(?i)" + p
+					}
+					r, err := regexp.Compile(p)
+					checkError(err)
+					patternsR[xxhash.Sum64String(p)] = r
+				} else if fbySeq {
+					pbyte = []byte(p)
+					if seq.DNAredundant.IsValid(pbyte) == nil ||
+						seq.RNAredundant.IsValid(pbyte) == nil ||
+						seq.Protein.IsValid(pbyte) == nil { // legal sequence
+						if fignoreCase {
+							// patternsS[strings.ToLower(p)] = struct{}{}
+							patternsS = append(patternsS, bytes.ToLower(pbyte))
+						} else {
+							// patternsS[p] = struct{}{}
+							patternsS = append(patternsS, pbyte)
+						}
+					} else {
+						checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", p))
+					}
+				} else {
+					if fignoreCase {
+						patternsN[xxhash.Sum64String(strings.ToLower(p))] = struct{}{}
+					} else {
+						patternsN[xxhash.Sum64String(p)] = struct{}{}
+					}
+				}
+			}
+		}
+
+		useFilter := len(fpattern) > 0 || fpatternFile != ""
+
+		// -----------------------------------------------------------------------------
+
+		// ---------------------------------------------------------------------------------------------
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 		if !config.SkipFileCheck {
@@ -240,6 +394,15 @@ var seqCmd = &cobra.Command{
 		var buffer *bytes.Buffer
 		var record *fastx.Record
 
+		// for filtering
+		var target []byte
+		var matched bool
+		var k2 []byte
+		var re *regexp.Regexp
+		var h uint64
+		var ok bool
+		matched = true // does not filter
+
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -269,19 +432,80 @@ var seqCmd = &cobra.Command{
 					checkSeqType = false
 				}
 
-				if removeGaps {
+				// -----------------------------------------------------------------------------
+				// filter
+
+				if useFilter {
+					if fbyName {
+						target = record.Name
+					} else if fbySeq {
+						target = record.Seq.Seq
+					} else {
+						target = record.ID
+					}
+
+					matched = false
+
+					if fuseRegexp {
+						for h, re = range patternsR {
+							if re.Match(target) {
+								matched = true
+								break
+							}
+						}
+					} else if fbySeq {
+						if fignoreCase {
+							target = bytes.ToLower(target)
+						}
+						for _, k2 = range patternsS {
+							if bytes.Contains(target, k2) {
+								matched = true
+								break
+							}
+						}
+						// search the reverse complement seq
+						if !matched && !fonlyPositiveStrand {
+							target = record.Seq.RevCom().Seq
+							if fignoreCase {
+								target = bytes.ToLower(target)
+							}
+							for _, k2 = range patternsS {
+								if bytes.Contains(target, k2) {
+									matched = true
+									break
+								}
+							}
+						}
+					} else {
+						h = xxhash.Sum64(target)
+						if fignoreCase {
+							h = xxhash.Sum64(bytes.ToLower(target))
+						}
+						if _, ok = patternsN[h]; ok {
+							matched = true
+						}
+					}
+
+					if finvertMatch {
+						matched = !matched
+					}
+				}
+
+				// -----------------------------------------------------------------------------
+
+				if matched && removeGaps {
 					record.Seq.RemoveGapsInplace(gapLetters)
 				}
 
-				if filterMinLen && len(record.Seq.Seq) < minLen {
+				if matched && filterMinLen && len(record.Seq.Seq) < minLen {
 					continue
 				}
 
-				if filterMaxLen && len(record.Seq.Seq) > maxLen {
+				if matched && filterMaxLen && len(record.Seq.Seq) > maxLen {
 					continue
 				}
 
-				if filterMinQual || filterMaxQual {
+				if matched && (filterMinQual || filterMaxQual) {
 					avgQual := record.Seq.AvgQual(qBase)
 					if filterMinQual && avgQual < minQual {
 						continue
@@ -328,10 +552,10 @@ var seqCmd = &cobra.Command{
 				}
 
 				sequence = record.Seq
-				if reverse {
+				if matched && reverse {
 					sequence = sequence.ReverseInplace()
 				}
-				if complement {
+				if matched && complement {
 					if !config.Quiet && record.Seq.Alphabet == seq.Protein || record.Seq.Alphabet == seq.Unlimit {
 						log.Warning("complement does no take effect on protein/unlimit sequence")
 					}
@@ -339,7 +563,7 @@ var seqCmd = &cobra.Command{
 				}
 
 				if printSeq {
-					if dna2rna {
+					if matched && dna2rna {
 						ab := fastxReader.Alphabet()
 						if ab == seq.RNA || ab == seq.RNAredundant {
 							if once {
@@ -357,7 +581,7 @@ var seqCmd = &cobra.Command{
 							}
 						}
 					}
-					if rna2dna {
+					if matched && rna2dna {
 						ab := fastxReader.Alphabet()
 						if ab == seq.DNA || ab == seq.DNAredundant {
 							if once {
@@ -375,14 +599,16 @@ var seqCmd = &cobra.Command{
 							}
 						}
 					}
-					if lowerCase {
-						sequence.Seq = bytes.ToLower(sequence.Seq)
-					} else if upperCase {
-						sequence.Seq = bytes.ToUpper(sequence.Seq)
+					if matched {
+						if lowerCase {
+							sequence.Seq = bytes.ToLower(sequence.Seq)
+						} else if upperCase {
+							sequence.Seq = bytes.ToUpper(sequence.Seq)
+						}
 					}
 
 					if isFastq {
-						if color {
+						if matched && color {
 							if sequence.Qual != nil {
 								outbw.Write(seqCol.ColorWithQuals(sequence.Seq, sequence.Qual))
 							} else {
@@ -394,7 +620,7 @@ var seqCmd = &cobra.Command{
 					} else {
 						text, buffer = wrapByteSlice(sequence.Seq, config.LineWidth, buffer)
 
-						if color {
+						if matched && color {
 							if sequence.Qual != nil {
 								text = seqCol.ColorWithQuals(text, sequence.Qual)
 							} else {
@@ -413,7 +639,7 @@ var seqCmd = &cobra.Command{
 						outbw.Write(_mark_plus_newline)
 					}
 
-					if color {
+					if matched && color {
 						outbw.Write(seqCol.ColorQuals(sequence.Qual))
 					} else {
 						outbw.Write(sequence.Qual)
@@ -441,7 +667,7 @@ func init() {
 	seqCmd.Flags().BoolP("seq", "s", false, "only print sequences")
 	seqCmd.Flags().BoolP("qual", "q", false, "only print qualities")
 	seqCmd.Flags().BoolP("only-id", "i", false, "print IDs instead of full headers")
-	seqCmd.Flags().BoolP("remove-gaps", "g", false, `remove gaps letters set by -G/--gap-letters, e.g., spaces, tabs, and dashes (gaps "-" in aligned sequences)`)
+	seqCmd.Flags().BoolP("remove-gaps", "g", false, `remove gaps letters seft by -G/--gap-letters, e.g., spaces, tabs, and dashes (gaps "-" in aligned sequences)`)
 	seqCmd.Flags().StringP("gap-letters", "G", "- 	.", `gap letters to be removed with -g/--remove-gaps`)
 	seqCmd.Flags().BoolP("lower-case", "l", false, "print sequences in lower case")
 	seqCmd.Flags().BoolP("upper-case", "u", false, "print sequences in upper case")
@@ -454,6 +680,16 @@ func init() {
 	seqCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
 	seqCmd.Flags().Float64P("min-qual", "Q", -1, "only print sequences with average quality greater or equal than this limit (-1 for no limit)")
 	seqCmd.Flags().Float64P("max-qual", "R", -1, "only print sequences with average quality less than this limit (-1 for no limit)")
+
+	// flags to choose which sequence to edit and output
+	seqCmd.Flags().StringSliceP("f-pattern", "", []string{""}, `[target filter] search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')`)
+	seqCmd.Flags().StringP("f-pattern-file", "", "", "[target filter] pattern file (one record per line)")
+	seqCmd.Flags().BoolP("f-use-regexp", "", false, "[target filter] patterns are regular expression")
+	seqCmd.Flags().BoolP("f-invert-match", "", false, "[target filter] invert the sense of matching, to select non-matching records")
+	seqCmd.Flags().BoolP("f-by-name", "", false, "[target filter] match by full name instead of just ID")
+	seqCmd.Flags().BoolP("f-by-seq", "", false, "[target filter] search subseq on seq, both positive and negative strand are searched")
+	seqCmd.Flags().BoolP("f-ignore-case", "", false, "[target filter] ignore case")
+	seqCmd.Flags().BoolP("f-only-positive-strand", "", false, "[target filter] only search on positive strand")
 }
 
 var _mark_fasta = []byte{'>'}
