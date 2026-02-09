@@ -22,6 +22,7 @@
 
 > **Seqkit also supports reading and writing xz (.xz) and zstd (.zst) formats since v2.2.0**.
 > **Bzip2 format is supported since v2.4.0**.
+> **LZ4 format is supported since v2.13.0**.
 
 SeqKit uses the author's lightweight and high-performance bioinformatics package
 [bio](https://github.com/shenwei356/bio) for FASTA/Q parsing,

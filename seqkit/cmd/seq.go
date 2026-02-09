@@ -35,6 +35,7 @@ import (
 	"github.com/cespare/xxhash/v2"
 	"github.com/dsnet/compress/bzip2"
 	gzip "github.com/klauspost/pgzip"
+	"github.com/pierrec/lz4/v4"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/breader"
@@ -322,6 +323,7 @@ Filtering records to edit:
 		xzOutfile := strings.HasSuffix(outFileLower, ".xz")
 		zstdOutfile := strings.HasSuffix(outFileLower, ".zst")
 		bzip2Outfile := strings.HasSuffix(outFileLower, ".bz2")
+		lz4Outfile := strings.HasSuffix(outFileLower, ".lz4")
 
 		var fh io.Writer
 		var outbw *bufio.Writer
@@ -329,6 +331,7 @@ Filtering records to edit:
 		var xw *xz.Writer
 		var zw *zstd.Encoder
 		var bz2 *bzip2.Writer
+		var lz *lz4.Writer
 
 		if color {
 			fh = seqCol.WrapWriter(outfh)
@@ -357,6 +360,46 @@ Filtering records to edit:
 				checkError(err)
 			}
 			outbw = bufio.NewWriterSize(bz2, bufSize)
+		} else if lz4Outfile {
+			var lvl lz4.CompressionLevel
+			switch config.CompressionLevel {
+			case 0:
+				lvl = lz4.Fast
+			case 1:
+				lvl = lz4.Level1
+			case 2:
+				lvl = lz4.Level2
+			case 3:
+				lvl = lz4.Level3
+			case 4:
+				lvl = lz4.Level4
+			case 5:
+				lvl = lz4.Level5
+			case 6:
+				lvl = lz4.Level6
+			case 7:
+				lvl = lz4.Level7
+			case 8:
+				lvl = lz4.Level8
+			case 9:
+				lvl = lz4.Level9
+			default:
+				lvl = lz4.Level9
+			}
+
+			lz = lz4.NewWriter(outfh)
+			options := []lz4.Option{
+				lz4.BlockChecksumOption(false),
+				lz4.BlockSizeOption(lz4.BlockSize(4 << 20)),
+				lz4.ChecksumOption(true),
+				lz4.CompressionLevelOption(lvl),
+				lz4.ConcurrencyOption(config.Threads),
+			}
+			var err error
+			if err = lz.Apply(options...); err != nil {
+				checkError(err)
+			}
+			outbw = bufio.NewWriterSize(lz, bufSize)
 		} else {
 			fh = outfh
 			outbw = bufio.NewWriterSize(fh, bufSize)
@@ -380,6 +423,10 @@ Filtering records to edit:
 
 			if bzip2Outfile {
 				checkError(bz2.Close())
+			}
+
+			if lz4Outfile {
+				checkError(lz.Close())
 			}
 
 			checkError(outfh.Close())

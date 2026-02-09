@@ -29,7 +29,7 @@ and
 - **Easy to use** 
     - Ultrafast (see [technical-details](http://bioinf.shenwei.me/seqkit/usage/#technical-details-and-guides-for-use) and [benchmark](http://bioinf.shenwei.me/seqkit/benchmark))
     - Seamlessly parsing both FASTA and FASTQ formats
-    - Supporting (`gzip`/`xz`/`zstd`/`bzip2` compressed) STDIN/STDOUT and input/output file, easily integrated in pipe
+    - Supporting (`gzip`/`xz`/`zstd`/`bzip2`/`lz4` compressed) STDIN/STDOUT and input/output file, easily integrated in pipe
     - Reproducible results (configurable rand seed in `sample` and `shuffle`)
     - Supporting custom sequence ID via regular expression
     - Supporting [Bash/Zsh autocompletion](http://bioinf.shenwei.me/seqkit/download/#shell-completion)
