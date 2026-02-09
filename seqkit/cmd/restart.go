@@ -28,6 +28,7 @@ import (
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/bwt/fmi"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -38,22 +39,39 @@ var restartCmd = &cobra.Command{
 
 	Use:     "restart",
 	Aliases: []string{"rotate"},
-	Short:   "reset start position for circular genome",
-	Long: `reset start position for circular genome
+	Short:   "reset start position (rotate) for circular genomes",
+	Long: `reset start position (rotate) for circular genomes
 
 Examples
+  1. Specify a new start position.
 
-    $ echo -e ">seq\nacgtnACGTN"
-    >seq
-    acgtnACGTN
+    $ echo -e ">seq1\natggcCACTG"
+    >seq1
+    atggcCACTG
 
-    $ echo -e ">seq\nacgtnACGTN" | seqkit restart -i 2
-    >seq
-    cgtnACGTNa
+    $ echo -e ">seq1\natggcCACTG" | seqkit restart -i 2
+    >seq1
+    tggcCACTGa
 
-    $ echo -e ">seq\nacgtnACGTN" | seqkit restart -i -2
-    >seq
-    TNacgtnACG
+    $ echo -e ">seq1\natggcCACTG" | seqkit restart -i -2
+    >seq1
+    TGatggcCAC
+
+  2. Specify a starting subsequence.
+
+    $ echo -e ">seq1\natggcCACTG" | seqkit restart -I -s GGCC
+    >seq1
+    ggcCACTGat
+
+    # on the negative strand
+    $ echo -e ">seq1\natggcCACTG" | seqkit restart -I -s AGTG
+    >seq1
+    AGTGgccatC
+
+    # allo 1 mismatch
+    $ echo -e ">seq1\natggcCACTG" | seqkit restart -I -s GGCCT -m 1
+    >seq1
+    ggcCACTGat
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -74,18 +92,30 @@ Examples
 		}
 
 		newstart := getFlagInt(cmd, "new-start")
-		if newstart == 0 {
-			checkError(fmt.Errorf("value of flag -s (--start) should not be 0"))
+		startSeq := []byte(getFlagString(cmd, "start-with"))
+		if !cmd.Flags().Lookup("new-start").Changed && len(startSeq) == 0 {
+			checkError(fmt.Errorf("one of the flags needed: -i/--new-start or -s/--start-with"))
 		}
+		if newstart == 0 {
+			checkError(fmt.Errorf("the value of flag -s (--start) should not be 0"))
+		}
+		mismatches := getFlagNonNegativeInt(cmd, "max-mismatch")
+		ignoreCase := getFlagBool(cmd, "ignore-case")
+
+		// -------------------------------------------------------------------------------
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Close()
 
-		var sequence, qual []byte
+		var sequence0, sequence, qual []byte
 		var bufSeq, bufQual bytes.Buffer
 		var l int
 		var record *fastx.Record
+		var i int
+		var sfmi *fmi.FMIndex
+		sfmi = fmi.NewFMIndex()
+		positions := make([]int, 0, 8)
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
@@ -103,19 +133,115 @@ Examples
 					fastx.ForcelyOutputFastq = true
 				}
 
+				sequence0 = record.Seq.Seq
+				sequence = record.Seq.Seq
 				l = len(record.Seq.Seq)
-				if newstart > l || newstart < -l {
-					checkError(fmt.Errorf("new start (%d) exceeds length of sequence (%d)", newstart, l))
+
+				// ----------------------------------------------------
+				// find the position of subsequence
+				if len(startSeq) > 0 {
+					if ignoreCase {
+						sequence = bytes.ToUpper(sequence0)
+						startSeq = bytes.ToUpper(startSeq)
+					}
+
+					positions = positions[:0]
+					if mismatches > 0 {
+						_, err = sfmi.Transform(sequence)
+						if err != nil {
+							checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.ID))
+						}
+						positions, err = sfmi.Locate(startSeq, mismatches)
+						if err != nil {
+							checkError(fmt.Errorf("fail to search subsequence on seq '%s': %s", record.ID, err))
+						}
+
+						if len(positions) > 1 {
+							log.Warningf("the given subsequence is found at %d positions in sequence: %s, please give a longer one to increase the specificity", len(positions), record.ID)
+							continue
+						}
+
+						if len(positions) == 0 { // not found in the current strand
+							record.Seq.RevComInplace()
+							sequence0 = record.Seq.Seq
+							sequence = record.Seq.Seq
+							if ignoreCase {
+								sequence = bytes.ToUpper(sequence0)
+							}
+
+							_, err = sfmi.Transform(sequence)
+							if err != nil {
+								checkError(fmt.Errorf("fail to build FMIndex for sequence: %s", record.ID))
+							}
+							positions, err = sfmi.Locate(startSeq, mismatches)
+							if err != nil {
+								checkError(fmt.Errorf("fail to search subsequence on seq '%s': %s", record.ID, err))
+							}
+
+							if len(positions) > 1 {
+								log.Warningf("the given subsequence is found at %d positions in the reverse complement sequence of %s, please give a longer one to increase the specificity", len(positions), record.ID)
+								continue
+							}
+						}
+					} else {
+						for {
+							newstart = bytes.Index(sequence[i:], startSeq)
+							if newstart < 0 {
+								break
+							}
+							positions = append(positions, newstart)
+							i += newstart + len(startSeq)
+						}
+
+						if len(positions) > 1 {
+							log.Warningf("the given subsequence is found at %d positions in sequence: %s, please give a longer one to increase the specificity", len(positions), record.ID)
+							continue
+						}
+
+						if len(positions) == 0 { // not found in the current strand
+							record.Seq.RevComInplace()
+							sequence0 = record.Seq.Seq
+							sequence = record.Seq.Seq
+							if ignoreCase {
+								sequence = bytes.ToUpper(sequence0)
+							}
+
+							for {
+								newstart = bytes.Index(sequence[i:], startSeq)
+								if newstart < 0 {
+									break
+								}
+								positions = append(positions, newstart)
+								i += newstart + len(startSeq)
+							}
+							if len(positions) > 1 {
+								log.Warningf("the given subsequence is found at %d positions in the reverse complement sequence of %s, please give a longer one to increase the specificity", len(positions), record.ID)
+								continue
+							}
+						}
+					}
+
+					if len(positions) == 0 {
+						log.Warningf("the given subsequence is not found in both strands of sequence: %s", record.ID)
+						continue
+					}
+
+					newstart = positions[0] + 1 // convert to 1-based
+				} else {
+					if newstart > l || newstart < -l {
+						checkError(fmt.Errorf("new start (%d) exceeds length of sequence (%d)", newstart, l))
+					}
 				}
 
-				sequence = record.Seq.Seq
+				// ----------------------------------------------------
+
 				bufSeq.Reset()
 				if newstart > 0 {
-					bufSeq.Write(sequence[newstart-1:])
-					bufSeq.Write(sequence[0 : newstart-1])
+					bufSeq.Write(sequence0[newstart-1:])
+					bufSeq.Write(sequence0[0 : newstart-1])
 				} else {
-					bufSeq.Write(sequence[l+newstart:])
-					bufSeq.Write(sequence[0 : l+newstart])
+					bufSeq.Write(sequence0[l+newstart:])
+					bufSeq.Write(sequence0[0 : l+newstart])
 				}
 				record.Seq.Seq = bufSeq.Bytes()
 
@@ -144,5 +270,10 @@ Examples
 func init() {
 	RootCmd.AddCommand(restartCmd)
 
-	restartCmd.Flags().IntP("new-start", "i", 1, "new start position (1-base, supporting negative value counting from the end)")
+	restartCmd.Flags().IntP("new-start", "i", 1, "new start position (1-based, supporting negative value counting from the end)")
+
+	restartCmd.Flags().StringP("start-with", "s", "", "rotate the genome to make it starting with the given subsequence")
+	restartCmd.Flags().BoolP("ignore-case", "I", false, "ignore case when searching the custom starting subsequence")
+	restartCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when searching the custom starting subsequence")
+
 }

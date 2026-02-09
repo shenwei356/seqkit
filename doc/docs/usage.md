@@ -3605,27 +3605,52 @@ aaaa
 Usage
 
 ``` text
-reset start position for circular genome
+reset start position (rotate) for circular genomes
 
 Examples
+  1. Specify a new start position.
 
-    $ echo -e ">seq\nacgtnACGTN"
-    >seq
-    acgtnACGTN
+    $ echo -e ">seq1\natggcCACTG"
+    >seq1
+    atggcCACTG
 
-    $ echo -e ">seq\nacgtnACGTN" | seqkit restart -i 2
-    >seq
-    cgtnACGTNa
+    $ echo -e ">seq1\natggcCACTG" | seqkit restart -i 2
+    >seq1
+    tggcCACTGa
 
-    $ echo -e ">seq\nacgtnACGTN" | seqkit restart -i -2
-    >seq
-    TNacgtnACG
+    $ echo -e ">seq1\natggcCACTG" | seqkit restart -i -2
+    >seq1
+    TGatggcCAC
+
+  2. Specify a starting subsequence.
+
+    $ echo -e ">seq1\natggcCACTG" | seqkit restart -I -s GGCC
+    >seq1
+    ggcCACTGat
+
+    # on the negative strand
+    $ echo -e ">seq1\natggcCACTG" | seqkit restart -I -s AGTG
+    >seq1
+    AGTGgccatC
+
+    # allo 1 mismatch
+    $ echo -e ">seq1\natggcCACTG" | seqkit restart -I -s GGCCT -m 1
+    >seq1
+    ggcCACTGat
 
 Usage:
-  seqkit restart [flags]
+  seqkit restart [flags] 
+
+Aliases:
+  restart, rotate
 
 Flags:
-  -i, --new-start int   new start position (1-base, supporting negative value counting from the end) (default 1)
+  -h, --help                help for restart
+  -I, --ignore-case         ignore case when searching the custom starting subsequence
+  -m, --max-mismatch int    max mismatch when searching the custom starting subsequence.
+  -i, --new-start int       new start position (1-based, supporting negative value counting from the
+                            end) (default 1)
+  -s, --start-with string   rotate the genome to make it starting with the given subsequence
 
 ```
 
