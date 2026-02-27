@@ -118,15 +118,25 @@ Examples:
 
 		extension := getFlagString(cmd, "extension")
 
+		prefixAll := getFlagString(cmd, "out-prefix")
+		prefixAllSet := cmd.Flags().Lookup("out-prefix").Changed
+
 		prefixBySize := getFlagString(cmd, "by-size-prefix")
 		prefixByPart := getFlagString(cmd, "by-part-prefix")
 		prefixByID := getFlagString(cmd, "by-id-prefix")
 		prefixByRegion := getFlagString(cmd, "by-region-prefix")
 
-		prefixBySizeSet := cmd.Flags().Lookup("by-size-prefix").Changed
-		prefixByPartSet := cmd.Flags().Lookup("by-part-prefix").Changed
-		prefixByIDSet := cmd.Flags().Lookup("by-id-prefix").Changed
-		prefixByRegionSet := cmd.Flags().Lookup("by-region-prefix").Changed
+		prefixBySizeSet := cmd.Flags().Lookup("by-size-prefix").Changed || prefixAllSet
+		prefixByPartSet := cmd.Flags().Lookup("by-part-prefix").Changed || prefixAllSet
+		prefixByIDSet := cmd.Flags().Lookup("by-id-prefix").Changed || prefixAllSet
+		prefixByRegionSet := cmd.Flags().Lookup("by-region-prefix").Changed || prefixAllSet
+
+		if prefixAllSet {
+			prefixBySize = prefixAll
+			prefixByPart = prefixAll
+			prefixByID = prefixAll
+			prefixByRegion = prefixAll
+		}
 
 		file := files[0]
 		isstdin := isStdin(file)
@@ -799,7 +809,7 @@ Examples:
 
 		if region != "" {
 			if !reRegion.MatchString(region) {
-				checkError(fmt.Errorf(`invalid region: %s. type "seqkit subseq -h" for more examples`, region))
+				checkError(fmt.Errorf(`invalid region: %s. type "seqkit split -h" for more examples`, region))
 			}
 			r := strings.Split(region, ":")
 			start, err := strconv.Atoi(r[0])
@@ -1046,6 +1056,7 @@ func init() {
 	splitCmd.Flags().StringP("by-part-prefix", "", "", "file prefix for --by-part")
 	splitCmd.Flags().StringP("by-id-prefix", "", "", "file prefix for --by-id")
 	splitCmd.Flags().StringP("by-region-prefix", "", "", "file prefix for --by-region")
+	splitCmd.Flags().StringP("out-prefix", "P", "", `file prefix (it overrides --by-*-prefix). The placeholder "{read}" is needed for paired-end files.`)
 
 	splitCmd.Flags().StringP("extension", "e", "", `set output file extension, e.g., ".gz", ".xz", or ".zst"`)
 }

@@ -159,7 +159,7 @@ reproduced in different environments with same random seed.
 ``` text
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-Version: 2.11.0
+Version: 2.13.0
 
 Author: Wei Shen <shenwei356@gmail.com>
 
@@ -186,7 +186,7 @@ Compression level:
   bzip     1-9     6        https://github.com/dsnet/compress
 
 Usage:
-  seqkit [command]
+  seqkit [command] 
 
 Commands for Basic Operation:
   faidx           create the FASTA index file and extract subsequences
@@ -220,6 +220,7 @@ Commands for Set Operation:
   range           print FASTA/Q records in a range (start:end)
   rmdup           remove duplicated sequences by ID/name/sequence
   sample          sample sequences by number or proportion
+  sample2         sample sequences by number or proportion (version 2)
   split           split sequences into files by id/seq region/size/parts (mainly for FASTA)
   split2          split sequences into files by size/parts (FASTA, PE/SE FASTQ)
 
@@ -228,7 +229,7 @@ Commands for Edit:
   mutate          edit sequence (point mutation, insertion, deletion)
   rename          rename duplicated IDs
   replace         replace name/sequence by regular expression
-  restart         reset start position for circular genome
+  restart         reset start position (rotate) for circular genomes
   sana            sanitize broken single line FASTQ files
 
 Commands for Ordering:
@@ -2660,7 +2661,7 @@ negative index    0-9-8-7-6-5-4-3-2-1
         -12:-1    A C G T N a c g t n
 
 Usage:
-  seqkit split [flags]
+  seqkit split [flags] 
 
 Flags:
   -i, --by-id                     split squences according to sequence ID
@@ -2677,9 +2678,11 @@ Flags:
   -e, --extension string          set output file extension, e.g., ".gz", ".xz", or ".zst"
   -f, --force                     overwrite output directory
   -h, --help                      help for split
-      --ignore-case               ignore case when using -i/--by-id
+  -I, --ignore-case               ignore case when using -i/--by-id
   -k, --keep-temp                 keep temporary FASTA and .fai file when using 2-pass mode
   -O, --out-dir string            output directory (default value is $infile.split)
+  -P, --out-prefix string         file prefix (it overrides --by-*-prefix). The placeholder "{read}" is
+                                  needed for paired-end files.
   -2, --two-pass                  two-pass mode read files twice to lower memory usage. (only for FASTA
                                   format)
   -U, --update-faidx              update the fasta index file if it exists. Use this if you are not sure
@@ -2695,6 +2698,14 @@ Examples
         [INFO] write 10000 sequences to file: hairpin.fa.part_001.gz
         [INFO] write 10000 sequences to file: hairpin.fa.part_002.gz
         [INFO] write 8645 sequences to file: hairpin.fa.part_003.gz
+        
+1. Change the file prefix with `-P/--out-prefix`, other modes support this too.
+
+        $ seqkit split hairpin.fa.gz -s 10000 --out-prefix p_
+        [INFO] split into 10000 seqs per file
+        [INFO] write 10000 sequences to file: hairpin.fa.gz.split/p_001.fa.gz
+        [INFO] write 10000 sequences to file: hairpin.fa.gz.split/p_002.fa.gz
+        [INFO] write 8645 sequences to file: hairpin.fa.gz.split/p_003.fa.gz
 
 1. Split sequences into 4 parts
 
@@ -2766,7 +2777,8 @@ occupation and fast speed.
 The prefix of output files:
   1. For stdin: stdin
   2. Others: same to the input file
-  3. Set via the options: --by-length-prefix, --by-part-prefix, or --by-size-prefix
+  3. Set via the options: -P/--out-prefix,
+     or --by-length-prefix, --by-part-prefix, or --by-size-prefix (for keeping backwards compatibility)
   4. Use the ID of the first sequence in each subset.
      E.g, 'seqkit split2 --by-size 1 --seqid-as-filename' is equal to
      'seqkit split --by-id', but it's much faster and uses less memory.
@@ -2805,6 +2817,8 @@ Flags:
   -f, --force                     overwrite output directory
   -h, --help                      help for split2
   -O, --out-dir string            output directory (default value is $infile.split)
+  -P, --out-prefix string         file prefix (it overrides --by-*-prefix). The placeholder "{read}" is
+                                  needed for paired-end files.
   -1, --read1 string              (gzipped) read1 file
   -2, --read2 string              (gzipped) read2 file
   -N, --seqid-as-filename         use the first sequence ID as the file name. E.g., using '-N -s 1' is
@@ -2850,12 +2864,23 @@ Examples
                 
 1. Change the prefix of output files:
 
+        # -o replaces only the basename of the input file
         $ seqkit split2 hairpin.fa -O test -f -s 10000 -e .gz -o xxx
         [INFO] split seqs from hairpin.fa
         [INFO] split into 10000 seqs per file
         [INFO] write 10000 sequences to file: test/xxx.part_001.fa.gz
         [INFO] write 10000 sequences to file: test/xxx.part_002.fa.gz
         [INFO] write 8645 sequences to file: test/xxx.part_003.fa.gz
+        
+        # -P/--out-prefix replaces the whole prefix
+        # and it can be empty ("")
+        $ seqkit split2 hairpin.fa -O test -f -s 10000 -e .gz -P yyy_
+        [INFO] split seqs from hairpin.fa
+        [INFO] split into 10000 seqs per file
+        [INFO] write 10000 sequences to file: test/yyy_001.fa.gz
+        [INFO] write 10000 sequences to file: test/yyy_002.fa.gz
+        [INFO] write 8645 sequences to file: test/yyy_003.fa.gz
+
         
         # here, we also change the compression format from xz to zstd
         $ cat hairpin.fa.xz | seqkit split2 -O test -f -s 10000 -e .zst

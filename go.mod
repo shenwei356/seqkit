@@ -14,7 +14,7 @@ require (
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/google/uuid v1.6.0
 	github.com/iafan/cwalk v0.0.0-20210125030640-586a8832a711
-	github.com/klauspost/compress v1.18.3
+	github.com/klauspost/compress v1.18.4
 	github.com/klauspost/pgzip v1.2.6
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mattn/go-colorable v0.1.13

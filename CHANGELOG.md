@@ -1,15 +1,17 @@
-- [SeqKit v2.13.0](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0) - 2026-xx-xx
+- [SeqKit v2.13.0](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0) - 2026-02-28
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.13.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0)
     - `seqkit`: add suport of reading and writing LZ4 compression format.
-    - **new command: `seqkit sample2`**: improved `seqkit sample` by [@stahiga](https://github.com/stahiga). [#566](https://github.com/shenwei356/seqkit/pull/566)
+    - **new command: `seqkit sample2`**: improved `seqkit sample` by [@stahiga](https://github.com/stahiga). [#566](https://github.com/shenwei356/seqkit/pull/566), [#386](https://github.com/shenwei356/seqkit/issues/386)
     - `seqkit seq`:
         - add flags to specify sequences to operate/transform. [#568](https://github.com/shenwei356/seqkit/issues/568)
     - `seqkit shuffle`:
         - add a new option `--tmp-dir`, which can specify tmp dir for FASTA records from stdin or compressed FASTA files. [#562](https://github.com/shenwei356/seqkit/issues/562)
     - `seqkit shuffle/sample`:
-        - add a new flag `-r/--non-deterministic`, which uses a time-based seed to **generate non-deterministic (truely random) results**. [#565](https://github.com/shenwei356/seqkit/issues/565)
+        - add a new flag `-r/--non-deterministic`, which uses a time-based seed to **generate non-deterministic (truly random) results**. [#565](https://github.com/shenwei356/seqkit/issues/565)
     - `seqkit restart`:
         - **support specifying the starting sequence of circular genomes**.
+    - `seqkit split/split2`:
+        - add a new option `-P/--out-prefix` to override `--by-*-prefix`, for simplifying output prefix setting. [#563](https://github.com/shenwei356/seqkit/issues/563)
     - `seqkit bam`:
         - fix a bug [#200](https://github.com/shenwei356/seqkit/issues/200) by @botond-sipos.
     - `seqkit stats`:

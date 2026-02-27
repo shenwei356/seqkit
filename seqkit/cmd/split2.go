@@ -53,7 +53,8 @@ occupation and fast speed.
 The prefix of output files:
   1. For stdin: stdin
   2. Others: same to the input file
-  3. Set via the options: --by-length-prefix, --by-part-prefix, or --by-size-prefix
+  3. Set via the options: -P/--out-prefix,
+     or --by-length-prefix, --by-part-prefix, or --by-size-prefix (for keeping backwards compatibility)
   4. Use the ID of the first sequence in each subset.
      E.g, 'seqkit split2 --by-size 1 --seqid-as-filename' is equal to
      'seqkit split --by-id', but it's much faster and uses less memory.
@@ -126,13 +127,22 @@ If you want to cut a sequence into multiple segments.
 
 		reRead := regexp.MustCompile(`\{read\}`)
 
+		prefixAll := getFlagString(cmd, "out-prefix")
+		prefixAllSet := cmd.Flags().Lookup("out-prefix").Changed
+
 		prefixBySize := getFlagString(cmd, "by-size-prefix")
 		prefixByPart := getFlagString(cmd, "by-part-prefix")
 		prefixByLength := getFlagString(cmd, "by-length-prefix")
 
-		prefixBySizeSet := cmd.Flags().Lookup("by-size-prefix").Changed
-		prefixByPartSet := cmd.Flags().Lookup("by-part-prefix").Changed
-		prefixByLengthSet := cmd.Flags().Lookup("by-length-prefix").Changed
+		prefixBySizeSet := cmd.Flags().Lookup("by-size-prefix").Changed || prefixAllSet
+		prefixByPartSet := cmd.Flags().Lookup("by-part-prefix").Changed || prefixAllSet
+		prefixByLengthSet := cmd.Flags().Lookup("by-length-prefix").Changed || prefixAllSet
+
+		if prefixAllSet {
+			prefixBySize = prefixAll
+			prefixByPart = prefixAll
+			prefixByLength = prefixAll
+		}
 
 		seqIDAsFileName := getFlagBool(cmd, "seqid-as-filename")
 
@@ -526,6 +536,7 @@ func init() {
 	split2Cmd.Flags().StringP("by-size-prefix", "", "", `file prefix for --by-size. The placeholder "{read}" is needed for paired-end files.`)
 	split2Cmd.Flags().StringP("by-part-prefix", "", "", `file prefix for --by-part. The placeholder "{read}" is needed for paired-end files.`)
 	split2Cmd.Flags().StringP("by-length-prefix", "", "", `file prefix for --by-length. The placeholder "{read}" is needed for paired-end files.`)
+	split2Cmd.Flags().StringP("out-prefix", "P", "", `file prefix (it overrides --by-*-prefix). The placeholder "{read}" is needed for paired-end files.`)
 
 	split2Cmd.Flags().BoolP("seqid-as-filename", "N", false, "use the first sequence ID as the file name. E.g., using '-N -s 1' is equal to 'seqkit split --by-id' but much faster and uses less memory.")
 
