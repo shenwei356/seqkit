@@ -10,11 +10,11 @@ Wei Shen\*, Botond Sipos, and Liuyang Zhao. 2024. SeqKit2: A Swiss Army Knife fo
 
 ## Current Version
 
-**SeqKit is 10 years old now!**
+**SeqKit is 10 years old!**
 
 - [SeqKit v2.13.0](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0) - 2026-02-28
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.13.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0)
-    - `seqkit`: add suport of reading and writing LZ4 compression format.
+    - `seqkit`: add support for reading and writing LZ4 compression format.
     - **new command: `seqkit sample2`**: improved `seqkit sample` by [@stahiga](https://github.com/stahiga). [#566](https://github.com/shenwei356/seqkit/pull/566), [#386](https://github.com/shenwei356/seqkit/issues/386)
     - `seqkit seq`:
         - add flags to specify sequences to operate/transform. [#568](https://github.com/shenwei356/seqkit/issues/568)
