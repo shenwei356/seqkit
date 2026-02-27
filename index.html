@@ -679,7 +679,7 @@ and
 <li><strong>Easy to use</strong> <ul>
 <li>Ultrafast (see <a href="http://bioinf.shenwei.me/seqkit/usage/#technical-details-and-guides-for-use">technical-details</a> and <a href="http://bioinf.shenwei.me/seqkit/benchmark">benchmark</a>)</li>
 <li>Seamlessly parsing both FASTA and FASTQ formats</li>
-<li>Supporting (<code>gzip</code>/<code>xz</code>/<code>zstd</code>/<code>bzip2</code> compressed) STDIN/STDOUT and input/output file, easily integrated in pipe</li>
+<li>Supporting (<code>gzip</code>/<code>xz</code>/<code>zstd</code>/<code>bzip2</code>/<code>lz4</code> compressed) STDIN/STDOUT and input/output file, easily integrated in pipe</li>
 <li>Reproducible results (configurable rand seed in <code>sample</code> and <code>shuffle</code>)</li>
 <li>Supporting custom sequence ID via regular expression</li>
 <li>Supporting <a href="http://bioinf.shenwei.me/seqkit/download/#shell-completion">Bash/Zsh autocompletion</a></li>
@@ -861,6 +861,14 @@ and
 </tr>
 <tr>
 <td style="text-align: left;"></td>
+<td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#sample2">sample2</a></td>
+<td style="text-align: left;">Sample sequences by number or proportion (version 2)</td>
+<td style="text-align: left;">FASTA/Q</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#rmdup">rmdup</a></td>
 <td style="text-align: left;">Remove duplicated sequences by ID/name/sequence</td>
 <td style="text-align: left;">FASTA/Q</td>
@@ -958,7 +966,7 @@ and
 <tr>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"><a href="https://bioinf.shenwei.me/seqkit/usage/#restart">restart</a></td>
-<td style="text-align: left;">Reset start position for circular genome</td>
+<td style="text-align: left;">Reset start position (rotate) for circular genomes</td>
 <td style="text-align: left;">FASTA/Q</td>
 <td style="text-align: left;">+ only</td>
 <td style="text-align: left;"></td>
