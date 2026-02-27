@@ -194,13 +194,13 @@ If you want to cut a sequence into multiple segments.
 
 				pairedEnd = true
 				if prefixBySizeSet && !reRead.MatchString(prefixBySize) {
-					checkError(fmt.Errorf(`--by-size-prefix should contains the placeholder "{read}" when paired-end files are given, such as "sample_{read}.fq.gz`))
+					checkError(fmt.Errorf(`-P/--out-prefix or --by-size-prefix should contains the placeholder "{read}" when paired-end files are given, such as "sample_{read}.fq.gz`))
 				}
 				if prefixByPartSet && !reRead.MatchString(prefixByPart) {
-					checkError(fmt.Errorf(`--by-part-prefix should contains the placeholder "{read}" when paired-end files are given, such as "sample_{read}.fq.gz`))
+					checkError(fmt.Errorf(`-P/--out-prefix or --by-part-prefix should contains the placeholder "{read}" when paired-end files are given, such as "sample_{read}.fq.gz`))
 				}
 				if prefixByLengthSet && !reRead.MatchString(prefixByLength) {
-					checkError(fmt.Errorf(`--by-size-prefix should contains the placeholder "{read}" when paired-end files are given, such as "sample_{read}.fq.gz`))
+					checkError(fmt.Errorf(`-P/--out-prefix or --by-size-prefix should contains the placeholder "{read}" when paired-end files are given, such as "sample_{read}.fq.gz`))
 				}
 			}
 		}
