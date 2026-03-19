@@ -154,7 +154,12 @@ var watchCmd = &cobra.Command{
 			seq.ValidateSeq = true
 		}
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
+		}
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2026 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -70,7 +70,13 @@ Examples:
 		runtime.GOMAXPROCS(config.Threads)
 		quiet := config.Quiet
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
+		}
+
 		var err error
 
 		mPoints := []_mutatePoint{}
@@ -339,7 +345,7 @@ func init() {
 	mutateCmd.Flags().StringP("deletion", "d", "", `deletion mutation: deleting subsequence in a range. e.g., -d 1:2 for deleting leading two bases, -d -3:-1 for removing last 3 bases`)
 	mutateCmd.Flags().StringP("insertion", "i", "", `insertion mutation: inserting bases behind of given position, e.g., -i 0:ACGT for inserting ACGT at the beginning, -1:* for add * to the end`)
 
-	mutateCmd.Flags().StringSliceP("pattern", "s", []string{""}, `[match seqs to mutate] search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"'))`)
+	mutateCmd.Flags().StringSliceP("pattern", "s", []string{""}, `[match seqs to mutate] search pattern .`+helpMultipleValues)
 	mutateCmd.Flags().StringP("pattern-file", "f", "", "[match seqs to mutate] pattern file (one record per line)")
 	mutateCmd.Flags().BoolP("use-regexp", "r", false, "[match seqs to mutate] search patterns are regular expression")
 	mutateCmd.Flags().BoolP("invert-match", "v", false, "[match seqs to mutate] invert the sense of matching, to select non-matching records")

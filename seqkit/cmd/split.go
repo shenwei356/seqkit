@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2026 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,6 +51,8 @@ part size or number of parts.
 If you just want to split by parts or sizes, please use "seqkit split2",
 which can apply to paired- and single-end FASTQ.
 
+If you want to split sequences by ID, please use "seqkit split2 -s 1 -N".
+
 If you want to cut a sequence into multiple segments.
   1. For cutting into even chunks, please use 'kmcp utils split-genomes'
      (https://bioinf.shenwei.me/kmcp/usage/#split-genomes).
@@ -87,7 +89,7 @@ Examples:
 		fai.MapWholeFile = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		if len(files) > 1 {
 			checkError(fmt.Errorf("no more than one file should be given"))
@@ -116,15 +118,25 @@ Examples:
 
 		extension := getFlagString(cmd, "extension")
 
+		prefixAll := getFlagString(cmd, "out-prefix")
+		prefixAllSet := cmd.Flags().Lookup("out-prefix").Changed
+
 		prefixBySize := getFlagString(cmd, "by-size-prefix")
 		prefixByPart := getFlagString(cmd, "by-part-prefix")
 		prefixByID := getFlagString(cmd, "by-id-prefix")
 		prefixByRegion := getFlagString(cmd, "by-region-prefix")
 
-		prefixBySizeSet := cmd.Flags().Lookup("by-size-prefix").Changed
-		prefixByPartSet := cmd.Flags().Lookup("by-part-prefix").Changed
-		prefixByIDSet := cmd.Flags().Lookup("by-id-prefix").Changed
-		prefixByRegionSet := cmd.Flags().Lookup("by-region-prefix").Changed
+		prefixBySizeSet := cmd.Flags().Lookup("by-size-prefix").Changed || prefixAllSet
+		prefixByPartSet := cmd.Flags().Lookup("by-part-prefix").Changed || prefixAllSet
+		prefixByIDSet := cmd.Flags().Lookup("by-id-prefix").Changed || prefixAllSet
+		prefixByRegionSet := cmd.Flags().Lookup("by-region-prefix").Changed || prefixAllSet
+
+		if prefixAllSet {
+			prefixBySize = prefixAll
+			prefixByPart = prefixAll
+			prefixByID = prefixAll
+			prefixByRegion = prefixAll
+		}
 
 		file := files[0]
 		isstdin := isStdin(file)
@@ -797,7 +809,7 @@ Examples:
 
 		if region != "" {
 			if !reRegion.MatchString(region) {
-				checkError(fmt.Errorf(`invalid region: %s. type "seqkit subseq -h" for more examples`, region))
+				checkError(fmt.Errorf(`invalid region: %s. type "seqkit split -h" for more examples`, region))
 			}
 			r := strings.Split(region, ":")
 			start, err := strconv.Atoi(r[0])
@@ -1044,6 +1056,7 @@ func init() {
 	splitCmd.Flags().StringP("by-part-prefix", "", "", "file prefix for --by-part")
 	splitCmd.Flags().StringP("by-id-prefix", "", "", "file prefix for --by-id")
 	splitCmd.Flags().StringP("by-region-prefix", "", "", "file prefix for --by-region")
+	splitCmd.Flags().StringP("out-prefix", "P", "", `file prefix (it overrides --by-*-prefix). The placeholder "{read}" is needed for paired-end files.`)
 
 	splitCmd.Flags().StringP("extension", "e", "", `set output file extension, e.g., ".gz", ".xz", or ".zst"`)
 }

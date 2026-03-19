@@ -14,8 +14,7 @@ and
 [![Github Releases](https://img.shields.io/github/downloads/shenwei356/seqkit/latest/total.svg?maxAge=3600)](http://bioinf.shenwei.me/seqkit/download/)
 [![Cross-platform](https://img.shields.io/badge/platform-any-ec2eb4.svg?style=flat)](http://bioinf.shenwei.me/seqkit/download/)
 [![Anaconda Cloud](https://anaconda.org/bioconda/seqkit/badges/version.svg)](https://anaconda.org/bioconda/seqkit)
-- **[Please cite](#citation):** [![doi](https://img.shields.io/badge/doi-10.1002%2Fimt2.191-blue.svg?style=flat)](https://doi.org/10.1002/imt2.191) [![Citation Badge](https://api.juleskreuer.eu/citation-badge.php?doi=10.1002/imt2.191)](https://doi.org/10.1002/imt2.191), [![doi](https://img.shields.io/badge/doi-10.1371%2Fjournal.pone.0163962-blue.svg?style=flat)](https://doi.org/10.1371/journal.pone.0163962)
-[![Citation Badge](https://api.juleskreuer.eu/citation-badge.php?doi=10.1371/journal.pone.0163962)](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=wHF3Lm8AAAAJ&citation_for_view=wHF3Lm8AAAAJ:zYLM7Y9cAGgC)
+- **[Please cite](#citation):** [![doi](https://img.shields.io/badge/doi-10.1002%2Fimt2.191-blue.svg?style=flat)](https://doi.org/10.1002/imt2.191) [![Citation Badge](https://api.juleskreuer.eu/citation-badge.php?doi=10.1002/imt2.191)](https://doi.org/10.1002/imt2.191)
 - **Others**: [![check in Biotreasury](https://img.shields.io/badge/Biotreasury-collected-brightgreen)](https://biotreasury.rjmart.cn/#/tool?id=10081)  
 
 
@@ -30,7 +29,7 @@ and
 - **Easy to use** 
     - Ultrafast (see [technical-details](http://bioinf.shenwei.me/seqkit/usage/#technical-details-and-guides-for-use) and [benchmark](http://bioinf.shenwei.me/seqkit/benchmark))
     - Seamlessly parsing both FASTA and FASTQ formats
-    - Supporting (`gzip`/`xz`/`zstd`/`bzip2` compressed) STDIN/STDOUT and input/output file, easily integrated in pipe
+    - Supporting (`gzip`/`xz`/`zstd`/`bzip2`/`lz4` compressed) STDIN/STDOUT and input/output file, easily integrated in pipe
     - Reproducible results (configurable rand seed in `sample` and `shuffle`)
     - Supporting custom sequence ID via regular expression
     - Supporting [Bash/Zsh autocompletion](http://bioinf.shenwei.me/seqkit/download/#shell-completion)
@@ -40,10 +39,21 @@ and
 
 ## Installation
 
-Go to [Download Page](http://bioinf.shenwei.me/seqkit/download) for more download options and changelogs, or
-install via conda:
+#### Method 1: Download binaries
+
+Go to [Download Page](http://bioinf.shenwei.me/seqkit/download), where you can find download links to various platforms.
+
+#### Method 2: Install via Pixi
+
+    pixi global install -c bioconda seqkit
+
+#### Method 3: Install via conda
 
     conda install -c bioconda seqkit
+
+#### Method 4: Install via homebrew
+
+    brew install seqkit
 
 ## Subcommands
 
@@ -67,19 +77,20 @@ install via conda:
 |                 |[amplicon](https://bioinf.shenwei.me/seqkit/usage/#amplicon)        |Extract amplicon (or specific region around it), mismatch allowed                            |FASTA/Q        |+ and -           |partly, -m   |
 |                 |[fish](https://bioinf.shenwei.me/seqkit/usage/#fish)                |Look for short sequences in larger sequences                                                 |FASTA/Q        |+ and -           |             |
 |Set operation    |[sample](https://bioinf.shenwei.me/seqkit/usage/#sample)            |Sample sequences by number or proportion                                                     |FASTA/Q        |                  |             |
+|                 |[sample2](https://bioinf.shenwei.me/seqkit/usage/#sample2)          |Sample sequences by number or proportion (version 2)                                         |FASTA/Q        |                  |             |
 |                 |[rmdup](https://bioinf.shenwei.me/seqkit/usage/#rmdup)              |Remove duplicated sequences by ID/name/sequence                                              |FASTA/Q        |+ and -           |             |
 |                 |[common](https://bioinf.shenwei.me/seqkit/usage/#common)            |Find common sequences of multiple files by id/name/sequence                                  |FASTA/Q        |+ and -           |             |
 |                 |[duplicate](https://bioinf.shenwei.me/seqkit/usage/#duplicate)      |Duplicate sequences N times                                                                  |FASTA/Q        |                  |             |
 |                 |[split](https://bioinf.shenwei.me/seqkit/usage/#split)              |Split sequences into files by id/seq region/size/parts (mainly for FASTA)                    |FASTA preffered|                  |             |
 |                 |[split2](https://bioinf.shenwei.me/seqkit/usage/#split2)            |Split sequences into files by size/parts (FASTA, PE/SE FASTQ)                                |FASTA/Q        |                  |             |
-|                 |[head](https://bioinf.shenwei.me/seqkit/usage/#head)                |Print first N FASTA/Q records                                                                |FASTA/Q        |                  |             |
+|                 |[head](https://bioinf.shenwei.me/seqkit/usage/#head)                |print the first N FASTA/Q records, or leading records whose total length >= L                |FASTA/Q        |                  |             |
 |                 |[head-genome](https://bioinf.shenwei.me/seqkit/usage/#head-genome)  |Print sequences of the first genome with common prefixes in name                             |FASTA/Q        |                  |             |
 |                 |[range](https://bioinf.shenwei.me/seqkit/usage/#range)              |Print FASTA/Q records in a range (start:end)                                                 |FASTA/Q        |                  |             |
 |                 |[pair](https://bioinf.shenwei.me/seqkit/usage/#pair)                |Patch up paired-end reads from two fastq files                                               |FASTA/Q        |                  |             |
 |Edit             |[replace](https://bioinf.shenwei.me/seqkit/usage/#replace)          |Replace name/sequence by regular expression                                                  |FASTA/Q        |+ only            |             |
 |                 |[rename](https://bioinf.shenwei.me/seqkit/usage/#rename)            |Rename duplicated IDs                                                                        |FASTA/Q        |                  |             |
 |                 |[concat](https://bioinf.shenwei.me/seqkit/usage/#concat)            |Concatenate sequences with same ID from multiple files                                       |FASTA/Q        |+ only            |             |
-|                 |[restart](https://bioinf.shenwei.me/seqkit/usage/#restart)          |Reset start position for circular genome                                                     |FASTA/Q        |+ only            |             |
+|                 |[restart](https://bioinf.shenwei.me/seqkit/usage/#restart)          |Reset start position (rotate) for circular genomes                                                    |FASTA/Q        |+ only            |             |
 |                 |[mutate](https://bioinf.shenwei.me/seqkit/usage/#mutate)            |Edit sequence (point mutation, insertion, deletion)                                          |FASTA/Q        |+ only            |             |
 |                 |[sana](https://bioinf.shenwei.me/seqkit/usage/#sana)                |Sanitize broken single line FASTQ files                                                      |FASTQ          |                  |             |
 |Ordering         |[sort](https://bioinf.shenwei.me/seqkit/usage/#sort)                |Sort sequences by id/name/sequence/length                                                    |FASTA preffered|                  |             |
@@ -98,11 +109,8 @@ Notes:
 
 ## Citation
 
-1. Wei Shen\*, Botond Sipos, and Liuyang Zhao. 2024. SeqKit2: A Swiss Army Knife for Sequence and Alignment Processing. ***iMeta*** e191. [doi:10.1002/imt2.191](https://doi.org/10.1002/imt2.191).
+Wei Shen\*, Botond Sipos, and Liuyang Zhao. 2024. SeqKit2: A Swiss Army Knife for Sequence and Alignment Processing. ***iMeta*** e191. [doi:10.1002/imt2.191](https://doi.org/10.1002/imt2.191).
 <span class="__dimensions_badge_embed__" data-doi="10.1002/imt2.191" data-style="small_rectangle"></span>
-2. Wei Shen, Shuai Le, Yan Li\*, and Fuquan Hu\*. SeqKit: a cross-platform and ultrafast toolkit for FASTA/Q file manipulation.
-***PLOS ONE***. [doi:10.1371/journal.pone.0163962](https://doi.org/10.1371/journal.pone.0163962).
-<span class="__dimensions_badge_embed__" data-doi="10.1371/journal.pone.0163962" data-style="small_rectangle"></span>
 
 ## Contributors
 

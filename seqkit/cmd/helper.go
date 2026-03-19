@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2026 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -119,6 +119,44 @@ func getFileListFromArgsAndFile(cmd *cobra.Command, args []string, checkFileFrom
 		files = append(files, _files...)
 	}
 	return files
+}
+
+func isTheSameFile(path1, path2 string) (bool, error) {
+	var notfound bool
+	info1, err := os.Stat(path1)
+	if err != nil {
+		if os.IsNotExist(err) {
+			notfound = true
+		} else {
+			return false, err
+		}
+	}
+	info2, err := os.Stat(path2)
+	if err != nil {
+		if os.IsNotExist(err) {
+			notfound = true
+		} else {
+			return false, err
+		}
+	}
+	if notfound {
+		return path1 == path2, nil
+	}
+	return os.SameFile(info1, info2), nil
+}
+
+func checkIfFilesAreTheSame(path1, path2, name1, name2 string) {
+	if path1 == "-" || path2 == "-" {
+		return
+	}
+
+	same, err := isTheSameFile(path1, path2)
+	if err != nil {
+		checkError(fmt.Errorf("checking %s and %s files: %s", name1, name2, err))
+	}
+	if same {
+		checkError(fmt.Errorf("%s and %s files cannot be the same", name1, name2))
+	}
 }
 
 func getFlagInt(cmd *cobra.Command, flag string) int {
@@ -245,6 +283,7 @@ type Config struct {
 	AlphabetGuessSeqLength int
 	ValidateSeqLength      int
 	CompressionLevel       int
+	SkipFileCheck          bool
 }
 
 func getConfigs(cmd *cobra.Command) Config {
@@ -294,6 +333,7 @@ func getConfigs(cmd *cobra.Command) Config {
 		Quiet:                  getFlagBool(cmd, "quiet"),
 		AlphabetGuessSeqLength: getFlagAlphabetGuessSeqLength(cmd, "alphabet-guess-seq-length"),
 		CompressionLevel:       level,
+		SkipFileCheck:          getFlagBool(cmd, "skip-file-check"),
 	}
 
 }

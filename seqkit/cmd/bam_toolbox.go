@@ -108,7 +108,7 @@ func NewBamReaderChan(inFile string, cp int, buff int, threads int) (chan *sam.R
 
 func NewBamSinkChan(cp int) (chan *sam.Record, chan bool) {
 	outChan := make(chan *sam.Record, cp)
-	doneChan := make(chan bool, 0)
+	doneChan := make(chan bool)
 	go func() {
 		for rec := range outChan {
 			_ = rec
@@ -121,7 +121,7 @@ func NewBamSinkChan(cp int) (chan *sam.Record, chan bool) {
 
 func NewBamWriterChan(inFile string, head *sam.Header, cp int, buff int, threads int) (chan *sam.Record, chan bool) {
 	outChan := make(chan *sam.Record, buff)
-	doneChan := make(chan bool, 0)
+	doneChan := make(chan bool)
 	fh, err := os.Stdout, error(nil)
 	if inFile != "-" {
 		fh, err = os.Open(inFile)
@@ -258,7 +258,7 @@ func BamToolAlnContext(p *BamToolParams) {
 		tsvFh, err = os.Create(tsvFile)
 	}
 
-	head := fmt.Sprintf("Read\tRef\tStrand\tStartSeq\tStartMatch\tEndSeq\tEndMatch\n")
+	head := "Read\tRef\tStrand\tStartSeq\tStartMatch\tEndSeq\tEndMatch\n"
 	tsvFh.WriteString(head)
 
 	for r := range p.InChan {
@@ -322,7 +322,7 @@ type RefWithFaidx struct {
 }
 
 func (idx *RefWithFaidx) IdxSubSeq(chrom string, start, end int) (string, error) {
-	b, err := idx.faidx.SubSeq(chrom, start, end)
+	b, err := idx.faidx.SubSeq(chrom, start+1, end)
 	return string(b), err
 }
 
@@ -551,7 +551,7 @@ func GetSamDump(field string, r *sam.Record) string {
 	case "Strand":
 		return fmt.Sprintf("%d", GetSamStrand(r))
 	case "MeanQual":
-		return fmt.Sprintf("%d", GetSamReadAln(r))
+		return fmt.Sprintf("%.3f", GetSamMeanBaseQual(r))
 	case "LeftClip":
 		return fmt.Sprintf("%d", GetSamLeftClip(r))
 	case "RightClip":
@@ -590,7 +590,7 @@ func GetSamMapped(r *sam.Record) bool {
 }
 
 func GetSamReverse(r *sam.Record) bool {
-	return (r.Flags&sam.Reverse == 0)
+	return (r.Flags&sam.Reverse != 0)
 }
 
 func GetSamRef(r *sam.Record) string {
@@ -602,7 +602,11 @@ func GetSamName(r *sam.Record) string {
 }
 
 func GetSamReadAlnSeq(r *sam.Record) string {
-	return r.Name
+	res := GetSamReadSeq(r)
+	if len(res) > 0 {
+		return res[GetSamLeftSoftClip(r) : len(res)-GetSamRightSoftClip(r)]
+	}
+	return ""
 }
 
 func GetSamReadSeq(r *sam.Record) string {
@@ -712,7 +716,7 @@ func GetSamRefCov(r *sam.Record) float64 {
 
 func GetSamReadCov(r *sam.Record) float64 {
 	sl := float64(GetSamReadLen(r))
-	return float64(100 * (sl - float64(GetSamLeftClip(r)-GetSamRightClip(r))) / float64(sl))
+	return float64(100 * (sl - float64(GetSamLeftClip(r)+GetSamRightClip(r))) / float64(sl))
 }
 
 func GetSamReadAln(r *sam.Record) int {

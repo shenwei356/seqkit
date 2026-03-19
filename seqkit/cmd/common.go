@@ -1,4 +1,4 @@
-// Copyright © 2016-2023 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2026 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -96,10 +96,15 @@ Note:
 			checkError(fmt.Errorf("flag -s (--by-seq) needed when using -e (--check-embedded-seqs)"))
 		}
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 
 		if len(files) < 2 {
 			checkError(errors.New("at least 2 files needed"))
+		}
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
 		}
 
 		outfh, err := xopen.Wopen(outFile)

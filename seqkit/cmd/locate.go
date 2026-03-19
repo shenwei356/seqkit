@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2026 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -77,7 +77,12 @@ Attention:
 
 		bwt.CheckEndSymbol = false
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
+		}
 
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
@@ -857,7 +862,7 @@ Attention:
 						// }
 
 						if nonGreedy {
-							offset = offset + loc[1] + 1
+							offset = offset + loc[1]
 						} else {
 							offset = offset + loc[0] + 1
 						}
@@ -956,7 +961,7 @@ Attention:
 						// }
 
 						if nonGreedy {
-							offset = offset + loc[1] + 1
+							offset = offset + loc[1]
 						} else {
 							offset = offset + loc[0] + 1
 						}
@@ -979,7 +984,7 @@ Attention:
 func init() {
 	RootCmd.AddCommand(locateCmd)
 
-	locateCmd.Flags().StringSliceP("pattern", "p", []string{""}, `pattern/motif (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')`)
+	locateCmd.Flags().StringSliceP("pattern", "p", []string{""}, `pattern/motif. `+helpMultipleValues)
 	locateCmd.Flags().StringP("pattern-file", "f", "", "pattern/motif file (FASTA format)")
 	locateCmd.Flags().BoolP("degenerate", "d", false, "pattern/motif contains degenerate base")
 	locateCmd.Flags().BoolP("use-regexp", "r", false, "patterns/motifs are regular expression")

@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2026 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@ import (
 	"strings"
 
 	"github.com/cespare/xxhash/v2"
+	"github.com/google/uuid"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/breader"
@@ -62,6 +63,7 @@ more on: http://bioinf.shenwei.me/seqkit/usage/#replace
 Special replacement symbols (only for replacing name not sequence):
 
     {nr}    Record number, starting from 1
+    {uuid}  Random 16-character Universally unique identifier (UUID)
     {fn}    File name
     {fbn}   File base name
     {fbne}  File base name without any extension
@@ -136,6 +138,11 @@ Filtering records to edit:
 			replaceWithNR = true
 		}
 
+		var replaceWithUUID bool
+		if reUUID.Match(replacement) {
+			replaceWithUUID = true
+		}
+
 		var replaceWithFN bool
 		if reFN.Match(replacement) {
 			replaceWithFN = true
@@ -147,7 +154,7 @@ Filtering records to edit:
 		}
 
 		var replaceWithFBNE bool
-		if reFN.Match(replacement) {
+		if reFBNE.Match(replacement) {
 			replaceWithFBNE = true
 		}
 
@@ -324,7 +331,12 @@ Filtering records to edit:
 
 		// -------------------
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
+		}
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
@@ -348,6 +360,7 @@ Filtering records to edit:
 		var h uint64
 
 		var fileBase string
+		var _uuid uuid.UUID
 
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
@@ -425,7 +438,7 @@ Filtering records to edit:
 						}
 					} else {
 						h = xxhash.Sum64(target)
-						if ignoreCase {
+						if fignoreCase {
 							h = xxhash.Sum64(bytes.ToLower(target))
 						}
 						if _, ok = patternsN[h]; ok {
@@ -459,6 +472,14 @@ Filtering records to edit:
 
 					if replaceWithNR {
 						r = reNR.ReplaceAll(r, []byte(fmt.Sprintf(nrFormat, nr)))
+					}
+
+					if replaceWithUUID {
+						_uuid, err = uuid.NewV7()
+						if err != nil {
+							_uuid = uuid.New()
+						}
+						r = reUUID.ReplaceAll(r, []byte(_uuid.String()))
 					}
 
 					if replaceWithFN {
@@ -523,10 +544,11 @@ func init() {
 	replaceCmd.Flags().StringP("pattern", "p", "", "search regular expression")
 	replaceCmd.Flags().StringP("replacement", "r", "",
 		"replacement. supporting capture variables. "+
-			" e.g. $1 represents the text of the first submatch. "+
+			" e.g. $1 represents the text of the first submatch (use ${1} instead of $1 when {kv} given!). "+
 			"ATTENTION: for *nix OS, use SINGLE quote NOT double quotes or "+
-			`use the \ escape character. Record number and file name is also supported by "{nr}" and "{fn}".`+
-			`use ${1} instead of $1 when {kv} given!`)
+			`use the \ escape character. `+
+			`Record number and file name is also supported by "{nr}" and "{fn}". `+
+			`Type "csvtk replace -h" for more replacement symbols.`)
 	replaceCmd.Flags().IntP("nr-width", "", 1, `minimum width for {nr} in flag -r/--replacement. e.g., formatting "1" to "001" by --nr-width 3`)
 	// replaceCmd.Flags().BoolP("by-name", "n", false, "replace full name instead of just id")
 	replaceCmd.Flags().BoolP("by-seq", "s", false, "replace seq (only FASTA)")
@@ -538,12 +560,13 @@ func init() {
 	replaceCmd.Flags().IntP("key-capt-idx", "I", 1, "capture variable index of key (1-based)")
 	replaceCmd.Flags().StringP("key-miss-repl", "m", "", "replacement for key with no corresponding value")
 
+	// flags to choose which sequence to edit
 	replaceCmd.Flags().StringSliceP("f-pattern", "", []string{""}, `[target filter] search pattern (multiple values supported. Attention: use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"')`)
 	replaceCmd.Flags().StringP("f-pattern-file", "", "", "[target filter] pattern file (one record per line)")
 	replaceCmd.Flags().BoolP("f-use-regexp", "", false, "[target filter] patterns are regular expression")
 	replaceCmd.Flags().BoolP("f-invert-match", "", false, "[target filter] invert the sense of matching, to select non-matching records")
 	replaceCmd.Flags().BoolP("f-by-name", "", false, "[target filter] match by full name instead of just ID")
-	replaceCmd.Flags().BoolP("f-by-seq", "", false, "[target filter] search subseq on seq, both positive and negative strand are searched, and mismatch allowed using flag -m/--max-mismatch")
+	replaceCmd.Flags().BoolP("f-by-seq", "", false, "[target filter] search subseq on seq, both positive and negative strand are searched")
 	replaceCmd.Flags().BoolP("f-ignore-case", "", false, "[target filter] ignore case")
 	replaceCmd.Flags().BoolP("f-only-positive-strand", "", false, "[target filter] only search on positive strand")
 }
@@ -553,3 +576,4 @@ var reKV = regexp.MustCompile(`\{(KV|kv)\}`)
 var reFN = regexp.MustCompile(`\{(FN|fn)\}`)
 var reFBN = regexp.MustCompile(`\{(FBN|fbn)\}`)
 var reFBNE = regexp.MustCompile(`\{(FBNE|fbne)\}`)
+var reUUID = regexp.MustCompile(`\{(UUID|uuid)\}`)

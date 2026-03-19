@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2026 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -77,7 +77,13 @@ Examples:
 		Threads = config.Threads
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", true)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
+		}
+
 		chrs := getFlagStringSlice(cmd, "chr")
 		chrs2 := make([]string, len(chrs))
 		for i, chr := range chrs {
@@ -172,7 +178,7 @@ Examples:
 				if _, ok := gtfFeaturesMap[chr]; !ok {
 					gtfFeaturesMap[chr] = make(map[string][]gtf.Feature)
 				}
-				feat = feature.Feature
+				feat = strings.ToLower(feature.Feature)
 				if _, ok := gtfFeaturesMap[chr][feat]; !ok {
 					gtfFeaturesMap[chr][feat] = []gtf.Feature{}
 				}
@@ -417,11 +423,12 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 	var subseq *seq.Seq
 
 	featsMap := make(map[string]struct{}, len(choosedFeatures))
-	for _, chr := range choosedFeatures {
-		featsMap[chr] = struct{}{}
+	for _, feat := range choosedFeatures {
+		featsMap[strings.ToLower(feat)] = struct{}{}
 	}
 
 	for featureType := range gtfFeaturesMap[seqname] {
+		featureType = strings.ToLower(featureType)
 		if len(choosedFeatures) > 0 {
 			if _, ok := featsMap[featureType]; !ok {
 				continue

@@ -33,6 +33,9 @@ doc/site*
 *ssshtest
 t.*
 seqkit/t.*
+seqkit/*.fa
+seqkit/*.fasta
+seqkit/*.gz
 seqkit/bench-fx2tab
 doc/docs/chinese/
 *.brename_detail.txt

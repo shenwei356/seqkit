@@ -1,4 +1,4 @@
-// Copyright © 2016-2019 Wei Shen <shenwei356@gmail.com>
+// Copyright © 2016-2026 Wei Shen <shenwei356@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -74,9 +74,15 @@ Columns:
   14. N50_num   N50_num or L50. https://en.wikipedia.org/wiki/N50,_L50,_and_related_statistics#L50
   15. Q20(%)    percentage of bases with the quality score greater than 20
   16. Q30(%)    percentage of bases with the quality score greater than 30
-  17. AvgQual   average quality
+  17. AvgQual   average quality.
+                Attention: It's not the arithmetic average of quartiles (some tools do that).
+                How to computate: 1) take the qscore for each base, 2) convert it back to
+                an error probability, 3) take the mean of those, 4) and then convert that
+                mean error back into a qscore.
+                Reference: https://github.com/shenwei356/seqkit/issues/448
   18. GC(%)     percentage of GC content
-  
+  19. sum_n     number of ambitious letters (N, n, X, x)
+
 Attention:
   1. Sequence length metrics (sum_len, min_len, avg_len, max_len, Q1, Q2, Q3)
      count the number of gaps or spaces. You can remove them with "seqkit seq -g":
@@ -86,7 +92,7 @@ Tips:
   1. For lots of small files (especially on SDD), use a big value of '-j' to
      parallelize counting.
   2. Extract one metric with csvtk (https://github.com/shenwei356/csvtk):
-         seqkit stats -Ta input.fastq.gz | csvtk cut -t -f "Q30(%)" | csvtk del-header 
+         seqkit stats -Ta input.fastq.gz | csvtk cut -t -f "Q30(%)" | csvtk del-header
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -109,6 +115,8 @@ Tips:
 		}
 		gapLettersBytes := []byte(gapLetters)
 		gcLettersBytes := []byte{'g', 'c', 'G', 'C'}
+		nLettersBytesNucl := []byte{'N', 'n'}
+		nLettersBytesProt := []byte{'X', 'x'}
 
 		skipFileCheck := getFlagBool(cmd, "skip-file-check")
 		all := getFlagBool(cmd, "all")
@@ -133,7 +141,12 @@ Tips:
 			}
 		}
 
-		files := getFileListFromArgsAndFile(cmd, args, !skipFileCheck, "infile-list", !skipFileCheck)
+		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !(skipFileCheck || config.SkipFileCheck))
+		if !config.SkipFileCheck {
+			for _, file := range files {
+				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
+		}
 
 		style := &stable.TableStyle{
 			Name: "plain",
@@ -194,7 +207,7 @@ Tips:
 				"max_len",
 			}
 			if all {
-				colnames = append(colnames, []string{"Q1", "Q2", "Q3", "sum_gap", "N50", "N50_num", "Q20(%)", "Q30(%)", "AvgQual", "GC(%)"}...)
+				colnames = append(colnames, []string{"Q1", "Q2", "Q3", "sum_gap", "N50", "N50_num", "Q20(%)", "Q30(%)", "AvgQual", "GC(%)", "sum_n"}...)
 			}
 
 			if hasNX {
@@ -242,7 +255,7 @@ Tips:
 							info.lenAvg,
 							info.lenMax)
 						if all {
-							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f",
+							fmt.Fprintf(outfh, "\t%.0f\t%.0f\t%.0f\t%d\t%d\t%d\t%.0f\t%.0f\t%.2f\t%.2f\t%d",
 								info.Q1,
 								info.Q2,
 								info.Q3,
@@ -252,7 +265,9 @@ Tips:
 								info.q20,
 								info.q30,
 								info.avgQual,
-								info.gc)
+								info.gc,
+								info.nSum,
+							)
 						}
 						if hasNX {
 							for _, x = range info.nx {
@@ -283,7 +298,7 @@ Tips:
 							info.lenAvg,
 							info.lenMax)
 						if all {
-							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f",
+							fmt.Fprintf(outfh, "\t%.0f\t%.0f\t%.0f\t%d\t%d\t%d\t%.0f\t%.0f\t%.2f\t%.2f\t%d",
 								info.Q1,
 								info.Q2,
 								info.Q3,
@@ -293,7 +308,9 @@ Tips:
 								info.q20,
 								info.q30,
 								info.avgQual,
-								info.gc)
+								info.gc,
+								info.nSum,
+							)
 						}
 						if hasNX {
 							for _, x = range info.nx {
@@ -332,7 +349,7 @@ Tips:
 							info.lenAvg,
 							info.lenMax)
 						if all {
-							fmt.Fprintf(outfh, "\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f",
+							fmt.Fprintf(outfh, "\t%.0f\t%.0f\t%.0f\t%d\t%d\t%d\t%.0f\t%.0f\t%.2f\t%.2f\t%d",
 								info.Q1,
 								info.Q2,
 								info.Q3,
@@ -342,7 +359,9 @@ Tips:
 								info.q20,
 								info.q30,
 								info.avgQual,
-								info.gc)
+								info.gc,
+								info.nSum,
+							)
 						}
 						if hasNX {
 							for _, x = range info.nx {
@@ -400,6 +419,7 @@ Tips:
 
 				var gapSum uint64
 				var gcSum uint64
+				var nSum uint64
 
 				lensStats := util.NewLengthStats()
 
@@ -413,6 +433,8 @@ Tips:
 				var record *fastx.Record
 				var fastxReader *fastx.Reader
 				var err error
+				checkSeqType := true
+				var isNucleotide bool
 
 				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 				if err != nil {
@@ -451,12 +473,18 @@ Tips:
 						break
 					}
 
-					if seqFormat == "" {
-						if len(record.Seq.Qual) > 0 {
+					if checkSeqType {
+						checkSeqType = false
+
+						if fastxReader.IsFastq {
 							seqFormat = "FASTQ"
 						} else {
 							seqFormat = "FASTA"
 						}
+
+						isNucleotide = fastxReader.Alphabet() == seq.DNA ||
+							fastxReader.Alphabet() == seq.DNAredundant ||
+							fastxReader.Alphabet() == seq.RNA || fastxReader.Alphabet() == seq.RNAredundant
 					}
 
 					lensStats.Add(uint64(len(record.Seq.Seq)))
@@ -477,7 +505,12 @@ Tips:
 						}
 
 						gapSum += uint64(byteutil.CountBytes(record.Seq.Seq, gapLettersBytes))
-						gcSum += uint64(byteutil.CountBytes(record.Seq.Seq, gcLettersBytes))
+						if isNucleotide {
+							gcSum += uint64(byteutil.CountBytes(record.Seq.Seq, gcLettersBytes))
+							nSum += uint64(byteutil.CountBytes(record.Seq.Seq, nLettersBytesNucl))
+						} else {
+							nSum += uint64(byteutil.CountBytes(record.Seq.Seq, nLettersBytesProt))
+						}
 					}
 				}
 
@@ -528,7 +561,7 @@ Tips:
 						file = stdinLabel
 					}
 					ch <- statInfo{file, seqFormat, t,
-						0, 0, 0, 0,
+						0, 0, 0, 0, 0,
 						0, 0, 0, 0,
 						0, 0, 0,
 						0, 0, 0, 0,
@@ -542,7 +575,7 @@ Tips:
 						file = stdinLabel
 					}
 					ch <- statInfo{file, seqFormat, t,
-						lensStats.Count(), lensStats.Sum(), gapSum, lensStats.Min(),
+						lensStats.Count(), lensStats.Sum(), gapSum, lensStats.Min(), nSum,
 						mathutil.Round(lensStats.Mean(), 1), lensStats.Max(), n50, l50,
 						q1, q2, q3,
 						mathutil.Round(float64(q20)/float64(lensStats.Sum())*100, 2),
@@ -601,6 +634,7 @@ Tips:
 				{Header: "Q30(%)", Align: stable.AlignRight, HumanizeNumbers: true},
 				{Header: "AvgQual", Align: stable.AlignRight, HumanizeNumbers: true},
 				{Header: "GC(%)", Align: stable.AlignRight, HumanizeNumbers: true},
+				{Header: "sum_n", Align: stable.AlignRight, HumanizeNumbers: true},
 				// {Header: "L50", AlignRight: true},
 			}...)
 		}
@@ -634,6 +668,7 @@ Tips:
 				row = append(row, info.q30)
 				row = append(row, info.avgQual)
 				row = append(row, info.gc)
+				row = append(row, info.nSum)
 			}
 			if hasNX {
 				for _, x = range info.nx {
@@ -656,6 +691,7 @@ type statInfo struct {
 	lenSum uint64
 	gapSum uint64
 	lenMin uint64
+	nSum   uint64
 
 	lenAvg float64
 	lenMax uint64
