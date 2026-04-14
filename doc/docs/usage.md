@@ -1283,7 +1283,9 @@ Flags:
   -B, --base-content strings   print base content. (case ignored, multiple values supported) e.g. -B AT
                                -B N. Note that the denominator is the sequence length
   -C, --base-count strings     print base count. (case ignored, multiple values supported) e.g. -C AT -C N
+      --basename               print the basename of input file
   -I, --case-sensitive         calculate case sensitive base content/sequence hash
+  -f, --file-name              print the name of input file
   -g, --gc                     print GC content, i.e., (G+C)/(G+C+A+T)
   -G, --gc-skew                print GC-Skew
   -H, --header-line            print header line
@@ -1294,6 +1296,7 @@ Flags:
   -i, --only-id                print ID instead of full head
   -b, --qual-ascii-base int    ASCII BASE, 33 for Phred+33 (default 33)
   -s, --seq-hash               print hash (MD5) of sequence
+      --stdin-label string     label for replacing default "-" for stdin (default "-")
 
 ```
 

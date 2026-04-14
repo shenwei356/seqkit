@@ -26,6 +26,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
@@ -87,6 +88,10 @@ Attention:
 		printSeqHash := getFlagBool(cmd, "seq-hash")
 		noQual := getFlagBool(cmd, "no-qual")
 
+		printFile := getFlagBool(cmd, "file-name")
+		basename := getFlagBool(cmd, "basename")
+		stdinLabel := getFlagString(cmd, "stdin-label")
+
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer outfh.Close()
@@ -125,12 +130,12 @@ Attention:
 			}
 			if len(baseCounts) > 0 {
 				for _, bc := range baseCounts {
-					outfh.WriteString(fmt.Sprintf("\t%s", bc))
+					fmt.Fprintf(outfh, "\t%s", bc)
 				}
 			}
 			if len(baseContents) > 0 {
 				for _, bc := range baseContents {
-					outfh.WriteString(fmt.Sprintf("\t%s", bc))
+					fmt.Fprintf(outfh, "\t%s", bc)
 				}
 			}
 			if printAlphabet {
@@ -150,9 +155,22 @@ Attention:
 		var g, c, a, t int
 		var record *fastx.Record
 		var sum [md5.Size]byte
+
+		var _file string
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
+
+			if printFile {
+				_file = file
+
+				if isStdin(_file) {
+					_file = stdinLabel
+				} else if basename {
+					_file = filepath.Base(file)
+				}
+			}
+
 			for {
 				record, err = fastxReader.Read()
 				if err != nil {
@@ -170,10 +188,10 @@ Attention:
 				if onlyName {
 					outfh.Write(name)
 				} else {
-					//outfh.WriteString(fmt.Sprintf("%s\t%s\t%s", name,
-					//	record.Seq.Seq, record.Seq.Qual))
+					//fmt.Fprintf(outfh,"%s\t%s\t%s", name,
+					//	record.Seq.Seq, record.Seq.Qual)
 
-					// outfh.WriteString(fmt.Sprintf("%s\t", name))
+					// fmt.Fprintf(outfh,"%s\t", name))
 					outfh.Write(name)
 					outfh.Write(_tab)
 					outfh.Write(record.Seq.Seq)
@@ -184,7 +202,7 @@ Attention:
 				}
 
 				if printLength {
-					outfh.WriteString(fmt.Sprintf("\t%d", len(record.Seq.Seq)))
+					fmt.Fprintf(outfh, "\t%d", len(record.Seq.Seq))
 				}
 				if printGC || printGCSkew {
 					g = record.Seq.BaseCount("G")
@@ -194,18 +212,18 @@ Attention:
 				}
 
 				if printGC {
-					outfh.WriteString(fmt.Sprintf("\t%.2f", float64(g+c)/float64(g+c+a+t)*100))
+					fmt.Fprintf(outfh, "\t%.2f", float64(g+c)/float64(g+c+a+t)*100)
 				}
 				if printGCSkew {
-					outfh.WriteString(fmt.Sprintf("\t%.2f", float64(g-c)/float64(g+c)*100))
+					fmt.Fprintf(outfh, "\t%.2f", float64(g-c)/float64(g+c)*100)
 				}
 
 				if len(baseCounts) > 0 {
 					for _, bc := range baseCounts {
 						if caseSensitive {
-							outfh.WriteString(fmt.Sprintf("\t%d", record.Seq.BaseCountCaseSensitive(bc)))
+							fmt.Fprintf(outfh, "\t%d", record.Seq.BaseCountCaseSensitive(bc))
 						} else {
-							outfh.WriteString(fmt.Sprintf("\t%d", record.Seq.BaseCount(bc)))
+							fmt.Fprintf(outfh, "\t%d", record.Seq.BaseCount(bc))
 						}
 					}
 				}
@@ -213,30 +231,33 @@ Attention:
 				if len(baseContents) > 0 {
 					for _, bc := range baseContents {
 						if caseSensitive {
-							outfh.WriteString(fmt.Sprintf("\t%.2f", record.Seq.BaseContentCaseSensitive(bc)*100))
+							fmt.Fprintf(outfh, "\t%.2f", record.Seq.BaseContentCaseSensitive(bc)*100)
 						} else {
-							outfh.WriteString(fmt.Sprintf("\t%.2f", record.Seq.BaseContent(bc)*100))
+							fmt.Fprintf(outfh, "\t%.2f", record.Seq.BaseContent(bc)*100)
 						}
 					}
 				}
 
 				if printAlphabet {
-					outfh.WriteString(fmt.Sprintf("\t%s", alphabetStr(record.Seq.Seq)))
+					fmt.Fprintf(outfh, "\t%s", alphabetStr(record.Seq.Seq))
 				}
 
 				if printAvgQual {
-					outfh.WriteString(fmt.Sprintf("\t%.2f", record.Seq.AvgQual(qBase)))
+					fmt.Fprintf(outfh, "\t%.2f", record.Seq.AvgQual(qBase))
 				}
 
 				if printSeqHash {
 					if caseSensitive {
 						sum = md5.Sum(record.Seq.Seq)
-						outfh.WriteString(fmt.Sprintf("\t%s", hex.EncodeToString(sum[:])))
+						fmt.Fprintf(outfh, "\t%s", hex.EncodeToString(sum[:]))
 					} else {
 						sum = md5.Sum(bytes.ToLower(record.Seq.Seq))
-						outfh.WriteString(fmt.Sprintf("\t%s", hex.EncodeToString(sum[:])))
+						fmt.Fprintf(outfh, "\t%s", hex.EncodeToString(sum[:]))
 					}
+				}
 
+				if printFile {
+					fmt.Fprintf(outfh, "\t%s", _file)
 				}
 
 				// outfh.WriteString("\n")
@@ -264,7 +285,9 @@ func init() {
 	fx2tabCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
 	fx2tabCmd.Flags().BoolP("seq-hash", "s", false, "print hash (MD5) of sequence")
 	fx2tabCmd.Flags().BoolP("no-qual", "Q", false, "only output two column even for FASTQ file")
-
+	fx2tabCmd.Flags().BoolP("file-name", "f", false, "print the name of input file")
+	fx2tabCmd.Flags().BoolP("basename", "", false, "print the basename of input file")
+	fx2tabCmd.Flags().StringP("stdin-label", "", "-", `label for replacing default "-" for stdin`)
 }
 
 func alphabetStr(s []byte) string {
