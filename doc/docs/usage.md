@@ -1245,14 +1245,14 @@ retrieve corresponding FASTQ records by a FASTA file
 
 Attention:
   1. We assume the FASTA file comes from the FASTQ file,
-     so they share sequence IDs, and sequences in FASTA
+     so they share sequence names (not just IDs), and sequences in FASTA
      should be subseq of sequences in FASTQ file.
 
 Usage:
   seqkit fa2fq [flags]
 
 Flags:
-  -f, --fasta-file string      FASTA file)
+  -f, --fasta-file string      FASTA file
   -h, --help                   help for fa2fq
   -P, --only-positive-strand   only search on positive strand
 ```

@@ -42,7 +42,7 @@ var fa2fqCmd = &cobra.Command{
 
 Attention:
   1. We assume the FASTA file comes from the FASTQ file,
-     so they share sequence IDs, and sequences in FASTA
+     so they share sequence names (not just IDs), and sequences in FASTA
      should be subseq of sequences in FASTQ file.
 
 `,
@@ -104,7 +104,7 @@ Attention:
 					checkError(fmt.Errorf("this command only works for FASTQ format"))
 				}
 
-				fa, ok = records[string(record.ID)]
+				fa, ok = records[string(record.Name)]
 				if !ok {
 					continue
 				}
@@ -150,6 +150,6 @@ Attention:
 func init() {
 	RootCmd.AddCommand(fa2fqCmd)
 
-	fa2fqCmd.Flags().StringP("fasta-file", "f", "", "FASTA file)")
+	fa2fqCmd.Flags().StringP("fasta-file", "f", "", "FASTA file")
 	fa2fqCmd.Flags().BoolP("only-positive-strand", "P", false, "only search on positive strand")
 }
