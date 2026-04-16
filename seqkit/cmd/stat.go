@@ -81,7 +81,7 @@ Columns:
                 mean error back into a qscore.
                 Reference: https://github.com/shenwei356/seqkit/issues/448
   18. GC(%)     percentage of GC content
-  19. sum_n     number of ambitious letters (N, n, X, x)
+  19. sum_n     number of ambiguous letters (N, n, X, x)
 
 Attention:
   1. Sequence length metrics (sum_len, min_len, avg_len, max_len, Q1, Q2, Q3)
