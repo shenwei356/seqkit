@@ -1,9 +1,11 @@
 - [SeqKit v2.14.0](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0) - 2026-02-28
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.14.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0)
+    - `seqkit stats`:
+        - **Quit earlier when meeting an error, and fixed showing the error that was hidden by the progress bar**. [#581](https://github.com/shenwei356/seqkit/issues/581)
     - `seqkit fx2tab`:
-        - support printing the input file name. [#578](https://github.com/shenwei356/seqkit/issues/578)
+        - Support printing the input file name. [#578](https://github.com/shenwei356/seqkit/issues/578)
     - `seqkit fa2fq`:
-        - fix the matching bug.
+        - Fixed the matching bug.
 - [SeqKit v2.13.0](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0) - 2026-02-28
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.13.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0)
     - `seqkit`: add support for reading and writing LZ4 compression format.

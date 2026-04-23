@@ -221,7 +221,7 @@ Tips:
 		ch := make(chan statInfo, config.Threads)
 		statInfos := make([]statInfo, 0, 1024)
 
-		cancel := make(chan struct{})
+		var quit bool
 
 		done := make(chan int)
 		var x float64
@@ -233,10 +233,12 @@ Tips:
 				if info.err != nil {
 					if skipErr {
 						log.Warningf("%s: %s", info.file, info.err)
+						log.Warning() // avoid being hidden by the progress bar
 						continue
 					} else {
 						log.Errorf("%s: %s", info.file, info.err)
-						close(cancel)
+						log.Error() // avoid being hidden by the progress bar
+						quit = true
 						break
 					}
 				}
@@ -381,11 +383,6 @@ Tips:
 		doneSendFile := make(chan int)
 		go func() {
 			for _, file := range files {
-				select {
-				case <-cancel:
-					break
-				default:
-				}
 				chFile <- file
 			}
 			close(chFile)
@@ -397,12 +394,6 @@ Tips:
 		threadsFloat := float64(config.Threads) // just avoid repeated type conversion
 		var id uint64
 		for file := range chFile {
-			select {
-			case <-cancel:
-				break
-			default:
-			}
-
 			token <- 1
 			wg.Add(1)
 			id++
@@ -438,15 +429,14 @@ Tips:
 
 				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 				if err != nil {
-					select {
-					case <-cancel:
-						return
-					default:
-					}
 					if replaceStdinLabel && isStdin(file) {
 						file = stdinLabel
 					}
 					ch <- statInfo{file: file, err: err, id: id}
+					return
+				}
+
+				if quit {
 					return
 				}
 
@@ -458,19 +448,17 @@ Tips:
 						if err == io.EOF {
 							break
 						}
-						if err != nil {
-							select {
-							case <-cancel:
-								return
-							default:
-							}
-							if replaceStdinLabel && isStdin(file) {
-								file = stdinLabel
-							}
-							ch <- statInfo{file: file, err: err, id: id}
-							return
+
+						if replaceStdinLabel && isStdin(file) {
+							file = stdinLabel
 						}
-						break
+						ch <- statInfo{file: file, err: err, id: id}
+						return
+					}
+
+					// for early quit
+					if quit {
+						return
 					}
 
 					if checkSeqType {
@@ -548,11 +536,6 @@ Tips:
 					}
 				}
 
-				select {
-				case <-cancel:
-					return
-				default:
-				}
 				if lensStats.Count() == 0 {
 					if basename {
 						file = filepath.Base(file)
@@ -600,10 +583,8 @@ Tips:
 			pbs.Wait()
 		}
 
-		select {
-		case <-cancel:
+		if quit {
 			return
-		default:
 		}
 
 		if tabular {
