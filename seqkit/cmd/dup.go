@@ -46,7 +46,6 @@ You may need "seqkit rename" to make the the sequence IDs unique.
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		lineWidth := config.LineWidth
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
@@ -70,7 +69,7 @@ You may need "seqkit rename" to make the the sequence IDs unique.
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
-
+			checkAlphabet := true
 			for {
 				record, err = fastxReader.Read()
 				if err != nil {
@@ -80,11 +79,17 @@ You may need "seqkit rename" to make the the sequence IDs unique.
 					checkError(err)
 					break
 				}
-				if fastxReader.IsFastq {
-					fastx.ForcelyOutputFastq = true
+				if checkAlphabet {
+					if fastxReader.IsFastq {
+						if !config.LineWidthChanged {
+							config.LineWidth = 0
+						}
+						fastx.ForcelyOutputFastq = true
+					}
+					checkAlphabet = false
 				}
 				for i = 0; i < times; i++ {
-					record.FormatToWriter(outfh, lineWidth)
+					record.FormatToWriter(outfh, config.LineWidth)
 				}
 			}
 			fastxReader.Close()

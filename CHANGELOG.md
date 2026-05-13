@@ -1,5 +1,7 @@
 - [SeqKit v2.14.0](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0) - 2026-02-28
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.14.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0)
+    - `seqkit`:
+        - Wrap sequences and qualities when explicitly specifying the line width (`-w, --line-width`). [#583](https://github.com/shenwei356/seqkit/issues/583)
     - `seqkit stats`:
         - **Quit earlier when meeting an error, and fixed showing the error that was hidden by the progress bar**. [#581](https://github.com/shenwei356/seqkit/issues/581)
     - `seqkit fx2tab`:

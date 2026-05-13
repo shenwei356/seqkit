@@ -347,6 +347,7 @@ Examples:
 			// Parse all sequences
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
+			checkAlphabet := true
 
 			var seqname string
 			var ok bool
@@ -361,9 +362,14 @@ Examples:
 					checkError(err)
 					break
 				}
-				if fastxReader.IsFastq {
-					config.LineWidth = 0
-					fastx.ForcelyOutputFastq = true
+				if checkAlphabet {
+					if fastxReader.IsFastq {
+						if !config.LineWidthChanged {
+							config.LineWidth = 0
+						}
+						fastx.ForcelyOutputFastq = true
+					}
+					checkAlphabet = false
 				}
 
 				if region != "" {

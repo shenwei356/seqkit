@@ -132,6 +132,7 @@ Examples:
 			}
 
 			n = 0
+			checkAlphabet := true
 			for {
 				record, err = fastxReader.Read()
 				if err != nil {
@@ -142,9 +143,14 @@ Examples:
 					break
 				}
 
-				if fastxReader.IsFastq {
-					config.LineWidth = 0
-					fastx.ForcelyOutputFastq = true
+				if checkAlphabet {
+					if fastxReader.IsFastq {
+						if !config.LineWidthChanged {
+							config.LineWidth = 0
+						}
+						fastx.ForcelyOutputFastq = true
+					}
+					checkAlphabet = false
 				}
 
 				n++

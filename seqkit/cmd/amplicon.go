@@ -313,7 +313,9 @@ Examples:
 						break
 					}
 					if fastxReader.IsFastq {
-						config.LineWidth = 0
+						if !config.LineWidthChanged {
+							config.LineWidth = 0
+						}
 						fastx.ForcelyOutputFastq = true
 					}
 
@@ -465,7 +467,9 @@ Examples:
 					break
 				}
 				if fastxReader.IsFastq {
-					config.LineWidth = 0
+					if !config.LineWidthChanged {
+						config.LineWidth = 0
+					}
 					fastx.ForcelyOutputFastq = true
 				}
 

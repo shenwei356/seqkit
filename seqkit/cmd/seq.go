@@ -473,7 +473,9 @@ Filtering records to edit:
 				if checkSeqType {
 					isFastq = fastxReader.IsFastq
 					if isFastq {
-						config.LineWidth = 0
+						if !config.LineWidthChanged {
+							config.LineWidth = 0
+						}
 						printQual = true
 					}
 					checkSeqType = false
@@ -654,29 +656,15 @@ Filtering records to edit:
 						}
 					}
 
-					if isFastq {
-						if matched && color {
-							if sequence.Qual != nil {
-								outbw.Write(seqCol.ColorWithQuals(sequence.Seq, sequence.Qual))
-							} else {
-								outbw.Write(seqCol.Color(sequence.Seq))
-							}
+					text, buffer = wrapByteSlice(sequence.Seq, config.LineWidth, buffer)
+					if matched && color {
+						if sequence.Qual != nil {
+							text = seqCol.ColorWithQuals(text, sequence.Qual)
 						} else {
-							outbw.Write(sequence.Seq)
+							text = seqCol.Color(text)
 						}
-					} else {
-						text, buffer = wrapByteSlice(sequence.Seq, config.LineWidth, buffer)
-
-						if matched && color {
-							if sequence.Qual != nil {
-								text = seqCol.ColorWithQuals(text, sequence.Qual)
-							} else {
-								text = seqCol.Color(text)
-							}
-						}
-
-						outbw.Write(text)
 					}
+					outbw.Write(text)
 
 					outbw.Write(_mark_newline)
 				}
@@ -686,11 +674,11 @@ Filtering records to edit:
 						outbw.Write(_mark_plus_newline)
 					}
 
+					text, buffer = wrapByteSlice(sequence.Qual, config.LineWidth, buffer)
 					if matched && color {
-						outbw.Write(seqCol.ColorQuals(sequence.Qual))
-					} else {
-						outbw.Write(sequence.Qual)
+						text = seqCol.ColorQuals(text)
 					}
+					outbw.Write(text)
 
 					outbw.Write(_mark_newline)
 				}

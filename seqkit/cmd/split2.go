@@ -312,7 +312,9 @@ If you want to cut a sequence into multiple segments.
 
 					if once {
 						if fastxReader.IsFastq {
-							config.LineWidth = 0
+							if !config.LineWidthChanged {
+								config.LineWidth = 0
+							}
 							fastx.ForcelyOutputFastq = true
 						}
 

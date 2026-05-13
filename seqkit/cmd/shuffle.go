@@ -63,7 +63,6 @@ Attention:
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		// lineWidth := config.LineWidth
 		outFile := config.OutFile
 		quiet := config.Quiet
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
@@ -117,6 +116,7 @@ Attention:
 			for _, file := range files {
 				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
+				checkAlphabet := true
 				for {
 					record, err = fastxReader.Read()
 					if err != nil {
@@ -126,9 +126,14 @@ Attention:
 						checkError(err)
 						break
 					}
-					if fastxReader.IsFastq {
-						config.LineWidth = 0
-						fastx.ForcelyOutputFastq = true
+					if checkAlphabet {
+						if fastxReader.IsFastq {
+							if !config.LineWidthChanged {
+								config.LineWidth = 0
+							}
+							fastx.ForcelyOutputFastq = true
+						}
+						checkAlphabet = false
 					}
 
 					sequences[string(record.Name)] = record.Clone()

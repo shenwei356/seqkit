@@ -238,6 +238,10 @@ Attention:
 				}
 
 				if isFastq {
+					if !config.LineWidthChanged {
+						lineWidth = 0
+					}
+
 					outfh.Write(_mark_fastq)
 					outfh.Write(bufName.Bytes())
 					if hasDesc {
@@ -246,12 +250,14 @@ Attention:
 					}
 					outfh.Write(_mark_newline)
 
-					outfh.Write(bufSeq.Bytes())
+					text, buffer = wrapByteSlice(bufSeq.Bytes(), lineWidth, buffer)
+					outfh.Write(text)
 					outfh.Write(_mark_newline)
 
 					outfh.Write(_mark_plus_newline)
 
-					outfh.Write(bufQual.Bytes())
+					text, buffer = wrapByteSlice(bufQual.Bytes(), lineWidth, buffer)
+					outfh.Write(text)
 					outfh.Write(_mark_newline)
 				} else {
 					outfh.Write(_mark_fasta)

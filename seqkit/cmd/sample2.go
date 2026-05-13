@@ -150,7 +150,10 @@ Attention:
 
 			totalSeqs := int64(len(records))
 			if totalSeqs > 0 && len(records[0].Seq.Qual) > 0 {
-				config.LineWidth = 0
+				if !config.LineWidthChanged {
+					config.LineWidth = 0
+				}
+				fastx.ForcelyOutputFastq = true
 			}
 			if number >= totalSeqs {
 				outputRecords(records)
@@ -173,7 +176,9 @@ Attention:
 		defer fastxReader.Close()
 
 		if fastxReader.IsFastq {
-			config.LineWidth = 0
+			if !config.LineWidthChanged {
+				config.LineWidth = 0
+			}
 			fastx.ForcelyOutputFastq = true
 		}
 		var record *fastx.Record

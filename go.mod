@@ -38,6 +38,8 @@ require (
 
 replace github.com/miekg/dns v1.0.14 => github.com/miekg/dns v1.1.46
 
+replace github.com/shenwei356/bio v0.13.9 => ../bio
+
 require (
 	git.sr.ht/~sbinet/gg v0.3.1 // indirect
 	github.com/VividCortex/ewma v1.1.1 // indirect

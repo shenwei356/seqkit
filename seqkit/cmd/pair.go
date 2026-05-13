@@ -67,7 +67,13 @@ Tips:
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		lineWidth := 0
+
+		lineWidth := config.LineWidth
+		if !config.LineWidthChanged {
+			lineWidth = 0
+		}
+		fastx.ForcelyOutputFastq = true
+
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)

@@ -276,6 +276,7 @@ type Config struct {
 	BufferSize             int
 	Threads                int
 	LineWidth              int
+	LineWidthChanged       bool
 	IDRegexp               string
 	IDNCBI                 bool
 	OutFile                string
@@ -327,6 +328,7 @@ func getConfigs(cmd *cobra.Command) Config {
 		Alphabet:               getAlphabet(cmd, "seq-type"),
 		Threads:                threads,
 		LineWidth:              getFlagNonNegativeInt(cmd, "line-width"),
+		LineWidthChanged:       cmd.Flags().Lookup("line-width").Changed,
 		IDRegexp:               getIDRegexp(cmd, "id-regexp"),
 		IDNCBI:                 getFlagBool(cmd, "id-ncbi"),
 		OutFile:                outfile,

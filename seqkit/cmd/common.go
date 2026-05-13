@@ -469,7 +469,9 @@ Note:
 				if checkFormat {
 					checkFormat = false
 					if fastxReader.IsFastq {
-						config.LineWidth = 0
+						if !config.LineWidthChanged {
+							config.LineWidth = 0
+						}
 						fastx.ForcelyOutputFastq = true
 					}
 					isFastq = fastxReader.IsFastq
@@ -511,7 +513,7 @@ Note:
 					}
 
 					if isFastq {
-						record.FormatToWriter(outfh, 0)
+						record.FormatToWriter(outfh, config.LineWidth)
 					} else {
 						begin, end, _ = seq.SubLocation(len(record.Seq.Seq), loc[0], loc[1])
 						text, buffer = wrapByteSlice(record.Seq.Seq[begin-1:end], config.LineWidth, buffer)
@@ -681,7 +683,9 @@ Note:
 			if checkFormat {
 				checkFormat = false
 				if fastxReader.IsFastq {
-					config.LineWidth = 0
+					if !config.LineWidthChanged {
+						config.LineWidth = 0
+					}
 					fastx.ForcelyOutputFastq = true
 				}
 			}

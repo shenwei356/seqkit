@@ -100,6 +100,7 @@ var convertCmd = &cobra.Command{
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 			once = true
+			checkAlphabet := true
 			for {
 				record, err = fastxReader.Read()
 				if err != nil {
@@ -184,11 +185,16 @@ var convertCmd = &cobra.Command{
 					checkError(err)
 					break
 				}
-				if fastxReader.IsFastq {
-					config.LineWidth = 0
-					fastx.ForcelyOutputFastq = true
-				} else {
-					checkError(fmt.Errorf("this command only works for FASTQ format"))
+				if checkAlphabet {
+					if fastxReader.IsFastq {
+						if !config.LineWidthChanged {
+							config.LineWidth = 0
+						}
+						fastx.ForcelyOutputFastq = true
+					} else {
+						checkError(fmt.Errorf("this command only works for FASTQ format"))
+					}
+					checkAlphabet = false
 				}
 
 				if guessing {
