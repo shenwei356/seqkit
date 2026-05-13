@@ -22,12 +22,12 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pierrec/lz4/v4 v4.1.25
 	github.com/pkg/errors v0.9.1
-	github.com/shenwei356/bio v0.13.9
+	github.com/shenwei356/bio v0.14.0
 	github.com/shenwei356/breader v0.3.2
 	github.com/shenwei356/bwt v0.6.1
 	github.com/shenwei356/go-logging v0.0.0-20171012171522-c6b9702d88ba
 	github.com/shenwei356/stable v0.1.2
-	github.com/shenwei356/util v0.5.4
+	github.com/shenwei356/util v0.5.6
 	github.com/shenwei356/xopen v0.4.0
 	github.com/smallfish/simpleyaml v0.1.0
 	github.com/spf13/cobra v1.8.0
@@ -37,8 +37,6 @@ require (
 )
 
 replace github.com/miekg/dns v1.0.14 => github.com/miekg/dns v1.1.46
-
-replace github.com/shenwei356/bio v0.13.9 => ../bio
 
 require (
 	git.sr.ht/~sbinet/gg v0.3.1 // indirect

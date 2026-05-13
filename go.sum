@@ -137,8 +137,8 @@ github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQD
 github.com/ruudk/golang-pdf417 v0.0.0-20181029194003-1af4ab5afa58/go.mod h1:6lfFZQK844Gfx8o5WFuvpxWRwnSoipWe/p622j1v06w=
 github.com/ruudk/golang-pdf417 v0.0.0-20201230142125-a7e3863a1245/go.mod h1:pQAZKsJ8yyVxGRWYNEm9oFB8ieLgKFnamEyDmSA0BRk=
 github.com/scylladb/termtables v0.0.0-20191203121021-c4c0b6d42ff4/go.mod h1:C1a7PQSMz9NShzorzCiG2fk9+xuCgLkPeCvMHYR2OWg=
-github.com/shenwei356/bio v0.13.9 h1:dPo9oqN+dIJs7xN/cALUNil9QPPqtbIACEbhh44XBFg=
-github.com/shenwei356/bio v0.13.9/go.mod h1:UrNU93t3MAkKIAZUjc3Z3YEfcPFSeTzwm9KSKjmA+m8=
+github.com/shenwei356/bio v0.14.0 h1:2Kim/Ii9j+k8/2OT1zd/TRac6KQc52nseR8kH3RR1Uk=
+github.com/shenwei356/bio v0.14.0/go.mod h1:oKoj4yduQ8v5gukoEWJvBElK3A6byP0v1P9MbOVHJ2c=
 github.com/shenwei356/breader v0.3.2 h1:GLy2clIMck6FdTwj8WLnmhv0PW/7Pp+Wcx7TVEHG0ks=
 github.com/shenwei356/breader v0.3.2/go.mod h1:BimwolkMTIr/O4iX7xXtjEB1z5y39G+8I5Tsm9guC3E=
 github.com/shenwei356/bwt v0.6.1 h1:BDS1nhhIxiC284OKtLBUgy+U5L/7WrvT/ehOExB/DSA=
@@ -149,8 +149,8 @@ github.com/shenwei356/natsort v0.0.0-20220117010048-580176ad49fb h1:pb0RhpaADsFr
 github.com/shenwei356/natsort v0.0.0-20220117010048-580176ad49fb/go.mod h1:SiiGiRFyRtV7S9RamOrmQR5gpGIRhWJM1w0EtmuQ1io=
 github.com/shenwei356/stable v0.1.2 h1:TCpfL8bFvZxbZcCm6XaSXpKYv4UopnRejIx6f+StiuM=
 github.com/shenwei356/stable v0.1.2/go.mod h1:KghgqlviHPiKn9AuSTpadb7ep74n42VsNtPLoZZ/JIc=
-github.com/shenwei356/util v0.5.4 h1:zZpLhiz1P5x7ylQvNRWU6weR42l+BaWXXcl0JYeaBvs=
-github.com/shenwei356/util v0.5.4/go.mod h1:9T+P2I2xGv98Y+KdtNyTJ99p8spXyLuSFmXQLU1dlmk=
+github.com/shenwei356/util v0.5.6 h1:Qdb8fUGeIUMA3ZQXYrdzJFCqNkOZDcol2pts7oMMg0M=
+github.com/shenwei356/util v0.5.6/go.mod h1:srQnMZk3ntd9AidKyEdsROEazlEn+dI8ZI0/5EQznw4=
 github.com/shenwei356/xopen v0.4.0 h1:5B9+DmHw6bbJjYg8upFVD3S7t0AekGnat3pxo03weY4=
 github.com/shenwei356/xopen v0.4.0/go.mod h1:nD6QKJWJHO66R7KRa5hvgDETkOiR4/GhsM0Qsp83qVM=
 github.com/smallfish/simpleyaml v0.1.0 h1:5uAZdLAiHxS9cmzkOxg7lH0dILXKTD7uRZbAhyHmyU0=
