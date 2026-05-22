@@ -69,7 +69,8 @@ Columns:
   9.  Q1        first quartile of sequence length , with gaps or spaces counted
   10. Q2        median of sequence length         , with gaps or spaces counted
   11. Q3        third quartile of sequence length , with gaps or spaces counted
-  12. sum_gap   number of gaps
+  12. sum_gap   number of gaps (spaces/dashes/dots, not N's), configurable with -G/--gap-letters.
+                To count N's, please add '-G Nn'.
   13. N50       N50. https://en.wikipedia.org/wiki/N50,_L50,_and_related_statistics#N50
   14. N50_num   N50_num or L50. https://en.wikipedia.org/wiki/N50,_L50,_and_related_statistics#L50
   15. Q20(%)    percentage of bases with the quality score greater than 20
