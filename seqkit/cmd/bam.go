@@ -86,16 +86,18 @@ func (c ReadCounts) Sorted() ReadCounts {
 func loadIdList(f string) map[string]bool {
 	fh, err := os.Open(f)
 	checkError(err)
+	defer fh.Close()
 	r := bufio.NewReader(fh)
 	res := make(map[string]bool)
 
 	for {
 		b, err := r.ReadBytes(byte('\n'))
-		if err == nil {
-			res[strings.TrimRight(string(b), "\n")] = true
-		} else if err == io.EOF {
+		if len(b) > 0 {
+			res[strings.TrimRight(string(b), "\r\n")] = true
+		}
+		if err == io.EOF {
 			break
-		} else {
+		} else if err != nil {
 			checkError(err)
 		}
 	}
@@ -357,7 +359,10 @@ func bamIdxCount(file string) {
 	checkError(err)
 	i, err := bam.ReadIndex(fh)
 	checkError(err)
-	bamReader := NewBamReader(file, 1)
+	bamReader, fhBam := NewBamReader(file, 1)
+	if fhBam != os.Stdin {
+		defer fhBam.Close()
+	}
 
 	fmt.Fprintf(os.Stderr, "Ref\tCount\tSecCount\tSupCount\n")
 	for j := 0; j < i.NumRefs(); j++ {
@@ -371,7 +376,10 @@ func bamIdxCount(file string) {
 
 // bamStatsOnce calculates detailed statistics for a single BAM file.
 func bamStatsOnce(f string, mapQual int, includeIds map[string]bool, excludeIds map[string]bool, threads int) *bamStatRec {
-	bamReader := NewBamReader(f, threads)
+	bamReader, fhBam := NewBamReader(f, threads)
+	if fhBam != os.Stdin {
+		defer fhBam.Close()
+	}
 	res := new(bamStatRec)
 	res.File = f
 	for {
@@ -409,8 +417,12 @@ func bamStatsOnce(f string, mapQual int, includeIds map[string]bool, excludeIds 
 			res.Unmapped++
 		}
 	} // records
-	res.PrimAlnPerc = 100 * float64(res.PrimAln) / float64(res.PrimAln+res.Unmapped)
-	res.MultimapPerc = 100 * res.MultimapPerc / float64(res.PrimAln)
+	if res.PrimAln+res.Unmapped > 0 {
+		res.PrimAlnPerc = 100 * float64(res.PrimAln) / float64(res.PrimAln+res.Unmapped)
+	}
+	if res.PrimAln > 0 {
+		res.MultimapPerc = 100 * res.MultimapPerc / float64(res.PrimAln)
+	}
 	res.TotalReads = res.PrimAln + res.Unmapped
 	return res
 }
@@ -458,7 +470,11 @@ func idxStats(files []string, pretty bool) {
 		for i, fi := range fields {
 			switch fi {
 			case "AlnPerc":
-				data[i] = append(data[i], fmt.Sprintf("%.2f", float64(s.PrimAln*100)/float64(s.PrimAln+s.Unmapped)))
+				var perc float64
+				if s.PrimAln+s.Unmapped > 0 {
+					perc = float64(s.PrimAln*100) / float64(s.PrimAln+s.Unmapped)
+				}
+				data[i] = append(data[i], fmt.Sprintf("%.2f", perc))
 			case "Aligned":
 				data[i] = append(data[i], fmt.Sprintf("%d", s.PrimAln))
 			case "Unmapped":
@@ -571,7 +587,7 @@ var bamCmd = &cobra.Command{
 		}
 
 		if toolYaml != "" {
-			if toolYaml == "help" && len(toolYaml) == 0 {
+			if toolYaml == "help" && len(files) == 0 {
 				files = []string{"-"}
 
 			}
@@ -620,7 +636,7 @@ var bamCmd = &cobra.Command{
 			}
 		}
 
-		validFields := []string{"Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "IsSup"}
+		validFields := []string{"Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "LeftSoftClip", "RightSoftClip", "LeftHardClip", "RightHardClip", "Flags", "IsSec", "IsSup"}
 
 		fields := strings.Split(field, ",")
 		if field == "" {
@@ -634,42 +650,59 @@ var bamCmd = &cobra.Command{
 
 		fmap := make(map[string]fieldInfo)
 
+		getLeftHardClip := func(r *sam.Record) float64 {
+			if len(r.Cigar) > 0 && r.Cigar[0].Type() == sam.CigarHardClipped {
+				return float64(r.Cigar[0].Len())
+			}
+			return 0
+		}
+
+		getLeftSoftClip := func(r *sam.Record) float64 {
+			if len(r.Cigar) > 0 {
+				if r.Cigar[0].Type() == sam.CigarSoftClipped {
+					return float64(r.Cigar[0].Len())
+				} else if len(r.Cigar) > 1 && r.Cigar[0].Type() == sam.CigarHardClipped && r.Cigar[1].Type() == sam.CigarSoftClipped {
+					return float64(r.Cigar[1].Len())
+				}
+			}
+			return 0
+		}
+
+		getRightHardClip := func(r *sam.Record) float64 {
+			if len(r.Cigar) > 0 {
+				last := len(r.Cigar) - 1
+				if r.Cigar[last].Type() == sam.CigarHardClipped {
+					return float64(r.Cigar[last].Len())
+				}
+			}
+			return 0
+		}
+
+		getRightSoftClip := func(r *sam.Record) float64 {
+			if len(r.Cigar) > 0 {
+				last := len(r.Cigar) - 1
+				if r.Cigar[last].Type() == sam.CigarSoftClipped {
+					return float64(r.Cigar[last].Len())
+				} else if len(r.Cigar) > 1 && r.Cigar[last].Type() == sam.CigarHardClipped && r.Cigar[last-1].Type() == sam.CigarSoftClipped {
+					return float64(r.Cigar[last-1].Len())
+				}
+			}
+			return 0
+		}
+
 		getLeftClip := func(r *sam.Record) float64 {
 			if r.Flags&sam.Unmapped != 0 {
 				return 0
 			}
-			if r.Cigar[0].Type() == sam.CigarSoftClipped || r.Cigar[0].Type() == sam.CigarHardClipped {
-				return float64(r.Cigar[0].Len())
-			}
-			return 0
+			return getLeftHardClip(r) + getLeftSoftClip(r)
 		}
 
 		getRightClip := func(r *sam.Record) float64 {
 			if r.Flags&sam.Unmapped != 0 {
 				return 0
 			}
-			last := len(r.Cigar) - 1
-			if r.Cigar[last].Type() == sam.CigarSoftClipped || r.Cigar[last].Type() == sam.CigarHardClipped {
-				return float64(r.Cigar[last].Len())
-			}
-			return 0
+			return getRightHardClip(r) + getRightSoftClip(r)
 		}
-		getLeftSoftClip := func(r *sam.Record) float64 {
-			if r.Cigar[0].Type() == sam.CigarSoftClipped {
-				return float64(r.Cigar[0].Len())
-			}
-			return 0
-		}
-		_ = getLeftSoftClip
-
-		getRightSoftClip := func(r *sam.Record) float64 {
-			last := len(r.Cigar) - 1
-			if r.Cigar[last].Type() == sam.CigarSoftClipped {
-				return float64(r.Cigar[last].Len())
-			}
-			return 0
-		}
-		_ = getRightSoftClip
 
 		getRead := func(r *sam.Record) string {
 			return r.Name
@@ -723,7 +756,10 @@ var bamCmd = &cobra.Command{
 		fmap["RefCov"] = fieldInfo{
 			"Reference coverage",
 			func(r *sam.Record) float64 {
-				return float64(r.Len()) / float64(r.Ref.Len()) * 100
+				if r.Ref.Len() > 0 {
+					return float64(r.Len()) / float64(r.Ref.Len()) * 100
+				}
+				return 0
 			},
 		}
 
@@ -742,7 +778,10 @@ var bamCmd = &cobra.Command{
 			"Read coverage",
 			func(r *sam.Record) float64 {
 				sl := fmap["ReadLen"].Generate(r)
-				return float64(100 * (float64(sl) - getLeftClip(r) - getRightClip(r)) / float64(sl))
+				if sl > 0 {
+					return float64(100 * (float64(sl) - getLeftClip(r) - getRightClip(r)) / float64(sl))
+				}
+				return 0
 			},
 		}
 
@@ -757,6 +796,34 @@ var bamCmd = &cobra.Command{
 			"Clipped bases on the right (hard and soft)",
 			func(r *sam.Record) float64 {
 				return getRightClip(r)
+			},
+		}
+
+		fmap["LeftSoftClip"] = fieldInfo{
+			"Soft clipped bases on the left",
+			func(r *sam.Record) float64 {
+				return getLeftSoftClip(r)
+			},
+		}
+
+		fmap["RightSoftClip"] = fieldInfo{
+			"Soft clipped bases on the right",
+			func(r *sam.Record) float64 {
+				return getRightSoftClip(r)
+			},
+		}
+
+		fmap["LeftHardClip"] = fieldInfo{
+			"Hard clipped bases on the left",
+			func(r *sam.Record) float64 {
+				return getLeftHardClip(r)
+			},
+		}
+
+		fmap["RightHardClip"] = fieldInfo{
+			"Hard clipped bases on the right",
+			func(r *sam.Record) float64 {
+				return getRightHardClip(r)
 			},
 		}
 
@@ -829,7 +896,10 @@ var bamCmd = &cobra.Command{
 			os.Exit(0)
 		}
 
-		bamReader := NewBamReader(files[0], config.Threads)
+		bamReader, fhBam := NewBamReader(files[0], config.Threads)
+		if fhBam != os.Stdin {
+			defer fhBam.Close()
+		}
 		bamHeader := bamReader.Header()
 
 		var bamWriter *bam.Writer
@@ -838,7 +908,7 @@ var bamCmd = &cobra.Command{
 		if printTop != "" {
 			topBuffer = make(TopBuffer, topSize)
 			for i := range topBuffer {
-				topBuffer[i].Value = math.NaN()
+				topBuffer[i].Value = math.Inf(-1)
 			}
 		}
 
@@ -1074,7 +1144,7 @@ func gtThanPerc(h *thist.Hist, percent float64) float64 {
 }
 
 // NewBamReader creates a new BAM reader from file.
-func NewBamReader(bamFile string, nrProc int) *bam.Reader {
+func NewBamReader(bamFile string, nrProc int) (*bam.Reader, *os.File) {
 	fh, err := os.Stdin, error(nil)
 	if bamFile != "-" {
 		fh, err = os.Open(bamFile)
@@ -1084,7 +1154,7 @@ func NewBamReader(bamFile string, nrProc int) *bam.Reader {
 	reader, err := bam.NewReader(bufio.NewReader(fh), nrProc)
 	checkError(err)
 
-	return reader
+	return reader, fh
 }
 
 // dumpTop saves to entries to a BAM files.
@@ -1139,7 +1209,10 @@ type Locus struct {
 }
 
 func Bam2Bundles(inBam string, outDir string, minBundle int, nrProcBam int, quiet, silent bool) {
-	bamReader := NewBamReader(inBam, nrProcBam)
+	bamReader, fhBam := NewBamReader(inBam, nrProcBam)
+	if fhBam != os.Stdin {
+		defer fhBam.Close()
+	}
 	if _, err := os.Stat(outDir); err == nil {
 		log.Fatal("Cannot create output directory as it already exists:", outDir)
 	}
