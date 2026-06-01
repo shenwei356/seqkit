@@ -90,6 +90,9 @@ func NewBamReaderChan(inFile string, cp int, buff int, threads int) (chan *sam.R
 
 	r, err := bam.NewReader(bufio.NewReaderSize(fh, buff), threads)
 	go func() {
+		if fh != os.Stdin {
+			defer fh.Close()
+		}
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
@@ -120,11 +123,11 @@ func NewBamSinkChan(cp int) (chan *sam.Record, chan bool) {
 }
 
 func NewBamWriterChan(inFile string, head *sam.Header, cp int, buff int, threads int) (chan *sam.Record, chan bool) {
-	outChan := make(chan *sam.Record, buff)
+	outChan := make(chan *sam.Record, cp)
 	doneChan := make(chan bool)
 	fh, err := os.Stdout, error(nil)
 	if inFile != "-" {
-		fh, err = os.Open(inFile)
+		fh, err = os.Create(inFile)
 		checkError(err)
 	}
 
@@ -151,7 +154,7 @@ func BamToolbox(toolYaml string, inFile string, outFile string, quiet bool, sile
 	checkError(err)
 	ty, err := y.GetMapKeys()
 	checkError(err)
-	if ty[0] == "Yaml" {
+	if len(ty) > 0 && ty[0] == "Yaml" {
 		conf, err := y.Get("Yaml").String()
 		checkError(err)
 		cb, err := ioutil.ReadFile(conf)
@@ -178,7 +181,7 @@ func BamToolbox(toolYaml string, inFile string, outFile string, quiet bool, sile
 		var bamReader *bam.Reader
 		var doneChan chan bool
 		var sink bool
-		if tkeys[0] != "help" {
+		if len(tkeys) > 0 && tkeys[0] != "help" {
 			inChan, bamReader = NewBamReaderChan(inFile, chanCap, ioBuff, threads)
 			sink, err = y.Get("Sink").Bool()
 			if err == nil && sink {
@@ -262,6 +265,10 @@ func BamToolAlnContext(p *BamToolParams) {
 	tsvFh.WriteString(head)
 
 	for r := range p.InChan {
+		if !GetSamMapped(r) || r.Ref == nil {
+			p.OutChan <- r
+			continue
+		}
 		chrom := r.Ref.Name()
 		startPos, endPos := r.Pos, r.End()
 		startSeq, err := idx.IdxSubSeq(chrom, startPos+leftShift, startPos+rightShift)
@@ -310,7 +317,9 @@ func BamToolAlnContext(p *BamToolParams) {
 
 	}
 	close(p.OutChan)
-	tsvFh.Close()
+	if tsvFh != os.Stderr {
+		tsvFh.Close()
+	}
 }
 
 type RefWithFaidx struct {
@@ -376,11 +385,19 @@ func BamToolAccStats(p *BamToolParams) {
 		}
 		p.OutChan <- r
 	}
-	WeightedAcc := wAccSum / float64(totalLen)
-	MeanAcc := accSum / nr
+	var WeightedAcc, MeanAcc float64
+	if totalLen > 0 {
+		WeightedAcc = wAccSum / float64(totalLen)
+	}
+	if nr > 0 {
+		MeanAcc = accSum / nr
+	}
 	tsvFh.WriteString("AccMean\tWeightedAccMean\n")
 	tsvFh.WriteString(fmt.Sprintf("%.3f\t%.3f\n", MeanAcc, WeightedAcc))
 	close(p.OutChan)
+	if tsvFh != os.Stderr {
+		tsvFh.Close()
+	}
 }
 
 type AlnDetails struct {
@@ -400,12 +417,14 @@ func GetSamAlnDetails(r *sam.Record) *AlnDetails {
 	res := new(AlnDetails)
 	aux, ok := r.Tag([]byte("NM"))
 	if !ok {
-		panic("no NM tag")
+		panic("No NM tag in the BAM record!")
 	}
+
 	var mm int
 	var ins int
 	var del int
 	var skip int
+
 	switch aux.Value().(type) {
 	case int:
 		mismatch = int(aux.Value().(int))
@@ -451,8 +470,14 @@ func GetSamAlnDetails(r *sam.Record) *AlnDetails {
 	res.Skip = skip
 	res.Len = mm + ins + del
 	res.Match = res.MatchMismatch - res.Mismatch
-	res.Acc = (1.0 - float64(mismatch)/float64(mm+ins+del)) * 100
-	res.WAcc = res.Acc * float64(res.Len)
+	alnLen := float64(mm + ins + del)
+	if alnLen > 0 {
+		res.Acc = (1.0 - float64(mismatch)/alnLen) * 100
+		res.WAcc = res.Acc * float64(res.Len)
+	} else {
+		res.Acc = 0.0
+		res.WAcc = 0.0
+	}
 	return res
 }
 
@@ -500,7 +525,9 @@ func BamToolDump(p *BamToolParams) {
 		p.OutChan <- r
 	}
 	close(p.OutChan)
-	tsvFh.Close()
+	if tsvFh != os.Stderr {
+		tsvFh.Close()
+	}
 }
 
 func SamDumper(fields []string, r *sam.Record) []string {
@@ -638,6 +665,9 @@ func GetSamMapQual(r *sam.Record) int {
 
 func GetSamHardClipped(r *sam.Record) int {
 	var hc int
+	if len(r.Cigar) == 0 {
+		return 0
+	}
 	last := len(r.Cigar) - 1
 	if r.Cigar[last].Type() == sam.CigarHardClipped {
 		hc += r.Cigar[last].Len()
@@ -650,7 +680,7 @@ func GetSamHardClipped(r *sam.Record) int {
 
 func GetSamLeftHardClip(r *sam.Record) int {
 	var hc int
-	if r.Cigar[0].Type() == sam.CigarHardClipped {
+	if len(r.Cigar) > 0 && r.Cigar[0].Type() == sam.CigarHardClipped {
 		hc += r.Cigar[0].Len()
 	}
 	return hc
@@ -666,26 +696,36 @@ func GetSamRightClip(r *sam.Record) int {
 
 func GetSamRightSoftClip(r *sam.Record) int {
 	var hc int
-	last := len(r.Cigar) - 1
-	if r.Cigar[last].Type() == sam.CigarSoftClipped {
-		hc += r.Cigar[last].Len()
+	if len(r.Cigar) > 0 {
+		last := len(r.Cigar) - 1
+		if r.Cigar[last].Type() == sam.CigarSoftClipped {
+			hc += r.Cigar[last].Len()
+		} else if len(r.Cigar) > 1 && r.Cigar[last].Type() == sam.CigarHardClipped && r.Cigar[last-1].Type() == sam.CigarSoftClipped {
+			hc += r.Cigar[last-1].Len()
+		}
 	}
 	return hc
 }
 
 func GetSamLeftSoftClip(r *sam.Record) int {
 	var hc int
-	if r.Cigar[0].Type() == sam.CigarSoftClipped {
-		hc += r.Cigar[0].Len()
+	if len(r.Cigar) > 0 {
+		if r.Cigar[0].Type() == sam.CigarSoftClipped {
+			hc += r.Cigar[0].Len()
+		} else if len(r.Cigar) > 1 && r.Cigar[0].Type() == sam.CigarHardClipped && r.Cigar[1].Type() == sam.CigarSoftClipped {
+			hc += r.Cigar[1].Len()
+		}
 	}
 	return hc
 }
 
 func GetSamRightHardClip(r *sam.Record) int {
 	var hc int
-	last := len(r.Cigar) - 1
-	if r.Cigar[last].Type() == sam.CigarHardClipped {
-		hc += r.Cigar[last].Len()
+	if len(r.Cigar) > 0 {
+		last := len(r.Cigar) - 1
+		if r.Cigar[last].Type() == sam.CigarHardClipped {
+			hc += r.Cigar[last].Len()
+		}
 	}
 	return hc
 }
@@ -711,12 +751,18 @@ func GetSamRefLen(r *sam.Record) int {
 }
 
 func GetSamRefCov(r *sam.Record) float64 {
+	if r.Ref == nil || r.Ref.Len() == 0 {
+		return 0
+	}
 	return float64(r.Len()) / float64(r.Ref.Len()) * 100
 }
 
 func GetSamReadCov(r *sam.Record) float64 {
 	sl := float64(GetSamReadLen(r))
-	return float64(100 * (sl - float64(GetSamLeftClip(r)+GetSamRightClip(r))) / float64(sl))
+	if sl > 0 {
+		return float64(100 * (sl - float64(GetSamLeftClip(r)+GetSamRightClip(r))) / float64(sl))
+	}
+	return 0
 }
 
 func GetSamReadAln(r *sam.Record) int {
@@ -812,5 +858,9 @@ func GetSamAcc(r *sam.Record) float64 {
 			//fmt.Println(op)
 		}
 	}
-	return (1.0 - float64(mismatch)/float64(mm+ins+del)) * 100
+	alnLen := float64(mm + ins + del)
+	if alnLen > 0 {
+		return (1.0 - float64(mismatch)/alnLen) * 100
+	}
+	return 0.0
 }
