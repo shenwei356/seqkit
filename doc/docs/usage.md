@@ -1206,7 +1206,7 @@ Examples
 
         seqkit scat -j 4 -f fastq_dir > all_records.fq
 
-2. Watch a directory and stream fastq records in real time until interrupt is recieved and plot read lengths using `seqkit watch`:
+2. Watch a directory and stream fastq records in real time until interrupt is received and plot read lengths using `seqkit watch`:
 
         seqkit scat -j 4 fastq_dir | seqkit watch -f ReadLen -
 
@@ -1568,7 +1568,7 @@ Flags:
   -L, --list-transl-table-with-amb-codons int   show details of translate table N (including ambigugous
                                                 codons), 0 for all.  (default -1)
   -m, --min-len int                             the minimum length of amino acid sequence
-  -s, --out-subseqs                             output individual amino acid subsequences seperated by
+  -s, --out-subseqs                             output individual amino acid subsequences separated by
                                                 the stop symbol "*"
   -T, --transl-table int                        translate table/genetic code, type 'seqkit translate
                                                 --help' for more details (default 1)
