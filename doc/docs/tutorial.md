@@ -373,7 +373,7 @@ We may want to check how may identical hairpins among different species there ar
 and save the replicates to another file (here is `duplicated.fa.gz`),
 as well as replicating details (`duplicated.detail.txt`,
 1th column is the repeated number,
-2nd column contains sequence IDs seperated by comma).
+2nd column contains sequence IDs separated by comma).
 
     $ seqkit rmdup -s -i hairpin.fa.gz -o clean.fa.gz -d duplicated.fa.gz -D duplicated.detail.txt
 
