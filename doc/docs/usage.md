@@ -2687,6 +2687,8 @@ Flags:
   -O, --out-dir string            output directory (default value is $infile.split)
   -P, --out-prefix string         file prefix (it overrides --by-*-prefix). The placeholder "{read}" is
                                   needed for paired-end files.
+  -W, --part-width int            number of digits used for output file part numbering (zero-padded),
+                                  e.g., 001, 002 (default 3)
   -2, --two-pass                  two-pass mode read files twice to lower memory usage. (only for FASTA
                                   format)
   -U, --update-faidx              update the fasta index file if it exists. Use this if you are not sure
@@ -2702,6 +2704,13 @@ Examples
         [INFO] write 10000 sequences to file: hairpin.fa.part_001.gz
         [INFO] write 10000 sequences to file: hairpin.fa.part_002.gz
         [INFO] write 8645 sequences to file: hairpin.fa.part_003.gz
+        
+        # if there are more than 1000 parts, increase the -W/--part-width
+        $ seqkit split hairpin.fa.gz -s 10000 -W 5
+        [INFO] split into 10000 seqs per file
+        [INFO] write 10000 sequences to file: hairpin.fa.gz.split/hairpin.part_00001.fa.gz
+        [INFO] write 10000 sequences to file: hairpin.fa.gz.split/hairpin.part_00002.fa.gz
+        [INFO] write 8645 sequences to file: hairpin.fa.gz.split/hairpin.part_00003.fa.gz
         
 1. Change the file prefix with `-P/--out-prefix`, other modes support this too.
 
@@ -2823,10 +2832,13 @@ Flags:
   -O, --out-dir string            output directory (default value is $infile.split)
   -P, --out-prefix string         file prefix (it overrides --by-*-prefix). The placeholder "{read}" is
                                   needed for paired-end files.
+  -W, --part-width int            number of digits used for output file part numbering (zero-padded),
+                                  e.g., 001, 002 (default 3)
   -1, --read1 string              (gzipped) read1 file
   -2, --read2 string              (gzipped) read2 file
   -N, --seqid-as-filename         use the first sequence ID as the file name. E.g., using '-N -s 1' is
                                   equal to 'seqkit split --by-id' but much faster and uses less memory.
+
 ```
 
 Examples
@@ -2839,6 +2851,13 @@ Examples
         [INFO] write 10000 sequences to file: hairpin.fa.split/hairpin.part_001.fa
         [INFO] write 10000 sequences to file: hairpin.fa.split/hairpin.part_002.fa
         [INFO] write 8645 sequences to file: hairpin.fa.split/hairpin.part_003.fa
+        
+        # if there are more than 1000 parts, increase the -W/--part-width
+        $ seqkit split2 hairpin.fa.gz -s 10000 -W 5
+        [INFO] split into 10000 seqs per file
+        [INFO] write 10000 sequences to file: hairpin.fa.gz.split/hairpin.part_00001.fa.gz
+        [INFO] write 10000 sequences to file: hairpin.fa.gz.split/hairpin.part_00002.fa.gz
+        [INFO] write 8645 sequences to file: hairpin.fa.gz.split/hairpin.part_00003.fa.gz
         
 1. Force compression for plain text input by adding an extra extension:
 

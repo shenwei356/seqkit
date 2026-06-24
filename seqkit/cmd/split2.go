@@ -144,6 +144,9 @@ If you want to cut a sequence into multiple segments.
 			prefixByLength = prefixAll
 		}
 
+		partNumberWidth := getFlagPositiveInt(cmd, "part-width")
+		fileFmt := fmt.Sprintf("%%s%%0%dd%%s", partNumberWidth)
+
 		seqIDAsFileName := getFlagBool(cmd, "seqid-as-filename")
 
 		if size == 0 && parts == 0 && length == 0 {
@@ -349,7 +352,7 @@ If you want to cut a sequence into multiple segments.
 								} else {
 									prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 								}
-								outfilePre = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
+								outfilePre = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, i+1, fileExt))
 							} else {
 								outfilePre = filepath.Join(outdir, fmt.Sprintf("%s%s", pathutil.RemoveInvalidPathChars(string(record.ID), "__"), fileExt))
 							}
@@ -373,7 +376,7 @@ If you want to cut a sequence into multiple segments.
 								} else {
 									prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 								}
-								outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
+								outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, i+1, fileExt))
 							} else {
 								outfile = filepath.Join(outdir, fmt.Sprintf("%s%s", pathutil.RemoveInvalidPathChars(string(record.ID), "__"), fileExt))
 							}
@@ -407,7 +410,7 @@ If you want to cut a sequence into multiple segments.
 								} else {
 									prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 								}
-								outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
+								outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, i+1, fileExt))
 							} else {
 								outfile = filepath.Join(outdir, fmt.Sprintf("%s%s", pathutil.RemoveInvalidPathChars(string(record.ID), "__"), fileExt))
 							}
@@ -437,7 +440,7 @@ If you want to cut a sequence into multiple segments.
 								} else {
 									prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 								}
-								outfilePre = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
+								outfilePre = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, i+1, fileExt))
 							} else {
 								outfilePre = filepath.Join(outdir, fmt.Sprintf("%s%s", pathutil.RemoveInvalidPathChars(string(record.ID), "__"), fileExt))
 							}
@@ -470,7 +473,7 @@ If you want to cut a sequence into multiple segments.
 								} else {
 									prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 								}
-								outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i+1, fileExt))
+								outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, i+1, fileExt))
 							} else {
 								outfile = filepath.Join(outdir, fmt.Sprintf("%s%s", pathutil.RemoveInvalidPathChars(string(record.ID), "__"), fileExt))
 							}
@@ -543,4 +546,6 @@ func init() {
 	split2Cmd.Flags().BoolP("seqid-as-filename", "N", false, "use the first sequence ID as the file name. E.g., using '-N -s 1' is equal to 'seqkit split --by-id' but much faster and uses less memory.")
 
 	split2Cmd.Flags().StringP("extension", "e", "", `set output file extension, e.g., ".gz", ".xz", or ".zst"`)
+
+	split2Cmd.Flags().IntP("part-width", "W", 3, "number of digits used for output file part numbering (zero-padded), e.g., 001, 002")
 }

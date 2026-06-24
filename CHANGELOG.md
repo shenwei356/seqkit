@@ -1,4 +1,4 @@
-- [SeqKit v2.14.0](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0) - 2026-02-28
+- [SeqKit v2.14.0](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0) - 2026-xx-xx
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.14.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0)
     - `seqkit`:
         - Wrap sequences and qualities when explicitly specifying the line width (`-w, --line-width`). [#583](https://github.com/shenwei356/seqkit/issues/583)
@@ -8,6 +8,8 @@
         - Support printing the input file name. [#578](https://github.com/shenwei356/seqkit/issues/578)
     - `seqkit fa2fq`:
         - Fixed the matching bug.
+    - `seqkit split/split2`:
+        - Added an option `-W/--part-width` to set the number of digits used for output file part numbering (zero-padded), e.g., 001, 002. [#589](https://github.com/shenwei356/seqkit/issues/589)
 - [SeqKit v2.13.0](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0) - 2026-02-28
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.13.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0)
     - `seqkit`: add support for reading and writing LZ4 compression format.

@@ -138,6 +138,9 @@ Examples:
 			prefixByRegion = prefixAll
 		}
 
+		partNumberWidth := getFlagPositiveInt(cmd, "part-width")
+		fileFmt := fmt.Sprintf("%%s%%0%dd%%s", partNumberWidth)
+
 		file := files[0]
 		isstdin := isStdin(file)
 
@@ -236,7 +239,7 @@ Examples:
 						} else {
 							prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 						}
-						outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i, fileExt))
+						outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, i, fileExt))
 						writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 						i++
 						records = []*fastx.Record{}
@@ -244,13 +247,12 @@ Examples:
 				}
 				fastxReader.Close()
 				if len(records) > 0 {
-					// outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
 					if prefixBySizeSet {
 						prefix = prefixBySize
 					} else {
 						prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 					}
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i, fileExt))
+					outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, i, fileExt))
 					writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 				}
 
@@ -326,13 +328,12 @@ Examples:
 
 			n := 1
 			if len(IDs) > 0 {
-				// outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
 				if prefixBySizeSet {
 					prefix = prefixBySize
 				} else {
 					prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 				}
-				outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, n, fileExt))
+				outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, n, fileExt))
 				if !dryRun {
 					outfh, err = xopen.Wopen(outfile)
 					checkError(err)
@@ -359,13 +360,12 @@ Examples:
 						log.Infof("write %d sequences to file: %s\n", j, outfile)
 					}
 					n++
-					// outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
 					if prefixBySizeSet {
 						prefix = prefixBySize
 					} else {
 						prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 					}
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, n, fileExt))
+					outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, n, fileExt))
 					if !dryRun {
 						outfh.Close()
 						outfh, err = xopen.Wopen(outfile)
@@ -435,26 +435,24 @@ Examples:
 					}
 					records = append(records, record)
 					if len(records) == size {
-						// outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
 						if prefixByPartSet {
 							prefix = prefixByPart
 						} else {
 							prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 						}
-						outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i, fileExt))
+						outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, i, fileExt))
 						writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 						i++
 						records = []*fastx.Record{}
 					}
 				}
 				if len(records) > 0 {
-					// outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), i, fileExt))
 					if prefixByPartSet {
 						prefix = prefixByPart
 					} else {
 						prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 					}
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, i, fileExt))
+					outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, i, fileExt))
 					writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 				}
 				return
@@ -541,13 +539,12 @@ Examples:
 
 			n := 1
 			if len(IDs) > 0 {
-				// outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
 				if prefixByPartSet {
 					prefix = prefixByPart
 				} else {
 					prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 				}
-				outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, n, fileExt))
+				outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, n, fileExt))
 				if !dryRun {
 					outfh, err = xopen.Wopen(outfile)
 					checkError(err)
@@ -574,13 +571,12 @@ Examples:
 						log.Infof("write %d sequences to file: %s\n", j, outfile)
 					}
 					n++
-					// outfile = filepath.Join(outdir, fmt.Sprintf("%s.part_%03d%s", filepath.Base(fileName), n, fileExt))
 					if prefixByPartSet {
 						prefix = prefixByPart
 					} else {
 						prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 					}
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s%03d%s", prefix, n, fileExt))
+					outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, n, fileExt))
 					if !dryRun {
 						outfh.Close()
 						outfh, err = xopen.Wopen(outfile)
@@ -1065,6 +1061,8 @@ func init() {
 	splitCmd.Flags().StringP("out-prefix", "P", "", `file prefix (it overrides --by-*-prefix). The placeholder "{read}" is needed for paired-end files.`)
 
 	splitCmd.Flags().StringP("extension", "e", "", `set output file extension, e.g., ".gz", ".xz", or ".zst"`)
+
+	splitCmd.Flags().IntP("part-width", "W", 3, "number of digits used for output file part numbering (zero-padded), e.g., 001, 002")
 }
 
 var suffixFA = ".fasta"
