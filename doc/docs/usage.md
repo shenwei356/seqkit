@@ -644,7 +644,7 @@ Usage
 extract subsequences in sliding windows
 
 Usage:
-  seqkit sliding [flags]
+  seqkit sliding [flags] 
 
 Flags:
   -c, --circular          circular genome (same to -C/--circular-genome)
@@ -652,7 +652,7 @@ Flags:
   -g, --greedy            greedy mode, i.e., exporting last subsequences even shorter than the windows size
   -h, --help              help for sliding
   -s, --step int          step size
-  -S, --sufix string      suffix added to the sequence ID
+  -S, --suffix string     suffix added to the sequence ID (default "_sliding")
   -W, --window int        window size
 
 ```
