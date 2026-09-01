@@ -1,9 +1,11 @@
 - [SeqKit v2.14.0](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0) - 2026-xx-xx
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.14.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0)
     - `seqkit`:
+        - **Faster and 40% less memory when reading large FASTA records**.
+        - Fixed a performance problem existing for many years: Old fastx readers could become extremely slow on BGZF FASTQ files.
         - Wrap sequences and qualities when explicitly specifying the line width (`-w, --line-width`). [#583](https://github.com/shenwei356/seqkit/issues/583)
     - `seqkit stats`:
-        - **Quit earlier when meeting an error, and fixed showing the error that was hidden by the progress bar**. [#581](https://github.com/shenwei356/seqkit/issues/581)
+        - Quit earlier when meeting an error, and fixed showing the error that was hidden by the progress bar. [#581](https://github.com/shenwei356/seqkit/issues/581)
     - `seqkit fx2tab`:
         - Support printing the input file name. [#578](https://github.com/shenwei356/seqkit/issues/578)
     - `seqkit fa2fq`:
