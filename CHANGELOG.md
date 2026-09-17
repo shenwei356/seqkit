@@ -12,6 +12,8 @@
         - Fixed the matching bug.
     - `seqkit split/split2`:
         - Added an option `-W/--part-width` to set the number of digits used for output file part numbering (zero-padded), e.g., 001, 002. [#589](https://github.com/shenwei356/seqkit/issues/589)
+    - `seqkit sample/sample2`:
+        - Updated help message. [#593](https://github.com/shenwei356/seqkit/issues/593)
 - [SeqKit v2.13.0](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0) - 2026-02-28
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.13.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0)
     - `seqkit`: add support for reading and writing LZ4 compression format.

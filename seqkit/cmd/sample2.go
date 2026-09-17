@@ -43,19 +43,25 @@ var sample2Cmd = &cobra.Command{
 	Short: "sample sequences by number or proportion (version 2)",
 	Long: `sample sequences by number or proportion (version 2).
 
-Differences to 'seqkit sample':
-1. Provides unbiased, fixed-size sampling with controlled memory usage.
-2. Guarantees exact target count with equal probability for each record.
-3. Memory efficient: tested on large datasets with minimal memory footprint.
-   -   2,195,354 records: <200 MB memory usage (output: 38 GB long read FASTQ)
-   - 124,437,023 records: 2.05 GB memory usage (output: 43 GB short read FASTQ)
+Sampling modes (N = requested number, p = requested proportion):
 
-Attention:
-1. '-n' SHOULD BE coupled with 2-pass mode (-2) when large FASTQ files, 
-   otherwise it loads ALL seqs into memory!
-2. By default, the output is deterministic; that is, given the same input and random seed,
-   seqkit shuf will always generate identical results across different runs.
-   For 'true randomness', please add '-r/--non-deterministic', which uses a time-based seed.
+----------------------------------------------------------------------------------
+  Mode     sample                       sample2
+----------------------------------------------------------------------------------
+  -p       count varies; one pass       count varies;     one pass
+  -p -2    count varies; one pass       floor(total * p); two passes
+  -n       up to N; loads all records   exactly min(N, total); loads all records
+  -n -2    up to N; two passes          exactly min(N, total); two passes
+----------------------------------------------------------------------------------
+
+For a proportion, use either command with -p; both stream the input, including stdin.
+For an exact number, use 'seqkit sample2 -n N': add -2 for large files to
+store only N record indices instead of all records. Two-pass mode needs a file,
+not stdin. 'seqkit sample -n N' is approximate and may return fewer than N;
+it is not uniform fixed-size sampling.
+
+Results are deterministic for the same input and seed. To vary results across
+runs, add '-r/--non-deterministic' for a time-based seed.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -296,8 +302,8 @@ func init() {
 	RootCmd.AddCommand(sample2Cmd)
 
 	sample2Cmd.Flags().Int64P("rand-seed", "s", 11, "random seed. For paired-end data, use the same seed across fastq files to sample the same read pairs")
-	sample2Cmd.Flags().BoolP("non-deterministic", "r", false, "use a time-based seed to generate non-deterministic (truly random) results")
-	sample2Cmd.Flags().Int64P("number", "n", 0, "sample by number. SHOULD BE coupled with -2 flag (2-pass mode) when handling large FASTQ files.")
-	sample2Cmd.Flags().Float64P("proportion", "p", 0, "sample by proportion. Numbers would not be constant if not coupled with 2-pass mode.")
-	sample2Cmd.Flags().BoolP("two-pass", "2", false, "2-pass mode read files twice to lower memory usage. Not allowed when reading from stdin")
+	sample2Cmd.Flags().BoolP("non-deterministic", "r", false, "use a time-based seed to vary results across runs")
+	sample2Cmd.Flags().Int64P("number", "n", 0, "sample exactly min(N, total) records; without -2, loads all records")
+	sample2Cmd.Flags().Float64P("proportion", "p", 0, "sample by proportion (with -2, output floor(total * p) records)")
+	sample2Cmd.Flags().BoolP("two-pass", "2", false, "for -n, store N indices; for -p, fix the count. Requires a file")
 }
