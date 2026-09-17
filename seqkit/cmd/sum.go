@@ -21,7 +21,6 @@
 package cmd
 
 import (
-	"bytes"
 	"crypto/md5"
 	"encoding/binary"
 	"encoding/hex"
@@ -52,7 +51,8 @@ var sumCmd = &cobra.Command{
 	Long: `compute message digest for all sequences in FASTA/Q files
 
 Attention:
-  1. Sequence headers and qualities are skipped, only sequences matter.
+  1. By default, sequence headers and qualities are skipped, only sequences matter.
+     Optionally, the sequence ID can be included with the flag -i/--include-id.
   2. The order of sequences records does not matter.
   3. Circular complete genomes are supported with the flag -c/--circular.
      - The same double-stranded genomes with different start positions or
@@ -72,12 +72,13 @@ Method:
 Following the seqhash in Poly (https://github.com/TimothyStiles/poly/),
 We add meta information to the message digest, with the format of:
 
-    seqkit.<version>_<seq type><seq structure><strand>_<kmer size>_<seq digest>
+    seqkit.<version>_<seq type><seq structure><strand>[with seqid]_<kmer size>_<seq digest>
 
     <version>:       digest version
     <seq type>:      'D' for DNA, 'R' for RNA, 'P' for protein, 'N' for others
     <seq structure>: 'L' for linear sequence, 'C' for circular genome
     <strand>:        'D' for double-stranded, 'S' for single-stranded
+    [with seqid]:	 'I' for including sequence ID, '' for not.
     <kmer size>:     0 for linear sequence, other values for circular genome
 
 Examples:
@@ -108,6 +109,7 @@ Examples:
 		all := getFlagBool(cmd, "all")
 		rna2dna := getFlagBool(cmd, "rna2dna")
 		singleStrand := getFlagBool(cmd, "single-strand")
+		includeID := getFlagBool(cmd, "include-id")
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 		if !config.SkipFileCheck {
@@ -264,6 +266,8 @@ Examples:
 				var seqStructure string // "L" for linear, "C" for circular
 				var strand string       // "D" for double strands, "S" for single strand
 
+				sep := []byte("shenwei356") // separator for sequence and sequence ID, to avoid the same hash for different sequences with different IDs
+
 				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				// checkError(err)
 				if err != nil {
@@ -336,7 +340,8 @@ Examples:
 
 						if checkAlphabet {
 							ab = fastxReader.Alphabet()
-							if ab == seq.Protein {
+							switch ab {
+							case seq.Protein:
 								seqType = "P"
 
 								ch <- &Aresult{
@@ -346,12 +351,11 @@ Examples:
 								}
 								log.Errorf(fmt.Sprintf("the flag -c/--circular does not support protein sequences: %s", file))
 								return
-
-							} else if ab == seq.RNA || ab == seq.RNAredundant {
+							case seq.RNA, seq.RNAredundant:
 								seqType = "R"
-							} else if ab == seq.DNA || ab == seq.DNAredundant {
+							case seq.DNA, seq.DNAredundant:
 								seqType = "D"
-							} else {
+							default:
 								seqType = "N"
 							}
 
@@ -362,7 +366,7 @@ Examples:
 							_seq.RemoveGapsInplace(gapLetters)
 						}
 
-						_seq.Seq = bytes.ToLower(_seq.Seq)
+						lowerSeqInplace(_seq.Seq)
 
 						if rna2dna {
 							if !(ab == seq.RNA || ab == seq.RNAredundant) {
@@ -420,7 +424,13 @@ Examples:
 							}
 							// fmt.Println(i, string(s), string(src))
 
-							h = xxhash.Sum64(s)
+							if includeID {
+								lowerSeqInplace(record.ID)
+								h = xxhash.Sum64(append(s, append(sep, record.ID...)...))
+							} else {
+								h = xxhash.Sum64(s)
+							}
+
 							if singleStrand {
 								hashes = append(hashes, h)
 							} else {
@@ -463,13 +473,14 @@ Examples:
 
 						if checkAlphabet {
 							ab = fastxReader.Alphabet()
-							if ab == seq.Protein {
+							switch ab {
+							case seq.Protein:
 								seqType = "P"
-							} else if ab == seq.RNA || ab == seq.RNAredundant {
+							case seq.RNA, seq.RNAredundant:
 								seqType = "R"
-							} else if ab == seq.DNA || ab == seq.DNAredundant {
+							case seq.DNA, seq.DNAredundant:
 								seqType = "D"
-							} else {
+							default:
 								seqType = "N"
 							}
 
@@ -480,7 +491,7 @@ Examples:
 							_seq.RemoveGapsInplace(gapLetters)
 						}
 
-						_seq.Seq = bytes.ToLower(_seq.Seq)
+						lowerSeqInplace(_seq.Seq)
 
 						if rna2dna {
 							if !(ab == seq.RNA || ab == seq.RNAredundant) {
@@ -492,7 +503,12 @@ Examples:
 							}
 						}
 
-						h = xxhash.Sum64(_seq.Seq)
+						if includeID {
+							lowerSeqInplace(record.ID)
+							h = xxhash.Sum64(append(_seq.Seq, append(sep, record.ID...)...))
+						} else {
+							h = xxhash.Sum64(_seq.Seq)
+						}
 
 						hashes = append(hashes, h)
 
@@ -534,12 +550,16 @@ Examples:
 				if !circular {
 					k = 0
 				}
-				sum := fmt.Sprintf("seqkit.v%s_%s%s%s_k%d_%s",
+				includeIDStr := ""
+				if includeID {
+					includeIDStr = "I"
+				}
+				sum := fmt.Sprintf("seqkit.v%s_%s%s%s%s_k%d_%s",
 					sumVersion,
 					seqType,
 					seqStructure,
 					strand,
-					k,
+					includeIDStr, k,
 					hex.EncodeToString(digest[:]))
 
 				ch <- &Aresult{
@@ -579,6 +599,16 @@ func init() {
 	sumCmd.Flags().BoolP("all", "a", false, "show all information, including the sequences length and the number of sequences")
 	sumCmd.Flags().BoolP("rna2dna", "", false, "convert RNA to DNA")
 	sumCmd.Flags().BoolP("single-strand", "s", false, "only consider the positive strand of a circular genome, e.g., ssRNA virus genomes")
+	sumCmd.Flags().BoolP("include-id", "i", false, "include the sequence ID (defined by --id-regexp) when computing the digest")
+}
+
+func lowerSeqInplace(bases []byte) {
+	var delta byte = 'a' - 'A'
+	for i, base := range bases {
+		if base >= 'A' && base <= 'Z' {
+			bases[i] = base + delta
+		}
+	}
 }
 
 type SumResult struct {

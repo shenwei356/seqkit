@@ -18,6 +18,8 @@
         - Updated help message. [#593](https://github.com/shenwei356/seqkit/issues/593)
     - `seqkit scat`:
         - Change the regular expression for matching FASTA files. [#596](https://github.com/shenwei356/seqkit/issues/596)
+    - `seqkit sum`:
+        - Added a new flag `-i/--include-id` to include the sequence ID (defined by --id-regexp) or other information such as UMI. [#595](https://github.com/shenwei356/seqkit/issues/595)
 - [SeqKit v2.13.0](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0) - 2026-02-28
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.13.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0)
     - `seqkit`: add support for reading and writing LZ4 compression format.
