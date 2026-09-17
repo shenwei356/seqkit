@@ -84,8 +84,9 @@ var scatCmd = &cobra.Command{
 		if gzOnly {
 			gzNr = 1
 		}
-		FASTA_REGEXP := fmt.Sprintf(".*\\.(fas|fa|fasta)(\\.gz){%d,1}$", gzNr)
-		FASTQ_REGEXP := fmt.Sprintf(".*\\.(fastq|fq)(\\.gz){%d,1}$", gzNr)
+		// matching fasta/q file: (?i)[^/.]+\.(fasta|fastq|faa|fas|fna|fa|fq)(?:\.(gz|xz|zst|bz2))?$
+		FASTA_REGEXP := fmt.Sprintf(`(?i)\.(fasta|faa|fas|fna|fa)(\.(gz|xz|zst|bz2)){%d,1}$`, gzNr)
+		FASTQ_REGEXP := fmt.Sprintf(`(?i)\.(fastq|fq)(\.(gz|xz|zst|bz2)){%d,1}$`, gzNr)
 		if reStr == "" {
 			switch inFmt {
 			case "fasta":
@@ -474,7 +475,7 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 					if wm == nil || fi.IsDir() {
 						continue SFOR
 					}
-					if time.Now().Sub(wm.LastTry) < dropDuration {
+					if time.Since(wm.LastTry) < dropDuration {
 						continue SFOR
 					}
 					if wm.LastSize == fi.Size() {
