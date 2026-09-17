@@ -4,6 +4,8 @@
         - **Faster and 40% less memory when reading large FASTA records**.
         - Fixed a performance problem existing for many years: Old fastx readers could become extremely slow on BGZF FASTQ files.
         - Wrap sequences and qualities when explicitly specifying the line width (`-w, --line-width`). [#583](https://github.com/shenwei356/seqkit/issues/583)
+    - `seqkit seq`:
+        - Create output directory if not exist.
     - `seqkit stats`:
         - Quit earlier when meeting an error, and fixed showing the error that was hidden by the progress bar. [#581](https://github.com/shenwei356/seqkit/issues/581)
     - `seqkit fx2tab`:

@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strings"
@@ -313,6 +314,16 @@ Filtering records to edit:
 		if outFile == "-" {
 			outfh = os.Stdout
 		} else {
+			// create output directory if not exist
+			dir := filepath.Dir(outFile)
+			fi, err := os.Stat(dir)
+			if err == nil && !fi.IsDir() {
+				checkError(fmt.Errorf("can not write file into a non-directory path: %s", dir))
+			}
+			if os.IsNotExist(err) {
+				checkError(os.MkdirAll(dir, 0755))
+			}
+
 			outfh, err = os.Create(outFile)
 			checkError(err)
 			color = false
