@@ -870,7 +870,8 @@ Usage
 compute message digest for all sequences in FASTA/Q files
 
 Attention:
-  1. Sequence headers and qualities are skipped, only sequences matter.
+  1. By default, sequence headers and qualities are skipped, only sequences matter.
+     Optionally, the sequence ID can be included with the flag -i/--include-id.
   2. The order of sequences records does not matter.
   3. Circular complete genomes are supported with the flag -c/--circular.
      - The same double-stranded genomes with different start positions or
@@ -890,12 +891,13 @@ Method:
 Following the seqhash in Poly (https://github.com/TimothyStiles/poly/),
 We add meta information to the message digest, with the format of:
 
-    seqkit.<version>_<seq type><seq structure><strand>_<kmer size>_<seq digest>
+    seqkit.<version>_<seq type><seq structure><strand>[with seqid]_<kmer size>_<seq digest>
 
     <version>:       digest version
     <seq type>:      'D' for DNA, 'R' for RNA, 'P' for protein, 'N' for others
     <seq structure>: 'L' for linear sequence, 'C' for circular genome
     <strand>:        'D' for double-stranded, 'S' for single-stranded
+    [with seqid]:    'I' for including sequence ID, '' for not.
     <kmer size>:     0 for linear sequence, other values for circular genome
 
 Examples:
@@ -908,7 +910,7 @@ Examples:
     seqkit.v0.1_DCS_k31_dd050490cd62ea5f94d73d4d636b7d60   single-stranded-circular DNA.fasta
 
 Usage:
-  seqkit sum [flags]
+  seqkit sum [flags] 
 
 Flags:
   -a, --all                  show all information, including the sequences length and the number of sequences
@@ -916,6 +918,7 @@ Flags:
   -c, --circular             the file contains a single cicular genome sequence
   -G, --gap-letters string   gap letters to delete with the flag -g/--remove-gaps (default "- \t.*")
   -h, --help                 help for sum
+  -i, --include-id           include the sequence ID (defined by --id-regexp) when computing the digest
   -k, --kmer-size int        k-mer size for processing circular genomes (default 1000)
   -g, --remove-gaps          remove gap characters set in the option -G/gap-letters
       --rna2dna              convert RNA to DNA
@@ -983,6 +986,29 @@ complement strand will not affect the result):
     # collect files with the same genomes
     $ seqkit sum -c -k 51  virus-*.fasta | csvtk fold -Ht -f 1 -v 2 
     seqkit.v0.1_DCD_k51_39e267864fddeafd7a5cacd77e0a6a11   virus-A.fasta; virus-B.fasta; virus-C.fasta; virus-D.fasta
+
+Include the sequence header via `-i/--include-id`. [#595](https://github.com/shenwei356/seqkit/issues/595)
+
+    # Firstly, set a regular expression to capture the UMI in the sequence header
+    $ echo -ne ">r1_aaa\nactg\n" 
+    >r1_aaa
+    actg
+    $ echo -ne ">r1_aaa\nactg\n" | seqkit seq -i --id-regexp '^\S+_([ACTGactg]+)\s?'
+    >aaa
+    actg
+    
+    # without id
+    $ echo -ne ">r1_aaa\nactg\n" | seqkit sum
+    seqkit.v0.1_DLS_k0_ebbf2222271114c348d63ba64f486e9e     -
+    
+    # including ID (UMI here)
+    $ echo -ne ">r1_aaa\nactg\n" | seqkit sum -i --id-regexp '^\S+_([ACTGactg]+)\s?'
+    seqkit.v0.1_DLSI_k0_f6b68f6e41d91f0e93f900832304cdec    -
+    
+    # including ID (UMI here)
+    # another read with a different sequence id, but the digest remains unchanged.
+    $ echo -ne ">r2_aaa\nactg\n" | seqkit sum -i --id-regexp '^\S+_([ACTGactg]+)\s?'
+    seqkit.v0.1_DLSI_k0_f6b68f6e41d91f0e93f900832304cdec    -
     
 ## faidx
 
@@ -3047,28 +3073,38 @@ Usage
 ``` text
 sample sequences by number or proportion.
 
-'seqkit sample2' is more accurate and memory efficient.
+Sampling modes (N = requested number, p = requested proportion):
 
-Attention:
-1. Do not use '-n' on large FASTQ files, it loads all seqs into memory!
-   use 'seqkit sample -p 0.1 seqs.fq.gz | seqkit head -n N' instead!
-2. By default, the output is deterministic; that is, given the same input and random seed,
-   seqkit shuf will always generate identical results across different runs.
-   For 'true randomness', please add '-r/--non-deterministic', which uses a time-based seed.
+----------------------------------------------------------------------------------
+  Mode     sample                       sample2
+----------------------------------------------------------------------------------
+  -p       count varies; one pass       count varies;     one pass
+  -p -2    count varies; one pass       floor(total * p); two passes
+  -n       up to N; loads all records   exactly min(N, total); loads all records
+  -n -2    up to N; two passes          exactly min(N, total); two passes
+----------------------------------------------------------------------------------
+
+For a proportion, use either command with -p; both stream the input, including stdin.
+For an exact number, use 'seqkit sample2 -n N': add -2 for large files to
+store only N record indices instead of all records. Two-pass mode needs a file,
+not stdin. 'seqkit sample -n N' is approximate and may return fewer than N;
+it is not uniform fixed-size sampling.
+
+Results are deterministic for the same input and seed. To vary results across
+runs, add '-r/--non-deterministic' for a time-based seed.
 
 Usage:
   seqkit sample [flags] 
 
 Flags:
   -h, --help                help for sample
-  -r, --non-deterministic   use a time-based seed to generate non-deterministic (truly random) results
-  -n, --number int          sample by number (result may not exactly match), DO NOT use on large FASTQ files.
+  -r, --non-deterministic   use a time-based seed to vary results across runs
+  -n, --number int          sample by number (may return fewer than requested; without -2, loads all records)
   -p, --proportion float    sample by proportion
   -s, --rand-seed int       random seed. For paired-end data, use the same seed across fastq files to
                             sample the same read pairs (default 11)
-  -2, --two-pass            2-pass mode read files twice to lower memory usage. Not allowed when reading
-                            from stdin
-
+  -2, --two-pass            for -n, count records first to avoid loading all; -p sampling is unchanged.
+                            Requires a file
 ```
 
 Examples
@@ -3114,37 +3150,39 @@ flag `-s` (`--rand-seed`).
 Usage
 
 ```text
-sample sequences by number or proportion (version 2)".
+sample sequences by number or proportion (version 2).
 
-Differences to 'seqkit sample':
-1. Provides unbiased, fixed-size sampling with controlled memory usage.
-2. Guarantees exact target count with equal probability for each record.
-3. Memory efficient: tested on large datasets with minimal memory footprint.
-   -   2,195,354 records: <200 MB memory usage (output: 38 GB long read FASTQ)
-   - 124,437,023 records: 2.05 GB memory usage (output: 43 GB short read FASTQ)
+Sampling modes (N = requested number, p = requested proportion):
 
-Attention:
-1. '-n' SHOULD BE coupled with 2-pass mode (-2) when large FASTQ files, 
-   otherwise it loads ALL seqs into memory!
-2. By default, the output is deterministic; that is, given the same input and random seed,
-   seqkit shuf will always generate identical results across different runs.
-   For 'true randomness', please add '-r/--non-deterministic', which uses a time-based seed.
+----------------------------------------------------------------------------------
+  Mode     sample                       sample2
+----------------------------------------------------------------------------------
+  -p       count varies; one pass       count varies;     one pass
+  -p -2    count varies; one pass       floor(total * p); two passes
+  -n       up to N; loads all records   exactly min(N, total); loads all records
+  -n -2    up to N; two passes          exactly min(N, total); two passes
+----------------------------------------------------------------------------------
+
+For a proportion, use either command with -p; both stream the input, including stdin.
+For an exact number, use 'seqkit sample2 -n N': add -2 for large files to
+store only N record indices instead of all records. Two-pass mode needs a file,
+not stdin. 'seqkit sample -n N' is approximate and may return fewer than N;
+it is not uniform fixed-size sampling.
+
+Results are deterministic for the same input and seed. To vary results across
+runs, add '-r/--non-deterministic' for a time-based seed.
 
 Usage:
   seqkit sample2 [flags] 
 
 Flags:
   -h, --help                help for sample2
-  -r, --non-deterministic   use a time-based seed to generate non-deterministic (truly random) results
-  -n, --number int          sample by number. SHOULD BE coupled with -2 flag (2-pass mode) when handling
-                            large FASTQ files.
-  -p, --proportion float    sample by proportion. Numbers would not be constant if not coupled with
-                            2-pass mode.
+  -r, --non-deterministic   use a time-based seed to vary results across runs
+  -n, --number int          sample exactly min(N, total) records; without -2, loads all records
+  -p, --proportion float    sample by proportion (with -2, output floor(total * p) records)
   -s, --rand-seed int       random seed. For paired-end data, use the same seed across fastq files to
                             sample the same read pairs (default 11)
-  -2, --two-pass            2-pass mode read files twice to lower memory usage. Not allowed when reading
-                            from stdin
-
+  -2, --two-pass            for -n, store N indices; for -p, fix the count. Requires a file
 ```
 
 

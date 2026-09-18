@@ -9,7 +9,7 @@
     - `seqkit stats`:
         - Quit earlier when meeting an error, and fixed showing the error that was hidden by the progress bar. [#581](https://github.com/shenwei356/seqkit/issues/581)
     - `seqkit fx2tab`:
-        - Support printing the input file name. [#578](https://github.com/shenwei356/seqkit/issues/578)
+        - Support printing the input file name via `-f/--file-name`. [#578](https://github.com/shenwei356/seqkit/issues/578)
     - `seqkit fa2fq`:
         - Fixed the matching bug.
     - `seqkit split/split2`:
@@ -17,9 +17,9 @@
     - `seqkit sample/sample2`:
         - Updated help message. [#593](https://github.com/shenwei356/seqkit/issues/593)
     - `seqkit scat`:
-        - Change the regular expression for matching FASTA files. [#596](https://github.com/shenwei356/seqkit/issues/596)
+        - Changed the regular expression for matching FASTA files. [#596](https://github.com/shenwei356/seqkit/issues/596)
     - `seqkit sum`:
-        - Added a new flag `-i/--include-id` to include the sequence ID (defined by --id-regexp) or other information such as UMI. [#595](https://github.com/shenwei356/seqkit/issues/595)
+        - Added a new flag `-i/--include-id` to include the sequence ID (defined by `--id-regexp`) or other information such as UMI. [#595](https://github.com/shenwei356/seqkit/issues/595)
 - [SeqKit v2.13.0](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0) - 2026-02-28
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.13.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0)
     - `seqkit`: add support for reading and writing LZ4 compression format.

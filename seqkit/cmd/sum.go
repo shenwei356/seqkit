@@ -78,7 +78,7 @@ We add meta information to the message digest, with the format of:
     <seq type>:      'D' for DNA, 'R' for RNA, 'P' for protein, 'N' for others
     <seq structure>: 'L' for linear sequence, 'C' for circular genome
     <strand>:        'D' for double-stranded, 'S' for single-stranded
-    [with seqid]:	 'I' for including sequence ID, '' for not.
+    [with seqid]:    'I' for including sequence ID, '' for not.
     <kmer size>:     0 for linear sequence, other values for circular genome
 
 Examples:
