@@ -34,7 +34,7 @@ and
     - Supporting custom sequence ID via regular expression
     - Supporting [Bash/Zsh autocompletion](http://bioinf.shenwei.me/seqkit/download/#shell-completion)
 - **Versatile commands** ([usages and examples](http://bioinf.shenwei.me/seqkit/usage/))
-    - Practical functions supported by [38 subcommands](#subcommands)
+    - Practical functions supported by [39 subcommands](#subcommands)
 
 
 ## Installation
@@ -81,7 +81,7 @@ Go to [Download Page](http://bioinf.shenwei.me/seqkit/download), where you can f
 |                 |[rmdup](https://bioinf.shenwei.me/seqkit/usage/#rmdup)              |Remove duplicated sequences by ID/name/sequence                                              |FASTA/Q        |+ and -           |             |
 |                 |[common](https://bioinf.shenwei.me/seqkit/usage/#common)            |Find common sequences of multiple files by id/name/sequence                                  |FASTA/Q        |+ and -           |             |
 |                 |[duplicate](https://bioinf.shenwei.me/seqkit/usage/#duplicate)      |Duplicate sequences N times                                                                  |FASTA/Q        |                  |             |
-|                 |[split](https://bioinf.shenwei.me/seqkit/usage/#split)              |Split sequences into files by id/seq region/size/parts (mainly for FASTA)                    |FASTA preffered|                  |             |
+|                 |[split](https://bioinf.shenwei.me/seqkit/usage/#split)              |Split sequences into files by id/seq region/size/parts (mainly for FASTA)                    |FASTA preferred|                  |             |
 |                 |[split2](https://bioinf.shenwei.me/seqkit/usage/#split2)            |Split sequences into files by size/parts (FASTA, PE/SE FASTQ)                                |FASTA/Q        |                  |             |
 |                 |[head](https://bioinf.shenwei.me/seqkit/usage/#head)                |print the first N FASTA/Q records, or leading records whose total length >= L                |FASTA/Q        |                  |             |
 |                 |[head-genome](https://bioinf.shenwei.me/seqkit/usage/#head-genome)  |Print sequences of the first genome with common prefixes in name                             |FASTA/Q        |                  |             |
@@ -93,8 +93,8 @@ Go to [Download Page](http://bioinf.shenwei.me/seqkit/download), where you can f
 |                 |[restart](https://bioinf.shenwei.me/seqkit/usage/#restart)          |Reset start position (rotate) for circular genomes                                                    |FASTA/Q        |+ only            |             |
 |                 |[mutate](https://bioinf.shenwei.me/seqkit/usage/#mutate)            |Edit sequence (point mutation, insertion, deletion)                                          |FASTA/Q        |+ only            |             |
 |                 |[sana](https://bioinf.shenwei.me/seqkit/usage/#sana)                |Sanitize broken single line FASTQ files                                                      |FASTQ          |                  |             |
-|Ordering         |[sort](https://bioinf.shenwei.me/seqkit/usage/#sort)                |Sort sequences by id/name/sequence/length                                                    |FASTA preffered|                  |             |
-|                 |[shuffle](https://bioinf.shenwei.me/seqkit/usage/#shuffle)          |Shuffle sequences                                                                            |FASTA preffered|                  |             |
+|Ordering         |[sort](https://bioinf.shenwei.me/seqkit/usage/#sort)                |Sort sequences by id/name/sequence/length                                                    |FASTA preferred|                  |             |
+|                 |[shuffle](https://bioinf.shenwei.me/seqkit/usage/#shuffle)          |Shuffle sequences                                                                            |FASTA preferred|                  |             |
 |BAM processing   |[bam](https://bioinf.shenwei.me/seqkit/usage/#bam)                  |Monitoring and online histograms of BAM record features                                      |BAM            |                  |             |
 |Miscellaneous    |[sum](https://bioinf.shenwei.me/seqkit/usage/#sum)                  |Compute message digest for all sequences in FASTA/Q files                                    |FASTA/Q        |                  |✓            |
 |                 |[merge-slides](https://bioinf.shenwei.me/seqkit/usage/#merge-slides)|Merge sliding windows generated from seqkit sliding                                          |TSV            |                  |
@@ -138,4 +138,3 @@ propose new functions or ask for help.
 ## Starchart
 
 <img src="https://starchart.cc/shenwei356/seqkit.svg" alt="Stargazers over time" style="max-width: 100%">
-

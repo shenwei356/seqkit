@@ -509,7 +509,10 @@ var bamCmd = &cobra.Command{
 
 	Use:   "bam",
 	Short: "monitoring and online histograms of BAM record features",
-	Long:  "monitoring and online histograms of BAM record features",
+	Long: `monitoring and online histograms of BAM record features
+
+The --stat and --idx-stat modes accept multiple input files; other modes
+require one BAM file. Range filters require a single numeric --field.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
 		idRegexp := config.IDRegexp
@@ -582,6 +585,9 @@ var bamCmd = &cobra.Command{
 		}
 
 		if printIdxCount {
+			if len(files) != 1 {
+				log.Fatal("--idx-count takes exactly one input BAM file")
+			}
 			bamIdxCount(files[0])
 			os.Exit(0)
 		}
@@ -607,6 +613,18 @@ var bamCmd = &cobra.Command{
 			}
 			Bam2Bundles(files[0], outFile, printBundle, config.Threads, printQuiet, silentMode)
 			os.Exit(0)
+		}
+		if !printHelp {
+			if len(files) != 1 {
+				log.Fatal("BAM monitoring takes exactly one input BAM file")
+			}
+			if printFreq == 0 {
+				checkError(fmt.Errorf("--print-freq must not be 0"))
+			}
+			if printCount == "" && (!math.IsNaN(rangeMin) || !math.IsNaN(rangeMax)) &&
+				(field == "" || strings.Contains(field, ",") || field == "Read" || field == "Ref") {
+				checkError(fmt.Errorf("--range-min/--range-max require a single numeric --field"))
+			}
 		}
 
 		binMode := "termfit"
@@ -1333,9 +1351,9 @@ func init() {
 	bamCmd.Flags().IntP("bins", "B", -1, "number of histogram bins")
 	bamCmd.Flags().IntP("bundle", "N", 0, "partition BAM file into loci (-1) or bundles with this minimum size")
 	bamCmd.Flags().Float64P("range-min", "m", math.NaN(), "discard record with field (-f) value less than this flag")
-	bamCmd.Flags().Float64P("range-max", "M", math.NaN(), "discard record with field (-f) value greater than this flag")
+	bamCmd.Flags().Float64P("range-max", "M", math.NaN(), "discard record with field (-f) value greater than or equal to this flag")
 	bamCmd.Flags().BoolP("dump", "y", false, "print histogram data to stderr instead of plotting")
-	bamCmd.Flags().BoolP("stat", "s", false, "print BAM satistics of the input files")
+	bamCmd.Flags().BoolP("stat", "s", false, "print BAM statistics of the input files")
 	bamCmd.Flags().BoolP("idx-stat", "i", false, "fast statistics based on the BAM index")
 	bamCmd.Flags().BoolP("idx-count", "C", false, "fast read per reference counting based on the BAM index")
 	bamCmd.Flags().StringP("count", "c", "", "count reads per reference and save to this file")
@@ -1344,8 +1362,8 @@ func init() {
 	bamCmd.Flags().BoolP("reset", "R", false, "reset histogram after every report")
 	bamCmd.Flags().BoolP("pass", "x", false, "passthrough mode (forward filtered BAM to output)")
 	bamCmd.Flags().BoolP("prim-only", "F", false, "filter out non-primary alignment records")
-	bamCmd.Flags().BoolP("quiet-mode", "Q", false, "supress all plotting to stderr")
-	bamCmd.Flags().BoolP("silent-mode", "Z", false, "supress TSV output to stderr")
+	bamCmd.Flags().BoolP("quiet-mode", "Q", false, "suppress all plotting to stderr")
+	bamCmd.Flags().BoolP("silent-mode", "Z", false, "suppress TSV output to stderr")
 	bamCmd.Flags().BoolP("list-fields", "H", false, "list all available BAM record features")
 	bamCmd.Flags().BoolP("pretty", "k", false, "pretty print certain TSV outputs")
 	bamCmd.Flags().StringP("exec-after", "e", "", "execute command after reporting")

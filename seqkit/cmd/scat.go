@@ -32,6 +32,7 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/iafan/cwalk"
+	"github.com/shenwei356/go-logging"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -53,8 +54,9 @@ var scatCmd = &cobra.Command{
 		outFile := config.OutFile
 		runtime.GOMAXPROCS(config.Threads)
 
-		quiet := config.Quiet // FIXME: add quiet mode
-		_ = quiet
+		if config.Quiet {
+			logging.SetLevel(logging.ERROR, "seqkit")
+		}
 		qBase := getFlagPositiveInt(cmd, "qual-ascii-base")
 		inFmt := getFlagString(cmd, "in-format")
 		checkFileFormat(inFmt)

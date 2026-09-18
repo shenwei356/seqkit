@@ -599,7 +599,7 @@ Examples:
 func init() {
 	RootCmd.AddCommand(sumCmd)
 
-	sumCmd.Flags().BoolP("circular", "c", false, "the file contains a single cicular genome sequence")
+	sumCmd.Flags().BoolP("circular", "c", false, "the file contains a single circular genome sequence")
 	sumCmd.Flags().IntP("kmer-size", "k", 1000, "k-mer size for processing circular genomes")
 	sumCmd.Flags().BoolP("basename", "b", false, "only output basename of files")
 	sumCmd.Flags().BoolP("remove-gaps", "g", false, "remove gap characters set in the option -G/gap-letters")

@@ -305,26 +305,26 @@ file=empty_id_and_seq2.fa
 
 # empty id
 run grep_empty_id $app grep -p "" $file
-assert_equal $(cat $STDOUT_FILE | seqkit seq -ni) ""
+assert_equal $(cat $STDOUT_FILE | $app seq -ni) ""
 
 run grep_empty_id_r $app grep -r -p "" $file
-assert_equal $(cat $STDOUT_FILE | seqkit seq -ni) ""
+assert_equal $(cat $STDOUT_FILE | $app seq -ni) ""
 
 run grep_empty_id_r2 $app grep -r -p "^$" $file
-assert_equal $(cat $STDOUT_FILE | seqkit seq -ni) ""
+assert_equal $(cat $STDOUT_FILE | $app seq -ni) ""
 
 # empty seq
 run grep_empty_seq $app grep -p "" $file -s
-assert_equal $(cat $STDOUT_FILE | seqkit seq -s) ""
+assert_equal $(cat $STDOUT_FILE | $app seq -s) ""
 
 run grep_empty_seq_r $app grep -r -p "" $file -s
-assert_equal $(cat $STDOUT_FILE | seqkit seq -s) ""
+assert_equal $(cat $STDOUT_FILE | $app seq -s) ""
 
 run grep_empty_seq_r2 $app grep -d -p "" $file -s
-assert_equal $(cat $STDOUT_FILE | seqkit seq -s) ""
+assert_equal $(cat $STDOUT_FILE | $app seq -s) ""
 
 run grep_empty_seq_r3 $app grep -r -p "^$" $file -s
-assert_equal $(cat $STDOUT_FILE | seqkit seq -s) ""
+assert_equal $(cat $STDOUT_FILE | $app seq -s) ""
 
 # ------------------------------------------------------------
 #                       locate
@@ -393,7 +393,7 @@ rm -r stdin.split
 #                       sample
 # ------------------------------------------------------------
 file=tests/hairpin.fa
-assert_equal $(cat $file | $app sample -p 0.1 | $app stat -a | md5sum | cut -d" " -f 1) $(cat $file | $app sample -p 0.1 | $app stat -a | md5sum | cut -d" " -f 1)
+assert_equal 2814 $(cat $file | $app sample -p 0.1 -s 11 --quiet | $app seq -n -i | wc -l)
 
 
 # ------------------------------------------------------------

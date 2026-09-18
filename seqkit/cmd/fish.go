@@ -356,7 +356,7 @@ func init() {
 	fishCmd.Flags().StringP("query-fastx", "f", "", "query fasta")
 	fishCmd.Flags().StringP("aln-params", "p", "4,-4,-2,-1", "alignment parameters in format \"<match>,<mismatch>,<gap_open>,<gap_extend>\"")
 	fishCmd.Flags().StringP("query-sequences", "F", "", "query sequences")
-	fishCmd.Flags().StringP("out-bam", "b", "", "save aligmnets to this BAM file (memory intensive)")
+	fishCmd.Flags().StringP("out-bam", "b", "", "save alignments to this BAM file (memory intensive)")
 	fishCmd.Flags().BoolP("stranded", "s", false, "search + strand only")
 	fishCmd.Flags().StringP("ranges", "r", "", "target ranges, for example: \":10,30:40,-20:\"")
 	fishCmd.Flags().BoolP("print-desc", "D", false, "print full sequence header")

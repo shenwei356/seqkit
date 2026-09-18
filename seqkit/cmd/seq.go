@@ -616,7 +616,7 @@ Filtering records to edit:
 					sequence = sequence.ReverseInplace()
 				}
 				if matched && complement {
-					if !config.Quiet && record.Seq.Alphabet == seq.Protein || record.Seq.Alphabet == seq.Unlimit {
+					if !config.Quiet && (record.Seq.Alphabet == seq.Protein || record.Seq.Alphabet == seq.Unlimit) {
 						log.Warning("complement does no take effect on protein/unlimit sequence")
 					}
 					sequence = sequence.ComplementInplace()

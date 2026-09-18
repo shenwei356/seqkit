@@ -65,7 +65,7 @@ Columns:
   5.  sum_len   number of bases or residues       , with gaps or spaces counted
   6.  min_len   minimal sequence length           , with gaps or spaces counted
   7.  avg_len   average sequence length           , with gaps or spaces counted
-  8.  max_len   miximal sequence length           , with gaps or spaces counted
+  8.  max_len   maximal sequence length           , with gaps or spaces counted
   9.  Q1        first quartile of sequence length , with gaps or spaces counted
   10. Q2        median of sequence length         , with gaps or spaces counted
   11. Q3        third quartile of sequence length , with gaps or spaces counted
@@ -77,7 +77,7 @@ Columns:
   16. Q30(%)    percentage of bases with the quality score greater than 30
   17. AvgQual   average quality.
                 Attention: It's not the arithmetic average of quartiles (some tools do that).
-                How to computate: 1) take the qscore for each base, 2) convert it back to
+                How to compute: 1) take the qscore for each base, 2) convert it back to
                 an error probability, 3) take the mean of those, 4) and then convert that
                 mean error back into a qscore.
                 Reference: https://github.com/shenwei356/seqkit/issues/448
@@ -90,7 +90,7 @@ Attention:
          seqkit seq -g input.fasta | seqkit stats
 
 Tips:
-  1. For lots of small files (especially on SDD), use a big value of '-j' to
+  1. For lots of small files (especially on SSD), use a big value of '-j' to
      parallelize counting.
   2. Extract one metric with csvtk (https://github.com/shenwei356/csvtk):
          seqkit stats -Ta input.fastq.gz | csvtk cut -t -f "Q30(%)" | csvtk del-header
@@ -740,4 +740,27 @@ func quartile(sorted []int64) (q1, q2, q3 int64) {
 	q2 = median(sorted)
 	q3 = median(sorted[c2:])
 	return
+}
+
+// l50FromLengths counts records, rather than distinct lengths, needed to reach
+// half of the total sequence length. bio/util.LengthStats.L50 counts lengths.
+func l50FromLengths(counts map[uint64]uint64, n50, total uint64) int {
+	if n50 == 0 || total == 0 {
+		return 0
+	}
+
+	target := total/2 + total%2
+	var longerBases, longerRecords uint64
+	for length, count := range counts {
+		if length > n50 {
+			longerBases += length * count
+			longerRecords += count
+		}
+	}
+	remaining := target - longerBases
+	needed := remaining / n50
+	if remaining%n50 != 0 {
+		needed++
+	}
+	return int(longerRecords + needed)
 }

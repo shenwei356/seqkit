@@ -43,7 +43,10 @@ var watchCmd = &cobra.Command{
 
 	Use:   "watch",
 	Short: "monitoring and online histograms of sequence features",
-	Long:  "monitoring and online histograms of sequence features",
+	Long: `monitoring and online histograms of sequence features
+
+Only one field can be selected. Sequences without G or C are omitted from
+GC-skew histograms, but are still written in pass-through mode.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -58,6 +61,9 @@ var watchCmd = &cobra.Command{
 			binMode = "fixed"
 		}
 		printFreq := getFlagInt(cmd, "print-freq")
+		if printFreq == 0 {
+			checkError(fmt.Errorf("--print-freq must not be 0"))
+		}
 		printDelay := getFlagInt(cmd, "delay")
 		printQuiet := getFlagBool(cmd, "quiet-mode")
 		printReset := getFlagBool(cmd, "reset")
@@ -111,10 +117,13 @@ var watchCmd = &cobra.Command{
 		}
 
 		fmap["GCSkew"] = fieldInfo{
-			"GC content",
+			"GC skew",
 			func(r *fastx.Record) float64 {
 				g := r.Seq.BaseContent("G")
 				c := r.Seq.BaseContent("C")
+				if g+c == 0 {
+					return math.NaN()
+				}
 				return (g - c) / (g + c) * 100
 			},
 		}
@@ -126,10 +135,8 @@ var watchCmd = &cobra.Command{
 			os.Exit(0)
 		}
 
-		if len(fields) == 0 {
-			fmt.Fprintf(os.Stderr, "No fields specified!")
-			os.Exit(1)
-
+		if len(fields) != 1 {
+			checkError(fmt.Errorf("watch accepts exactly one field"))
 		}
 
 		for _, f := range fields {
@@ -137,6 +144,9 @@ var watchCmd = &cobra.Command{
 				fmt.Fprintf(os.Stderr, "Invalid field: %s\n", f)
 				os.Exit(1)
 			}
+		}
+		if logMode && fields[0] == "GCSkew" {
+			checkError(fmt.Errorf("--log is not supported for GC skew, which can be negative"))
 		}
 
 		transform := func(x float64) float64 { return x }
@@ -205,24 +215,26 @@ var watchCmd = &cobra.Command{
 				}
 
 				p := transform(fmap[field].Generate(record))
-				count++
-				h.Update(p)
+				if !math.IsNaN(p) && !math.IsInf(p, 0) {
+					count++
+					h.Update(p)
 
-				if printFreq > 0 && count%printFreq == 0 {
-					if printDump {
-						os.Stderr.Write([]byte(h.Dump()))
-					} else {
-						if !printQuiet {
-							os.Stderr.Write([]byte(thist.ClearScreenString()))
-							os.Stderr.Write([]byte(h.Draw()))
+					if printFreq > 0 && count%printFreq == 0 {
+						if printDump {
+							os.Stderr.Write([]byte(h.Dump()))
+						} else {
+							if !printQuiet {
+								os.Stderr.Write([]byte(thist.ClearScreenString()))
+								os.Stderr.Write([]byte(h.Draw()))
+							}
 						}
-					}
-					if printPdf != "" {
-						h.SaveImage(printPdf)
-					}
-					time.Sleep(time.Duration(printDelay) * time.Second)
-					if printReset {
-						h = thist.NewHist([]float64{}, fmap[field].Title, binMode, printBins, true)
+						if printPdf != "" {
+							h.SaveImage(printPdf)
+						}
+						time.Sleep(time.Duration(printDelay) * time.Second)
+						if printReset {
+							h = thist.NewHist([]float64{}, fmap[field].Title, binMode, printBins, true)
+						}
 					}
 				}
 
@@ -286,11 +298,11 @@ func init() {
 	watchCmd.Flags().BoolP("validate-seq", "v", false, "validate bases according to the alphabet")
 	watchCmd.Flags().BoolP("pass", "x", false, "pass through mode (write input to stdout)")
 	watchCmd.Flags().BoolP("log", "L", false, "log10(x+1) transform numeric values")
-	watchCmd.Flags().StringP("fields", "f", "ReadLen", "target fields, available values: ReadLen, MeanQual, GC, GCSkew")
+	watchCmd.Flags().StringP("fields", "f", "ReadLen", "target field, available values: ReadLen, MeanQual, GC, GCSkew")
 	watchCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
 	watchCmd.Flags().IntP("bins", "B", -1, "number of histogram bins")
 	watchCmd.Flags().IntP("print-freq", "p", -1, "print/report after this many records (-1 for print after EOF)")
-	watchCmd.Flags().BoolP("quiet-mode", "Q", false, "supress all plotting to stderr")
+	watchCmd.Flags().BoolP("quiet-mode", "Q", false, "suppress all plotting to stderr")
 	watchCmd.Flags().BoolP("reset", "R", false, "reset histogram after every report")
 	watchCmd.Flags().BoolP("dump", "y", false, "print histogram data to stderr instead of plotting")
 	watchCmd.Flags().BoolP("list-fields", "H", false, "print out a list of available fields")
