@@ -80,13 +80,12 @@ var scatCmd = &cobra.Command{
 		delta := getFlagInt(cmd, "delta") * 1024
 		reStr := getFlagString(cmd, "regexp")
 		var err error
-		gzNr := 0
+		compressionSuffix := `(\.(gz|xz|zst|bz2))?`
 		if gzOnly {
-			gzNr = 1
+			compressionSuffix = `\.gz`
 		}
-		// matching fasta/q file: (?i)[^/.]+\.(fasta|fastq|faa|fas|fna|fa|fq)(?:\.(gz|xz|zst|bz2))?$
-		FASTA_REGEXP := fmt.Sprintf(`(?i)\.(fasta|faa|fas|fna|fa)(\.(gz|xz|zst|bz2)){%d,1}$`, gzNr)
-		FASTQ_REGEXP := fmt.Sprintf(`(?i)\.(fastq|fq)(\.(gz|xz|zst|bz2)){%d,1}$`, gzNr)
+		FASTA_REGEXP := `(?i)\.(fasta|faa|fas|fna|fa)` + compressionSuffix + `$`
+		FASTQ_REGEXP := `(?i)\.(fastq|fq)` + compressionSuffix + `$`
 		if reStr == "" {
 			switch inFmt {
 			case "fasta":

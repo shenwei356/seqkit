@@ -283,6 +283,8 @@ Examples:
 
 				checkAlphabet := true
 
+				idOfCircularGenome := make([]byte, 0, 128)
+
 				if circular {
 					seqStructure = "C"
 					if singleStrand {
@@ -326,6 +328,7 @@ Examples:
 						}
 
 						_seq = record.Seq
+						idOfCircularGenome = append(idOfCircularGenome, record.ID...)
 
 						if k > len(_seq.Seq) {
 							// checkError(fmt.Errorf("k is too big for sequence of %d bp: %s", len(record.Seq.Seq), file))
@@ -369,12 +372,17 @@ Examples:
 						lowerSeqInplace(_seq.Seq)
 
 						if rna2dna {
-							if !(ab == seq.RNA || ab == seq.RNAredundant) {
-								for ii, bb = range _seq.Seq {
-									if bb == 'u' {
-										_seq.Seq[ii] = 't'
-									}
+							for ii, bb = range _seq.Seq {
+								if bb == 'u' {
+									_seq.Seq[ii] = 't'
 								}
+							}
+							if ab == seq.RNA {
+								_seq.Alphabet = seq.DNA
+								seqType = "D"
+							} else if ab == seq.RNAredundant {
+								_seq.Alphabet = seq.DNAredundant
+								seqType = "D"
 							}
 						}
 
@@ -424,13 +432,7 @@ Examples:
 							}
 							// fmt.Println(i, string(s), string(src))
 
-							if includeID {
-								lowerSeqInplace(record.ID)
-								h = xxhash.Sum64(append(s, append(sep, record.ID...)...))
-							} else {
-								h = xxhash.Sum64(s)
-							}
-
+							h = xxhash.Sum64(s)
 							if singleStrand {
 								hashes = append(hashes, h)
 							} else {
@@ -494,12 +496,13 @@ Examples:
 						lowerSeqInplace(_seq.Seq)
 
 						if rna2dna {
-							if !(ab == seq.RNA || ab == seq.RNAredundant) {
-								for ii, bb = range _seq.Seq {
-									if bb == 'u' {
-										_seq.Seq[ii] = 't'
-									}
+							for ii, bb = range _seq.Seq {
+								if bb == 'u' {
+									_seq.Seq[ii] = 't'
 								}
+							}
+							if ab == seq.RNA || ab == seq.RNAredundant {
+								seqType = "D"
 							}
 						}
 
@@ -537,6 +540,11 @@ Examples:
 				// sequence number
 				le.PutUint64(buf, uint64(n))
 				di.Write(buf)
+
+				if circular && includeID {
+					lowerSeqInplace(idOfCircularGenome)
+					di.Write(append(sep, idOfCircularGenome...))
+				}
 
 				// sum up
 				le.PutUint64(buf, di.Sum64())

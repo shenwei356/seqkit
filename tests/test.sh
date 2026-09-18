@@ -32,6 +32,27 @@ run stats $app stats -T $file
 assert_equal 0 $(sed 1d $STDOUT_FILE | cut -f 4)
 
 # ------------------------------------------------------------
+#                        sum
+# ------------------------------------------------------------
+fun() {
+    printf '>same\nAUGU\n' | $app sum --rna2dna --quiet
+}
+run sum_rna2dna fun
+assert_equal "$(printf '>same\nATGT\n' | $app sum --quiet | cut -f 1)" "$(cut -f 1 "$STDOUT_FILE")"
+
+fun() {
+    printf '>same\nAUGU\n' | $app sum -c -k 2 --rna2dna --quiet
+}
+run sum_rna2dna_circular fun
+assert_equal "$(printf '>same\nATGT\n' | $app sum -c -k 2 --quiet | cut -f 1)" "$(cut -f 1 "$STDOUT_FILE")"
+
+fun() {
+    printf '>same\nAUGR\n' | $app sum -c -k 2 --rna2dna --quiet
+}
+run sum_rna2dna_circular_redundant fun
+assert_equal "$(printf '>same\nATGR\n' | $app sum -c -k 2 --quiet | cut -f 1)" "$(cut -f 1 "$STDOUT_FILE")"
+
+# ------------------------------------------------------------
 #                        seq
 # ------------------------------------------------------------
 
@@ -644,6 +665,10 @@ assert_equal $? 0
 # ------------------------------------------------------------
 #                       scat
 # ------------------------------------------------------------
+
+run scat_gz_only $app scat -f -g -i fasta tests
+assert_in_stderr "Streaming file: tests/hairpin.fa.gz"
+assert_equal 0 "$(grep -c 'Streaming file: tests/hairpin.fa.xz' "$STDERR_FILE")"
 
 # Regression test for scat/fasta
 fun(){
