@@ -19,6 +19,8 @@
         - Updated help message. [#593](https://github.com/shenwei356/seqkit/issues/593)
     - `seqkit scat`:
         - Changed the regular expression for matching FASTA files. [#596](https://github.com/shenwei356/seqkit/issues/596)
+    - `seqkit replace`:
+        - Support FASTQ files with `-s/--by-seq` flag. Quality scores are automatically adjusted for deletions and equal-length replacements. Length-increasing replacements are not allowed. [#579](https://github.com/shenwei356/seqkit/issues/579)
     - `seqkit sum`:
         - Added a new flag `-i/--include-id` to include the sequence ID (defined by `--id-regexp`) or other information such as UMI. [#595](https://github.com/shenwei356/seqkit/issues/595)
         - Fixed `--rna2dna`, which did not work.

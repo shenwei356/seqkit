@@ -27,6 +27,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"github.com/cespare/xxhash/v2"
@@ -469,9 +470,86 @@ Filtering records to edit:
 
 				if bySeq {
 					if fastxReader.IsFastq {
-						checkError(fmt.Errorf("editing FASTQ is not supported"))
+						// For FASTQ: support sequence replacement with quality score adjustment
+						origSeq := record.Seq.Seq
+						origLen := len(origSeq)
+						origQual := record.Seq.Qual
+
+						// Find all matches and their submatches to track position mapping
+						allMatches := patternRegexp.FindAllSubmatchIndex(origSeq, -1)
+
+						if len(allMatches) == 0 {
+							// No match, sequence unchanged
+							record.Seq.Seq = origSeq
+						} else {
+							// Build new sequence and quality by processing matches
+							newSeq := make([]byte, 0, origLen)
+							newQual := make([]byte, 0, origLen)
+							lastEnd := 0
+
+							for _, match := range allMatches {
+								matchStart := match[0]
+								matchEnd := match[1]
+
+								// Copy unchanged region before this match
+								if matchStart > lastEnd {
+									newSeq = append(newSeq, origSeq[lastEnd:matchStart]...)
+									newQual = append(newQual, origQual[lastEnd:matchStart]...)
+								}
+
+								// Expand the replacement with capture groups
+								expanded := patternRegexp.Expand(nil, replacement, origSeq, match)
+
+								// For quality scores: figure out which original positions contribute
+								// For capture group replacements like $1, we need to map back to original positions
+								// Check which capture groups are actually used in the replacement
+								usedGroups := findUsedCaptureGroups(replacement)
+
+								if len(usedGroups) > 0 {
+									// Build quality from the used capture groups
+									for _, groupIdx := range usedGroups {
+										if groupIdx*2+1 < len(match) {
+											groupStart := match[groupIdx*2]
+											groupEnd := match[groupIdx*2+1]
+											if groupStart >= 0 && groupEnd >= 0 && groupEnd <= len(origQual) {
+												newQual = append(newQual, origQual[groupStart:groupEnd]...)
+											}
+										}
+									}
+								} else {
+									// No capture groups used, or literal replacement
+									// Keep quality from start of match for the replaced length
+									replacedLen := len(expanded)
+									if matchStart+replacedLen <= len(origQual) {
+										newQual = append(newQual, origQual[matchStart:matchStart+replacedLen]...)
+									}
+								}
+
+								newSeq = append(newSeq, expanded...)
+								lastEnd = matchEnd
+							}
+
+							// Copy any remaining sequence after the last match
+							if lastEnd < origLen {
+								newSeq = append(newSeq, origSeq[lastEnd:]...)
+								newQual = append(newQual, origQual[lastEnd:]...)
+							}
+
+							// Check length constraints
+							if len(newSeq) > origLen {
+								checkError(fmt.Errorf("sequence replacement that increases length is not supported for FASTQ files (original: %d bp, new: %d bp)", origLen, len(newSeq)))
+							}
+
+							if len(newQual) != len(newSeq) {
+								checkError(fmt.Errorf("quality length mismatch after replacement (seq: %d bp, qual: %d). Pattern may be too complex for quality tracking.", len(newSeq), len(newQual)))
+							}
+
+							record.Seq.Seq = newSeq
+							record.Seq.Qual = newQual
+						}
+					} else {
+						record.Seq.Seq = patternRegexp.ReplaceAll(record.Seq.Seq, replacement)
 					}
-					record.Seq.Seq = patternRegexp.ReplaceAll(record.Seq.Seq, replacement)
 				} else {
 					doNotChange = false
 
@@ -558,7 +636,7 @@ func init() {
 			`Type "csvtk replace -h" for more replacement symbols.`)
 	replaceCmd.Flags().IntP("nr-width", "", 1, `minimum width for {nr} in flag -r/--replacement. e.g., formatting "1" to "001" by --nr-width 3`)
 	// replaceCmd.Flags().BoolP("by-name", "n", false, "replace full name instead of just id")
-	replaceCmd.Flags().BoolP("by-seq", "s", false, "replace seq (only FASTA)")
+	replaceCmd.Flags().BoolP("by-seq", "s", false, "replace seq (FASTQ: length-increasing replacements not allowed)")
 	replaceCmd.Flags().BoolP("ignore-case", "i", false, "ignore case")
 	replaceCmd.Flags().StringP("kv-file", "k", "",
 		`tab-delimited key-value file for replacing key with value when using "{kv}" in -r (--replacement) (only for sequence name)`)
@@ -584,3 +662,34 @@ var reFN = regexp.MustCompile(`\{(FN|fn)\}`)
 var reFBN = regexp.MustCompile(`\{(FBN|fbn)\}`)
 var reFBNE = regexp.MustCompile(`\{(FBNE|fbne)\}`)
 var reUUID = regexp.MustCompile(`\{(UUID|uuid)\}`)
+
+// findUsedCaptureGroups parses the replacement string to find which capture groups are referenced
+// Returns a list of capture group indices (e.g., [1, 2] for $1 and $2)
+func findUsedCaptureGroups(replacement []byte) []int {
+	groups := make([]int, 0)
+	seen := make(map[int]bool)
+
+	// Match $1, $2, ${1}, ${2}, etc.
+	reCaptureGroup := regexp.MustCompile(`\$(\d+)|\$\{(\d+)\}`)
+	matches := reCaptureGroup.FindAllSubmatch(replacement, -1)
+
+	for _, match := range matches {
+		var groupStr string
+		if len(match[1]) > 0 {
+			groupStr = string(match[1])
+		} else if len(match[2]) > 0 {
+			groupStr = string(match[2])
+		}
+
+		if groupStr != "" {
+			if groupIdx, err := strconv.Atoi(groupStr); err == nil {
+				if !seen[groupIdx] {
+					groups = append(groups, groupIdx)
+					seen[groupIdx] = true
+				}
+			}
+		}
+	}
+
+	return groups
+}
