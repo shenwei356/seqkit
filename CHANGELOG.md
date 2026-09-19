@@ -8,7 +8,7 @@
         - Create output directory if not exist.
     - `seqkit stats`:
         - Quit earlier when meeting an error, and fixed showing the error that was hidden by the progress bar. [#581](https://github.com/shenwei356/seqkit/issues/581)
-        - Fixed `L50`.
+        - Fixed `N50_num` (L50) for sequences with repeated lengths.
     - `seqkit fx2tab`:
         - Support printing the input file name via `-f/--file-name`. [#578](https://github.com/shenwei356/seqkit/issues/578)
     - `seqkit fa2fq`:
@@ -22,8 +22,12 @@
     - `seqkit sum`:
         - Added a new flag `-i/--include-id` to include the sequence ID (defined by `--id-regexp`) or other information such as UMI. [#595](https://github.com/shenwei356/seqkit/issues/595)
         - Fixed `--rna2dna`, which did not work.
-    - `seqkit bam/sana/watch`:
-        - Fix parameter checking, small optimizations.
+    - `seqkit bam`:
+        - Reject `--print-freq 0`, multiple BAM files in single-file modes, and range filters without a single numeric field.
+    - `seqkit sana`:
+        - Remove the 100-ms control-channel polling delay when processing files.
+    - `seqkit watch`:
+        - Reject `--print-freq 0` and multiple fields; exclude sequences without G/C from GC-skew histograms.
 - [SeqKit v2.13.0](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0) - 2026-02-28
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.13.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0)
     - `seqkit`: add support for reading and writing LZ4 compression format.
