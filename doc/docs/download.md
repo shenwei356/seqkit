@@ -81,7 +81,7 @@ And then:
 
     brew install seqkit
 
-#### Method 5: Docker based installation (might not be latest stable versio)
+#### Method 5: Docker-based installation
 
 [Install Docker](https://docs.docker.com/engine/installation/#supported-platforms)
 
@@ -93,7 +93,11 @@ Run the following commands:
 
     cd seqkit
     docker build -t shenwei356/seqkit .
-    docker run -it shenwei356/seqkit:latest
+    docker run --rm shenwei356/seqkit:latest version
+
+To process files in the current directory, mount it at `/data`:
+
+    docker run --rm -v "$PWD":/data shenwei356/seqkit:latest stats example.fasta
     
 #### Method 6: Compiling from source (latest stable/dev version)
 

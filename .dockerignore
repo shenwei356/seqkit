@@ -1,0 +1,13 @@
+.git/
+.github/
+.agents/
+.codex/
+benchmark/
+doc/
+tests/
+seqkit/binaries/
+seqkit/seqkit
+seqkit/seqkit-*
+seqkit/t.*
+seqkit/**/*_test.go
+*.jpg

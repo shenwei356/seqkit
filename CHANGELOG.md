@@ -28,6 +28,8 @@
         - Remove the 100-ms control-channel polling delay when processing files.
     - `seqkit watch`:
         - Reject `--print-freq 0` and multiple fields; exclude sequences without G/C from GC-skew histograms.
+    - Docker:
+        - Fixed building the image from source. [#502](https://github.com/shenwei356/seqkit/issues/502)
 - [SeqKit v2.13.0](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0) - 2026-02-28
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.13.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.13.0)
     - `seqkit`: add support for reading and writing LZ4 compression format.

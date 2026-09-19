@@ -1,6 +1,6 @@
 module github.com/shenwei356/seqkit/v2
 
-go 1.25.5
+go 1.25.14
 
 // replace github.com/shenwei356/bio => /home/shenwei/go/src/github.com/shenwei356/bio/
 

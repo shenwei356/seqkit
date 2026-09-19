@@ -1,47 +1,27 @@
-FROM ubuntu:16.04
+ARG GO_VERSION=1.25.5
 
-#Begin: install prerequisites
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        build-essential \
-        curl \
-        git \
-        libcurl3-dev \
-        libfreetype6-dev \
-        libpng12-dev \
-        libzmq3-dev \
-        locate \
-        pkg-config \
-        rsync \
-        software-properties-common \
-        sudo \
-        unzip \
-        wget \
-        zip \
-        zlib1g-dev \
-        && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-#End: install prerequisites
+FROM golang:${GO_VERSION}-bookworm AS builder
 
-#Begin: install golang
-ENV GOLANG_VERSION 1.17
-ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
-ENV GOLANG_SHA256_CHECKSUM b3fcf280ff86558e0559e185b601c9eade0fd24c900b4c63cd14d1d38613e499
-ENV GOPATH $HOME/go
-ENV PATH $PATH:/usr/local/go/bin:$GOPATH/bin
-RUN curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz && \
-    echo "$GOLANG_SHA256_CHECKSUM golang.tar.gz" | sha256sum -c - && \
-    sudo tar -C /usr/local -xzf golang.tar.gz && \
-    rm golang.tar.gz && \
-    mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
-#End: install golang
+ARG GOPROXY=https://proxy.golang.org,direct
 
-#Begin: install delve
-RUN go get github.com/derekparker/delve/cmd/dlv
-#End: install delve
+WORKDIR /src
 
-#Begin: install seqkit
-RUN go get -u github.com/shenwei356/seqkit/seqkit
-#End: install seqkit
+COPY go.mod go.sum ./
+RUN GOPROXY="${GOPROXY}" go mod download
 
-WORKDIR $HOME/go/src/github.com/shenwei356/seqkit
+COPY . .
+RUN CGO_ENABLED=0 GOPROXY="${GOPROXY}" go build \
+    -tags netgo \
+    -trimpath \
+    -ldflags="-s -w" \
+    -o /out/seqkit \
+    ./seqkit
+
+FROM scratch
+
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /out/seqkit /usr/local/bin/seqkit
+
+WORKDIR /data
+
+ENTRYPOINT ["/usr/local/bin/seqkit"]
