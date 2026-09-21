@@ -825,6 +825,14 @@ Eexamples
     | reads_2.fq.gz     | FASTQ  | DNA  | 2500     | 560002  | 223     | 224.0   | 225     |
 
 
+1. [MultiQC](https://docs.seqera.io/multiqc/modules/seqkit) report
+
+        $ seqkit stats --all --tabular *.fastq.gz > seqkit_stats.tsv
+        $ multiqc .
+
+    MultiQC's SeqKit module reads the tabular output. Use `--all` to include
+    quality, GC, and N50 statistics in the report.
+
 1. Extra information
 
         $ seqkit stats *.f{a,q}.gz -a
@@ -3376,10 +3384,10 @@ Usage:
   seqkit replace [flags] 
 
 Flags:
-  -s, --by-seq                   replace seq (only FASTA)
+  -s, --by-seq                   replace seq (FASTQ: length-increasing replacements not allowed)
       --f-by-name                [target filter] match by full name instead of just ID
       --f-by-seq                 [target filter] search subseq on seq, both positive and negative strand
-                                 are searched, and mismatch allowed using flag -m/--max-mismatch
+                                 are searched
       --f-ignore-case            [target filter] ignore case
       --f-invert-match           [target filter] invert the sense of matching, to select non-matching records
       --f-only-positive-strand   [target filter] only search on positive strand

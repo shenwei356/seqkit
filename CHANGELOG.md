@@ -9,6 +9,7 @@
     - `seqkit stats`:
         - Quit earlier when meeting an error, and fixed showing the error that was hidden by the progress bar. [#581](https://github.com/shenwei356/seqkit/issues/581)
         - Fixed `N50_num` (L50) for sequences with repeated lengths.
+        - Documented how to use its tabular output with MultiQC. [#377](https://github.com/shenwei356/seqkit/issues/377)
     - `seqkit fx2tab`:
         - Support printing the input file name via `-f/--file-name`. [#578](https://github.com/shenwei356/seqkit/issues/578)
     - `seqkit fa2fq`:
