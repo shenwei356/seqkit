@@ -1,22 +1,48 @@
 #!/usr/bin/env sh
 
-export GOEXPERIMENT=greenteagc # for go1.25
-CGO_ENABLED=0 gox -os="windows darwin linux freebsd" -arch="amd64 arm64" -tags netgo -ldflags '-w -s' -asmflags '-trimpath'
+set -eu
 
-dir=binaries
-mkdir -p $dir;
-rm -rf $dir/$f;
+name=seqkit
+output_dir=binaries
+targets="
+linux/amd64
+linux/arm64
+darwin/amd64
+darwin/arm64
+windows/amd64
+windows/arm64
+openbsd/amd64
+openbsd/arm64
+freebsd/amd64
+freebsd/arm64
+"
 
-for f in seqkit_*; do
-    mkdir -p $dir/$f;
-    mv $f $dir/$f;
-    cd $dir/$f;
-    mv $f $(echo $f | perl -pe 's/_[^\.]+//g');
-    tar -zcf $f.tar.gz seqkit*;
-    mv *.tar.gz ../;
-    cd ..;
-    rm -rf $f;
-    cd ..;
-done;
+staging_dir=$(mktemp -d "${TMPDIR:-/tmp}/$name-packaging.XXXXXX")
+trap 'rm -rf "$staging_dir"' EXIT HUP INT TERM
 
-ls binaries/*.tar.gz | rush 'cd {/}; md5sum {%} > {%}.md5.txt'
+mkdir -p "$output_dir"
+
+for target in $targets; do
+    goos=${target%/*}
+    goarch=${target#*/}
+    extension=
+    if [ "$goos" = windows ]; then
+        extension=.exe
+    fi
+
+    binary="${name}${extension}"
+    archive="${name}_${goos}_${goarch}${extension}.tar.gz"
+
+    printf 'Building %s/%s\n' "$goos" "$goarch"
+    CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" \
+        go build -trimpath -tags netgo \
+        -ldflags "-extldflags '-static' -w -s" \
+        -o "$staging_dir/$binary" .
+
+    tar -C "$staging_dir" -zcf "$output_dir/$archive" "$binary"
+    (
+        cd "$output_dir"
+        md5sum "$archive" > "$archive.md5.txt"
+    )
+    rm -f "$staging_dir/$binary"
+done
