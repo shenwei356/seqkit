@@ -1,3 +1,7 @@
+- [SeqKit v2.14.1](https://github.com/shenwei356/seqkit/releases/tag/v2.14.1) - 2026-10-xx
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.14.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.14.1)
+    - `seqkit faidx`, `seqkit sort/shuffle/split --two-pass`, `seqkit bam`:
+        - Fixed an error when creating an index for an empty plain FASTA file (introduced in v2.14.0). Empty input now produces an index with 0 records. [#597](https://github.com/shenwei356/seqkit/issues/597)
 - [SeqKit v2.14.0](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0) - 2026-09-24
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.14.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0)
     - `seqkit`:
