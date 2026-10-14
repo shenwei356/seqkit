@@ -566,7 +566,10 @@ Filtering records to edit:
 				}
 
 				if matched && (filterMinQual || filterMaxQual) {
-					avgQual := record.Seq.AvgQual(qBase)
+					avgQual, err := record.Seq.AvgQualWithError(qBase)
+					if err != nil {
+						checkError(fmt.Errorf("%s: %s: %w", file, record.ID, err))
+					}
 					if filterMinQual && avgQual < minQual {
 						continue
 					}

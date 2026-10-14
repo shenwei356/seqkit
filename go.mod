@@ -2,7 +2,7 @@ module github.com/shenwei356/seqkit/v2
 
 go 1.25.14
 
-// replace github.com/shenwei356/bio => /home/shenwei/go/src/github.com/shenwei356/bio/
+replace github.com/shenwei356/bio => /home/shenwei/go/src/github.com/shenwei356/bio/
 
 require (
 	github.com/biogo/biogo v1.0.4

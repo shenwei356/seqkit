@@ -155,6 +155,7 @@ Attention:
 		var g, c, a, t int
 		var record *fastx.Record
 		var sum [md5.Size]byte
+		var avgQual float64 // Compute quality before writing any part of a row.
 
 		var _file string
 		for _, file := range files {
@@ -179,6 +180,12 @@ Attention:
 					}
 					checkError(err)
 					break
+				}
+				if printAvgQual {
+					avgQual, err = record.Seq.AvgQualWithError(qBase)
+					if err != nil {
+						checkError(fmt.Errorf("%s: %s: %w", file, record.ID, err))
+					}
 				}
 				if onlyID {
 					name = record.ID
@@ -243,7 +250,7 @@ Attention:
 				}
 
 				if printAvgQual {
-					fmt.Fprintf(outfh, "\t%.2f", record.Seq.AvgQual(qBase))
+					fmt.Fprintf(outfh, "\t%.2f", avgQual)
 				}
 
 				if printSeqHash {

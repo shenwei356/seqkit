@@ -185,6 +185,73 @@ func TestSortInputFormats(t *testing.T) {
 	}
 }
 
+// TestQualityErrorsCLI checks malformed qualities without panics or partial rows.
+func TestQualityErrorsCLI(t *testing.T) {
+	for _, args := range [][]string{
+		{"seq", "-b", "64", "-Q", "20"},
+		{"seq", "-b", "64", "-R", "20"},
+		{"fx2tab", "-b", "64", "-q"},
+		{"stats", "-a", "-E", "illumina-1.5+"},
+		{"stats", "-Ta", "-E", "illumina-1.5+"},
+	} {
+		t.Run(strings.Join(args, " "), func(t *testing.T) {
+			stdout, stderr, err := runCLI(t, "@r1\nACGT\n+\nIII!\n", args...)
+			if err == nil || strings.Contains(stderr, "panic:") || !strings.Contains(stderr, "r1") || !strings.Contains(stderr, "'!'") || !strings.Contains(stderr, "ASCII base 64") {
+				t.Fatalf("expected a descriptive quality error, got %v: %s", err, stderr)
+			}
+			if args[0] != "stats" && stdout != "" {
+				t.Fatalf("invalid record produced partial output: %q", stdout)
+			}
+		})
+	}
+	// A long row exposes writes that would otherwise remain buffered on error.
+	length := 128 << 10
+	input := "@long\n" + strings.Repeat("A", length) + "\n+\n" + strings.Repeat("I", length-1) + "!\n"
+	stdout, stderr, err := runCLI(t, input, "fx2tab", "-b", "64", "-q")
+	if err == nil || strings.Contains(stderr, "panic:") || stdout != "" {
+		t.Fatalf("invalid long record: stdout length=%d, err=%v, stderr=%s", len(stdout), err, stderr)
+	}
+}
+
+// TestQualityCalculationsCLI preserves valid Phred+33 and Phred+64 results.
+func TestQualityCalculationsCLI(t *testing.T) {
+	for _, test := range []struct {
+		base, encoding, quality string
+	}{
+		{"33", "sanger", "IIII"},
+		{"64", "illumina-1.5+", "hhhh"},
+	} {
+		t.Run(test.base, func(t *testing.T) {
+			input := "@r1\nACGT\n+\n" + test.quality + "\n"
+			stdout, stderr, err := runCLI(t, input, "seq", "-b", test.base, "-Q", "20")
+			if err != nil || stdout != input {
+				t.Fatalf("seq: stdout=%q, err=%v, stderr=%s", stdout, err, stderr)
+			}
+			stdout, stderr, err = runCLI(t, input, "fx2tab", "-b", test.base, "-q")
+			if err != nil || stdout != "r1\tACGT\t"+test.quality+"\t40.00\n" {
+				t.Fatalf("fx2tab: stdout=%q, err=%v, stderr=%s", stdout, err, stderr)
+			}
+			stdout, stderr, err = runCLI(t, input, "stats", "-Ta", "-E", test.encoding)
+			lines := strings.Split(strings.TrimSpace(stdout), "\n")
+			if err != nil || len(lines) != 2 {
+				t.Fatalf("stats: stdout=%q, err=%v, stderr=%s", stdout, err, stderr)
+			}
+			fields := strings.Split(lines[1], "\t")
+			if len(fields) != 19 || fields[14] != "100" || fields[15] != "100" || fields[16] != "40.00" {
+				t.Fatalf("unexpected quality metrics: %q", lines[1])
+			}
+		})
+	}
+}
+
+// TestStatsSkipsInvalidQuality preserves the explicit skip-error mode.
+func TestStatsSkipsInvalidQuality(t *testing.T) {
+	stdout, stderr, err := runCLI(t, "@r1\nACGT\n+\nIII!\n", "stats", "-Ta", "-e", "-E", "illumina-1.5+")
+	if err != nil || strings.Contains(stderr, "panic:") || !strings.Contains(stderr, "ASCII base 64") || strings.Count(stdout, "\n") != 1 {
+		t.Fatalf("stats --skip-err: stdout=%q, err=%v, stderr=%s", stdout, err, stderr)
+	}
+}
+
 func TestStatsL50CLI(t *testing.T) {
 	input := ">a\nAAAA\n>b\nAAAA\n>c\nAAAA\n>d\nAAAA\n"
 	stdout, stderr, err := runCLI(t, input, "stats", "-Ta", "--quiet")

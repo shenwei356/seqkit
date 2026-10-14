@@ -21,6 +21,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -223,6 +224,7 @@ Tips:
 		statInfos := make([]statInfo, 0, 1024)
 
 		var quit bool
+		var qualityErr error // The result collector owns quality failures until workers finish.
 
 		done := make(chan int)
 		var x float64
@@ -237,6 +239,12 @@ Tips:
 						log.Warning() // avoid being hidden by the progress bar
 						continue
 					} else {
+						if errors.Is(info.err, seq.ErrInvalidPhredQuality) {
+							if qualityErr == nil {
+								qualityErr = fmt.Errorf("%s: %w", info.file, info.err)
+							}
+							continue
+						}
 						log.Errorf("%s: %s", info.file, info.err)
 						log.Error() // avoid being hidden by the progress bar
 						quit = true
@@ -418,7 +426,6 @@ Tips:
 				var errSum, avgQual float64
 				qual_map := seq.QUAL_MAP
 				var q20, q30 int64
-				var q byte
 				var qual int
 				var encodeOffset int = fqEncoding.Offset()
 				var seqFormat, t string
@@ -480,8 +487,17 @@ Tips:
 
 					if all {
 						if fastxReader.IsFastq {
-							for _, q = range record.Seq.Qual {
+							for i, q := range record.Seq.Qual {
 								qual = int(q) - encodeOffset
+								if qual < 0 {
+									err = fmt.Errorf("%s: %w: quality character %q (ASCII %d) at position %d is below ASCII base %d", record.ID, seq.ErrInvalidPhredQuality, q, q, i+1, encodeOffset)
+									fastxReader.Close()
+									if replaceStdinLabel && isStdin(file) {
+										file = stdinLabel
+									}
+									ch <- statInfo{file: file, err: err, id: id}
+									return
+								}
 								if qual >= 20 {
 									q20++
 									if qual >= 30 {
@@ -584,6 +600,7 @@ Tips:
 			pbs.Wait()
 		}
 
+		checkError(qualityErr)
 		if quit {
 			return
 		}
