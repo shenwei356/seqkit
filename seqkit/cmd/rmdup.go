@@ -83,8 +83,15 @@ Attention:
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 		if !config.SkipFileCheck {
+			// Validate auxiliary outputs before opening any file for writing.
 			for _, file := range files {
 				checkIfFilesAreTheSame(file, outFile, "input", "output")
+				if saveDupFile {
+					checkIfFilesAreTheSame(file, dupFile, "input", "output")
+				}
+				if saveNumFile {
+					checkIfFilesAreTheSame(file, numFile, "input", "output")
+				}
 			}
 		}
 		outfh, err := xopen.Wopen(outFile)

@@ -66,6 +66,84 @@ func runCLI(t *testing.T, input string, args ...string) (string, string, error) 
 	return stdout.String(), stderr.String(), err
 }
 
+// TestRmdupRejectsInputOutputs checks all input paths before any output is opened.
+func TestRmdupRejectsInputOutputs(t *testing.T) {
+	for _, flag := range []string{"-o", "-d", "-D"} {
+		for inputIndex := 0; inputIndex < 2; inputIndex++ {
+			for _, alias := range []string{"same path", "symlink", "hard link"} {
+				t.Run(fmt.Sprintf("%s/input%d/%s", flag, inputIndex, alias), func(t *testing.T) {
+					dir := t.TempDir()
+					inputs := []string{filepath.Join(dir, "in.fa"), filepath.Join(dir, "dup.fa")}
+					contents := []string{">a\nAAAA\n>b\nCCCC\n", ">a\nTTTT\n>b\nTTTT\n"}
+					for i, path := range inputs {
+						if err := os.WriteFile(path, []byte(contents[i]), 0600); err != nil {
+							t.Fatal(err)
+						}
+					}
+					target := inputs[inputIndex]
+					switch alias {
+					case "symlink":
+						target = filepath.Join(dir, "alias.fa")
+						if err := os.Symlink(inputs[inputIndex], target); err != nil {
+							t.Fatal(err)
+						}
+					case "hard link":
+						target = filepath.Join(dir, "alias.fa")
+						if err := os.Link(inputs[inputIndex], target); err != nil {
+							t.Fatal(err)
+						}
+					}
+					out := filepath.Join(dir, "out.fa")
+					const originalOutput = "existing output\n"
+					if err := os.WriteFile(out, []byte(originalOutput), 0600); err != nil {
+						t.Fatal(err)
+					}
+					args := []string{"rmdup", "-s", "--quiet"}
+					if flag != "-o" {
+						args = append(args, "-o", out)
+					}
+					args = append(args, flag, target)
+					stdout, stderr, err := runCLI(t, "", append(args, inputs...)...)
+					if err == nil || !strings.Contains(stderr, "input and output files cannot be the same") || strings.Contains(stderr, "panic:") {
+						t.Errorf("expected file collision error, got %v: %s", err, stderr)
+					}
+					if stdout != "" {
+						t.Errorf("unexpected stdout: %q", stdout)
+					}
+					for i, path := range append(inputs, out) {
+						want := originalOutput
+						if i < len(contents) {
+							want = contents[i]
+						}
+						got, err := os.ReadFile(path)
+						if err != nil || string(got) != want {
+							t.Errorf("file %s changed: got %q, want %q, err %v", path, got, want, err)
+						}
+					}
+				})
+			}
+		}
+	}
+}
+
+// TestRmdupAuxiliaryOutputs checks normal duplicate sequence and count outputs.
+func TestRmdupAuxiliaryOutputs(t *testing.T) {
+	dir := t.TempDir()
+	dup := filepath.Join(dir, "duplicates.fa")
+	num := filepath.Join(dir, "counts.tsv")
+	input := ">a\nAAAA\n>b\nCCCC\n>c\nAAAA\n"
+	stdout, stderr, err := runCLI(t, input, "rmdup", "-s", "-P", "--quiet", "-d", dup, "-D", num)
+	if err != nil || stdout != ">a\nAAAA\n>b\nCCCC\n" {
+		t.Fatalf("rmdup failed: stdout=%q, err=%v, stderr=%q", stdout, err, stderr)
+	}
+	for path, want := range map[string]string{dup: ">c\nAAAA\n", num: "2\ta, c\n"} {
+		got, err := os.ReadFile(path)
+		if err != nil || string(got) != want {
+			t.Errorf("file %s: got %q, want %q, err %v", path, got, want, err)
+		}
+	}
+}
+
 func TestStatsL50CLI(t *testing.T) {
 	input := ">a\nAAAA\n>b\nAAAA\n>c\nAAAA\n>d\nAAAA\n"
 	stdout, stderr, err := runCLI(t, input, "stats", "-Ta", "--quiet")
