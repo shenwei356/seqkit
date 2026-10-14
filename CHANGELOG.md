@@ -10,6 +10,8 @@
         - Report invalid quality scores instead of panicking; `fx2tab` no longer writes partial rows for these errors. [#598](https://github.com/shenwei356/seqkit/issues/598)
     - `seqkit stats`:
         - Exit with a non-zero status on read errors and retain all valid results in input order; `--skip-err` still exits successfully. [#599](https://github.com/shenwei356/seqkit/issues/599)
+    - `seqkit subseq`:
+        - Read the last GTF attribute with or without a trailing semicolon, and skip attributes without values. [#600](https://github.com/shenwei356/seqkit/issues/600)
 - [SeqKit v2.14.0](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0) - 2026-09-24
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.14.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0)
     - `seqkit`:

@@ -381,6 +381,45 @@ func TestStatsErrorOutputFiles(t *testing.T) {
 	}
 }
 
+// TestSubseqGTFAttributes checks attribute comments through indexed and streaming input.
+func TestSubseqGTFAttributes(t *testing.T) {
+	for _, test := range []struct {
+		name, attributes, tag, comment string
+	}{
+		{"last with semicolon", `gene_id "g1"; gene_name "A";`, "gene_name", "A"},
+		{"last without semicolon", `gene_name "A"; gene_id "g1"`, "gene_id", "g1"},
+		{"single attribute", `gene_id "g1";`, "gene_id", "g1"},
+		{"missing value", `gene_id; gene_name "A";`, "gene_id", ""},
+		{"valid after missing value", `gene_id; gene_name "A";`, "gene_name", "A"},
+		{"quoted semicolon", `gene_name "alpha; beta";`, "gene_name", "alpha; beta"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			dir := t.TempDir()
+			gtfFile := filepath.Join(dir, "input.gtf")
+			gtfInput := "chr1\tsrc\tgene\t1\t4\t.\t+\t.\t" + test.attributes + "\n"
+			if err := os.WriteFile(gtfFile, []byte(gtfInput), 0600); err != nil {
+				t.Fatal(err)
+			}
+			fasta := filepath.Join(dir, "input.fa")
+			input := ">chr1\nACGTACGTAC\n"
+			if err := os.WriteFile(fasta, []byte(input), 0600); err != nil {
+				t.Fatal(err)
+			}
+			for _, indexed := range []bool{false, true} {
+				args := []string{"subseq", "--quiet", "--gtf", gtfFile, "--gtf-tag", test.tag}
+				if indexed {
+					args = append(args, fasta)
+				}
+				stdout, stderr, err := runCLI(t, input, args...)
+				want := ">chr1_1-4:+ " + test.comment + "\nACGT\n"
+				if err != nil || stdout != want {
+					t.Fatalf("indexed=%v: stdout=%q, want %q, err=%v, stderr=%s", indexed, stdout, want, err, stderr)
+				}
+			}
+		})
+	}
+}
+
 func TestStatsL50CLI(t *testing.T) {
 	input := ">a\nAAAA\n>b\nAAAA\n>c\nAAAA\n>d\nAAAA\n"
 	stdout, stderr, err := runCLI(t, input, "stats", "-Ta", "--quiet")
