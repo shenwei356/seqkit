@@ -2,12 +2,16 @@ package cmd
 
 import (
 	"bytes"
+	"compress/gzip"
+	"context"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/shenwei356/bio/util"
 )
@@ -57,7 +61,9 @@ func TestCLIProcess(t *testing.T) {
 
 func runCLI(t *testing.T, input string, args ...string) (string, string, error) {
 	t.Helper()
-	cmd := exec.Command(os.Args[0], append([]string{"-test.run=^TestCLIProcess$", "--"}, args...)...)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, os.Args[0], append([]string{"-test.run=^TestCLIProcess$", "--"}, args...)...)
 	cmd.Env = append(os.Environ(), "SEQKIT_CLI_TEST_HELPER=1")
 	cmd.Stdin = strings.NewReader(input)
 	var stdout, stderr bytes.Buffer
@@ -249,6 +255,129 @@ func TestStatsSkipsInvalidQuality(t *testing.T) {
 	stdout, stderr, err := runCLI(t, "@r1\nACGT\n+\nIII!\n", "stats", "-Ta", "-e", "-E", "illumina-1.5+")
 	if err != nil || strings.Contains(stderr, "panic:") || !strings.Contains(stderr, "ASCII base 64") || strings.Count(stdout, "\n") != 1 {
 		t.Fatalf("stats --skip-err: stdout=%q, err=%v, stderr=%s", stdout, err, stderr)
+	}
+}
+
+// TestStatsReadErrors checks ordered valid rows and exit status across output modes.
+func TestStatsReadErrors(t *testing.T) {
+	dir := t.TempDir()
+	files := []string{filepath.Join(dir, "a.fa"), filepath.Join(dir, "bad.fq"), filepath.Join(dir, "p.fa")}
+	for i, input := range []string{">a\nACGT\n", "@r1\nACGT\n+\nIII\n", ">p\nMEL\n"} {
+		if err := os.WriteFile(files[i], []byte(input), 0600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, threads := range []string{"1", "4"} {
+		for _, tabular := range []bool{false, true} {
+			for _, skipErr := range []bool{false, true} {
+				t.Run(fmt.Sprintf("threads%s/tabular%v/skip%v", threads, tabular, skipErr), func(t *testing.T) {
+					args := []string{"stats", "-j", threads}
+					if tabular {
+						args = append(args, "-T")
+					}
+					if skipErr {
+						args = append(args, "-e")
+					}
+					stdout, stderr, err := runCLI(t, "", append(args, files...)...)
+					if (err == nil) != skipErr || strings.Contains(stderr, "panic:") || !strings.Contains(stderr, "unequal sequence and quality") || strings.Count(stderr, files[1]) != 1 {
+						t.Errorf("unexpected failure status or diagnostic: err=%v, stderr=%s", err, stderr)
+					}
+					lines := strings.Split(strings.TrimSpace(stdout), "\n")
+					if len(lines) != 3 {
+						t.Fatalf("expected header and both valid rows, got %q", stdout)
+					}
+					averages := []string{"4", "3"}
+					if tabular {
+						averages = []string{"4.0", "3.0"}
+					}
+					for i, want := range [][]string{
+						{files[0], "FASTA", "DNA", "1", "4", "4", averages[0], "4"},
+						{files[2], "FASTA", "Protein", "1", "3", "3", averages[1], "3"},
+					} {
+						if got := strings.Join(strings.Fields(lines[i+1]), "\t"); got != strings.Join(want, "\t") {
+							t.Errorf("row %d = %q, want %q", i, got, strings.Join(want, "\t"))
+						}
+					}
+				})
+			}
+		}
+	}
+}
+
+// TestStatsErrorOutputFiles checks draining failures and closing buffered/compressed output.
+func TestStatsErrorOutputFiles(t *testing.T) {
+	dir := t.TempDir()
+	for name, input := range map[string]string{
+		"format.fx":  "not FASTA\n",
+		"quality.fq": "@bad\nA\n+\n!\n",
+		"length.fq":  "@bad\nAC\n+\nI\n",
+		"a.fa":       ">a\nACGT\n",
+		"empty.fa":   "",
+		"p.fa":       ">p\nMEL\n",
+	} {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte(input), 0600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	inputs := []string{"format.fx", "quality.fq", "length.fq", "missing.fa", "a.fa", "empty.fa", "p.fa"}
+	paths := make([]string, len(inputs))
+	for i, name := range inputs {
+		paths[i] = filepath.Join(dir, name)
+	}
+	list := filepath.Join(dir, "inputs.txt")
+	if err := os.WriteFile(list, []byte(strings.Join(paths, "\n")+"\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	for _, compressed := range []bool{false, true} {
+		for _, skipErr := range []bool{false, true} {
+			t.Run(fmt.Sprintf("compressed%v/skip%v", compressed, skipErr), func(t *testing.T) {
+				out := filepath.Join(t.TempDir(), "stats.tsv")
+				if compressed {
+					out += ".gz"
+				}
+				args := []string{"stats", "-Ta", "-b", "-j", "2", "-S", "-E", "illumina-1.5+", "-o", out, "--infile-list", list}
+				if skipErr {
+					args = append(args, "-e")
+				}
+				_, stderr, err := runCLI(t, "", args...)
+				if (err == nil) != skipErr || strings.Contains(stderr, "panic:") {
+					t.Fatalf("unexpected failure status: err=%v, stderr=%s", err, stderr)
+				}
+				previous := -1
+				for _, name := range inputs[:4] {
+					position := strings.Index(stderr, filepath.Join(dir, name))
+					if position <= previous {
+						t.Fatalf("missing or unordered diagnostic for %s: %s", name, stderr)
+					}
+					previous = position
+				}
+				data, err := os.ReadFile(out)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if compressed {
+					reader, err := gzip.NewReader(bytes.NewReader(data))
+					if err != nil {
+						t.Fatal(err)
+					}
+					defer reader.Close()
+					data, err = io.ReadAll(reader)
+					if err != nil {
+						t.Fatal(err)
+					}
+				}
+				lines := strings.Split(strings.TrimSpace(string(data)), "\n")
+				if len(lines) != 4 {
+					t.Fatalf("expected header and all three valid rows: %q", data)
+				}
+				for i, name := range inputs[4:] {
+					fields := strings.Split(lines[i+1], "\t")
+					if len(fields) != 19 || fields[0] != name {
+						t.Errorf("unexpected row %d: %q", i, lines[i+1])
+					}
+				}
+			})
+		}
 	}
 }
 

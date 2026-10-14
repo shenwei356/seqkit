@@ -21,20 +21,17 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"math"
 	"os"
 	"path/filepath"
 	"runtime"
-	"sort"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/cznic/sortutil"
 	"github.com/dustin/go-humanize"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
@@ -192,9 +189,16 @@ Tips:
 		}
 		// process bar
 
+		var fileErrors []error // Collected in input order and reported after the progress bar stops.
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer func() {
+			// Finish buffered and compressed output before setting the failure status.
+			checkError(outfh.Close())
+			if len(fileErrors) > 0 && !skipErr {
+				os.Exit(-1)
+			}
+		}()
 
 		// tabular output
 		if tabular {
@@ -223,130 +227,24 @@ Tips:
 		ch := make(chan statInfo, config.Threads)
 		statInfos := make([]statInfo, 0, 1024)
 
-		var quit bool
-		var qualityErr error // The result collector owns quality failures until workers finish.
-
 		done := make(chan int)
-		var x float64
 		go func() {
-			var id uint64 = 1 // for keepping order
+			var id uint64 = 1 // Next input result to emit, including failed inputs.
 			buf := make(map[uint64]statInfo)
 
 			for info := range ch {
-				if info.err != nil {
-					if skipErr {
-						log.Warningf("%s: %s", info.file, info.err)
-						log.Warning() // avoid being hidden by the progress bar
-						continue
-					} else {
-						if errors.Is(info.err, seq.ErrInvalidPhredQuality) {
-							if qualityErr == nil {
-								qualityErr = fmt.Errorf("%s: %w", info.file, info.err)
-							}
-							continue
-						}
-						log.Errorf("%s: %s", info.file, info.err)
-						log.Error() // avoid being hidden by the progress bar
-						quit = true
+				buf[info.id] = info
+				for {
+					info, ok := buf[id]
+					if !ok {
 						break
 					}
-				}
-
-				if id == info.id { // right the one
-					if !tabular {
-						statInfos = append(statInfos, info)
-					} else {
-						fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d",
-							info.file,
-							info.format,
-							info.t,
-							info.num,
-							info.lenSum,
-							info.lenMin,
-							info.lenAvg,
-							info.lenMax)
-						if all {
-							fmt.Fprintf(outfh, "\t%.0f\t%.0f\t%.0f\t%d\t%d\t%d\t%.0f\t%.0f\t%.2f\t%.2f\t%d",
-								info.Q1,
-								info.Q2,
-								info.Q3,
-								info.gapSum,
-								info.N50,
-								info.L50,
-								info.q20,
-								info.q30,
-								info.avgQual,
-								info.gc,
-								info.nSum,
-							)
-						}
-						if hasNX {
-							for _, x = range info.nx {
-								fmt.Fprintf(outfh, "\t%.0f", x)
-							}
-						}
-						outfh.WriteString("\n")
-						outfh.Flush()
-					}
+					delete(buf, id)
 					id++
-					continue
-				}
-
-				buf[info.id] = info // save for later check
-
-				// check bufferd results
-				if info, ok := buf[id]; ok {
-					if !tabular {
-						statInfos = append(statInfos, info)
-					} else {
-						fmt.Fprintf(outfh, "%s\t%s\t%s\t%d\t%d\t%d\t%.1f\t%d",
-							info.file,
-							info.format,
-							info.t,
-							info.num,
-							info.lenSum,
-							info.lenMin,
-							info.lenAvg,
-							info.lenMax)
-						if all {
-							fmt.Fprintf(outfh, "\t%.0f\t%.0f\t%.0f\t%d\t%d\t%d\t%.0f\t%.0f\t%.2f\t%.2f\t%d",
-								info.Q1,
-								info.Q2,
-								info.Q3,
-								info.gapSum,
-								info.N50,
-								info.L50,
-								info.q20,
-								info.q30,
-								info.avgQual,
-								info.gc,
-								info.nSum,
-							)
-						}
-						if hasNX {
-							for _, x = range info.nx {
-								fmt.Fprintf(outfh, "\t%.0f", x)
-							}
-						}
-						outfh.WriteString("\n")
-						outfh.Flush()
+					if info.err != nil {
+						fileErrors = append(fileErrors, fmt.Errorf("%s: %w", info.file, info.err))
+						continue
 					}
-
-					delete(buf, info.id)
-					id++
-				}
-			}
-
-			if len(buf) > 0 {
-				ids := make(sortutil.Uint64Slice, len(buf))
-				i := 0
-				for id := range buf {
-					ids[i] = id
-					i++
-				}
-				sort.Sort(ids)
-				for _, id := range ids {
-					info := buf[id]
 					if !tabular {
 						statInfos = append(statInfos, info)
 					} else {
@@ -375,7 +273,7 @@ Tips:
 							)
 						}
 						if hasNX {
-							for _, x = range info.nx {
+							for _, x := range info.nx {
 								fmt.Fprintf(outfh, "\t%.0f", x)
 							}
 						}
@@ -409,12 +307,13 @@ Tips:
 			go func(file string, id uint64) {
 				startTime := time.Now()
 				defer func() {
-					wg.Done()
 					<-token
 
 					if !config.Quiet && len(files) > 1 {
 						chDuration <- time.Duration(float64(time.Since(startTime)) / threadsFloat)
 					}
+					// Wait for progress reporting before the main goroutine closes its channel.
+					wg.Done()
 				}()
 
 				var gapSum uint64
@@ -444,9 +343,7 @@ Tips:
 					return
 				}
 
-				if quit {
-					return
-				}
+				defer fastxReader.Close()
 
 				seqFormat = ""
 
@@ -461,11 +358,6 @@ Tips:
 							file = stdinLabel
 						}
 						ch <- statInfo{file: file, err: err, id: id}
-						return
-					}
-
-					// for early quit
-					if quit {
 						return
 					}
 
@@ -491,7 +383,6 @@ Tips:
 								qual = int(q) - encodeOffset
 								if qual < 0 {
 									err = fmt.Errorf("%s: %w: quality character %q (ASCII %d) at position %d is below ASCII base %d", record.ID, seq.ErrInvalidPhredQuality, q, q, i+1, encodeOffset)
-									fastxReader.Close()
 									if replaceStdinLabel && isStdin(file) {
 										file = stdinLabel
 									}
@@ -518,8 +409,6 @@ Tips:
 						}
 					}
 				}
-
-				fastxReader.Close()
 
 				if fastxReader.Alphabet() == seq.DNAredundant {
 					t = "DNA"
@@ -600,9 +489,12 @@ Tips:
 			pbs.Wait()
 		}
 
-		checkError(qualityErr)
-		if quit {
-			return
+		for _, err := range fileErrors {
+			if skipErr {
+				log.Warning(err)
+			} else {
+				log.Error(err)
+			}
 		}
 
 		if tabular {
@@ -670,7 +562,7 @@ Tips:
 				row = append(row, info.nSum)
 			}
 			if hasNX {
-				for _, x = range info.nx {
+				for _, x := range info.nx {
 					row = append(row, x)
 				}
 			}
