@@ -191,6 +191,142 @@ func TestSortInputFormats(t *testing.T) {
 	}
 }
 
+// TestSortCaseDistinctRecords preserves records whose IDs differ only in case.
+func TestSortCaseDistinctRecords(t *testing.T) {
+	input := ">r1\nACGT\n>R1\nGGGG\n>x\nTTTT\n"
+	path := filepath.Join(t.TempDir(), "input.fa")
+	if err := os.WriteFile(path, []byte(input), 0600); err != nil {
+		t.Fatal(err)
+	}
+	for _, mode := range []string{"", "-l", "-s", "-n", "-N"} {
+		for _, twoPass := range []bool{false, true} {
+			t.Run(fmt.Sprintf("%s/twoPass%v", mode, twoPass), func(t *testing.T) {
+				args := []string{"sort", "--quiet", "-i"}
+				if mode != "" {
+					args = append(args, mode)
+				}
+				if twoPass {
+					args = append(args, "-2")
+				}
+				stdout, stderr, err := runCLI(t, "", append(args, path)...)
+				want := input
+				if mode == "-l" {
+					want = ">R1\nGGGG\n>r1\nACGT\n>x\nTTTT\n"
+				}
+				if err != nil || stdout != want {
+					t.Fatalf("sort output=%q, want %q, err=%v, stderr=%s", stdout, want, err, stderr)
+				}
+			})
+		}
+	}
+}
+
+// TestSortModeParity checks sequence keys, prefix ties, empty records, and reverse order.
+func TestSortModeParity(t *testing.T) {
+	for _, test := range []struct {
+		name, input, want string
+		args              []string
+	}{
+		{"sequence without ignore case", ">b\nCCCC\n>a\nAAAA\n", ">a\nAAAA\n>b\nCCCC\n", []string{"-s"}},
+		{"sequence ignore case", ">x\nbbb\n>y\nAAA\n>z\nCCC\n", ">y\nAAA\n>x\nbbb\n>z\nCCC\n", []string{"-s", "-i"}},
+		{"reverse sequence", ">x\nbbb\n>y\nAAA\n>z\nCCC\n", ">z\nCCC\n>x\nbbb\n>y\nAAA\n", []string{"-s", "-i", "-r"}},
+		{"prefix ties", ">s1\nGGGGA\n>s2\nGGGGC\n>s3\nGGGGA\n>s4\nGGGGC\n", ">s1\nGGGGA\n>s2\nGGGGC\n>s3\nGGGGA\n>s4\nGGGGC\n", []string{"-s", "-L", "4"}},
+		{"whole sequences", ">s1\nGGGGA\n>s2\nGGGGC\n>s3\nGGGGA\n>s4\nGGGGC\n", ">s1\nGGGGA\n>s3\nGGGGA\n>s2\nGGGGC\n>s4\nGGGGC\n", []string{"-s", "-L", "0"}},
+		{"empty record by ID", ">e\n\n>a\nAC\n", ">a\nAC\n>e\n\n", nil},
+		{"empty record by length", ">e\n\n>a\nAC\n", ">e\n\n>a\nAC\n", []string{"-l"}},
+		{"empty record by sequence", ">e\n\n>a\nAC\n", ">e\n\n>a\nAC\n", []string{"-s"}},
+		{"natural reverse ties", ">r2\nAA\n>R2\nCC\n>r10\nGG\n", ">r10\nGG\n>r2\nAA\n>R2\nCC\n", []string{"-i", "-N", "-r"}},
+		{"natural numeric ties", ">r02\nAA\n>r2\nCC\n>r10\nGG\n", ">r02\nAA\n>r2\nCC\n>r10\nGG\n", []string{"-N"}},
+		{"natural reverse numeric ties", ">r02\nAA\n>r2\nCC\n>r10\nGG\n", ">r10\nGG\n>r02\nAA\n>r2\nCC\n", []string{"-N", "-r"}},
+		{"case-distinct full names", ">a same\nAA\n>a SAME\nCC\n", ">a same\nAA\n>a SAME\nCC\n", []string{"-n", "-i"}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "input.fa")
+			if err := os.WriteFile(path, []byte(test.input), 0600); err != nil {
+				t.Fatal(err)
+			}
+			for _, twoPass := range []bool{false, true} {
+				args := append([]string{"sort", "--quiet"}, test.args...)
+				if twoPass {
+					args = append(args, "-2")
+				}
+				stdout, stderr, err := runCLI(t, "", append(args, path)...)
+				if err != nil || stdout != test.want {
+					t.Errorf("twoPass=%v: output=%q, want %q, err=%v, stderr=%s", twoPass, stdout, test.want, err, stderr)
+				}
+			}
+		})
+	}
+}
+
+// TestSortDefaultSequencePrefix checks the default cutoff against whole-sequence sorting.
+func TestSortDefaultSequencePrefix(t *testing.T) {
+	common := strings.Repeat("G", 10000)
+	input := ">s1\n" + common + "A\n>s2\n" + common + "C\n>s3\n" + common + "A\n>s4\n" + common + "C\n"
+	path := filepath.Join(t.TempDir(), "input.fa")
+	if err := os.WriteFile(path, []byte(input), 0600); err != nil {
+		t.Fatal(err)
+	}
+	for _, whole := range []bool{false, true} {
+		for _, twoPass := range []bool{false, true} {
+			args := []string{"sort", "--quiet", "-s"}
+			if whole {
+				args = append(args, "-L", "0")
+			}
+			if twoPass {
+				args = append(args, "-2")
+			}
+			stdout, stderr, err := runCLI(t, "", append(args, path)...)
+			if err != nil {
+				t.Fatalf("whole=%v, twoPass=%v: %v: %s", whole, twoPass, err, stderr)
+			}
+			var headers []string
+			for _, line := range strings.Split(stdout, "\n") {
+				if strings.HasPrefix(line, ">") {
+					headers = append(headers, line)
+				}
+			}
+			want := ">s1,>s2,>s3,>s4"
+			if whole {
+				want = ">s1,>s3,>s2,>s4"
+			}
+			if got := strings.Join(headers, ","); got != want {
+				t.Errorf("whole=%v, twoPass=%v: headers=%s, want %s", whole, twoPass, got, want)
+			}
+		}
+	}
+}
+
+// TestSortFASTQCaseDistinctRecords checks that sequence and quality pairs remain intact.
+func TestSortFASTQCaseDistinctRecords(t *testing.T) {
+	input := "@r1\nACGT\n+\nIIII\n@R1\nGGGG\n+\nJJJJ\n@x\nTTTT\n+\nKKKK\n"
+	for _, args := range [][]string{{"sort", "--quiet", "-i"}, {"sort", "--quiet", "-s", "-i"}} {
+		stdout, stderr, err := runCLI(t, input, args...)
+		if err != nil || stdout != input {
+			t.Fatalf("%v: output=%q, want %q, err=%v, stderr=%s", args, stdout, input, err, stderr)
+		}
+	}
+}
+
+// TestSortDuplicateIDs retains rejection of exact duplicate IDs with different headers.
+func TestSortDuplicateIDs(t *testing.T) {
+	input := ">same first\nAC\n>same second\nGT\n"
+	path := filepath.Join(t.TempDir(), "input.fa")
+	if err := os.WriteFile(path, []byte(input), 0600); err != nil {
+		t.Fatal(err)
+	}
+	for _, twoPass := range []bool{false, true} {
+		args := []string{"sort", "--quiet", "-i"}
+		if twoPass {
+			args = append(args, "-2")
+		}
+		_, stderr, err := runCLI(t, "", append(args, path)...)
+		if err == nil || !strings.Contains(stderr, "duplicated sequences found: same") || strings.Contains(stderr, "panic:") {
+			t.Fatalf("twoPass=%v: expected duplicate-ID error, got %v: %s", twoPass, err, stderr)
+		}
+	}
+}
+
 // TestQualityErrorsCLI checks malformed qualities without panics or partial rows.
 func TestQualityErrorsCLI(t *testing.T) {
 	for _, args := range [][]string{

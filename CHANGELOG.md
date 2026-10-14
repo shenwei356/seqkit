@@ -6,6 +6,9 @@
         - Reject `-d/--dup-seqs-file` and `-D/--dup-num-file` paths that refer to an input file. [#601](https://github.com/shenwei356/seqkit/issues/601)
     - `seqkit sort`:
         - Reject mixed FASTA and FASTQ inputs. [#603](https://github.com/shenwei356/seqkit/issues/603)
+        - Preserve records with IDs or full names that differ only in case when using `--ignore-case`. [#602](https://github.com/shenwei356/seqkit/issues/602)
+        - Apply `--seq-prefix-length` and case-insensitive sequence sorting in both modes; retain input order for equal prefixes. [#605](https://github.com/shenwei356/seqkit/issues/605), [#606](https://github.com/shenwei356/seqkit/issues/606)
+        - Fix sequence lookup failures with `-2 -s` and missing empty-sequence lines in two-pass output. [#604](https://github.com/shenwei356/seqkit/issues/604), [#606](https://github.com/shenwei356/seqkit/issues/606)
     - `seqkit seq/fx2tab/stats`:
         - Report invalid quality scores instead of panicking; `fx2tab` no longer writes partial rows for these errors. [#598](https://github.com/shenwei356/seqkit/issues/598)
     - `seqkit stats`:

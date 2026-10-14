@@ -4120,6 +4120,8 @@ and extracts sequences by FASTA index.
 Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
+  2. When sorting by sequence (-s), -L applies in both modes. Records with equal
+     sequence prefixes retain their input order.
 
 Usage:
   seqkit sort [flags]
@@ -4135,8 +4137,8 @@ Flags:
   -k, --keep-temp               keep temporary FASTA and .fai file when using 2-pass mode
   -N, --natural-order           sort in natural order, when sorting by IDs/full name
   -r, --reverse                 reverse the result
-  -L, --seq-prefix-length int   length of sequence prefix on which seqkit sorts by sequences (0 for
-                                whole sequence) (default 10000)
+  -L, --seq-prefix-length int   sequence prefix length for sorting in both modes (0 for whole sequence)
+                                (default 10000)
   -2, --two-pass                two-pass mode read files twice to lower memory usage. (only for FASTA format)
   -U, --update-faidx            update the fasta index file if it exists. Use this if you are not sure
                                 whether the fasta file changed

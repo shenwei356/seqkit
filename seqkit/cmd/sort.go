@@ -33,6 +33,7 @@ import (
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
+	"github.com/shenwei356/natsort"
 	"github.com/shenwei356/util/stringutil"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
@@ -60,6 +61,8 @@ and extracts sequences by FASTA index.
 Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
+  2. When sorting by sequence (-s), -L applies in both modes. Records with equal
+     sequence prefixes retain their input order.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -134,8 +137,7 @@ Attention:
 			}
 		}
 
-		name2name0 := make(map[string]string, 1000)
-		name2sequence := []stringutil.String2ByteSlice{}
+		name2sequence := make([]sequenceSortKey, 0, 1024)
 		name2length := []stringutil.StringCount{}
 
 		// for indexing when output and duplicated sequences checking
@@ -192,13 +194,6 @@ Attention:
 					}
 					id2name[name] = []byte(string(record.Name))
 
-					if ignoreCase {
-						name2name0[strings.ToLower(name)] = name
-						name = strings.ToLower(name)
-					} else {
-						name2name0[name] = name
-					}
-
 					record2 := record.Clone()
 					sequences[name] = record2
 					if byLength {
@@ -208,12 +203,21 @@ Attention:
 							length = len(record2.Seq.Seq)
 						}
 						name2length = append(name2length, stringutil.StringCount{Key: name, Count: length})
-					} else if byID || byName || bySeq {
-						if ignoreCase {
-							name2sequence = append(name2sequence, stringutil.String2ByteSlice{Key: name, Value: bytes.ToLower(record2.Seq.Seq)})
-						} else {
-							name2sequence = append(name2sequence, stringutil.String2ByteSlice{Key: name, Value: record2.Seq.Seq})
+					} else if bySeq {
+						prefix := record2.Seq.Seq
+						if seqPrefixLength > 0 && len(prefix) > seqPrefixLength {
+							prefix = prefix[:seqPrefixLength]
 						}
+						if ignoreCase {
+							prefix = bytes.ToLower(prefix)
+						}
+						name2sequence = append(name2sequence, sequenceSortKey{Key: name, Value: prefix})
+					} else {
+						comparison := name
+						if ignoreCase {
+							comparison = strings.ToLower(name)
+						}
+						name2sequence = append(name2sequence, sequenceSortKey{Key: name, Name: comparison})
 					}
 				}
 				fastxReader.Close()
@@ -225,24 +229,15 @@ Attention:
 			}
 
 			if bySeq {
-				if reverse {
-					sort.Sort(stringutil.ReversedByValue{stringutil.String2ByteSliceList(name2sequence)})
-				} else {
-					sort.Sort(stringutil.ByValue{stringutil.String2ByteSliceList(name2sequence)})
-				}
+				sortBySequencePrefix(name2sequence, reverse)
 			} else if byLength {
 				if reverse {
-					sort.Sort(stringutil.ReversedStringCountList{stringutil.StringCountList(name2length)})
+					sort.Sort(stringutil.ReversedStringCountList{StringCountList: name2length})
 				} else {
 					sort.Sort(stringutil.StringCountList(name2length))
 				}
 			} else if byName || byID { // by name/id
-				stringutil.NaturalOrder = inNaturalOrder
-				if reverse {
-					sort.Sort(stringutil.ReversedString2ByteSliceList{stringutil.String2ByteSliceList(name2sequence)})
-				} else {
-					sort.Sort(stringutil.String2ByteSliceList(name2sequence))
-				}
+				sortBySequenceName(name2sequence, inNaturalOrder, reverse)
 			}
 
 			if !quiet {
@@ -355,15 +350,13 @@ Attention:
 				}
 				id2name[name] = []byte(head)
 
+				comparison := name
 				if ignoreCase {
-					name2name0[strings.ToLower(name)] = name
-					name = strings.ToLower(name)
-				} else {
-					name2name0[name] = name
+					comparison = strings.ToLower(name)
 				}
 
 				name2sequence = append(name2sequence,
-					stringutil.String2ByteSlice{Key: name, Value: []byte{}})
+					sequenceSortKey{Key: name, Name: comparison})
 				name2length = append(name2length,
 					stringutil.StringCount{Key: name, Count: lengths[i]})
 			}
@@ -375,7 +368,6 @@ Attention:
 			checkError(err)
 			var name string
 			var prefix []byte
-			var length int
 			for {
 				record, err := fastxReader.Read()
 				if err != nil {
@@ -397,27 +389,18 @@ Attention:
 				}
 				id2name[name] = []byte(string(record.Name))
 
-				if ignoreCase {
-					name2name0[strings.ToLower(name)] = name
-					name = strings.ToLower(name)
-				}
-
 				if seqPrefixLength == 0 || len(record.Seq.Seq) <= seqPrefixLength {
 					prefix = record.Seq.Seq
 				} else {
 					prefix = record.Seq.Seq[0:seqPrefixLength]
 				}
-				name2sequence = append(name2sequence,
-					stringutil.String2ByteSlice{Key: name, Value: []byte(string(prefix))})
-
-				if byBases {
-					length = record.Seq.Bases(gapLetters)
+				if ignoreCase {
+					prefix = bytes.ToLower(prefix)
 				} else {
-					length = len(record.Seq.Seq)
+					prefix = bytes.Clone(prefix)
 				}
-				name2length = append(name2length, stringutil.StringCount{Key: name, Count: length})
-				name2length = append(name2length,
-					stringutil.StringCount{Key: name, Count: len(record.Seq.Seq)})
+				name2sequence = append(name2sequence,
+					sequenceSortKey{Key: name, Value: prefix})
 			}
 			fastxReader.Close()
 		}
@@ -428,24 +411,15 @@ Attention:
 		}
 
 		if bySeq {
-			if reverse {
-				sort.Sort(stringutil.ReversedByValue{stringutil.String2ByteSliceList(name2sequence)})
-			} else {
-				sort.Sort(stringutil.ByValue{stringutil.String2ByteSliceList(name2sequence)})
-			}
+			sortBySequencePrefix(name2sequence, reverse)
 		} else if byLength {
 			if reverse {
-				sort.Sort(stringutil.ReversedStringCountList{stringutil.StringCountList(name2length)})
+				sort.Sort(stringutil.ReversedStringCountList{StringCountList: name2length})
 			} else {
 				sort.Sort(stringutil.StringCountList(name2length))
 			}
 		} else if byName || byID { // by name/id
-			stringutil.NaturalOrder = inNaturalOrder
-			if reverse {
-				sort.Sort(stringutil.ReversedString2ByteSliceList{stringutil.String2ByteSliceList(name2sequence)})
-			} else {
-				sort.Sort(stringutil.String2ByteSliceList(name2sequence))
-			}
+			sortBySequenceName(name2sequence, inNaturalOrder, reverse)
 		}
 
 		if !quiet {
@@ -459,7 +433,7 @@ Attention:
 		var chr string
 		if byName || byID || bySeq {
 			for _, kv := range name2sequence {
-				chr = string(id2name[name2name0[kv.Key]])
+				chr = string(id2name[kv.Key])
 				r, ok := faidx.Index[chr]
 				if !ok {
 					checkError(fmt.Errorf(`sequence (%s) not found in file: %s`, chr, newFile))
@@ -469,13 +443,13 @@ Attention:
 				sequence := subseqByFaixNotCleaned(faidx, chr, r, 1, -1)
 				outfh.Write([]byte(fmt.Sprintf(">%s\n", chr)))
 				outfh.Write(sequence)
-				if len(sequence) > 0 && sequence[len(sequence)-1] != '\n' {
+				if len(sequence) == 0 || sequence[len(sequence)-1] != '\n' {
 					outfh.WriteString("\n")
 				}
 			}
 		} else if byLength {
 			for _, kv := range name2length {
-				chr = string(id2name[name2name0[kv.Key]])
+				chr = string(id2name[kv.Key])
 				r, ok := faidx.Index[chr]
 				if !ok {
 					checkError(fmt.Errorf(`sequence (%s) not found in file: %s`, chr, newFile))
@@ -485,7 +459,7 @@ Attention:
 				sequence := subseqByFaixNotCleaned(faidx, chr, r, 1, -1)
 				outfh.Write([]byte(fmt.Sprintf(">%s\n", chr)))
 				outfh.Write(sequence)
-				if len(sequence) > 0 && sequence[len(sequence)-1] != '\n' {
+				if len(sequence) == 0 || sequence[len(sequence)-1] != '\n' {
 					outfh.WriteString("\n")
 				}
 			}
@@ -496,6 +470,41 @@ Attention:
 			checkError(os.Remove(newFile + ".seqkit.fai"))
 		}
 	},
+}
+
+// sequenceSortKey separates record identity from the name or sequence used for comparison.
+type sequenceSortKey struct {
+	Key   string // Original ID or full name used to retrieve the record.
+	Name  string // Precomputed ID/name comparison key, optionally case-folded.
+	Value []byte // Sequence prefix comparison key, optionally case-folded.
+}
+
+// sortBySequencePrefix preserves input order for equal sequence prefixes.
+func sortBySequencePrefix(records []sequenceSortKey, reverse bool) {
+	sort.SliceStable(records, func(i, j int) bool {
+		if reverse {
+			return bytes.Compare(records[j].Value, records[i].Value) < 0
+		}
+		return bytes.Compare(records[i].Value, records[j].Value) < 0
+	})
+}
+
+// sortBySequenceName sorts comparison keys while retaining original keys for record lookup.
+func sortBySequenceName(records []sequenceSortKey, natural, reverse bool) {
+	sort.SliceStable(records, func(i, j int) bool {
+		a, b := records[i].Name, records[j].Name
+		if a == b {
+			return false
+		}
+		if reverse {
+			a, b = b, a
+		}
+		if natural {
+			// Numerically equal spellings must not precede each other in both directions.
+			return natsort.Compare(a, b, false) && !natsort.Compare(b, a, false)
+		}
+		return a < b
+	})
 }
 
 func init() {
@@ -512,5 +521,5 @@ func init() {
 	sortCmd.Flags().BoolP("two-pass", "2", false, "two-pass mode read files twice to lower memory usage. (only for FASTA format)")
 	sortCmd.Flags().BoolP("update-faidx", "U", false, "update the fasta index file if it exists. Use this if you are not sure whether the fasta file changed")
 	sortCmd.Flags().BoolP("keep-temp", "k", false, "keep temporary FASTA and .fai file when using 2-pass mode")
-	sortCmd.Flags().IntP("seq-prefix-length", "L", 10000, "length of sequence prefix on which seqkit sorts by sequences (0 for whole sequence)")
+	sortCmd.Flags().IntP("seq-prefix-length", "L", 10000, "sequence prefix length for sorting in both modes (0 for whole sequence)")
 }
