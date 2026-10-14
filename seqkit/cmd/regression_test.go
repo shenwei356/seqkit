@@ -144,6 +144,47 @@ func TestRmdupAuxiliaryOutputs(t *testing.T) {
 	}
 }
 
+// TestSortInputFormats checks mixed-format rejection and empty-file handling.
+func TestSortInputFormats(t *testing.T) {
+	for _, test := range []struct {
+		name   string
+		inputs []string
+		want   string
+		mixed  bool
+	}{
+		{name: "FASTQ then FASTA", inputs: []string{"@a\nGG\n+\nII\n", ">b\nCC\n"}, mixed: true},
+		{name: "FASTA then FASTQ", inputs: []string{">a\nGG\n", "@b\nCC\n+\nJJ\n"}, mixed: true},
+		{name: "mixed with empty files", inputs: []string{"", "@a\nGG\n+\nII\n", "\n", ">b\nCC\n"}, mixed: true},
+		{name: "empty FASTQ record then FASTA", inputs: []string{"@a\n\n+\n\n", ">b\nCC\n"}, mixed: true},
+		{name: "empty FASTA record then FASTQ", inputs: []string{">a\n\n", "@b\nCC\n+\nJJ\n"}, mixed: true},
+		{name: "FASTA", inputs: []string{"", ">b\nCC\n", "\n", ">a\nGG\n", ""}, want: ">a\nGG\n>b\nCC\n"},
+		{name: "FASTQ", inputs: []string{"", "@b\nCC\n+\nJJ\n", "\n", "@a\nGG\n+\nII\n", ""}, want: "@a\nGG\n+\nII\n@b\nCC\n+\nJJ\n"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			dir := t.TempDir()
+			args := []string{"sort", "--quiet"}
+			for i, input := range test.inputs {
+				path := filepath.Join(dir, fmt.Sprintf("input%d.fx", i))
+				if err := os.WriteFile(path, []byte(input), 0600); err != nil {
+					t.Fatal(err)
+				}
+				args = append(args, path)
+			}
+			stdout, stderr, err := runCLI(t, "", args...)
+			if test.mixed {
+				if err == nil || !strings.Contains(stderr, "cannot mix FASTA and FASTQ") || strings.Contains(stderr, "panic:") {
+					t.Fatalf("expected format error, got %v: %s", err, stderr)
+				}
+				if stdout != "" {
+					t.Fatalf("mixed input produced output: %q", stdout)
+				}
+			} else if err != nil || stdout != test.want {
+				t.Fatalf("sort output = %q, want %q, err = %v: %s", stdout, test.want, err, stderr)
+			}
+		})
+	}
+}
+
 func TestStatsL50CLI(t *testing.T) {
 	input := ">a\nAAAA\n>b\nAAAA\n>c\nAAAA\n>d\nAAAA\n"
 	stdout, stderr, err := runCLI(t, input, "stats", "-Ta", "--quiet")

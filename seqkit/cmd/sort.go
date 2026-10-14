@@ -151,6 +151,8 @@ Attention:
 			}
 			var name string
 			var length int
+			// Empty files do not determine the input format.
+			var formatKnown, inputIsFastq bool
 			for _, file := range files {
 				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
@@ -165,6 +167,11 @@ Attention:
 						break
 					}
 					if checkAlphabet {
+						if formatKnown && fastxReader.IsFastq != inputIsFastq {
+							checkError(fmt.Errorf("cannot mix FASTA and FASTQ input files: %s", file))
+						}
+						inputIsFastq = fastxReader.IsFastq
+						formatKnown = true
 						if fastxReader.IsFastq {
 							if !config.LineWidthChanged {
 								config.LineWidth = 0

@@ -4,6 +4,8 @@
         - Fixed an error when creating an index for an empty plain FASTA file (introduced in v2.14.0). Empty input now produces an index with 0 records. [#597](https://github.com/shenwei356/seqkit/issues/597)
     - `seqkit rmdup`:
         - Reject `-d/--dup-seqs-file` and `-D/--dup-num-file` paths that refer to an input file. [#601](https://github.com/shenwei356/seqkit/issues/601)
+    - `seqkit sort`:
+        - Reject mixed FASTA and FASTQ inputs. [#603](https://github.com/shenwei356/seqkit/issues/603)
 - [SeqKit v2.14.0](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0) - 2026-09-24
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.14.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0)
     - `seqkit`:
