@@ -169,8 +169,10 @@ Examples:
 		var record *fastx.Record
 
 		if !dryRun {
-			pwd, _ := os.Getwd()
-			if outdir != "./" && outdir != "." && pwd != filepath.Clean(outdir) {
+			if force {
+				checkOutputDir(files, outdir)
+			}
+			if !isWorkingDir(outdir) {
 				existed, err := pathutil.DirExists(outdir)
 				checkError(err)
 				if existed {
@@ -264,18 +266,16 @@ Examples:
 			newFile := file
 
 			if isstdin || !isPlainFile(file) {
-				if isstdin {
-					newFile = "stdin" + ".fastx"
-				} else {
-					newFile = file + ".fastx"
+				var nseqs int
+				newFile, nseqs, err = copySeqsToTemp(file, tempSeqDir(file))
+				checkError(err)
+				if !keepTemp {
+					defer cleanupTempSeqs(newFile)
 				}
 				if !quiet {
 					log.Infof("read and write sequences to temporary file: %s ...", newFile)
 				}
 
-				var nseqs int
-				nseqs, err = copySeqs(file, newFile)
-				checkError(err)
 				if !quiet {
 					log.Infof("%d sequences saved", nseqs)
 				}
@@ -367,7 +367,7 @@ Examples:
 					}
 					outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, n, fileExt))
 					if !dryRun {
-						outfh.Close()
+						closeOutput(outfh)
 						outfh, err = xopen.Wopen(outfile)
 						checkError(err)
 					}
@@ -381,13 +381,9 @@ Examples:
 				os.Remove(outfile)
 			}
 			if !dryRun {
-				outfh.Close()
+				closeOutput(outfh)
 			}
 
-			if (isstdin || !isPlainFile(file)) && !keepTemp {
-				checkError(os.Remove(newFile))
-				checkError(os.Remove(newFile + ".seqkit.fai"))
-			}
 			return
 		}
 
@@ -463,18 +459,16 @@ Examples:
 			newFile := file
 
 			if isstdin || !isPlainFile(file) {
-				if isstdin {
-					newFile = "stdin" + ".fastx"
-				} else {
-					newFile = file + ".fastx"
+				var nseqs int
+				newFile, nseqs, err = copySeqsToTemp(file, tempSeqDir(file))
+				checkError(err)
+				if !keepTemp {
+					defer cleanupTempSeqs(newFile)
 				}
 				if !quiet {
 					log.Infof("read and write sequences to temporary file: %s ...", newFile)
 				}
 
-				var nseqs int
-				nseqs, err = copySeqs(file, newFile)
-				checkError(err)
 				if !quiet {
 					log.Infof("%d sequences saved", nseqs)
 				}
@@ -578,7 +572,7 @@ Examples:
 					}
 					outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, n, fileExt))
 					if !dryRun {
-						outfh.Close()
+						closeOutput(outfh)
 						outfh, err = xopen.Wopen(outfile)
 						checkError(err)
 					}
@@ -590,7 +584,7 @@ Examples:
 					log.Infof("write %d sequences to file: %s\n", j, outfile)
 				}
 				if !dryRun {
-					outfh.Close()
+					closeOutput(outfh)
 				}
 			} else {
 				if !dryRun {
@@ -598,10 +592,6 @@ Examples:
 				}
 			}
 
-			if (isstdin || !isPlainFile(file)) && !keepTemp {
-				checkError(os.Remove(newFile))
-				checkError(os.Remove(newFile + ".seqkit.fai"))
-			}
 			return
 		}
 
@@ -669,18 +659,16 @@ Examples:
 			newFile := file
 
 			if isstdin || !isPlainFile(file) {
-				if isstdin {
-					newFile = "stdin" + ".fastx"
-				} else {
-					newFile = file + ".fastx"
+				var nseqs int
+				newFile, nseqs, err = copySeqsToTemp(file, tempSeqDir(file))
+				checkError(err)
+				if !keepTemp {
+					defer cleanupTempSeqs(newFile)
 				}
 				if !quiet {
 					log.Infof("read and write sequences to temporary file: %s ...", newFile)
 				}
 
-				var nseqs int
-				nseqs, err = copySeqs(file, newFile)
-				checkError(err)
 				if !quiet {
 					log.Infof("%d sequences saved", nseqs)
 				}
@@ -796,16 +784,12 @@ Examples:
 						log.Infof("write %d sequences to file: %s\n", len(_IDs), outfile)
 					}
 					if !dryRun {
-						outfh.Close()
+						closeOutput(outfh)
 					}
 				}(id, _IDs)
 			}
 			wg.Wait()
 
-			if (isstdin || !isPlainFile(file)) && !keepTemp {
-				checkError(os.Remove(newFile))
-				checkError(os.Remove(newFile + ".seqkit.fai"))
-			}
 			return
 		}
 
@@ -887,18 +871,16 @@ Examples:
 			newFile := file
 
 			if isstdin || !isPlainFile(file) {
-				if isstdin {
-					newFile = "stdin" + ".fastx"
-				} else {
-					newFile = file + ".fastx"
+				var nseqs int
+				newFile, nseqs, err = copySeqsToTemp(file, tempSeqDir(file))
+				checkError(err)
+				if !keepTemp {
+					defer cleanupTempSeqs(newFile)
 				}
 				if !quiet {
 					log.Infof("read and write sequences to temporary file: %s ...", newFile)
 				}
 
-				var nseqs int
-				nseqs, err = copySeqs(file, newFile)
-				checkError(err)
 				if !quiet {
 					log.Infof("%d sequences saved", nseqs)
 				}
@@ -983,11 +965,12 @@ Examples:
 			var wg sync.WaitGroup
 			tokens := make(chan int, config.Threads)
 
-			var record *fastx.Record
 			for subseq, chrs := range region2name {
 				wg.Add(1)
 				tokens <- 1
 				go func(subseq string, chrs []string) {
+					var prefix, outfile string
+					var record *fastx.Record
 					defer func() {
 						wg.Done()
 						<-tokens
@@ -1025,7 +1008,7 @@ Examples:
 						log.Infof("write %d sequences to file: %s\n", len(chrs), outfile)
 					}
 					if !dryRun {
-						outfh.Close()
+						closeOutput(outfh)
 					}
 				}(subseq, chrs)
 			}

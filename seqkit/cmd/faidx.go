@@ -122,7 +122,7 @@ Examples:
 
 		outfh, err := xopen.Wopen(config.OutFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		// create and read .fai
 		var idx fai.Index

@@ -65,14 +65,14 @@ var tab2faCmd = &cobra.Command{
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		var line, p string
 		var items []string
 		var isCommentLine, isFastq bool
 		var scanner *bufio.Scanner
 		var fh *xopen.Reader
-		buf := make([]byte, bufferSize)
+		buf := make([]byte, min(bufferSize, 64<<10)) // Preserve the limit without eagerly reserving 1 GiB.
 		for _, file := range files {
 			fh, err = xopen.Ropen(file)
 			checkError(err)
@@ -120,6 +120,7 @@ var tab2faCmd = &cobra.Command{
 
 			}
 			checkError(scanner.Err())
+			checkError(fh.Close())
 		}
 	},
 }

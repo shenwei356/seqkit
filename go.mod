@@ -2,7 +2,7 @@ module github.com/shenwei356/seqkit/v2
 
 go 1.25.14
 
-replace github.com/shenwei356/bio => /home/shenwei/go/src/github.com/shenwei356/bio/
+// replace github.com/shenwei356/bio => /home/shenwei/go/src/github.com/shenwei356/bio/
 
 require (
 	github.com/biogo/biogo v1.0.4
@@ -24,7 +24,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pierrec/lz4/v4 v4.1.29
 	github.com/pkg/errors v0.9.1
-	github.com/shenwei356/bio v0.15.3
+	github.com/shenwei356/bio v0.15.4
 	github.com/shenwei356/breader v0.3.2
 	github.com/shenwei356/bwt v0.6.1
 	github.com/shenwei356/go-logging v0.0.0-20171012171522-c6b9702d88ba

@@ -151,9 +151,15 @@ Examples:
 		}
 		// process bar
 
+		var failed bool // Set by the collector for invalid circular-sequence parameters.
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer func() {
+			closeOutput(outfh)
+			if failed {
+				os.Exit(-1)
+			}
+		}()
 
 		tokens := make(chan int, config.Threads)
 		done := make(chan int)
@@ -162,6 +168,7 @@ Examples:
 
 		type Aresult struct {
 			ok     bool
+			failed bool // Hard validation errors differ from intentionally skipped files.
 			id     uint64
 			result *SumResult
 		}
@@ -175,6 +182,9 @@ Examples:
 
 			id = 1
 			for r := range ch {
+				if r.failed {
+					failed = true
+				}
 				_id = r.id
 
 				if _id == id { // right there
@@ -241,11 +251,11 @@ Examples:
 				startTime := time.Now()
 				defer func() {
 					<-tokens
-					wg.Done()
 
 					if !config.Quiet && len(files) > 1 {
 						chDuration <- time.Duration(float64(time.Since(startTime)) / threadsFloat)
 					}
+					wg.Done()
 				}()
 
 				var n int    // number of sequences
@@ -330,9 +340,13 @@ Examples:
 						_seq = record.Seq
 						idOfCircularGenome = append(idOfCircularGenome, record.ID...)
 
+						if removeGaps {
+							_seq.RemoveGapsInplace(gapLetters)
+						}
 						if k > len(_seq.Seq) {
 							// checkError(fmt.Errorf("k is too big for sequence of %d bp: %s", len(record.Seq.Seq), file))
 							ch <- &Aresult{
+								failed: true,
 								id:     id,
 								ok:     false,
 								result: nil,
@@ -348,6 +362,7 @@ Examples:
 								seqType = "P"
 
 								ch <- &Aresult{
+									failed: true,
 									id:     id,
 									ok:     false,
 									result: nil,
@@ -363,10 +378,6 @@ Examples:
 							}
 
 							checkAlphabet = false
-						}
-
-						if removeGaps {
-							_seq.RemoveGapsInplace(gapLetters)
 						}
 
 						lowerSeqInplace(_seq.Seq)
@@ -555,8 +566,9 @@ Examples:
 					file = filepath.Base(file)
 				}
 
+				outputK := k // Linear output has no k-mer size; do not mutate worker-shared options.
 				if !circular {
-					k = 0
+					outputK = 0
 				}
 				includeIDStr := ""
 				if includeID {
@@ -567,7 +579,7 @@ Examples:
 					seqType,
 					seqStructure,
 					strand,
-					includeIDStr, k,
+					includeIDStr, outputK,
 					hex.EncodeToString(digest[:]))
 
 				ch <- &Aresult{

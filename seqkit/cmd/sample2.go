@@ -120,7 +120,7 @@ runs, add '-r/--non-deterministic' for a time-based seed.
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		var _rand *rand.Rand
 		if nonDeterministic {

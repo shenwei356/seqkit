@@ -304,7 +304,7 @@ Attention:
 		if flagBam != "" {
 			saveBam(flagBam, samRefs, refMap, alns)
 		}
-		outfh.Close()
+		closeOutput(outfh)
 	},
 }
 

@@ -134,9 +134,14 @@ Translate Tables/Genetic Codes:
 			appendFrame = true
 		}
 
+		var files []string
+		if listTable < 0 && listTableAmb < 0 {
+			files = getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+			checkOutputFiles(files, []string{outFile})
+		}
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		if listTableAmb == 0 || listTable == 0 {
 			ks := make([]int, len(seq.CodonTables))
@@ -160,13 +165,6 @@ Translate Tables/Genetic Codes:
 				outfh.WriteString(table.String())
 			}
 			return
-		}
-
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		if !config.SkipFileCheck {
-			for _, file := range files {
-				checkIfFilesAreTheSame(file, outFile, "input", "output")
-			}
 		}
 
 		var record *fastx.Record

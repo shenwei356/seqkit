@@ -93,7 +93,7 @@ Example:
 		if !mOutputs {
 			outfh, err = xopen.Wopen(outFile)
 			checkError(err)
-			defer outfh.Close()
+			defer closeOutput(outfh)
 		} else {
 			if outdir == "" {
 				checkError(fmt.Errorf("out dir (flag -O/--out-dir) should not be empty"))
@@ -103,9 +103,16 @@ Example:
 					checkError(fmt.Errorf("stdin detected, should not use -m/--mutliple-outfiles"))
 				}
 			}
+			outputs := make([]string, len(files))
+			for i, file := range files {
+				outputs[i] = filepath.Join(outdir, filepath.Base(file))
+			}
+			checkOutputFiles(files, outputs)
+			if force {
+				checkOutputDir(files, outdir)
+			}
 
-			pwd, _ := os.Getwd()
-			if outdir != "./" && outdir != "." && pwd != filepath.Clean(outdir) {
+			if !isWorkingDir(outdir) {
 				existed, err := pathutil.DirExists(outdir)
 				checkError(err)
 				if existed {
@@ -129,7 +136,8 @@ Example:
 		var newID string
 		var k uint64
 		var ok bool
-		numbers := make(map[uint64]int, 1<<20)
+		numbers := make(map[uint64]int)
+		emitted := make(map[uint64]struct{}) // Reserve actual output IDs/names, including generated suffixes.
 		for _, file := range files {
 			func(file string) {
 				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
@@ -138,7 +146,7 @@ Example:
 				if mOutputs {
 					outfh, err = xopen.Wopen(filepath.Join(outdir, filepath.Base(file)))
 					checkError(err)
-					defer outfh.Close()
+					defer closeOutput(outfh)
 				}
 
 				checkAlphabet := true
@@ -168,24 +176,33 @@ Example:
 						k = xxhash.Sum64(record.ID)
 					}
 
-					if _, ok = numbers[k]; ok {
-						numbers[k]++
-						newID = fmt.Sprintf("%s%s%d", record.ID, separator, numbers[k]-2+startNum)
-						if len(record.Desc) > 0 {
-							record.Name = []byte(fmt.Sprintf("%s %s", newID, record.Desc))
-						} else {
-							record.Name = []byte(newID)
+					numbers[k]++
+					_, ok = emitted[k]
+					if numbers[k] > 1 || rename1st || ok {
+						count := numbers[k] - 2 + startNum
+						if numbers[k] == 1 && !rename1st {
+							count++
+						}
+						for {
+							newID = fmt.Sprintf("%s%s%d", record.ID, separator, count)
+							name := newID
+							if len(record.Desc) > 0 {
+								name += " " + string(record.Desc)
+							}
+							outputKey := xxhash.Sum64String(newID)
+							if byName {
+								outputKey = xxhash.Sum64String(name)
+							}
+							if _, exists := emitted[outputKey]; !exists {
+								numbers[k] = count - startNum + 2
+								record.Name = []byte(name)
+								emitted[outputKey] = struct{}{}
+								break
+							}
+							count++
 						}
 					} else {
-						numbers[k] = 1
-						if rename1st {
-							newID = fmt.Sprintf("%s%s%d", record.ID, separator, numbers[k]-2+startNum)
-							if len(record.Desc) > 0 {
-								record.Name = []byte(fmt.Sprintf("%s %s", newID, record.Desc))
-							} else {
-								record.Name = []byte(newID)
-							}
-						}
+						emitted[k] = struct{}{}
 					}
 
 					record.FormatToWriter(outfh, config.LineWidth)

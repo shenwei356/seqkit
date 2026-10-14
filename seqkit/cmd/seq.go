@@ -171,7 +171,7 @@ Filtering records to edit:
 		usingDefaultIDRegexp := config.IDRegexp == fastx.DefaultIDRegexp
 
 		patternsR := make(map[uint64]*regexp.Regexp, 1<<10)
-		patternsN := make(map[uint64]interface{}, 1<<20)
+		patternsN := make(map[uint64]struct{}) // Allocate buckets only for active exact filters.
 		// patternsS := make(map[string]interface{}, 1<<10)
 		patternsS := make([][]byte, 0, 16)
 

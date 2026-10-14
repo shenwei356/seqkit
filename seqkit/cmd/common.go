@@ -109,7 +109,7 @@ Note:
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		var fastxReader *fastx.Reader
 		var record *fastx.Record

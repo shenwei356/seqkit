@@ -106,7 +106,7 @@ Examples
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		var sequence0, sequence, qual []byte
 		var bufSeq, bufQual bytes.Buffer

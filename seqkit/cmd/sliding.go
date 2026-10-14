@@ -39,6 +39,8 @@ var slidingCmd = &cobra.Command{
 	Short: "extract subsequences in sliding windows",
 	Long: `extract subsequences in sliding windows
 
+Circular windows must not exceed the sequence length.
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -48,7 +50,7 @@ var slidingCmd = &cobra.Command{
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
-		runtime.GOMAXPROCS(config.BufferSize)
+		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 		if !config.SkipFileCheck {
@@ -75,7 +77,7 @@ var slidingCmd = &cobra.Command{
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		var sequence, s, qual, q []byte
 		var r *fastx.Record
@@ -105,6 +107,9 @@ var slidingCmd = &cobra.Command{
 				}
 
 				originalLen = len(record.Seq.Seq)
+				if circular && window > originalLen {
+					checkError(fmt.Errorf("circular window (%d) exceeds sequence length (%d): %s", window, originalLen, record.ID))
+				}
 				sequence = record.Seq.Seq
 				qual = record.Seq.Qual
 				l = len(sequence)

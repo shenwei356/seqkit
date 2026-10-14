@@ -73,238 +73,113 @@ var convertCmd = &cobra.Command{
 		}
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
-
-		guessing := from <= 0
-
-		var records []*fastx.Record // records for guessing quality encoding
-		var n int
-		var encodings, encodingsGuessed []seq.QualityEncoding
-		var encoding seq.QualityEncoding
-		// for compute intersection of potential quality encoding from leading N records
-		var encodingsMark []int
-		if guessing {
-			records = make([]*fastx.Record, nrecords+1)
-			encodingsGuessed = make([]seq.QualityEncoding, 0, seq.NQualityEncoding)
-			encodingsMark = make([]int, seq.NQualityEncoding)
-		} else {
-			fromEncoding = from
-			if !quiet {
-				log.Infof("converting %s -> %s", fromEncoding, toEncoding)
-			}
+		defer closeOutput(outfh)
+		lineWidth := config.LineWidth
+		if !config.LineWidthChanged {
+			lineWidth = 0
 		}
+		fastx.ForcelyOutputFastq = true // This command accepts only FASTQ, including empty records.
 
-		var record *fastx.Record
-		var once = true
 		for _, file := range files {
-			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
-			checkError(err)
-			once = true
-			checkAlphabet := true
-			for {
-				record, err = fastxReader.Read()
-				if err != nil {
+			func() {
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
+				checkError(err)
+				defer fastxReader.Close()
+
+				guessing := from <= 0
+				fromEncoding = from
+				var records []*fastx.Record // Only the current file's unconverted sample.
+				marks := make([]int, seq.NQualityEncoding)
+				reportEncoding := func() {
+					if !quiet {
+						log.Infof("converting %s -> %s", fromEncoding, toEncoding)
+					}
+					if encodingsMatch(fromEncoding, toEncoding, force) {
+						log.Warningf("source and target quality encoding match.")
+					}
+				}
+				finishGuessing := func() {
+					fromEncoding, err = guessQualityEncoding(marks, len(records), threshIllumina1p5Frac)
+					checkError(err)
+					if !quiet {
+						log.Infof("guessed quality encoding: %s", fromEncoding)
+					}
+					reportEncoding()
+					if !dryRun {
+						for _, record := range records {
+							record.Seq.Qual, err = seq.QualityConvert(fromEncoding, toEncoding, record.Seq.Qual, force)
+							checkError(err)
+							record.FormatToWriter(outfh, lineWidth)
+						}
+					}
+					records = nil
+					guessing = false
+				}
+				if !guessing {
+					reportEncoding()
+				}
+				for {
+					record, err := fastxReader.Read()
 					if err == io.EOF {
-						if guessing && n < nrecords {
-							for e, n2 := range encodingsMark {
-								if n2 == n {
-									encodingsGuessed = append(encodingsGuessed, seq.QualityEncoding(e))
-								}
-							}
-
-							if float64(encodingsMark[seq.Illumina1p5]/len(records)) > threshIllumina1p5Frac {
-								encodingsGuessed = []seq.QualityEncoding{seq.Illumina1p5}
-							}
-
-							if !quiet {
-								log.Infof("possible quality encodings: %v", encodingsGuessed)
-							}
-							switch len(encodingsGuessed) {
-							case 0:
-								checkError(fmt.Errorf("quality encoding not consistent"))
-							case 1:
-								fromEncoding = encodingsGuessed[0]
-								if !quiet {
-									log.Infof("guessed quality encoding: %s", fromEncoding)
-								}
-							default:
-								same := true
-								isSolexa := encodingsGuessed[0].IsSolexa()
-								offset := encodingsGuessed[0].Offset()
-								for i := 1; i < len(encodingsGuessed); i++ {
-									if encodingsGuessed[i].IsSolexa() != isSolexa ||
-										encodingsGuessed[i].Offset() != offset {
-										same = false
-										break
-									}
-									isSolexa = encodingsGuessed[i].IsSolexa()
-									offset = encodingsGuessed[i].Offset()
-								}
-								if same {
-									fromEncoding = encodingsGuessed[len(encodingsGuessed)-1]
-									if fromEncoding == seq.Illumina1p8 {
-										fromEncoding = seq.Sanger
-									}
-									if !quiet {
-										log.Infof("guessed quality encoding: %s", fromEncoding)
-									}
-								} else {
-									checkError(fmt.Errorf("fail to guess the source quality encoding, please specify it"))
-								}
-							}
-
-							if !quiet {
-								log.Infof("converting %s -> %s", fromEncoding, toEncoding)
-							}
-
-							if once && encodingsMatch(fromEncoding, toEncoding, force) {
-								once = false
-								// if force {
-								// 	log.Warningf("source and target quality encoding match.")
-								// } else {
-								// 	log.Warningf("source and target quality encoding match. aborted.")
-								// 	break
-								// }
-								log.Warningf("source and target quality encoding match.")
-							}
-
-							if dryRun {
-								break
-							}
-							for _, record = range records {
-								if record == nil {
-									break
-								}
-								record.Seq.Qual, err = seq.QualityConvert(fromEncoding, toEncoding, record.Seq.Qual, force)
-								checkError(err)
-								record.FormatToWriter(outfh, config.LineWidth)
-							}
+						if guessing && len(records) > 0 {
+							finishGuessing()
 						}
 						break
 					}
 					checkError(err)
-					break
-				}
-				if checkAlphabet {
-					if fastxReader.IsFastq {
-						if !config.LineWidthChanged {
-							config.LineWidth = 0
-						}
-						fastx.ForcelyOutputFastq = true
-					} else {
+					if !fastxReader.IsFastq {
 						checkError(fmt.Errorf("this command only works for FASTQ format"))
 					}
-					checkAlphabet = false
-				}
-
-				if guessing {
-					if n < nrecords {
-						records[n] = record.Clone()
-						encodings = seq.GuessQualityEncoding(record.Seq.Qual)
-						for _, encoding = range encodings {
-							encodingsMark[encoding]++
+					if guessing {
+						records = append(records, record.Clone())
+						for _, encoding := range seq.GuessQualityEncoding(record.Seq.Qual) {
+							marks[encoding]++
 						}
-					} else if n == nrecords {
-						for e, n2 := range encodingsMark {
-							if n2 == n {
-								encodingsGuessed = append(encodingsGuessed, seq.QualityEncoding(e))
+						if len(records) == nrecords {
+							finishGuessing()
+							if dryRun {
+								break
 							}
 						}
-
-						if float64(encodingsMark[seq.Illumina1p5]/len(records)) > threshIllumina1p5Frac {
-							encodingsGuessed = []seq.QualityEncoding{seq.Illumina1p5}
-						}
-
-						if !quiet {
-							log.Infof("possible quality encodings: %v", encodingsGuessed)
-						}
-						switch len(encodingsGuessed) {
-						case 0:
-							checkError(fmt.Errorf("quality encoding not consistent"))
-						case 1:
-							fromEncoding = encodingsGuessed[0]
-							if !quiet {
-								log.Infof("guessed quality encoding: %s", fromEncoding)
-							}
-						default:
-							same := true
-							isSolexa := encodingsGuessed[0].IsSolexa()
-							offset := encodingsGuessed[0].Offset()
-							for i := 1; i < len(encodingsGuessed); i++ {
-								if encodingsGuessed[i].IsSolexa() != isSolexa ||
-									encodingsGuessed[i].Offset() != offset {
-									same = false
-									break
-								}
-								isSolexa = encodingsGuessed[i].IsSolexa()
-								offset = encodingsGuessed[i].Offset()
-							}
-							if same {
-								// choose the latest encoding
-								fromEncoding = encodingsGuessed[len(encodingsGuessed)-1]
-								if fromEncoding == seq.Illumina1p8 {
-									fromEncoding = seq.Sanger
-								}
-								if !quiet {
-									log.Infof("guessed quality encoding: %s", fromEncoding)
-								}
-							} else {
-								checkError(fmt.Errorf("fail to guess the source quality encoding, please specify it"))
-							}
-						}
-
-						if !quiet {
-							log.Infof("converting %s -> %s", fromEncoding, toEncoding)
-						}
-
-						if once && encodingsMatch(fromEncoding, toEncoding, force) {
-							once = false
-							// if force {
-							// 	log.Warningf("source and target quality encoding match.")
-							// } else {
-							// 	log.Warningf("source and target quality encoding match. aborted.")
-							// 	break
-							// }
-							log.Warningf("source and target quality encoding match.")
-						}
-
-						if dryRun {
-							break
-						}
-						records[n] = record.Clone()
-						for _, record = range records {
-							record.Seq.Qual, err = seq.QualityConvert(fromEncoding, toEncoding, record.Seq.Qual, force)
-							checkError(err)
-							record.FormatToWriter(outfh, config.LineWidth)
-						}
-						guessing = false
+						continue
 					}
-					n++
-					continue
+					if dryRun {
+						break
+					}
+					record.Seq.Qual, err = seq.QualityConvert(fromEncoding, toEncoding, record.Seq.Qual, force)
+					checkError(err)
+					record.FormatToWriter(outfh, lineWidth)
 				}
-
-				if once && encodingsMatch(fromEncoding, toEncoding, force) {
-					once = false
-					// if force {
-					// 	log.Warningf("source and target quality encoding match.")
-					// } else {
-					// 	log.Warningf("source and target quality encoding match. aborted.")
-					// 	break
-					// }
-					log.Warningf("source and target quality encoding match.")
-				}
-
-				if dryRun {
-					break
-				}
-
-				record.Seq.Qual, err = seq.QualityConvert(fromEncoding, toEncoding, record.Seq.Qual, force)
-				checkError(err)
-				record.FormatToWriter(outfh, config.LineWidth)
-			}
-			fastxReader.Close()
+			}()
 		}
 	},
+}
+
+// guessQualityEncoding intersects sample candidates and resolves equivalent encodings.
+func guessQualityEncoding(marks []int, n int, illuminaFraction float64) (seq.QualityEncoding, error) {
+	candidates := make([]seq.QualityEncoding, 0, seq.NQualityEncoding)
+	for e, count := range marks {
+		if count == n {
+			candidates = append(candidates, seq.QualityEncoding(e))
+		}
+	}
+	if float64(marks[seq.Illumina1p5])/float64(n) > illuminaFraction {
+		candidates = []seq.QualityEncoding{seq.Illumina1p5}
+	}
+	if len(candidates) == 0 {
+		return seq.Unknown, fmt.Errorf("quality encoding not consistent")
+	}
+	first := candidates[0]
+	for _, e := range candidates[1:] {
+		if e.IsSolexa() != first.IsSolexa() || e.Offset() != first.Offset() {
+			return seq.Unknown, fmt.Errorf("fail to guess the source quality encoding, please specify it")
+		}
+	}
+	encoding := candidates[len(candidates)-1]
+	if encoding == seq.Illumina1p8 {
+		encoding = seq.Sanger
+	}
+	return encoding, nil
 }
 
 var qualityEncodingCode string

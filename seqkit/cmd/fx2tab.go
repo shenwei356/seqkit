@@ -94,7 +94,7 @@ Attention:
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		if printTitle {
 			if onlyName {

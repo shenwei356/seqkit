@@ -109,8 +109,7 @@ var scatCmd = &cobra.Command{
 		dirs := getFileList(args, true)
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Flush()
-		defer outfh.Close()
+		defer closeOutput(outfh)
 		ctrlChan := make(WatchCtrlChan, 0)
 		ndirs := []string{}
 		for _, d := range dirs {
@@ -207,6 +206,7 @@ MAIN:
 			continue MAIN
 		default:
 			activeCount = 0
+			worked := false // Keep the fast path responsive, but wait after an entirely idle pass.
 		CHAN:
 			for j, sc := range allSeqChans {
 				if allInCtrlChans[j] == nil || allOutCtrlChans[j] == nil {
@@ -216,6 +216,7 @@ MAIN:
 				for {
 					select {
 					case rawSeq := <-sc:
+						worked = true
 						if rawSeq == nil {
 							log.Fatal("Trying to print nil sequence!")
 						}
@@ -236,6 +237,7 @@ MAIN:
 					default:
 						select {
 						case fb := <-allOutCtrlChans[j]:
+							worked = true
 							if fb != WatchCtrl(-9) {
 								log.Fatal("Invalid exit feedback:", fb)
 							}
@@ -246,7 +248,6 @@ MAIN:
 							activeCount--
 							continue CHAN
 						default:
-							outw.Flush()
 							continue CHAN
 						}
 					}
@@ -255,6 +256,9 @@ MAIN:
 			if activeCount == 0 {
 				outw.Flush()
 				break MAIN
+			}
+			if !worked {
+				time.Sleep(time.Millisecond)
 			}
 		} // select 2
 	} //for evers

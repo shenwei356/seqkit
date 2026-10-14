@@ -173,7 +173,7 @@ GC-skew histograms, but are still written in pass-through mode.`,
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		var checkSeqType bool
 		var isFastq bool
@@ -288,7 +288,6 @@ GC-skew histograms, but are still written in pass-through mode.`,
 			}
 		}
 
-		outfh.Close()
 	},
 }
 

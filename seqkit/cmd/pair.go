@@ -99,11 +99,31 @@ Tips:
 			outdir = filepath.Dir(read1)
 		}
 
-		var addSuffix bool
+		inputDir, err := resolvedPath(filepath.Dir(read1))
+		checkError(err)
+		outputDir, err := resolvedPath(outdir)
+		checkError(err)
+		addSuffix := inputDir == outputDir
+		base1, suffix1 := filepathTrimExtension(filepath.Base(read1))
+		base2, suffix2 := filepathTrimExtension(filepath.Base(read2))
+		outFile1 := filepath.Join(outdir, filepath.Base(read1))
+		outFile2 := filepath.Join(outdir, filepath.Base(read2))
+		if addSuffix {
+			outFile1 = filepath.Join(outdir, base1+".paired"+suffix1)
+			outFile2 = filepath.Join(outdir, base2+".paired"+suffix2)
+		}
+		outFile1U := filepath.Join(outdir, base1+".unpaired"+suffix1)
+		outFile2U := filepath.Join(outdir, base2+".unpaired"+suffix2)
+		outputs := []string{outFile1, outFile2}
+		if saveUnpaired {
+			outputs = append(outputs, outFile1U, outFile2U)
+		}
+		checkOutputFiles([]string{read1, read2}, outputs)
+		if force && !addSuffix {
+			checkOutputDir([]string{read1, read2}, outdir)
+		}
 
-		if filepath.Clean(filepath.Dir(read1)) == filepath.Clean(outdir) {
-			addSuffix = true
-		} else if outdir != "./" && outdir != "." {
+		if !addSuffix && !isWorkingDir(outdir) {
 			existed, err := pathutil.DirExists(outdir)
 			checkError(err)
 			if existed {
@@ -126,7 +146,6 @@ Tips:
 		var record1, record2 *fastx.Record
 
 		// readers
-		var err error
 		reader1, err = fastx.NewReader(alphabet, read1, idRegexp)
 		checkError(errors.Wrap(err, read1))
 		defer reader1.Close()
@@ -135,28 +154,14 @@ Tips:
 		defer reader2.Close()
 
 		// out file 1
-		var outFile1, base1, suffix1 string
-		if addSuffix {
-			base1, suffix1 = filepathTrimExtension(filepath.Base(read1))
-			outFile1 = filepath.Join(outdir, base1+".paired"+suffix1)
-		} else {
-			outFile1 = filepath.Join(outdir, filepath.Base(read1))
-		}
 		outfh1, err := xopen.Wopen(outFile1)
 		checkError(errors.Wrap(err, outFile1))
-		defer outfh1.Close()
+		defer closeOutput(outfh1)
 
 		// out file 2
-		var outFile2, base2, suffix2 string
-		if addSuffix {
-			base2, suffix2 = filepathTrimExtension(filepath.Base(read2))
-			outFile2 = filepath.Join(outdir, base2+".paired"+suffix2)
-		} else {
-			outFile2 = filepath.Join(outdir, filepath.Base(read2))
-		}
 		outfh2, err := xopen.Wopen(outFile2)
 		checkError(errors.Wrap(err, outFile2))
-		defer outfh2.Close()
+		defer closeOutput(outfh2)
 
 		// load first records
 		record1, err = reader1.Read()
@@ -278,15 +283,8 @@ Tips:
 			}
 		}
 
-		var outFile1U, outFile2U string
 		var outfh1U, outfh2U *xopen.Writer
 		var n1U, n2U uint64
-		if saveUnpaired {
-			if !addSuffix {
-				base1, suffix1 = filepathTrimExtension(filepath.Base(read1))
-				base2, suffix2 = filepathTrimExtension(filepath.Base(read2))
-			}
-		}
 
 		// left reads
 		if len(m1) > 0 && len(m2) > 0 {
@@ -306,7 +304,7 @@ Tips:
 						outFile1U = filepath.Join(outdir, base1+".unpaired"+suffix1)
 						outfh1U, err = xopen.Wopen(outFile1U)
 						checkError(errors.Wrap(err, outFile1U))
-						defer outfh1U.Close()
+						defer closeOutput(outfh1U)
 					}
 					r1.FormatToWriter(outfh1U, lineWidth)
 					n1U++
@@ -318,7 +316,7 @@ Tips:
 						outFile2U = filepath.Join(outdir, base2+".unpaired"+suffix2)
 						outfh2U, err = xopen.Wopen(outFile2U)
 						checkError(errors.Wrap(err, outFile2U))
-						defer outfh2U.Close()
+						defer closeOutput(outfh2U)
 					}
 
 					r2.FormatToWriter(outfh2U, lineWidth)
@@ -332,7 +330,7 @@ Tips:
 						outFile1U = filepath.Join(outdir, base1+".unpaired"+suffix1)
 						outfh1U, err = xopen.Wopen(outFile1U)
 						checkError(errors.Wrap(err, outFile1U))
-						defer outfh1U.Close()
+						defer closeOutput(outfh1U)
 					}
 
 					r1.FormatToWriter(outfh1U, lineWidth)
@@ -345,7 +343,7 @@ Tips:
 					outFile2U = filepath.Join(outdir, base2+".unpaired"+suffix2)
 					outfh2U, err = xopen.Wopen(outFile2U)
 					checkError(errors.Wrap(err, outFile2U))
-					defer outfh2U.Close()
+					defer closeOutput(outfh2U)
 				}
 
 				r2.FormatToWriter(outfh2U, lineWidth)

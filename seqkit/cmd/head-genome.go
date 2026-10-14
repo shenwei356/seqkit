@@ -79,7 +79,7 @@ Attention:
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		var record *fastx.Record
 		var prefixes, words []string

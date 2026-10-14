@@ -643,6 +643,8 @@ Usage
 ``` text
 extract subsequences in sliding windows
 
+Circular windows must not exceed the sequence length.
+
 Usage:
   seqkit sliding [flags] 
 

@@ -62,7 +62,7 @@ var fq2faCmd = &cobra.Command{
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		var record *fastx.Record
 		for _, file := range files {

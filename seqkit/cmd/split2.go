@@ -223,6 +223,35 @@ If you want to cut a sequence into multiple segments.
 			}
 		}
 
+		if outdir == "" {
+			if isStdin(files[0]) {
+				outdir = "stdin.split"
+			} else {
+				outdir = files[0] + ".split"
+			}
+		}
+		if force {
+			checkOutputDir(files, outdir)
+		}
+		if !isWorkingDir(outdir) {
+			existed, err := pathutil.DirExists(outdir)
+			checkError(err)
+			if existed {
+				empty, err := pathutil.IsEmpty(outdir)
+				checkError(err)
+				if !empty {
+					if force {
+						checkError(os.RemoveAll(outdir))
+						checkError(os.MkdirAll(outdir, 0755))
+					} else {
+						log.Warningf("outdir not empty: %s, you can use --force to overwrite", outdir)
+					}
+				}
+			} else {
+				checkError(os.MkdirAll(outdir, 0755))
+			}
+		}
+
 		var wg sync.WaitGroup
 		for i, file := range files {
 			isstdin := isStdin(file)
@@ -247,26 +276,6 @@ If you want to cut a sequence into multiple segments.
 
 			if outFile != "-" {
 				fileName = filepath.Base(outFile)
-			}
-
-			pwd, _ := os.Getwd()
-			if outdir != "./" && outdir != "." && pwd != filepath.Clean(outdir) {
-				existed, err := pathutil.DirExists(outdir)
-				checkError(err)
-				if existed {
-					empty, err := pathutil.IsEmpty(outdir)
-					checkError(err)
-					if !empty {
-						if force {
-							checkError(os.RemoveAll(outdir))
-							checkError(os.MkdirAll(outdir, 0755))
-						} else {
-							log.Warningf("outdir not empty: %s, you can use --force to overwrite", outdir)
-						}
-					}
-				} else {
-					checkError(os.MkdirAll(outdir, 0755))
-				}
 			}
 
 			wg.Add(1)
@@ -299,6 +308,22 @@ If you want to cut a sequence into multiple segments.
 
 				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
+				lineWidth := config.LineWidth // Each worker owns its format settings.
+				isFastq := false
+				writeRecord := func(out *xopen.Writer) {
+					if !isFastq || len(record.Seq.Qual) > 0 {
+						record.FormatToWriter(out, lineWidth)
+						return
+					}
+					out.Write(_mark_fastq)
+					out.Write(record.Name)
+					out.Write(_mark_newline)
+					out.Write(record.Seq.Seq)
+					out.Write(_mark_newline)
+					out.Write(_mark_plus_newline)
+					out.Write(record.Seq.Qual)
+					out.Write(_mark_newline)
+				}
 				i := 0 // nth part
 				j := 0
 				var n int64 // length sum
@@ -315,10 +340,10 @@ If you want to cut a sequence into multiple segments.
 
 					if once {
 						if fastxReader.IsFastq {
+							isFastq = true
 							if !config.LineWidthChanged {
-								config.LineWidth = 0
+								lineWidth = 0
 							}
-							fastx.ForcelyOutputFastq = true
 						}
 
 						if renameFileExt && isstdin {
@@ -336,7 +361,7 @@ If you want to cut a sequence into multiple segments.
 
 					if bySize {
 						if j == size {
-							outfhPre.Close()
+							closeOutput(outfhPre)
 							if !quiet {
 								log.Infof("write %d sequences to file: %s\n", j, outfilePre)
 							}
@@ -390,10 +415,10 @@ If you want to cut a sequence into multiple segments.
 						}
 
 						if n >= length {
-							record.FormatToWriter(outfhPre, config.LineWidth)
+							writeRecord(outfhPre)
 							j++
 
-							outfhPre.Close()
+							closeOutput(outfhPre)
 							if !quiet {
 								log.Infof("write %d sequences to file: %s\n", j, outfilePre)
 							}
@@ -450,12 +475,12 @@ If you want to cut a sequence into multiple segments.
 							j = 0
 						}
 
-						record.FormatToWriter(outfhPre, config.LineWidth)
+						writeRecord(outfhPre)
 
 						j++ // increase size
 					} else if byLength {
 						if flag {
-							record.FormatToWriter(outfhPre, config.LineWidth)
+							writeRecord(outfhPre)
 
 							j++
 						}
@@ -485,7 +510,7 @@ If you want to cut a sequence into multiple segments.
 							outfiles = append(outfiles, outfile)
 						}
 
-						record.FormatToWriter(outfhs[i], config.LineWidth)
+						writeRecord(outfhs[i])
 						counts[i]++
 
 						i++
@@ -498,7 +523,7 @@ If you want to cut a sequence into multiple segments.
 
 				if byParts {
 					for i, outfh := range outfhs {
-						outfh.Close()
+						closeOutput(outfh)
 
 						if !quiet {
 							if counts[i] == 0 {
@@ -510,7 +535,7 @@ If you want to cut a sequence into multiple segments.
 					}
 				} else {
 					if outfhPre != nil {
-						outfhPre.Close()
+						closeOutput(outfhPre)
 					}
 
 					if j == 0 {

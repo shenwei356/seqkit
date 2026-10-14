@@ -27,7 +27,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
-	"strconv"
 	"strings"
 
 	"github.com/cespare/xxhash/v2"
@@ -125,6 +124,7 @@ Filtering records to edit:
 		}
 		patternRegexp, err := regexp.Compile(p)
 		checkError(err)
+		qualityParts := parseQualityReplacement(replacement)
 
 		if kvFile != "" {
 			if len(replacement) == 0 {
@@ -219,7 +219,7 @@ Filtering records to edit:
 		usingDefaultIDRegexp := config.IDRegexp == fastx.DefaultIDRegexp
 
 		patternsR := make(map[uint64]*regexp.Regexp, 1<<10)
-		patternsN := make(map[uint64]interface{}, 1<<20)
+		patternsN := make(map[uint64]struct{}) // Allocate buckets only for active exact filters.
 		// patternsS := make(map[string]interface{}, 1<<10)
 		patternsS := make([][]byte, 0, 16)
 
@@ -341,7 +341,7 @@ Filtering records to edit:
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		var r []byte
 		var founds [][][]byte
@@ -500,28 +500,18 @@ Filtering records to edit:
 								// Expand the replacement with capture groups
 								expanded := patternRegexp.Expand(nil, replacement, origSeq, match)
 
-								// For quality scores: figure out which original positions contribute
-								// For capture group replacements like $1, we need to map back to original positions
-								// Check which capture groups are actually used in the replacement
-								usedGroups := findUsedCaptureGroups(replacement)
-
-								if len(usedGroups) > 0 {
-									// Build quality from the used capture groups
-									for _, groupIdx := range usedGroups {
-										if groupIdx*2+1 < len(match) {
-											groupStart := match[groupIdx*2]
-											groupEnd := match[groupIdx*2+1]
-											if groupStart >= 0 && groupEnd >= 0 && groupEnd <= len(origQual) {
-												newQual = append(newQual, origQual[groupStart:groupEnd]...)
-											}
+								// Expand qualities in the same order; literals retain positional qualities.
+								qualityStart := len(newQual)
+								for _, part := range qualityParts {
+									if part.Capture {
+										newQual = patternRegexp.Expand(newQual, part.Text, origQual, match)
+									} else {
+										start := matchStart + len(newQual) - qualityStart
+										end := start + len(part.Text)
+										if end > len(origQual) {
+											checkError(fmt.Errorf("length-increasing replacement is not supported for FASTQ files"))
 										}
-									}
-								} else {
-									// No capture groups used, or literal replacement
-									// Keep quality from start of match for the replaced length
-									replacedLen := len(expanded)
-									if matchStart+replacedLen <= len(origQual) {
-										newQual = append(newQual, origQual[matchStart:matchStart+replacedLen]...)
+										newQual = append(newQual, origQual[start:end]...)
 									}
 								}
 
@@ -663,33 +653,33 @@ var reFBN = regexp.MustCompile(`\{(FBN|fbn)\}`)
 var reFBNE = regexp.MustCompile(`\{(FBNE|fbne)\}`)
 var reUUID = regexp.MustCompile(`\{(UUID|uuid)\}`)
 
-// findUsedCaptureGroups parses the replacement string to find which capture groups are referenced
-// Returns a list of capture group indices (e.g., [1, 2] for $1 and $2)
-func findUsedCaptureGroups(replacement []byte) []int {
-	groups := make([]int, 0)
-	seen := make(map[int]bool)
+// qualityReplacementPart is either an expansion reference or decoded literal text.
+type qualityReplacementPart struct {
+	Text    []byte // Capture template, or literal bytes whose positions retain input qualities.
+	Capture bool   // Resolve references using the same regexp.Expand as the sequence.
+}
 
-	// Match $1, $2, ${1}, ${2}, etc.
-	reCaptureGroup := regexp.MustCompile(`\$(\d+)|\$\{(\d+)\}`)
-	matches := reCaptureGroup.FindAllSubmatch(replacement, -1)
+// replacementReferences follows Go's maximal named/numeric reference syntax.
+var replacementReferences = regexp.MustCompile(`\$\$|\$(?:\{[\pL\p{Nd}_]+\}|[\pL\p{Nd}_]+)`)
 
-	for _, match := range matches {
-		var groupStr string
-		if len(match[1]) > 0 {
-			groupStr = string(match[1])
-		} else if len(match[2]) > 0 {
-			groupStr = string(match[2])
+// parseQualityReplacement tokenizes a replacement once, preserving reference order.
+func parseQualityReplacement(replacement []byte) []qualityReplacementPart {
+	parts := make([]qualityReplacementPart, 0, 4)
+	last := 0
+	for _, match := range replacementReferences.FindAllIndex(replacement, -1) {
+		if match[0] > last {
+			parts = append(parts, qualityReplacementPart{Text: replacement[last:match[0]]})
 		}
-
-		if groupStr != "" {
-			if groupIdx, err := strconv.Atoi(groupStr); err == nil {
-				if !seen[groupIdx] {
-					groups = append(groups, groupIdx)
-					seen[groupIdx] = true
-				}
-			}
+		token := replacement[match[0]:match[1]]
+		if bytes.Equal(token, []byte("$$")) {
+			parts = append(parts, qualityReplacementPart{Text: []byte("$")})
+		} else {
+			parts = append(parts, qualityReplacementPart{Text: token, Capture: true})
 		}
+		last = match[1]
 	}
-
-	return groups
+	if last < len(replacement) {
+		parts = append(parts, qualityReplacementPart{Text: replacement[last:]})
+	}
+	return parts
 }

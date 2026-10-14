@@ -62,7 +62,7 @@ You may need "seqkit rename" to make the the sequence IDs unique.
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		var record *fastx.Record
 		var i int

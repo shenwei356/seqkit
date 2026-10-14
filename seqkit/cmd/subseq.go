@@ -130,7 +130,7 @@ Examples:
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		idRe, err := regexp.Compile(idRegexp)
 		if err != nil {

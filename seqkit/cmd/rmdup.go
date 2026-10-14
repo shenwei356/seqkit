@@ -94,15 +94,23 @@ Attention:
 				}
 			}
 		}
+		outputs := []string{outFile}
+		if saveDupFile {
+			outputs = append(outputs, dupFile)
+		}
+		if saveNumFile {
+			outputs = append(outputs, numFile)
+		}
+		checkOutputFiles(nil, outputs)
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		var outfhDup *xopen.Writer
 		if saveDupFile {
 			outfhDup, err = xopen.Wopen(dupFile)
 			checkError(err)
-			defer outfhDup.Close()
+			defer closeOutput(outfhDup)
 		}
 
 		counter := make(map[uint64]int)
@@ -205,7 +213,7 @@ Attention:
 		if saveNumFile {
 			outfhNum, err = xopen.Wopen(numFile)
 			checkError(err)
-			defer outfhNum.Close()
+			defer closeOutput(outfhNum)
 		}
 		if removed > 0 {
 			list := new(listOfStringSlice)

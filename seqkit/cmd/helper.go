@@ -140,7 +140,12 @@ func isTheSameFile(path1, path2 string) (bool, error) {
 		}
 	}
 	if notfound {
-		return path1 == path2, nil
+		path1, err = resolvedPath(path1)
+		if err != nil {
+			return false, err
+		}
+		path2, err = resolvedPath(path2)
+		return path1 == path2, err
 	}
 	return os.SameFile(info1, info2), nil
 }
@@ -411,20 +416,24 @@ func fileNotExists(file string) bool {
 	return os.IsNotExist(err)
 }
 
-func copySeqs(file, newFile string) (int, error) {
+func copySeqs(file, newFile string) (n int, err error) {
 	outfh, err := xopen.Wopen(newFile)
 	if err != nil {
 		return 0, err
 	}
-	defer outfh.Close()
+	defer func() {
+		if closeErr := outfh.Close(); err == nil {
+			err = closeErr
+		}
+	}()
 
 	lineWidth := 60
 	fastxReader, err := fastx.NewDefaultReader(file)
 	if err != nil {
 		return 0, err
 	}
+	defer fastxReader.Close()
 	var record *fastx.Record
-	var n int
 	for {
 		record, err = fastxReader.Read()
 		if err != nil {
@@ -459,6 +468,9 @@ func getFaidx(file string, idRegexp string, quiet bool) *fai.Faidx {
 		}
 		idx, err = fai.Read(fileFai)
 		checkError(err)
+	}
+	if idRegexp == `^(.+)$` {
+		checkError(validateFASTAIndex(file, idx))
 	}
 	faidx, err := fai.NewWithIndex(file, idx)
 	checkError(err)
@@ -554,7 +566,7 @@ func writeSeqs(records []*fastx.Record, file string, lineWidth int, quiet bool, 
 
 	outfh, err := xopen.Wopen(file)
 	checkError(err)
-	defer outfh.Close()
+	defer closeOutput(outfh)
 
 	for _, record := range records {
 		record.FormatToWriter(outfh, lineWidth)

@@ -120,13 +120,13 @@ Output (BED3 format):
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		var line, p string
 		var isCommentLine bool
 		var scanner *bufio.Scanner
 		var fh *xopen.Reader
-		buf := make([]byte, bufferSize)
+		buf := make([]byte, min(bufferSize, 64<<10)) // Grow only when a long line needs it.
 		var founds [][]string
 		var ref, ref0 string
 		var begin, end, begin0, end0, begin1, end1 int
@@ -134,6 +134,9 @@ Output (BED3 format):
 
 		for _, file := range files {
 			fh, err = xopen.Ropen(file)
+			if err == xopen.ErrNoContent {
+				continue
+			}
 			checkError(err)
 
 			scanner = bufio.NewScanner(fh)
@@ -195,8 +198,13 @@ Output (BED3 format):
 				begin1, end1 = begin, end // last record
 			}
 
-			// print the last region
-			fmt.Fprintf(outfh, "%s\t%d\t%d\n", ref0, begin0-1, end0)
+			scanErr := scanner.Err()
+			closeErr := fh.Close()
+			checkError(scanErr)
+			checkError(closeErr)
+			if begin0 > 0 {
+				fmt.Fprintf(outfh, "%s\t%d\t%d\n", ref0, begin0-1, end0)
+			}
 		}
 	},
 }

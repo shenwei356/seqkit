@@ -102,17 +102,15 @@ Attention:
 			checkError(fmt.Errorf("flag -U (--update-faidx) must be used with flag -2 (--two-pass)"))
 		}
 
-		index2name := make(map[int]string)
 		var record *fastx.Record
 		var err error
 
 		if !twoPass { // read all records into memory
-			sequences := make(map[string]*fastx.Record)
+			sequences := make([]*fastx.Record, 0, 1024)
 
 			if !quiet {
 				log.Infof("read sequences ...")
 			}
-			i := 0
 			for _, file := range files {
 				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
@@ -136,9 +134,7 @@ Attention:
 						checkAlphabet = false
 					}
 
-					sequences[string(record.Name)] = record.Clone()
-					index2name[i] = string(record.Name)
-					i++
+					sequences = append(sequences, record.Clone())
 				}
 				fastxReader.Close()
 			}
@@ -147,13 +143,8 @@ Attention:
 				log.Infof("%d sequences loaded", len(sequences))
 				log.Infof("shuffle ...")
 			}
-			indices := make([]int, len(index2name))
-			for i := 0; i < len(index2name); i++ {
-				indices[i] = i
-			}
-
-			r.Shuffle(len(indices), func(i, j int) {
-				indices[i], indices[j] = indices[j], indices[i]
+			r.Shuffle(len(sequences), func(i, j int) {
+				sequences[i], sequences[j] = sequences[j], sequences[i]
 			})
 
 			if !quiet {
@@ -162,11 +153,9 @@ Attention:
 
 			outfh, err := xopen.Wopen(outFile)
 			checkError(err)
-			defer outfh.Close()
+			defer closeOutput(outfh)
 
-			var record *fastx.Record
-			for _, i := range indices {
-				record = sequences[index2name[i]]
+			for _, record := range sequences {
 				record.FormatToWriter(outfh, config.LineWidth)
 			}
 			return
@@ -181,18 +170,16 @@ Attention:
 
 		newFile := file
 		if isStdin(file) || !isPlainFile(file) {
-			if isStdin(file) {
-				newFile = filepath.Join(tmpDir, "stdin") + ".fastx"
-			} else {
-				newFile = filepath.Join(tmpDir, filepath.Base(file)) + ".fastx"
+			var nseqs int
+			newFile, nseqs, err = copySeqsToTemp(file, tmpDir)
+			checkError(err)
+			if !keepTemp {
+				defer cleanupTempSeqs(newFile)
 			}
 			if !quiet {
 				log.Infof("read and write sequences to temporary file: %s ...", newFile)
 			}
 
-			var nseqs int
-			nseqs, err = copySeqs(file, newFile)
-			checkError(err)
 			if !quiet {
 				log.Infof("%d sequences saved", nseqs)
 			}
@@ -233,20 +220,12 @@ Attention:
 
 		ids, _, err := getSeqIDAndLengthFromFaidxFile(newFile + ".seqkit.fai")
 		checkError(err)
-		for i, id := range ids {
-			index2name[i] = id
-		}
 
 		if !quiet {
 			log.Infof("shuffle ...")
 		}
-		indices := make([]int, len(index2name))
-		for i := 0; i < len(index2name); i++ {
-			indices[i] = i
-		}
-
-		r.Shuffle(len(indices), func(i, j int) {
-			indices[i], indices[j] = indices[j], indices[i]
+		r.Shuffle(len(ids), func(i, j int) {
+			ids[i], ids[j] = ids[j], ids[i]
 		})
 
 		if !quiet {
@@ -254,11 +233,9 @@ Attention:
 		}
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
-		var chr string
-		for _, i := range indices {
-			chr = index2name[i]
+		for _, chr := range ids {
 			r, ok := faidx.Index[chr]
 			if !ok {
 				checkError(fmt.Errorf(`sequence (%s) not found in file: %s`, chr, newFile))
@@ -268,14 +245,9 @@ Attention:
 			sequence := subseqByFaixNotCleaned(faidx, chr, r, 1, -1)
 			outfh.Write([]byte(fmt.Sprintf(">%s\n", chr)))
 			outfh.Write(sequence)
-			if len(sequence) > 0 && sequence[len(sequence)-1] != '\n' {
+			if len(sequence) == 0 || sequence[len(sequence)-1] != '\n' {
 				outfh.WriteString("\n")
 			}
-		}
-
-		if (isStdin(file) || !isPlainFile(file)) && !keepTemp {
-			checkError(os.Remove(newFile))
-			checkError(os.Remove(newFile + ".seqkit.fai"))
 		}
 
 	},

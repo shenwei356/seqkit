@@ -245,7 +245,7 @@ Attention:
 			}
 			outfh, err := xopen.Wopen(outFile)
 			checkError(err)
-			defer outfh.Close()
+			defer closeOutput(outfh)
 
 			if byName || byID || bySeq {
 				for _, kv := range name2sequence {
@@ -273,18 +273,16 @@ Attention:
 
 		newFile := file
 		if isStdin(file) || !isPlainFile(file) {
-			if isStdin(file) {
-				newFile = "stdin" + ".fastx"
-			} else {
-				newFile = file + ".fastx"
+			var nseqs int
+			newFile, nseqs, err = copySeqsToTemp(file, tempSeqDir(file))
+			checkError(err)
+			if !keepTemp {
+				defer cleanupTempSeqs(newFile)
 			}
 			if !quiet {
 				log.Infof("read and write sequences to temporary file: %s ...", newFile)
 			}
 
-			var nseqs int
-			nseqs, err = copySeqs(file, newFile)
-			checkError(err)
 			if !quiet {
 				log.Infof("%d sequences saved", nseqs)
 			}
@@ -427,7 +425,7 @@ Attention:
 		}
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		// var record *fastx.Record
 		var chr string
@@ -465,10 +463,6 @@ Attention:
 			}
 		}
 
-		if (isStdin(file) || !isPlainFile(file)) && !keepTemp {
-			checkError(os.Remove(newFile))
-			checkError(os.Remove(newFile + ".seqkit.fai"))
-		}
 	},
 }
 

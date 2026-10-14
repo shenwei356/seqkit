@@ -99,7 +99,7 @@ Examples:
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		var n int
 		var bufSize int
@@ -181,6 +181,9 @@ Examples:
 			fastxReader.Close()
 
 			if rangeNN {
+				if buf.Size < -end {
+					continue
+				}
 				current0 := buf.Current
 				buf.Backward(-end - 1)
 				tail := buf.Current

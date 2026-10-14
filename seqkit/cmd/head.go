@@ -85,7 +85,7 @@ For returning the last N records, use:
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		var record *fastx.Record
 		i := 0

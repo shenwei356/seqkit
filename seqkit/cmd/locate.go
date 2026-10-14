@@ -252,7 +252,7 @@ Attention:
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Close()
+		defer closeOutput(outfh)
 
 		if !(outFmtGTF || outFmtBED) {
 			if hideMatched {
@@ -800,6 +800,13 @@ Attention:
 							}
 							loc = []int{i, i + lpatten}
 						}
+						if loc[0] == loc[1] { // Empty hits have no valid sequence coordinates.
+							offset += loc[1] + 1
+							if offset >= len(record.Seq.Seq) {
+								break
+							}
+							continue
+						}
 						begin = offset + loc[0] + 1
 
 						if circular && begin > l { // 2nd clone of original part
@@ -896,6 +903,13 @@ Attention:
 							loc = []int{i, i + lpatten}
 						}
 
+						if loc[0] == loc[1] {
+							offset += loc[1] + 1
+							if offset >= len(seqRP.Seq) {
+								break
+							}
+							continue
+						}
 						if circular && offset+loc[0]+1 > l { // 2nd clone of original part
 							break
 						}
