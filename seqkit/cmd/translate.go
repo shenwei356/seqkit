@@ -231,7 +231,9 @@ Translate Tables/Genetic Codes:
 												record.ID, frame, _end, _start, record.Desc))
 										}
 									} else {
-										outfh.WriteString(">" + string(record.Name) + "\n")
+										outfh.WriteString(">")
+										outfh.Write(record.Name)
+										outfh.WriteByte('\n')
 									}
 									outfh.Write(byteutil.WrapByteSlice(_seq.Seq[start:i], config.LineWidth))
 									outfh.WriteString("\n")
@@ -257,7 +259,9 @@ Translate Tables/Genetic Codes:
 										record.ID, frame, _end, _start, record.Desc))
 								}
 							} else {
-								outfh.WriteString(">" + string(record.Name) + "\n")
+								outfh.WriteString(">")
+								outfh.Write(record.Name)
+								outfh.WriteByte('\n')
 							}
 							outfh.Write(byteutil.WrapByteSlice(_seq.Seq[start:], config.LineWidth))
 							outfh.WriteString("\n")
@@ -269,7 +273,9 @@ Translate Tables/Genetic Codes:
 					if appendFrame {
 						outfh.WriteString(fmt.Sprintf(">%s_frame=%d %s\n", record.ID, frame, record.Desc))
 					} else {
-						outfh.WriteString(">" + string(record.Name) + "\n")
+						outfh.WriteString(">")
+						outfh.Write(record.Name)
+						outfh.WriteByte('\n')
 					}
 					outfh.Write(byteutil.WrapByteSlice(_seq.Seq, config.LineWidth))
 					outfh.WriteString("\n")

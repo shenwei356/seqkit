@@ -546,7 +546,7 @@ Filtering records to edit:
 					r = replacement
 
 					if replaceWithNR {
-						r = reNR.ReplaceAll(r, []byte(fmt.Sprintf(nrFormat, nr)))
+						r = reNR.ReplaceAll(r, fmt.Appendf(nil, nrFormat, nr))
 					}
 
 					if replaceWithUUID {

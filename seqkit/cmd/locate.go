@@ -191,7 +191,7 @@ Attention:
 						re, err := regexp.Compile(s)
 						checkError(err)
 						regexps[name] = re
-					} else if bytes.Index(record.Seq.Seq, []byte(".")) >= 0 ||
+					} else if bytes.Contains(record.Seq.Seq, []byte(".")) ||
 						!(seq.DNAredundant.IsValid(record.Seq.Seq) == nil ||
 							seq.RNAredundant.IsValid(record.Seq.Seq) == nil ||
 							seq.Protein.IsValid(record.Seq.Seq) == nil) {
@@ -203,7 +203,7 @@ Attention:
 			for _, p := range pattern {
 				patterns[p] = []byte(p)
 
-				if !quiet && bytes.IndexAny(patterns[p], " \t") >= 0 {
+				if !quiet && bytes.Contains(patterns[p], []byte(" \t")) {
 					log.Warningf("space found in sequence: '%s'", p)
 				}
 
@@ -240,7 +240,7 @@ Attention:
 						re, err := regexp.Compile(s)
 						checkError(err)
 						regexps[p] = re
-					} else if bytes.Index(patterns[p], []byte(".")) >= 0 ||
+					} else if bytes.Contains(patterns[p], []byte(".")) ||
 						!(seq.DNAredundant.IsValid(patterns[p]) == nil ||
 							seq.RNAredundant.IsValid(patterns[p]) == nil ||
 							seq.Protein.IsValid(patterns[p]) == nil) {

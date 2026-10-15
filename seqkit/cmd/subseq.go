@@ -85,11 +85,6 @@ Examples:
 		}
 
 		chrs := getFlagStringSlice(cmd, "chr")
-		chrs2 := make([]string, len(chrs))
-		for i, chr := range chrs {
-			chrs2[i] = chr
-		}
-		chrs = chrs2
 		chrsMap := make(map[string]struct{}, len(chrs))
 		for _, chr := range chrs {
 			chrsMap[chr] = struct{}{}
@@ -101,11 +96,6 @@ Examples:
 		bedFile := getFlagString(cmd, "bed")
 		gtfTag := getFlagString(cmd, "gtf-tag")
 		choosedFeatures := getFlagStringSlice(cmd, "feature")
-		choosedFeatures2 := make([]string, len(choosedFeatures))
-		for i, f := range choosedFeatures {
-			choosedFeatures2[i] = f
-		}
-		choosedFeatures = choosedFeatures2
 
 		upStream := getFlagNonNegativeInt(cmd, "up-stream")
 		downStream := getFlagNonNegativeInt(cmd, "down-stream")
@@ -413,7 +403,7 @@ type type2gtfFeatures map[string][]gtf.Feature
 func subseqByRegion(outfh *xopen.Writer, record *fastx.Record, lineWidth int, start, end int, appendRegionCoord bool) {
 	record.Seq = record.Seq.SubSeq(start, end)
 	if appendRegionCoord {
-		record.Name = []byte(fmt.Sprintf("%s:%d-%d %s", record.ID, start, end, record.Desc))
+		record.Name = fmt.Appendf(nil, "%s:%d-%d %s", record.ID, start, end, record.Desc)
 	}
 	record.FormatToWriter(outfh, lineWidth)
 }

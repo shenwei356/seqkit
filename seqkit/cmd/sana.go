@@ -114,7 +114,8 @@ Sana currently supports this FASTQ dialect:
 				switch rawSeq.Err {
 				case nil:
 					pass++
-					outfh.WriteString(rawSeq.Format(outFmt) + "\n")
+					outfh.WriteString(rawSeq.Format(outFmt))
+					outfh.WriteByte('\n')
 				default:
 					fail++
 					if !quiet {
@@ -338,7 +339,6 @@ func FqLinesToSimpleSeq(lines FqLines, qBase int, gaps bool) (*simpleSeq, error)
 	} else {
 		return nil, errors.New("Invalid line states!")
 	}
-	return nil, nil
 }
 
 // FasLinesToSimpleSeq attempts to construct a valid sequence record from a buffer of parsed lines.
@@ -461,7 +461,6 @@ func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 		}
 
 	}
-	return sbuff[:0], nil
 }
 
 // streamFastq reads records from a potentially incomplete fasta file.
@@ -556,7 +555,6 @@ func streamFasta(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSe
 		}
 
 	}
-	return sbuff, nil
 }
 
 // NewRawSeqStream initializes a new channel for reading fastq records in a robust way.

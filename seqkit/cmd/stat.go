@@ -221,7 +221,8 @@ Tips:
 					colnames = append(colnames, "N"+x)
 				}
 			}
-			outfh.WriteString(strings.Join(colnames, "\t") + "\n")
+			outfh.WriteString(strings.Join(colnames, "\t"))
+			outfh.WriteByte('\n')
 		}
 
 		ch := make(chan statInfo, config.Threads)

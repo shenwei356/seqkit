@@ -44,6 +44,18 @@ import (
 	"github.com/twotwotwo/sorts/sortutil"
 )
 
+// appendAmpliconMismatchName formats the original name into reusable record storage.
+func appendAmpliconMismatchName(dst, original []byte, total, forward, reverse int) []byte {
+	dst = append(dst[:0], original...)
+	dst = append(dst, " mismatches="...)
+	dst = strconv.AppendInt(dst, int64(total), 10)
+	dst = append(dst, '(')
+	dst = strconv.AppendInt(dst, int64(forward), 10)
+	dst = append(dst, '+')
+	dst = strconv.AppendInt(dst, int64(reverse), 10)
+	return append(dst, ')')
+}
+
 // ampliconCmd represents the amplicon command
 var ampliconCmd = &cobra.Command{
 	GroupID: "search",
@@ -339,7 +351,7 @@ Examples:
 
 						results := make([]string, 0, 2)
 						var s []byte
-						name0 := string(record.Name)
+						name0 := record.Name
 
 						for _, strand = range strands {
 							if strand == "-" {
@@ -402,7 +414,7 @@ Examples:
 
 								record.Seq = record.Seq.SubSeq(loc[0], loc[1])
 								if outputMismatches {
-									record.Name = []byte(fmt.Sprintf("%s mismatches=%d(%d+%d)", name0, mis[0]+mis[1], mis[0], mis[1]))
+									record.Name = appendAmpliconMismatchName(record.Name, name0, mis[0]+mis[1], mis[0], mis[1])
 								}
 								results = append(results, string(record.Format(config.LineWidth)))
 
@@ -450,7 +462,7 @@ Examples:
 		var tmpSeq *seq.Seq
 		var primer [3][]byte
 		var matched bool
-		var name0 string
+		var name0 []byte
 		var start1, end1 int
 
 		for _, file := range files {
@@ -474,7 +486,7 @@ Examples:
 				}
 
 				matched = false
-				name0 = string(record.Name)
+				name0 = record.Name
 
 				for _, strand = range strands {
 					if strand == "-" {
@@ -540,7 +552,7 @@ Examples:
 
 						record.Seq = record.Seq.SubSeq(loc[0], loc[1])
 						if outputMismatches {
-							record.Name = []byte(fmt.Sprintf("%s mismatches=%d(%d+%d)", name0, 0, 0, 0))
+							record.Name = appendAmpliconMismatchName(record.Name, name0, 0, 0, 0)
 						}
 						record.FormatToWriter(outfh, config.LineWidth)
 

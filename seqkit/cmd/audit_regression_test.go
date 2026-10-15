@@ -336,6 +336,53 @@ func TestScatSequenceQueueBoundsPendingRecordsAcrossDirectories(t *testing.T) {
 	}
 }
 
+// TestAppendAmpliconMismatchName preserves names while reusing its byte buffer.
+func TestAppendAmpliconMismatchName(t *testing.T) {
+	name := []byte("read/1")
+	got := appendAmpliconMismatchName(name, name, 3, 1, 2)
+	if string(got) != "read/1 mismatches=3(1+2)" {
+		t.Fatalf("formatted name = %q", got)
+	}
+	got = appendAmpliconMismatchName(got, name, 0, 0, 0)
+	if string(got) != "read/1 mismatches=0(0+0)" {
+		t.Fatalf("reused formatted name = %q", got)
+	}
+}
+
+// TestAmpliconMismatchAnnotation preserves CLI mismatch labels in both search paths.
+func TestAmpliconMismatchAnnotation(t *testing.T) {
+	tests := []struct {
+		name, sequence, mismatches string
+		maxMismatch                string
+	}{
+		{"exact", "acgcccactgaaatga", "mismatches=0(0+0)", "0"},
+		{"primer mismatches", "acgcacactgaaatga", "mismatches=2(1+1)", "1"},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			input := ">seq\n" + test.sequence + "\n"
+			out, stderr, err := runCLI(t, input, "amplicon", "-F", "ccc", "-R", "ttt", "-P", "-M", "-m", test.maxMismatch)
+			if err != nil || !strings.Contains(out, test.mismatches) {
+				t.Fatalf("output=%q, err=%v, stderr=%s", out, err, stderr)
+			}
+		})
+	}
+}
+
+// TestTranslateOutputHeaders preserves FASTA headers in whole and split outputs.
+func TestTranslateOutputHeaders(t *testing.T) {
+	input := ">r desc\nATGTAAATG\n"
+	out, stderr, err := runCLI(t, input, "translate", "-f", "1")
+	if err != nil || out != ">r desc\nM*M\n" {
+		t.Fatalf("whole translation = %q, err=%v, stderr=%s", out, err, stderr)
+	}
+	out, stderr, err = runCLI(t, input, "translate", "-f", "1", "-s")
+	want := ">r_frame=1_begin=1_end=3 desc\nM\n>r_frame=1_begin=7_end=9 desc\nM\n"
+	if err != nil || out != want {
+		t.Fatalf("split translation = %q, want %q, err=%v, stderr=%s", out, want, err, stderr)
+	}
+}
+
 // TestAuditRenameGeneratedIDs checks both orders of original/generated collisions.
 func TestAuditRenameGeneratedIDs(t *testing.T) {
 	for _, input := range []string{">a\nAC\n>a\nGT\n>a_2\nTT\n", ">a_2\nTT\n>a\nAC\n>a\nGT\n"} {

@@ -264,7 +264,6 @@ func (p *SeqColorizer) Color(seq []byte) []byte {
 	default:
 		return seq
 	}
-	return seq
 }
 
 // ColorAmino adds ANSI colors to DNA/RNA or protein sequences, use quality palette as background.
@@ -275,7 +274,6 @@ func (p *SeqColorizer) ColorWithQuals(seq []byte, quals []byte) []byte {
 	default:
 		return seq
 	}
-	return seq
 }
 
 // ColorAmino adds grayscale colors to DNA/RNA or protein sequences.

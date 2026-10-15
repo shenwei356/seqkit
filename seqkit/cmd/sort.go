@@ -439,7 +439,7 @@ Attention:
 				}
 
 				sequence := subseqByFaixNotCleaned(faidx, chr, r, 1, -1)
-				outfh.Write([]byte(fmt.Sprintf(">%s\n", chr)))
+				outfh.Write(fmt.Appendf(nil, ">%s\n", chr))
 				outfh.Write(sequence)
 				if len(sequence) == 0 || sequence[len(sequence)-1] != '\n' {
 					outfh.WriteString("\n")
@@ -455,7 +455,7 @@ Attention:
 				}
 
 				sequence := subseqByFaixNotCleaned(faidx, chr, r, 1, -1)
-				outfh.Write([]byte(fmt.Sprintf(">%s\n", chr)))
+				outfh.Write(fmt.Appendf(nil, ">%s\n", chr))
 				outfh.Write(sequence)
 				if len(sequence) == 0 || sequence[len(sequence)-1] != '\n' {
 					outfh.WriteString("\n")

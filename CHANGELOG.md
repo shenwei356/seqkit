@@ -1,53 +1,15 @@
-- [SeqKit v2.15.0](https://github.com/shenwei356/seqkit/releases/tag/v2.15.0) - 2026-10-15
-[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.15.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.15.0)
-    - `seqkit faidx`, `seqkit mutate`, `seqkit merge-slides`:
-        - Report integer coordinate overflow instead of silently treating an invalid coordinate as zero.
-    - `seqkit scat`:
-        - Bound pending sequence records with a shared queue across watched directories.
-    - `seqkit sana`:
-        - Remove a redundant flush after closing the output writer.
-    - `seqkit faidx`, `seqkit sort/shuffle/split --two-pass`, `seqkit bam`:
-        - Fixed an error when creating an index for an empty plain FASTA file (introduced in v2.14.0). Empty input now produces an index with 0 records. [#597](https://github.com/shenwei356/seqkit/issues/597)
-    - `seqkit rmdup`:
-        - Reject `-d/--dup-seqs-file` and `-D/--dup-num-file` paths that refer to an input file. [#601](https://github.com/shenwei356/seqkit/issues/601)
-        - Reject collisions between the kept-record, duplicate-record, and count output files.
-    - `seqkit sort`:
-        - Reject mixed FASTA and FASTQ inputs. [#603](https://github.com/shenwei356/seqkit/issues/603)
-        - Preserve records with IDs or full names that differ only in case when using `--ignore-case`. [#602](https://github.com/shenwei356/seqkit/issues/602)
-        - Apply `--seq-prefix-length` and case-insensitive sequence sorting in both modes; retain input order for equal prefixes. [#605](https://github.com/shenwei356/seqkit/issues/605), [#606](https://github.com/shenwei356/seqkit/issues/606)
-        - Fix sequence lookup failures with `-2 -s` and missing empty-sequence lines in two-pass output. [#604](https://github.com/shenwei356/seqkit/issues/604), [#606](https://github.com/shenwei356/seqkit/issues/606)
-    - `seqkit seq/fx2tab/stats`:
-        - Report invalid quality scores instead of panicking; `fx2tab` no longer writes partial rows for these errors. [#598](https://github.com/shenwei356/seqkit/issues/598)
-    - `seqkit stats`:
-        - Exit with a non-zero status on read errors and retain all valid results in input order; `--skip-err` still exits successfully. [#599](https://github.com/shenwei356/seqkit/issues/599)
-    - `seqkit subseq`:
-        - Read the last GTF attribute with or without a trailing semicolon, and skip attributes without values. [#600](https://github.com/shenwei356/seqkit/issues/600)
-    - `seqkit sort/shuffle/split --two-pass`:
-        - Use unique temporary files and reject duplicate full headers, including when reusing an index.
-    - `seqkit translate/rename/pair`:
-        - Check output paths before opening files or clearing output directories; reject conflicting generated output names.
-    - `seqkit shuffle`:
-        - Preserve records with duplicate headers and reduce in-memory indexing overhead without changing seeded permutations.
-    - `seqkit rename`:
-        - Avoid collisions between generated IDs/names and previously emitted records.
-    - `seqkit convert`:
-        - Fix missing records at the quality-guessing threshold and repeated records across input files.
-    - `seqkit replace`:
-        - Preserve FASTQ quality positions for named and repeated capture references; parse replacement references once.
-    - `seqkit sum`:
-        - Fix multi-file data races and validate circular sequence length after removing gaps.
-    - `seqkit locate`:
-        - Skip zero-length regular-expression matches instead of looping or emitting invalid coordinates.
-    - `seqkit sliding`:
-        - Reject circular windows longer than the sequence instead of reading past sequence data.
-    - `seqkit split/split2`:
-        - Fix shared output state in region/paired-end workers; initialize paired output directories only once.
-    - `seqkit range`:
-        - Return no records when a negative range ends before the first input record.
-    - `seqkit merge-slides/tab2fx`:
-        - Close input readers and grow scanner buffers on demand; `merge-slides` now reports scan errors and emits no intervals for empty input.
-    - `seqkit scat`:
-        - Reduce CPU use while waiting for input without delaying active output loops.
+- [SeqKit v2.14.1](https://github.com/shenwei356/seqkit/releases/tag/v2.14.1) - 2026-10-15
+[![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.14.1/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.14.1)
+    - `seqkit sort`: Fixed sorting and output issues involving mixed formats, case-insensitive comparisons, sequence prefixes, and empty sequences. [#602](https://github.com/shenwei356/seqkit/issues/602), [#603](https://github.com/shenwei356/seqkit/issues/603), [#604](https://github.com/shenwei356/seqkit/issues/604), [#605](https://github.com/shenwei356/seqkit/issues/605), [#606](https://github.com/shenwei356/seqkit/issues/606)
+    - `seqkit faidx`, `sort`, `shuffle`, `split`, and `bam`: Fixed index creation for empty FASTA files. [#597](https://github.com/shenwei356/seqkit/issues/597)
+    - `seqkit seq`, `fx2tab`, and `stats`: Report invalid quality scores without panicking or emitting partial output. [#598](https://github.com/shenwei356/seqkit/issues/598)
+    - `seqkit stats`: Report read errors correctly while retaining valid results; `--skip-err` continues processing. [#599](https://github.com/shenwei356/seqkit/issues/599)
+    - `seqkit subseq`: Handle GTF attributes with or without a trailing semicolon. [#600](https://github.com/shenwei356/seqkit/issues/600)
+    - `seqkit replace`, `convert`, `sum`, `locate`, `sliding`, `range`, `merge-slides`, `split`, and `split2`: Fixed record handling, validation, and concurrency issues.
+    - `seqkit sort`, `shuffle`, and `split`: Improved two-pass processing and duplicate-header handling.
+    - `seqkit rename`, `translate`, and `pair`: Prevent conflicting output paths and generated names.
+    - `seqkit scat`: Reduced idle CPU use and bounded pending records.
+    - `seqkit sana`: Fixed output flushing.
 - [SeqKit v2.14.0](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0) - 2026-09-24
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.14.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0)
     - `seqkit`:

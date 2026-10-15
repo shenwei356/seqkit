@@ -123,7 +123,7 @@ var scatCmd = &cobra.Command{
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer closeOutput(outfh)
-		ctrlChan := make(WatchCtrlChan, 0)
+		ctrlChan := make(WatchCtrlChan)
 		ndirs := []string{}
 		for _, d := range dirs {
 			if d != "-" {
@@ -146,7 +146,7 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 	allOutCtrlChans := make([]WatchCtrlChan, len(dirs))
 	for i, dir := range dirs {
 		allInCtrlChans[i] = make(WatchCtrlChan, 1000)
-		allOutCtrlChans[i] = make(WatchCtrlChan, 0)
+		allOutCtrlChans[i] = make(WatchCtrlChan)
 		go NewFxWatcher(dir, allSeqChans[i], allInCtrlChans[i], allOutCtrlChans[i], re, inFmt, outFmt, qBase, allowGaps, delta, dropString, findOnly)
 	}
 	sigChan := make(chan os.Signal, 1)
@@ -235,11 +235,12 @@ MAIN:
 						switch rawSeq.Err {
 						case nil:
 							pass++
-							outw.Write([]byte(rawSeq.Format(outFmt) + "\n"))
+							outw.WriteString(rawSeq.Format(outFmt))
+							outw.WriteByte('\n')
 							outw.Flush()
 						default:
 							fail++
-							os.Stderr.WriteString("From file: " + rawSeq.File + "\t" + rawSeq.String() + "\n")
+							fmt.Fprintf(os.Stderr, "From file: %s\t%s\n", rawSeq.File, rawSeq.String())
 						}
 						if timeout != "" {
 							ticker.Stop()
@@ -381,7 +382,6 @@ func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watche
 			}
 			return nil
 		}
-		return nil
 	}
 
 	go func() {

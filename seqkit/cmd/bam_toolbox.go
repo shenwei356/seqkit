@@ -609,7 +609,6 @@ func GetSamDump(field string, r *sam.Record) string {
 		return "<!INVALID_FIELD!>"
 
 	}
-	return ""
 }
 
 func GetSamMapped(r *sam.Record) bool {

@@ -146,10 +146,10 @@ Circular windows must not exceed the sequence length.
 
 					if len(qual) > 0 {
 						r, _ = fastx.NewRecordWithQualWithoutValidation(record.Seq.Alphabet,
-							[]byte{}, []byte(fmt.Sprintf("%s%s:%d-%d", record.ID, suffix, i+1, e)), []byte{}, s, q)
+							[]byte{}, fmt.Appendf(nil, "%s%s:%d-%d", record.ID, suffix, i+1, e), []byte{}, s, q)
 					} else {
 						r, _ = fastx.NewRecordWithoutValidation(record.Seq.Alphabet,
-							[]byte{}, []byte(fmt.Sprintf("%s%s:%d-%d", record.ID, suffix, i+1, e)), []byte{}, s)
+							[]byte{}, fmt.Appendf(nil, "%s%s:%d-%d", record.ID, suffix, i+1, e), []byte{}, s)
 					}
 					r.FormatToWriter(outfh, config.LineWidth)
 				}

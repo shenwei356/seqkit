@@ -506,9 +506,9 @@ Note:
 
 					if !(loc[0] == 1 && loc[1] == -1) {
 						if len(record.Desc) > 0 {
-							record.Name = []byte(fmt.Sprintf("%s:%d-%d %s", record.ID, loc[0], loc[1], record.Desc))
+							record.Name = fmt.Appendf(nil, "%s:%d-%d %s", record.ID, loc[0], loc[1], record.Desc)
 						} else {
-							record.Name = []byte(fmt.Sprintf("%s:%d-%d", record.ID, loc[0], loc[1]))
+							record.Name = fmt.Appendf(nil, "%s:%d-%d", record.ID, loc[0], loc[1])
 						}
 					}
 
