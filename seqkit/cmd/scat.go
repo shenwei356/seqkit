@@ -41,6 +41,19 @@ type WatchCtrl int
 
 type WatchCtrlChan chan WatchCtrl
 
+// watchSequenceQueueSize bounds pending records across all watched directories.
+const watchSequenceQueueSize = 128
+
+// newWatchSequenceChannels gives every directory access to one shared queue.
+func newWatchSequenceChannels(n int) []chan *simpleSeq {
+	queue := make(chan *simpleSeq, watchSequenceQueueSize)
+	channels := make([]chan *simpleSeq, n)
+	for i := range channels {
+		channels[i] = queue
+	}
+	return channels
+}
+
 // scatCmd represents the fish command
 var scatCmd = &cobra.Command{
 	GroupID: "basic",
@@ -128,11 +141,10 @@ var scatCmd = &cobra.Command{
 
 // LaunchFxWatchers launches fastx watcher goroutines on multiple input directories.
 func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, timeout string, dropString string, waitPid int, findOnly bool, outw *xopen.Writer) {
-	allSeqChans := make([]chan *simpleSeq, len(dirs))
+	allSeqChans := newWatchSequenceChannels(len(dirs))
 	allInCtrlChans := make([]WatchCtrlChan, len(dirs))
 	allOutCtrlChans := make([]WatchCtrlChan, len(dirs))
 	for i, dir := range dirs {
-		allSeqChans[i] = make(chan *simpleSeq, 10000)
 		allInCtrlChans[i] = make(WatchCtrlChan, 1000)
 		allOutCtrlChans[i] = make(WatchCtrlChan, 0)
 		go NewFxWatcher(dir, allSeqChans[i], allInCtrlChans[i], allOutCtrlChans[i], re, inFmt, outFmt, qBase, allowGaps, delta, dropString, findOnly)

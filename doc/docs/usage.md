@@ -1257,7 +1257,7 @@ Examples
 
         seqkit scat -j 4 -p $PID fastq_dir > all_records.fq
 
-**Notes**: You might need to increase the `ulimit` allowance on open files if you intend to stream fastx records from a large number of files.
+**Notes**: You might need to increase the `ulimit` allowance on open files if you intend to stream fastx records from a large number of files. Pending records from all watched directories share a bounded queue.
 
 ## fq2fa
 

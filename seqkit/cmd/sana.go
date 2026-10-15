@@ -96,7 +96,6 @@ Sana currently supports this FASTQ dialect:
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
-		defer outfh.Flush()
 		defer closeOutput(outfh)
 
 		for _, file := range files {

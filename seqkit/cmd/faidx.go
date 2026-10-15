@@ -212,7 +212,8 @@ Examples:
 		if !useRegexp {
 			var begin, end int
 			for _, query := range queries {
-				id, begin, end = parseRegion(query)
+				id, begin, end, err = parseRegion(query)
+				checkError(err)
 
 				if ignoreCase {
 					id = strings.ToLower(id)
@@ -340,31 +341,46 @@ var reRegionOneBase = regexp.MustCompile(`^(.+?):(\d+)$`)
 var reRegionOnlyBegin = regexp.MustCompile(`^(.+?):(\-?\d+)\-$`)
 var reRegionOnlyEnd = regexp.MustCompile(`^(.+?):\-(\-?\d+)$`)
 
-func parseRegion(region string) (id string, begin int, end int) {
+func parseRegion(region string) (id string, begin int, end int, err error) {
 	var found []string
 	if reRegionFull.MatchString(region) {
 		found = reRegionFull.FindStringSubmatch(region)
 		id = found[1]
-		begin, _ = strconv.Atoi(found[2])
-		end, _ = strconv.Atoi(found[3])
+		begin, err = strconv.Atoi(found[2])
+		if err != nil {
+			return id, 0, 0, fmt.Errorf("invalid region start coordinate %q: %w", found[2], err)
+		}
+		end, err = strconv.Atoi(found[3])
+		if err != nil {
+			return id, 0, 0, fmt.Errorf("invalid region end coordinate %q: %w", found[3], err)
+		}
 	} else if reRegionOneBase.MatchString(region) {
 		found = reRegionOneBase.FindStringSubmatch(region)
 		id = found[1]
-		begin, _ = strconv.Atoi(found[2])
+		begin, err = strconv.Atoi(found[2])
+		if err != nil {
+			return id, 0, 0, fmt.Errorf("invalid region coordinate %q: %w", found[2], err)
+		}
 		end = begin
 	} else if reRegionOnlyBegin.MatchString(region) {
 		found = reRegionOnlyBegin.FindStringSubmatch(region)
 		id = found[1]
-		begin, _ = strconv.Atoi(found[2])
+		begin, err = strconv.Atoi(found[2])
+		if err != nil {
+			return id, 0, 0, fmt.Errorf("invalid region start coordinate %q: %w", found[2], err)
+		}
 		end = -1
 	} else if reRegionOnlyEnd.MatchString(region) {
 		found = reRegionOnlyEnd.FindStringSubmatch(region)
 		id = found[1]
 		begin = 1
-		end, _ = strconv.Atoi(found[2])
+		end, err = strconv.Atoi(found[2])
+		if err != nil {
+			return id, 0, 0, fmt.Errorf("invalid region end coordinate %q: %w", found[2], err)
+		}
 	} else {
 		id = region
 		begin, end = 1, -1
 	}
-	return
+	return id, begin, end, nil
 }

@@ -283,6 +283,57 @@ func TestAuditMergeSlidesErrors(t *testing.T) {
 	if err == nil || !strings.Contains(stderr, "token too long") {
 		t.Fatalf("scanner failure lost: %v %s", err, stderr)
 	}
+	for _, coordinates := range []string{"999999999999999999999999-10", "1-999999999999999999999999"} {
+		_, stderr, err = runCLI(t, "ref_sliding:"+coordinates+"\n", "merge-slides", "-b", "1K")
+		if err == nil || !strings.Contains(stderr, "invalid") {
+			t.Fatalf("coordinate overflow accepted (%s): %v %s", coordinates, err, stderr)
+		}
+	}
+}
+
+// TestAuditCoordinateOverflows rejects coordinates that do not fit in int.
+func TestAuditCoordinateOverflows(t *testing.T) {
+	const tooLarge = "999999999999999999999999"
+	input := filepath.Join(t.TempDir(), "input.fa")
+	if err := os.WriteFile(input, []byte(">chr1\nACGT\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	var stderr string
+	var err error
+	for _, region := range []string{"chr1:" + tooLarge, "chr1:1-" + tooLarge, "chr1:" + tooLarge + "-"} {
+		_, stderr, err = runCLI(t, "", "faidx", input, region)
+		if err == nil || !strings.Contains(stderr, "invalid region") {
+			t.Fatalf("faidx coordinate overflow accepted (%s): %v %s", region, err, stderr)
+		}
+	}
+	for _, test := range []struct{ flag, value string }{
+		{"-p", tooLarge + ":A"},
+		{"-d", tooLarge + ":1"},
+		{"-d", "1:" + tooLarge},
+		{"-i", tooLarge + ":A"},
+	} {
+		args := []string{"mutate", test.flag, test.value}
+		_, stderr, err = runCLI(t, ">a\nACGT\n", args...)
+		if err == nil || !strings.Contains(stderr, "invalid") {
+			t.Fatalf("mutate %s coordinate overflow accepted: %v %s", test.flag, err, stderr)
+		}
+	}
+}
+
+// TestScatSequenceQueueBoundsPendingRecordsAcrossDirectories.
+func TestScatSequenceQueueBoundsPendingRecordsAcrossDirectories(t *testing.T) {
+	channels := newWatchSequenceChannels(10)
+	if len(channels) != 10 {
+		t.Fatalf("got %d channels, want 10", len(channels))
+	}
+	for _, channel := range channels {
+		if channel != channels[0] {
+			t.Fatal("watched directories do not share the bounded sequence queue")
+		}
+	}
+	if got := cap(channels[0]); got != watchSequenceQueueSize {
+		t.Fatalf("queue capacity = %d, want %d", got, watchSequenceQueueSize)
+	}
 }
 
 // TestAuditRenameGeneratedIDs checks both orders of original/generated collisions.
@@ -313,7 +364,7 @@ func TestAuditOutputErrors(t *testing.T) {
 	if _, err := os.Stat("/dev/full"); err != nil {
 		t.Skip("/dev/full is unavailable on this platform")
 	}
-	for _, command := range []string{"fx2tab", "rename", "sort", "shuffle", "rmdup", "fq2fa", "translate"} {
+	for _, command := range []string{"fx2tab", "rename", "sort", "shuffle", "rmdup", "fq2fa", "translate", "sana"} {
 		t.Run(command, func(t *testing.T) {
 			input := "@r\nATGGCC\n+\nIIIIII\n"
 			_, stderr, err := runCLI(t, input, command, "--quiet", "-o", "/dev/full")

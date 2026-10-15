@@ -1,7 +1,11 @@
-- [SeqKit v2.15.0](https://github.com/shenwei356/seqkit/releases/tag/v2.15.0) - 2026-10-xx
+- [SeqKit v2.15.0](https://github.com/shenwei356/seqkit/releases/tag/v2.15.0) - 2026-10-15
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.15.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.15.0)
-    - FASTA/Q output:
-        - Report buffered write and compression-finalization errors instead of exiting successfully.
+    - `seqkit faidx`, `seqkit mutate`, `seqkit merge-slides`:
+        - Report integer coordinate overflow instead of silently treating an invalid coordinate as zero.
+    - `seqkit scat`:
+        - Bound pending sequence records with a shared queue across watched directories.
+    - `seqkit sana`:
+        - Remove a redundant flush after closing the output writer.
     - `seqkit faidx`, `seqkit sort/shuffle/split --two-pass`, `seqkit bam`:
         - Fixed an error when creating an index for an empty plain FASTA file (introduced in v2.14.0). Empty input now produces an index with 0 records. [#597](https://github.com/shenwei356/seqkit/issues/597)
     - `seqkit rmdup`:
@@ -30,8 +34,6 @@
         - Fix missing records at the quality-guessing threshold and repeated records across input files.
     - `seqkit replace`:
         - Preserve FASTQ quality positions for named and repeated capture references; parse replacement references once.
-    - `seqkit seq/replace`:
-        - Avoid large filter-map allocations when no exact-name filter is used.
     - `seqkit sum`:
         - Fix multi-file data races and validate circular sequence length after removing gaps.
     - `seqkit locate`:

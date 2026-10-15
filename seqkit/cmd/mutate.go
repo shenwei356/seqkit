@@ -85,7 +85,10 @@ Examples:
 				checkError(fmt.Errorf("invalid value of flag -p/--point : %s", val))
 			}
 			items := strings.Split(val, ":")
-			pos, _ := strconv.Atoi(items[0])
+			pos, err := strconv.Atoi(items[0])
+			if err != nil {
+				checkError(fmt.Errorf("invalid point position %q: %w", items[0], err))
+			}
 			if pos == 0 {
 				checkError(fmt.Errorf("position should be non-zero integer"))
 			}
@@ -105,8 +108,14 @@ Examples:
 				checkError(fmt.Errorf("invalid value of flag -id/--deletion : %s", valDel))
 			}
 			items := strings.Split(valDel, ":")
-			start, _ := strconv.Atoi(items[0])
-			end, _ := strconv.Atoi(items[1])
+			start, err := strconv.Atoi(items[0])
+			if err != nil {
+				checkError(fmt.Errorf("invalid deletion start position %q: %w", items[0], err))
+			}
+			end, err := strconv.Atoi(items[1])
+			if err != nil {
+				checkError(fmt.Errorf("invalid deletion end position %q: %w", items[1], err))
+			}
 
 			if start == 0 || end == 0 {
 				checkError(fmt.Errorf("both start and end should not be 0"))
@@ -124,7 +133,10 @@ Examples:
 				checkError(fmt.Errorf("invalid value of flag -i/--insertion : %s", valIns))
 			}
 			items := strings.Split(valIns, ":")
-			pos, _ := strconv.Atoi(items[0])
+			pos, err := strconv.Atoi(items[0])
+			if err != nil {
+				checkError(fmt.Errorf("invalid insertion position %q: %w", items[0], err))
+			}
 
 			mIns = &_mutateIns{pos: pos, seq: []byte(items[1])}
 		}

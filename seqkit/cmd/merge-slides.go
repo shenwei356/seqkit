@@ -166,8 +166,14 @@ Output (BED3 format):
 					checkError(fmt.Errorf("no reference and location found in the input  line"))
 				}
 				ref = founds[0][1]
-				begin, _ = strconv.Atoi(founds[0][2])
-				end, _ = strconv.Atoi(founds[0][3])
+				begin, err = strconv.Atoi(founds[0][2])
+				if err != nil {
+					checkError(fmt.Errorf("invalid start coordinate %q: %w", founds[0][2], err))
+				}
+				end, err = strconv.Atoi(founds[0][3])
+				if err != nil {
+					checkError(fmt.Errorf("invalid end coordinate %q: %w", founds[0][3], err))
+				}
 
 				// ------------------------------------------
 				if begin0 > 0 { // not the first record
