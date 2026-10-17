@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/shenwei356/bio/util"
+	"github.com/shenwei356/go-logging"
 )
 
 func TestL50FromLengths(t *testing.T) {
@@ -46,6 +47,11 @@ func TestCLIProcess(t *testing.T) {
 	if os.Getenv("SEQKIT_CLI_TEST_HELPER") != "1" {
 		return
 	}
+	// Match main's log levels so CLI tests distinguish errors from warnings.
+	logging.SetBackend(logging.NewBackendFormatter(
+		logging.NewLogBackend(os.Stderr, "", 0),
+		logging.MustStringFormatter(`[%{level:.4s}] %{message}`),
+	))
 	for i, arg := range os.Args {
 		if arg == "--" {
 			RootCmd.SetArgs(os.Args[i+1:])

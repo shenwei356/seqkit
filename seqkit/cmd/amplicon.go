@@ -328,13 +328,17 @@ Examples:
 						if !config.LineWidthChanged {
 							config.LineWidth = 0
 						}
-						fastx.ForcelyOutputFastq = true
+						if !fastx.ForcelyOutputFastq {
+							// Finish earlier FASTA records before changing shared output state.
+							wg.Wait()
+							fastx.ForcelyOutputFastq = true
+						}
 					}
 
 					tokens <- 1
 					wg.Add(1)
 					id++
-					go func(record *fastx.Record, id uint64) {
+					go func(record *fastx.Record, id uint64, width int) {
 						defer func() {
 							wg.Done()
 							<-tokens
@@ -348,6 +352,7 @@ Examples:
 						var tmpSeq *seq.Seq
 						var primer [3][]byte
 						var start1, end1 int
+						var err error // Each worker owns its search error independently of input reads.
 
 						results := make([]string, 0, 2)
 						var s []byte
@@ -416,7 +421,7 @@ Examples:
 								if outputMismatches {
 									record.Name = appendAmpliconMismatchName(record.Name, name0, mis[0]+mis[1], mis[0], mis[1])
 								}
-								results = append(results, string(record.Format(config.LineWidth)))
+								results = append(results, string(record.Format(width)))
 
 								record.Seq = tmpSeq
 
@@ -428,17 +433,17 @@ Examples:
 							ch <- &Arecord{record: results, id: id, ok: true}
 						} else if saveUnmatched {
 							if onlyPositiveStrand {
-								results = append(results, string(record.Format(config.LineWidth)))
+								results = append(results, string(record.Format(width)))
 							} else {
 								record.Seq.RevComInplace()
-								results = append(results, string(record.Format(config.LineWidth)))
+								results = append(results, string(record.Format(width)))
 							}
 							ch <- &Arecord{record: results, id: id, ok: true}
 						} else {
 							ch <- &Arecord{record: results, id: id, ok: false}
 						}
 
-					}(record.Clone(), id)
+					}(record.Clone(), id, config.LineWidth) // Capture width before it changes for another file.
 				}
 				fastxReader.Close()
 

@@ -43,6 +43,12 @@ Notes:
 ### Input and output files
 
 Seqkit accepts input data from standard input (STDIN) and plain or gzip-compressed files.
+Read and decompression errors are reported with a non-zero exit status, except
+when explicitly skipping errors with `stats --skip-err`. Commands such as `head`
+stop after collecting the requested records and do not validate unread data.
+To check an entire compressed FASTA/Q input, use `seqkit stats input.fa.gz`
+without `--skip-err` and check its exit status.
+
 Files can be given via positional arguments or the flag `--infile-list`. For example:
 
     seqkit seq   a.fasta b.fasta

@@ -4,6 +4,8 @@ go 1.25.14
 
 // replace github.com/shenwei356/bio => /home/shenwei/go/src/github.com/shenwei356/bio/
 
+// replace github.com/shenwei356/xopen => /home/shenwei/go/src/github.com/shenwei356/xopen/
+
 require (
 	github.com/biogo/biogo v1.0.4
 	github.com/biogo/hts v1.4.5
@@ -16,13 +18,13 @@ require (
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/google/uuid v1.6.0
 	github.com/iafan/cwalk v0.0.0-20210125030640-586a8832a711
-	github.com/klauspost/compress v1.19.2
-	github.com/klauspost/pgzip v1.2.6
+	github.com/klauspost/compress v1.20.3
+	github.com/klauspost/pgzip v1.2.7
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mattn/go-colorable v0.1.15
 	github.com/mattn/go-isatty v0.0.24
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/pierrec/lz4/v4 v4.1.29
+	github.com/pierrec/lz4/v4 v4.1.33
 	github.com/pkg/errors v0.9.1
 	github.com/shenwei356/bio v0.15.4
 	github.com/shenwei356/breader v0.3.2
@@ -31,11 +33,11 @@ require (
 	github.com/shenwei356/natsort v0.0.0-20220117010048-580176ad49fb
 	github.com/shenwei356/stable v0.3.0
 	github.com/shenwei356/util v0.5.6
-	github.com/shenwei356/xopen v0.4.0
+	github.com/shenwei356/xopen v0.4.1
 	github.com/smallfish/simpleyaml v0.1.0
 	github.com/spf13/cobra v1.10.2
 	github.com/twotwotwo/sorts v0.0.0-20160814051341-bf5c1f2b8553
-	github.com/ulikunitz/xz v0.5.16
+	github.com/ulikunitz/xz v0.5.17
 	github.com/vbauerster/mpb/v5 v5.4.0
 )
 

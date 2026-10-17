@@ -369,6 +369,23 @@ func TestAmpliconMismatchAnnotation(t *testing.T) {
 	}
 }
 
+// TestAmpliconWorkerState preserves formatting and order across concurrent input reads.
+func TestAmpliconWorkerState(t *testing.T) {
+	const sequence = "acgcacactgaaatga"
+	const extracted = "cgcacactgaaat"
+	dir := t.TempDir()
+	fasta := auditInput(t, dir, "in.fa", strings.Repeat(">seq\n"+sequence+"\n", 64))
+	fastq := auditInput(t, dir, "in.fq", strings.Repeat("@seq\n"+sequence+"\n+\n"+strings.Repeat("I", len(sequence))+"\n", 64))
+	want := strings.Repeat(">seq mismatches=2(1+1)\ncgca\ncact\ngaaa\nt\n", 64) +
+		strings.Repeat("@seq mismatches=2(1+1)\n"+extracted+"\n+\n"+strings.Repeat("I", len(extracted))+"\n", 64)
+	for _, threads := range []string{"1", "4"} {
+		out, stderr, err := runCLI(t, "", "amplicon", "-F", "ccc", "-R", "ttt", "-P", "-M", "-m", "1", "-w", "4", "-j", threads, fasta, fastq)
+		if err != nil || out != want {
+			t.Fatalf("threads=%s: err=%v stderr=%s output=%q", threads, err, stderr, out)
+		}
+	}
+}
+
 // TestTranslateOutputHeaders preserves FASTA headers in whole and split outputs.
 func TestTranslateOutputHeaders(t *testing.T) {
 	input := ">r desc\nATGTAAATG\n"
