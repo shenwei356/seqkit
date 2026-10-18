@@ -26,7 +26,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pierrec/lz4/v4 v4.1.33
 	github.com/pkg/errors v0.9.1
-	github.com/shenwei356/bio v0.15.4
+	github.com/shenwei356/bio v0.16.0
 	github.com/shenwei356/breader v0.3.2
 	github.com/shenwei356/bwt v0.6.1
 	github.com/shenwei356/go-logging v0.0.0-20171012171522-c6b9702d88ba

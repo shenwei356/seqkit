@@ -88,6 +88,17 @@ is configurable by global flag `--alphabet-guess-seq-length` with default value
 of 10000. If length of the sequences is less than that, whole sequences will
 be checked.
 
+#### Leading FASTA comments
+
+Lines starting with `;` before the first FASTA header are skipped, including
+FAIR Header Reference genome (FHR) metadata lines starting with `;~`.
+These comments are discarded when writing sequences; their metadata is neither
+validated nor preserved. Keep the original file if its metadata is needed.
+
+This support is limited to leading FASTA comments. Lines starting with `;`
+after the first header are not skipped and may be read as sequence data or
+rejected. Leading comments before FASTQ are rejected.
+
 ### Sequence ID
 
 By default, most softwares, including `seqkit`, take the leading non-space
