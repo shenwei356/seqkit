@@ -57,6 +57,11 @@ Files can be given via positional arguments or the flag `--infile-list`. For exa
     
     seqkit seq --infile-list <(find -name "*.fq.gz" directory)
 
+Stdin (`-`) may appear only once across positional arguments and `--infile-list`.
+An explicit `-` is retained when a file list is supplied; the list replaces the
+default stdin input only when there are no positional arguments.
+When `--infile-list -` reads the list from stdin, input data must come from files.
+
 Result are printed to standard ouput (STDOUT) by default, you can also specify the output file
 via the flag `-o/--out-file`. The file name extension `.gz` is automatically recognized.
 For example:
@@ -194,6 +199,10 @@ therefore there's no need to pipe the result to gzip/pigz.
 
 Seqkit also supports reading and writing xz (.xz) and zstd (.zst) formats since v2.2.0.
 Bzip2 format is supported since v2.4.0.
+
+Stdin (-) may only appear once in the input file list, including files supplied
+via --infile-list. When --infile-list - reads the list from stdin, input data
+must come from files.
 
 Compression level:
   format   range   default  comment
@@ -906,6 +915,9 @@ Attention:
      - For single-stranded genomes like ssRNA genomes, use -s/--single-strand.
      - The message digest would change with different values of k-mer size.
   4. Multiple files are processed in parallel (-j/--threads).
+     Files that cannot be read or processed produce an error and no digest.
+     Valid results are retained, with a non-zero exit status after processing.
+  5. Invalid ID regular expressions are rejected before processing any files.
 
 Method:
   1. Converting the sequences to low cases, optionally removing gaps (-g).
@@ -1439,6 +1451,11 @@ Usage
 
 ``` text
 convert FASTQ quality encoding between Sanger, Solexa and Illumina
+
+Quality conversion rejects invalid source scores and results outside printable
+ASCII (33-126), returning a non-zero exit status without writing the invalid record.
+Phred scores must be non-negative; Solexa scores must be at least -5.
+The --force flag only clips scores > 40 for Illumina-1.8+ -> Sanger.
 
 Usage:
   seqkit convert [flags]

@@ -28,6 +28,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"sync"
 	"time"
@@ -60,6 +61,9 @@ Attention:
      - For single-stranded genomes like ssRNA genomes, use -s/--single-strand.
      - The message digest would change with different values of k-mer size.
   4. Multiple files are processed in parallel (-j/--threads).
+     Files that cannot be read or processed produce an error and no digest.
+     Valid results are retained, with a non-zero exit status after processing.
+  5. Invalid ID regular expressions are rejected before processing any files.
 
 Method:
   1. Converting the sequences to low cases, optionally removing gaps (-g).
@@ -111,6 +115,17 @@ Examples:
 		singleStrand := getFlagBool(cmd, "single-strand")
 		includeID := getFlagBool(cmd, "include-id")
 
+		// Validate the shared ID parser once, before opening inputs or output.
+		if idRegexp != "" {
+			r, err := regexp.Compile(idRegexp)
+			if err != nil {
+				checkError(fmt.Errorf("fail to compile regexp %q: %w", idRegexp, err))
+			}
+			if r.NumSubexp() == 0 {
+				checkError(fmt.Errorf("regular expression must contain a capturing group for the ID; default: %s", fastx.DefaultIDRegexp))
+			}
+		}
+
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 		if !config.SkipFileCheck {
 			for _, file := range files {
@@ -151,7 +166,7 @@ Examples:
 		}
 		// process bar
 
-		var failed bool // Set by the collector for invalid circular-sequence parameters.
+		var failed bool // Set by the collector if any file cannot produce a digest.
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer func() {
@@ -166,9 +181,9 @@ Examples:
 		threadsFloat := float64(config.Threads) // just avoid repeated type conversion
 		var wg sync.WaitGroup
 
+		// Aresult carries one file's digest or failure to the ordered collector.
 		type Aresult struct {
 			ok     bool
-			failed bool // Hard validation errors differ from intentionally skipped files.
 			id     uint64
 			result *SumResult
 		}
@@ -182,7 +197,7 @@ Examples:
 
 			id = 1
 			for r := range ch {
-				if r.failed {
+				if !r.ok {
 					failed = true
 				}
 				_id = r.id
@@ -286,7 +301,7 @@ Examples:
 						ok:     false,
 						result: nil,
 					}
-					log.Warningf(fmt.Sprintf("skip file: %s: %s", file, err))
+					log.Errorf("%s: %s", file, err)
 					return
 				}
 				defer fastxReader.Close()
@@ -322,7 +337,7 @@ Examples:
 								ok:     false,
 								result: nil,
 							}
-							log.Warningf(fmt.Sprintf("skip file: %s: %s", file, err))
+							log.Errorf("%s: %s", file, err)
 							return
 						}
 
@@ -333,7 +348,7 @@ Examples:
 								ok:     false,
 								result: nil,
 							}
-							log.Warningf(fmt.Sprintf("skip file with more than 1 sequences: %s", file))
+							log.Errorf("file contains more than 1 sequence: %s", file)
 							return
 						}
 
@@ -346,7 +361,6 @@ Examples:
 						if k > len(_seq.Seq) {
 							// checkError(fmt.Errorf("k is too big for sequence of %d bp: %s", len(record.Seq.Seq), file))
 							ch <- &Aresult{
-								failed: true,
 								id:     id,
 								ok:     false,
 								result: nil,
@@ -362,7 +376,6 @@ Examples:
 								seqType = "P"
 
 								ch <- &Aresult{
-									failed: true,
 									id:     id,
 									ok:     false,
 									result: nil,
@@ -478,7 +491,7 @@ Examples:
 								ok:     false,
 								result: nil,
 							}
-							log.Warningf(fmt.Sprintf("%s: %s", file, err))
+							log.Errorf("%s: %s", file, err)
 							return
 						}
 

@@ -40,6 +40,11 @@ var convertCmd = &cobra.Command{
 	Short: "convert FASTQ quality encoding between Sanger, Solexa and Illumina",
 	Long: `convert FASTQ quality encoding between Sanger, Solexa and Illumina
 
+Quality conversion rejects invalid source scores and results outside printable
+ASCII (33-126), returning a non-zero exit status without writing the invalid record.
+Phred scores must be non-negative; Solexa scores must be at least -5.
+The --force flag only clips scores > 40 for Illumina-1.8+ -> Sanger.
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -107,7 +112,7 @@ var convertCmd = &cobra.Command{
 					reportEncoding()
 					if !dryRun {
 						for _, record := range records {
-							record.Seq.Qual, err = seq.QualityConvert(fromEncoding, toEncoding, record.Seq.Qual, force)
+							record.Seq.Qual, err = convertQualityChecked(fromEncoding, toEncoding, record.Seq.Qual, force)
 							checkError(err)
 							record.FormatToWriter(outfh, lineWidth)
 						}
@@ -146,13 +151,49 @@ var convertCmd = &cobra.Command{
 					if dryRun {
 						break
 					}
-					record.Seq.Qual, err = seq.QualityConvert(fromEncoding, toEncoding, record.Seq.Qual, force)
+					record.Seq.Qual, err = convertQualityChecked(fromEncoding, toEncoding, record.Seq.Qual, force)
 					checkError(err)
 					record.FormatToWriter(outfh, lineWidth)
 				}
 			}()
 		}
 	},
+}
+
+// convertQualityChecked validates both encodings before a record can be written.
+func convertQualityChecked(from, to seq.QualityEncoding, quality []byte, force bool) ([]byte, error) {
+	if err := validateQualityEncoding(from, quality); err != nil {
+		return nil, err
+	}
+	converted, err := seq.QualityConvert(from, to, quality, force)
+	if err != nil {
+		return nil, err
+	}
+	// Valid source bytes cannot wrap uint8 during conversion, but adding the
+	// target offset can exceed printable ASCII. Reject the entire record.
+	if err := validateQualityEncoding(to, converted); err != nil {
+		return nil, fmt.Errorf("converted quality: %w", err)
+	}
+	return converted, nil
+}
+
+// validateQualityEncoding checks representable scores, not typical read ranges.
+func validateQualityEncoding(encoding seq.QualityEncoding, quality []byte) error {
+	min := encoding.Offset()
+	if min == 0 {
+		return seq.ErrUnknownQualityEncoding
+	}
+	invalid := seq.ErrInvalidPhredQuality
+	if encoding.IsSolexa() {
+		min -= 5 // Solexa permits scores down to -5; Phred permits scores down to 0.
+		invalid = seq.ErrInvalidSolexaQuality
+	}
+	for i, q := range quality {
+		if int(q) < min || q > 126 {
+			return fmt.Errorf("%w: byte %d at position %d is outside [%d, 126] for %s", invalid, q, i+1, min, encoding)
+		}
+	}
+	return nil
 }
 
 // guessQualityEncoding intersects sample candidates and resolves equivalent encodings.

@@ -78,6 +78,123 @@ func runCLI(t *testing.T, input string, args ...string) (string, string, error) 
 	return stdout.String(), stderr.String(), err
 }
 
+// TestDuplicateStdin rejects repeated streams before opening the output.
+func TestDuplicateStdin(t *testing.T) {
+	dir := t.TempDir()
+	one := auditInput(t, dir, "one.list", "-\n")
+	two := auditInput(t, dir, "two.list", "-\n-\n")
+	empty := auditInput(t, dir, "empty.list", "")
+	for _, command := range []string{"seq", "stats", "sum", "convert", "head", "concat", "sana", "tab2fx", "bam"} {
+		for _, tt := range []struct {
+			name string
+			args []string
+		}{
+			{"arguments", []string{"-", "-"}},
+			{"list", []string{"--infile-list", two}},
+			{"arguments and list", []string{"-", "--infile-list", one}},
+			{"empty list", []string{"-", "-", "--infile-list", empty}},
+			{"skip file check", []string{"--skip-file-check", "--infile-list", two}},
+		} {
+			t.Run(command+"/"+tt.name, func(t *testing.T) {
+				output := auditInput(t, dir, "out.txt", "keep\n")
+				args := append([]string{command, "-o", output}, tt.args...)
+				out, stderr, err := runCLI(t, ">a\nACGT\n", args...)
+				if err == nil || !strings.Contains(stderr, "stdin may only be specified once") || strings.Count(stderr, "[ERRO]") != 1 || out != "" {
+					t.Fatalf("err=%v out=%q stderr=%s", err, out, stderr)
+				}
+				data, err := os.ReadFile(output)
+				if err != nil || string(data) != "keep\n" {
+					t.Fatalf("output changed before validation: %q %v", data, err)
+				}
+			})
+		}
+	}
+}
+
+// TestStdinFileList ensures stdin cannot supply both the list and its input data.
+func TestStdinFileList(t *testing.T) {
+	for _, list := range []string{"-\n", ""} {
+		_, stderr, err := runCLI(t, list, "seq", "--infile-list", "-")
+		if err == nil || !strings.Contains(stderr, "stdin may only be specified once") {
+			t.Fatalf("list=%q err=%v stderr=%s", list, err, stderr)
+		}
+	}
+}
+
+// TestInputListStdinCompatibility preserves a single stdin and repeated regular files.
+func TestInputListStdinCompatibility(t *testing.T) {
+	dir := t.TempDir()
+	const input = ">a\nACGT\n"
+	const disk = ">b\nTTTT\n"
+	file := auditInput(t, dir, "input.fa", disk)
+	one := auditInput(t, dir, "one.list", "-\n")
+	files := auditInput(t, dir, "files.list", file+"\n")
+	empty := auditInput(t, dir, "empty.list", "")
+	for _, tt := range []struct {
+		name, stdin, want string
+		args              []string
+	}{
+		{"implicit stdin", input, input, nil},
+		{"explicit stdin", input, input, []string{"-"}},
+		{"stdin in list", input, input, []string{"-X", one}},
+		{"replace implicit stdin", input, disk, []string{"-X", files}},
+		{"preserve explicit stdin", input, input + disk, []string{"-", "-X", files}},
+		{"empty list fallback", input, input, []string{"-X", empty}},
+		{"duplicate regular files", "", disk + disk, []string{file, file}},
+		{"list from stdin", file + "\n", disk, []string{"-X", "-"}},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			out, stderr, err := runCLI(t, tt.stdin, append([]string{"seq"}, tt.args...)...)
+			if err != nil || out != tt.want {
+				t.Fatalf("err=%v out=%q want=%q stderr=%s", err, out, tt.want, stderr)
+			}
+		})
+	}
+}
+
+// TestSplit2DuplicateStdin covers paired inputs assembled outside the shared list helper.
+func TestSplit2DuplicateStdin(t *testing.T) {
+	outdir := filepath.Join(t.TempDir(), "parts")
+	_, stderr, err := runCLI(t, ">a\nACGT\n", "split2", "-1", "-", "-2", "-", "-s", "1", "-O", outdir)
+	if err == nil || !strings.Contains(stderr, "stdin may only be specified once") {
+		t.Fatalf("err=%v stderr=%s", err, stderr)
+	}
+	if _, err := os.Stat(outdir); !os.IsNotExist(err) {
+		t.Fatalf("output directory created before validation: %v", err)
+	}
+}
+
+// TestSplit2SingleStdin allows one paired input stream alongside a regular file.
+func TestSplit2SingleStdin(t *testing.T) {
+	dir := t.TempDir()
+	const input = ">a\nACGT\n"
+	file := auditInput(t, dir, "read.fa", input)
+	outdir := filepath.Join(dir, "parts")
+	_, stderr, err := runCLI(t, input, "split2", "-1", "-", "-2", file, "-s", "1", "-O", outdir)
+	if err != nil {
+		t.Fatalf("err=%v stderr=%s", err, stderr)
+	}
+	for _, name := range []string{"stdin.part_001.fasta", "read.part_001.fa"} {
+		data, err := os.ReadFile(filepath.Join(outdir, name))
+		if err != nil || string(data) != input {
+			t.Fatalf("%s: got=%q err=%v", name, data, err)
+		}
+	}
+}
+
+// TestFaidxDashQueries treats query IDs as IDs, not additional input streams.
+func TestFaidxDashQueries(t *testing.T) {
+	dir := t.TempDir()
+	file := auditInput(t, dir, "input.fa", ">-\nACGT\n")
+	queries := auditInput(t, dir, "queries.list", "-\n-\n")
+	for _, args := range [][]string{{file, "-", "-"}, {file, "-X", queries}} {
+		out, stderr, err := runCLI(t, "", append([]string{"faidx"}, args...)...)
+		if err != nil || out != ">-\nACGT\n>-\nACGT\n" {
+			t.Fatalf("err=%v out=%q stderr=%s", err, out, stderr)
+		}
+	}
+}
+
 // TestRmdupRejectsInputOutputs checks all input paths before any output is opened.
 func TestRmdupRejectsInputOutputs(t *testing.T) {
 	for _, flag := range []string{"-o", "-d", "-D"} {

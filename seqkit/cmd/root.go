@@ -55,6 +55,10 @@ therefore there's no need to pipe the result to gzip/pigz.
 Seqkit also supports reading and writing xz (.xz) and zstd (.zst) formats since v2.2.0.
 Bzip2 format is supported since v2.4.0.
 
+Stdin (-) may only appear once in the input file list, including files supplied
+via --infile-list. When --infile-list - reads the list from stdin, input data
+must come from files.
+
 Compression level:
   format   range   default  comment
   gzip     1-9     5        https://github.com/klauspost/pgzip sets 5 as the default value.

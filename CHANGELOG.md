@@ -3,6 +3,9 @@
     - `seqkit`:
         - Report compressed-input read errors instead of treating damaged files as empty input. [#610](https://github.com/shenwei356/seqkit/issues/610)
         - Accept leading `;` comment lines before the first FASTA record; comments are discarded when writing sequences. [bio#12](https://github.com/shenwei356/bio/pull/12)
+        - Reject repeated stdin input across command-line arguments, `--infile-list`, and paired-read inputs. [#613](https://github.com/shenwei356/seqkit/issues/613)
+    - `seqkit convert`: Reject invalid quality scores and conversions outside printable ASCII. [#612](https://github.com/shenwei356/seqkit/issues/612)
+    - `seqkit sum`: Return a non-zero exit status for failed files while retaining valid results; reject invalid ID regular expressions before processing. [#613](https://github.com/shenwei356/seqkit/issues/613)
     - `seqkit sort`: Fixed sorting and output issues involving mixed formats, case-insensitive comparisons, sequence prefixes, and empty sequences. [#602](https://github.com/shenwei356/seqkit/issues/602), [#603](https://github.com/shenwei356/seqkit/issues/603), [#604](https://github.com/shenwei356/seqkit/issues/604), [#605](https://github.com/shenwei356/seqkit/issues/605), [#606](https://github.com/shenwei356/seqkit/issues/606)
     - `seqkit faidx`, `sort`, `shuffle`, `split`, and `bam`: Fixed index creation for empty FASTA files. [#597](https://github.com/shenwei356/seqkit/issues/597)
     - `seqkit seq`, `fx2tab`, and `stats`: Report invalid quality scores without panicking or emitting partial output. [#598](https://github.com/shenwei356/seqkit/issues/598)

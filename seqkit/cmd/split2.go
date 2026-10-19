@@ -208,6 +208,9 @@ If you want to cut a sequence into multiple segments.
 			}
 		}
 
+		// Paired-read flags replace the shared input list and need the same check.
+		checkError(validateStdinUsage(files, isStdin(getFlagString(cmd, "infile-list"))))
+
 		if pairedEnd && seqIDAsFileName {
 			checkError(fmt.Errorf("the flag -N/--seqid-as-filename is not applicable for paired-end reads"))
 		}

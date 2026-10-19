@@ -102,6 +102,7 @@ func getFileListFromFile(file string, checkFile bool) ([]string, error) {
 	return lists, fh.Close()
 }
 
+// getFileListFromArgsAndFile merges input sources and rejects repeated stdin use.
 func getFileListFromArgsAndFile(cmd *cobra.Command, args []string, checkFileFromArgs bool, flag string, checkFileFromFile bool) []string {
 	infileList := getFlagString(cmd, flag)
 	files := getFileList(args, checkFileFromArgs)
@@ -110,15 +111,34 @@ func getFileListFromArgsAndFile(cmd *cobra.Command, args []string, checkFileFrom
 		checkError(err)
 		if len(_files) == 0 {
 			log.Warningf("no files found in file list: %s", infileList)
-			return files
+		} else if len(args) == 0 {
+			// A supplied list replaces only the implicit stdin default.
+			files = _files
+		} else {
+			files = append(files, _files...)
 		}
-
-		if len(files) == 1 && isStdin(files[0]) {
-			return _files
-		}
-		files = append(files, _files...)
 	}
+	inputFiles := files
+	if cmd.Name() == "faidx" {
+		// faidx takes one input file followed by query IDs, which may be "-".
+		inputFiles = files[:1]
+	}
+	checkError(validateStdinUsage(inputFiles, isStdin(infileList)))
 	return files
+}
+
+// validateStdinUsage allows one stdin consumer, including a list read from stdin.
+// stdinUsed is true when --infile-list has already consumed the stream.
+func validateStdinUsage(files []string, stdinUsed bool) error {
+	for _, file := range files {
+		if isStdin(file) {
+			if stdinUsed {
+				return fmt.Errorf("stdin may only be specified once, including --infile-list")
+			}
+			stdinUsed = true
+		}
+	}
+	return nil
 }
 
 func isTheSameFile(path1, path2 string) (bool, error) {
