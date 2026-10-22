@@ -1,22 +1,81 @@
-- [SeqKit v2.15.0](https://github.com/shenwei356/seqkit/releases/tag/v2.15.0) - 2026-10-15
+- [SeqKit v2.15.0](https://github.com/shenwei356/seqkit/releases/tag/v2.15.0) - 2026-xx-xx
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.15.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.15.0)
     - `seqkit`:
         - Report compressed-input read errors instead of treating damaged files as empty input. [#610](https://github.com/shenwei356/seqkit/issues/610)
         - Accept leading `;` comment lines before the first FASTA record; comments are discarded when writing sequences. [bio#12](https://github.com/shenwei356/bio/pull/12)
         - Reject repeated stdin input across command-line arguments, `--infile-list`, and paired-read inputs. [#613](https://github.com/shenwei356/seqkit/issues/613)
-    - `seqkit convert`: Reject invalid quality scores and conversions outside printable ASCII. [#612](https://github.com/shenwei356/seqkit/issues/612)
-    - `seqkit sum`: Return a non-zero exit status for failed files while retaining valid results; reject invalid ID regular expressions before processing. [#613](https://github.com/shenwei356/seqkit/issues/613)
-    - `seqkit sort`: Fixed sorting and output issues involving mixed formats, case-insensitive comparisons, sequence prefixes, and empty sequences. [#602](https://github.com/shenwei356/seqkit/issues/602), [#603](https://github.com/shenwei356/seqkit/issues/603), [#604](https://github.com/shenwei356/seqkit/issues/604), [#605](https://github.com/shenwei356/seqkit/issues/605), [#606](https://github.com/shenwei356/seqkit/issues/606)
-    - `seqkit faidx`, `sort`, `shuffle`, `split`, and `bam`: Fixed index creation for empty FASTA files. [#597](https://github.com/shenwei356/seqkit/issues/597)
-    - `seqkit seq`, `fx2tab`, and `stats`: Report invalid quality scores without panicking or emitting partial output. [#598](https://github.com/shenwei356/seqkit/issues/598)
-    - `seqkit stats`: Report read errors correctly while retaining valid results; `--skip-err` continues processing. [#599](https://github.com/shenwei356/seqkit/issues/599)
-    - `seqkit subseq`: Handle GTF attributes with or without a trailing semicolon. [#600](https://github.com/shenwei356/seqkit/issues/600)
-    - `seqkit replace`, `convert`, `sum`, `locate`, `sliding`, `range`, `merge-slides`, `split`, and `split2`: Fixed record handling, validation, and concurrency issues.
-    - `seqkit sort`, `shuffle`, and `split`: Improved two-pass processing and duplicate-header handling.
-    - `seqkit rename`, `translate`, and `pair`: Prevent conflicting output paths and generated names.
-    - `seqkit scat`: Reduced idle CPU use and bounded pending records.
-    - `seqkit sana`: Fixed output flushing.
-    - `seqkit amplicon`: Fixed data races during parallel mismatch searches.
+    - `seqkit head/split2`:
+        - Use base-1000 K/M/G/T suffixes for sequence lengths. Buffer sizes and file-growth thresholds retain base 1024; help now identifies each base.
+    - `seqkit split2/pair/split`:
+        - Preserve unrelated output-directory files and check initial input before writing. [#620](https://github.com/shenwei356/seqkit/issues/620)
+    - `seqkit split2`:
+        - Reject conflicting outputs/modes/prefixes and keep paired boundaries and record counts aligned. [#620](https://github.com/shenwei356/seqkit/issues/620)
+    - `seqkit split2/locate/sliding/merge-slides/replace/split/convert/sum/range`:
+        - Fixed record handling, validation, and concurrency issues.
+    - `seqkit concat/head-genome/rename`:
+        - Preserve descriptions after repeated header separators with the default ID parser. [#614](https://github.com/shenwei356/seqkit/issues/614)
+    - `seqkit concat`:
+        - Preserve descriptions with custom ID parsing and ignore empty files when calculating full-join padding. [#614](https://github.com/shenwei356/seqkit/issues/614)
+    - `seqkit rename/translate/pair`:
+        - Prevent conflicting output paths and generated names.
+    - `seqkit shuffle`:
+        - Normalize CRLF sequence lines in two-pass output. [#615](https://github.com/shenwei356/seqkit/issues/615)
+    - `seqkit shuffle/bam/faidx/split/sort`:
+        - Fixed index creation for empty FASTA files. [#597](https://github.com/shenwei356/seqkit/issues/597)
+    - `seqkit shuffle/split/sort`:
+        - Improved two-pass processing and duplicate-header handling.
+    - `seqkit sample/sample2`:
+        - Reject NaN proportions. [#615](https://github.com/shenwei356/seqkit/issues/615)
+    - `seqkit sample`:
+        - Report loading errors and accept multiple inputs with `-p`, restarting the same seed for each file. [#615](https://github.com/shenwei356/seqkit/issues/615)
+    - `seqkit watch/bam`:
+        - Skip empty histograms, keep automatic bin counts positive, and report image errors without truncating existing images. [#616](https://github.com/shenwei356/seqkit/issues/616)
+    - `seqkit bam`:
+        - Validate fields and top-output combinations before processing; require NM only for dependent statistics; fix BAM pass-through, toolbox errors, and retention of completed file statistics on failure. [#616](https://github.com/shenwei356/seqkit/issues/616)
+    - `seqkit sana/scat`:
+        - Recover neighboring FASTA records around junk or empty records; handle empty IDs, CRLF, physical line numbers, and file errors consistently. [#617](https://github.com/shenwei356/seqkit/issues/617)
+    - `seqkit sana`:
+        - Fixed output flushing.
+    - `seqkit scat`:
+        - Fix PID monitoring, rename/append handling, directory lists, and duplicate monitoring. [#617](https://github.com/shenwei356/seqkit/issues/617)
+        - Reduced idle CPU use and bounded pending records.
+    - `seqkit faidx`:
+        - Clip negative starts, retain region suffixes, and return failure for missing IDs while preserving valid query results. [#618](https://github.com/shenwei356/seqkit/issues/618)
+    - `seqkit locate`:
+        - Combine command-line and file patterns, preserve repeated pattern records and warn about duplicate IDs, validate empty patterns, and normalize circular minus-strand coordinates. [#618](https://github.com/shenwei356/seqkit/issues/618)
+    - `seqkit amplicon`:
+        - Validate primer files and mismatch combinations, match N as a degenerate base, and omit reversed or entirely out-of-range results. [#618](https://github.com/shenwei356/seqkit/issues/618)
+        - Fixed data races during parallel mismatch searches.
+    - `seqkit fish`:
+        - Validate alignment parameters, compare bases without case in accuracy/NM statistics, and correct BAM reference names and program tags. [#618](https://github.com/shenwei356/seqkit/issues/618)
+    - `seqkit sliding`:
+        - Skip empty circular records. [#619](https://github.com/shenwei356/seqkit/issues/619)
+    - `seqkit merge-slides`:
+        - Validate and merge ordered intervals correctly. [#619](https://github.com/shenwei356/seqkit/issues/619)
+    - `seqkit mutate`:
+        - Skip invalid edit boundaries without changing valid edits. [#619](https://github.com/shenwei356/seqkit/issues/619)
+    - `seqkit translate`:
+        - Correct negative-frame subsequence coordinates and failed-frame headers, validate table/frame selections, and clarify truncation and minimum-length options. [#619](https://github.com/shenwei356/seqkit/issues/619)
+    - `seqkit replace`:
+        - Reject FASTQ replacements that borrow qualities outside the current match; document per-file record numbering. [#620](https://github.com/shenwei356/seqkit/issues/620)
+    - `seqkit common`:
+        - Make embedded-sequence intersections deterministic, slice qualities with sequences, report counts with explicit units, and preserve first-input semantics for stdin. [#620](https://github.com/shenwei356/seqkit/issues/620)
+    - `seqkit pair`:
+        - Preserve duplicate IDs and each mate's format. [#620](https://github.com/shenwei356/seqkit/issues/620)
+    - `seqkit split`:
+        - With `-p`, create balanced nonempty parts. [#620](https://github.com/shenwei356/seqkit/issues/620)
+    - `seqkit convert`:
+        - Reject invalid quality scores and conversions outside printable ASCII. [#612](https://github.com/shenwei356/seqkit/issues/612)
+    - `seqkit sum`:
+        - Return a non-zero exit status for failed files while retaining valid results; reject invalid ID regular expressions before processing. [#613](https://github.com/shenwei356/seqkit/issues/613)
+    - `seqkit sort`:
+        - Fixed sorting and output issues involving mixed formats, case-insensitive comparisons, sequence prefixes, and empty sequences. [#602](https://github.com/shenwei356/seqkit/issues/602), [#603](https://github.com/shenwei356/seqkit/issues/603), [#604](https://github.com/shenwei356/seqkit/issues/604), [#605](https://github.com/shenwei356/seqkit/issues/605), [#606](https://github.com/shenwei356/seqkit/issues/606)
+    - `seqkit seq/fx2tab/stats`:
+        - Report invalid quality scores without panicking or emitting partial output. [#598](https://github.com/shenwei356/seqkit/issues/598)
+    - `seqkit stats`:
+        - Report read errors correctly while retaining valid results; `--skip-err` continues processing. [#599](https://github.com/shenwei356/seqkit/issues/599)
+    - `seqkit subseq`:
+        - Handle GTF attributes with or without a trailing semicolon. [#600](https://github.com/shenwei356/seqkit/issues/600)
 - [SeqKit v2.14.0](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0) - 2026-09-24
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.14.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0)
     - `seqkit`:

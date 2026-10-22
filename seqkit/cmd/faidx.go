@@ -54,11 +54,14 @@ This command is similar with "samtools faidx" but has some extra features:
 
 Attention:
   1. The flag -U/--update-faidx is recommended to ensure the .fai file matches the FASTA file.
+  2. Missing IDs in ordinary queries are warned about; valid queries are still
+     written, and the command finishes with a nonzero exit status.
 
 The definition of region is 1-based and with some custom design.
 
 Examples:
 %s
+
 `, regionExample),
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -208,22 +211,25 @@ Examples:
 		faidxQueries := make([]faidxQuery, 0, len(queries))
 		var region [2]int
 
+		missing := false
 		var ok bool
 		if !useRegexp {
 			var begin, end int
 			for _, query := range queries {
 				id, begin, end, err = parseRegion(query)
 				checkError(err)
+				suffix := query[len(id):]
 
 				if ignoreCase {
 					id = strings.ToLower(id)
 				}
 				if _, ok = id2head[id]; !ok {
+					missing = true
 					log.Warningf("sequence not found: %s", id)
 					continue
 				}
 
-				faidxQueries = append(faidxQueries, faidxQuery{ID: id, Region: [2]int{begin, end}})
+				faidxQueries = append(faidxQueries, faidxQuery{ID: id, Region: [2]int{begin, end}, Suffix: suffix})
 			}
 		} else {
 			queriesRe := make([]*regexp.Regexp, len(queries))
@@ -254,17 +260,21 @@ Examples:
 		for _, faidxQ := range faidxQueries {
 			head = id2head[faidxQ.ID]
 			region = faidxQ.Region
+			// Clip a negative start before passing coordinates to the index reader.
+			if region[0] < -idx[head].Length {
+				region[0] = 1
+			}
 
 			if (region[0] == 1 && region[1] == -1) || (region[0] > 0 && region[1] < 0) { // full record or region like [5, -5].
-				subseq, _ = faidx.SubSeq(head, region[0], region[1])
+				subseq, err = faidx.SubSeq(head, region[0], region[1])
 
-				outfh.WriteString(fmt.Sprintf(">%s\n", head))
+				outfh.WriteString(fmt.Sprintf(">%s%s\n", head, faidxQ.Suffix))
 			} else if region[0] <= region[1] {
-				subseq, _ = faidx.SubSeq(head, region[0], region[1])
+				subseq, err = faidx.SubSeq(head, region[0], region[1])
 
 				outfh.WriteString(fmt.Sprintf(">%s:%d-%d\n", head, region[0], region[1]))
 			} else { // reverse complement sequence
-				subseq, _ = faidx.SubSeq(head, region[1], region[0])
+				subseq, err = faidx.SubSeq(head, region[1], region[0])
 				alphabet = config.Alphabet
 				if alphabet == nil {
 					alphabet = seq.DNAredundant
@@ -281,6 +291,7 @@ Examples:
 				outfh.WriteString(fmt.Sprintf(">%s:%d-%d\n", head, region[0], region[1]))
 			}
 
+			checkError(err)
 			text, buffer = wrapByteSlice(subseq, config.LineWidth, buffer)
 			outfh.Write(text)
 
@@ -290,12 +301,17 @@ Examples:
 
 			outfh.WriteString("\n")
 		}
+		if missing {
+			closeOutput(outfh)
+			os.Exit(255)
+		}
 	},
 }
 
 type faidxQuery struct {
 	ID     string
 	Region [2]int
+	Suffix string // Original suffix for otherwise omitted mixed/open regions.
 }
 
 func init() {

@@ -119,12 +119,22 @@ Translate Tables/Genetic Codes:
 			}
 			frames = append(frames, frame)
 		}
+		if len(frames) == 0 {
+			checkError(fmt.Errorf("empty frame list"))
+		}
 		trim := getFlagBool(cmd, "trim")
 		clean := getFlagBool(cmd, "clean")
 		allowUnknownCodon := getFlagBool(cmd, "allow-unknown-codon")
 		markInitCodonAsM := getFlagBool(cmd, "init-codon-as-M")
 		listTable := getFlagInt(cmd, "list-transl-table")
 		listTableAmb := getFlagInt(cmd, "list-transl-table-with-amb-codons")
+		for _, table := range []int{listTable, listTableAmb} {
+			if table > 0 {
+				if _, ok := seq.CodonTables[table]; !ok {
+					checkError(fmt.Errorf("invalid translate table: %d", table))
+				}
+			}
+		}
 		appendFrame := getFlagBool(cmd, "append-frame")
 		skipTranslateErrors := getFlagBool(cmd, "skip-translate-errors")
 
@@ -200,7 +210,14 @@ Translate Tables/Genetic Codes:
 
 					if err != nil {
 						if skipTranslateErrors {
-							outfh.WriteString(fmt.Sprintf(">%s %s\n\n", record.ID, record.Desc))
+							name := string(record.Name)
+							if appendFrame {
+								name = fmt.Sprintf("%s_frame=%d", record.ID, frame)
+								if len(record.Desc) > 0 {
+									name += " " + string(record.Desc)
+								}
+							}
+							outfh.WriteString(">" + name + "\n\n")
 							continue
 						}
 						if err == seq.ErrUnknownCodon {
@@ -225,7 +242,7 @@ Translate Tables/Genetic Codes:
 											outfh.WriteString(fmt.Sprintf(">%s_frame=%d_begin=%d_end=%d %s\n",
 												record.ID, frame, _start, _end, record.Desc))
 										case -1, -2, -3:
-											_start, _end = _len-start*3+frame+1, _len-i*3+frame+1
+											_start, _end = _len-start*3+frame+1, _len-i*3+frame+2
 
 											outfh.WriteString(fmt.Sprintf(">%s_frame=%d_begin=%d_end=%d %s\n",
 												record.ID, frame, _end, _start, record.Desc))
@@ -291,7 +308,7 @@ func init() {
 	RootCmd.AddCommand(translateCmd)
 	translateCmd.Flags().IntP("transl-table", "T", 1, `translate table/genetic code, type 'seqkit translate --help' for more details`)
 	translateCmd.Flags().StringSliceP("frame", "f", []string{"1"}, "frame(s) to translate, available value: 1, 2, 3, -1, -2, -3, and 6 for all six frames")
-	translateCmd.Flags().BoolP("trim", "", false, "remove all 'X' and '*' characters from the right end of the translation")
+	translateCmd.Flags().BoolP("trim", "", false, "truncate translation at the first 'X' or '*' character")
 	translateCmd.Flags().BoolP("clean", "", false, "change all STOP codon positions from the '*' character to 'X' (an unknown residue)")
 	translateCmd.Flags().BoolP("allow-unknown-codon", "x", false, "translate unknown code to 'X'. And you may not use flag --trim which removes 'X'")
 	translateCmd.Flags().BoolP("init-codon-as-M", "M", false, "translate initial codon at beginning to 'M'")
@@ -299,6 +316,6 @@ func init() {
 	translateCmd.Flags().IntP("list-transl-table-with-amb-codons", "L", -1, "show details of translate table N (including ambigugous codons), 0 for all. ")
 	translateCmd.Flags().BoolP("append-frame", "F", false, "append frame information to sequence ID")
 	translateCmd.Flags().BoolP("out-subseqs", "s", false, `output individual amino acid subsequences separated by the stop symbol "*"`)
-	translateCmd.Flags().IntP("min-len", "m", 0, `the minimum length of amino acid sequence`)
+	translateCmd.Flags().IntP("min-len", "m", 0, `minimum amino acid length of subsequences (only with -s/--out-subseqs)`)
 	translateCmd.Flags().BoolP("skip-translate-errors", "e", false, `skip errors during translate and output blank sequence`)
 }
