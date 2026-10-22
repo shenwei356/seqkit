@@ -63,6 +63,9 @@ it is not uniform fixed-size sampling.
 Results are deterministic for the same input and seed. To vary results across
 runs, add '-r/--non-deterministic' for a time-based seed.
 
+Attention:
+  1. Duplicate headers are allowed in both single-pass and two-pass sampling.
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
@@ -114,7 +117,7 @@ runs, add '-r/--non-deterministic' for a time-based seed.
 		if number < 0 {
 			checkError(fmt.Errorf("value of -n (--number) and should be greater than 0"))
 		}
-		if proportion < 0 || proportion > 1 {
+		if math.IsNaN(proportion) || proportion < 0 || proportion > 1 {
 			checkError(fmt.Errorf("value of -p (--proportion) (%f) should be in range of (0, 1]", proportion))
 		}
 

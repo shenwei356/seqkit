@@ -48,16 +48,21 @@ Attention:
   1. Multiple point mutations (-p/--point) are allowed, but only single
      insertion (-i/--insertion) OR single deletion (-d/--deletion) is allowed.
   2. Point mutation takes place before insertion/deletion.
+  3. Out-of-range point/insert positions and empty deletion intervals are
+     warned about and skipped. Partially out-of-range deletion intervals
+     are clipped to the sequence.
 
 Notes:
 
   1. You can choose certain sequences to edit using similar flags in
      'seqkit grep'.
+  2. Insertion at 0 prepends bases.
 
 The definition of position is 1-based and with some custom design.
 
 Examples:
 %s
+
 `, regionExample),
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -307,7 +312,7 @@ Examples:
 
 				for _, mp = range mPoints {
 					s, _, ok = seq.SubLocation(seqLen, mp.pos, mp.pos)
-					if !ok {
+					if !ok || mp.pos < -seqLen || mp.pos > seqLen {
 						log.Warningf("[%s]: point mutation: position (%d) out of sequence length (%d)", record.ID, mp.pos, seqLen)
 						continue
 					}
@@ -315,7 +320,7 @@ Examples:
 				}
 
 				if mDel != nil {
-					s, e, ok = seq.SubLocation(seqLen, mDel.start, mDel.end)
+					s, e, ok = nonemptySubLocation(seqLen, mDel.start, mDel.end)
 
 					if !ok {
 						log.Warningf("[%s]: deletion mutation: range (%d-%d) out of sequence length (%d)", record.ID, mDel.start, mDel.end, seqLen)
@@ -333,7 +338,7 @@ Examples:
 						copy(record.Seq.Seq[s:s+len(mIns.seq)], mIns.seq)
 					} else {
 						s, _, ok = seq.SubLocation(seqLen, mIns.pos, mIns.pos)
-						if !ok {
+						if !ok || mIns.pos < -seqLen || mIns.pos > seqLen {
 							log.Warningf("[%s]: insertion mutation: position (%d) out of sequence length (%d)", record.ID, mIns.pos, seqLen)
 						} else {
 							record.Seq.Seq = append(record.Seq.Seq, mIns.seq...)             // append insert sequence to the end

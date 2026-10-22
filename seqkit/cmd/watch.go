@@ -30,7 +30,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/botond-sipos/thist"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 	"github.com/shenwei356/xopen"
@@ -45,8 +44,14 @@ var watchCmd = &cobra.Command{
 	Short: "monitoring and online histograms of sequence features",
 	Long: `monitoring and online histograms of sequence features
 
-Only one field can be selected. Sequences without G or C are omitted from
-GC-skew histograms, but are still written in pass-through mode.`,
+Attention:
+  1. Only one field can be selected.
+  2. Sequences without G or C are omitted from GC-skew histograms, but are
+     still written in pass-through mode.
+  3. Without valid statistics, plotting and image generation are skipped successfully.
+  4. Invalid qualities in MeanQual and image-writing failures are reported as errors.
+
+`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -70,6 +75,7 @@ GC-skew histograms, but are still written in pass-through mode.`,
 		printDump := getFlagBool(cmd, "dump")
 		printHelp := getFlagBool(cmd, "list-fields")
 		printPdf := getFlagString(cmd, "img")
+		checkError(validateHistogramImage(printPdf))
 
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		runtime.GOMAXPROCS(config.Threads)
@@ -103,7 +109,11 @@ GC-skew histograms, but are still written in pass-through mode.`,
 		fmap["MeanQual"] = fieldInfo{
 			"Mean base quality",
 			func(r *fastx.Record) float64 {
-				return float64(r.Seq.AvgQual(qBase))
+				value, err := r.Seq.AvgQualWithError(qBase)
+				if err != nil {
+					checkError(fmt.Errorf("%s: %w", r.ID, err))
+				}
+				return value
 			},
 		}
 
@@ -141,8 +151,7 @@ GC-skew histograms, but are still written in pass-through mode.`,
 
 		for _, f := range fields {
 			if fmap[f].Generate == nil {
-				fmt.Fprintf(os.Stderr, "Invalid field: %s\n", f)
-				os.Exit(1)
+				checkError(fmt.Errorf("Invalid field: %s", f))
 			}
 		}
 		if logMode && fields[0] == "GCSkew" {
@@ -187,7 +196,7 @@ GC-skew histograms, but are still written in pass-through mode.`,
 
 		field := fields[0]
 
-		h := thist.NewHist([]float64{}, fmap[field].Title, binMode, printBins, true)
+		h := newHistogram([]float64{}, fmap[field].Title, binMode, printBins, true)
 
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
@@ -217,23 +226,23 @@ GC-skew histograms, but are still written in pass-through mode.`,
 				p := transform(fmap[field].Generate(record))
 				if !math.IsNaN(p) && !math.IsInf(p, 0) {
 					count++
-					h.Update(p)
+					updateHistogram(h, p)
 
 					if printFreq > 0 && count%printFreq == 0 {
 						if printDump {
-							os.Stderr.Write([]byte(h.Dump()))
+							os.Stderr.Write([]byte(histogramText(h, true)))
 						} else {
 							if !printQuiet {
-								os.Stderr.Write([]byte(thist.ClearScreenString()))
-								os.Stderr.Write([]byte(h.Draw()))
+								os.Stderr.Write([]byte(histogramClear(h)))
+								os.Stderr.Write([]byte(histogramText(h, false)))
 							}
 						}
 						if printPdf != "" {
-							h.SaveImage(printPdf)
+							checkError(saveHistogram(h, printPdf))
 						}
 						time.Sleep(time.Duration(printDelay) * time.Second)
 						if printReset {
-							h = thist.NewHist([]float64{}, fmap[field].Title, binMode, printBins, true)
+							h = newHistogram([]float64{}, fmap[field].Title, binMode, printBins, true)
 						}
 					}
 				}
@@ -274,17 +283,22 @@ GC-skew histograms, but are still written in pass-through mode.`,
 
 		} //file
 
+		if count == 0 {
+			log.Warningf("no valid values; skipping histogram")
+			return
+		}
+
 		if printFreq < 0 || count%printFreq != 0 {
 			if printDump {
-				os.Stderr.Write([]byte(h.Dump()))
+				os.Stderr.Write([]byte(histogramText(h, true)))
 			} else {
 				if !printQuiet {
-					os.Stderr.Write([]byte(thist.ClearScreenString()))
-					os.Stderr.Write([]byte(h.Draw()))
+					os.Stderr.Write([]byte(histogramClear(h)))
+					os.Stderr.Write([]byte(histogramText(h, false)))
 				}
 			}
 			if printPdf != "" {
-				h.SaveImage(printPdf)
+				checkError(saveHistogram(h, printPdf))
 			}
 		}
 

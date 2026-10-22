@@ -51,7 +51,7 @@ func parseAlnParams(s string) *AlnParams {
 	p := new(AlnParams)
 	sp := strings.Split(s, ",")
 	if len(sp) != 4 {
-		panic("Invalid alignment parameters: " + s)
+		checkError(fmt.Errorf("invalid alignment parameters: %s (expected four integers)", s))
 	}
 	for i, tok := range sp {
 		sp[i] = strings.TrimSpace(tok)
@@ -65,6 +65,9 @@ func parseAlnParams(s string) *AlnParams {
 	checkError(err)
 	p.GapExtend, err = strconv.Atoi(sp[3])
 	checkError(err)
+	if p.Match <= 0 || p.Mismatch > 0 || p.GapOpen > 0 || p.GapExtend > 0 {
+		checkError(fmt.Errorf("invalid alignment parameters: %s (match > 0; mismatch, gap_open and gap_extend <= 0)", s))
+	}
 	return p
 }
 
@@ -82,7 +85,7 @@ func parseRanges(rf string) Ranges {
 		}
 		rt := strings.Split(t, ":")
 		if len(rt) != 2 {
-			panic("invalid range: " + t)
+			checkError(fmt.Errorf("invalid range: %s", t))
 		}
 		var err error
 		var ts, te string
@@ -102,7 +105,7 @@ func parseRanges(rf string) Ranges {
 			checkError(err)
 		}
 		if e > 0 && s > 0 && e < s {
-			panic("invalid range: " + t)
+			checkError(fmt.Errorf("invalid range: %s", t))
 		}
 		res = append(res, Range{s, e})
 	}
@@ -120,6 +123,10 @@ var fishCmd = &cobra.Command{
 Attention:
   1. output coordinates are BED-like 0-based, left-close and right-open.
   2. alignment information are printed to STDERR.
+  3. Alignment scores require match > 0 and mismatch/gap penalties <= 0.
+  4. Accuracy and NM statistics ignore case.
+  5. BAM reference names use sequence IDs; -D affects only the full-header
+     display in text results.
 
 `,
 
@@ -228,9 +235,9 @@ Attention:
 					checkSeqType = false
 				}
 
-				refId := string(record.Name)
-				if !flagDesc {
-					refId = strings.Split(refId, " ")[0]
+				refId := string(record.ID)
+				if flagDesc {
+					refId = string(record.Name)
 				}
 
 				hits := detector.Detect(&Reference{refId, string(record.Seq.Seq), ranges}, flagAll)
@@ -249,7 +256,8 @@ Attention:
 					}
 
 					if flagBam != "" {
-						nr, _ := sam.NewReference(refId, "", "", len(record.Seq.Seq), nil, nil)
+						nr, err := sam.NewReference(string(record.ID), "", "", len(record.Seq.Seq), nil, nil)
+						checkError(err)
 						samRefs = append(samRefs, nr)
 						refMap[refId] = count
 						alns = append(alns, hits...)
@@ -320,7 +328,7 @@ func saveBam(bamFile string, refs []*sam.Reference, refMap map[string]int, alns 
 	var h *sam.Header
 	h, err = sam.NewHeader([]byte{}, refs)
 	checkError(err)
-	fish := sam.NewProgram("seqkit", "seqkit", "seqkit fish", "-", "1.0")
+	fish := sam.NewProgram("seqkit", "seqkit", "seqkit fish", "", "1.0")
 	h.AddProgram(fish)
 	bamWriter, err = bam.NewWriter(fh, h, 50)
 	checkError(err)
@@ -330,7 +338,7 @@ func saveBam(bamFile string, refs []*sam.Reference, refMap map[string]int, alns 
 			mq = 60
 		}
 		var record *sam.Record
-		pg, err := sam.NewAux(sam.NewTag("PG"), 0)
+		pg, err := sam.NewAux(sam.NewTag("PG"), "seqkit")
 		record, err = NewSAMRecordFromAln(a.Query.Name, refs[refMap[a.Ref.Name]], a.RefStart, a.RefEnd, a.QueryStart, a.QueryEnd, a.RefAln, a.QueryAln, a.Query.Strand, byte(uint8(mq)), a.Query.Seq, nil, []sam.Aux{pg})
 		checkError(err)
 		if !sam.IsValidRecord(record) {
@@ -398,7 +406,7 @@ func NewSAMRecordFromAln(name string, ref *sam.Reference, refStart, refEnd, quer
 		} else {
 			rawCo = append(rawCo, sam.NewCigarOp(sam.CigarMatch, 1))
 			consumed++
-			if queryAln[i] != refAln[i] {
+			if !equalFoldBase(queryAln[i], refAln[i]) {
 				nm++
 			}
 			continue

@@ -61,6 +61,7 @@ and extracts sequences by FASTA index.
 Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
+     Two-pass mode requires unique complete FASTA headers (ID and description).
   2. When sorting by sequence (-s), -L applies in both modes. Records with equal
      sequence prefixes retain their input order.
 

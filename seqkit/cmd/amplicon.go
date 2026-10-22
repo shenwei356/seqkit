@@ -73,6 +73,9 @@ Attention:
   3. Degenerate bases/residues like "RYMM.." are also supported.
      But do not use degenerate bases/residues in regular expression, you need
      convert them to regular expression, e.g., change "N" or "X"  to ".".
+     Degenerate primers, including N, cannot be combined with --max-mismatch.
+  4. Primer files require two or three tab-separated columns; malformed rows
+     are errors. Each primer group must contain at least one nonempty primer.
 
 Examples:
   0. no region given.
@@ -140,9 +143,7 @@ Examples:
 			}
 		}
 
-		outfh, err := xopen.Wopen(outFile)
-		checkError(err)
-		defer closeOutput(outfh)
+		var err error
 
 		region := getFlagString(cmd, "region")
 		fregion := getFlagBool(cmd, "flanking-region")
@@ -171,6 +172,14 @@ Examples:
 
 		primers, err = parsePrimers(list)
 		checkError(err)
+		if len(primers) == 0 {
+			checkError(fmt.Errorf("at least one primer needed"))
+		}
+		for _, primer := range primers {
+			if maxMismatch > 0 && (hasDegeneratePrimer(primer[1]) || hasDegeneratePrimer(primer[2])) {
+				checkError(fmt.Errorf("degenerate primers are not supported with --max-mismatch"))
+			}
+		}
 
 		if !config.Quiet {
 			log.Infof("%d primer pair loaded", len(primers))
@@ -207,6 +216,10 @@ Examples:
 			}
 			usingRegion = true
 		}
+
+		outfh, err := xopen.Wopen(outFile)
+		checkError(err)
+		defer closeOutput(outfh)
 
 		strands := []string{"+", "-"}
 
@@ -616,13 +629,16 @@ func loadPrimers(file string) ([][3]string, error) {
 		return nil, fmt.Errorf("load primers from '%s': %s", file, err)
 	}
 
+	defer fh.Close()
 	var text string
+	var lineNo int
 	var items []string
 	lists := make([][3]string, 0, 100)
 	scanner := bufio.NewScanner(fh)
 	for scanner.Scan() {
-		text = strings.TrimSpace(scanner.Text())
-		if text == "" || text[0] == '#' {
+		lineNo++
+		text = strings.TrimRight(scanner.Text(), "\r\n")
+		if strings.TrimSpace(text) == "" || strings.HasPrefix(strings.TrimSpace(text), "#") {
 			continue
 		}
 
@@ -633,7 +649,16 @@ func loadPrimers(file string) ([][3]string, error) {
 		case 2:
 			lists = append(lists, [3]string{items[0], items[1], ""})
 		default:
-			continue
+			return nil, fmt.Errorf("%s:%d: expected 2 or 3 tab-separated columns", file, lineNo)
+		}
+		row := lists[len(lists)-1]
+		if row[1] == "" && row[2] == "" {
+			return nil, fmt.Errorf("%s:%d: at least one primer needed", file, lineNo)
+		}
+		for _, primer := range []string{row[1], row[2]} {
+			if seq.DNAredundant.IsValid([]byte(primer)) != nil {
+				return nil, fmt.Errorf("%s:%d: invalid primer sequence: %s", file, lineNo, primer)
+			}
 		}
 	}
 	if err = scanner.Err(); err != nil {
@@ -648,6 +673,9 @@ func parsePrimers(primers [][3]string) ([][3][]byte, error) {
 
 	for _, items := range primers {
 		name := []byte(items[0])
+		if items[1] == "" && items[2] == "" {
+			return nil, fmt.Errorf("primer %s: at least one primer needed", items[0])
+		}
 
 		forward := []byte(items[1])
 		if seq.DNAredundant.IsValid(forward) != nil {
@@ -712,6 +740,10 @@ func NewAmpliconFinder(sequence, forwardPrimer, reversePrimerRC []byte, maxMisma
 		return nil, fmt.Errorf("at least one primer needed")
 	}
 
+	if maxMismatch > 0 && (hasDegeneratePrimer(forwardPrimer) || hasDegeneratePrimer(reversePrimerRC)) {
+		return nil, fmt.Errorf("degenerate primers are not supported with --max-mismatch")
+	}
+
 	if len(forwardPrimer) == 0 { // F = R.revcom()
 		forwardPrimer = reversePrimerRC
 		reversePrimerRC = nil
@@ -732,11 +764,11 @@ func NewAmpliconFinder(sequence, forwardPrimer, reversePrimerRC []byte, maxMisma
 		finder.MaxMismatch = maxMismatch
 		finder.FMindex = index
 	} else {
-		if seq.DNA.IsValid(finder.F) != nil { // containing degenerate base
+		if hasDegeneratePrimer(finder.F) { // containing degenerate base
 			if maxMismatch > 0 {
 				checkError(fmt.Errorf("it does not support both degenerate base and mismatch"))
 			}
-			s, _ := seq.NewSeq(seq.DNA, finder.F)
+			s, _ := seq.NewSeqWithoutValidation(seq.DNAredundant, finder.F)
 			rF, err := regexp.Compile(s.Degenerate2Regexp())
 			if err != nil {
 				return nil, fmt.Errorf("fail to parse primer containing degenerate base: %s", finder.F)
@@ -744,11 +776,11 @@ func NewAmpliconFinder(sequence, forwardPrimer, reversePrimerRC []byte, maxMisma
 			finder.rF = rF
 		}
 
-		if seq.DNA.IsValid(finder.R) != nil { // containing degenerate base
+		if hasDegeneratePrimer(finder.R) { // containing degenerate base
 			if maxMismatch > 0 {
 				checkError(fmt.Errorf("it does not support both degenerate base and mismatch"))
 			}
-			s, _ := seq.NewSeq(seq.DNA, finder.R)
+			s, _ := seq.NewSeqWithoutValidation(seq.DNAredundant, finder.R)
 			rR, err := regexp.Compile(s.Degenerate2Regexp())
 			if err != nil {
 				return nil, fmt.Errorf("fail to parse primer containing degenerate base: %s", finder.R)
@@ -824,44 +856,31 @@ func SubLocationInner(length, B, E, begin, end int, strictMode bool) (int, int, 
 	}
 
 	var b, e int
-
 	if begin > 0 {
+		if begin > length-B {
+			return 0, 0, false
+		}
 		b = B + begin
 	} else {
 		b = E + begin + 2
 	}
-	if b > length {
-		if strictMode {
-			return 0, 0, false
-		}
-		b = length
-	} else if b < 1 {
-		if strictMode {
-			return 0, 0, false
-		}
-		b = 1
-	}
-
 	if end > 0 {
-		e = B + end
+		if end > length-B {
+			if strictMode {
+				return 0, 0, false
+			}
+			e = length
+		} else {
+			e = B + end
+		}
 	} else {
 		e = E + end + 2
 	}
-	if e > length {
-		if strictMode {
-			return 0, 0, false
-		}
-		e = length
-	} else if e < 1 {
-		if strictMode {
-			return 0, 0, false
-		}
-		e = 1
-	}
-
-	if b > e {
+	// Reject empty intersections before clipping, without overflowing coordinates.
+	if b > e || b > length || e < 1 || strictMode && (b < 1 || e > length) {
 		return b, e, false
 	}
+	b, e = max(1, b), min(length, e)
 
 	return b, e, true
 }
@@ -1056,6 +1075,10 @@ func (finder *AmpliconFinder) Locate() ([]int, []int, error) {
 	}
 	sort.Ints(locsI) // to remain the FIRST location
 	sort.Ints(locsJ) // to remain the LAST location
+	if locsJ[len(locsJ)-1] < locsI[0] {
+		finder.searched, finder.found = true, false
+		return nil, nil, nil
+	}
 	finder.searched, finder.found = true, true
 	finder.iBegin, finder.iEnd = locsI[0], locsJ[len(locsJ)-1]+len(finder.R)-1
 	finder.mis5 = amplicon_mismatches(finder.Seq[locsI[0]:locsI[0]+len(finder.F)], finder.F)
@@ -1079,4 +1102,14 @@ func (finder *AmpliconFinder) Location() ([]int, []int, error) {
 	}
 
 	return []int{finder.iBegin + 1, finder.iEnd + 1}, []int{finder.mis5, finder.mis3}, nil
+}
+
+// hasDegeneratePrimer includes N, which the plain DNA alphabet also accepts.
+func hasDegeneratePrimer(p []byte) bool {
+	for _, b := range bytes.ToUpper(p) {
+		if !bytes.ContainsRune([]byte("ACGTU"), rune(b)) {
+			return true
+		}
+	}
+	return false
 }

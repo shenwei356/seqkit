@@ -41,6 +41,14 @@ var mergeSlidesCmd = &cobra.Command{
 	Short: "merge sliding windows generated from seqkit sliding",
 	Long: `merge sliding windows generated from seqkit sliding
 
+Attention:
+  1. Input coordinates are 1-based and inclusive; output is BED3.
+  2. Within each input file, reference groups must be contiguous and starts
+     nondecreasing.
+  3. The regular expression needs at least three capturing groups: reference,
+     start, end.
+  4. -g limits the distance between adjacent input starts.
+
 For example,
 
     ref.contig00001_sliding:454531-454680
@@ -93,6 +101,9 @@ Output (BED3 format):
 		reQueryStr := getFlagString(cmd, "regexp")
 		reQuery, err := regexp.Compile(reQueryStr)
 		checkError(err)
+		if reQuery.NumSubexp() < 3 {
+			checkError(fmt.Errorf("regular expression must contain at least three capturing groups"))
+		}
 
 		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
 		if !config.SkipFileCheck {
@@ -129,7 +140,7 @@ Output (BED3 format):
 		buf := make([]byte, min(bufferSize, 64<<10)) // Grow only when a long line needs it.
 		var founds [][]string
 		var ref, ref0 string
-		var begin, end, begin0, end0, begin1, end1 int
+		var begin, end, begin0, end0, begin1 int
 		var extend bool
 
 		for _, file := range files {
@@ -143,7 +154,16 @@ Output (BED3 format):
 			scanner.Buffer(buf, int(bufferSize))
 
 			ref0, begin0, end0 = "", 0, 0
+			seenRefs := make(map[string]bool)
+			lineNo := 0
+			fail := func(err error) {
+				if err != nil {
+					closeOutput(outfh)
+					checkError(fmt.Errorf("%s:%d: %w", file, lineNo, err))
+				}
+			}
 			for scanner.Scan() {
+				lineNo++
 				line = strings.TrimRight(scanner.Text(), "\r\n")
 
 				if line == "" {
@@ -163,24 +183,33 @@ Output (BED3 format):
 
 				founds = reQuery.FindAllStringSubmatch(line, 3)
 				if len(founds) == 0 {
-					checkError(fmt.Errorf("no reference and location found in the input  line"))
+					fail(fmt.Errorf("no reference and location found in the input line"))
 				}
 				ref = founds[0][1]
 				begin, err = strconv.Atoi(founds[0][2])
 				if err != nil {
-					checkError(fmt.Errorf("invalid start coordinate %q: %w", founds[0][2], err))
+					fail(fmt.Errorf("invalid start coordinate %q: %w", founds[0][2], err))
 				}
 				end, err = strconv.Atoi(founds[0][3])
 				if err != nil {
-					checkError(fmt.Errorf("invalid end coordinate %q: %w", founds[0][3], err))
+					fail(fmt.Errorf("invalid end coordinate %q: %w", founds[0][3], err))
 				}
+
+				if begin < 1 || end < begin {
+					fail(fmt.Errorf("invalid coordinates: %d-%d (require 1 <= start <= end)", begin, end))
+				}
+				// Validate input order without retaining all windows.
+				if ref == ref0 && begin < begin1 || ref != ref0 && seenRefs[ref] {
+					fail(fmt.Errorf("windows are not sorted: %s:%d-%d", ref, begin, end))
+				}
+				seenRefs[ref] = true
 
 				// ------------------------------------------
 				if begin0 > 0 { // not the first record
 					extend = false
 
 					// 1. the same chromesome; 2. has overlap
-					if ref == ref0 && begin+minOverlap-1 <= end1 {
+					if ref == ref0 && min(end, end0)-begin+1 >= minOverlap {
 						if limitGap {
 							if begin-begin1 <= maxGap {
 								extend = true
@@ -191,7 +220,7 @@ Output (BED3 format):
 					}
 
 					if extend {
-						end0 = end
+						begin0, end0 = min(begin0, begin), max(end0, end)
 					} else { // print previous region
 						fmt.Fprintf(outfh, "%s\t%d\t%d\n", ref0, begin0-1, end0)
 
@@ -201,13 +230,13 @@ Output (BED3 format):
 					ref0, begin0, end0 = ref, begin, end
 				}
 
-				begin1, end1 = begin, end // last record
+				begin1 = begin // Adjacent input start, independent of the merged interval.
 			}
 
 			scanErr := scanner.Err()
 			closeErr := fh.Close()
-			checkError(scanErr)
-			checkError(closeErr)
+			fail(scanErr)
+			fail(closeErr)
 			if begin0 > 0 {
 				fmt.Fprintf(outfh, "%s\t%d\t%d\n", ref0, begin0-1, end0)
 			}
@@ -219,7 +248,7 @@ func init() {
 	RootCmd.AddCommand(mergeSlidesCmd)
 
 	mergeSlidesCmd.Flags().StringSliceP("comment-line-prefix", "p", []string{"#", "//"}, "comment line prefix")
-	mergeSlidesCmd.Flags().StringP("buffer-size", "b", "1G", `size of buffer, supported unit: K, M, G. You need increase the value when "bufio.Scanner: token too long" error reported`)
+	mergeSlidesCmd.Flags().StringP("buffer-size", "b", "1G", `size of buffer, supported unit: K, M, G (base 1024). You need increase the value when "bufio.Scanner: token too long" error reported`)
 
 	mergeSlidesCmd.Flags().StringP("regexp", "r", `^(.+)_sliding:(\d+)\-(\d+)`, `regular expression for extract the reference name and window position.`)
 

@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"math"
 	"math/rand"
 	"runtime"
 	"time"
@@ -61,11 +62,15 @@ it is not uniform fixed-size sampling.
 Results are deterministic for the same input and seed. To vary results across
 runs, add '-r/--non-deterministic' for a time-based seed.
 
+Attention:
+  1. Proportion mode (-p) accepts multiple inputs, including --infile-list.
+     Each file restarts the same random seed, as if sampled separately. With -r,
+     one time-based seed is generated per invocation and reused for each file.
+  2. Number mode (-n) accepts one input file.
+  3. Duplicate headers are allowed.
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 1 {
-			checkError(fmt.Errorf("no more than one file needed (%d)", len(args)))
-		}
 
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
@@ -97,8 +102,13 @@ runs, add '-r/--non-deterministic' for a time-based seed.
 
 		file := files[0]
 
-		if twoPass && isStdin(file) {
-			checkError(fmt.Errorf("two-pass mode (-2) will failed when reading from stdin. please disable flag: -2"))
+		if number > 0 && len(files) > 1 {
+			checkError(fmt.Errorf("no more than one file needed (%d)", len(files)))
+		}
+		for _, input := range files {
+			if twoPass && isStdin(input) {
+				checkError(fmt.Errorf("two-pass mode (-2) will failed when reading from stdin. please disable flag: -2"))
+			}
 		}
 
 		if number == 0 && proportion == 0 {
@@ -108,7 +118,7 @@ runs, add '-r/--non-deterministic' for a time-based seed.
 		if number < 0 {
 			checkError(fmt.Errorf("value of -n (--number) and should be greater than 0"))
 		}
-		if proportion < 0 || proportion > 1 {
+		if math.IsNaN(proportion) || proportion < 0 || proportion > 1 {
 			checkError(fmt.Errorf("value of -p (--proportion) (%f) should be in range of (0, 1]", proportion))
 		}
 
@@ -118,7 +128,8 @@ runs, add '-r/--non-deterministic' for a time-based seed.
 
 		var _rand *rand.Rand
 		if nonDeterministic {
-			_rand = rand.New(rand.NewSource(time.Now().UnixNano()))
+			seed = time.Now().UnixNano()
+			_rand = rand.New(rand.NewSource(seed))
 		} else {
 			_rand = rand.New(rand.NewSource(seed))
 		}
@@ -187,7 +198,7 @@ runs, add '-r/--non-deterministic' for a time-based seed.
 				if !quiet {
 					log.Info("loading all sequences into memory...")
 				}
-				records, err := fastx.GetSeqs(file, alphabet, config.Threads, 10, idRegexp)
+				records, err := readRecordsChecked(file, alphabet, idRegexp)
 				checkError(err)
 
 				if len(records) > 0 && len(records[0].Seq.Qual) > 0 {
@@ -215,37 +226,43 @@ runs, add '-r/--non-deterministic' for a time-based seed.
 				log.Info("sample by proportion")
 			}
 
-			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
-			checkError(err)
+			lineWidth := config.LineWidth
+			for _, file := range files {
+				_rand = rand.New(rand.NewSource(seed))
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
+				checkError(err)
 
-			checkAlphabet := true
-			for {
-				record, err = fastxReader.Read()
-				if err != nil {
-					if err == io.EOF {
+				checkAlphabet := true
+				fastx.ForcelyOutputFastq = false
+				config.LineWidth = lineWidth
+				for {
+					record, err = fastxReader.Read()
+					if err != nil {
+						if err == io.EOF {
+							break
+						}
+						checkError(err)
 						break
 					}
-					checkError(err)
-					break
-				}
 
-				if checkAlphabet {
-					if fastxReader.IsFastq {
-						if !config.LineWidthChanged {
-							config.LineWidth = 0
+					if checkAlphabet {
+						if fastxReader.IsFastq {
+							if !config.LineWidthChanged {
+								config.LineWidth = 0
+							}
+							fastx.ForcelyOutputFastq = true
 						}
-						fastx.ForcelyOutputFastq = true
+						checkAlphabet = false
 					}
-					checkAlphabet = false
-				}
 
-				// if <-randg <= proportion {
-				if _rand.Float64() <= proportion {
-					n++
-					record.FormatToWriter(outfh, config.LineWidth)
+					// if <-randg <= proportion {
+					if _rand.Float64() <= proportion {
+						n++
+						record.FormatToWriter(outfh, config.LineWidth)
+					}
 				}
+				fastxReader.Close()
 			}
-			fastxReader.Close()
 		}
 
 		if !quiet {

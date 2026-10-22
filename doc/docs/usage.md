@@ -179,6 +179,8 @@ reproduced in different environments with same random seed.
 ## seqkit
 
 ``` text
+$ seqkit -h
+
 SeqKit -- a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
 Version: 2.14.0
@@ -339,6 +341,8 @@ Only DNA and gtf/bed data of Chr1 were used:
 Usage
 
 ``` text
+$ seqkit seq -h
+
 transform sequences (extract ID, filter by length, remove gaps, reverse complement...)
 
 Filtering records to edit:
@@ -525,6 +529,8 @@ Examples
 Usage
 
 ``` text
+$ seqkit subseq -h
+
 get subsequences by region/gtf/bed, including flanking sequences.
 
 Attention:
@@ -667,12 +673,16 @@ Examples
 Usage
 
 ``` text
+$ seqkit sliding -h
+
 extract subsequences in sliding windows
 
-Circular windows must not exceed the sequence length.
+Attention:
+  1. Circular windows must not exceed a nonempty sequence's length.
+     Empty circular records are skipped.
 
 Usage:
-  seqkit sliding [flags] 
+  seqkit sliding [flags]
 
 Flags:
   -c, --circular          circular genome (same to -C/--circular-genome)
@@ -681,8 +691,7 @@ Flags:
   -h, --help              help for sliding
   -s, --step int          step size
   -S, --suffix string     suffix added to the sequence ID (default "_sliding")
-  -W, --window int        window size
-
+  -W, --window int        window size (circular mode requires window <= sequence length)
 ```
 
 Examples
@@ -737,6 +746,8 @@ Examples
 Usage
 
 ``` text
+$ seqkit stats -h
+
 simple statistics of FASTA/Q files
 
 Columns:
@@ -903,6 +914,8 @@ Eexamples
 Usage
 
 ```text
+$ seqkit sum -h
+
 compute message digest for all sequences in FASTA/Q files
 
 Attention:
@@ -1054,6 +1067,8 @@ Include the sequence header via `-i/--include-id`. [#595](https://github.com/she
 Usage
 
 ``` text
+$ seqkit faidx -h
+
 create the FASTA index file and extract subsequences
 
 This command is similar with "samtools faidx" but has some extra features:
@@ -1065,6 +1080,8 @@ This command is similar with "samtools faidx" but has some extra features:
 
 Attention:
   1. The flag -U/--update-faidx is recommended to ensure the .fai file matches the FASTA file.
+  2. Missing IDs in ordinary queries are warned about; valid queries are still
+     written, and the command finishes with a nonzero exit status.
 
 The definition of region is 1-based and with some custom design.
 
@@ -1096,7 +1113,6 @@ Flags:
   -U, --update-faidx         update the fasta index file if it exists. Use this if you are not sure
                              whether the fasta file changed
   -r, --use-regexp           IDs are regular expression. But subseq region is not supported here.
-
 ```
 
 Example
@@ -1153,10 +1169,16 @@ Example
 Usage
 
 ``` text
+$ seqkit watch -h
+
 monitoring and online histograms of sequence features
 
-Only one field can be selected. Sequences without G or C are omitted from
-GC-skew histograms, but are still written in pass-through mode.
+Attention:
+  1. Only one field can be selected.
+  2. Sequences without G or C are omitted from GC-skew histograms, but are
+     still written in pass-through mode.
+  3. Without valid statistics, plotting and image generation are skipped successfully.
+  4. Invalid qualities in MeanQual and image-writing failures are reported as errors.
 
 Usage:
   seqkit watch [flags]
@@ -1177,7 +1199,6 @@ Flags:
   -Q, --quiet-mode            suppress all plotting to stderr
   -R, --reset                 reset histogram after every report
   -v, --validate-seq          validate bases according to the alphabet
-
 ```
 
 Examples
@@ -1204,6 +1225,8 @@ Examples
 Usage
 
 ``` text
+$ seqkit sana -h
+
 sanitize broken single line FASTQ files
 
 Sana is a resilient FASTQ/FASTA parser. Unlike many parsers,
@@ -1213,6 +1236,12 @@ and continues processing the file.
 Sana currently supports this FASTQ dialect:
 
   - One line for each sequence and quality value
+
+Attention:
+  1. FASTA recovery discards pre-header junk and malformed records, preserving
+     valid neighboring records. Empty IDs are allowed; records without sequence
+     are discarded.
+  2. File I/O errors stop processing with a nonzero exit status.
 
 Usage:
   seqkit sana [flags]
@@ -1246,16 +1275,27 @@ Examples
 Usage
 
 ```text
+$ seqkit scat -h
+
 real time recursive concatenation and streaming of fastx files
+
+Attention:
+  1. --infile-list accepts directories, one per line, and is merged with positional
+     directories. Overlapping directories and file aliases are processed once.
+  2. Renames within the watched directories retain the read position.
+  3. Complete appended records are flushed promptly; incomplete records wait
+     for more data.
+  4. In --find-only mode, file errors do not stop other files, but the final exit
+     status is nonzero.
 
 Usage:
   seqkit scat [flags]
 
 Flags:
   -A, --allow-gaps            allow gap character (-) in sequences
-  -d, --delta int             minimum size increase in kilobytes to trigger parsing (default 5)
+  -d, --delta int             minimum size increase in kilobytes (base 1024) to trigger parsing (default 5)
   -D, --drop-time string      Notification drop interval (default "500ms")
-  -f, --find-only             concatenate exisiting files and quit
+  -f, --find-only             concatenate existing files and quit
   -i, --format string         input and output format: fastq or fasta (fastq) (default "fastq")
   -g, --gz-only               only look for gzipped files (.gz suffix)
   -h, --help                  help for scat
@@ -1265,7 +1305,6 @@ Flags:
   -r, --regexp string         regexp for watched files, by default guessed from the input format
   -T, --time-limit string     quit after inactive for this time period
   -p, --wait-pid int          after process with this PID exited (default -1)
-  
 ```
 
 Examples
@@ -1293,6 +1332,8 @@ Examples
 Usage
 
 ```text
+$ seqkit fq2fa -h
+
 convert FASTQ to FASTA
 
 Usage:
@@ -1310,6 +1351,8 @@ Examples
 Usage
 
 ```text
+$ seqkit fa2fq -h
+
 retrieve corresponding FASTQ records by a FASTA file
 
 Attention:
@@ -1331,6 +1374,8 @@ Flags:
 Usage (fx2tab)
 
 ``` text
+$ seqkit fx2tab -h
+
 convert FASTA/Q to tabular format, and provide various information,
 like sequence length, GC content/GC skew.
 
@@ -1372,18 +1417,19 @@ Flags:
 Usage (tab2fx)
 
 ``` text
+$ seqkit tab2fx -h
+
 convert tabular format (first two/three columns) to FASTA/Q format
 
 Usage:
-  seqkit tab2fx [flags] 
+  seqkit tab2fx [flags]
 
 Flags:
-  -b, --buffer-size string            size of buffer, supported unit: K, M, G. You need increase the
-                                      value when "bufio.Scanner: token too long" error reported (default
-                                      "1G")
+  -b, --buffer-size string            size of buffer, supported unit: K, M, G (base 1024). You need
+                                      increase the value when "bufio.Scanner: token too long" error
+                                      reported (default "1G")
   -p, --comment-line-prefix strings   comment line prefix (default [#,//])
   -h, --help                          help for tab2fx
-
 ```
 
 Examples
@@ -1450,6 +1496,8 @@ as `seqkit common -n` along with shell.
 Usage
 
 ``` text
+$ seqkit convert -h
+
 convert FASTQ quality encoding between Sanger, Solexa and Illumina
 
 Quality conversion rejects invalid source scores and results outside printable
@@ -1576,6 +1624,8 @@ FGDGGGGGDGFFGGGDGGGGGGEEGAGFFE>A>@!B@?@@<:!!!!!!!!!!355=>><>EEEEAEEE?EEEBEE?!!!!
 Usage
 
 ``` text
+$ seqkit translate -h
+
 translate DNA/RNA to protein sequence (supporting ambiguous bases)
 
 Note:
@@ -1591,7 +1641,7 @@ Note:
         GGN -> G
         GTN -> V
         TCN -> S
-        
+
         MGR -> R
         YTR -> L
 
@@ -1640,14 +1690,14 @@ Flags:
   -l, --list-transl-table int                   show details of translate table N, 0 for all (default -1)
   -L, --list-transl-table-with-amb-codons int   show details of translate table N (including ambigugous
                                                 codons), 0 for all.  (default -1)
-  -m, --min-len int                             the minimum length of amino acid sequence
+  -m, --min-len int                             minimum amino acid length of subsequences (only with
+                                                -s/--out-subseqs)
   -s, --out-subseqs                             output individual amino acid subsequences separated by
                                                 the stop symbol "*"
+  -e, --skip-translate-errors                   skip errors during translate and output blank sequence
   -T, --transl-table int                        translate table/genetic code, type 'seqkit translate
                                                 --help' for more details (default 1)
-      --trim                                    remove all 'X' and '*' characters from the right end of
-                                                the translation
-
+      --trim                                    truncate translation at the first 'X' or '*' character
 ```
 
 Examples
@@ -1775,6 +1825,8 @@ Examples
 Usage
 
 ``` text
+$ seqkit grep -h
+
 search sequences by ID/name/sequence/sequence motifs, mismatch allowed
 
 Attention:
@@ -2002,23 +2054,29 @@ Examples
 Usage
 
 ``` text
+$ seqkit locate -h
+
 locate subsequences/motifs, mismatch allowed
 
 Attention:
 
   1. Motifs could be EITHER plain sequence containing "ACTGN" OR regular
-     expression like "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" for ORFs.     
+     expression like "A[TU]G(?:.{3})+?[TU](?:AG|AA|GA)" for ORFs.
   2. Degenerate bases/residues like "RYMM.." are also supported by flag -d.
      But do not use degenerate bases/residues in regular expression, you need
      convert them to regular expression, e.g., change "N" or "X"  to ".".
   3. When providing search patterns (motifs) via flag '-p',
-     please use double quotation marks for patterns containing comma, 
+     please use double quotation marks for patterns containing comma,
      e.g., -p '"A{2,}"' or -p "\"A{2,}\"". Because the command line argument
      parser accepts comma-separated-values (CSV) for multiple values (motifs).
-     Patterns in file do not follow this rule.     
+     Patterns in file do not follow this rule.
+     Patterns from -p and -f are combined. Every pattern-file record is searched,
+     including duplicate names and sequences. Duplicate IDs in the pattern file
+     trigger warnings unless --quiet is set; all their patterns are retained.
+     Empty patterns are warned about and skipped; having no valid patterns is an error.
   4. Mismatch is allowed using flag "-m/--max-mismatch",
      you can increase the value of "-j/--threads" to accelerate processing.
-  5. When using flag --circular, end position of matched subsequence that 
+  5. When using flag --circular, end position of matched subsequence that
      crossing genome sequence end would be greater than sequence length.
 
 Usage:
@@ -2044,7 +2102,6 @@ Flags:
   -f, --pattern-file string    pattern/motif file (FASTA format)
   -F, --use-fmi                use FM-index for much faster search of lots of sequence patterns
   -r, --use-regexp             patterns/motifs are regular expression
-
 ```
 
 Examples
@@ -2175,11 +2232,17 @@ crossing genome sequence end would be greater than sequence length.
 Usage
 
 ``` text
+$ seqkit fish -h
+
 look for short sequences in larger sequences using local alignment
 
 Attention:
   1. output coordinates are BED-like 0-based, left-close and right-open.
   2. alignment information are printed to STDERR.
+  3. Alignment scores require match > 0 and mismatch/gap penalties <= 0.
+  4. Accuracy and NM statistics ignore case.
+  5. BAM reference names use sequence IDs; -D affects only the full-header
+     display in text results.
 
 Usage:
   seqkit fish [flags]
@@ -2200,7 +2263,6 @@ Flags:
   -r, --ranges string            target ranges, for example: ":10,30:40,-20:"
   -s, --stranded                 search + strand only
   -v, --validate-seq             validate bases according to the alphabet
-
 ```
 
 Examples
@@ -2235,24 +2297,31 @@ Examples
 Usage
 
 ``` text
+$ seqkit amplicon -h
+
 extract amplicon (or specific region around it) via primer(s).
 
 Attention:
   1. Only one (the longest) matching location is returned for every primer pair.
-  2. Mismatch is allowed, but the mismatch location (5' or 3') is not controled. 
+  2. Mismatch is allowed, but the mismatch location (5' or 3') is not controlled.
      You can increase the value of "-j/--threads" to accelerate processing.
+     You can switch "-M/--output-mismatches" to append total mismatches and
+     mismatches of 5' end and 3' end.
   3. Degenerate bases/residues like "RYMM.." are also supported.
      But do not use degenerate bases/residues in regular expression, you need
      convert them to regular expression, e.g., change "N" or "X"  to ".".
+     Degenerate primers, including N, cannot be combined with --max-mismatch.
+  4. Primer files require two or three tab-separated columns; malformed rows
+     are errors. Each primer group must contain at least one nonempty primer.
 
 Examples:
   0. no region given.
-  
+
                     F
         -----===============-----
              F             R
         -----=====-----=====-----
-             
+
              ===============         amplicon
 
   1. inner region (-r x:y).
@@ -2263,7 +2332,7 @@ Examples:
                       -5-3-1          x/y
              F             R
         -----=====-----=====-----     x:y
-        
+
              ===============          1:-1
              =======                  1:7
                =====                  3:7
@@ -2271,16 +2340,16 @@ Examples:
                   =====             -10:-6
                      =====           -7:-3
                                      -x:y (invalid)
-                    
+
   2. flanking region (-r x:y -f)
-        
+
                     F
         -----===============-----
          -3-1                        x/y
                             1 3 5    x/y
              F             R
         -----=====-----=====-----
-        
+
         =====                        -5:-1
         ===                          -5:-3
                             =====     1:5
@@ -2307,7 +2376,6 @@ Flags:
   -u, --save-unmatched         also save records that do not match any primer
   -s, --strict-mode            strict mode, i.e., discarding seqs not fully matching (shorter) given
                                region range
-
 ```
 
 Examples
@@ -2431,6 +2499,8 @@ Examples
 Usage
 
 ``` text
+$ seqkit duplicate -h
+
 duplicate sequences N times
 
 You may need "seqkit rename" to make the the sequence IDs unique.
@@ -2484,6 +2554,8 @@ Examples
 Usage
 
 ``` text
+$ seqkit rmdup -h
+
 remove duplicated sequences by ID/name/sequence
 
 Attention:
@@ -2534,10 +2606,13 @@ Similar to `common`.
 Usage
 
 ``` text
-find common sequences of multiple files by id/name/sequence
+$ seqkit common -h
+
+find common/shared sequences of multiple files by id/name/sequence
 
 Note:
   1. 'seqkit common' is designed to support 2 and MORE files.
+     Results always come from the first input, including stdin.
   2. When comparing by sequences,
      a) Both positive and negative strands are compared. You can switch on
         -P/--only-positive-strand for considering the positive strand only.
@@ -2548,6 +2623,9 @@ Note:
           as it is an embedded subsequence of GGGG.
         It is recommended to put the smallest file as the first file, for saving
         memory usage.
+        With -s -e, empty records are skipped, but every input still participates
+        in the intersection. Fragments retain their corresponding qualities and
+        are ordered by first-file record, then decreasing length and increasing start.
   3. For 2 files, 'seqkit grep' is much faster and consumes lesser memory:
        seqkit grep -f <(seqkit seq -n -i small.fq.gz) big.fq.gz # by seq ID
      But note that searching by sequence would be much slower, as it's partly
@@ -2568,7 +2646,6 @@ Flags:
   -h, --help                   help for common
   -i, --ignore-case            ignore case
   -P, --only-positive-strand   only considering the positive strand when comparing by sequence
-
 ```
 
 Examples
@@ -2649,14 +2726,11 @@ Examples
         # with -e
 
         $ seqkit common -s -i common_a.fasta common_b.fasta common_c.fasta -e
-        [INFO] read file 1/3: common_a.fasta
-        [INFO]   7 seqs loaded
         [INFO] read file 2/3: common_b.fasta
-        [INFO]   5 seqs left
+        [INFO] 5 first-file records with candidate fragments left
         [INFO] read file 3/3: common_c.fasta
-        [INFO]   5 seqs left
-        [INFO] 5 unique sequences found in 3 files, which belong to 5 records in the first file: common_a.fasta
-        [INFO] 5 common/shared sequences saved to: -
+        [INFO] 5 first-file records with candidate fragments left
+        [INFO] 5 original records, 5 distinct common sequences, 5 output fragments from first file: common_a.fasta
         >A_a:3-5
         TTT
         >A_b
@@ -2671,14 +2745,11 @@ Examples
         # change the order of file, the sequences are the same
 
         $ seqkit common -s -i common_c.fasta common_b.fasta common_a.fasta -e
-        [INFO] read file 1/3: common_c.fasta
-        [INFO]   7 seqs loaded
         [INFO] read file 2/3: common_b.fasta
-        [INFO]   5 seqs left
+        [INFO] 5 first-file records with candidate fragments left
         [INFO] read file 3/3: common_a.fasta
-        [INFO]   5 seqs left
-        [INFO] 5 unique sequences found in 3 files, which belong to 5 records in the first file: common_c.fasta
-        [INFO] 5 common/shared sequences saved to: -
+        [INFO] 5 first-file records with candidate fragments left
+        [INFO] 5 original records, 5 distinct common sequences, 5 output fragments from first file: common_c.fasta
         >C_a:3-5
         TTT
         >C_b
@@ -2696,13 +2767,15 @@ Examples
 Usage
 
 ``` text
+$ seqkit split -h
+
 split sequences into files by name ID, subsequence of given region,
 part size or number of parts.
 
 If you just want to split by parts or sizes, please use "seqkit split2",
 which can apply to paired- and single-end FASTQ.
 
-If you want to split sequences by ID, please use "seqkit split2 -s 1 -N".
+For one record per file using unique IDs, use "seqkit split2 -s 1 -N".
 
 If you want to cut a sequence into multiple segments.
   1. For cutting into even chunks, please use 'kmcp utils split-genomes'
@@ -2716,9 +2789,15 @@ If you want to cut a sequence into multiple segments.
 Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
+     Two-pass mode requires unique full headers and a matching full-header index;
+     use -U to rebuild an incompatible index. Output names and compression
+     follow the same rules in both modes.
   2. For splitting by sequence IDs in Windows/MacOS, where the file systems might be case-insensitive,
      output files might be overwritten if they are only different in cases, like Abc and ABC.
      To avoid this, please switch one -I/--ignore-case.
+  3. -p produces min(N, P) balanced, nonempty parts in input order.
+  4. Existing matching outputs are overwritten; -f suppresses the directory
+     warning. Other files, including old parts not produced this time, are retained.
 
 The definition of region is 1-based and with some custom design.
 
@@ -2738,12 +2817,12 @@ negative index    0-9-8-7-6-5-4-3-2-1
         -12:-1    A C G T N a c g t n
 
 Usage:
-  seqkit split [flags] 
+  seqkit split [flags]
 
 Flags:
   -i, --by-id                     split squences according to sequence ID
       --by-id-prefix string       file prefix for --by-id
-  -p, --by-part int               split sequences into N parts
+  -p, --by-part int               split into N balanced nonempty parts (at most the number of records)
       --by-part-prefix string     file prefix for --by-part
   -r, --by-region string          split squences according to subsequence of given region. e.g 1:12 for
                                   first 12 bases, -12:-1 for last 12 bases. type "seqkit split -h" for
@@ -2753,7 +2832,7 @@ Flags:
       --by-size-prefix string     file prefix for --by-size
   -d, --dry-run                   dry run, just print message and no files will be created.
   -e, --extension string          set output file extension, e.g., ".gz", ".xz", or ".zst"
-  -f, --force                     overwrite output directory
+  -f, --force                     overwrite matching output files without the nonempty-directory warning
   -h, --help                      help for split
   -I, --ignore-case               ignore case when using -i/--by-id
   -k, --keep-temp                 keep temporary FASTA and .fai file when using 2-pass mode
@@ -2774,9 +2853,9 @@ Examples
 
         $ seqkit split hairpin.fa.gz -s 10000
         [INFO] split into 10000 seqs per file
-        [INFO] write 10000 sequences to file: hairpin.fa.part_001.gz
-        [INFO] write 10000 sequences to file: hairpin.fa.part_002.gz
-        [INFO] write 8645 sequences to file: hairpin.fa.part_003.gz
+        [INFO] write 10000 sequences to file: hairpin.fa.gz.split/hairpin.part_001.fa.gz
+        [INFO] write 10000 sequences to file: hairpin.fa.gz.split/hairpin.part_002.fa.gz
+        [INFO] write 8645 sequences to file: hairpin.fa.gz.split/hairpin.part_003.fa.gz
         
         # if there are more than 1000 parts, increase the -W/--part-width
         $ seqkit split hairpin.fa.gz -s 10000 -W 5
@@ -2799,54 +2878,56 @@ Examples
         [INFO] split into 4 parts
         [INFO] read sequences ...
         [INFO] read 28645 sequences
-        [INFO] write 7162 sequences to file: hairpin.fa.part_001.gz
-        [INFO] write 7162 sequences to file: hairpin.fa.part_002.gz
-        [INFO] write 7162 sequences to file: hairpin.fa.part_003.gz
-        [INFO] write 7159 sequences to file: hairpin.fa.part_004.gz
+        [INFO] write 7162 sequences to file: hairpin.fa.gz.split/hairpin.part_001.fa.gz
+        [INFO] write 7161 sequences to file: hairpin.fa.gz.split/hairpin.part_002.fa.gz
+        [INFO] write 7161 sequences to file: hairpin.fa.gz.split/hairpin.part_003.fa.gz
+        [INFO] write 7161 sequences to file: hairpin.fa.gz.split/hairpin.part_004.fa.gz
 
 
-    ***To reduce memory usage when spliting big file, we should alwasy use flag `--two-pass`***
+    Use `--two-pass` to reduce memory usage for large FASTA files. Temporary file names are random.
 
         $ seqkit split hairpin.fa.gz -p 4 -2
         [INFO] split into 4 parts
-        [INFO] read and write sequences to temporary file: hairpin.fa.gz.fastx ...
+        [INFO] read and write sequences to temporary file: ./seqkit-<random>.fastx ...
         [INFO] 28645 sequences saved
         [INFO] create or read FASTA index ...
-        [INFO] create FASTA index for hairpin.fa.gz.fastx
-        [INFO]   28645 records loaded from hairpin.fa.gz.fastx.seqkit.fai
-        [INFO] write 7162 sequences to file: hairpin.part_001.fa.gz
-        [INFO] write 7162 sequences to file: hairpin.part_002.fa.gz
-        [INFO] write 7162 sequences to file: hairpin.part_003.fa.gz
-        [INFO] write 7159 sequences to file: hairpin.part_004.fa.gz
+        [INFO] create FASTA index for ./seqkit-<random>.fastx
+        [INFO]   28645 records loaded from ./seqkit-<random>.fastx.seqkit.fai
+        [INFO] write 7162 sequences to file: hairpin.fa.gz.split/hairpin.part_001.fa.gz
+        [INFO] write 7161 sequences to file: hairpin.fa.gz.split/hairpin.part_002.fa.gz
+        [INFO] write 7161 sequences to file: hairpin.fa.gz.split/hairpin.part_003.fa.gz
+        [INFO] write 7161 sequences to file: hairpin.fa.gz.split/hairpin.part_004.fa.gz
 
 1. Split sequences by species. i.e. by custom IDs (first three letters)
 
         $ seqkit split hairpin.fa.gz -i --id-regexp "^([\w]+)\-" -2
         [INFO] split by ID. idRegexp: ^([\w]+)\-
-        [INFO] read and write sequences to temporary file: hairpin.fa.gz.fastx ...
+        [INFO] read and write sequences to temporary file: ./seqkit-<random>.fastx ...
         [INFO] 28645 sequences saved
         [INFO] create or read FASTA index ...
-        [INFO] create FASTA index for hairpin.fa.gz.fastx
-        [INFO]   28645 records loaded from hairpin.fa.gz.fastx.seqkit.fai
-        [INFO] write 48 sequences to file: hairpin.id_cca.fa.gz
-        [INFO] write 3 sequences to file: hairpin.id_hci.fa.gz
-        [INFO] write 106 sequences to file: hairpin.id_str.fa.gz
-        [INFO] write 1 sequences to file: hairpin.id_bkv.fa.gz
+        [INFO] create FASTA index for ./seqkit-<random>.fastx
+        [INFO]   28645 records loaded from ./seqkit-<random>.fastx.seqkit.fai
+        [INFO] write 3 sequences to file: hairpin.fa.gz.split/hairpin.part_smr.fa.gz
+        [INFO] write 8 sequences to file: hairpin.fa.gz.split/hairpin.part_xbo.fa.gz
+        [INFO] write 18 sequences to file: hairpin.fa.gz.split/hairpin.part_ssl.fa.gz
+        [INFO] write 619 sequences to file: hairpin.fa.gz.split/hairpin.part_mml.fa.gz
         ...
 
 1. Split sequences by sequence region (for example, sequence barcode)
 
         $ seqkit split hairpin.fa.gz -r 1:3 -2
         [INFO] split by region: 1:3
-        [INFO] read and write sequences to temporary file: hairpin.fa.gz.fastx ...
+        [INFO] read and write sequences to temporary file: ./seqkit-<random>.fastx ...
         [INFO] 28645 sequences saved
         [INFO] read sequence IDs and sequence region from FASTA file ...
         [INFO] create or read FASTA index ...
-        [INFO] create FASTA index for hairpin.fa.gz.fastx
-        [INFO]   28645 records loaded from hairpin.fa.gz.fastx.seqkit.fai
-        [INFO] write 463 sequences to file: hairpin.region_1:3_AUG.fa.gz
-        [INFO] write 349 sequences to file: hairpin.region_1:3_ACU.fa.gz
-        [INFO] write 311 sequences to file: hairpin.region_1:3_CGG.fa.gz
+        [INFO] create FASTA index for ./seqkit-<random>.fastx
+        [INFO]   28645 records loaded from ./seqkit-<random>.fastx.seqkit.fai
+        [INFO] write 536 sequences to file: hairpin.fa.gz.split/hairpin.part_1:3_GGA.fa.gz
+        [INFO] write 636 sequences to file: hairpin.fa.gz.split/hairpin.part_1:3_UGC.fa.gz
+        [INFO] write 338 sequences to file: hairpin.fa.gz.split/hairpin.part_1:3_UUA.fa.gz
+        [INFO] write 463 sequences to file: hairpin.fa.gz.split/hairpin.part_1:3_AUG.fa.gz
+        ...
 
     Sequence suffix could be defined as `-r -12:-1`
 
@@ -2855,10 +2936,21 @@ Examples
 Usage
 
 ``` text
+$ seqkit split2 -h
+
 split sequences into files by part size or number of parts
 
 This command supports FASTA and paired- or single-end FASTQ with low memory
 occupation and fast speed.
+
+Attention:
+  1. Specify exactly one of -s, -p and -l.
+  2. For paired inputs, parts contain corresponding records by position;
+     unequal record counts are errors. With -l, read1 determines the boundaries
+     and read2 follows.
+  3. Lengths use K/M/G/T suffixes with base 1000; fractional bases are truncated.
+  4. Existing matching outputs are overwritten; -f suppresses the directory
+     warning. Other files, including old parts not produced this time, are retained.
 
 The prefix of output files:
   1. For stdin: stdin
@@ -2866,8 +2958,9 @@ The prefix of output files:
   3. Set via the options: -P/--out-prefix,
      or --by-length-prefix, --by-part-prefix, or --by-size-prefix (for keeping backwards compatibility)
   4. Use the ID of the first sequence in each subset.
-     E.g, 'seqkit split2 --by-size 1 --seqid-as-filename' is equal to
-     'seqkit split --by-id', but it's much faster and uses less memory.
+     Output names must be unique; -N does not group records with the same ID.
+     Conflicting output names are errors, including repeated names produced by -N.
+  5. Prefix flags accept file names only, not directory paths.
 
 The extension of output files:
   1. For stdin: .fast[aq]
@@ -2887,10 +2980,10 @@ If you want to cut a sequence into multiple segments.
         seqkit sliding -g -s 40 -W 40 input.fasta -o out.fasta
 
 Usage:
-  seqkit split2 [flags] 
+  seqkit split2 [flags]
 
 Flags:
-  -l, --by-length string          split sequences into chunks of >=N bases, supports K/M/G suffix
+  -l, --by-length string          split sequences into chunks of >=N bases, supports K/M/G suffix (base 1000)
       --by-length-prefix string   file prefix for --by-length. The placeholder "{read}" is needed for
                                   paired-end files.
   -p, --by-part int               split sequences into N parts with the round robin distribution
@@ -2900,7 +2993,7 @@ Flags:
       --by-size-prefix string     file prefix for --by-size. The placeholder "{read}" is needed for
                                   paired-end files.
   -e, --extension string          set output file extension, e.g., ".gz", ".xz", or ".zst"
-  -f, --force                     overwrite output directory
+  -f, --force                     overwrite matching output files without the nonempty-directory warning
   -h, --help                      help for split2
   -O, --out-dir string            output directory (default value is $infile.split)
   -P, --out-prefix string         file prefix (it overrides --by-*-prefix). The placeholder "{read}" is
@@ -2909,9 +3002,8 @@ Flags:
                                   e.g., 001, 002 (default 3)
   -1, --read1 string              (gzipped) read1 file
   -2, --read2 string              (gzipped) read2 file
-  -N, --seqid-as-filename         use the first sequence ID as the file name. E.g., using '-N -s 1' is
-                                  equal to 'seqkit split --by-id' but much faster and uses less memory.
-
+  -N, --seqid-as-filename         use the first sequence ID as each part's file name; conflicting names
+                                  are errors
 ```
 
 Examples
@@ -3049,17 +3141,24 @@ Examples
 Usage
 
 ```text
-match up paired-end reads from two fastq files
+$ seqkit pair -h
+
+match up paired-end reads from two FASTA/Q files
 
 Attention:
 1. Orders of headers in the two files should be the same (not shuffled),
    otherwise, it consumes a huge number of memory for buffering reads in memory.
 2. Unpaired reads are optional outputted with the flag -u/--save-unpaired.
+   Duplicate IDs are paired one-to-one in occurrence order; -u retains all extras.
 3. If the flag -O/--out-dir is not given, the output will be saved in the same directory
    of input, with the suffix "paired", e.g., read_1.paired.fq.gz.
    Otherwise, names are kept untouched in the given output directory.
+   Both first records are checked before outputs are opened. Existing matching
+   outputs are overwritten; -f suppresses the directory warning. Unrelated
+   files are retained.
 4. Paired gzipped files may be slightly larger than original files, because
    of using a different gzip package/library, don't worry.
+5. Each output retains its input format; FASTA and FASTQ mates may be mixed.
 
 Tips:
 1. Support for '/1 'and '/2' tags for paired read files generated by platforms like MGI.
@@ -3070,7 +3169,7 @@ Usage:
   seqkit pair [flags]
 
 Flags:
-  -f, --force            overwrite output directory
+  -f, --force            overwrite matching output files without the nonempty-directory warning
   -h, --help             help for pair
   -O, --out-dir string   output directory
   -1, --read1 string     (gzipped) read1 file
@@ -3118,6 +3217,8 @@ Examples
 Usage
 
 ``` text
+$ seqkit sample -h
+
 sample sequences by number or proportion.
 
 Sampling modes (N = requested number, p = requested proportion):
@@ -3140,8 +3241,15 @@ it is not uniform fixed-size sampling.
 Results are deterministic for the same input and seed. To vary results across
 runs, add '-r/--non-deterministic' for a time-based seed.
 
+Attention:
+  1. Proportion mode (-p) accepts multiple inputs, including --infile-list.
+     Each file restarts the same random seed, as if sampled separately. With -r,
+     one time-based seed is generated per invocation and reused for each file.
+  2. Number mode (-n) accepts one input file.
+  3. Duplicate headers are allowed.
+
 Usage:
-  seqkit sample [flags] 
+  seqkit sample [flags]
 
 Flags:
   -h, --help                help for sample
@@ -3197,6 +3305,8 @@ flag `-s` (`--rand-seed`).
 Usage
 
 ```text
+$ seqkit sample2 -h
+
 sample sequences by number or proportion (version 2).
 
 Sampling modes (N = requested number, p = requested proportion):
@@ -3219,8 +3329,11 @@ it is not uniform fixed-size sampling.
 Results are deterministic for the same input and seed. To vary results across
 runs, add '-r/--non-deterministic' for a time-based seed.
 
+Attention:
+  1. Duplicate headers are allowed in both single-pass and two-pass sampling.
+
 Usage:
-  seqkit sample2 [flags] 
+  seqkit sample2 [flags]
 
 Flags:
   -h, --help                help for sample2
@@ -3238,20 +3351,21 @@ Flags:
 Usage
 
 ```text
+$ seqkit head -h
+
 print the first N FASTA/Q records, or leading records whose total length >= L
 
 For returning the last N records, use:
     seqkit range -r -N:-1 seqs.fasta
 
 Usage:
-  seqkit head [flags] 
+  seqkit head [flags]
 
 Flags:
   -h, --help            help for head
   -l, --length string   print leading FASTA/Q records whose total sequence length >= L (supports K/M/G
-                        suffix). This flag overrides -n/--number
+                        suffix, base 1000). This flag overrides -n/--number
   -n, --number int      print the first N FASTA/Q records (default 10)
-
 ```
 
 Examples
@@ -3286,6 +3400,7 @@ Examples
 Usage
 
 ```text
+$ seqkit head-genome -h
 
 print sequences of the first genome with common prefixes in name
 
@@ -3305,14 +3420,14 @@ i.e., "Vibrio cholerae strain M29".
 Attention:
 
   1. Sequences in file should be well organized.
+  2. Shared prefixes are compared as whole words separated by spaces or tabs.
 
 Usage:
   seqkit head-genome [flags]
 
 Flags:
   -h, --help                    help for head-genome
-  -m, --mini-common-words int   minimal shared prefix words (default 4)
-
+  -m, --mini-common-words int   minimal shared prefix words (default 1)
 ```
         
 ## range
@@ -3320,6 +3435,8 @@ Flags:
 Usage
 
 ```text
+$ seqkit range -h
+
 print FASTA/Q records in a range (start:end)
 
 Examples:
@@ -3380,6 +3497,8 @@ Examples
 Usage
 
 ``` text
+$ seqkit replace -h
+
 replace name/sequence by regular expression.
 
 Note that the replacement supports capture variables.
@@ -3398,16 +3517,16 @@ more on: http://bioinf.shenwei.me/seqkit/usage/#replace
 
 Special replacement symbols (only for replacing name not sequence):
 
-    {nr}    Record number, starting from 1
+    {nr}    Record number within each input file, starting from 1
     {uuid}  Random 16-character Universally unique identifier (UUID)
     {fn}    File name
     {fbn}   File base name
     {fbne}  File base name without any extension
     {kv}    Corresponding value of the key (captured variable $n) by key-value file,
             n can be specified by flag -I (--key-capt-idx) (default: 1)
-            
+
 Special cases:
-  1. If replacements contain '$', 
+  1. If replacements contain '$',
     a). If using '{kv}', you need use '$$$$' instead of a single '$':
             -r '{kv}' -k <(sed 's/\$/$$$$/' kv.txt)
     b). If not, use '$$':
@@ -3417,7 +3536,7 @@ Filtering records to edit:
   You can use flags similar to those in "seqkit grep" to choose partly records to edit.
 
 Usage:
-  seqkit replace [flags] 
+  seqkit replace [flags]
 
 Flags:
   -s, --by-seq                   replace seq (FASTQ: length-increasing replacements not allowed)
@@ -3448,9 +3567,9 @@ Flags:
   -r, --replacement string       replacement. supporting capture variables.  e.g. $1 represents the text
                                  of the first submatch (use ${1} instead of $1 when {kv} given!).
                                  ATTENTION: for *nix OS, use SINGLE quote NOT double quotes or use the \
-                                 escape character. Record number and file name is also supported by
-                                 "{nr}" and "{fn}". Type "csvtk replace -h" for more replacement symbols.
-
+                                 escape character. The per-file record number and file name are also
+                                 supported by "{nr}" and "{fn}". Type "csvtk replace -h" for more
+                                 replacement symbols.
 ```
 
 Examples
@@ -3667,6 +3786,8 @@ Examples
 Usage
 
 ``` text
+$ seqkit rename -h
+
 rename duplicated IDs
 
 Attention:
@@ -3675,7 +3796,7 @@ Attention:
 
 Example:
 
-    $ seqkit seq seqs.fasta 
+    $ seqkit seq seqs.fasta
     >id comment
     actg
     >id description
@@ -3699,8 +3820,7 @@ Flags:
   -1, --rename-1st-rec      rename the first record as well
   -s, --separator string    separator between original ID/name and the counter (default "_")
   -N, --start-num int       starting count number for *duplicated* IDs/names, should be greater than
-                            zero (default 2
-
+                            zero (default 2)
 ```
 
 Examples
@@ -3739,6 +3859,8 @@ aaaa
 Usage
 
 ``` text
+$ seqkit restart -h
+
 reset start position (rotate) for circular genomes
 
 Examples
@@ -3793,6 +3915,8 @@ Flags:
 Usage
 
 ``` text
+$ seqkit concat -h
+
 concatenate sequences with same ID from multiple files
 
 Attention:
@@ -3801,6 +3925,7 @@ Attention:
       * If you are processing multiple-sequence-alignment results, you can use
         -F/--fill to fill with N bases/residues for IDs missing in some files when
         using -f/--full.
+        Empty input files contribute no padding in full-join mode (-f -F).
    2. If there are more than one sequences of the same ID, we output the Cartesian
       product of sequences.
    3. Description are also concatenated with a separator (-s/--separator).
@@ -3817,7 +3942,6 @@ Flags:
   -f, --full               keep all sequences, like full/outer join
   -h, --help               help for concat
   -s, --separator string   separator for descriptions of records with the same ID (default "|")
-
 ```
 
 Examples
@@ -3871,18 +3995,24 @@ b1-===
 Usage
 
 ``` text
+$ seqkit mutate -h
+
 edit sequence (point mutation, insertion, deletion)
 
 Attention:
 
-  1. Mutiple point mutations (-p/--point) are allowed, but only single 
+  1. Multiple point mutations (-p/--point) are allowed, but only single
      insertion (-i/--insertion) OR single deletion (-d/--deletion) is allowed.
   2. Point mutation takes place before insertion/deletion.
+  3. Out-of-range point/insert positions and empty deletion intervals are
+     warned about and skipped. Partially out-of-range deletion intervals
+     are clipped to the sequence.
 
 Notes:
 
   1. You can choose certain sequences to edit using similar flags in
      'seqkit grep'.
+  2. Insertion at 0 prepends bases.
 
 The definition of position is 1-based and with some custom design.
 
@@ -3921,7 +4051,6 @@ Flags:
   -p, --point strings         point mutation: changing base at given position. e.g., -p 2:C for setting
                               2nd base as C, -p -1:A for change last base as A
   -r, --use-regexp            [match seqs to mutate] search patterns are regular expression
-
 ```
 
 Examples:
@@ -4075,11 +4204,13 @@ Examples:
 Usage
 
 ``` text
+$ seqkit shuffle -h
+
 shuffle sequences.
 
 By default, all records will be read into memory.
 For FASTA format, you can use flag -2 (--two-pass) to reduce memory usage.
-While FASTQ is not supported. 
+While FASTQ is not supported.
   1. Seqkit reads the sequence IDs. If the file is not a plain FASTA file,
      seqkit will write the sequences to temporary files, and create the FASTA index.
   2. Secondly, seqkit shuffles sequence IDs and extracts sequences by FASTA index.
@@ -4087,12 +4218,14 @@ While FASTQ is not supported.
 Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
+     Two-pass mode requires unique complete FASTA headers (ID and description).
+     Single-pass mode retains records with duplicate headers.
   2. By default, the output is deterministic; that is, given the same input and random seed,
      seqkit shuf will always generate identical results across different runs.
      For 'true randomness', please add '-r/--non-deterministic', which uses a time-based seed.
 
 Usage:
-  seqkit shuffle [flags] 
+  seqkit shuffle [flags]
 
 Flags:
   -h, --help                help for shuffle
@@ -4104,7 +4237,6 @@ Flags:
   -2, --two-pass            two-pass mode read files twice to lower memory usage. (only for FASTA format)
   -U, --update-faidx        update the fasta index file if it exists. Use this if you are not sure
                             whether the fasta file changed
-
 ```
 
 Examples
@@ -4140,6 +4272,8 @@ flag `-s` (`--rand-seed`) for read 1 and 2 files.
 Usage
 
 ``` text
+$ seqkit sort -h
+
 sort sequences by id/name/sequence/length.
 
 By default, all records will be readed into memory.
@@ -4156,6 +4290,7 @@ and extracts sequences by FASTA index.
 Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
+     Two-pass mode requires unique complete FASTA headers (ID and description).
   2. When sorting by sequence (-s), -L applies in both modes. Records with equal
      sequence prefixes retain their input order.
 
@@ -4178,7 +4313,6 @@ Flags:
   -2, --two-pass                two-pass mode read files twice to lower memory usage. (only for FASTA format)
   -U, --update-faidx            update the fasta index file if it exists. Use this if you are not sure
                                 whether the fasta file changed
-
 ```
 
 Examples
@@ -4249,10 +4383,19 @@ Examples
 ## bam
 
 ``` text
+$ seqkit bam -h
+
 monitoring and online histograms of BAM record features
 
-The --stat and --idx-stat modes accept multiple input files; other modes
-require one BAM file. Range filters require a single numeric --field.
+Attention:
+  1. The --stat and --idx-stat modes accept multiple input files; other modes
+     require one BAM file. Multi-file --stat stops at the first error while
+     retaining statistics from completed files. --pass and --stat cannot be combined.
+  2. Range filters require a single numeric --field.
+  3. NM is required only for NM-dependent statistics, such as accuracy.
+  4. --top-bam requires a single numeric --field in record mode; --top-size 0
+     writes a header-only BAM.
+  5. Empty histograms are skipped.
 
 Usage:
   seqkit bam [flags]
@@ -4280,7 +4423,8 @@ Flags:
   -F, --prim-only            filter out non-primary alignment records
   -p, --print-freq int       print/report after this many records (-1 for print after EOF) (default -1)
   -Q, --quiet-mode           suppress all plotting to stderr
-  -M, --range-max float      discard record with field (-f) value greater than or equal to this flag (default NaN)
+  -M, --range-max float      discard record with field (-f) value greater than or equal to this flag
+                             (default NaN)
   -m, --range-min float      discard record with field (-f) value less than this flag (default NaN)
   -R, --reset                reset histogram after every report
   -Z, --silent-mode          suppress TSV output to stderr
@@ -4396,7 +4540,17 @@ seqkit bam -T '{Yaml: "bam_tool_pipeline.yml"}' ../pcs109_5k_spliced.bam | samto
 Usage
 
 ```text
+$ seqkit merge-slides -h
+
 merge sliding windows generated from seqkit sliding
+
+Attention:
+  1. Input coordinates are 1-based and inclusive; output is BED3.
+  2. Within each input file, reference groups must be contiguous and starts
+     nondecreasing.
+  3. The regular expression needs at least three capturing groups: reference,
+     start, end.
+  4. -g limits the distance between adjacent input starts.
 
 For example,
 
@@ -4428,9 +4582,9 @@ Usage:
   seqkit merge-slides [flags]
 
 Flags:
-  -b, --buffer-size string            size of buffer, supported unit: K, M, G. You need increase the
-                                      value when "bufio.Scanner: token too long" error reported (default
-                                      "1G")
+  -b, --buffer-size string            size of buffer, supported unit: K, M, G (base 1024). You need
+                                      increase the value when "bufio.Scanner: token too long" error
+                                      reported (default "1G")
   -p, --comment-line-prefix strings   comment line prefix (default [#,//])
   -h, --help                          help for merge-slides
   -g, --max-gap int                   maximum distance of starting positions of two adjacent regions, 0
@@ -4439,7 +4593,6 @@ Flags:
                                       $sliding_step_size - 1. (default 1)
   -r, --regexp string                 regular expression for extract the reference name and window
                                       position. (default "^(.+)_sliding:(\\d+)\\-(\\d+)")
-
 ```
 
 Example:
@@ -4451,6 +4604,8 @@ Example:
 Usage
 
 ``` text
+$ seqkit genautocomplete -h
+
 generate shell autocompletion script
 
 Supported shell: bash|zsh|fish|powershell

@@ -162,16 +162,21 @@ func reportCounts(readCounts ReadCounts, countFile string, field string, rangeMi
 		outw.Close()
 	}
 
-	h := thist.NewHist(totalCounts, fmt.Sprintf("%s - records: %d", title, count), binMode, printBins, true)
+	if len(totalCounts) == 0 {
+		log.Warningf("no valid values; skipping histogram")
+		return
+	}
+
+	h := newHistogram(totalCounts, fmt.Sprintf("%s - records: %d", title, count), binMode, printBins, true)
 	if printDump {
-		os.Stderr.Write([]byte(h.Dump()))
+		os.Stderr.Write([]byte(histogramText(h, true)))
 	} else {
 		if !printQuiet {
-			os.Stderr.Write([]byte(thist.ClearScreenString()))
-			os.Stderr.Write([]byte(h.Draw()))
+			os.Stderr.Write([]byte(histogramClear(h)))
+			os.Stderr.Write([]byte(histogramText(h, false)))
 		}
 		if printPdf != "" {
-			h.SaveImage(printPdf)
+			checkError(saveHistogram(h, printPdf))
 		}
 
 	}
@@ -244,7 +249,7 @@ func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, 
 		} else {
 			unmapped++
 			if printPass {
-				bamWriter.Write(record)
+				checkError(bamWriter.Write(record))
 			}
 		}
 	} // records
@@ -260,7 +265,7 @@ func CountReads(bamReader *bam.Reader, bamWriter *bam.Writer, countFile string, 
 		}
 	}
 	if printPass {
-		bamWriter.Close()
+		checkError(bamWriter.Close())
 	}
 
 }
@@ -375,8 +380,12 @@ func bamIdxCount(file string) {
 }
 
 // bamStatsOnce calculates detailed statistics for a single BAM file.
-func bamStatsOnce(f string, mapQual int, includeIds map[string]bool, excludeIds map[string]bool, threads int) *bamStatRec {
-	bamReader, fhBam := NewBamReader(f, threads)
+func bamStatsOnce(f string, mapQual int, includeIds map[string]bool, excludeIds map[string]bool, threads int) (*bamStatRec, error) {
+	bamReader, fhBam, err := openBamReader(f, threads)
+	if err != nil {
+		return nil, err
+	}
+	defer bamReader.Close()
 	if fhBam != os.Stdin {
 		defer fhBam.Close()
 	}
@@ -388,7 +397,9 @@ func bamStatsOnce(f string, mapQual int, includeIds map[string]bool, excludeIds 
 		if err == io.EOF {
 			break
 		}
-		checkError(err)
+		if err != nil {
+			return nil, err
+		}
 
 		if filterById(record.Name, includeIds, excludeIds) {
 			continue
@@ -424,7 +435,7 @@ func bamStatsOnce(f string, mapQual int, includeIds map[string]bool, excludeIds 
 		res.MultimapPerc = 100 * res.MultimapPerc / float64(res.PrimAln)
 	}
 	res.TotalReads = res.PrimAln + res.Unmapped
-	return res
+	return res, nil
 }
 
 // bamStats calculates detailed statistics for multiple BAM files and prints to stderr.
@@ -433,28 +444,24 @@ func bamStats(files []string, mapQual int, includeIds map[string]bool, excludeId
 	if pretty {
 		width = -1
 	}
-	var fields []string
-	var out [][]string
-	for _, f := range files {
-		s := bamStatsOnce(f, mapQual, includeIds, excludeIds, threads)
-		fi, data := s.StatFields()
-		if fields == nil {
-			fields = fi
-			out = make([][]string, len(fi))
-			for i := range out {
-				out[i] = make([]string, 0)
-			}
+	fields, _ := (&bamStatRec{}).StatFields()
+	columns := make([][]string, len(fields))
+	render := func() {
+		text, brush := PrettyPrintTsv(fields, columns, width, pretty)
+		brush.WrapWriter(os.Stderr).Write([]byte(text))
+	}
+	for _, file := range files {
+		stats, err := bamStatsOnce(file, mapQual, includeIds, excludeIds, threads)
+		if err != nil {
+			render()
+			checkError(fmt.Errorf("%s: %w", file, err))
 		}
-		for i, d := range data {
-			out[i] = append(out[i], d)
+		_, values := stats.StatFields()
+		for i, value := range values {
+			columns[i] = append(columns[i], value)
 		}
 	}
-	color := true
-	if width == 0 {
-		color = false
-	}
-	fs, brush := PrettyPrintTsv(fields, out, width, color)
-	brush.WrapWriter(os.Stderr).Write([]byte(fs))
+	render()
 }
 
 // idxStats print rough statistics for multiple BAM files to stderr.
@@ -511,8 +518,17 @@ var bamCmd = &cobra.Command{
 	Short: "monitoring and online histograms of BAM record features",
 	Long: `monitoring and online histograms of BAM record features
 
-The --stat and --idx-stat modes accept multiple input files; other modes
-require one BAM file. Range filters require a single numeric --field.`,
+Attention:
+  1. The --stat and --idx-stat modes accept multiple input files; other modes
+     require one BAM file. Multi-file --stat stops at the first error while
+     retaining statistics from completed files. --pass and --stat cannot be combined.
+  2. Range filters require a single numeric --field.
+  3. NM is required only for NM-dependent statistics, such as accuracy.
+  4. --top-bam requires a single numeric --field in record mode; --top-size 0
+     writes a header-only BAM.
+  5. Empty histograms are skipped.
+
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
 		idRegexp := config.IDRegexp
@@ -536,6 +552,7 @@ require one BAM file. Range filters require a single numeric --field.`,
 		printCount := getFlagString(cmd, "count")
 		printBundle := getFlagInt(cmd, "bundle")
 		printPdf := getFlagString(cmd, "img")
+		checkError(validateHistogramImage(printPdf))
 		//printScatter := getFlagString(cmd, "scatter")
 		//_ = printScatter
 		printDump := getFlagBool(cmd, "dump")
@@ -562,90 +579,6 @@ require one BAM file. Range filters require a single numeric --field.`,
 		toolYaml := getFlagString(cmd, "tool")
 		includeIdList := getFlagString(cmd, "grep-ids")
 		excludeIdList := getFlagString(cmd, "exclude-ids")
-
-		var includeIds map[string]bool
-		var excludeIds map[string]bool
-
-		if includeIdList != "" {
-			includeIds = loadIdList(includeIdList)
-		}
-
-		if excludeIdList != "" {
-			excludeIds = loadIdList(excludeIdList)
-		}
-
-		if printIdxStat {
-			idxStats(files, prettyTSV)
-			os.Exit(0)
-		}
-
-		if printStat {
-			bamStats(files, mapQual, includeIds, excludeIds, config.Threads, prettyTSV)
-			os.Exit(0)
-		}
-
-		if printIdxCount {
-			if len(files) != 1 {
-				log.Fatal("--idx-count takes exactly one input BAM file")
-			}
-			bamIdxCount(files[0])
-			os.Exit(0)
-		}
-
-		if toolYaml != "" {
-			if toolYaml == "help" && len(files) == 0 {
-				files = []string{"-"}
-
-			}
-			if len(files) != 1 {
-				log.Fatal("The BAM toolbox takes exactly one input file!")
-			}
-			BamToolbox(toolYaml, files[0], outFile, printQuiet, silentMode, config.Threads)
-			os.Exit(0)
-		}
-
-		if printBundle != 0 {
-			if len(files) != 1 {
-				log.Fatal("The BAM bundler takes exactly one input file!")
-			}
-			if outFile == "-" {
-				outFile = path.Base(files[0]) + "_bundles"
-			}
-			Bam2Bundles(files[0], outFile, printBundle, config.Threads, printQuiet, silentMode)
-			os.Exit(0)
-		}
-		if !printHelp {
-			if len(files) != 1 {
-				log.Fatal("BAM monitoring takes exactly one input BAM file")
-			}
-			if printFreq == 0 {
-				checkError(fmt.Errorf("--print-freq must not be 0"))
-			}
-			if printCount == "" && (!math.IsNaN(rangeMin) || !math.IsNaN(rangeMax)) &&
-				(field == "" || strings.Contains(field, ",") || field == "Read" || field == "Ref") {
-				checkError(fmt.Errorf("--range-min/--range-max require a single numeric --field"))
-			}
-		}
-
-		binMode := "termfit"
-		if printBins > 0 {
-			binMode = "fixed"
-		}
-
-		if printPass && printCount == "-" {
-			fmt.Fprintf(os.Stderr, "Cannot enable pass-through mode when count output is stdout!\n")
-			os.Exit(1)
-		}
-
-		outw := os.Stdout
-		if outFile != "-" {
-			tw, err := os.Create(outFile)
-			checkError(err)
-			outw = tw
-		}
-		outfh := bufio.NewWriter(outw)
-
-		defer outw.Close()
 
 		transform := func(x float64) float64 { return x }
 		if printLog {
@@ -914,6 +847,131 @@ require one BAM file. Range filters require a single numeric --field.`,
 			os.Exit(0)
 		}
 
+		// Validate every requested field before opening BAM or output files.
+		allowedFields := validFields
+		if printCount != "" {
+			allowedFields = append(append([]string(nil), validFields...), "Count", "SecCount", "SupCount")
+		}
+		for _, requested := range strings.Split(field, ",") {
+			if requested == "" {
+				continue
+			}
+			found := false
+			for _, name := range allowedFields {
+				if requested == name {
+					found = true
+					break
+				}
+			}
+			if !found {
+				fmt.Fprintln(os.Stderr, "The valid fields are:")
+				for _, name := range allowedFields {
+					fmt.Fprintf(os.Stderr, "%-10s\t%s\n", name, fmap[name].Title)
+				}
+				checkError(fmt.Errorf("Invalid field: %s", requested))
+			}
+		}
+		if printPass && printStat {
+			checkError(fmt.Errorf("--pass and --stat cannot be combined"))
+		}
+		if printTop != "" {
+			if topSize < 0 {
+				checkError(fmt.Errorf("--top-size must not be negative"))
+			}
+			if printStat || printIdxStat || printIdxCount || toolYaml != "" || printBundle != 0 || printCount != "" || field == "" || len(fields) != 1 || field == "Read" || field == "Ref" {
+				checkError(fmt.Errorf("--top-bam requires a single numeric --field in record mode"))
+			}
+		}
+
+		var includeIds map[string]bool
+		var excludeIds map[string]bool
+
+		if includeIdList != "" {
+			includeIds = loadIdList(includeIdList)
+		}
+
+		if excludeIdList != "" {
+			excludeIds = loadIdList(excludeIdList)
+		}
+
+		if printIdxStat {
+			idxStats(files, prettyTSV)
+			os.Exit(0)
+		}
+
+		if printStat {
+			bamStats(files, mapQual, includeIds, excludeIds, config.Threads, prettyTSV)
+			os.Exit(0)
+		}
+
+		if printIdxCount {
+			if len(files) != 1 {
+				log.Fatal("--idx-count takes exactly one input BAM file")
+			}
+			bamIdxCount(files[0])
+			os.Exit(0)
+		}
+
+		if toolYaml != "" {
+			if toolYaml == "help" && len(files) == 0 {
+				files = []string{"-"}
+
+			}
+			if len(files) != 1 {
+				log.Fatal("The BAM toolbox takes exactly one input file!")
+			}
+			BamToolbox(toolYaml, files[0], outFile, printQuiet, silentMode, config.Threads)
+			os.Exit(0)
+		}
+
+		if printBundle != 0 {
+			if len(files) != 1 {
+				log.Fatal("The BAM bundler takes exactly one input file!")
+			}
+			if outFile == "-" {
+				outFile = path.Base(files[0]) + "_bundles"
+			}
+			Bam2Bundles(files[0], outFile, printBundle, config.Threads, printQuiet, silentMode)
+			os.Exit(0)
+		}
+		if !printHelp {
+			if len(files) != 1 {
+				log.Fatal("BAM monitoring takes exactly one input BAM file")
+			}
+			if printFreq == 0 {
+				checkError(fmt.Errorf("--print-freq must not be 0"))
+			}
+			if printCount == "" && (!math.IsNaN(rangeMin) || !math.IsNaN(rangeMax)) &&
+				(field == "" || strings.Contains(field, ",") || field == "Read" || field == "Ref") {
+				checkError(fmt.Errorf("--range-min/--range-max require a single numeric --field"))
+			}
+		}
+
+		binMode := "termfit"
+		if printBins > 0 {
+			binMode = "fixed"
+		}
+
+		if printPass && printCount == "-" {
+			fmt.Fprintf(os.Stderr, "Cannot enable pass-through mode when count output is stdout!\n")
+			os.Exit(1)
+		}
+
+		outw := os.Stdout
+		if outFile != "-" {
+			tw, err := os.Create(outFile)
+			checkError(err)
+			outw = tw
+		}
+		outfh := bufio.NewWriter(outw)
+
+		defer func() {
+			checkError(outfh.Flush())
+			if outw != os.Stdout {
+				checkError(outw.Close())
+			}
+		}()
+
 		bamReader, fhBam := NewBamReader(files[0], config.Threads)
 		if fhBam != os.Stdin {
 			defer fhBam.Close()
@@ -939,8 +997,6 @@ require one BAM file. Range filters require a single numeric --field.`,
 
 		if printCount != "" {
 			CountReads(bamReader, bamWriter, printCount, field, rangeMin, rangeMax, printPass, printPrim, printLog, printBins, binMode, mapQual, printFreq, printDump, printDelay, printPdf, execBefore, execAfter, includeIds, excludeIds, printQuiet)
-			outfh.Flush()
-			outw.Close()
 			return
 		}
 
@@ -1015,11 +1071,11 @@ require one BAM file. Range filters require a single numeric --field.`,
 				}
 
 				if printPass {
-					bamWriter.Write(record)
+					checkError(bamWriter.Write(record))
 				}
 			}
 			if printPass {
-				bamWriter.Close()
+				checkError(bamWriter.Close())
 			}
 			if execAfter != "" {
 				BashExec(execAfter)
@@ -1036,7 +1092,7 @@ require one BAM file. Range filters require a single numeric --field.`,
 			}
 			os.Exit(1)
 		}
-		h := thist.NewHist([]float64{}, fmap[field].Title, binMode, printBins, true)
+		h := newHistogram([]float64{}, fmap[field].Title, binMode, printBins, true)
 
 		var count int
 		var unmapped int
@@ -1066,6 +1122,12 @@ require one BAM file. Range filters require a single numeric --field.`,
 				}
 
 				p := transform(fmap[field].Generate(record))
+				if math.IsNaN(p) || math.IsInf(p, 0) {
+					if printPass {
+						checkError(bamWriter.Write(record))
+					}
+					continue
+				}
 
 				if !math.IsNaN(rangeMin) && p < rangeMin {
 					continue
@@ -1075,11 +1137,11 @@ require one BAM file. Range filters require a single numeric --field.`,
 				}
 
 				count++
-				h.Update(p)
+				updateHistogram(h, p)
 				topBuffer = updateTop(record, p, topBuffer, printTop)
 
 				if printPass {
-					bamWriter.Write(record)
+					checkError(bamWriter.Write(record))
 				}
 
 				if printFreq > 0 && count%printFreq == 0 {
@@ -1087,19 +1149,19 @@ require one BAM file. Range filters require a single numeric --field.`,
 						BashExec(execBefore)
 					}
 					if printDump {
-						os.Stderr.Write([]byte(h.Dump()))
+						os.Stderr.Write([]byte(histogramText(h, true)))
 					} else {
 						if !printQuiet {
 							switch field {
 							case "RefCov", "ReadCov":
 								h.Title = fmt.Sprintf("%s (>= 80: %.1f)", fmap[field].Title, gtThanPerc(h, 80))
 							}
-							os.Stderr.Write([]byte(thist.ClearScreenString()))
-							os.Stderr.Write([]byte(h.Draw()))
+							os.Stderr.Write([]byte(histogramClear(h)))
+							os.Stderr.Write([]byte(histogramText(h, false)))
 						}
 					}
 					if printPdf != "" {
-						h.SaveImage(printPdf)
+						checkError(saveHistogram(h, printPdf))
 					}
 					dumpTop(printTop, bamHeader, topBuffer)
 					time.Sleep(time.Duration(printDelay) * time.Second)
@@ -1107,35 +1169,45 @@ require one BAM file. Range filters require a single numeric --field.`,
 						BashExec(execAfter)
 					}
 					if printReset {
-						h = thist.NewHist([]float64{}, fmap[field].Title, binMode, printBins, true)
+						h = newHistogram([]float64{}, fmap[field].Title, binMode, printBins, true)
 					}
 				}
 			} else {
 				unmapped++
 				if printPass {
-					bamWriter.Write(record)
+					checkError(bamWriter.Write(record))
 				}
 			}
 		} // records
+
+		if count == 0 {
+			log.Warningf("no valid values; skipping histogram")
+			dumpTop(printTop, bamHeader, topBuffer)
+			if printPass {
+				checkError(bamWriter.Close())
+			}
+			checkError(outfh.Flush())
+			return
+		}
 
 		if printFreq < 0 || count%printFreq != 0 {
 			if execBefore != "" {
 				BashExec(execBefore)
 			}
 			if printDump {
-				os.Stderr.Write([]byte(h.Dump()))
+				os.Stderr.Write([]byte(histogramText(h, true)))
 			} else {
 				if !printQuiet {
 					switch field {
 					case "RefCov", "ReadCov":
 						h.Title = fmt.Sprintf("%s (>= 80: %.1f)", fmap[field].Title, gtThanPerc(h, 80))
 					}
-					os.Stderr.Write([]byte(thist.ClearScreenString()))
-					os.Stderr.Write([]byte(h.Draw()))
+					os.Stderr.Write([]byte(histogramClear(h)))
+					os.Stderr.Write([]byte(histogramText(h, false)))
 				}
 			}
 			if printPdf != "" {
-				h.SaveImage(printPdf)
+				checkError(saveHistogram(h, printPdf))
 			}
 			dumpTop(printTop, bamHeader, topBuffer)
 			if execAfter != "" {
@@ -1143,7 +1215,7 @@ require one BAM file. Range filters require a single numeric --field.`,
 			}
 		}
 		if printPass {
-			bamWriter.Close()
+			checkError(bamWriter.Close())
 		}
 		outfh.Flush()
 
@@ -1163,16 +1235,28 @@ func gtThanPerc(h *thist.Hist, percent float64) float64 {
 
 // NewBamReader creates a new BAM reader from file.
 func NewBamReader(bamFile string, nrProc int) (*bam.Reader, *os.File) {
-	fh, err := os.Stdin, error(nil)
-	if bamFile != "-" {
-		fh, err = os.Open(bamFile)
-		checkError(err)
+	reader, fh, err := openBamReader(bamFile, nrProc)
+	if err != nil {
+		checkError(fmt.Errorf("%s: %w", bamFile, err))
 	}
-
-	reader, err := bam.NewReader(bufio.NewReader(fh), nrProc)
-	checkError(err)
-
 	return reader, fh
+}
+
+// openBamReader leaves error policy to callers that preserve completed results.
+func openBamReader(file string, threads int) (*bam.Reader, *os.File, error) {
+	fh := os.Stdin
+	var err error
+	if file != "-" {
+		fh, err = os.Open(file)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+	reader, err := bam.NewReader(bufio.NewReader(fh), threads)
+	if err != nil && fh != os.Stdin {
+		fh.Close()
+	}
+	return reader, fh, err
 }
 
 // dumpTop saves to entries to a BAM files.
@@ -1190,13 +1274,13 @@ func dumpTop(printTop string, bamHeader *sam.Header, topBuffer TopBuffer) {
 	checkError(err)
 	for _, r := range topBuffer {
 		if r.Record != nil {
-			topBam.Write(r.Record)
+			checkError(topBam.Write(r.Record))
 		}
 	}
 
-	topBam.Close()
-	topbuff.Flush()
-	topfh.Close()
+	checkError(topBam.Close())
+	checkError(topbuff.Flush())
+	checkError(topfh.Close())
 
 }
 
@@ -1283,7 +1367,7 @@ func Bam2Bundles(inBam string, outDir string, minBundle int, nrProcBam int, quie
 					bamWriter.Write(r)
 				}
 
-				bamWriter.Close()
+				checkError(bamWriter.Close())
 				outFh.Close()
 				if !quiet && !silent {
 					os.Stderr.WriteString(fmt.Sprintf("%d\t%s\t%d\t%d\t%d\t%d\n", bundleCount, chrom, bStart, bEnd, len(recCache), bundleLoci))
@@ -1330,7 +1414,7 @@ func Bam2Bundles(inBam string, outDir string, minBundle int, nrProcBam int, quie
 			os.Stderr.WriteString(fmt.Sprintf("%d\t%s\t%d\t%d\t%d\t%d\n", bundleCount, chrom, bStart, bEnd, len(recCache), bundleLoci))
 		}
 
-		bamWriter.Close()
+		checkError(bamWriter.Close())
 		outFh.Close()
 		recCache = nil
 	}

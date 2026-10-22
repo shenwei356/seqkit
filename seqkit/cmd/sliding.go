@@ -39,7 +39,9 @@ var slidingCmd = &cobra.Command{
 	Short: "extract subsequences in sliding windows",
 	Long: `extract subsequences in sliding windows
 
-Circular windows must not exceed the sequence length.
+Attention:
+  1. Circular windows must not exceed a nonempty sequence's length.
+     Empty circular records are skipped.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -107,6 +109,9 @@ Circular windows must not exceed the sequence length.
 				}
 
 				originalLen = len(record.Seq.Seq)
+				if circular && originalLen == 0 {
+					continue
+				}
 				if circular && window > originalLen {
 					checkError(fmt.Errorf("circular window (%d) exceeds sequence length (%d): %s", window, originalLen, record.ID))
 				}
@@ -165,7 +170,7 @@ func init() {
 	RootCmd.AddCommand(slidingCmd)
 
 	slidingCmd.Flags().IntP("step", "s", 0, "step size")
-	slidingCmd.Flags().IntP("window", "W", 0, "window size")
+	slidingCmd.Flags().IntP("window", "W", 0, "window size (circular mode requires window <= sequence length)")
 	slidingCmd.Flags().BoolP("greedy", "g", false, "greedy mode, i.e., exporting last subsequences even shorter than the windows size")
 	slidingCmd.Flags().BoolP("circular-genome", "C", false, "circular genome (same to -c/--circular)")
 	slidingCmd.Flags().BoolP("circular", "c", false, "circular genome (same to -C/--circular-genome)")

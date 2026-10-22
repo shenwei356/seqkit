@@ -261,9 +261,9 @@ func TestAuditLocateEmptyMatches(t *testing.T) {
 	}
 }
 
-// TestAuditSlidingOversized rejects undefined multi-wrap and empty circular windows.
+// TestAuditSlidingOversized rejects undefined multi-wrap windows.
 func TestAuditSlidingOversized(t *testing.T) {
-	for _, input := range []string{">a\nACGT\n", ">a\n\n", "@a\nACGT\n+\n1234\n"} {
+	for _, input := range []string{">a\nACGT\n", "@a\nACGT\n+\n1234\n"} {
 		out, stderr, err := runCLI(t, input, "sliding", "-c", "-s", "1", "-W", "10")
 		if err == nil || out != "" || strings.Contains(stderr, "panic:") {
 			t.Fatalf("oversized window accepted: %q %v %s", out, err, stderr)
@@ -479,7 +479,7 @@ func TestAuditSplitRegionsConcurrent(t *testing.T) {
 	if err != nil {
 		t.Fatalf("split regions: %v %s", err, stderr)
 	}
-	paths, err := filepath.Glob(filepath.Join(outDir, "*.fasta"))
+	paths, err := filepath.Glob(filepath.Join(outDir, "*.fa"))
 	if err != nil || len(paths) != 8 {
 		t.Fatalf("lost regions: %d %v", len(paths), err)
 	}
