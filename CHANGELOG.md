@@ -17,6 +17,8 @@
     - `seqkit scat`: Reduced idle CPU use and bounded pending records.
     - `seqkit sana`: Fixed output flushing.
     - `seqkit amplicon`: Fixed data races during parallel mismatch searches.
+    - `seqkit grep`:
+        - Added a fast bit-parallel search path for a single pattern of up to 64 characters with 1-4 mismatches, avoiding FM-index construction for each record. Contributed by #DylanCosto [#621](https://github.com/shenwei356/seqkit/pull/621)
 - [SeqKit v2.14.0](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0) - 2026-09-24
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.14.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0)
     - `seqkit`:

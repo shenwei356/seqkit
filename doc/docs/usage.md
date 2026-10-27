@@ -1775,6 +1775,8 @@ Examples
 Usage
 
 ``` text
+$ seqkit grep -h
+
 search sequences by ID/name/sequence/sequence motifs, mismatch allowed
 
 Attention:
@@ -1790,6 +1792,7 @@ Attention:
      search only on the positive strand.
      Mismatch is allowed using flag "-m/--max-mismatch", you can increase
      the value of "-j/--threads" to accelerate processing.
+     Only substitutions are allowed; insertions and deletions are not.
   3. Degenerate bases/residues like "RYMM.." are also supported by flag -d.
      But do not use degenerate bases/residues in regular expression, you need
      convert them to regular expression, e.g., change "N" or "X"  to ".".
@@ -1806,9 +1809,13 @@ Attention:
      -p pattern1 -p pattern2, or give a file of patterns via "-f/--pattern-file".
 
 Tips:
-  1. Empty patterns are allowed. So you can search records with empty ID or sequence.
+  1. Use an empty pattern to select records with an empty ID or sequence.
+     Keep -m 0 (the default) and omit -R/--region for these examples.
         seqkit grep    -p "" t.fa     # empty ID
         seqkit grep -s -p "" t.fa     # empty sequence
+  2. Searching for a single pattern of up to 64 characters with 1-4
+     mismatches uses an optimized search path. Longer patterns, multiple
+     patterns, and higher mismatch limits are also supported.
 
 You can specify the sequence region for searching with the flag -R (--region).
 The definition of region is 1-based and with some custom design.

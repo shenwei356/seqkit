@@ -63,6 +63,7 @@ Attention:
      search only on the positive strand.
      Mismatch is allowed using flag "-m/--max-mismatch", you can increase
      the value of "-j/--threads" to accelerate processing.
+     Only substitutions are allowed; insertions and deletions are not.
   3. Degenerate bases/residues like "RYMM.." are also supported by flag -d.
      But do not use degenerate bases/residues in regular expression, you need
      convert them to regular expression, e.g., change "N" or "X"  to ".".
@@ -79,9 +80,12 @@ Attention:
      -p pattern1 -p pattern2, or give a file of patterns via "-f/--pattern-file".
 
 Tips:
-  1. Empty patterns are allowed. So you can search records with empty ID or sequence.
+  1. Use an empty pattern to select records with an empty ID or sequence.
         seqkit grep    -p "" t.fa     # empty ID
         seqkit grep -s -p "" t.fa     # empty sequence
+  2. Searching for a single pattern of up to 64 characters with 1-4
+     mismatches uses an optimized search path. Longer patterns, multiple
+     patterns, and higher mismatch limits are also supported.
 
 You can specify the sequence region for searching with the flag -R (--region).
 The definition of region is 1-based and with some custom design.
@@ -350,6 +354,7 @@ Examples:
 		// only for searching with sequences and mismatch > 0, were FMI is very slow
 
 		if bySeq && mismatches > 0 {
+			// Precompute masks once for all read workers; nil selects the FM-index fallback.
 			var shortMatcher *shortMismatchMatcher
 			if len(patternsS) == 1 {
 				shortMatcher = newShortMismatchMatcher(patternsS[0], mismatches)
@@ -482,6 +487,7 @@ Examples:
 						// var k string
 						var k []byte
 
+						// The short matcher scans directly, so it needs no per-read index.
 						var sfmi *fmi.FMIndex
 						if shortMatcher == nil {
 							sfmi = fmi.NewFMIndex()
@@ -518,6 +524,7 @@ Examples:
 								target = bytes.ToLower(target)
 							}
 
+							// Strand, region, circularity, and case handling above apply to both paths.
 							if shortMatcher != nil {
 								hit = shortMatcher.match(target)
 								continue
@@ -765,38 +772,109 @@ var helpUnquotedComma = `possible unquoted comma detected, please use double quo
 
 var helpMultipleValues = `Multiple values supported: comma-separated (e.g., -p "p1,p2") OR use -p multiple times (e.g., -p p1 -p p2). Make sure to quote literal commas, e.g. in regex patterns '"A{2,}"'`
 
-// shortMismatchMatcher uses one bit per pattern position to find matches with
-// substitutions only. Its masks are immutable and shared by the read workers.
+// shortMismatchMatcher is a Shift-And (Bitap) matcher allowing substitutions only.
+// Its fields are immutable after construction and shared by the read workers.
+// Each match call keeps its own state, with one uint64 per mismatch budget.
+//
+// states[e] records which pattern prefixes match target substrings ending at
+// the byte just read, with at most e substitutions. Thus states[0] allows none,
+// and states[1] allows either zero or one; exact matches qualify for both.
+//
+// Each bit answers a different question: does the prefix of this length match?
+// Bit indices start at 0 on the right; a bit value of 1 means yes, 0 means no.
+// For pattern ACG, only the lowest three bits are relevant:
+//
+//	Bit index:    2    1    0
+//	Prefix:      ACG  AC    A
+//
+// Read target ATG from left to right. The states after each byte are:
+//
+//	Target read    states[0]    states[1]
+//	(empty)           000          000
+//	A                 001          001
+//	AT                000          011
+//	ATG               000          101  <-- bit at index 2 is set: full match
+//
+// In the AT row, the two 1s represent separate attempts ending at the current T.
+// Each "start" row aligns a pattern prefix at that zero-based target position:
+//
+//	Target:   A T
+//	start 0:  A C     1 substitution  -> bit at index 1 = 1 (prefix AC)
+//	start 1:    A     1 substitution  -> bit at index 0 = 1 (prefix A)
+//
+// The rightmost 1 is a new attempt, A versus T, not the earlier A-versus-A
+// attempt copied in place. The earlier attempt advances from index 0 to index 1.
+// In the code, <<1 extends old attempts; |1 starts an attempt at the current byte.
+// For this T, mask['T'] is zero, so only the lower-budget term contributes:
+//
+//	Old states[0]     <<1          |1       New states[1]
+//	     001    ->    010    ->    011    =      011
+//	                   ^             ^
+//	                 extend        start
+//
+// Now read the final G. Extend the two attempts and start a third:
+//
+//	Target:   A T G
+//	start 0:  A C G   1 substitution  -> bit at index 2 = 1 (prefix ACG)
+//	start 1:    A C   2 substitutions -> bit at index 1 = 0 (prefix AC)
+//	start 2:      A   1 substitution  -> bit at index 0 = 1 (prefix A)
+//
+// This gives 101. The middle attempt fails because both A/T and C/G differ.
+// The leftmost bit marks a complete match; the rightmost bit is another new
+// attempt. A bit refers to a prefix length, not a fixed start in the target.
 type shortMismatchMatcher struct {
-	masks      [256]uint64
-	matchBit   uint64
-	length     int
+	// masks[c] has bit i set wherever pattern[i] equals byte c.
+	masks [256]uint64
+	// matchBit selects the last pattern position, indicating a complete match.
+	matchBit uint64
+	// length is the pattern length in bytes, from 1 to 64.
+	length int
+	// mismatches is the maximum number of substitutions allowed, from 0 to 4.
 	mismatches int
 }
 
+// newShortMismatchMatcher builds byte-equality masks for a single pattern.
+// It returns nil for unsupported inputs so the caller can use the FM-index.
+// Case normalization, when requested, must be applied by the caller.
 func newShortMismatchMatcher(pattern []byte, mismatches int) *shortMismatchMatcher {
+	// One uint64 holds up to 64 pattern positions. The four-mismatch cap bounds
+	// per-byte work and matches the five state slots used by match.
 	if len(pattern) == 0 || len(pattern) > 64 || mismatches < 0 || mismatches > 4 || mismatches > len(pattern) {
 		return nil
 	}
 	m := &shortMismatchMatcher{length: len(pattern), mismatches: mismatches, matchBit: uint64(1) << (len(pattern) - 1)}
 	for i, base := range pattern {
+		// OR preserves earlier positions when a byte occurs more than once.
 		m.masks[base] |= uint64(1) << i
 	}
 	return m
 }
 
+// match reports whether any target substring matches within the mismatch budget.
+// Bytes are compared literally; insertions and deletions are not supported.
 func (m *shortMismatchMatcher) match(target []byte) bool {
+	// Substitutions preserve length, so a complete match needs length bytes.
 	if len(target) < m.length {
 		return false
 	}
+	// Local states keep concurrent calls independent; all start with no progress.
 	var states [5]uint64
 	for _, base := range target {
+		// Select pattern positions equal to the current target byte.
 		mask := m.masks[base]
-		// Descending updates retain the previous position's lower-error state.
+		// Update higher budgets first so states[errors-1] still describes the
+		// previous target byte, preventing the current byte from advancing twice.
 		for errors := m.mismatches; errors > 0; errors-- {
+			// <<1 moves each old attempt to the next pattern position; |1 starts
+			// a new attempt at this target byte, rather than copying old bit 0.
+			// The first term uses the old states[errors] and requires an equal
+			// byte (&mask). The second uses the old states[errors-1] and accepts
+			// any byte: at most one more substitution keeps it within this budget.
 			states[errors] = ((states[errors]<<1 | 1) & mask) | (states[errors-1]<<1 | 1)
 		}
+		// With no mismatch budget, only equal-byte extensions survive.
 		states[0] = (states[0]<<1 | 1) & mask
+		// The final pattern bit marks a complete match ending at this byte.
 		if states[m.mismatches]&m.matchBit != 0 {
 			return true
 		}
