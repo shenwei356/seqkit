@@ -350,6 +350,10 @@ Examples:
 		// only for searching with sequences and mismatch > 0, were FMI is very slow
 
 		if bySeq && mismatches > 0 {
+			var shortMatcher *shortMismatchMatcher
+			if len(patternsS) == 1 {
+				shortMatcher = newShortMismatchMatcher(patternsS[0], mismatches)
+			}
 			type Arecord struct {
 				id     uint64
 				ok     bool
@@ -478,7 +482,10 @@ Examples:
 						// var k string
 						var k []byte
 
-						sfmi := fmi.NewFMIndex()
+						var sfmi *fmi.FMIndex
+						if shortMatcher == nil {
+							sfmi = fmi.NewFMIndex()
+						}
 
 						for _, strand := range strands {
 							if hit {
@@ -509,6 +516,11 @@ Examples:
 
 							if ignoreCase {
 								target = bytes.ToLower(target)
+							}
+
+							if shortMatcher != nil {
+								hit = shortMatcher.match(target)
+								continue
 							}
 
 							_, err = sfmi.Transform(target)
@@ -752,3 +764,42 @@ var reUnquotedComma = regexp.MustCompile(`\{[^\}]*$|^[^\{]*\}`)
 var helpUnquotedComma = `possible unquoted comma detected, please use double quotation marks for patterns containing comma, e.g., -p '"A{2,}"' or -p "\"A{2,}\""`
 
 var helpMultipleValues = `Multiple values supported: comma-separated (e.g., -p "p1,p2") OR use -p multiple times (e.g., -p p1 -p p2). Make sure to quote literal commas, e.g. in regex patterns '"A{2,}"'`
+
+// shortMismatchMatcher uses one bit per pattern position to find matches with
+// substitutions only. Its masks are immutable and shared by the read workers.
+type shortMismatchMatcher struct {
+	masks      [256]uint64
+	matchBit   uint64
+	length     int
+	mismatches int
+}
+
+func newShortMismatchMatcher(pattern []byte, mismatches int) *shortMismatchMatcher {
+	if len(pattern) == 0 || len(pattern) > 64 || mismatches < 0 || mismatches > 4 || mismatches > len(pattern) {
+		return nil
+	}
+	m := &shortMismatchMatcher{length: len(pattern), mismatches: mismatches, matchBit: uint64(1) << (len(pattern) - 1)}
+	for i, base := range pattern {
+		m.masks[base] |= uint64(1) << i
+	}
+	return m
+}
+
+func (m *shortMismatchMatcher) match(target []byte) bool {
+	if len(target) < m.length {
+		return false
+	}
+	var states [5]uint64
+	for _, base := range target {
+		mask := m.masks[base]
+		// Descending updates retain the previous position's lower-error state.
+		for errors := m.mismatches; errors > 0; errors-- {
+			states[errors] = ((states[errors]<<1 | 1) & mask) | (states[errors-1]<<1 | 1)
+		}
+		states[0] = (states[0]<<1 | 1) & mask
+		if states[m.mismatches]&m.matchBit != 0 {
+			return true
+		}
+	}
+	return false
+}

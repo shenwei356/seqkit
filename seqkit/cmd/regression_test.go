@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -14,6 +15,7 @@ import (
 	"time"
 
 	"github.com/shenwei356/bio/util"
+	"github.com/shenwei356/bwt/fmi"
 	"github.com/shenwei356/go-logging"
 )
 
@@ -772,5 +774,56 @@ func TestAllCommandHelp(t *testing.T) {
 				t.Fatalf("%s --help failed: %v: stdout=%q stderr=%q", name, err, stdout, stderr)
 			}
 		})
+	}
+}
+
+func TestShortMismatchMatcher(t *testing.T) {
+	rng := rand.New(rand.NewSource(54821))
+	alphabet := []byte("ACGTNRYacgt")
+	for _, length := range []int{1, 2, 3, 4, 15, 31, 32, 63, 64} {
+		for errors := 0; errors <= 4 && errors <= length; errors++ {
+			for trial := 0; trial < 50; trial++ {
+				pattern := make([]byte, length)
+				target := make([]byte, length+40)
+				for i := range pattern {
+					pattern[i] = alphabet[rng.Intn(len(alphabet))]
+				}
+				for i := range target {
+					target[i] = alphabet[rng.Intn(len(alphabet))]
+				}
+				if trial%2 == 0 {
+					start := rng.Intn(41)
+					copy(target[start:], pattern)
+					for i := 0; i < errors && i < length; i++ {
+						target[start+i] = 'Z'
+					}
+				}
+				index := fmi.NewFMIndex()
+				if _, err := index.Transform(target); err != nil {
+					t.Fatal(err)
+				}
+				want, err := index.Match(pattern, errors)
+				if err != nil {
+					t.Fatal(err)
+				}
+				matcher := newShortMismatchMatcher(pattern, errors)
+				if got := matcher.match(target); got != want {
+					t.Fatalf("pattern %q, target %q, mismatches %d: got %v, want %v", pattern, target, errors, got, want)
+				}
+				if matcher.match(target[:length-1]) || matcher.match(nil) {
+					t.Fatal("matched a target shorter than the pattern")
+				}
+			}
+		}
+	}
+	for _, input := range []struct {
+		pattern []byte
+		errors  int
+	}{
+		{nil, 1}, {bytes.Repeat([]byte("A"), 65), 1}, {[]byte("ACGTACGT"), 5},
+	} {
+		if newShortMismatchMatcher(input.pattern, input.errors) != nil {
+			t.Fatal("unsupported pattern should use the FM-index fallback")
+		}
 	}
 }
