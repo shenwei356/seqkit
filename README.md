@@ -1,6 +1,13 @@
 # SeqKit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
 
-- [**Try SeqKit in your browser**](https://sandbox.bio/tutorials/seqkit-intro) (Tutorials and Exercises provided by [sandbox.bio](https://sandbox.bio/tutorials/seqkit-intro))
+**Try SeqKit in your browser:**
+
+<pre style="border: 2px solid var(--md-primary-fg-color); border-radius: 8px; background: rgba(0, 150, 136, 0.08); padding-right: 1em"><code class="language-bash" style="background: none"><span style="color: gray"># Find let-7 microRNA</span>
+$ <b style="color: var(--md-primary-fg-color)">seqkit</b> locate -p UGAGGUAGUAG hairpin.fa.gz | head</code></pre>
+
+<script src="https://sandbox.bio/embed.js" data-config="files/sandboxbio/index.json"></script>
+
+- **Interactive Tutorial:** [https://sandbox.bio/tutorials/seqkit-intro](https://sandbox.bio/tutorials/seqkit-intro)
 - **Documents:** [http://bioinf.shenwei.me/seqkit](http://bioinf.shenwei.me/seqkit)
 ([**Usage**](http://bioinf.shenwei.me/seqkit/usage/),
 [**FAQs**](http://bioinf.shenwei.me/seqkit/faq/),
