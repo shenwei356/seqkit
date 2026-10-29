@@ -1,0 +1,4 @@
+{
+  "tools": ["seqkit"],
+  "files": [{ "url": "../hairpin/hairpin.fa.gz", "path": "hairpin.fa.gz" }]
+}
