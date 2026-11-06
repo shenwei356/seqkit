@@ -44,6 +44,8 @@ Attention:
   1. We assume the FASTA file comes from the FASTQ file,
      so they share sequence names (not just IDs), and sequences in FASTA
      should be subseq of sequences in FASTQ file.
+  2. The complete FASTA reference is checked before output is written.
+     The FASTA reference and FASTQ input cannot both be stdin.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -63,11 +65,18 @@ Attention:
 		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
 
 		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+		checkError(validateStdinUsage(append([]string{fileFasta}, files...), isStdin(getFlagString(cmd, "infile-list"))))
 		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 		checkOutputFiles([]string{fileFasta}, []string{outFile}, true)
 
-		records, err := fastx.GetSeqsMap(fileFasta, seq.Unlimit, config.Threads, 10, "")
+		// Read the complete reference before opening output; partial maps are unsafe.
+		referenceRecords, err := readRecordsChecked(fileFasta, seq.Unlimit, "")
 		checkError(err)
+		records := make(map[string]*fastx.Record, len(referenceRecords))
+		for _, record := range referenceRecords {
+			records[string(record.Name)] = record
+		}
+		referenceRecords = nil
 		if len(records) == 0 {
 			checkError(fmt.Errorf("no sequences found in fasta file: %s", fileFasta))
 		} else {

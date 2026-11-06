@@ -86,7 +86,7 @@ Examples
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
-		runtime.GOMAXPROCS(config.BufferSize)
+		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
 		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)

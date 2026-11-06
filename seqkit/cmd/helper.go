@@ -517,7 +517,7 @@ func getFaidx(file string, idRegexp string, quiet bool) *fai.Faidx {
 }
 
 func subseqByFaix(faidx *fai.Faidx, chrs string, r fai.Record, start, end int) []byte {
-	start, end, ok := seq.SubLocation(r.Length, start, end)
+	start, end, ok := nonemptySubLocation(r.Length, start, end)
 	if !ok {
 		return []byte("")
 	}

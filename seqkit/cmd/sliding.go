@@ -119,10 +119,10 @@ Attention:
 					end = 0
 				}
 				for i := 0; i <= end; i += step {
-					e = i + window
-					if e > originalLen {
+					// Compare the remaining length before adding a possibly huge window.
+					if window > originalLen-i {
 						if circular {
-							e = e - originalLen
+							e = window - (originalLen - i)
 							s = sequence[i:]
 							s = append(s, sequence[0:e]...)
 							if len(qual) > 0 {
@@ -139,9 +139,10 @@ Attention:
 							break
 						}
 					} else {
-						s = sequence[i : i+window]
+						e = i + window
+						s = sequence[i:e]
 						if len(qual) > 0 {
-							q = qual[i : i+window]
+							q = qual[i:e]
 						}
 					}
 

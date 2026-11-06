@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"os"
+	"os/exec"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -31,5 +34,26 @@ func TestRestartOverlappingStarts(t *testing.T) {
 	out, stderr, err := runCLI(t, ">r1\nAAAAC\n>r2\nAAACG\n", "restart", "-s", "AAA")
 	if err != nil || out != ">r2\nAAACG\n" || !strings.Contains(stderr, "found at 2 positions") {
 		t.Fatalf("overlapping starts: %q %v %s", out, err, stderr)
+	}
+}
+
+// TestRestartThreads checks the effective runtime limit in an isolated CLI process.
+func TestRestartThreads(t *testing.T) {
+	if os.Getenv("SEQKIT_RESTART_THREADS_TEST") == "1" {
+		runtime.GOMAXPROCS(4)
+		RootCmd.SetArgs([]string{"restart", "-i", "1", "-j", "2"})
+		if err := RootCmd.Execute(); err != nil {
+			t.Fatal(err)
+		}
+		if got := runtime.GOMAXPROCS(0); got != 2 {
+			t.Fatalf("thread limit ignored: got %d, want 2", got)
+		}
+		return
+	}
+	command := exec.Command(os.Args[0], "-test.run=^TestRestartThreads$")
+	command.Env = append(os.Environ(), "SEQKIT_RESTART_THREADS_TEST=1")
+	command.Stdin = strings.NewReader(">s\nACGT\n")
+	if output, err := command.CombinedOutput(); err != nil {
+		t.Fatalf("thread limit: %v %s", err, output)
 	}
 }

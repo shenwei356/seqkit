@@ -88,6 +88,9 @@ func ReadBedFilteredFeatures(file string, chrs []string) ([]BedFeature, error) {
 		if err != nil {
 			return nil, false, fmt.Errorf("%s: bad end: %s", items[0], items[2])
 		}
+		if start < 0 || end < 0 {
+			return nil, false, fmt.Errorf("%s: BED coordinates must be non-negative: %d, %d", items[0], start, end)
+		}
 		if start == end {
 			return nil, false, fmt.Errorf("%s: start (%d) should not be equal to end (%d)", items[0], start, end)
 		}

@@ -53,6 +53,7 @@
         - Preserve empty FASTQ records without changing the output format or losing qualities.
     - `seqkit convert`:
         - Reject invalid quality scores and conversions outside printable ASCII. [#612](https://github.com/shenwei356/seqkit/issues/612)
+        - Reject nonfinite or out-of-range quality-encoding guess fractions.
     - `seqkit convert/locate/merge-slides/range/replace/sliding/split/split2/sum`:
         - Fixed record handling, validation, and concurrency issues.
     - `seqkit faidx`:
@@ -71,6 +72,7 @@
         - Added a fast bit-parallel search path for a single pattern of up to 64 characters with 1-4 mismatches, avoiding FM-index construction for each record. by @DylanCosto [#621](https://github.com/shenwei356/seqkit/pull/621)
         - Fixed data races and preserved each file's FASTA/FASTQ formatting during parallel mismatch searches.
         - Reduce memory use for sequence/regular-expression searches and small command-line pattern sets.
+        - Reduce memory use when searching a region with `-R`.
     - `seqkit grep/locate`:
         - Preserve DNA reverse-strand matches after protein input files, and search protein sequences only on the positive strand in all search modes.
     - `seqkit head/split2`:
@@ -98,6 +100,7 @@
     - `seqkit restart`:
         - Process each record independently with `-s`, avoiding skipped records and crashes on multi-record input.
         - Detect overlapping start matches as ambiguous.
+        - Honor the thread limit set with `-j/--threads`.
     - `seqkit sample`:
         - Report loading errors. [#615](https://github.com/shenwei356/seqkit/issues/615)
     - `seqkit sample/sample2`:
@@ -123,6 +126,7 @@
         - Accept leading FASTA comments in two-pass mode.
     - `seqkit sliding`:
         - Skip empty circular records. [#619](https://github.com/shenwei356/seqkit/issues/619)
+        - Avoid crashes with very large windows in greedy mode.
     - `seqkit sort`:
         - Fixed sorting and output issues involving mixed formats, case-insensitive comparisons, sequence prefixes, and empty sequences. [#602](https://github.com/shenwei356/seqkit/issues/602), [#603](https://github.com/shenwei356/seqkit/issues/603), [#604](https://github.com/shenwei356/seqkit/issues/604), [#605](https://github.com/shenwei356/seqkit/issues/605), [#606](https://github.com/shenwei356/seqkit/issues/606)
     - `seqkit split`:
@@ -142,12 +146,24 @@
         - Update the FASTA index with `-U` even when `--quiet` is enabled.
         - Avoid exhausting file descriptors when extracting from many indexed FASTA files.
         - Avoid loading or creating an unused index for `-r` without `--chr`, while honoring explicit `-U`.
+        - Clip BED/GTF flanking regions at sequence boundaries without returning the whole sequence for an empty flank or overflowing large flank lengths; reject invalid negative BED and non-positive GTF coordinates.
+        - Honor `-R` consistently for indexed and streamed regions, and continue to later files after empty inputs.
+        - Preserve full headers and custom IDs in indexed extraction; rebuild older ID-only indexes with `-U`.
+        - Honor explicit FASTQ line widths when extracting BED/GTF regions, and use less memory for large intervals.
     - `seqkit sum`:
         - Return a non-zero exit status for failed files while retaining valid results; reject invalid ID regular expressions before processing. [#613](https://github.com/shenwei356/seqkit/issues/613)
     - `seqkit tab2fx`:
         - Preserve FASTQ qualities when additional columns follow the quality column, and reject records with unequal sequence and quality lengths.
     - `seqkit translate`:
         - Correct negative-frame subsequence coordinates and failed-frame headers, validate table/frame selections, and clarify truncation and minimum-length options. [#619](https://github.com/shenwei356/seqkit/issues/619)
+    - `seqkit grep/subseq`:
+        - Avoid crashes with extremely negative region coordinates.
+    - `seqkit fa2fq`:
+        - Reject damaged FASTA references and repeated stdin use before opening output files.
+    - `seqkit seq/replace`:
+        - Avoid crashes with empty filter patterns; search reverse complements for DNA/RNA regular-expression filters and avoid reversed protein matches.
+    - `seqkit seq`:
+        - Apply a zero maximum-quality threshold and reject nonfinite quality limits.
 - [SeqKit v2.14.0](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0) - 2026-09-24
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.14.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0)
     - `seqkit`:

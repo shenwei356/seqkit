@@ -25,6 +25,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -89,10 +90,14 @@ Filtering records to edit:
 		minQual := getFlagFloat64(cmd, "min-qual")
 		maxQual := getFlagFloat64(cmd, "max-qual")
 
+		if math.IsNaN(minQual) || math.IsInf(minQual, 0) || math.IsNaN(maxQual) || math.IsInf(maxQual, 0) {
+			checkError(fmt.Errorf("quality limits (-Q/--min-qual and -R/--max-qual) must be finite"))
+		}
+
 		filterMinLen := minLen >= 0
 		filterMaxLen := maxLen >= 0
-		filterMinQual := minQual > 0
-		filterMaxQual := maxQual > 0
+		filterMinQual := minQual >= 0
+		filterMaxQual := maxQual >= 0
 
 		if gapLetters == "" {
 			checkError(fmt.Errorf("value of flag -G (--gap-letters) should not be empty"))
@@ -240,7 +245,7 @@ Filtering records to edit:
 			}
 		} else if len(fpattern) > 0 {
 			for _, p := range fpattern {
-				if !quiet {
+				if !quiet && len(p) > 0 {
 					if p[0] == '>' {
 						log.Warningf(`symbol ">" detected, it should not be a part of the sequence ID/name: %s`, p)
 					} else if p[0] == '@' {
@@ -510,6 +515,15 @@ Filtering records to edit:
 								break
 							}
 						}
+						if !matched && fbySeq && !fbyName && !fonlyPositiveStrand && hasComplement(record.Seq.Alphabet) {
+							target = record.Seq.RevCom().Seq
+							for _, re = range patternsR {
+								if re.Match(target) {
+									matched = true
+									break
+								}
+							}
+						}
 					} else if fbySeq {
 						if fignoreCase {
 							target = bytes.ToLower(target)
@@ -521,7 +535,7 @@ Filtering records to edit:
 							}
 						}
 						// search the reverse complement seq
-						if !matched && !fonlyPositiveStrand {
+						if !matched && !fonlyPositiveStrand && hasComplement(record.Seq.Alphabet) {
 							target = record.Seq.RevCom().Seq
 							if fignoreCase {
 								target = bytes.ToLower(target)
@@ -733,7 +747,7 @@ func init() {
 	seqCmd.Flags().BoolP("f-use-regexp", "", false, "[target filter] patterns are regular expression")
 	seqCmd.Flags().BoolP("f-invert-match", "", false, "[target filter] invert the sense of matching, to select non-matching records")
 	seqCmd.Flags().BoolP("f-by-name", "", false, "[target filter] match by full name instead of just ID")
-	seqCmd.Flags().BoolP("f-by-seq", "", false, "[target filter] search subseq on seq, both positive and negative strand are searched")
+	seqCmd.Flags().BoolP("f-by-seq", "", false, "[target filter] search subseq on seq; both strands for DNA/RNA, positive strand only for proteins")
 	seqCmd.Flags().BoolP("f-ignore-case", "", false, "[target filter] ignore case")
 	seqCmd.Flags().BoolP("f-only-positive-strand", "", false, "[target filter] only search on positive strand")
 }

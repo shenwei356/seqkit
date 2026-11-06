@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"math"
 	"runtime"
 	"strings"
 
@@ -69,6 +70,9 @@ The --force flag only clips scores > 40 for Illumina-1.8+ -> Sanger.
 
 		seq.NMostCommonThreshold = getFlagPositiveInt(cmd, "thresh-B-in-n-most-common")
 		threshIllumina1p5Frac := getFlagFloat64(cmd, "thresh-illumina1.5-frac")
+		if math.IsNaN(threshIllumina1p5Frac) || threshIllumina1p5Frac < 0 || threshIllumina1p5Frac > 1 {
+			checkError(fmt.Errorf("--thresh-illumina1.5-frac must be in [0, 1]"))
+		}
 
 		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
 		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
@@ -231,7 +235,7 @@ func init() {
 	convertCmd.Flags().IntP("nrecords", "n", 1000, "number of records for guessing quality encoding")
 
 	convertCmd.Flags().IntP("thresh-B-in-n-most-common", "N", seq.NMostCommonThreshold, "threshold of 'B' in top N most common quality for guessing Illumina 1.5.")
-	convertCmd.Flags().Float64P("thresh-illumina1.5-frac", "F", 0.1, "threshold of faction of Illumina 1.5 in the leading N records")
+	convertCmd.Flags().Float64P("thresh-illumina1.5-frac", "F", 0.1, "threshold of fraction of Illumina 1.5 in the leading N records, in [0, 1]")
 }
 
 func parseQualityEncoding(s string) seq.QualityEncoding {

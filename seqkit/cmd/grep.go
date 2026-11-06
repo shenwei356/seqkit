@@ -479,7 +479,7 @@ Examples:
 								sequence = record.Seq.RevCom()
 							}
 							if limitRegion {
-								target = sequence.SubSeq(start, end).Seq
+								target = sliceSequenceRegion(sequence.Seq, start, end)
 								if len(target) == 0 {
 									continue
 								}
@@ -628,7 +628,7 @@ Examples:
 							sequence = record.Seq.RevCom()
 						}
 						if limitRegion {
-							target = sequence.SubSeq(start, end).Seq
+							target = sliceSequenceRegion(sequence.Seq, start, end)
 							if len(target) == 0 {
 								continue
 							}

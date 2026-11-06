@@ -68,6 +68,16 @@ func nonemptySubLocation(length, start, end int) (int, int, bool) {
 	return start, end, start <= end
 }
 
+// sliceSequenceRegion returns a read-only view of a clipped 1-based region.
+// Searchers need only the bases, not a copied sequence and its quality scores.
+func sliceSequenceRegion(bases []byte, start, end int) []byte {
+	start, end, ok := nonemptySubLocation(len(bases), start, end)
+	if !ok {
+		return nil
+	}
+	return bases[start-1 : end]
+}
+
 // parseSequenceLength uses decimal biological units, truncating fractional bases.
 func parseSequenceLength(value string) (int64, error) {
 	v := strings.TrimSpace(value)

@@ -370,15 +370,15 @@ Filtering records to edit:
   You can use flags similar to those in "seqkit grep" to choose partly records to edit.
 
 Usage:
-  seqkit seq [flags] 
+  seqkit seq [flags]
 
 Flags:
   -k, --color                    colorize sequences - to be piped into "less -R"
   -p, --complement               complement sequence, flag '-v' is recommended to switch on
       --dna2rna                  DNA to RNA
       --f-by-name                [target filter] match by full name instead of just ID
-      --f-by-seq                 [target filter] search subseq on seq, both positive and negative strand
-                                 are searched
+      --f-by-seq                 [target filter] search subseq on seq; both strands for DNA/RNA,
+                                 positive strand only for proteins
       --f-ignore-case            [target filter] ignore case
       --f-invert-match           [target filter] invert the sense of matching, to select non-matching records
       --f-only-positive-strand   [target filter] only search on positive strand
@@ -409,7 +409,6 @@ Flags:
   -s, --seq                      only print sequences
   -u, --upper-case               print sequences in upper case
   -v, --validate-seq             validate bases according to the alphabet
-
 ```
 
 Examples
@@ -563,6 +562,11 @@ Attention:
      "seqkit grep -f id.txt seqs.fasta"
   3. With -r and no --chr, sequences are read in input order without loading or
      creating an index, unless -U/--update-faidx is given.
+   4. BED coordinates must be non-negative; GTF coordinates must be positive.
+      Flanking regions are clipped to sequence boundaries. A missing flank
+      produces an empty sequence.
+   5. With -r, coordinate suffixes are added only with -R, including with --chr.
+      Rebuild older ID-only .seqkit.fai indexes with -U to retain full headers.
 
 Recommendation:
   1. Use plain FASTA file, so seqkit could utilize FASTA index.
@@ -1390,6 +1394,8 @@ Attention:
   1. We assume the FASTA file comes from the FASTQ file,
      so they share sequence names (not just IDs), and sequences in FASTA
      should be subseq of sequences in FASTQ file.
+  2. The complete FASTA reference is checked before output is written.
+     The FASTA reference and FASTQ input cannot both be stdin.
 
 Usage:
   seqkit fa2fq [flags]
@@ -1551,8 +1557,8 @@ Flags:
   -n, --nrecords int                    number of records for guessing quality encoding (default 1000)
   -N, --thresh-B-in-n-most-common int   threshold of 'B' in top N most common quality for guessing
                                         Illumina 1.5. (default 2)
-  -F, --thresh-illumina1.5-frac float   threshold of faction of Illumina 1.5 in the leading N records
-                                        (default 0.1)
+  -F, --thresh-illumina1.5-frac float   threshold of fraction of Illumina 1.5 in the leading N records,
+                                        in [0, 1] (default 0.1)
       --to string                       target quality encoding (default "Sanger")
 ```
 
@@ -3600,8 +3606,8 @@ Usage:
 Flags:
   -s, --by-seq                   replace seq (FASTQ: length-increasing replacements not allowed)
       --f-by-name                [target filter] match by full name instead of just ID
-      --f-by-seq                 [target filter] search subseq on seq, both positive and negative strand
-                                 are searched
+      --f-by-seq                 [target filter] search subseq on seq; both strands for DNA/RNA,
+                                 positive strand only for proteins
       --f-ignore-case            [target filter] ignore case
       --f-invert-match           [target filter] invert the sense of matching, to select non-matching records
       --f-only-positive-strand   [target filter] only search on positive strand

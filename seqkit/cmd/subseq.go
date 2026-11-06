@@ -33,7 +33,6 @@ import (
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
-	"github.com/shenwei356/util/byteutil"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -55,6 +54,11 @@ Attention:
      "seqkit grep -f id.txt seqs.fasta"
   3. With -r and no --chr, sequences are read in input order without loading or
      creating an index, unless -U/--update-faidx is given.
+   4. BED coordinates must be non-negative; GTF coordinates must be positive.
+      Flanking regions are clipped to sequence boundaries. A missing flank
+      produces an empty sequence.
+   5. With -r, coordinate suffixes are added only with -R, including with --chr.
+      Rebuild older ID-only .seqkit.fai indexes with -U to retain full headers.
 
 Recommendation:
   1. Use plain FASTA file, so seqkit could utilize FASTA index.
@@ -163,6 +167,9 @@ Examples:
 
 			var chr, feat string
 			for _, feature := range features {
+				if feature.Start < 1 || feature.End < 1 {
+					checkError(fmt.Errorf("%s: GTF coordinates must be positive: %d, %d", feature.SeqName, feature.Start, feature.End))
+				}
 				chr = feature.SeqName
 				if _, ok := gtfFeaturesMap[chr]; !ok {
 					gtfFeaturesMap[chr] = make(map[string][]gtf.Feature)
@@ -225,7 +232,9 @@ Examples:
 				continue
 			}
 			alphabet2, isFastq, err := guessAlphabet(file)
-			checkError(err)
+			if err != io.EOF {
+				checkError(err)
+			}
 			if useIndex {
 				plainInputs[file] = inputFormat{alphabet2, isFastq}
 			}
@@ -287,12 +296,13 @@ Examples:
 
 					// faidx, err := fai.New(file)
 					// checkError(err)
-					faidx := getFaidx(file, idRegexp, quiet)
+					// Shared indexes retain complete headers so custom IDs are parsed only once.
+					faidx := getFaidx(file, `^(.+)$`, quiet)
 
 					if len(faidx.Index) == 0 {
 						checkError(faidx.Close())
 						log.Warningf("  0 records loaded from %s, please check if it matches the fasta file, or switch on the flag -U/--update-faidx", fileFai)
-						return
+						continue
 					} else if !quiet {
 						log.Infof("  %d records loaded from %s", len(faidx.Index), fileFai)
 					}
@@ -300,6 +310,10 @@ Examples:
 					var id string
 					for head := range faidx.Index {
 						id = string(fastx.ParseHeadID(idRe, []byte(head)))
+						// Match ID-only indexes by keeping the first record for repeated IDs.
+						if previous, ok := id2name[id]; ok && faidx.Index[string(previous)].Start < faidx.Index[head].Start {
+							continue
+						}
 						id2name[id] = []byte(head)
 					}
 
@@ -314,12 +328,13 @@ Examples:
 									continue
 								}
 
-								s, e, _ := seq.SubLocation(r.Length, start, end)
 								subseq := subseqByFaix(faidx, chr2, r, start, end)
-								outfh.WriteString(fmt.Sprintf(">%s_%d-%d %s\n",
-									chr, s, e, chr2))
-								outfh.Write(byteutil.WrapByteSlice(subseq, config.LineWidth))
-								outfh.WriteString("\n")
+								record, err := fastx.NewRecordWithoutValidation(alphabet2, []byte(chr), []byte(chr2), nil, subseq)
+								checkError(err)
+								if idRegexp == fastx.DefaultIDRegexp {
+									restoreDescription(record)
+								}
+								writeSubseqRegion(outfh, record, config.LineWidth, start, end, appendRegionCoord)
 							}
 							checkError(faidx.Close())
 							continue
@@ -419,6 +434,9 @@ Examples:
 				}
 
 				if region != "" {
+					if appendRegionCoord && idRegexp == fastx.DefaultIDRegexp {
+						restoreDescription(record)
+					}
 					if noChrs {
 						subseqByRegion(outfh, record, config.LineWidth, start, end, appendRegionCoord)
 					} else {
@@ -457,11 +475,50 @@ Examples:
 type type2gtfFeatures map[string][]gtf.Feature
 
 func subseqByRegion(outfh *xopen.Writer, record *fastx.Record, lineWidth int, start, end int, appendRegionCoord bool) {
-	record.Seq = record.Seq.SubSeq(start, end)
+	if s, e, ok := nonemptySubLocation(len(record.Seq.Seq), start, end); ok {
+		record.Seq = record.Seq.SubSeq(s, e)
+	} else {
+		record.Seq = &seq.Seq{Alphabet: record.Seq.Alphabet}
+	}
+	writeSubseqRegion(outfh, record, lineWidth, start, end, appendRegionCoord)
+}
+
+// writeSubseqRegion keeps indexed and streamed region headers consistent.
+func writeSubseqRegion(outfh *xopen.Writer, record *fastx.Record, lineWidth, start, end int, appendRegionCoord bool) {
 	if appendRegionCoord {
 		record.Name = fmt.Appendf(nil, "%s:%d-%d %s", record.ID, start, end, record.Desc)
 	}
 	record.FormatToWriter(outfh, lineWidth)
+}
+
+// annotationSubseq clips absolute annotation coordinates without interpreting zero
+// as the sequence end. Length-limited additions also avoid flank-length overflow.
+func annotationSubseq(sequence *seq.Seq, start, end int, negative, onlyFlank bool, upStream, downStream int) *seq.Seq {
+	if negative {
+		upStream, downStream = downStream, upStream
+	}
+	// Convert to a half-open interval before calculating the flanking region.
+	start--
+	if onlyFlank {
+		if upStream > 0 {
+			end = start
+			downStream = 0
+		} else {
+			start = end
+		}
+	}
+	length := len(sequence.Seq)
+	start = max(0, min(length, start-upStream))
+	end = max(0, min(length, end))
+	end += min(downStream, length-end)
+	if start >= end {
+		return &seq.Seq{Alphabet: sequence.Alphabet}
+	}
+	subsequence := sequence.SubSeq(start+1, end)
+	if negative {
+		subsequence.RevComInplace()
+	}
+	return subsequence
 }
 
 func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
@@ -471,7 +528,6 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 	seqname := string(record.ID)
 
 	var strand, tag, outname, flankInfo string
-	var s, e int
 	var subseq *seq.Seq
 
 	featsMap := make(map[string]struct{}, len(choosedFeatures))
@@ -487,48 +543,8 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 			}
 		}
 		for _, feature := range gtfFeaturesMap[seqname][featureType] {
-			s, e = feature.Start, feature.End
-			if feature.Strand != nil && *feature.Strand == "-" {
-				if onlyFlank {
-					if upStream > 0 {
-						s = feature.End + 1
-						e = feature.End + upStream
-					} else {
-						s = feature.Start - downStream
-						e = feature.Start - 1
-					}
-				} else {
-					s = feature.Start - downStream // seq.SubSeq will check it
-					e = feature.End + upStream
-				}
-				if s < 1 {
-					s = 1
-				}
-				if e > len(record.Seq.Seq) {
-					e = len(record.Seq.Seq)
-				}
-				subseq = record.Seq.SubSeq(s, e).RevComInplace()
-			} else {
-				if onlyFlank {
-					if upStream > 0 {
-						s = feature.Start - upStream
-						e = feature.Start - 1
-					} else {
-						s = e + 1
-						e = e + downStream
-					}
-				} else {
-					s = feature.Start - upStream
-					e = feature.End + downStream
-				}
-				if s < 1 {
-					s = 1
-				}
-				if e > len(record.Seq.Seq) {
-					e = len(record.Seq.Seq)
-				}
-				subseq = record.Seq.SubSeq(s, e)
-			}
+			subseq = annotationSubseq(record.Seq, feature.Start, feature.End,
+				feature.Strand != nil && *feature.Strand == "-", onlyFlank, upStream, downStream)
 
 			if feature.Strand == nil {
 				strand = "."
@@ -570,7 +586,7 @@ func subseqByGTFFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 				newRecord, err = fastx.NewRecordWithoutValidation(record.Seq.Alphabet, []byte(outname), []byte(outname), []byte{}, subseq.Seq)
 			}
 			checkError(err)
-			outfh.Write(newRecord.Format(lineWidth))
+			newRecord.FormatToWriter(outfh, lineWidth)
 		}
 	}
 }
@@ -581,51 +597,10 @@ func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 	seqname := string(record.ID)
 
 	var strand, geneID, outname, flankInfo string
-	var s, e int
 	var subseq *seq.Seq
 	for _, feature := range bedFeatureMap[seqname] {
-		s, e = feature.Start, feature.End
-		if feature.Strand != nil && *feature.Strand == "-" {
-			if onlyFlank {
-				if upStream > 0 {
-					s = feature.End + 1
-					e = feature.End + upStream
-				} else {
-					s = feature.Start - downStream
-					e = feature.Start - 1
-				}
-			} else {
-				s = feature.Start - downStream // seq.SubSeq will check it
-				e = feature.End + upStream
-			}
-			if s < 1 {
-				s = 1
-			}
-			if e > len(record.Seq.Seq) {
-				e = len(record.Seq.Seq)
-			}
-			subseq = record.Seq.SubSeq(s, e).RevComInplace()
-		} else {
-			if onlyFlank {
-				if upStream > 0 {
-					s = feature.Start - upStream
-					e = feature.Start - 1
-				} else {
-					s = e + 1
-					e = e + downStream
-				}
-			} else {
-				s = feature.Start - upStream
-				e = feature.End + downStream
-			}
-			if s < 1 {
-				s = 1
-			}
-			if e > len(record.Seq.Seq) {
-				e = len(record.Seq.Seq)
-			}
-			subseq = record.Seq.SubSeq(s, e)
-		}
+		subseq = annotationSubseq(record.Seq, feature.Start, feature.End,
+			feature.Strand != nil && *feature.Strand == "-", onlyFlank, upStream, downStream)
 
 		if feature.Strand == nil {
 			strand = "."
@@ -664,7 +639,7 @@ func subSeqByBEDFile(outfh *xopen.Writer, record *fastx.Record, lineWidth int,
 			newRecord, err = fastx.NewRecordWithoutValidation(record.Seq.Alphabet, []byte(outname), []byte(outname), []byte{}, subseq.Seq)
 		}
 		checkError(err)
-		outfh.Write(newRecord.Format(lineWidth))
+		newRecord.FormatToWriter(outfh, lineWidth)
 	}
 }
 

@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -137,6 +138,25 @@ func TestGrepParallelFileFormats(t *testing.T) {
 			out, stderr, err := runCLI(t, "", append(args, files...)...)
 			if err != nil || out != want {
 				t.Fatalf("parallel output differs from separate files: %v %s", err, stderr)
+			}
+		}
+	}
+}
+
+// TestGrepExtremeRegionCoordinates preserves records while clipping search regions.
+func TestGrepExtremeRegionCoordinates(t *testing.T) {
+	minimum := strconv.Itoa(-int(^uint(0)>>1) - 1)
+	input := "@s\nACGT\n+\n1234\n"
+	for _, mode := range [][]string{nil, {"-r"}, {"-m", "1"}, {"-m", "1", "-p", "TCGT"}} {
+		for _, region := range []string{minimum + ":-1", "1:" + minimum, "20:30"} {
+			args := append([]string{"grep", "-s", "-P", "-p", "ACGT", "-R", region}, mode...)
+			out, stderr, err := runCLI(t, input, args...)
+			want := ""
+			if region == minimum+":-1" {
+				want = input
+			}
+			if err != nil || out != want {
+				t.Fatalf("extreme search region failed: mode=%v region=%s: %v %s", mode, region, err, stderr)
 			}
 		}
 	}

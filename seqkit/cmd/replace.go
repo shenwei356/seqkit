@@ -288,7 +288,7 @@ Filtering records to edit:
 			}
 		} else if len(fpattern) > 0 {
 			for _, p := range fpattern {
-				if !quiet {
+				if !quiet && len(p) > 0 {
 					if p[0] == '>' {
 						log.Warningf(`symbol ">" detected, it should not be a part of the sequence ID/name: %s`, p)
 					} else if p[0] == '@' {
@@ -419,6 +419,15 @@ Filtering records to edit:
 								break
 							}
 						}
+						if !hit && fbySeq && !fbyName && !fonlyPositiveStrand && hasComplement(record.Seq.Alphabet) {
+							target = record.Seq.RevCom().Seq
+							for _, re = range patternsR {
+								if re.Match(target) {
+									hit = true
+									break
+								}
+							}
+						}
 					} else if fbySeq {
 						if fignoreCase {
 							target = bytes.ToLower(target)
@@ -430,7 +439,7 @@ Filtering records to edit:
 							}
 						}
 						// search the reverse complement seq
-						if !hit && !fonlyPositiveStrand {
+						if !hit && !fonlyPositiveStrand && hasComplement(record.Seq.Alphabet) {
 							target = record.Seq.RevCom().Seq
 							if fignoreCase {
 								target = bytes.ToLower(target)
@@ -639,7 +648,7 @@ func init() {
 	replaceCmd.Flags().BoolP("f-use-regexp", "", false, "[target filter] patterns are regular expression")
 	replaceCmd.Flags().BoolP("f-invert-match", "", false, "[target filter] invert the sense of matching, to select non-matching records")
 	replaceCmd.Flags().BoolP("f-by-name", "", false, "[target filter] match by full name instead of just ID")
-	replaceCmd.Flags().BoolP("f-by-seq", "", false, "[target filter] search subseq on seq, both positive and negative strand are searched")
+	replaceCmd.Flags().BoolP("f-by-seq", "", false, "[target filter] search subseq on seq; both strands for DNA/RNA, positive strand only for proteins")
 	replaceCmd.Flags().BoolP("f-ignore-case", "", false, "[target filter] ignore case")
 	replaceCmd.Flags().BoolP("f-only-positive-strand", "", false, "[target filter] only search on positive strand")
 }
