@@ -81,6 +81,7 @@ Attention:
 
 Tips:
   1. Use an empty pattern to select records with an empty ID or sequence.
+     Keep -m 0 (the default) and omit -R/--region for these examples.
         seqkit grep    -p "" t.fa     # empty ID
         seqkit grep -s -p "" t.fa     # empty sequence
   2. Searching for a single pattern of up to 64 characters with 1-4

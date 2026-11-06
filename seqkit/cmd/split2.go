@@ -23,13 +23,11 @@ package cmd
 import (
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
@@ -50,14 +48,24 @@ var split2Cmd = &cobra.Command{
 This command supports FASTA and paired- or single-end FASTQ with low memory
 occupation and fast speed.
 
+Attention:
+  1. Specify exactly one of -s, -p and -l.
+  2. For paired inputs, parts contain corresponding records by position;
+     unequal record counts are errors. With -l, read1 determines the boundaries
+     and read2 follows.
+  3. Lengths use K/M/G/T suffixes with base 1000; fractional bases are truncated.
+  4. Existing matching outputs are overwritten; -f suppresses the directory
+     warning. Other files, including old parts not produced this time, are retained.
+
 The prefix of output files:
   1. For stdin: stdin
   2. Others: same to the input file
   3. Set via the options: -P/--out-prefix,
      or --by-length-prefix, --by-part-prefix, or --by-size-prefix (for keeping backwards compatibility)
   4. Use the ID of the first sequence in each subset.
-     E.g, 'seqkit split2 --by-size 1 --seqid-as-filename' is equal to
-     'seqkit split --by-id', but it's much faster and uses less memory.
+     Output names must be unique; -N does not group records with the same ID.
+     Conflicting output names are errors, including repeated names produced by -N.
+  5. Prefix flags accept file names only, not directory paths.
 
 The extension of output files:
   1. For stdin: .fast[aq]
@@ -113,11 +121,21 @@ If you want to cut a sequence into multiple segments.
 		lengthS := getFlagString(cmd, "by-length")
 		var length int64
 		var err error
-		if lengthS != "" {
-			length, err = ParseByteSize(lengthS)
-			if err != nil {
-				checkError(fmt.Errorf("parsing sequence length: %s", lengthS))
+		if cmd.Flags().Changed("by-length") {
+			length, err = parseSequenceLength(lengthS)
+			if err != nil || length < 1 {
+				checkError(fmt.Errorf("invalid sequence length: %q", lengthS))
 			}
+		}
+
+		modes := 0
+		for _, flag := range []string{"by-size", "by-part", "by-length"} {
+			if cmd.Flags().Changed(flag) {
+				modes++
+			}
+		}
+		if modes != 1 {
+			checkError(fmt.Errorf("exactly one of -s/-p/-l must be specified"))
 		}
 
 		outdir := getFlagString(cmd, "out-dir")
@@ -142,6 +160,10 @@ If you want to cut a sequence into multiple segments.
 			prefixBySize = prefixAll
 			prefixByPart = prefixAll
 			prefixByLength = prefixAll
+		}
+
+		for _, prefix := range []string{prefixAll, prefixBySize, prefixByPart, prefixByLength} {
+			validateOutputPrefix(prefix)
 		}
 
 		partNumberWidth := getFlagPositiveInt(cmd, "part-width")
@@ -236,322 +258,148 @@ If you want to cut a sequence into multiple segments.
 		if force {
 			checkOutputDir(files, outdir)
 		}
-		if !isWorkingDir(outdir) {
-			existed, err := pathutil.DirExists(outdir)
-			checkError(err)
-			if existed {
-				empty, err := pathutil.IsEmpty(outdir)
-				checkError(err)
-				if !empty {
-					if force {
-						checkError(os.RemoveAll(outdir))
-						checkError(os.MkdirAll(outdir, 0755))
-					} else {
-						log.Warningf("outdir not empty: %s, you can use --force to overwrite", outdir)
-					}
-				}
-			} else {
-				checkError(os.MkdirAll(outdir, 0755))
-			}
-		}
-
-		var wg sync.WaitGroup
+		// Read mates together so all modes share one set of part boundaries.
+		readers := make([]*fastx.Reader, len(files))
+		records := make([]*fastx.Record, len(files))
+		fastqs := make([]bool, len(files))
+		widths := make([]int, len(files))
+		stems := make([]string, len(files))
+		exts := make([]string, len(files))
 		for i, file := range files {
-			isstdin := isStdin(file)
-			var fileName, fileExt, fileExt2 string
-			if isstdin {
-				fileName, fileExt = "stdin", extension
-				if outdir == "" {
-					outdir = "stdin.split"
+			readers[i], err = fastx.NewReader(alphabet, file, idRegexp)
+			checkError(err)
+			defer readers[i].Close()
+			records[i], err = readers[i].Read()
+			if err != nil && err != io.EOF {
+				checkError(fmt.Errorf("%s: %w", file, err))
+			}
+			if records[i] != nil {
+				records[i] = records[i].Clone()
+			}
+			fastqs[i] = readers[i].IsFastq
+			widths[i] = config.LineWidth
+			if fastqs[i] && !config.LineWidthChanged {
+				widths[i] = 0
+			}
+			if isStdin(file) {
+				stems[i] = "stdin"
+				if fastqs[i] {
+					exts[i] = suffixFQ + extension
+				} else {
+					exts[i] = suffixFA + extension
 				}
 			} else {
-				fileName, fileExt, fileExt2 = filepathTrimExtension2(file, nil)
+				stem, ext, compression := filepathTrimExtension2(file, nil)
+				stems[i], exts[i] = filepath.Base(stem), ext+compression
 				if extension != "" {
-					fileExt += extension
-				} else {
-					fileExt += fileExt2
-				}
-
-				if outdir == "" {
-					outdir = file + ".split"
+					exts[i] = ext + extension
 				}
 			}
-
 			if outFile != "-" {
-				fileName = filepath.Base(outFile)
+				stems[i] = filepath.Base(outFile)
 			}
-
-			wg.Add(1)
-			go func(file string, pairedEnd bool, r int) {
-				defer wg.Done()
-
-				renameFileExt := true
-				var record *fastx.Record
-				var err error
-
-				var outfhs []*xopen.Writer
-				var counts []int
-				var outfiles []string
-
-				// by size or by length
-				var outfhPre *xopen.Writer
-				var prefix string
-				var outfilePre string
-
-				var flag bool
-
-				if bySize || byLength { // by size or by length
-				} else if byParts { // by part
-					outfhs = make([]*xopen.Writer, 0, parts)
-					counts = make([]int, 0, parts)
-					outfiles = make([]string, 0, parts)
-				} else {
-					checkError(fmt.Errorf(`one of flags should be given: -s/-p/-l. type "seqkit split2 -h" for help`))
+		}
+		fastx.ForcelyOutputFastq = false
+		if pairedEnd && (records[0] == nil) != (records[1] == nil) {
+			checkError(fmt.Errorf("record counts differ: %s and %s", files[0], files[1]))
+		}
+		if records[0] == nil {
+			return
+		}
+		registry := splitOutputRegistry{inputs: files}
+		filename := func(side, part int, record *fastx.Record) string {
+			if seqIDAsFileName {
+				return filepath.Join(outdir, pathutil.RemoveInvalidPathChars(string(record.ID), "__")+exts[side])
+			}
+			prefix := stems[side] + ".part_"
+			if bySize && prefixBySizeSet {
+				prefix = prefixBySize
+			}
+			if byParts && prefixByPartSet {
+				prefix = prefixByPart
+			}
+			if byLength && prefixByLengthSet {
+				prefix = prefixByLength
+			}
+			if pairedEnd {
+				prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(side+1))
+			}
+			return filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, part, exts[side]))
+		}
+		if pairedEnd {
+			checkOutputFiles(files, []string{filename(0, 1, records[0]), filename(1, 1, records[1])})
+		}
+		prepareOutputDir(outdir, force)
+		writers := make(map[int][]*xopen.Writer)
+		counts := make(map[int]int)
+		paths := make(map[int][]string)
+		closePart := func(part int) {
+			for side, w := range writers[part] {
+				closeOutput(w)
+				if !quiet {
+					log.Infof("write %d sequences to file: %s", counts[part], paths[part][side])
 				}
-
-				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
-				checkError(err)
-				lineWidth := config.LineWidth // Each worker owns its format settings.
-				isFastq := false
-				writeRecord := func(out *xopen.Writer) {
-					if !isFastq || len(record.Seq.Qual) > 0 {
-						record.FormatToWriter(out, lineWidth)
-						return
+			}
+			delete(writers, part)
+		}
+		closeAll := func() {
+			for part := range writers {
+				closePart(part)
+			}
+		}
+		part := 1
+		var bases int64
+		total := 0
+		for {
+			if writers[part] == nil {
+				for side, record := range records {
+					path := filename(side, part, record)
+					// Register every logical part once, including round-robin outputs.
+					w, openErr := registry.open(path)
+					if openErr != nil {
+						closeAll()
+						checkError(openErr)
 					}
-					out.Write(_mark_fastq)
-					out.Write(record.Name)
-					out.Write(_mark_newline)
-					out.Write(record.Seq.Seq)
-					out.Write(_mark_newline)
-					out.Write(_mark_plus_newline)
-					out.Write(record.Seq.Qual)
-					out.Write(_mark_newline)
+					writers[part] = append(writers[part], w)
+					paths[part] = append(paths[part], path)
 				}
-				i := 0 // nth part
-				j := 0
-				var n int64 // length sum
-				once := true
-				for {
-					record, err = fastxReader.Read()
-					if err != nil {
-						if err == io.EOF {
-							break
-						}
-						checkError(err)
-						break
-					}
-
-					if once {
-						if fastxReader.IsFastq {
-							isFastq = true
-							if !config.LineWidthChanged {
-								lineWidth = 0
-							}
-						}
-
-						if renameFileExt && isstdin {
-							if len(record.Seq.Qual) > 0 {
-								fileExt = suffixFQ + extension
-							} else {
-								fileExt = suffixFA + extension
-							}
-							renameFileExt = false
-						}
-						once = false
-					}
-
-					n += int64(len(record.Seq.Seq))
-
-					if bySize {
-						if j == size {
-							closeOutput(outfhPre)
-							if !quiet {
-								log.Infof("write %d sequences to file: %s\n", j, outfilePre)
-							}
-
-							i++
-
-							if !seqIDAsFileName {
-								if prefixBySizeSet {
-									prefix = prefixBySize
-									if pairedEnd {
-										prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
-									}
-								} else {
-									prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
-								}
-								outfilePre = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, i+1, fileExt))
-							} else {
-								outfilePre = filepath.Join(outdir, fmt.Sprintf("%s%s", pathutil.RemoveInvalidPathChars(string(record.ID), "__"), fileExt))
-							}
-							outfhPre, err = xopen.Wopen(outfilePre)
-							checkError(err)
-
-							j = 0
-						}
-					} else if byLength {
-						flag = false
-
-						if outfhPre == nil { // first record
-							var outfh2 *xopen.Writer
-							var outfile string
-							if !seqIDAsFileName {
-								if prefixByLengthSet {
-									prefix = prefixByLength
-									if pairedEnd {
-										prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
-									}
-								} else {
-									prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
-								}
-								outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, i+1, fileExt))
-							} else {
-								outfile = filepath.Join(outdir, fmt.Sprintf("%s%s", pathutil.RemoveInvalidPathChars(string(record.ID), "__"), fileExt))
-							}
-							outfh2, err = xopen.Wopen(outfile)
-							checkError(err)
-
-							outfhPre = outfh2
-							outfilePre = outfile
-
-							j = 0
-						}
-
-						if n >= length {
-							writeRecord(outfhPre)
-							j++
-
-							closeOutput(outfhPre)
-							if !quiet {
-								log.Infof("write %d sequences to file: %s\n", j, outfilePre)
-							}
-							i++
-
-							var outfh2 *xopen.Writer
-							var outfile string
-							if !seqIDAsFileName {
-								if prefixByLengthSet {
-									prefix = prefixByLength
-									if pairedEnd {
-										prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
-									}
-								} else {
-									prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
-								}
-								outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, i+1, fileExt))
-							} else {
-								outfile = filepath.Join(outdir, fmt.Sprintf("%s%s", pathutil.RemoveInvalidPathChars(string(record.ID), "__"), fileExt))
-							}
-							outfh2, err = xopen.Wopen(outfile)
-							checkError(err)
-
-							outfhPre = outfh2
-							outfilePre = outfile
-
-							j = 0
-							n = 0
-							flag = false
-						} else { // write this record later
-							flag = true
-						}
-					}
-
-					if bySize {
-						// first record, for bySize
-						if outfhPre == nil {
-							if !seqIDAsFileName {
-								if prefixBySizeSet {
-									prefix = prefixBySize
-									if pairedEnd {
-										prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
-									}
-								} else {
-									prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
-								}
-								outfilePre = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, i+1, fileExt))
-							} else {
-								outfilePre = filepath.Join(outdir, fmt.Sprintf("%s%s", pathutil.RemoveInvalidPathChars(string(record.ID), "__"), fileExt))
-							}
-							outfhPre, err = xopen.Wopen(outfilePre)
-							checkError(err)
-
-							j = 0
-						}
-
-						writeRecord(outfhPre)
-
-						j++ // increase size
-					} else if byLength {
-						if flag {
-							writeRecord(outfhPre)
-
-							j++
-						}
-					} else {
-						// first record, for byParts
-						if i+1 > len(outfhs) {
-							var outfh2 *xopen.Writer
-							var outfile string
-							if !seqIDAsFileName {
-								if prefixByPartSet {
-									prefix = prefixByPart
-									if pairedEnd {
-										prefix = reRead.ReplaceAllString(prefix, strconv.Itoa(r))
-									}
-								} else {
-									prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
-								}
-								outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, i+1, fileExt))
-							} else {
-								outfile = filepath.Join(outdir, fmt.Sprintf("%s%s", pathutil.RemoveInvalidPathChars(string(record.ID), "__"), fileExt))
-							}
-							outfh2, err = xopen.Wopen(outfile)
-							checkError(err)
-
-							outfhs = append(outfhs, outfh2)
-							counts = append(counts, 0)
-							outfiles = append(outfiles, outfile)
-						}
-
-						writeRecord(outfhs[i])
-						counts[i]++
-
-						i++
-						if i == parts { // reset index
-							i = 0
-						}
-					}
+			}
+			for side, record := range records {
+				writeFastxRecord(writers[part][side], record, fastqs[side], widths[side])
+			}
+			counts[part]++
+			total++
+			bases += int64(len(records[0].Seq.Seq))
+			if byParts {
+				part = (part % parts) + 1
+			} else if bySize && counts[part] >= size || byLength && bases >= length {
+				closePart(part)
+				part++
+				bases = 0
+			}
+			ended := 0
+			for side, reader := range readers {
+				record, readErr := reader.Read()
+				if readErr == io.EOF {
+					ended++
+					records[side] = nil
+					continue
 				}
-				fastxReader.Close()
-
-				if byParts {
-					for i, outfh := range outfhs {
-						closeOutput(outfh)
-
-						if !quiet {
-							if counts[i] == 0 {
-
-							} else {
-								log.Infof("write %d sequences to file: %s\n", counts[i], outfiles[i])
-							}
-						}
-					}
-				} else {
-					if outfhPre != nil {
-						closeOutput(outfhPre)
-					}
-
-					if j == 0 {
-						os.Remove(outfilePre)
-					} else {
-						log.Infof("write %d sequences to file: %s\n", j, outfilePre)
-					}
+				if readErr != nil {
+					closeAll()
+					checkError(fmt.Errorf("%s: %w", files[side], readErr))
 				}
-
-			}(file, pairedEnd, i+1)
+				records[side] = record
+			}
+			if ended > 0 {
+				closeAll()
+				if ended != len(readers) {
+					checkError(fmt.Errorf("record counts differ after %d pairs: %s and %s", total, files[0], files[1]))
+				}
+				break
+			}
 		}
 
-		wg.Wait()
 	},
 }
 
@@ -562,16 +410,16 @@ func init() {
 	split2Cmd.Flags().StringP("read2", "2", "", "(gzipped) read2 file")
 	split2Cmd.Flags().IntP("by-size", "s", 0, "split sequences into multi parts with N sequences")
 	split2Cmd.Flags().IntP("by-part", "p", 0, "split sequences into N parts with the round robin distribution")
-	split2Cmd.Flags().StringP("by-length", "l", "", "split sequences into chunks of >=N bases, supports K/M/G suffix")
+	split2Cmd.Flags().StringP("by-length", "l", "", "split sequences into chunks of >=N bases, supports K/M/G suffix (base 1000)")
 	split2Cmd.Flags().StringP("out-dir", "O", "", "output directory (default value is $infile.split)")
-	split2Cmd.Flags().BoolP("force", "f", false, "overwrite output directory")
+	split2Cmd.Flags().BoolP("force", "f", false, "overwrite matching output files without the nonempty-directory warning")
 
 	split2Cmd.Flags().StringP("by-size-prefix", "", "", `file prefix for --by-size. The placeholder "{read}" is needed for paired-end files.`)
 	split2Cmd.Flags().StringP("by-part-prefix", "", "", `file prefix for --by-part. The placeholder "{read}" is needed for paired-end files.`)
 	split2Cmd.Flags().StringP("by-length-prefix", "", "", `file prefix for --by-length. The placeholder "{read}" is needed for paired-end files.`)
 	split2Cmd.Flags().StringP("out-prefix", "P", "", `file prefix (it overrides --by-*-prefix). The placeholder "{read}" is needed for paired-end files.`)
 
-	split2Cmd.Flags().BoolP("seqid-as-filename", "N", false, "use the first sequence ID as the file name. E.g., using '-N -s 1' is equal to 'seqkit split --by-id' but much faster and uses less memory.")
+	split2Cmd.Flags().BoolP("seqid-as-filename", "N", false, "use the first sequence ID as each part's file name; conflicting names are errors")
 
 	split2Cmd.Flags().StringP("extension", "e", "", `set output file extension, e.g., ".gz", ".xz", or ".zst"`)
 

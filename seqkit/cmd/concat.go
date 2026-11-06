@@ -24,6 +24,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"regexp"
 	"runtime"
 	"strings"
 
@@ -48,6 +49,7 @@ Attention:
       * If you are processing multiple-sequence-alignment results, you can use
         -F/--fill to fill with N bases/residues for IDs missing in some files when
         using -f/--full.
+        Empty input files contribute no padding in full-join mode (-f -F).
    2. If there are more than one sequences of the same ID, we output the Cartesian
       product of sequences.
    3. Description are also concatenated with a separator (-s/--separator).
@@ -81,6 +83,9 @@ Attention:
 			}
 		}
 
+		idPattern, err := regexp.Compile(idRegexp)
+		checkError(err)
+
 		// id -> seqs
 		seqs0 := make([]map[string]*[]*fastx.Record, 0, 1024)
 
@@ -96,7 +101,7 @@ Attention:
 		first := true
 
 		var idxFile int
-		for i, file := range files {
+		for _, file := range files {
 			if !quiet {
 				log.Infof("read file: %s", file)
 			}
@@ -131,6 +136,9 @@ Attention:
 			var list *[]*fastx.Record
 			var m *map[int]int
 			for j, _seq := range seqs {
+				if idPattern.Match(_seq.Name) {
+					restoreDescription(_seq)
+				}
 				id = string(_seq.ID)
 
 				if list, ok = seqsM[id]; !ok {
@@ -151,10 +159,10 @@ Attention:
 					continue
 				}
 				if j == 0 {
-					seqLens[i] = len(_seq.Seq.Seq)
-				} else if seqLens[i] != len(_seq.Seq.Seq) {
+					seqLens[idxFile] = len(_seq.Seq.Seq)
+				} else if seqLens[idxFile] != len(_seq.Seq.Seq) {
 					log.Warningf("records with different lengths (%d, %d) detected in file '%s' , -F/--fill is disabled",
-						seqLens[i], len(_seq.Seq.Seq), file)
+						seqLens[idxFile], len(_seq.Seq.Seq), file)
 					fill = false
 				}
 			}
@@ -168,7 +176,10 @@ Attention:
 		checkError(err)
 		defer closeOutput(outfh)
 
-		n := len(files)
+		if !full && len(seqs0) != len(files) {
+			return
+		}
+		n := len(seqs0)
 
 		lists := make([][]int, 0, 1024)
 		var bufName, bufSeq, bufQual bytes.Buffer

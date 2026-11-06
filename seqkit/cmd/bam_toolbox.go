@@ -89,6 +89,12 @@ func NewBamReaderChan(inFile string, cp int, buff int, threads int) (chan *sam.R
 	}
 
 	r, err := bam.NewReader(bufio.NewReaderSize(fh, buff), threads)
+	if err != nil {
+		if fh != os.Stdin {
+			fh.Close()
+		}
+		checkError(fmt.Errorf("%s: %w", inFile, err))
+	}
 	go func() {
 		if fh != os.Stdin {
 			defer fh.Close()
@@ -102,7 +108,9 @@ func NewBamReaderChan(inFile string, cp int, buff int, threads int) (chan *sam.R
 			if err != nil {
 				close(outChan)
 			}
-			checkError(err)
+			if err != nil {
+				checkError(fmt.Errorf("%s: %w", inFile, err))
+			}
 			outChan <- rec
 		}
 	}()
@@ -161,6 +169,14 @@ func BamToolbox(toolYaml string, inFile string, outFile string, quiet bool, sile
 		checkError(err)
 		y, err = syaml.NewYaml(cb)
 		checkError(err)
+	}
+
+	if keys, err := y.GetMapKeys(); err == nil {
+		for _, key := range keys {
+			if key == "Dump" {
+				dumpFields(y.Get("Dump"))
+			}
+		}
 	}
 
 	chanCap := 5000
@@ -412,42 +428,44 @@ type AlnDetails struct {
 	WAcc          float64
 }
 
-func GetSamAlnDetails(r *sam.Record) *AlnDetails {
+// GetSamAlnDetails computes NM-dependent alignment statistics.
+func GetSamAlnDetails(r *sam.Record) *AlnDetails { return samAlnDetails(r, true) }
+
+// samAlnDetails reads NM only for fields that actually depend on it.
+func samAlnDetails(r *sam.Record, needNM bool) *AlnDetails {
 	var mismatch int
 	res := new(AlnDetails)
-	aux, ok := r.Tag([]byte("NM"))
-	if !ok {
-		panic("No NM tag in the BAM record!")
-	}
+	var mm, ins, del, skip int
+	if needNM {
+		aux, ok := r.Tag([]byte("NM"))
+		if !ok {
+			checkError(fmt.Errorf("%s: required NM tag is missing", r.Name))
+		}
 
-	var mm int
-	var ins int
-	var del int
-	var skip int
-
-	switch aux.Value().(type) {
-	case int:
-		mismatch = int(aux.Value().(int))
-	case int8:
-		mismatch = int(aux.Value().(int8))
-	case int16:
-		mismatch = int(aux.Value().(int16))
-	case int32:
-		mismatch = int(aux.Value().(int32))
-	case int64:
-		mismatch = int(aux.Value().(int64))
-	case uint:
-		mismatch = int(aux.Value().(uint))
-	case uint8:
-		mismatch = int(aux.Value().(uint8))
-	case uint16:
-		mismatch = int(aux.Value().(uint16))
-	case uint32:
-		mismatch = int(aux.Value().(uint32))
-	case uint64:
-		mismatch = int(aux.Value().(uint64))
-	default:
-		panic("Could not parse NM tag: " + aux.String())
+		switch aux.Value().(type) {
+		case int:
+			mismatch = int(aux.Value().(int))
+		case int8:
+			mismatch = int(aux.Value().(int8))
+		case int16:
+			mismatch = int(aux.Value().(int16))
+		case int32:
+			mismatch = int(aux.Value().(int32))
+		case int64:
+			mismatch = int(aux.Value().(int64))
+		case uint:
+			mismatch = int(aux.Value().(uint))
+		case uint8:
+			mismatch = int(aux.Value().(uint8))
+		case uint16:
+			mismatch = int(aux.Value().(uint16))
+		case uint32:
+			mismatch = int(aux.Value().(uint32))
+		case uint64:
+			mismatch = int(aux.Value().(uint64))
+		default:
+			checkError(fmt.Errorf("%s: could not parse NM tag: %s", r.Name, aux.String()))
+		}
 	}
 	for _, op := range r.Cigar {
 		switch op.Type() {
@@ -482,41 +500,14 @@ func GetSamAlnDetails(r *sam.Record) *AlnDetails {
 }
 
 func BamToolDump(p *BamToolParams) {
-	validFields := []string{"Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "Match", "Mismatch", "Ins", "Del", "AlnLen", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "IsSup", "ReadSeq", "ReadAlnSeq", "LeftSoftClipSeq", "RightSoftClipSeq", "RightSoftClip", "LeftHardClip", "RightHardClip"}
-
+	keys := dumpFields(p.Yaml)
 	tsvFh := os.Stderr
 	tsvFile, err := p.Yaml.Get("Tsv").String()
 	if err == nil && tsvFile != "-" {
 		tsvFh, err = os.Create(tsvFile)
+		checkError(err)
 	}
 
-	arr, err := p.Yaml.Get("Fields").Array()
-	checkError(err)
-	keys := []string{}
-	for _, k := range arr {
-		s, ok := k.(string)
-		if ok {
-			found := false
-			for _, x := range validFields {
-				if s == x {
-					found = true
-					continue
-				}
-			}
-			if found {
-				keys = append(keys, s)
-			}
-
-		}
-	}
-	if len(arr) == 1 {
-		tmp, ok := arr[0].(string)
-		if ok {
-			if tmp == "*" {
-				keys = validFields
-			}
-		}
-	}
 	tsvFh.WriteString(PrintTsvLine(keys))
 	for r := range p.InChan {
 		if GetSamMapped(r) {
@@ -539,7 +530,13 @@ func SamDumper(fields []string, r *sam.Record) []string {
 }
 
 func GetSamDump(field string, r *sam.Record) string {
-	acc := GetSamAlnDetails(r)
+	var acc *AlnDetails
+	switch field {
+	case "Acc", "Match", "Mismatch":
+		acc = samAlnDetails(r, true)
+	case "Ins", "Del", "AlnLen":
+		acc = samAlnDetails(r, false)
+	}
 	switch field {
 	case "Read":
 		return fmt.Sprintf("%s", GetSamName(r))
@@ -813,7 +810,7 @@ func GetSamAcc(r *sam.Record) float64 {
 	var mismatch int
 	aux, ok := r.Tag([]byte("NM"))
 	if !ok {
-		panic("no NM tag")
+		checkError(fmt.Errorf("%s: required NM tag is missing", r.Name))
 	}
 	var mm int
 	var ins int
@@ -841,7 +838,7 @@ func GetSamAcc(r *sam.Record) float64 {
 	case uint64:
 		mismatch = int(aux.Value().(uint64))
 	default:
-		panic("Could not parse NM tag: " + aux.String())
+		checkError(fmt.Errorf("%s: could not parse NM tag: %s", r.Name, aux.String()))
 	}
 	for _, op := range r.Cigar {
 		switch op.Type() {
@@ -862,4 +859,32 @@ func GetSamAcc(r *sam.Record) float64 {
 		return (1.0 - float64(mismatch)/alnLen) * 100
 	}
 	return 0.0
+}
+
+// dumpFields rejects unknown names before any stage starts processing.
+func dumpFields(y *syaml.Yaml) []string {
+	valid := []string{"Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "Match", "Mismatch", "Ins", "Del", "AlnLen", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "IsSup", "ReadSeq", "ReadAlnSeq", "LeftSoftClipSeq", "RightSoftClipSeq", "RightSoftClip", "LeftHardClip", "RightHardClip"}
+	fields, err := y.Get("Fields").Array()
+	checkError(err)
+	if len(fields) == 1 && fields[0] == "*" {
+		return valid
+	}
+	keys := make([]string, 0, len(fields))
+	for _, field := range fields {
+		name, ok := field.(string)
+		found := false
+		if ok {
+			for _, allowed := range valid {
+				if name == allowed {
+					found = true
+					break
+				}
+			}
+		}
+		if !found {
+			checkError(fmt.Errorf("Dump: unknown field: %v", field))
+		}
+		keys = append(keys, name)
+	}
+	return keys
 }

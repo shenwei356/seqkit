@@ -56,7 +56,11 @@ Attention:
      please use double quotation marks for patterns containing comma, 
      e.g., -p '"A{2,}"' or -p "\"A{2,}\"". Because the command line argument
      parser accepts comma-separated-values (CSV) for multiple values (motifs).
-     Patterns in file do not follow this rule.     
+     Patterns in file do not follow this rule.
+     Patterns from -p and -f are combined. Every pattern-file record is searched,
+     including duplicate names and sequences. Duplicate IDs in the pattern file
+     trigger warnings unless --quiet is set; all their patterns are retained.
+     Empty patterns are warned about and skipped; having no valid patterns is an error.
   4. Mismatch is allowed using flag "-m/--max-mismatch",
      you can increase the value of "-j/--threads" to accelerate processing.
   5. When using flag --circular, end position of matched subsequence that 
@@ -105,7 +109,7 @@ Attention:
 			onlyPositiveStrand = true
 		}
 
-		if len(pattern) == 0 && patternFile == "" {
+		if len(pattern) == 0 && patternFile == "" && !cmd.Flags().Changed("pattern") {
 			checkError(fmt.Errorf("one of flags -p (--pattern) and -f (--pattern-file) needed"))
 		}
 
@@ -147,16 +151,35 @@ Attention:
 		}
 
 		// prepare pattern
+		if len(pattern) == 0 && cmd.Flags().Changed("pattern") {
+			log.Warningf("empty pattern skipped")
+		}
 		regexps := make(map[string]*regexp.Regexp)
 		patterns := make(map[string][]byte)
+		patternNames := make(map[string]string) // Internal keys preserve duplicate display names.
 		var s string
 		if patternFile != "" {
-			records, err := fastx.GetSeqsMap(patternFile, seq.Unlimit, config.Threads, 10, "")
+			records, err := readRecordsChecked(patternFile, seq.Unlimit, "")
 			checkError(err)
 			if len(records) == 0 {
 				checkError(fmt.Errorf("no FASTA sequences found in pattern file: %s", patternFile))
 			}
-			for name, record := range records {
+			// Track display IDs for warnings without removing any searchable patterns.
+			seenIDs := make(map[string]struct{})
+			for _, record := range records {
+				if len(record.Seq.Seq) == 0 {
+					log.Warningf("empty pattern skipped: %s", record.ID)
+					continue
+				}
+				name := fmt.Sprint(len(patterns))
+				id := string(record.ID)
+				if !quiet {
+					if _, seen := seenIDs[id]; seen {
+						log.Warningf("duplicate pattern ID %q in %s; all patterns with this ID will be searched", id, patternFile)
+					}
+					seenIDs[id] = struct{}{}
+				}
+				patternNames[name] = id
 				patterns[name] = record.Seq.Seq
 				if !quiet && bytes.Contains(record.Seq.Seq, []byte("\t ")) {
 					log.Warningf("space found in sequence: %s", name)
@@ -199,22 +222,29 @@ Attention:
 					}
 				}
 			}
-		} else {
-			for _, p := range pattern {
-				patterns[p] = []byte(p)
+		}
+		{
+			for _, raw := range pattern {
+				if raw == "" {
+					log.Warningf("empty pattern skipped")
+					continue
+				}
+				p := fmt.Sprint(len(patterns))
+				patternNames[p] = raw
+				patterns[p] = []byte(raw)
 
 				if !quiet && bytes.Contains(patterns[p], []byte(" \t")) {
 					log.Warningf("space found in sequence: '%s'", p)
 				}
 
 				if degenerate {
-					pattern2seq, err := seq.NewSeq(alphabet, []byte(p))
+					pattern2seq, err := seq.NewSeq(alphabet, []byte(raw))
 					if err != nil {
 						checkError(fmt.Errorf("it seems that flag -d is given, but you provide regular expression instead of available %s sequence", alphabet.String()))
 					}
 					s = pattern2seq.Degenerate2Regexp()
 				} else if useRegexp {
-					s = p
+					s = raw
 				} else {
 					if ignoreCase {
 						patterns[p] = bytes.ToLower(patterns[p])
@@ -248,6 +278,10 @@ Attention:
 					}
 				}
 			}
+		}
+
+		if len(patterns) == 0 {
+			checkError(fmt.Errorf("no valid patterns"))
 		}
 
 		outfh, err := xopen.Wopen(outFile)
@@ -377,7 +411,9 @@ Attention:
 					tokens <- 1
 					wg.Add(1)
 					id++
-					go func(record *fastx.Record, id uint64) {
+					go func(record *fastx.Record, id uint64, positiveOnly bool) {
+						// Index construction errors and strand policy belong to this worker.
+						var err error
 						defer func() {
 							wg.Done()
 							<-tokens
@@ -447,20 +483,20 @@ Attention:
 											0,
 											"+",
 											".",
-											pName)
+											patternNames[pName])
 									} else if outFmtBED {
 										_ch <- fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
 											record.ID,
 											begin-1,
 											end,
-											pName,
+											patternNames[pName],
 											0,
 											"+")
 									} else {
 										if hideMatched {
 											_ch <- fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
 												record.ID,
-												pName,
+												patternNames[pName],
 												prune(patterns[pName], len2show), // patterns[pName],
 												"+",
 												begin,
@@ -468,7 +504,7 @@ Attention:
 										} else {
 											_ch <- fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 												record.ID,
-												pName,
+												patternNames[pName],
 												prune(patterns[pName], len2show), // patterns[pName],
 												"+",
 												begin,
@@ -485,7 +521,7 @@ Attention:
 
 						_wg.Wait()
 
-						if _onlyPositiveStrand {
+						if positiveOnly {
 							close(_ch)
 							<-_done
 
@@ -519,6 +555,10 @@ Attention:
 
 									begin = l - i - len(pSeq) + 1
 									end = l - i
+									if circular && begin < 1 {
+										begin += l
+										end += l
+									}
 									if i+len(pSeq) > len(record.Seq.Seq) {
 										continue
 									}
@@ -532,20 +572,20 @@ Attention:
 											0,
 											"-",
 											".",
-											pName)
+											patternNames[pName])
 									} else if outFmtBED {
 										_ch <- fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
 											record.ID,
 											begin-1,
 											end,
-											pName,
+											patternNames[pName],
 											0,
 											"-")
 									} else {
 										if hideMatched {
 											_ch <- fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
 												record.ID,
-												pName,
+												patternNames[pName],
 												prune(patterns[pName], len2show), // patterns[pName],
 												"-",
 												begin,
@@ -553,7 +593,7 @@ Attention:
 										} else {
 											_ch <- fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 												record.ID,
-												pName,
+												patternNames[pName],
 												prune(patterns[pName], len2show), // patterns[pName],
 												"-",
 												begin,
@@ -573,7 +613,7 @@ Attention:
 						<-_done
 
 						ch <- &Arecord{record: results, id: id, ok: len(results) > 0}
-					}(record.Clone(), id)
+					}(record.Clone(), id, _onlyPositiveStrand)
 				}
 				fastxReader.Close()
 			}
@@ -671,20 +711,20 @@ Attention:
 									0,
 									"+",
 									".",
-									pName))
+									patternNames[pName]))
 							} else if outFmtBED {
 								outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
 									record.ID,
 									begin-1,
 									end,
-									pName,
+									patternNames[pName],
 									0,
 									"+"))
 							} else {
 								if hideMatched {
 									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
 										record.ID,
-										pName,
+										patternNames[pName],
 										prune(patterns[pName], len2show), // patterns[pName],
 										"+",
 										begin,
@@ -692,7 +732,7 @@ Attention:
 								} else {
 									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 										record.ID,
-										pName,
+										patternNames[pName],
 										prune(patterns[pName], len2show), // patterns[pName],
 										"+",
 										begin,
@@ -725,6 +765,10 @@ Attention:
 
 							begin = l - i - len(pSeq) + 1
 							end = l - i
+							if circular && begin < 1 {
+								begin += l
+								end += l
+							}
 							if i+len(pSeq) > len(record.Seq.Seq) {
 								continue
 							}
@@ -738,20 +782,20 @@ Attention:
 									0,
 									"-",
 									".",
-									pName))
+									patternNames[pName]))
 							} else if outFmtBED {
 								outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
 									record.ID,
 									begin-1,
 									end,
-									pName,
+									patternNames[pName],
 									0,
 									"-"))
 							} else {
 								if hideMatched {
 									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
 										record.ID,
-										pName,
+										patternNames[pName],
 										prune(patterns[pName], len2show), // patterns[pName],
 										"-",
 										begin,
@@ -759,7 +803,7 @@ Attention:
 								} else {
 									outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 										record.ID,
-										pName,
+										patternNames[pName],
 										prune(patterns[pName], len2show), // patterns[pName],
 										"-",
 										begin,
@@ -836,20 +880,20 @@ Attention:
 								0,
 								"+",
 								".",
-								pName))
+								patternNames[pName]))
 						} else if outFmtBED {
 							outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
 								record.ID,
 								begin-1,
 								end,
-								pName,
+								patternNames[pName],
 								0,
 								"+"))
 						} else {
 							if hideMatched {
 								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
 									record.ID,
-									pName,
+									patternNames[pName],
 									prune(patterns[pName], len2show), // patterns[pName],
 									"+",
 									begin,
@@ -857,7 +901,7 @@ Attention:
 							} else {
 								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 									record.ID,
-									pName,
+									patternNames[pName],
 									prune(patterns[pName], len2show), // patterns[pName],
 									"+",
 									begin,
@@ -942,20 +986,20 @@ Attention:
 								0,
 								"-",
 								".",
-								pName))
+								patternNames[pName]))
 						} else if outFmtBED {
 							outfh.WriteString(fmt.Sprintf("%s\t%d\t%d\t%s\t%d\t%s\n",
 								record.ID,
 								begin-1,
 								end,
-								pName,
+								patternNames[pName],
 								0,
 								"-"))
 						} else {
 							if hideMatched {
 								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\n",
 									record.ID,
-									pName,
+									patternNames[pName],
 									prune(patterns[pName], len2show), // patterns[pName],
 									"-",
 									begin,
@@ -963,7 +1007,7 @@ Attention:
 							} else {
 								outfh.WriteString(fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%s\n",
 									record.ID,
-									pName,
+									patternNames[pName],
 									prune(patterns[pName], len2show), // patterns[pName],
 									"-",
 									begin,

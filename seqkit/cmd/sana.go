@@ -27,6 +27,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"runtime"
 	"strings"
 	"time"
@@ -64,12 +65,18 @@ Sana currently supports this FASTQ dialect:
 
   - One line for each sequence and quality value
 
-	`,
+Attention:
+  1. FASTA recovery discards pre-header junk and malformed records, preserving
+     valid neighboring records. Empty IDs are allowed; records without sequence
+     are discarded.
+  2. File I/O errors stop processing with a nonzero exit status.
+
+`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
 		outFile := config.OutFile
-		quiet := config.Quiet // FIXME: add quiet mode
+		quiet := config.Quiet
 		qBase := getFlagPositiveInt(cmd, "qual-ascii-base")
 		inFmt := getFlagString(cmd, "in-format")
 		checkFileFormat(inFmt)
@@ -84,6 +91,10 @@ Sana currently supports this FASTQ dialect:
 			outFmt = inOutFmt
 		}
 
+		if inFmt == "" || outFmt == "" {
+			log.Fatal("Invalid format specified: empty effective format")
+		}
+
 		allowGaps := getFlagBool(cmd, "allow-gaps")
 		runtime.GOMAXPROCS(config.Threads)
 
@@ -91,6 +102,15 @@ Sana currently supports this FASTQ dialect:
 		if !config.SkipFileCheck {
 			for _, file := range files {
 				checkIfFilesAreTheSame(file, outFile, "input", "output")
+			}
+		}
+
+		for _, file := range files {
+			if !isStdin(file) {
+				info, err := os.Stat(file)
+				if err == nil && info.IsDir() {
+					checkError(fmt.Errorf("%s: input is a directory", file))
+				}
 			}
 		}
 
@@ -117,6 +137,10 @@ Sana currently supports this FASTQ dialect:
 					outfh.WriteString(rawSeq.Format(outFmt))
 					outfh.WriteByte('\n')
 				default:
+					if _, fatal := rawSeq.Err.(*rawFileError); fatal {
+						closeOutput(outfh)
+						checkError(rawSeq.Err)
+					}
 					fail++
 					if !quiet {
 						log.Info("File: " + rawSeq.File + "\t" + rawSeq.String() + "\n")
@@ -239,26 +263,21 @@ func ValidateSeq(seq *simpleSeq, gaps bool) error {
 }
 
 // NewRawSeqStream initializes a new channel for reading fastq records from a file in a robust way.
-func NewRawSeqStreamFromFile(inFastq string, seqChan chan *simpleSeq, qBase int, format string, allowGaps bool) (chan SeqStreamCtrl, chan SeqStreamCtrl) {
-	rio, err := xopen.Ropen(inFastq)
-	var bio *bufio.Reader
-	if err == nil {
-		buffSize := 128 * 1024
-		bio = bufio.NewReaderSize(rio, buffSize)
-	}
-	ctrlChanIn := make(chan SeqStreamCtrl, 1000)
-	ctrlChanOut := make(chan SeqStreamCtrl)
-
-	switch format {
-	case "fastq":
-		NewRawFastqStream(inFastq, rio, bio, seqChan, qBase, inFastq, ctrlChanIn, ctrlChanOut, allowGaps)
-		return ctrlChanIn, ctrlChanOut
-	case "fasta":
-		NewRawFastaStream(inFastq, rio, bio, seqChan, inFastq, ctrlChanIn, ctrlChanOut, allowGaps)
-		return ctrlChanIn, ctrlChanOut
-	}
-	return nil, nil
+func NewRawSeqStreamFromFile(file string, seqChan chan *simpleSeq, qBase int, format string, allowGaps bool) (chan SeqStreamCtrl, chan SeqStreamCtrl) {
+	in := make(chan SeqStreamCtrl, 1000)
+	out := make(chan SeqStreamCtrl)
+	go runRawSeqStream(file, nil, nil, seqChan, qBase, format, in, out, allowGaps)
+	return in, out
 }
+
+// rawFileError distinguishes I/O failures from recoverable malformed records.
+type rawFileError struct {
+	file  string
+	cause error
+}
+
+func (e *rawFileError) Error() string { return fmt.Sprintf("%s: %v", e.file, e.cause) }
+func (e *rawFileError) Unwrap() error { return e.cause }
 
 type FqlState struct {
 	Header  bool
@@ -308,11 +327,7 @@ func guessFasState(line []byte, gaps bool) FqlState {
 	state := FqlState{}
 	switch line[0] {
 	case '>':
-		if len(line) > 1 {
-			state.Header = true
-		} else {
-			state.Invalid = true
-		}
+		state.Header = true
 	default:
 		if validateSeqBytes(line, gaps) == nil {
 			state.Seq = true
@@ -350,315 +365,289 @@ func FasLinesToSimpleSeq(lines FqLines) (*simpleSeq, error) {
 		return nil, fmt.Errorf("line %d: expected header line, got: %s", lines[0].LineNr, lines[0].Line)
 	}
 	s := &simpleSeq{Id: lines[0].Line[1:]}
+	var sequence strings.Builder
 	for i := 1; i < len(lines); i++ {
 		if lines[i].FqlState.Invalid && !lines[i].FqlState.Seq {
 			return nil, fmt.Errorf("line %d: invalid sequence line: %s", lines[i].LineNr, lines[i].Line)
 		}
-		s.Seq += lines[i].Line
+		sequence.WriteString(lines[i].Line)
 	}
+	s.Seq = sequence.String()
 	return s, nil
 }
 
 // streamFastq reads records from a potentially incomplete fastq file.
-func streamFastq(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSeq, ctrlChanIn, ctrlChanOut chan SeqStreamCtrl, lineCounter *int, qBase int, gaps bool, final bool) (FqLines, error) {
-	var line []byte
-	var lastLine *FqLine
-	var prevLine *FqLine
-	if len(sbuff) > 0 {
-		lastLine = &sbuff[len(sbuff)-1]
+// streamRaw retains physical lines across temporary EOFs and emits complete records.
+func streamRaw(name string, r *bufio.Reader, buffer FqLines, out chan *simpleSeq, feedback chan SeqStreamCtrl, lineCounter *int, qBase int, gaps, fastq, final bool) (FqLines, error) {
+	discard := func(lines FqLines, cause error) {
+		for _, line := range lines {
+			if line.Line != "" {
+				out <- &simpleSeq{File: name, StartLine: line.LineNr, Seq: line.Line, Err: fmt.Errorf("Discarded line: %w", cause)}
+			}
+		}
 	}
-	if len(sbuff) > 1 {
-		prevLine = &sbuff[len(sbuff)-2]
+	emitFasta := func(lines FqLines) {
+		record, err := FasLinesToSimpleSeq(lines)
+		if err != nil {
+			discard(lines, err)
+		} else {
+			record.File = name
+			record.StartLine = lines[0].LineNr
+			out <- record
+		}
 	}
-	var err error
+	process := func(text string, number int) {
+		if !fastq {
+			text = strings.TrimRight(text, "\r\n\t ")
+			if text == "" {
+				return
+			}
+			state := guessFasState([]byte(text), gaps)
+			if state.Header && len(buffer) > 0 {
+				emitFasta(buffer)
+				buffer = buffer[:0]
+			}
+			if len(buffer) == 0 && !state.Header {
+				discard(FqLines{{Line: text, LineNr: number}}, fmt.Errorf("expected FASTA header"))
+				return
+			}
+			buffer = append(buffer, FqLine{text, state, number})
+			return
+		}
+		text = strings.Trim(text, "\r\n\t ")
+		var prev *FqLine
+		if len(buffer) > 0 {
+			prev = &buffer[len(buffer)-1]
+		}
+		buffer = append(buffer, FqLine{text, guessFqlState([]byte(text), prev), number})
+		if len(buffer) == 4 {
+			record, err := FqLinesToSimpleSeq(buffer, qBase, gaps)
+			if err == nil {
+				record.File = name
+				record.StartLine = buffer[0].LineNr
+				out <- record
+				buffer = buffer[:0]
+			} else {
+				next := len(buffer)
+				for i := 1; i < len(buffer); i++ {
+					if buffer[i].FqlState.Header {
+						next = i
+						break
+					}
+				}
+				discard(buffer[:next], err)
+				buffer = buffer[next:]
+			}
+		}
+	}
 	for {
 		if r == nil {
-			return sbuff, nil
+			return buffer, nil
 		}
-		line, err = r.ReadBytes('\n')
-		switch err {
-		case nil:
-			line = bytes.Trim(line, "\r\n\t ")
-			(*lineCounter)++
-			if lastLine != nil && lastLine.FqlState.Partial {
-				lastLine.Line += string(line)
-				lastLine.FqlState = guessFqlState([]byte(lastLine.Line), prevLine)
+		line, err := r.ReadBytes('\n')
+		if err != nil && err != io.EOF {
+			return buffer, err
+		}
+		number := *lineCounter
+		partial := len(buffer) > 0 && buffer[len(buffer)-1].FqlState.Partial
+		if len(line) > 0 || final && partial {
+			if partial {
+				last := buffer[len(buffer)-1]
+				buffer = buffer[:len(buffer)-1]
+				line = append([]byte(last.Line), line...)
+				number = last.LineNr
 			} else {
-				lineStr := string(line)
-				if len(sbuff) > 0 {
-					prevLine = &sbuff[len(sbuff)-1]
-				}
-				sbuff = append(sbuff, FqLine{lineStr, guessFqlState(line, prevLine), *lineCounter})
-				lastLine = &sbuff[len(sbuff)-1]
+				(*lineCounter)++
+				number = *lineCounter
 			}
-			if len(sbuff) == 4 && !lastLine.FqlState.Partial {
-				seq, err := FqLinesToSimpleSeq(sbuff, qBase, gaps)
-				if err == nil {
-					if lineCounter != nil {
-						seq.StartLine = *lineCounter - 4
-					}
-					out <- seq
-					sbuff = sbuff[:0]
+			if err == io.EOF && !final {
+				buffer = append(buffer, FqLine{string(line), FqlState{Partial: true}, number})
+			} else {
+				process(string(line), number)
+			}
+		}
+		if err == io.EOF {
+			if !final {
+				feedback <- StreamEOF
+				return buffer, nil
+			}
+			if len(buffer) > 0 {
+				if fastq {
+					discard(buffer, fmt.Errorf("incomplete FASTQ record"))
 				} else {
-					h := -1
-					for i := 1; i < len(sbuff); i++ {
-						if sbuff[i].FqlState.Header {
-							h = i
+					emitFasta(buffer)
+				}
+			}
+			return buffer[:0], nil
+		}
+	}
+}
+
+// streamFastq resumes a potentially incomplete single-line FASTQ stream.
+func streamFastq(name string, r *bufio.Reader, buffer FqLines, out chan *simpleSeq, in, feedback chan SeqStreamCtrl, counter *int, qBase int, gaps, final bool) (FqLines, error) {
+	return streamRaw(name, r, buffer, out, feedback, counter, qBase, gaps, true, final)
+}
+
+// streamFasta resumes multiline FASTA without discarding an unfinished record.
+func streamFasta(name string, r *bufio.Reader, buffer FqLines, out chan *simpleSeq, in, feedback chan SeqStreamCtrl, counter *int, gaps, final bool) (FqLines, error) {
+	return streamRaw(name, r, buffer, out, feedback, counter, 0, gaps, false, final)
+}
+
+// rawInputView leaves ownership of the source file with the stream runner.
+type rawInputView struct{ io.Reader }
+
+// rawGrowingReader preserves decoded offsets across temporary compressed EOFs.
+type rawGrowingReader struct {
+	source  io.Reader
+	offset  *int64
+	growing bool
+}
+
+// Read counts decoded bytes and distinguishes a temporary truncated member.
+func (r *rawGrowingReader) Read(p []byte) (int, error) {
+	n, err := r.source.Read(p)
+	*r.offset += int64(n)
+	if r.growing && errors.Is(err, io.ErrUnexpectedEOF) {
+		err = io.EOF
+	}
+	return n, err
+}
+
+// runRawSeqStream reports file failures through the ordered output channel.
+func runRawSeqStream(name string, fh *xopen.Reader, reader *bufio.Reader, sequences chan *simpleSeq, qBase int, format string, in, feedback chan SeqStreamCtrl, gaps bool) {
+	var buffer FqLines
+	var counter int
+	var source *os.File
+	seekable := false
+	defer func() {
+		if source != nil {
+			source.Close()
+		}
+	}()
+	var decodedOffset int64
+	var tracked *rawGrowingReader
+	compressed := false
+	report := func(err error) { sequences <- &simpleSeq{File: name, Err: &rawFileError{name, err}} }
+	finish := func() {
+		if source != nil {
+			if err := source.Close(); err != nil {
+				report(err)
+			}
+			source = nil
+		}
+		feedback <- StreamExited
+	}
+
+	for command := range in {
+		if reader == nil {
+			var err error
+			// Final-only streams retain xopen support for URLs, commands and FIFOs.
+			if isStdin(name) || command == StreamQuit && source == nil || strings.HasPrefix(name, "http://") || strings.HasPrefix(name, "https://") || strings.HasPrefix(name, "|") {
+				fh, err = xopen.Ropen(name)
+			} else {
+				if source == nil {
+					source, err = os.Open(name)
+					if err == nil {
+						info, statErr := source.Stat()
+						err = statErr
+						if err == nil {
+							seekable = info.Mode().IsRegular()
+						}
+					}
+				}
+				if err == nil && !seekable {
+					fh, err = xopen.Buf(rawInputView{source})
+				}
+				if err == nil && seekable {
+					var magic [6]byte
+					n, probeErr := source.ReadAt(magic[:], 0)
+					if probeErr != nil && probeErr != io.EOF {
+						err = probeErr
+					}
+					// A short compression header is not yet malformed while the file grows.
+					partialHeader := false
+					for _, signature := range [][]byte{{0x1f, 0x8b}, {0xfd, 0x37, 0x7a, 0x58, 0x5a, 0x00}, {0x28, 0xb5, 0x2f, 0xfd}, {'B', 'Z', 'h'}, {0x04, 0x22, 0x4d, 0x18}, {0x02, 0x21, 0x4c, 0x18}} {
+						if n > 0 && (bytes.HasPrefix(magic[:n], signature) || bytes.HasPrefix(signature, magic[:n])) {
+							compressed = true
+							partialHeader = n < len(signature)
 							break
 						}
 					}
-					if h < 0 {
-						h = len(sbuff)
+					if command == StreamTry && partialHeader {
+						feedback <- StreamEOF
+						continue
 					}
-					for j := 0; j < h; j++ {
-						serr := &simpleSeq{
-							StartLine: sbuff[j].LineNr,
-							Err:       fmt.Errorf("discarded line: %w", err),
-							Seq:       sbuff[j].Line,
-							File:      name,
-						}
-						out <- serr
+					if err == nil {
+						_, err = source.Seek(0, io.SeekStart)
 					}
-					sbuff = sbuff[h:]
-
-				}
-			} //sbuff == 4
-		case io.EOF:
-			line = bytes.TrimRight(line, "\n")
-			if len(line) > 0 {
-				(*lineCounter)++
-				sbuff = append(sbuff, FqLine{string(line), FqlState{Partial: true}, *lineCounter})
-			}
-			if !final {
-				ctrlChanOut <- StreamEOF
-				return sbuff, nil
-			}
-			if final && len(sbuff) == 4 {
-				last := len(sbuff) - 1
-				prevLine = &sbuff[len(sbuff)-2]
-				sbuff[last].FqlState.Partial = false
-				sbuff[last].FqlState = guessFqlState([]byte(sbuff[last].Line), prevLine)
-				seq, err := FqLinesToSimpleSeq(sbuff, qBase, gaps)
-				if err != nil {
-					for il, l := range sbuff {
-						ems := fmt.Sprintf("Discarded line: %s", err)
-						serr := &simpleSeq{StartLine: (*lineCounter - 4 + il + 1), Err: errors.New(ems), Seq: l.Line, File: name}
-						out <- serr
-						sbuff = sbuff[:0]
+					if err == nil {
+						fh, err = xopen.Buf(rawInputView{source})
 					}
-				} else {
-					if seq == nil {
-						panic("Sequence is nil!")
-					}
-					seq.StartLine = *lineCounter - 4
-					out <- seq
-					sbuff = sbuff[:0]
 				}
 			}
-			return sbuff, nil
-		default:
-			return sbuff, err
-		}
-
-	}
-}
-
-// streamFastq reads records from a potentially incomplete fasta file.
-func streamFasta(name string, r *bufio.Reader, sbuff FqLines, out chan *simpleSeq, ctrlChanIn, ctrlChanOut chan SeqStreamCtrl, lineCounter *int, gaps bool, final bool) (FqLines, error) {
-	var line []byte
-	var spaceShift int
-	var lastLine *FqLine
-	if len(sbuff) > 0 {
-		lastLine = &sbuff[len(sbuff)-1]
-	}
-	var err error
-	for {
-		if r == nil {
-			return sbuff, nil
-		}
-		line, err = r.ReadBytes('\n')
-		switch err {
-		case nil:
-			line = bytes.TrimRight(line, "\n\t ")
-			if len(line) == 0 {
-				(*lineCounter)++
-				spaceShift++
+			if err == xopen.ErrNoContent || command == StreamTry && errors.Is(err, io.ErrUnexpectedEOF) {
+				if command == StreamQuit {
+					finish()
+					return
+				}
+				feedback <- StreamEOF
 				continue
 			}
-			if lastLine != nil && lastLine.FqlState.Partial {
-				*lineCounter++
-				lastLine.Line += string(line)
-				lastLine.FqlState = guessFasState([]byte(lastLine.Line), gaps)
-			} else {
-				*lineCounter++
-				lineStr := string(line)
-				sbuff = append(sbuff, FqLine{lineStr, guessFasState(line, gaps), *lineCounter})
-				lastLine = &sbuff[len(sbuff)-1]
+			if err != nil {
+				report(err)
+				finish()
+				return
 			}
-			if len(sbuff) >= 2 && !lastLine.FqlState.Partial {
-				if sbuff[0].FqlState.Header && (lastLine.FqlState.Header) {
-					seq, err := FasLinesToSimpleSeq(sbuff[:len(sbuff)-1])
-					if err == nil {
-						seq.StartLine = spaceShift + *lineCounter - len(sbuff) - 1
-						out <- seq
-						sbuff = sbuff[len(sbuff)-1:]
-					} else {
-						for j := 0; j < len(sbuff)-1; j++ {
-							ems := fmt.Sprintf("Discarded line: %s", err)
-							serr := &simpleSeq{StartLine: spaceShift + *lineCounter - len(sbuff) - 1 + j, Err: errors.New(ems), Seq: sbuff[j].Line, File: name}
-							out <- serr
-						}
-					}
-					sbuff = sbuff[len(sbuff)-1:]
+			if decodedOffset > 0 {
+				if _, err := io.CopyN(io.Discard, fh, decodedOffset); err != nil {
+					fh.Close()
+					report(err)
+					finish()
+					return
 				}
 			}
-		case io.EOF:
-			line = bytes.TrimRight(line, "\n")
-			if len(line) == 0 && !final {
-				spaceShift++
-			}
-
-			if len(line) > 0 {
-				state := guessFasState(line, gaps)
-				if !final {
-					state.Partial = true
-				}
-				sbuff = append(sbuff, FqLine{string(line), state, *lineCounter})
-			}
-
-			if !final {
-				ctrlChanOut <- StreamEOF
-				return sbuff, nil
-			}
-
-			if final && len(sbuff) > 1 {
-				last := len(sbuff) - 1
-				sbuff[last].FqlState.Partial = false
-				sbuff[last].FqlState = guessFasState([]byte(sbuff[last].Line), gaps)
-				seq, err := FasLinesToSimpleSeq(sbuff)
-				if err == nil {
-					seq.StartLine = spaceShift + *lineCounter - len(sbuff) - 1
-					out <- seq
-					sbuff = sbuff[:0]
-				} else {
-					for j := 0; j < len(sbuff)-1; j++ {
-						ems := fmt.Sprintf("Discarded line: %s", err)
-						serr := &simpleSeq{StartLine: spaceShift + *lineCounter - len(sbuff) - 1 + j, Err: errors.New(ems), Seq: sbuff[j].Line, File: name}
-						out <- serr
-					}
-				}
-				sbuff = sbuff[:0]
-			}
-			return sbuff, nil
-		default:
-			return sbuff, err
+			tracked = &rawGrowingReader{source: fh, offset: &decodedOffset}
+			reader = bufio.NewReaderSize(tracked, 128<<10)
 		}
-
+		if tracked != nil {
+			tracked.growing = command == StreamTry
+		}
+		var err error
+		buffer, err = streamRaw(name, reader, buffer, sequences, feedback, &counter, qBase, gaps, format == "fastq", command == StreamQuit)
+		if err != nil || command == StreamQuit {
+			if err != nil {
+				report(err)
+			}
+			if closeErr := fh.Close(); closeErr != nil {
+				report(closeErr)
+			}
+			finish()
+			return
+		}
+		if compressed {
+			// Decoders may cache EOF. Reopen them at the decoded offset, while keeping
+			// the original source descriptor so renames do not change the input identity.
+			// The decoder also reports a temporary truncated member from Close.
+			if err := fh.Close(); err != nil && !errors.Is(err, io.ErrUnexpectedEOF) {
+				report(err)
+				finish()
+				return
+			}
+			reader = nil
+		}
 	}
 }
 
-// NewRawSeqStream initializes a new channel for reading fastq records in a robust way.
-func NewRawFastqStream(name string, inFh *xopen.Reader, inReader *bufio.Reader, seqChan chan *simpleSeq, qBase int, id string, ctrlChanIn, ctrlChanOut chan SeqStreamCtrl, gaps bool) chan *simpleSeq {
-	lineCounter := 0
-
-	go func() {
-		sbuff := make(FqLines, 0, 1000)
-		var err error
-
-	MAIN_FQ:
-		for {
-			cmd := <-ctrlChanIn
-			if inReader == nil {
-				inFh, err = xopen.Ropen(name)
-				if err == nil {
-					buffSize := 128 * 1024
-					inReader = bufio.NewReaderSize(inFh, buffSize)
-				} else {
-					if cmd == StreamQuit {
-						ctrlChanOut <- StreamExited
-						return
-					}
-					continue MAIN_FQ
-				}
-
-			}
-			if cmd == StreamTry {
-				sbuff, err = streamFastq(name, inReader, sbuff, seqChan, ctrlChanIn, ctrlChanOut, &lineCounter, qBase, gaps, false)
-				if err != nil {
-					log.Fatal(err)
-				}
-
-			} else if cmd == StreamQuit {
-				sbuff, err = streamFastq(name, inReader, sbuff, seqChan, ctrlChanIn, ctrlChanOut, &lineCounter, qBase, gaps, true)
-				for _, l := range sbuff {
-					var ems string
-					if err != nil {
-						ems = fmt.Sprintf("Discarded line: %s", err)
-					} else {
-						ems = "Discarded final line"
-					}
-					serr := &simpleSeq{Err: errors.New(ems), StartLine: lineCounter, Seq: l.Line, File: name}
-					seqChan <- serr
-				}
-				ctrlChanOut <- StreamExited
-				inFh.Close()
-				return
-			} else {
-				log.Fatal("Invalid command:", int(cmd))
-			}
-		}
-	}()
-
-	return seqChan
+// NewRawFastqStream starts the shared parser with an already opened reader.
+func NewRawFastqStream(name string, fh *xopen.Reader, reader *bufio.Reader, sequences chan *simpleSeq, qBase int, id string, in, feedback chan SeqStreamCtrl, gaps bool) chan *simpleSeq {
+	go runRawSeqStream(name, fh, reader, sequences, qBase, "fastq", in, feedback, gaps)
+	return sequences
 }
 
-// NewRawSeqStream initializes a new channel for reading fastq records in a robust way.
-func NewRawFastaStream(name string, inFh *xopen.Reader, inReader *bufio.Reader, seqChan chan *simpleSeq, id string, ctrlChanIn, ctrlChanOut chan SeqStreamCtrl, gaps bool) chan *simpleSeq {
-	go func() {
-		sbuff := make(FqLines, 0, 1000)
-		var err error
-		lineCounter := new(int)
-
-	MAIN_FA:
-		for {
-			cmd := <-ctrlChanIn
-			if inReader == nil {
-				inFh, err = xopen.Ropen(name)
-				if err == nil {
-					buffSize := 128 * 1024
-					inReader = bufio.NewReaderSize(inFh, buffSize)
-				} else {
-					if cmd == StreamQuit {
-						ctrlChanOut <- StreamExited
-						return
-					}
-					continue MAIN_FA
-				}
-
-			}
-			if cmd == StreamTry {
-				sbuff, err = streamFasta(name, inReader, sbuff, seqChan, ctrlChanIn, ctrlChanOut, lineCounter, gaps, false)
-				if err != nil {
-					log.Fatal(err)
-				}
-
-			} else if cmd == StreamQuit {
-				sbuff, err = streamFasta(name, inReader, sbuff, seqChan, ctrlChanIn, ctrlChanOut, lineCounter, gaps, true)
-				for i, l := range sbuff {
-					ems := fmt.Sprintf("Discarded line: %s", err)
-					serr := &simpleSeq{Err: errors.New(ems), StartLine: *lineCounter - i, Seq: l.Line, File: name}
-					seqChan <- serr
-				}
-				ctrlChanOut <- StreamExited
-				inFh.Close()
-				return
-			} else {
-				log.Fatal("Invalid command:", int(cmd))
-			}
-		}
-	}()
-
-	return seqChan
+// NewRawFastaStream starts the shared parser with an already opened reader.
+func NewRawFastaStream(name string, fh *xopen.Reader, reader *bufio.Reader, sequences chan *simpleSeq, id string, in, feedback chan SeqStreamCtrl, gaps bool) chan *simpleSeq {
+	go runRawSeqStream(name, fh, reader, sequences, 0, "fasta", in, feedback, gaps)
+	return sequences
 }
 
 // parseQuals parses quality string into a slice of integers.

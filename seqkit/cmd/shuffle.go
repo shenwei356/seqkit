@@ -21,6 +21,7 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"math/rand"
@@ -54,6 +55,8 @@ While FASTQ is not supported.
 Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
+     Two-pass mode requires unique complete FASTA headers (ID and description).
+     Single-pass mode retains records with duplicate headers.
   2. By default, the output is deterministic; that is, given the same input and random seed,
      seqkit shuf will always generate identical results across different runs.
      For 'true randomness', please add '-r/--non-deterministic', which uses a time-based seed.
@@ -243,6 +246,9 @@ Attention:
 			}
 
 			sequence := subseqByFaixNotCleaned(faidx, chr, r, 1, -1)
+			if bytes.IndexByte(sequence, '\r') >= 0 {
+				sequence = bytes.ReplaceAll(sequence, []byte("\r"), nil)
+			}
 			outfh.Write(fmt.Appendf(nil, ">%s\n", chr))
 			outfh.Write(sequence)
 			if len(sequence) == 0 || sequence[len(sequence)-1] != '\n' {

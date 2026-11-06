@@ -25,6 +25,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"runtime"
 	"sort"
 
@@ -45,6 +46,7 @@ var commonCmd = &cobra.Command{
 
 Note:
   1. 'seqkit common' is designed to support 2 and MORE files.
+     Results always come from the first input, including stdin.
   2. When comparing by sequences,
      a) Both positive and negative strands are compared. You can switch on
         -P/--only-positive-strand for considering the positive strand only.
@@ -55,6 +57,9 @@ Note:
           as it is an embedded subsequence of GGGG.
         It is recommended to put the smallest file as the first file, for saving
         memory usage.
+        With -s -e, empty records are skipped, but every input still participates
+        in the intersection. Fragments retain their corresponding qualities and
+        are ordered by first-file record, then decreasing length and increasing start.
   3. For 2 files, 'seqkit grep' is much faster and consumes lesser memory:
        seqkit grep -f <(seqkit seq -n -i small.fq.gz) big.fq.gz # by seq ID
      But note that searching by sequence would be much slower, as it's partly
@@ -107,441 +112,50 @@ Note:
 			}
 		}
 
-		outfh, err := xopen.Wopen(outFile)
-		checkError(err)
-		defer closeOutput(outfh)
+		firstLabel := files[0]
+		var spool string
+		// Cache bytes rather than parsed records so stdin preserves every header and quality.
+		if isStdin(files[0]) {
+			temp, err := os.CreateTemp("", "seqkit-common-*")
+			checkError(err)
+			spool = temp.Name()
+			defer os.Remove(spool)
+			_, copyErr := io.Copy(temp, os.Stdin)
+			closeErr := temp.Close()
+			if copyErr != nil || closeErr != nil {
+				os.Remove(spool)
+				checkError(errors.Join(copyErr, closeErr))
+			}
+			files[0] = spool
+		}
+		check := func(err error) {
+			if err != nil {
+				if spool != "" {
+					os.Remove(spool)
+				}
+				checkError(err)
+			}
+		}
 
+		outfh, err := xopen.Wopen(outFile)
+		check(err)
+		defer closeOutput(outfh)
+		if bySeq && checkembeddedSeqs {
+			err := commonEmbedded(files, firstLabel, outfh, config, revcom, ignoreCase)
+			if err != nil {
+				closeOutput(outfh)
+				check(err)
+			}
+			return
+		}
 		var fastxReader *fastx.Reader
 		var record *fastx.Record
 		var rc *seq.Seq
-
-		var _seq0, _seq, _seqRC []byte
-		var subject uint64
-		var subjectRC uint64 // hash value of reverse complement sequence
-		var checkFirstFile = true
-		var isFirstFile = true
-		var firstFile string
+		var _seq, _seqRC []byte
+		var subject, subjectRC uint64
+		isFirstFile := true
+		firstFile := files[0]
 		var ok bool
-
-		// ------------ for bySeq && checkembeddedSeqs ---------------
-
-		type loc2hash struct {
-			id    string
-			begin int
-			end   int
-			len   int
-		}
-
-		// relation structures
-		var seqs map[string]*fastx.Record                  // seqid -> record, sequences in the first file
-		var hashes map[uint64]*[]*loc2hash                 // hash -> [(id,begin,end,len)]
-		var seqid2Hashes map[string]map[uint64]interface{} // seqid -> hashes of subseqs
-
-		var hitSeqs map[string]interface{}
-		var hitHashes map[uint64]interface{}
-		rmSeqs := make([]string, 0, 1024)
-		rmHashes := make([]uint64, 0, 1024)
-		blackHashes := make(map[uint64]interface{}, 1024)
-
-		var seqid string
-		var _record *fastx.Record
-		var loc2hashes *[]*loc2hash
-		var _loc2hash *loc2hash
-		var j, begin, end, _begin, _end int
-		var hash uint64
-		var foundSameSeq bool
-		var foundSubseq bool // found a subsequence for the previous seq
-		var foundSubseqID string
-
-		// debug := false
-
-		if bySeq && checkembeddedSeqs {
-			seqs = make(map[string]*fastx.Record, 1024)
-			hashes = make(map[uint64]*[]*loc2hash, 1024)
-			seqid2Hashes = make(map[string]map[uint64]interface{}, 1024)
-
-			for i, file := range files {
-				if !quiet {
-					log.Infof("read file %d/%d: %s", i+1, len(files), file)
-				}
-				if checkFirstFile && !isStdin(file) {
-					firstFile = file
-					checkFirstFile = false
-				}
-
-				if !isFirstFile { // compare
-					hitSeqs = make(map[string]interface{}, 1024)
-					hitHashes = make(map[uint64]interface{}, 1024)
-				}
-
-				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
-				checkError(err)
-
-				for {
-					record, err = fastxReader.Read()
-					if err != nil {
-						if err == io.EOF {
-							break
-						}
-						checkError(err)
-						break
-					}
-
-					_seq = record.Seq.Seq
-					if ignoreCase {
-						_seq = bytes.ToLower(_seq)
-						record.Seq.Seq = _seq
-					}
-					subject = xxhash.Sum64(_seq)
-
-					if revcom {
-						rc = record.Seq.RevCom()
-						_seqRC = rc.Seq
-						// if ignoreCase {
-						// 	_seqRC = bytes.ToLower(_seqRC)
-						// }
-						subjectRC = xxhash.Sum64(_seqRC)
-
-						if subjectRC < subject { // only save the smaller one, like keeping canonical k-mers
-							subject = subjectRC
-						}
-					}
-
-					seqid = string(record.ID)
-					if isFirstFile { // just save data
-						if _, ok = seqs[seqid]; ok {
-							checkError(fmt.Errorf("duplicated ID not allowed: %s", record.ID))
-						} else {
-							seqs[seqid] = record.Clone()
-						}
-
-						if loc2hashes, ok = hashes[subject]; !ok {
-							loc2hashes = &[]*loc2hash{}
-							hashes[subject] = loc2hashes
-						}
-						*loc2hashes = append(*loc2hashes, &loc2hash{
-							id:    seqid,
-							begin: 1,
-							end:   -1,
-							len:   len(record.Seq.Seq),
-						})
-
-						if _, ok = seqid2Hashes[seqid]; !ok {
-							seqid2Hashes[seqid] = make(map[uint64]interface{})
-						}
-						seqid2Hashes[seqid][subject] = struct{}{}
-
-						continue
-					}
-
-					// 2+ files
-					// if debug {
-					// 	fmt.Printf("check seq: %s\n", seqid)
-					// }
-					if loc2hashes, ok = hashes[subject]; ok { // existed
-						foundSameSeq = false
-						for _, _loc2hash = range *loc2hashes {
-							if _loc2hash.len == len(record.Seq.Seq) { // hash and seqlen both matched
-								foundSameSeq = true
-								foundSubseqID = _loc2hash.id
-								break
-							}
-						}
-						if foundSameSeq {
-							hitHashes[subject] = struct{}{}
-							hitSeqs[foundSubseqID] = struct{}{}
-
-							// if debug {
-							// 	fmt.Printf("    0) exactly the same seq (%s) vs (%s)\n", record.ID, _loc2hash.id)
-							// }
-						}
-					} else {
-						for _, _record = range seqs {
-							foundSubseq = false
-
-							seqid = string(_record.ID)
-
-							// if debug {
-							// 	fmt.Printf("  - compare to %s\n", seqid)
-							// }
-
-						THESEQ:
-							for hash = range seqid2Hashes[seqid] { // this seqs has many subseqs
-								// if debug {
-								// 	fmt.Printf("  - check hash %d\n", hash)
-								// }
-								for _, _loc2hash = range *(hashes[hash]) { // for each record
-									if _loc2hash.id != seqid { // subseq of other seqs
-										continue
-									}
-									_begin, _end, _ = seq.SubLocation(len(_record.Seq.Seq), _loc2hash.begin, _loc2hash.end)
-									_seq0 = _record.Seq.Seq[_begin-1 : _end]
-
-									if j = bytes.Index(_seq0, _seq); j >= 0 { // current seq is part of one previous seq
-										begin, end = _begin+j, _begin+j+len(_seq)-1
-										foundSubseq = true
-
-										// if debug {
-										// 	fmt.Printf("    1) Previous seq (%s):%d-%d contains this one (%s)\n", seqid, begin, end, record.ID)
-										// }
-									} else if j = bytes.Index(_seq, _seq0); j >= 0 { // one previous seq is part of current seq
-										hitSeqs[seqid] = struct{}{}
-										hitHashes[hash] = struct{}{} // mark hashes with matches
-
-										// if debug {
-										// 	begin, end = _begin+j, _begin+j+len(_seq0)-1 // just for debug
-										// 	fmt.Printf("    3) This seq (%s) countains previous one (%s):%d-%d\n", record.ID, seqid, begin, end)
-										// }
-									} else if revcom {
-										if j = bytes.Index(_seq0, _seqRC); j >= 0 { // current seq is part of one previous seq
-											begin, end = _begin+j, _begin+j+len(_seq)-1
-											foundSubseq = true
-
-											// if debug {
-											// 	fmt.Printf("    2) Previous seq (%s):%d-%d contains this one (%s) (RC)\n", seqid, begin, end, record.ID)
-											// }
-										} else if j = bytes.Index(_seqRC, _seq0); j >= 0 { // one previous seq is part of current seq
-											hitSeqs[seqid] = struct{}{}
-											hitHashes[hash] = struct{}{} // mark hashes with matches
-
-											// if debug {
-											// 	begin, end = _begin+j, _begin+j+len(_seq0)-1 // just for debug
-											// 	fmt.Printf("    4) This seq (%s) RC countains previous one (%s):%d-%d\n", record.ID, seqid, begin, end)
-											// }
-										}
-									}
-
-									if !foundSubseq {
-										continue
-									}
-
-									// if debug {
-									// 	fmt.Printf("  > add new record %d for %s\n", subject, seqid)
-									// }
-
-									hitSeqs[seqid] = struct{}{}               // mark the sequence with matches
-									hitHashes[subject] = struct{}{}           // mark hashes with matches
-									seqid2Hashes[seqid][subject] = struct{}{} // add new record
-
-									// add a new record for subsequence
-									if loc2hashes, ok = hashes[subject]; !ok {
-										loc2hashes = &[]*loc2hash{}
-										hashes[subject] = loc2hashes
-									}
-									*loc2hashes = append(*loc2hashes, &loc2hash{
-										id:    seqid,
-										begin: begin,
-										end:   end,
-										len:   end - begin + 1,
-									})
-
-									break THESEQ // just need one hit in the same sequence
-								}
-							} // all subsequences of a target seq
-						} // target seqs to compare
-					} // compare seqs by bytes.index
-				} // all input seqs
-				fastxReader.Close()
-
-				if isFirstFile {
-					if !quiet {
-						log.Infof("  %d seqs loaded", len(seqs))
-					}
-
-					isFirstFile = false
-				} else {
-					rmHashes = rmHashes[:0]
-					rmSeqs = rmSeqs[:0]
-
-					// clean hashes
-					for hash, loc2hashes = range hashes {
-						if _, ok = blackHashes[hash]; ok {
-							rmHashes = append(rmHashes, hash)
-						}
-						if _, ok = hitHashes[hash]; !ok {
-							rmHashes = append(rmHashes, hash)
-						}
-
-						for _, _loc2hash = range *loc2hashes { // some seqs do not exist anymore
-							if _, ok = hitSeqs[_loc2hash.id]; !ok {
-								rmSeqs = append(rmSeqs, seqid)
-							}
-						}
-					}
-					for _, hash = range rmHashes {
-						blackHashes[hash] = struct{}{}
-						delete(hashes, hash)
-					}
-
-					// clean seqs and seqid2Hashes
-
-					for seqid = range seqs {
-						if _, ok = hitSeqs[seqid]; !ok {
-							rmSeqs = append(rmSeqs, seqid)
-						}
-
-						for hash = range seqid2Hashes[seqid] {
-							if _, ok = blackHashes[hash]; ok {
-								delete(seqid2Hashes[seqid], hash)
-							}
-						}
-					}
-
-					for _, seqid = range rmSeqs {
-						delete(seqs, seqid)
-						delete(seqid2Hashes, seqid)
-					}
-
-					if !quiet {
-						log.Infof("  %d seqs left", len(seqs))
-
-						// if debug {
-						// 	fmt.Printf("   %d seqs left\n", len(seqs))
-						// 	for seqid = range seqs {
-						// 		fmt.Printf("    %s\n", seqid)
-						// 	}
-						// }
-					}
-				}
-
-				if len(seqs) == 0 {
-					log.Info("no common sequences found")
-					return
-				}
-
-				// list hashes
-				// if debug {
-				// 	fmt.Println("-----------------------------------")
-				// 	var _hashes map[uint64]interface{}
-				// 	for seqid, _hashes = range seqid2Hashes {
-				// 		fmt.Printf("%s\n", seqid)
-				// 		for hash = range _hashes {
-				// 			fmt.Printf("  %d\n", hash)
-				// 		}
-				// 	}
-				// 	for subject, loc2hashes = range hashes {
-				// 		fmt.Println(subject)
-				// 		for _, _loc2hash = range *loc2hashes {
-				// 			fmt.Printf("  %s:%d-%d=%d %s\n", _loc2hash.id, _loc2hash.begin, _loc2hash.end, _loc2hash.len, seqs[_loc2hash.id].Seq.SubSeq(_loc2hash.begin, _loc2hash.end).Seq)
-				// 		}
-				// 	}
-				// }
-			}
-
-			// retrieve
-			var nHashes, nOriginalRecords, nOutput int
-			var loc [3]int
-			var locs *[][3]int
-			seq2loc := make(map[string]*[][3]int, len(hashes))
-
-			for subject, loc2hashes = range hashes {
-				nHashes++ // number of hash values
-
-				for _, _loc2hash = range *loc2hashes {
-					if locs, ok = seq2loc[_loc2hash.id]; !ok {
-						seq2loc[_loc2hash.id] = &[][3]int{
-							{_loc2hash.begin, _loc2hash.end, _loc2hash.len},
-						}
-					} else {
-						*locs = append(*locs, [3]int{_loc2hash.begin, _loc2hash.end, _loc2hash.len})
-					}
-				}
-			}
-
-			var loc1 [3]int
-			var text []byte
-			var buffer *bytes.Buffer
-
-			fastxReader, err := fastx.NewReader(alphabet, firstFile, idRegexp)
-			checkError(err)
-			checkFormat := true
-			var isFastq bool
-			var embedded bool
-			for {
-				record, err = fastxReader.Read()
-				if err != nil {
-					if err == io.EOF {
-						break
-					}
-					checkError(err)
-					break
-				}
-				if checkFormat {
-					checkFormat = false
-					if fastxReader.IsFastq {
-						if !config.LineWidthChanged {
-							config.LineWidth = 0
-						}
-						fastx.ForcelyOutputFastq = true
-					}
-					isFastq = fastxReader.IsFastq
-				}
-
-				if locs, ok = seq2loc[string(record.ID)]; !ok {
-					continue
-				}
-
-				nOriginalRecords++ // number of records
-
-				sort.Slice(*locs, func(i, j int) bool {
-					return (*locs)[i][2] > (*locs)[j][2]
-				})
-
-				for j, loc = range *locs {
-					if j > 0 {
-						embedded = false
-						for _, loc1 = range (*locs)[0:j] {
-							if (loc1[0] == 1 && loc1[1] == -1) || // the full seqs
-								(loc[0] >= loc1[0] && loc[1] <= loc1[1]) { // subseq
-								embedded = true
-								break
-							}
-						}
-						if embedded {
-							continue
-						}
-					}
-
-					nOutput++ // output sequences
-
-					if !(loc[0] == 1 && loc[1] == -1) {
-						if len(record.Desc) > 0 {
-							record.Name = fmt.Appendf(nil, "%s:%d-%d %s", record.ID, loc[0], loc[1], record.Desc)
-						} else {
-							record.Name = fmt.Appendf(nil, "%s:%d-%d", record.ID, loc[0], loc[1])
-						}
-					}
-
-					if isFastq {
-						record.FormatToWriter(outfh, config.LineWidth)
-					} else {
-						begin, end, _ = seq.SubLocation(len(record.Seq.Seq), loc[0], loc[1])
-						text, buffer = wrapByteSlice(record.Seq.Seq[begin-1:end], config.LineWidth, buffer)
-
-						outfh.Write(_mark_fasta)
-						outfh.Write(record.Name)
-						outfh.Write(_mark_newline)
-						outfh.Write(text)
-						outfh.Write(_mark_newline)
-					}
-				}
-			}
-			fastxReader.Close()
-
-			fileNum := len(files)
-			t := "sequences"
-			if !quiet {
-				log.Infof("%d unique %s found in %d files, which belong to %d records in the first file: %s",
-					nHashes, t, fileNum, nOriginalRecords, firstFile)
-				log.Infof("%d common/shared sequences saved to: %s", nOutput, outFile)
-				log.Infof("note that embedded subsequences of a sequence are not outputted")
-				if nOutput-nOriginalRecords > 0 {
-					log.Infof("more than one subsequences are outputted in some (%d) records", nOutput-nOriginalRecords)
-				}
-			}
-
-			return
-		}
 
 		// ------------------------- for other situations  --------------------------------
 
@@ -555,15 +169,15 @@ Note:
 
 		for i, file := range files {
 			if !quiet {
-				log.Infof("read file %d/%d: %s", i+1, len(files), file)
-			}
-			if checkFirstFile && !isStdin(file) {
-				firstFile = file
-				checkFirstFile = false
+				label := file
+				if i == 0 {
+					label = firstLabel
+				}
+				log.Infof("read file %d/%d: %s", i+1, len(files), label)
 			}
 
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
-			checkError(err)
+			check(err)
 
 			for {
 				record, err = fastxReader.Read()
@@ -571,7 +185,7 @@ Note:
 					if err == io.EOF {
 						break
 					}
-					checkError(err)
+					check(err)
 					break
 				}
 
@@ -633,10 +247,8 @@ Note:
 			log.Info("find common seqs ...")
 		}
 		fileNum := len(files)
-		namesOK := make(map[string]struct{})
 
 		var nHashes, nOriginalRecords, nOutput int
-		var seqname string
 		for subject, presence := range counter {
 			if len(presence) != fileNum {
 				continue
@@ -645,9 +257,6 @@ Note:
 			nHashes++                               // number of hash values
 			nOriginalRecords += len(names[subject]) // number of records
 
-			for _, seqname = range names[subject] {
-				namesOK[seqname] = struct{}{}
-			}
 		}
 
 		var t string
@@ -664,12 +273,12 @@ Note:
 		}
 		if !quiet {
 			log.Infof("%d unique %s found in %d files, which belong to %d records in the first file: %s",
-				nHashes, t, fileNum, nOriginalRecords, firstFile)
+				nHashes, t, fileNum, nOriginalRecords, firstLabel)
 		}
 
 		// retrieve
 		fastxReader, err = fastx.NewReader(alphabet, firstFile, idRegexp)
-		checkError(err)
+		check(err)
 		checkFormat := true
 		for {
 			record, err = fastxReader.Read()
@@ -677,7 +286,7 @@ Note:
 				if err == io.EOF {
 					break
 				}
-				checkError(err)
+				check(err)
 				break
 			}
 			if checkFormat {
@@ -690,7 +299,8 @@ Note:
 				}
 			}
 
-			if _, ok = namesOK[string(record.Name)]; ok {
+			subject = commonRecordHash(record, bySeq, byName, revcom, ignoreCase)
+			if len(counter[subject]) == fileNum {
 				nOutput++
 				record.FormatToWriter(outfh, config.LineWidth)
 			}
@@ -712,4 +322,236 @@ func init() {
 	// commonCmd.Flags().BoolP("consider-revcom", "r", false, "considering the reverse compelment sequence")
 	commonCmd.Flags().BoolP("only-positive-strand", "P", false, "only considering the positive strand when comparing by sequence")
 	commonCmd.Flags().BoolP("check-embedded-seqs", "e", false, "check embedded sequences, e.g., if a sequence is part of another one, we'll keep the shorter one")
+}
+
+// commonRecordHash uses the same canonical comparison for input and retrieval.
+func commonRecordHash(record *fastx.Record, bySeq, byName, revcom, ignoreCase bool) uint64 {
+	text := record.ID
+	if byName {
+		text = record.Name
+	} else if bySeq {
+		text = record.Seq.Seq
+	}
+	if ignoreCase {
+		text = bytes.ToLower(text)
+	}
+	hash := xxhash.Sum64(text)
+	if bySeq && revcom {
+		rc := record.Seq.RevCom().Seq
+		if ignoreCase {
+			rc = bytes.ToLower(rc)
+		}
+		hash = min(hash, xxhash.Sum64(rc))
+	}
+	return hash
+}
+
+// commonSpan is a half-open interval in an unchanged first-file record.
+type commonSpan struct{ begin, end int }
+
+// commonEmbedded intersects snapshots, so records within one file cannot remove
+// candidates needed by later records from that same file.
+func commonEmbedded(files []string, firstLabel string, out *xopen.Writer, config Config, revcom, ignoreCase bool) error {
+	originals, err := readRecordsChecked(files[0], config.Alphabet, config.IDRegexp)
+	if err != nil {
+		return err
+	}
+	candidates := make([][]commonSpan, len(originals))
+	normalized := make([][]byte, len(originals))
+	seenIDs := make(map[string]bool)
+	normalize := func(text []byte) []byte {
+		if ignoreCase {
+			return bytes.ToLower(text)
+		}
+		return text
+	}
+	for i, record := range originals {
+		if len(record.Seq.Seq) == 0 {
+			continue
+		}
+		if seenIDs[string(record.ID)] {
+			return fmt.Errorf("duplicated ID not allowed: %s", record.ID)
+		}
+		seenIDs[string(record.ID)] = true
+		normalized[i] = normalize(record.Seq.Seq)
+		candidates[i] = []commonSpan{{0, len(record.Seq.Seq)}}
+	}
+	for fileIndex, file := range files[1:] {
+		if !config.Quiet {
+			log.Infof("read file %d/%d: %s", fileIndex+2, len(files), file)
+		}
+		reader, err := fastx.NewReader(config.Alphabet, file, config.IDRegexp)
+		if err != nil {
+			return err
+		}
+		next := make([]map[commonSpan]bool, len(originals))
+		// Equal-length candidates use hashes; only unequal lengths need containment scans.
+		type targetSpan struct {
+			record int
+			span   commonSpan
+			text   []byte
+		}
+		var targets []targetSpan
+		exact := make(map[uint64][]targetSpan)
+		for i, spans := range candidates {
+			for _, span := range spans {
+				target := targetSpan{i, span, normalized[i][span.begin:span.end]}
+				targets = append(targets, target)
+				key := canonicalCommonSequence(target.text, originals[i].Seq.Alphabet, revcom)
+				hash := xxhash.Sum64(key)
+				exact[hash] = append(exact[hash], target)
+			}
+		}
+		sort.Slice(targets, func(i, j int) bool { return len(targets[i].text) < len(targets[j].text) })
+		keep := func(target targetSpan, span commonSpan) {
+			if next[target.record] == nil {
+				next[target.record] = make(map[commonSpan]bool)
+			}
+			next[target.record][span] = true
+		}
+
+		for {
+			record, err := reader.Read()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				reader.Close()
+				return fmt.Errorf("%s: %w", file, err)
+			}
+			if len(record.Seq.Seq) == 0 {
+				continue
+			}
+			query := normalize(record.Seq.Seq)
+			var queryRC []byte
+			if revcom {
+				queryRC = normalize(record.Seq.RevCom().Seq)
+			}
+			key := query
+			if revcom && bytes.Compare(queryRC, key) < 0 {
+				key = queryRC
+			}
+			for _, target := range exact[xxhash.Sum64(key)] {
+				if bytes.Equal(target.text, query) || revcom && bytes.Equal(target.text, queryRC) {
+					keep(target, target.span)
+				}
+			}
+			shorter := sort.Search(len(targets), func(i int) bool { return len(targets[i].text) >= len(query) })
+			longer := sort.Search(len(targets), func(i int) bool { return len(targets[i].text) > len(query) })
+			for _, target := range targets[:shorter] {
+				if bytes.Contains(query, target.text) || revcom && bytes.Contains(queryRC, target.text) {
+					keep(target, target.span)
+				}
+			}
+			for _, target := range targets[longer:] {
+				position := bytes.Index(target.text, query)
+				if position < 0 && revcom {
+					position = bytes.Index(target.text, queryRC)
+				}
+				if position >= 0 {
+					keep(target, commonSpan{target.span.begin + position, target.span.begin + position + len(query)})
+				}
+			}
+
+		}
+		reader.Close()
+		remaining := 0
+		for i := range candidates {
+			candidates[i] = nil
+			for span := range next[i] {
+				candidates[i] = append(candidates[i], span)
+			}
+			if len(candidates[i]) > 0 {
+				remaining++
+			}
+		}
+		if !config.Quiet {
+			log.Infof("%d first-file records with candidate fragments left", remaining)
+		}
+	}
+	unique := make(map[uint64][][]byte)
+	uniqueCount := 0
+	contributed, written := 0, 0
+	fastx.ForcelyOutputFastq = false
+	for i, record := range originals {
+		spans := candidates[i]
+		sort.Slice(spans, func(a, b int) bool {
+			x, y := spans[a], spans[b]
+			if x.end-x.begin != y.end-y.begin {
+				return x.end-x.begin > y.end-y.begin
+			}
+			return x.begin < y.begin
+		})
+		retained := make([]commonSpan, 0, len(spans))
+		for _, span := range spans {
+			contained := false
+			for _, previous := range retained {
+				if span.begin >= previous.begin && span.end <= previous.end {
+					contained = true
+					break
+				}
+			}
+			if contained {
+				continue
+			}
+			retained = append(retained, span)
+			// Views preserve the original record without copying its full sequence for each hit.
+			fragment := *record
+			sequence := *record.Seq
+			sequence.Seq = record.Seq.Seq[span.begin:span.end]
+			if len(record.Seq.Qual) > 0 {
+				sequence.Qual = record.Seq.Qual[span.begin:span.end]
+			}
+			if len(record.Seq.QualValue) > 0 {
+				sequence.QualValue = record.Seq.QualValue[span.begin:span.end]
+			}
+			fragment.Seq = &sequence
+			if span.begin != 0 || span.end != len(record.Seq.Seq) {
+				fragment.Name = []byte(fmt.Sprintf("%s:%d-%d", record.ID, span.begin+1, span.end))
+				if len(record.Desc) > 0 {
+					fragment.Name = append(fragment.Name, []byte(" "+string(record.Desc))...)
+				}
+			}
+			width := config.LineWidth
+			if len(record.Seq.Qual) > 0 && !config.LineWidthChanged {
+				width = 0
+			}
+			fragment.FormatToWriter(out, width)
+			key := canonicalCommonSequence(normalized[i][span.begin:span.end], record.Seq.Alphabet, revcom)
+			hash := xxhash.Sum64(key)
+			exists := false
+			for _, previous := range unique[hash] {
+				if bytes.Equal(previous, key) {
+					exists = true
+					break
+				}
+			}
+			if !exists {
+				unique[hash] = append(unique[hash], key)
+				uniqueCount++
+			}
+
+			written++
+		}
+		if len(retained) > 0 {
+			contributed++
+		}
+	}
+	if !config.Quiet {
+		log.Infof("%d original records, %d distinct common sequences, %d output fragments from first file: %s", contributed, uniqueCount, written, firstLabel)
+	}
+	return nil
+}
+
+// canonicalCommonSequence returns a view or reverse complement for exact comparison.
+func canonicalCommonSequence(text []byte, alphabet *seq.Alphabet, revcom bool) []byte {
+	if !revcom {
+		return text
+	}
+	sequence := &seq.Seq{Alphabet: alphabet, Seq: text}
+	rc := sequence.RevCom().Seq
+	if bytes.Compare(rc, text) < 0 {
+		return rc
+	}
+	return text
 }

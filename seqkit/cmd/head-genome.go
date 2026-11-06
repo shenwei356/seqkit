@@ -56,6 +56,7 @@ i.e., "Vibrio cholerae strain M29".
 Attention:
 
   1. Sequences in file should be well organized.
+  2. Shared prefixes are compared as whole words separated by spaces or tabs.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -109,6 +110,10 @@ Attention:
 						fastx.ForcelyOutputFastq = true
 					}
 					checkAlphabet = false
+				}
+
+				if idRegexp == fastx.DefaultIDRegexp || idRegexp == "" {
+					restoreDescription(record)
 				}
 
 				if len(record.Desc) == 0 {

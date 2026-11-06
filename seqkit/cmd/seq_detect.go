@@ -350,7 +350,7 @@ func (a *AlignedSeq) String() string {
 	fmap["Acc"] = func(a *AlignedSeq) string {
 		diff := 0
 		for i, rb := range []byte(a.RefAln) {
-			if rb != a.QueryAln[i] {
+			if !equalFoldBase(rb, a.QueryAln[i]) {
 				diff++
 			}
 		}
@@ -361,7 +361,7 @@ func (a *AlignedSeq) String() string {
 	fmap["ClipAcc"] = func(a *AlignedSeq) string {
 		diff := 0
 		for i, rb := range []byte(a.RefAln) {
-			if rb != a.QueryAln[i] {
+			if !equalFoldBase(rb, a.QueryAln[i]) {
 				diff++
 			}
 		}

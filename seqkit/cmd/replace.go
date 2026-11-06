@@ -62,7 +62,7 @@ more on: http://bioinf.shenwei.me/seqkit/usage/#replace
 
 Special replacement symbols (only for replacing name not sequence):
 
-    {nr}    Record number, starting from 1
+    {nr}    Record number within each input file, starting from 1
     {uuid}  Random 16-character Universally unique identifier (UUID)
     {fn}    File name
     {fbn}   File base name
@@ -508,7 +508,7 @@ Filtering records to edit:
 									} else {
 										start := matchStart + len(newQual) - qualityStart
 										end := start + len(part.Text)
-										if end > len(origQual) {
+										if end > matchEnd {
 											checkError(fmt.Errorf("length-increasing replacement is not supported for FASTQ files"))
 										}
 										newQual = append(newQual, origQual[start:end]...)
@@ -622,7 +622,7 @@ func init() {
 			" e.g. $1 represents the text of the first submatch (use ${1} instead of $1 when {kv} given!). "+
 			"ATTENTION: for *nix OS, use SINGLE quote NOT double quotes or "+
 			`use the \ escape character. `+
-			`Record number and file name is also supported by "{nr}" and "{fn}". `+
+			`The per-file record number and file name are also supported by "{nr}" and "{fn}". `+
 			`Type "csvtk replace -h" for more replacement symbols.`)
 	replaceCmd.Flags().IntP("nr-width", "", 1, `minimum width for {nr} in flag -r/--replacement. e.g., formatting "1" to "001" by --nr-width 3`)
 	// replaceCmd.Flags().BoolP("by-name", "n", false, "replace full name instead of just id")

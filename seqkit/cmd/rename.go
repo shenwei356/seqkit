@@ -170,6 +170,10 @@ Example:
 						checkAlphabet = false
 					}
 
+					if idRegexp == fastx.DefaultIDRegexp || idRegexp == "" {
+						restoreDescription(record)
+					}
+
 					if byName {
 						k = xxhash.Sum64(record.Name)
 					} else {

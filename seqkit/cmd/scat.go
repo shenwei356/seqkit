@@ -22,16 +22,15 @@ package cmd
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"os/signal"
-	ospath "path"
+	"path/filepath"
 	"regexp"
 	"runtime"
-	"sync"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/iafan/cwalk"
 	"github.com/shenwei356/go-logging"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
@@ -60,7 +59,18 @@ var scatCmd = &cobra.Command{
 
 	Use:   "scat",
 	Short: "real time recursive concatenation and streaming of fastx files",
-	Long:  "real time recursive concatenation and streaming of fastx files",
+	Long: `real time recursive concatenation and streaming of fastx files
+
+Attention:
+  1. --infile-list accepts directories, one per line, and is merged with positional
+     directories. Overlapping directories and file aliases are processed once.
+  2. Renames within the watched directories retain the read position.
+  3. Complete appended records are flushed promptly; incomplete records wait
+     for more data.
+  4. In --find-only mode, file errors do not stop other files, but the final exit
+     status is nonzero.
+
+`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -83,6 +93,9 @@ var scatCmd = &cobra.Command{
 		}
 		if outFmt == "" {
 			outFmt = inOutFmt
+		}
+		if inFmt == "" || outFmt == "" {
+			log.Fatal("Invalid format specified: empty effective format")
 		}
 		log.Info("Input format is:", inFmt)
 		log.Info("Output format is:", outFmt)
@@ -119,7 +132,28 @@ var scatCmd = &cobra.Command{
 		reFilter, err := regexp.Compile(reStr)
 		checkError(err)
 
-		dirs := getFileList(args, true)
+		dirs := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+		roots := make([]string, 0, len(dirs))
+		seenDirs := make(map[string]bool)
+		for _, dir := range dirs {
+			if isStdin(dir) {
+				continue
+			}
+			real, err := filepath.EvalSymlinks(dir)
+			checkError(err)
+			real, err = filepath.Abs(real)
+			checkError(err)
+			info, err := os.Stat(real)
+			checkError(err)
+			if !info.IsDir() {
+				checkError(fmt.Errorf("not a directory: %s", dir))
+			}
+			if !seenDirs[real] {
+				roots = append(roots, filepath.Clean(dir))
+				seenDirs[real] = true
+			}
+		}
+		dirs = roots
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer closeOutput(outfh)
@@ -134,449 +168,285 @@ var scatCmd = &cobra.Command{
 			log.Info("No directories given to watch! Exiting.")
 			os.Exit(1)
 		}
-		LaunchFxWatchers(dirs, ctrlChan, reFilter, inFmt, outFmt, qBase, allowGaps, delta, timeLimit, dropString, waitPid, findOnly, outfh)
+		err = LaunchFxWatchers(dirs, ctrlChan, reFilter, inFmt, outFmt, qBase, allowGaps, delta, timeLimit, dropString, waitPid, findOnly, outfh)
+		closeOutput(outfh)
+		checkError(err)
 
 	},
 }
 
-// LaunchFxWatchers launches fastx watcher goroutines on multiple input directories.
-func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, timeout string, dropString string, waitPid int, findOnly bool, outw *xopen.Writer) {
-	allSeqChans := newWatchSequenceChannels(len(dirs))
-	allInCtrlChans := make([]WatchCtrlChan, len(dirs))
-	allOutCtrlChans := make([]WatchCtrlChan, len(dirs))
-	for i, dir := range dirs {
-		allInCtrlChans[i] = make(WatchCtrlChan, 1000)
-		allOutCtrlChans[i] = make(WatchCtrlChan)
-		go NewFxWatcher(dir, allSeqChans[i], allInCtrlChans[i], allOutCtrlChans[i], re, inFmt, outFmt, qBase, allowGaps, delta, dropString, findOnly)
-	}
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt)
-	defer outw.Flush()
+// trackedFx retains parser state and physical identity across path changes.
+// lastSize is the size at the last parse attempt; pendingSize is the latest
+// notification size. busy lasts until EOF feedback; quitting drains exactly once.
+type trackedFx struct {
+	key, name                     string
+	info                          fs.FileInfo
+	in, feedback                  chan SeqStreamCtrl
+	lastSize, pendingSize         int64
+	lastTry                       time.Time
+	busy, pending, quitting, done bool
+}
 
-	pidTimer := *time.NewTicker(time.Millisecond * 500)
-	if waitPid < 0 {
-		pidTimer.C = nil
-	} else {
-		log.Info("Running until process with PID", waitPid, "exits.")
+// LaunchFxWatchers coordinates all roots, so aliases never launch duplicate parsers.
+func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, timeout, dropString string, waitPid int, findOnly bool, outw *xopen.Writer) error {
+	drop, err := time.ParseDuration(dropString)
+	if err != nil {
+		return err
 	}
-	ticker := time.NewTimer(time.Minute)
-	ticker.Stop()
-	td := time.Duration(0)
+	var idle time.Duration
 	if timeout != "" {
-		var err error
-		td, err = time.ParseDuration(timeout)
-		checkError(err)
-		ticker = time.NewTimer(td)
-		log.Info("Will exit after being inactive for", timeout)
-	}
-
-	pass, fail := 0, 0
-
-	sendQuitCmds := func() {
-		for i, cc := range allInCtrlChans {
-			if cc == nil {
-				continue
-			}
-			cc <- WatchCtrl(i)
+		idle, err = time.ParseDuration(timeout)
+		if err != nil {
+			return err
 		}
 	}
-
-	activeCount := 0
-	QUITTING := false
-
-MAIN:
-	for {
-		select {
-		case <-sigChan:
-			signal.Stop(sigChan)
-			if !QUITTING {
-				QUITTING = true
-				sendQuitCmds()
-				close(sigChan)
-				for _ = range sigChan {
-				}
-			} else {
-				signal.Reset(os.Interrupt)
-				sigChan = nil
-			}
-			outw.Flush()
-			continue MAIN
-		case <-pidTimer.C:
-			if !IsPidAlive(waitPid) {
-				pidTimer.Stop()
-				pidTimer.C = nil
-				log.Info("Watched process with PID", waitPid, "exited.")
-				sendQuitCmds()
-			}
-			outw.Flush()
-			continue MAIN
-		case <-ticker.C:
-			ticker.Stop()
-			ticker.C = nil
-			log.Info("Inactivity limit of", timeout, "reached!")
-			sendQuitCmds()
-			continue MAIN
-		default:
-			activeCount = 0
-			worked := false // Keep the fast path responsive, but wait after an entirely idle pass.
-		CHAN:
-			for j, sc := range allSeqChans {
-				if allInCtrlChans[j] == nil || allOutCtrlChans[j] == nil {
-					continue CHAN
-				}
-				activeCount++
-				for {
-					select {
-					case rawSeq := <-sc:
-						worked = true
-						if rawSeq == nil {
-							log.Fatal("Trying to print nil sequence!")
-						}
-						switch rawSeq.Err {
-						case nil:
-							pass++
-							outw.WriteString(rawSeq.Format(outFmt))
-							outw.WriteByte('\n')
-							outw.Flush()
-						default:
-							fail++
-							fmt.Fprintf(os.Stderr, "From file: %s\t%s\n", rawSeq.File, rawSeq.String())
-						}
-						if timeout != "" {
-							ticker.Stop()
-							ticker = time.NewTimer(td)
-						}
-						continue CHAN
-					default:
-						select {
-						case fb := <-allOutCtrlChans[j]:
-							worked = true
-							if fb != WatchCtrl(-9) {
-								log.Fatal("Invalid exit feedback:", fb)
-							}
-
-							allOutCtrlChans[j] = nil
-							allInCtrlChans[j] = nil
-							outw.Flush()
-							activeCount--
-							continue CHAN
-						default:
-							continue CHAN
-						}
-					}
-				} // select 1
-			} // for chan
-			if activeCount == 0 {
-				outw.Flush()
-				break MAIN
-			}
-			if !worked {
-				time.Sleep(time.Millisecond)
-			}
-		} // select 2
-	} //for evers
-
-	outw.Flush()
-	log.Info(fmt.Sprintf("Total stats:\tPass records: %d\tDiscarded lines: %d\n", pass, fail))
-}
-
-type WatchedFx struct {
-	Name        string
-	LastSize    int64
-	LastTry     time.Time
-	BytesRead   int64
-	IsDir       bool
-	SeqChan     chan *simpleSeq
-	CtrlChanIn  chan SeqStreamCtrl
-	CtrlChanOut chan SeqStreamCtrl
-}
-
-type WatchedFxPool struct {
-	Map *sync.Map
-}
-
-func (m *WatchedFxPool) Range(f func(key, value interface{}) bool) {
-	m.Map.Range(f)
-}
-
-func (m *WatchedFxPool) Get(k string) *WatchedFx {
-	v, ok := m.Map.Load(k)
-	if !ok {
-		return nil
-	}
-	return v.(*WatchedFx)
-}
-
-func (m *WatchedFxPool) Insert(k string, v *WatchedFx) {
-	m.Map.Store(k, v)
-}
-
-func (m *WatchedFxPool) Delete(k string) {
-	m.Map.Delete(k)
-}
-
-func (m *WatchedFxPool) IsEmpty() bool {
-	count := 0
-	m.Map.Range(func(_, _ interface{}) bool {
-		count++
-		return false
-	})
-	return count == 0
-}
-
-type FxWatcher struct {
-	Base string
-	Pool *WatchedFxPool
-}
-
-// NewFxWatcher streams records from fastx files under a directory.
-func NewFxWatcher(dir string, seqChan chan *simpleSeq, watcherCtrlChanIn, watcherCtrlChanOut WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, minDelta int, dropString string, findOnly bool) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		log.Fatalf("fsnotify error:", err)
+		return err
 	}
 	defer watcher.Close()
-	self := new(FxWatcher)
-	self.Base = dir
-	self.Pool = &WatchedFxPool{&sync.Map{}}
-	dropDuration, err := time.ParseDuration(dropString)
-	checkError(err)
-
-	if findOnly {
-		watcher.Close()
-	}
-
-	walkFunc := func(path string, info os.FileInfo, err error) error {
-		path = ospath.Join(dir, path)
-		wm := self.Pool.Get(path)
-		if wm != nil {
-			return nil
-		}
-		if info.IsDir() && !findOnly {
-			err = watcher.Add(path)
-			checkError(err)
-			self.Pool.Insert(path, &WatchedFx{Name: path, IsDir: true})
-			log.Info("Watching directory:", path)
-			return nil
+	sequences := newWatchSequenceChannels(1)[0]
+	files := make(map[string]*trackedFx)
+	running := make(map[string]*trackedFx)
+	var queued []*trackedFx
+	active, nextQueued := 0, 0
+	// Scan-only readers finish, so a bounded worker set avoids exhausting descriptors.
+	scanLimit := max(1, min(16, runtime.GOMAXPROCS(0)))
+	watchedDirs := make(map[string]bool)
+	hadError := false
+	fileError := func(path string, err error) { log.Errorf("%s: %v", path, err); hadError = true }
+	start := func(item *trackedFx) {
+		item.in, item.feedback = NewRawSeqStreamFromFile(item.name, sequences, qBase, inFmt, allowGaps)
+		item.busy, item.quitting, item.lastTry = true, findOnly, time.Now()
+		running[item.key] = item
+		if findOnly {
+			log.Info("Streaming file:", item.name)
+			item.in <- StreamQuit
 		} else {
-			if !reFilterName(path, re) {
+			log.Info("Watching file:", item.name)
+			item.in <- StreamTry
+		}
+	}
+
+	add := func(path string, info fs.FileInfo) {
+		key, err := fileIdentity(path, info)
+		if err != nil {
+			fileError(path, err)
+			return
+		}
+		if previous := files[key]; previous != nil {
+			if current, err := os.Stat(previous.name); err != nil || !os.SameFile(current, previous.info) {
+				previous.name = path
+			}
+			return
+		}
+		item := &trackedFx{key: key, name: path, info: info, lastSize: info.Size()}
+		files[key] = item
+		active++
+		if findOnly {
+			queued = append(queued, item)
+		} else {
+			start(item)
+		}
+
+	}
+	scan := func() {
+		for _, root := range dirs {
+			walkRoot, err := filepath.EvalSymlinks(root)
+			if err != nil {
+				fileError(root, err)
+				continue
+			}
+			walkErr := filepath.WalkDir(walkRoot, func(path string, entry fs.DirEntry, walkErr error) error {
+				if walkErr != nil {
+					fileError(path, walkErr)
+					return nil
+				}
+				if entry.IsDir() {
+					if !findOnly && !watchedDirs[path] {
+						if err := watcher.Add(path); err != nil {
+							fileError(path, err)
+						} else {
+							watchedDirs[path] = true
+						}
+					}
+					return nil
+				}
+				if !reFilterName(path, re) {
+					return nil
+				}
+				info, err := os.Stat(path)
+				if err != nil {
+					fileError(path, err)
+					return nil
+				}
+				if !info.IsDir() {
+					add(path, info)
+				}
 				return nil
+			})
+			if walkErr != nil {
+				fileError(root, walkErr)
 			}
-			created := time.Now()
-			sc := seqChan
-			ctrlIn, ctrlOut := NewRawSeqStreamFromFile(path, sc, qBase, inFmt, allowGaps)
-			if !findOnly {
-				err := watcher.Add(path)
-				checkError(err)
-			}
-			fi, err := os.Stat(path)
-			checkError(err)
-			self.Pool.Insert(path, &WatchedFx{Name: path, IsDir: false, SeqChan: sc, CtrlChanIn: ctrlIn, CtrlChanOut: ctrlOut, LastSize: fi.Size(), LastTry: created})
-
-			ctrlIn <- StreamTry
-			if findOnly {
-				log.Info("Streaming file:", path)
-				ctrlIn <- StreamQuit
+		}
+	}
+	scan()
+	quit := func(item *trackedFx) {
+		if !item.done && !item.quitting {
+			item.quitting = true
+			if item.in == nil {
+				item.done = true
+				active--
 			} else {
-				log.Info("Watching file:", path)
-			}
-			return nil
-		}
-	}
-
-	go func() {
-	SFOR:
-		for {
-			select {
-			case <-watcherCtrlChanIn:
-				log.Info("Exiting...")
-				sigChan := make(chan os.Signal, 2)
-				signal.Notify(sigChan, os.Interrupt)
-				self.Pool.Range(func(k, v interface{}) bool {
-					ePath := k.(string)
-					w := v.(*WatchedFx)
-					watcher.Remove(ePath)
-					if w.IsDir {
-						self.Pool.Delete(ePath)
-						log.Info("Stopped watching directory: ", ePath)
-						return true
-					}
-					log.Info("Stopped watching file: ", ePath)
-					if !findOnly {
-						w.CtrlChanIn <- StreamQuit
-					}
-				DRAIN:
-					for fb := range w.CtrlChanOut {
-						switch fb {
-						case StreamExited:
-							self.Pool.Delete(ePath)
-							break DRAIN
-						case StreamEOF:
-							continue DRAIN
-						default:
-							log.Fatal("Invalid feedback when trying to quit:", int(fb))
-						}
-					}
-					return true
-				})
-				watcherCtrlChanOut <- WatchCtrl(-9)
-				return
-			case event := <-watcher.Events:
-				ePath := event.Name
-				if event.Op&fsnotify.Remove == fsnotify.Remove {
-					di := self.Pool.Get(ePath)
-					if di == nil {
-						continue SFOR
-					}
-					if di.IsDir {
-						log.Info("Removed directory:", ePath)
-						watcher.Remove(ePath)
-						self.Pool.Delete(ePath)
-						continue SFOR
-					}
-					log.Info("Removed file:", ePath)
-					di.CtrlChanIn <- StreamQuit
-					fb := <-di.CtrlChanOut
-					if fb != StreamExited {
-						log.Fatal("Invalid removal feedback:", int(fb))
-					}
-					self.Pool.Delete(ePath)
-					continue SFOR
-				}
-				if event.Op&fsnotify.Rename == fsnotify.Rename {
-					wm := self.Pool.Get(ePath)
-					if wm != nil {
-						log.Info("Stopped watching renamed file:", ePath)
-						wm.CtrlChanIn <- StreamQuit
-						fb := <-wm.CtrlChanOut
-						if fb != StreamExited {
-							log.Fatal("Invalid renaming feedback:", int(fb))
-						}
-						self.Pool.Delete(ePath)
-					}
-				}
-				if event.Op&fsnotify.Create == fsnotify.Create {
-					wm := self.Pool.Get(ePath)
-					if wm != nil {
-						continue
-					}
-					fi, err := os.Stat(ePath)
-					checkError(err)
-					if fi.IsDir() {
-						log.Info("Watching new directory:", ePath)
-						err := watcher.Add(ePath)
-						checkError(err)
-						self.Pool.Insert(ePath, &WatchedFx{Name: ePath, IsDir: true})
-						err = cwalk.Walk(dir, walkFunc)
-						checkError(err)
-						continue SFOR
-
-					}
-					if !reFilterName(ePath, re) {
-						continue SFOR
-					}
-					created := time.Now()
-
-					sc := seqChan
-					ctrlIn, ctrlOut := NewRawSeqStreamFromFile(ePath, sc, qBase, inFmt, allowGaps)
-					self.Pool.Insert(ePath, &WatchedFx{Name: ePath, IsDir: false, SeqChan: sc, CtrlChanIn: ctrlIn, CtrlChanOut: ctrlOut, LastSize: fi.Size(), LastTry: created})
-					err = watcher.Add(ePath)
-					checkError(err)
-					log.Info("Watching new file:", ePath)
-					ctrlIn <- StreamTry
-				}
-				if event.Op&fsnotify.Write == fsnotify.Write {
-					fi, err := os.Stat(ePath)
-					checkError(err)
-					wm := self.Pool.Get(ePath)
-					if wm == nil || fi.IsDir() {
-						continue SFOR
-					}
-					if time.Since(wm.LastTry) < dropDuration {
-						continue SFOR
-					}
-					if wm.LastSize == fi.Size() {
-						continue SFOR
-					}
-					delta := fi.Size() - wm.LastSize
-					if delta < 0 {
-						log.Info("Stopped watching truncated file:", ePath)
-						wm := self.Pool.Get(ePath)
-						wm.CtrlChanIn <- StreamQuit
-						fb := <-wm.CtrlChanOut
-						if fb != StreamExited {
-							log.Fatal("Invalid truncation feedback:", int(fb))
-						}
-						self.Pool.Delete(ePath)
-						continue SFOR
-					}
-					if delta < int64(minDelta) {
-						continue SFOR
-					}
-
-					wm.CtrlChanIn <- StreamTry
-					wm.LastTry = time.Now()
-
-				}
-			case err, ok := <-watcher.Errors:
-				if ok {
-					log.Fatalf("fsnotify error:", err)
-				}
-			default:
-				time.Sleep(NAP_SLEEP)
+				item.in <- StreamQuit
 			}
 		}
-	}()
-
-	if !findOnly {
-		err = watcher.Add(dir)
-		checkError(err)
 	}
-	self.Pool.Insert(dir, &WatchedFx{Name: dir, IsDir: true})
-	if !findOnly {
-		log.Info(fmt.Sprintf("Watcher (%s) launched on root: %s", inFmt, dir))
-	} else {
-		log.Info(fmt.Sprintf("Streaming %s records from directory: %s", inFmt, dir))
+	quitting := findOnly
+	stopping := false
+	quitAll := func() {
+		quitting, stopping = true, true
+		for _, item := range files {
+			quit(item)
+		}
 	}
-
-	err = cwalk.Walk(dir, walkFunc)
-	checkError(err)
-
-	if findOnly {
-		watcherCtrlChanIn <- WatchCtrl(1)
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt)
+	defer signal.Stop(signals)
+	tick := time.NewTicker(10 * time.Millisecond)
+	defer tick.Stop()
+	pidTick := time.NewTicker(500 * time.Millisecond)
+	defer pidTick.Stop()
+	var pidEvents <-chan time.Time
+	if waitPid >= 0 {
+		pidEvents = pidTick.C
 	}
-
+	lastActivity := time.Now()
+	pass, discarded := 0, 0
 	for {
-		if self.Pool.IsEmpty() {
+		if findOnly && !stopping {
+			for len(running) < scanLimit && nextQueued < len(queued) {
+				item := queued[nextQueued]
+				queued[nextQueued] = nil
+				nextQueued++
+				if !item.done {
+					start(item)
+				}
+			}
+		}
+
+		if quitting && active == 0 && len(sequences) == 0 {
 			break
 		}
-		for {
-			time.Sleep(NAP_SLEEP)
-
-			self.Pool.Range(func(k, v interface{}) bool {
-				ePath := k.(string)
-				w := v.(*WatchedFx)
-				select {
-				case seq := <-w.SeqChan:
-					seqChan <- seq
-					return true
-				case fb := <-w.CtrlChanOut:
-					switch fb {
-					case StreamExited:
-						self.Pool.Delete(ePath)
-						return true
-					case StreamEOF:
-						return true
-					default:
-						log.Fatal("Invalid feedback on channel: ", int(fb))
+		select {
+		case record := <-sequences:
+			lastActivity = time.Now()
+			if record.Err == nil {
+				pass++
+				if _, err := outw.WriteString(record.Format(outFmt) + "\n"); err != nil {
+					return err
+				}
+				if err := outw.Flush(); err != nil {
+					return err
+				}
+			} else if fileErr, fatal := record.Err.(*rawFileError); fatal {
+				fileError(fileErr.file, fileErr.cause)
+			} else {
+				discarded++
+				fmt.Fprintf(os.Stderr, "From file: %s\t%s\n", record.File, record.String())
+			}
+		case <-signals:
+			quitAll()
+		case <-pidEvents:
+			if !IsPidAlive(waitPid) {
+				pidEvents = nil
+				quitAll()
+			}
+		case event := <-watcher.Events:
+			if quitting {
+				continue
+			}
+			if event.Op&(fsnotify.Create|fsnotify.Rename|fsnotify.Remove) != 0 {
+				// Relocate a renamed identity before deciding that it left the watched roots.
+				scan()
+				for _, item := range files {
+					if item.done || item.quitting {
+						continue
+					}
+					current, err := os.Stat(item.name)
+					if err != nil || !os.SameFile(current, item.info) {
+						quit(item)
 					}
 				}
-				return true
-			})
-
+			}
+			if event.Op&fsnotify.Write != 0 {
+				info, err := os.Stat(event.Name)
+				if os.IsNotExist(err) {
+					continue
+				}
+				if err != nil {
+					fileError(event.Name, err)
+					continue
+				}
+				if info.IsDir() {
+					continue
+				}
+				key, err := fileIdentity(event.Name, info)
+				if err != nil {
+					fileError(event.Name, err)
+					continue
+				}
+				if item := files[key]; item != nil && !item.done && !item.quitting {
+					item.pending, item.pendingSize = true, info.Size()
+				}
+			}
+		case err := <-watcher.Errors:
+			if err != nil {
+				fileError("fsnotify", err)
+				quitAll()
+			}
+		case <-tick.C:
+			for _, item := range running {
+				if item.done {
+					continue
+				}
+				select {
+				case feedback := <-item.feedback:
+					if feedback == StreamExited {
+						item.done = true
+						active--
+						delete(running, item.key)
+						item.in, item.feedback = nil, nil
+						if findOnly {
+							delete(files, item.key)
+						}
+					} else if feedback == StreamEOF {
+						item.busy = false
+					}
+				default:
+				}
+				if !item.done && !item.quitting && !item.busy && item.pending && time.Since(item.lastTry) >= drop {
+					if item.pendingSize < item.lastSize {
+						quit(item)
+						continue
+					}
+					if item.pendingSize-item.lastSize >= int64(delta) {
+						item.in <- StreamTry
+						item.lastTry, item.lastSize, item.busy = time.Now(), item.pendingSize, true
+					}
+					item.pending = false
+				}
+			}
+			if !quitting && idle > 0 && time.Since(lastActivity) >= idle {
+				quitAll()
+			}
 		}
 	}
-
+	log.Infof("Total stats:\tPass records: %d\tDiscarded lines: %d", pass, discarded)
+	if hadError {
+		return fmt.Errorf("one or more input files could not be read")
+	}
+	return outw.Flush()
 }
 
 func init() {
@@ -591,7 +461,7 @@ func init() {
 	scatCmd.Flags().BoolP("gz-only", "g", false, "only look for gzipped files (.gz suffix)")
 	scatCmd.Flags().StringP("time-limit", "T", "", "quit after inactive for this time period")
 	scatCmd.Flags().IntP("wait-pid", "p", -1, "after process with this PID exited")
-	scatCmd.Flags().IntP("delta", "d", 5, "minimum size increase in kilobytes to trigger parsing")
+	scatCmd.Flags().IntP("delta", "d", 5, "minimum size increase in kilobytes (base 1024) to trigger parsing")
 	scatCmd.Flags().StringP("drop-time", "D", "500ms", "Notification drop interval")
 	scatCmd.Flags().IntP("qual-ascii-base", "b", 33, "ASCII BASE, 33 for Phred+33")
 }

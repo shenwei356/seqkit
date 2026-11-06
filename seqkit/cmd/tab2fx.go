@@ -128,5 +128,5 @@ var tab2faCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(tab2faCmd)
 	tab2faCmd.Flags().StringSliceP("comment-line-prefix", "p", []string{"#", "//"}, "comment line prefix")
-	tab2faCmd.Flags().StringP("buffer-size", "b", "1G", `size of buffer, supported unit: K, M, G. You need increase the value when "bufio.Scanner: token too long" error reported`)
+	tab2faCmd.Flags().StringP("buffer-size", "b", "1G", `size of buffer, supported unit: K, M, G (base 1024). You need increase the value when "bufio.Scanner: token too long" error reported`)
 }

@@ -51,7 +51,7 @@ part size or number of parts.
 If you just want to split by parts or sizes, please use "seqkit split2",
 which can apply to paired- and single-end FASTQ.
 
-If you want to split sequences by ID, please use "seqkit split2 -s 1 -N".
+For one record per file using unique IDs, use "seqkit split2 -s 1 -N".
 
 If you want to cut a sequence into multiple segments.
   1. For cutting into even chunks, please use 'kmcp utils split-genomes'
@@ -65,14 +65,21 @@ If you want to cut a sequence into multiple segments.
 Attention:
   1. For the two-pass mode (-2/--two-pass), The flag -U/--update-faidx is recommended to
      ensure the .fai file matches the FASTA file.
+     Two-pass mode requires unique full headers and a matching full-header index;
+     use -U to rebuild an incompatible index. Output names and compression
+     follow the same rules in both modes.
   2. For splitting by sequence IDs in Windows/MacOS, where the file systems might be case-insensitive,
      output files might be overwritten if they are only different in cases, like Abc and ABC.
      To avoid this, please switch one -I/--ignore-case.
+  3. -p produces min(N, P) balanced, nonempty parts in input order.
+  4. Existing matching outputs are overwritten; -f suppresses the directory
+     warning. Other files, including old parts not produced this time, are retained.
 
 The definition of region is 1-based and with some custom design.
 
 Examples:
 %s
+
 `, regionExample),
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
@@ -168,34 +175,67 @@ Examples:
 		var prefix string
 		var record *fastx.Record
 
-		if !dryRun {
-			if force {
-				checkOutputDir(files, outdir)
-			}
-			if !isWorkingDir(outdir) {
-				existed, err := pathutil.DirExists(outdir)
+		if force && !dryRun {
+			checkOutputDir(files, outdir)
+		}
+		var dirOnce sync.Once
+		var outputMu sync.Mutex
+		registry := splitOutputRegistry{inputs: files}
+		openOutput := func(path string) (*xopen.Writer, error) {
+			outputMu.Lock()
+			defer outputMu.Unlock()
+			dirOnce.Do(func() { prepareOutputDir(outdir, force) })
+			return registry.open(path)
+		}
+		writeSeqs := func(records []*fastx.Record, path string, width int, quiet, dry bool) {
+			if !dry {
+				w, err := openOutput(path)
 				checkError(err)
-				if existed {
-					empty, err := pathutil.IsEmpty(outdir)
-					checkError(err)
-					if !empty {
-						if force {
-							checkError(os.RemoveAll(outdir))
-							checkError(os.MkdirAll(outdir, 0755))
-						} else {
-							log.Warningf("outdir not empty: %s, you can use --force to overwrite", outdir)
-						}
-					}
-				} else {
-					checkError(os.MkdirAll(outdir, 0755))
+				for _, record := range records {
+					record.FormatToWriter(w, width)
 				}
+				closeOutput(w)
+			}
+			if !quiet {
+				log.Infof("write %d sequences to file: %s", len(records), path)
+			}
+		}
+		// Index iteration keeps only one sequence in memory and opens no empty part.
+		writeIndexed := func(index *fai.Faidx, ids []string, size, parts int, prefix string) {
+			offset, partNo := 0, 1
+			for offset < len(ids) {
+				take := size
+				if parts > 0 {
+					take = balancedPartSize(len(ids), parts, partNo-1)
+				}
+				take = min(take, len(ids)-offset)
+				path := filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, partNo, fileExt))
+				if !dryRun {
+					w, err := openOutput(path)
+					checkError(err)
+					for _, id := range ids[offset : offset+take] {
+						sequence := subseqByFaix(index, id, index.Index[id], 1, -1)
+						w.WriteString(">" + id + "\n")
+						text, _ := wrapByteSlice(sequence, config.LineWidth, nil)
+						w.Write(text)
+						w.WriteString("\n")
+					}
+					closeOutput(w)
+				}
+				if !quiet {
+					log.Infof("write %d sequences to file: %s", take, path)
+				}
+				offset += take
+				partNo++
 			}
 		}
 
-		var outfh *xopen.Writer
 		var err error
 
 		if size > 0 {
+			if twoPass && !quiet {
+				log.Infof("split into %d seqs per file", size)
+			}
 			if !twoPass {
 				if !quiet {
 					log.Infof("split into %d seqs per file", size)
@@ -261,8 +301,6 @@ Examples:
 				return
 			}
 
-			var alphabet2 *seq.Alphabet
-
 			newFile := file
 
 			if isstdin || !isPlainFile(file) {
@@ -282,7 +320,7 @@ Examples:
 
 				var isFastq bool
 				var err error
-				alphabet2, isFastq, err = fastx.GuessAlphabet(newFile)
+				_, isFastq, err = fastx.GuessAlphabet(newFile)
 				checkError(err)
 				if renameFileExt && isstdin {
 					if isFastq {
@@ -297,7 +335,6 @@ Examples:
 					checkError(fmt.Errorf("Sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
-			fileExt = suffixFA + extension
 
 			fileFai := newFile + ".seqkit.fai"
 
@@ -326,63 +363,12 @@ Examples:
 			IDs, _, err := getSeqIDAndLengthFromFaidxFile(fileFai)
 			checkError(err)
 
-			n := 1
-			if len(IDs) > 0 {
-				if prefixBySizeSet {
-					prefix = prefixBySize
-				} else {
-					prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
-				}
-				outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, n, fileExt))
-				if !dryRun {
-					outfh, err = xopen.Wopen(outfile)
-					checkError(err)
-				}
+			if prefixBySizeSet {
+				prefix = prefixBySize
+			} else {
+				prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 			}
-			j := 0
-			var record *fastx.Record
-			for _, chr := range IDs {
-				if !dryRun {
-					r, ok := faidx.Index[chr]
-					if !ok {
-						checkError(fmt.Errorf(`sequence (%s) not found in file: %s`, chr, newFile))
-					}
-
-					sequence := subseqByFaix(faidx, chr, r, 1, -1)
-					record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), []byte{}, sequence)
-					checkError(err)
-
-					record.FormatToWriter(outfh, config.LineWidth)
-				}
-				j++
-				if j == size {
-					if !quiet {
-						log.Infof("write %d sequences to file: %s\n", j, outfile)
-					}
-					n++
-					if prefixBySizeSet {
-						prefix = prefixBySize
-					} else {
-						prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
-					}
-					outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, n, fileExt))
-					if !dryRun {
-						closeOutput(outfh)
-						outfh, err = xopen.Wopen(outfile)
-						checkError(err)
-					}
-					j = 0
-				}
-			}
-			if j > 0 && !quiet {
-				log.Infof("write %d sequences to file: %s\n", j, outfile)
-			}
-			if j == 0 {
-				os.Remove(outfile)
-			}
-			if !dryRun {
-				closeOutput(outfh)
-			}
+			writeIndexed(faidx, IDs, size, 0, prefix)
 
 			return
 		}
@@ -398,7 +384,7 @@ Examples:
 				if !quiet {
 					log.Info("read sequences ...")
 				}
-				allRecords, err := fastx.GetSeqs(file, alphabet, config.Threads, 10, idRegexp)
+				allRecords, err := readRecordsChecked(file, alphabet, idRegexp)
 				checkError(err)
 				if !quiet {
 					log.Infof("read %d sequences", len(allRecords))
@@ -409,16 +395,7 @@ Examples:
 				}
 
 				n := len(allRecords)
-				if n%part > 0 {
-					size = int(n/part) + 1
-					if n%size == 0 {
-						if !quiet {
-							log.Infof("corrected: split into %d parts", n/size)
-						}
-					}
-				} else {
-					size = int(n / part)
-				}
+				size = balancedPartSize(n, part, 0)
 
 				for _, record := range allRecords {
 					if renameFileExt && isstdin {
@@ -439,6 +416,7 @@ Examples:
 						outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, i, fileExt))
 						writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 						i++
+						size = balancedPartSize(n, part, i-1)
 						records = []*fastx.Record{}
 					}
 				}
@@ -453,8 +431,6 @@ Examples:
 				}
 				return
 			}
-
-			var alphabet2 *seq.Alphabet
 
 			newFile := file
 
@@ -475,7 +451,7 @@ Examples:
 
 				var isFastq bool
 				var err error
-				alphabet2, isFastq, err = fastx.GuessAlphabet(newFile)
+				_, isFastq, err = fastx.GuessAlphabet(newFile)
 				checkError(err)
 				if renameFileExt && isstdin {
 					if isFastq {
@@ -490,7 +466,6 @@ Examples:
 					checkError(fmt.Errorf("Sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
-			fileExt = suffixFA + extension
 
 			fileFai := newFile + ".seqkit.fai"
 
@@ -519,78 +494,12 @@ Examples:
 			IDs, _, err := getSeqIDAndLengthFromFaidxFile(fileFai)
 			checkError(err)
 
-			N := len(IDs)
-			if N%part > 0 {
-				size = int(N/part) + 1
-				if N%size == 0 {
-					if !quiet {
-						log.Infof("corrected: split into %d parts", N/size)
-					}
-				}
+			if prefixByPartSet {
+				prefix = prefixByPart
 			} else {
-				size = int(N / part)
+				prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 			}
-
-			n := 1
-			if len(IDs) > 0 {
-				if prefixByPartSet {
-					prefix = prefixByPart
-				} else {
-					prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
-				}
-				outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, n, fileExt))
-				if !dryRun {
-					outfh, err = xopen.Wopen(outfile)
-					checkError(err)
-				}
-			}
-			j := 0
-			var record *fastx.Record
-			for _, chr := range IDs {
-				if !dryRun {
-					r, ok := faidx.Index[chr]
-					if !ok {
-						checkError(fmt.Errorf(`sequence (%s) not found in file: %s`, chr, newFile))
-					}
-
-					sequence := subseqByFaix(faidx, chr, r, 1, -1)
-					record, err = fastx.NewRecord(alphabet2, []byte(chr), []byte(chr), []byte{}, sequence)
-					checkError(err)
-
-					record.FormatToWriter(outfh, config.LineWidth)
-				}
-				j++
-				if j == size {
-					if !quiet {
-						log.Infof("write %d sequences to file: %s\n", j, outfile)
-					}
-					n++
-					if prefixByPartSet {
-						prefix = prefixByPart
-					} else {
-						prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
-					}
-					outfile = filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, n, fileExt))
-					if !dryRun {
-						closeOutput(outfh)
-						outfh, err = xopen.Wopen(outfile)
-						checkError(err)
-					}
-					j = 0
-				}
-			}
-			if j > 0 {
-				if quiet {
-					log.Infof("write %d sequences to file: %s\n", j, outfile)
-				}
-				if !dryRun {
-					closeOutput(outfh)
-				}
-			} else {
-				if !dryRun {
-					checkError(os.Remove(outfile))
-				}
-			}
+			writeIndexed(faidx, IDs, size, part, prefix)
 
 			return
 		}
@@ -604,7 +513,7 @@ Examples:
 				if !quiet {
 					log.Info("read sequences ...")
 				}
-				allRecords, err := fastx.GetSeqs(file, alphabet, config.Threads, 10, idRegexp)
+				allRecords, err := readRecordsChecked(file, alphabet, idRegexp)
 				checkError(err)
 				if !quiet {
 					log.Infof("read %d sequences", len(allRecords))
@@ -690,7 +599,6 @@ Examples:
 					checkError(fmt.Errorf("sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
-			fileExt = suffixFA + extension
 
 			fileFai := newFile + ".seqkit.fai"
 
@@ -764,7 +672,7 @@ Examples:
 						pathutil.RemoveInvalidPathChars(id, "__"), fileExt))
 
 					if !dryRun {
-						outfh, err = xopen.Wopen(outfile)
+						outfh, err = openOutput(outfile)
 						checkError(err)
 						for _, chr := range _IDs {
 							r, ok := faidx.Index[chr]
@@ -817,7 +725,7 @@ Examples:
 				if !quiet {
 					log.Info("read sequences ...")
 				}
-				allRecords, err := fastx.GetSeqs(file, alphabet, config.Threads, 10, idRegexp)
+				allRecords, err := readRecordsChecked(file, alphabet, idRegexp)
 				checkError(err)
 				if !quiet {
 					log.Infof("read %d sequences", len(allRecords))
@@ -841,7 +749,7 @@ Examples:
 						}
 						renameFileExt = false
 					}
-					s, e, ok = seq.SubLocation(len(record.Seq.Seq), start, end)
+					s, e, ok = nonemptySubLocation(len(record.Seq.Seq), start, end)
 					if !ok {
 						checkError(fmt.Errorf("region (%s) not match sequence (%s) with length of %d", region, record.Name, len(record.Seq.Seq)))
 					}
@@ -902,8 +810,6 @@ Examples:
 					checkError(fmt.Errorf("sorry, two-pass mode does not support FASTQ format"))
 				}
 			}
-			fileExt = suffixFA + extension
-
 			if !quiet {
 				log.Infof("read sequence IDs and sequence region from FASTA file ...")
 			}
@@ -925,7 +831,7 @@ Examples:
 					break
 				}
 
-				s, e, ok = seq.SubLocation(len(record.Seq.Seq), start, end)
+				s, e, ok = nonemptySubLocation(len(record.Seq.Seq), start, end)
 				if !ok {
 					checkError(fmt.Errorf("region (%s) not match sequence (%s) with length of %d", region, record.Name, len(record.Seq.Seq)))
 				}
@@ -988,7 +894,7 @@ Examples:
 					outfile = filepath.Join(outdir, fmt.Sprintf("%s%d:%d_%s%s", prefix, start, end, subseq, fileExt))
 
 					if !dryRun {
-						outfh, err = xopen.Wopen(outfile)
+						outfh, err = openOutput(outfile)
 						checkError(err)
 
 						for _, chr := range chrs {
@@ -1025,7 +931,7 @@ func init() {
 	RootCmd.AddCommand(splitCmd)
 
 	splitCmd.Flags().IntP("by-size", "s", 0, "split sequences into multi parts with N sequences")
-	splitCmd.Flags().IntP("by-part", "p", 0, "split sequences into N parts")
+	splitCmd.Flags().IntP("by-part", "p", 0, "split into N balanced nonempty parts (at most the number of records)")
 	splitCmd.Flags().BoolP("by-id", "i", false, "split squences according to sequence ID")
 	splitCmd.Flags().BoolP("ignore-case", "I", false, "ignore case when using -i/--by-id")
 	splitCmd.Flags().StringP("by-region", "r", "", "split squences according to subsequence of given region. "+
@@ -1035,7 +941,7 @@ func init() {
 	splitCmd.Flags().BoolP("dry-run", "d", false, "dry run, just print message and no files will be created.")
 	splitCmd.Flags().BoolP("keep-temp", "k", false, "keep temporary FASTA and .fai file when using 2-pass mode")
 	splitCmd.Flags().StringP("out-dir", "O", "", "output directory (default value is $infile.split)")
-	splitCmd.Flags().BoolP("force", "f", false, "overwrite output directory")
+	splitCmd.Flags().BoolP("force", "f", false, "overwrite matching output files without the nonempty-directory warning")
 
 	splitCmd.Flags().StringP("by-size-prefix", "", "", "file prefix for --by-size")
 	splitCmd.Flags().StringP("by-part-prefix", "", "", "file prefix for --by-part")
