@@ -346,6 +346,7 @@ Examples:
 
 			fileFai := newFile + ".seqkit.fai"
 			checkError(checkFASTAIndexFile(fileFai))
+			checkOutputFiles([]string{newFile}, []string{fileFai}, !config.SkipFileCheck)
 			checkOutputFiles(auxiliaryInputs, []string{fileFai}, true)
 			registry.auxiliaryInputs = append(registry.auxiliaryInputs, fileFai)
 
@@ -481,6 +482,7 @@ Examples:
 
 			fileFai := newFile + ".seqkit.fai"
 			checkError(checkFASTAIndexFile(fileFai))
+			checkOutputFiles([]string{newFile}, []string{fileFai}, !config.SkipFileCheck)
 			checkOutputFiles(auxiliaryInputs, []string{fileFai}, true)
 			registry.auxiliaryInputs = append(registry.auxiliaryInputs, fileFai)
 
@@ -618,6 +620,7 @@ Examples:
 
 			fileFai := newFile + ".seqkit.fai"
 			checkError(checkFASTAIndexFile(fileFai))
+			checkOutputFiles([]string{newFile}, []string{fileFai}, !config.SkipFileCheck)
 			checkOutputFiles(auxiliaryInputs, []string{fileFai}, true)
 			registry.auxiliaryInputs = append(registry.auxiliaryInputs, fileFai)
 
@@ -866,6 +869,7 @@ Examples:
 
 			fileFai := newFile + ".seqkit.fai"
 			checkError(checkFASTAIndexFile(fileFai))
+			checkOutputFiles([]string{newFile}, []string{fileFai}, !config.SkipFileCheck)
 			checkOutputFiles(auxiliaryInputs, []string{fileFai}, true)
 			registry.auxiliaryInputs = append(registry.auxiliaryInputs, fileFai)
 

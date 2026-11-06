@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strconv"
@@ -216,6 +217,9 @@ Examples:
 			fastq    bool
 		}
 		plainInputs := make(map[string]inputFormat)
+		var indexOutputs []string
+		// Repeated inputs may reuse one index, but different inputs must not share a writer.
+		seenIndexOutputs := make(map[[2]string]bool)
 		for _, file := range files {
 			if isStdin(file) || !isPlainFile(file) {
 				continue
@@ -230,6 +234,18 @@ Examples:
 				checkError(checkFASTAIndexFile(fileFai))
 				checkOutputFiles([]string{fileFai}, []string{outFile}, true)
 				if useIndex && (updateFaidx || fileNotExists(fileFai)) {
+					indexPath, err := resolvedPath(fileFai)
+					checkError(err)
+					inputPath, err := filepath.Abs(file)
+					if !config.SkipFileCheck {
+						inputPath, err = resolvedPath(file)
+					}
+					checkError(err)
+					key := [2]string{inputPath, indexPath}
+					if !seenIndexOutputs[key] {
+						indexOutputs = append(indexOutputs, fileFai)
+						seenIndexOutputs[key] = true
+					}
 					checkOutputFiles(files, []string{fileFai}, !config.SkipFileCheck)
 					for _, input := range []string{bedFile, gtfFile, getFlagString(cmd, "infile-list")} {
 						if input != "" {
@@ -239,6 +255,8 @@ Examples:
 				}
 			}
 		}
+
+		checkOutputFiles(nil, indexOutputs, true)
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

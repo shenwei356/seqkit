@@ -24,7 +24,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"regexp"
 	"sort"
@@ -35,6 +34,7 @@ import (
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
 	syaml "github.com/smallfish/simpleyaml"
+	"gopkg.in/yaml.v2"
 )
 
 type BamTool struct {
@@ -80,6 +80,7 @@ func NewToolshed() Toolshed {
 	return ts
 }
 
+// NewBamReaderChan streams records and closes the reader before signaling EOF.
 func NewBamReaderChan(inFile string, cp int, buff int, threads int) (chan *sam.Record, *bam.Reader) {
 	outChan := make(chan *sam.Record, cp)
 	fh, err := os.Stdin, error(nil)
@@ -96,17 +97,15 @@ func NewBamReaderChan(inFile string, cp int, buff int, threads int) (chan *sam.R
 		checkError(fmt.Errorf("%s: %w", inFile, err))
 	}
 	go func() {
+		defer close(outChan)
 		if fh != os.Stdin {
 			defer fh.Close()
 		}
+		defer r.Close()
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
-				close(outChan)
 				return
-			}
-			if err != nil {
-				close(outChan)
 			}
 			if err != nil {
 				checkError(fmt.Errorf("%s: %w", inFile, err))
@@ -130,6 +129,7 @@ func NewBamSinkChan(cp int) (chan *sam.Record, chan bool) {
 	return outChan, doneChan
 }
 
+// NewBamWriterChan reports completion only after compression and buffered writes succeed.
 func NewBamWriterChan(inFile string, head *sam.Header, cp int, buff int, threads int) (chan *sam.Record, chan bool) {
 	outChan := make(chan *sam.Record, cp)
 	doneChan := make(chan bool)
@@ -141,106 +141,166 @@ func NewBamWriterChan(inFile string, head *sam.Header, cp int, buff int, threads
 
 	bio := bufio.NewWriterSize(fh, buff)
 	w, err := bam.NewWriter(bio, head, threads)
+	checkError(err)
 	go func() {
 		for rec := range outChan {
 			err := w.Write(rec)
 			checkError(err)
 		}
-		w.Close()
-		bio.Flush()
-		fh.Close()
+		checkError(w.Close())
+		checkError(bio.Flush())
+		if fh != os.Stdout {
+			checkError(fh.Close())
+		}
 		doneChan <- true
 	}()
 	return outChan, doneChan
 }
 
+// parseBamToolbox retains the declared pipeline order rather than Go map order.
+func parseBamToolbox(data []byte) (*syaml.Yaml, []string, error) {
+	var ordered yaml.MapSlice
+	if err := yaml.UnmarshalStrict(data, &ordered); err != nil {
+		return nil, nil, err
+	}
+	keys := make([]string, 0, len(ordered))
+	seen := make(map[string]bool, len(ordered))
+	for _, item := range ordered {
+		key, ok := item.Key.(string)
+		if !ok || seen[key] {
+			return nil, nil, fmt.Errorf("toolbox: invalid or repeated tool name: %v", item.Key)
+		}
+		seen[key] = true
+		keys = append(keys, key)
+	}
+	y, err := syaml.NewYaml(data)
+	return y, keys, err
+}
+
+// BamToolbox runs a validated pipeline using full input-path checks.
 func BamToolbox(toolYaml string, inFile string, outFile string, quiet bool, silent bool, threads int) {
+	runBamToolbox(toolYaml, inFile, outFile, quiet, silent, threads, nil, true)
+}
+
+// runBamToolbox also protects CLI auxiliary inputs and honors --skip-file-check.
+func runBamToolbox(toolYaml string, inFile string, outFile string, quiet bool, silent bool, threads int, auxiliaryInputs []string, checkInputFiles bool) {
 	if toolYaml == "help" {
 		toolYaml = "help: true"
 	}
-	y, err := syaml.NewYaml([]byte(toolYaml))
+	y, keys, err := parseBamToolbox([]byte(toolYaml))
 	checkError(err)
-	ty, err := y.GetMapKeys()
-	checkError(err)
-	if len(ty) > 0 && ty[0] == "Yaml" {
+	if y.Get("Yaml").IsFound() {
+		if len(keys) != 1 {
+			checkError(fmt.Errorf("toolbox: Yaml must be the only configuration key"))
+		}
 		conf, err := y.Get("Yaml").String()
 		checkError(err)
-		cb, err := ioutil.ReadFile(conf)
+		cb, err := os.ReadFile(conf)
 		checkError(err)
-		y, err = syaml.NewYaml(cb)
+		auxiliaryInputs = append(auxiliaryInputs, conf)
+		y, keys, err = parseBamToolbox(cb)
 		checkError(err)
 	}
 
-	if keys, err := y.GetMapKeys(); err == nil {
-		for _, key := range keys {
-			if key == "Dump" {
-				dumpFields(y.Get("Dump"))
+	shed := NewToolshed()
+	if len(keys) == 1 && keys[0] == "help" {
+		ListTools(&BamToolParams{Shed: shed})
+		return
+	}
+	sink := false
+	if y.Get("Sink").IsFound() {
+		sink, err = y.Get("Sink").Bool()
+		checkError(err)
+	}
+	outputs := []string{}
+	if !sink {
+		outputs = append(outputs, outFile)
+	}
+	stages := make([]string, 0, len(keys))
+	var indexes, newIndexes []string
+	for _, key := range keys {
+		if key == "Sink" {
+			continue
+		}
+		if _, ok := shed[key]; !ok || key == "help" {
+			checkError(fmt.Errorf("toolbox: unknown tool: %s", key))
+		}
+		stages = append(stages, key)
+		params := y.Get(key)
+		if params.Get("Tsv").IsFound() {
+			tsv, err := params.Get("Tsv").String()
+			checkError(err)
+			if tsv == "" {
+				checkError(fmt.Errorf("%s: Tsv must not be empty", key))
+			}
+			outputs = append(outputs, tsv)
+		}
+		switch key {
+		case "Dump":
+			dumpFields(params)
+		case "AlnContext":
+			ref, err := params.Get("Ref").String()
+			checkError(err)
+			_, err = params.Get("LeftShift").Int()
+			checkError(err)
+			_, err = params.Get("RightShift").Int()
+			checkError(err)
+			for _, key := range []string{"RegexStart", "RegexEnd"} {
+				if params.Get(key).IsFound() {
+					pattern, err := params.Get(key).String()
+					checkError(err)
+					_, err = regexp.Compile(pattern)
+					checkError(err)
+				}
+			}
+			for _, key := range []string{"Stranded", "Invert"} {
+				if params.Get(key).IsFound() {
+					_, err = params.Get(key).Bool()
+					checkError(err)
+				}
+			}
+			_, err = os.Stat(ref)
+			checkError(err)
+			index := ref + ".seqkit.fai"
+			checkError(checkFASTAIndexFile(index))
+			auxiliaryInputs = append(auxiliaryInputs, ref)
+			indexes = append(indexes, index)
+			if fileNotExists(index) {
+				newIndexes = append(newIndexes, index)
 			}
 		}
 	}
+	if len(stages) == 0 {
+		checkError(fmt.Errorf("toolbox: no tool specified"))
+	}
+	checkOutputFiles([]string{inFile}, append(outputs, newIndexes...), checkInputFiles)
+	checkOutputFiles(auxiliaryInputs, append(outputs, newIndexes...), true)
+	checkOutputFiles(indexes, outputs, true)
+	checkBAMOutputPaths(append(outputs, newIndexes...))
 
 	chanCap := 5000
 	ioBuff := 1024 * 128
-
-	paramFields := map[string]bool{
-		"Sink": true,
+	inChan, bamReader := NewBamReaderChan(inFile, chanCap, ioBuff, threads)
+	var lastOut chan *sam.Record
+	var doneChan chan bool
+	if sink {
+		lastOut, doneChan = NewBamSinkChan(chanCap)
+	} else {
+		lastOut, doneChan = NewBamWriterChan(outFile, bamReader.Header(), chanCap, ioBuff, threads)
 	}
-
-	switch len(ty) {
-	case 0:
-		log.Fatal("toolbox: not tool specified!")
-	default:
-		tkeys, err := y.GetMapKeys()
-		checkError(err)
-		shed := NewToolshed()
-		var inChan, outChan, lastOut chan *sam.Record
-		var bamReader *bam.Reader
-		var doneChan chan bool
-		var sink bool
-		if len(tkeys) > 0 && tkeys[0] != "help" {
-			inChan, bamReader = NewBamReaderChan(inFile, chanCap, ioBuff, threads)
-			sink, err = y.Get("Sink").Bool()
-			if err == nil && sink {
-				lastOut, doneChan = NewBamSinkChan(chanCap)
-			} else {
-				lastOut, doneChan = NewBamWriterChan(outFile, bamReader.Header(), chanCap, ioBuff, threads)
-			}
-		}
-		outChan = make(chan *sam.Record, chanCap)
-		nextIn, nextOut := inChan, outChan
-		clearKeys := make([]string, 0)
-		for _, k := range tkeys {
-			if !paramFields[k] {
-				clearKeys = append(clearKeys, k)
-			}
-		}
-		for rank, tool := range clearKeys {
-			var wt BamTool
-			var ok bool
-			if wt, ok = shed[tool]; !ok {
-				log.Fatal("Unknown tool:", tool)
-			}
-			if rank == (len(clearKeys) - 1) {
-				nextOut = lastOut
-			}
-			params := &BamToolParams{
-				Yaml:    y.Get(tool),
-				InChan:  nextIn,
-				OutChan: nextOut,
-				Quiet:   quiet,
-				Silent:  silent,
-				Threads: threads,
-				Rank:    rank,
-				Shed:    shed,
-			}
-			nextIn = nextOut
+	for rank, tool := range stages {
+		nextOut := lastOut
+		if rank < len(stages)-1 {
 			nextOut = make(chan *sam.Record, chanCap)
-			go wt.Use(params)
-
 		}
-		<-doneChan
+		params := &BamToolParams{
+			Yaml: y.Get(tool), InChan: inChan, OutChan: nextOut,
+			Quiet: quiet, Silent: silent, Threads: threads, Rank: rank, Shed: shed,
+		}
+		go shed[tool].Use(params)
+		inChan = nextOut
 	}
-
+	<-doneChan
 }
 
 func ListTools(p *BamToolParams) {
@@ -248,10 +308,14 @@ func ListTools(p *BamToolParams) {
 	os.Exit(0)
 }
 
+// BamToolAlnContext filters alignments by flanking reference sequences.
 func BamToolAlnContext(p *BamToolParams) {
+	// Signal completion only after TSV output and the reference have closed.
+	defer close(p.OutChan)
 	ref, err := p.Yaml.Get("Ref").String()
 	checkError(err)
 	idx := NewRefWitdFaidx(ref, false, p.Silent)
+	defer closeOutput(idx.faidx)
 	leftShift, err := p.Yaml.Get("LeftShift").Int()
 	checkError(err)
 	rightShift, err := p.Yaml.Get("RightShift").Int()
@@ -261,11 +325,13 @@ func BamToolAlnContext(p *BamToolParams) {
 	checkError(err)
 	regStrStart, err := p.Yaml.Get("RegexStart").String()
 	if err == nil {
-		regStart = regexp.MustCompile(regStrStart)
+		regStart, err = regexp.Compile(regStrStart)
+		checkError(err)
 	}
 	regStrEnd, err := p.Yaml.Get("RegexEnd").String()
 	if err == nil {
-		regEnd = regexp.MustCompile(regStrEnd)
+		regEnd, err = regexp.Compile(regStrEnd)
+		checkError(err)
 	}
 	stranded, invert := false, false
 	_ = invert
@@ -275,10 +341,13 @@ func BamToolAlnContext(p *BamToolParams) {
 	tsvFile, err := p.Yaml.Get("Tsv").String()
 	if err == nil && tsvFile != "-" {
 		tsvFh, err = os.Create(tsvFile)
+		checkError(err)
+		defer closeOutput(tsvFh)
 	}
 
 	head := "Read\tRef\tStrand\tStartSeq\tStartMatch\tEndSeq\tEndMatch\n"
-	tsvFh.WriteString(head)
+	_, err = tsvFh.WriteString(head)
+	checkError(err)
 
 	for r := range p.InChan {
 		if !GetSamMapped(r) || r.Ref == nil {
@@ -287,9 +356,9 @@ func BamToolAlnContext(p *BamToolParams) {
 		}
 		chrom := r.Ref.Name()
 		startPos, endPos := r.Pos, r.End()
-		startSeq, err := idx.IdxSubSeq(chrom, startPos+leftShift, startPos+rightShift)
+		startSeq, err := idx.IdxSubSeq(chrom, addBamOffset(startPos, leftShift), addBamOffset(startPos, rightShift))
 		checkError(err)
-		endSeq, err := idx.IdxSubSeq(chrom, endPos+leftShift, endPos+rightShift)
+		endSeq, err := idx.IdxSubSeq(chrom, addBamOffset(endPos, leftShift), addBamOffset(endPos, rightShift))
 		checkError(err)
 		strand := 1
 		if GetSamReverse(r) {
@@ -323,18 +392,16 @@ func BamToolAlnContext(p *BamToolParams) {
 
 		if match && !invert {
 			p.OutChan <- r
-			tsvFh.WriteString(info)
+			_, err = tsvFh.WriteString(info)
+			checkError(err)
 		} else if !match && invert {
 			p.OutChan <- r
 		} else {
-			tsvFh.WriteString(info)
+			_, err = tsvFh.WriteString(info)
+			checkError(err)
 
 		}
 
-	}
-	close(p.OutChan)
-	if tsvFh != os.Stderr {
-		tsvFh.Close()
 	}
 }
 
@@ -346,7 +413,29 @@ type RefWithFaidx struct {
 	Cache   bool
 }
 
+// addBamOffset saturates extreme offsets so clipping cannot wrap to the other end.
+func addBamOffset(position, offset int) int {
+	maxInt := int(^uint(0) >> 1)
+	minInt := -maxInt - 1
+	if offset > 0 && position > maxInt-offset {
+		return maxInt
+	}
+	if offset < 0 && position < minInt-offset {
+		return minInt
+	}
+	return position + offset
+}
+
+// IdxSubSeq clips absolute, zero-based half-open coordinates to the reference.
 func (idx *RefWithFaidx) IdxSubSeq(chrom string, start, end int) (string, error) {
+	record, ok := idx.idx[chrom]
+	if !ok {
+		return "", fmt.Errorf("reference not found: %s", chrom)
+	}
+	start, end = max(0, start), min(record.Length, end)
+	if start >= end {
+		return "", nil
+	}
 	b, err := idx.faidx.SubSeq(chrom, start+1, end)
 	return string(b), err
 }
@@ -381,7 +470,9 @@ func NewRefWitdFaidx(file string, cache bool, quiet bool) *RefWithFaidx {
 	return i
 }
 
+// BamToolAccStats reports mean and length-weighted alignment accuracy.
 func BamToolAccStats(p *BamToolParams) {
+	defer close(p.OutChan)
 	totalLen := 0
 	accSum := 0.0
 	wAccSum := 0.0
@@ -390,6 +481,8 @@ func BamToolAccStats(p *BamToolParams) {
 	tsvFile, err := p.Yaml.Get("Tsv").String()
 	if err == nil && tsvFile != "-" {
 		tsvFh, err = os.Create(tsvFile)
+		checkError(err)
+		defer closeOutput(tsvFh)
 	}
 	for r := range p.InChan {
 		if GetSamMapped(r) {
@@ -408,12 +501,8 @@ func BamToolAccStats(p *BamToolParams) {
 	if nr > 0 {
 		MeanAcc = accSum / nr
 	}
-	tsvFh.WriteString("AccMean\tWeightedAccMean\n")
-	tsvFh.WriteString(fmt.Sprintf("%.3f\t%.3f\n", MeanAcc, WeightedAcc))
-	close(p.OutChan)
-	if tsvFh != os.Stderr {
-		tsvFh.Close()
-	}
+	_, err = fmt.Fprintf(tsvFh, "AccMean\tWeightedAccMean\n%.3f\t%.3f\n", MeanAcc, WeightedAcc)
+	checkError(err)
 }
 
 type AlnDetails struct {
@@ -482,7 +571,10 @@ func samAlnDetails(r *sam.Record, needNM bool) *AlnDetails {
 		}
 	}
 	res.MatchMismatch = mm
-	res.Mismatch = mismatch
+	// NM includes insertions and deletions; Mismatch counts substitutions only.
+	if needNM {
+		res.Mismatch = mismatch - ins - del
+	}
 	res.Insertion = ins
 	res.Deletion = del
 	res.Skip = skip
@@ -499,25 +591,26 @@ func samAlnDetails(r *sam.Record, needNM bool) *AlnDetails {
 	return res
 }
 
+// BamToolDump writes selected record fields and forwards the records unchanged.
 func BamToolDump(p *BamToolParams) {
+	defer close(p.OutChan)
 	keys := dumpFields(p.Yaml)
 	tsvFh := os.Stderr
 	tsvFile, err := p.Yaml.Get("Tsv").String()
 	if err == nil && tsvFile != "-" {
 		tsvFh, err = os.Create(tsvFile)
 		checkError(err)
+		defer closeOutput(tsvFh)
 	}
 
-	tsvFh.WriteString(PrintTsvLine(keys))
+	_, err = tsvFh.WriteString(PrintTsvLine(keys))
+	checkError(err)
 	for r := range p.InChan {
 		if GetSamMapped(r) {
-			tsvFh.WriteString(PrintTsvLine(SamDumper(keys, r)))
+			_, err = tsvFh.WriteString(PrintTsvLine(SamDumper(keys, r)))
+			checkError(err)
 		}
 		p.OutChan <- r
-	}
-	close(p.OutChan)
-	if tsvFh != os.Stderr {
-		tsvFh.Close()
 	}
 }
 
@@ -735,7 +828,7 @@ func GetSamReadLen(r *sam.Record) int {
 	for _, op := range r.Cigar {
 		ql += op.Len() * op.Type().Consumes().Query
 	}
-	return ql
+	return ql + GetSamHardClipped(r)
 }
 
 func GetSamRefAln(r *sam.Record) int {
@@ -863,7 +956,7 @@ func GetSamAcc(r *sam.Record) float64 {
 
 // dumpFields rejects unknown names before any stage starts processing.
 func dumpFields(y *syaml.Yaml) []string {
-	valid := []string{"Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "Match", "Mismatch", "Ins", "Del", "AlnLen", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "IsSup", "ReadSeq", "ReadAlnSeq", "LeftSoftClipSeq", "RightSoftClipSeq", "RightSoftClip", "LeftHardClip", "RightHardClip"}
+	valid := []string{"Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "Match", "Mismatch", "Ins", "Del", "AlnLen", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "IsSup", "ReadSeq", "ReadAlnSeq", "LeftSoftClipSeq", "RightSoftClipSeq", "RightSoftClip", "LeftHardClip", "RightHardClip", "LeftSoftClip"}
 	fields, err := y.Get("Fields").Array()
 	checkError(err)
 	if len(fields) == 1 && fields[0] == "*" {

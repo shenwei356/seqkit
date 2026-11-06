@@ -174,7 +174,14 @@ Attention:
 		}
 
 		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
-		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
+		outputs := []string{outFile}
+		if printPdf != "" {
+			outputs = append(outputs, printPdf)
+		}
+		checkOutputFiles(files, outputs, !config.SkipFileCheck)
+		if infileList := getFlagString(cmd, "infile-list"); infileList != "" {
+			checkOutputFiles([]string{infileList}, outputs, true)
+		}
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

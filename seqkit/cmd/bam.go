@@ -22,11 +22,13 @@ package cmd
 
 import (
 	"bufio"
+	"encoding/binary"
 	"fmt"
 	"io"
 	"math"
 	"os"
 	"path"
+	"path/filepath"
 	"runtime"
 	"sort"
 	"strconv"
@@ -157,9 +159,9 @@ func reportCounts(readCounts ReadCounts, countFile string, field string, rangeMi
 
 	}
 
-	outfh.Flush()
+	checkError(outfh.Flush())
 	if countFile != "-" {
-		outw.Close()
+		checkError(outw.Close())
 	}
 
 	if len(totalCounts) == 0 {
@@ -333,12 +335,25 @@ func bamIdxStats(file string) *bamStatRec {
 	i, err := bam.ReadIndex(fh)
 	checkError(err)
 	res := new(bamStatRec)
-	um, ok := i.Unmapped()
+	var um uint64
+	var ok bool
+	if i == nil {
+		// biogo returns nil after the zero-reference header, before n_no_coor.
+		err = binary.Read(fh, binary.LittleEndian, &um)
+		ok = err == nil
+	} else {
+		um, ok = i.Unmapped()
+	}
+	checkError(fh.Close())
 	if !ok {
 		fmt.Fprintf(os.Stderr, "Unmapped counts are invalid in the index of %s!\n", file)
 		os.Exit(1)
 	}
 	res.Unmapped = int(um)
+	res.File = file
+	if i == nil {
+		return res
+	}
 	for j := 0; j < i.NumRefs(); j++ {
 		st, ok := i.ReferenceStats(j)
 		if !ok {
@@ -346,7 +361,6 @@ func bamIdxStats(file string) *bamStatRec {
 		}
 		res.PrimAln += int(st.Mapped)
 	}
-	res.File = file
 	return res
 }
 
@@ -364,13 +378,25 @@ func bamIdxCount(file string) {
 	checkError(err)
 	i, err := bam.ReadIndex(fh)
 	checkError(err)
+	checkError(fh.Close())
 	bamReader, fhBam := NewBamReader(file, 1)
 	if fhBam != os.Stdin {
 		defer fhBam.Close()
 	}
+	defer bamReader.Close()
 
+	nRefs := 0
+	if i != nil {
+		nRefs = i.NumRefs()
+	}
+	if nRefs != len(bamReader.Header().Refs()) {
+		checkError(fmt.Errorf("BAM index reference count does not match %s", file))
+	}
 	fmt.Fprintf(os.Stderr, "Ref\tCount\tSecCount\tSupCount\n")
-	for j := 0; j < i.NumRefs(); j++ {
+	if i == nil {
+		return
+	}
+	for j := 0; j < nRefs; j++ {
 		st, ok := i.ReferenceStats(j)
 		if !ok {
 			continue
@@ -527,6 +553,9 @@ Attention:
   4. --top-bam requires a single numeric --field in record mode; --top-size 0
      writes a header-only BAM.
   5. Empty histograms are skipped.
+  6. Toolbox stages run in the order written in the YAML configuration.
+     Output paths and required parameters are checked before processing.
+  7. Toolbox Match/Mismatch counts exclude insertions and deletions.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -537,7 +566,6 @@ Attention:
 		runtime.GOMAXPROCS(config.Threads)
 
 		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
-		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 
 		mapQual := getFlagInt(cmd, "map-qual")
 		field := getFlagString(cmd, "field")
@@ -571,10 +599,28 @@ Attention:
 		execBefore := getFlagString(cmd, "exec-before")
 		execAfter := getFlagString(cmd, "exec-after")
 		printTop := getFlagString(cmd, "top-bam")
+		// Unlike -o, this flag writes a named file even when its value is "-".
+		if printTop == "-" {
+			printTop = "." + string(os.PathSeparator) + "-"
+		}
 		topSize := getFlagInt(cmd, "top-size")
 		toolYaml := getFlagString(cmd, "tool")
 		includeIdList := getFlagString(cmd, "grep-ids")
 		excludeIdList := getFlagString(cmd, "exclude-ids")
+		var auxiliaryInputs []string
+		for _, input := range []string{includeIdList, excludeIdList, getFlagString(cmd, "infile-list")} {
+			if input != "" {
+				auxiliaryInputs = append(auxiliaryInputs, input)
+			}
+		}
+		outputs := []string{outFile}
+		for _, output := range []string{printCount, printTop, printPdf} {
+			if output != "" {
+				outputs = append(outputs, output)
+			}
+		}
+		checkOutputFiles(files, outputs, !config.SkipFileCheck)
+		checkOutputFiles(auxiliaryInputs, outputs, true)
 
 		transform := func(x float64) float64 { return x }
 		if printLog {
@@ -674,15 +720,7 @@ Attention:
 		fmap["ReadLen"] = fieldInfo{
 			"Read length",
 			func(r *sam.Record) float64 {
-				if r.Seq.Length > 0 {
-					sl := float64(r.Seq.Length) + float64(GetSamHardClipped(r))
-					return float64(sl)
-				}
-				var ql int
-				for _, op := range r.Cigar {
-					ql += op.Len() * op.Type().Consumes().Query
-				}
-				return float64(ql)
+				return float64(GetSamReadLen(r))
 			},
 		}
 
@@ -916,7 +954,7 @@ Attention:
 			if len(files) != 1 {
 				log.Fatal("The BAM toolbox takes exactly one input file!")
 			}
-			BamToolbox(toolYaml, files[0], outFile, printQuiet, silentMode, config.Threads)
+			runBamToolbox(toolYaml, files[0], outFile, printQuiet, silentMode, config.Threads, auxiliaryInputs, !config.SkipFileCheck)
 			os.Exit(0)
 		}
 
@@ -953,6 +991,7 @@ Attention:
 			os.Exit(1)
 		}
 
+		checkBAMOutputPaths(outputs)
 		outw := os.Stdout
 		if outFile != "-" {
 			tw, err := os.Create(outFile)
@@ -972,6 +1011,7 @@ Attention:
 		if fhBam != os.Stdin {
 			defer fhBam.Close()
 		}
+		defer bamReader.Close()
 		bamHeader := bamReader.Header()
 
 		var bamWriter *bam.Writer
@@ -1255,6 +1295,30 @@ func openBamReader(file string, threads int) (*bam.Reader, *os.File, error) {
 	return reader, fh, err
 }
 
+// checkBAMOutputPaths validates destinations written with os.Create before any
+// output is truncated. Special files such as pipes remain valid destinations.
+func checkBAMOutputPaths(outputs []string) {
+	for _, output := range outputs {
+		if isStdin(output) {
+			continue
+		}
+		target, err := resolvedPath(output)
+		checkError(err)
+		parent, err := os.Stat(filepath.Dir(target))
+		checkError(err)
+		if !parent.IsDir() {
+			checkError(fmt.Errorf("output parent is not a directory: %s", output))
+		}
+		info, err := os.Stat(target)
+		if err != nil && !os.IsNotExist(err) {
+			checkError(err)
+		}
+		if info != nil && info.IsDir() {
+			checkError(fmt.Errorf("output is a directory: %s", output))
+		}
+	}
+}
+
 // dumpTop saves to entries to a BAM files.
 func dumpTop(printTop string, bamHeader *sam.Header, topBuffer TopBuffer) {
 	if printTop == "" {
@@ -1280,21 +1344,20 @@ func dumpTop(printTop string, bamHeader *sam.Header, topBuffer TopBuffer) {
 
 }
 
-// byTopValue is a utility type for sorting top entries.
-type byTopValue TopBuffer
-
-func (a byTopValue) Len() int           { return len(a) }
-func (a byTopValue) Less(i, j int) bool { return a[i].Value < a[j].Value }
-func (a byTopValue) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-
+// updateTop retains the largest finite values in stable ascending order.
 func updateTop(record *sam.Record, value float64, topBuffer TopBuffer, printTop string) TopBuffer {
 	if printTop == "" {
 		return nil
 	}
-	topBuffer = append(topBuffer, topEntry{record, value})
-	sort.Stable(byTopValue(topBuffer))
-	return topBuffer[1:]
-
+	if len(topBuffer) == 0 || value < topBuffer[0].Value {
+		return topBuffer
+	}
+	// Insert after equal values so ties retain the same stable order as sorting
+	// after append. Reuse the discarded minimum's slot and the existing buffer.
+	i := sort.Search(len(topBuffer), func(i int) bool { return topBuffer[i].Value > value })
+	copy(topBuffer[:i-1], topBuffer[1:i])
+	topBuffer[i-1] = topEntry{Record: record, Value: value}
+	return topBuffer
 }
 
 type Locus struct {
@@ -1311,6 +1374,7 @@ func Bam2Bundles(inBam string, outDir string, minBundle int, nrProcBam int, quie
 	if fhBam != os.Stdin {
 		defer fhBam.Close()
 	}
+	defer bamReader.Close()
 	if _, err := os.Stat(outDir); err == nil {
 		log.Fatal("Cannot create output directory as it already exists:", outDir)
 	}
@@ -1360,11 +1424,11 @@ func Bam2Bundles(inBam string, outDir string, minBundle int, nrProcBam int, quie
 				checkError(err)
 
 				for _, r := range recCache {
-					bamWriter.Write(r)
+					checkError(bamWriter.Write(r))
 				}
 
 				checkError(bamWriter.Close())
-				outFh.Close()
+				checkError(outFh.Close())
 				if !quiet && !silent {
 					os.Stderr.WriteString(fmt.Sprintf("%d\t%s\t%d\t%d\t%d\t%d\n", bundleCount, chrom, bStart, bEnd, len(recCache), bundleLoci))
 				}
@@ -1404,14 +1468,14 @@ func Bam2Bundles(inBam string, outDir string, minBundle int, nrProcBam int, quie
 		checkError(err)
 
 		for _, r := range recCache {
-			bamWriter.Write(r)
+			checkError(bamWriter.Write(r))
 		}
 		if !quiet && !silent {
 			os.Stderr.WriteString(fmt.Sprintf("%d\t%s\t%d\t%d\t%d\t%d\n", bundleCount, chrom, bStart, bEnd, len(recCache), bundleLoci))
 		}
 
 		checkError(bamWriter.Close())
-		outFh.Close()
+		checkError(outFh.Close())
 		recCache = nil
 	}
 

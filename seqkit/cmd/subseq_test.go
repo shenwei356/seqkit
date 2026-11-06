@@ -103,3 +103,31 @@ func TestSubseqIndexAuxiliaryAliases(t *testing.T) {
 		}
 	}
 }
+
+// TestSubseqIndexOutputAliases rejects two generated indexes sharing a destination.
+func TestSubseqIndexOutputAliases(t *testing.T) {
+	dir := t.TempDir()
+	first := auditInput(t, dir, "first.fa", ">r1\nACGT\n")
+	second := auditInput(t, dir, "second.fa", ">r2\nTGCATGCA\n")
+	firstIndex, secondIndex := first+".seqkit.fai", second+".seqkit.fai"
+	if err := os.Symlink(secondIndex, firstIndex); err != nil {
+		t.Skipf("symlinks unavailable: %v", err)
+	}
+	output := auditInput(t, dir, "output.fa", "keep\n")
+	_, stderr, err := runCLI(t, "", "subseq", "-U", "-r", "1:2", first, second, "-o", output)
+	after, _ := os.ReadFile(output)
+	_, indexErr := os.Stat(secondIndex)
+	if err == nil || !strings.Contains(stderr, "cannot be the same") || string(after) != "keep\n" || !os.IsNotExist(indexErr) {
+		t.Fatalf("index collision accepted: %v %s index=%v", err, stderr, indexErr)
+	}
+}
+
+// TestSubseqRepeatedIndexedInput keeps repeated inputs valid when they reuse an index.
+func TestSubseqRepeatedIndexedInput(t *testing.T) {
+	dir := t.TempDir()
+	input := auditInput(t, dir, "input.fa", ">r1\nACGT\n")
+	out, stderr, err := runCLI(t, "", "subseq", "-U", "-r", "1:2", input, dir+"/./input.fa")
+	if err != nil || strings.Count(out, "AC\n") != 2 {
+		t.Fatalf("repeated indexed input rejected: %v %s", err, stderr)
+	}
+}

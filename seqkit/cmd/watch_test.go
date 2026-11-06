@@ -59,3 +59,36 @@ func TestWatchQualityAndFieldErrors(t *testing.T) {
 		t.Fatalf("invalid field: %v %s", err, stderr)
 	}
 }
+
+// TestWatchImageAliases checks input, input-list, and main-output conflicts before writing.
+func TestWatchImageAliases(t *testing.T) {
+	for _, target := range []string{"input", "list", "output"} {
+		for _, alias := range []string{"same", "symlink", "hardlink"} {
+			t.Run(target+"/"+alias, func(t *testing.T) {
+				dir := t.TempDir()
+				input := auditInput(t, dir, "input.png", ">r1\nACGT\n")
+				list := auditInput(t, dir, "list.png", input+"\n")
+				output := auditInput(t, dir, "output.png", "keep\n")
+				protected := map[string]string{"input": input, "list": list, "output": output}[target]
+				before, _ := os.ReadFile(protected)
+				image := protected
+				if alias != "same" {
+					image = filepath.Join(dir, "alias.png")
+					link := os.Link
+					if alias == "symlink" {
+						link = os.Symlink
+					}
+					if err := link(protected, image); err != nil {
+						t.Skipf("links unavailable: %v", err)
+					}
+				}
+				_, stderr, err := runCLI(t, "", "watch", "-X", list, "-O", image, "-o", output, "-Q")
+				after, _ := os.ReadFile(protected)
+				kept, _ := os.ReadFile(output)
+				if err == nil || !strings.Contains(stderr, "cannot be the same") || string(after) != string(before) || string(kept) != "keep\n" {
+					t.Fatalf("image conflict modified files: %v %s", err, stderr)
+				}
+			})
+		}
+	}
+}

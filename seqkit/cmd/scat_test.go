@@ -119,6 +119,10 @@ func testScatLiveAppend(t *testing.T, compressed bool) {
 		f.Close()
 	}
 	waitFor("@a\nAC\n+\nII\n")
+	// A new alias of redirected stdout must never become a watched input.
+	if err := os.Link(stdout.Name(), filepath.Join(root, "output.fq")); err != nil {
+		t.Fatal(err)
+	}
 	appendText(file, "@b\nGG\n+\n")
 	appendText(file, "JJ\n")
 	waitFor("@b\nGG\n+\nJJ\n")
@@ -151,5 +155,54 @@ func TestScatWaitPid(t *testing.T) {
 	out, stderr, err := runCLI(t, "", "scat", "-i", "fasta", "-p", "2147483647", dir)
 	if err != nil || out != ">a\nAC\n" {
 		t.Fatalf("PID finalization failed: %q %v %s", out, err, stderr)
+	}
+}
+
+// TestScatOutputAliases protects matching files before opening the output.
+func TestScatOutputAliases(t *testing.T) {
+	for _, alias := range []string{"same", "symlink", "hardlink"} {
+		t.Run(alias, func(t *testing.T) {
+			dir := t.TempDir()
+			root := filepath.Join(dir, "root")
+			const data = "@r1\nAC\n+\nII\n"
+			input := auditInput(t, root, "input.fq", data)
+			output := input
+			if alias != "same" {
+				output = filepath.Join(dir, "alias")
+				link := os.Link
+				if alias == "symlink" {
+					link = os.Symlink
+				}
+				if err := link(input, output); err != nil {
+					t.Skipf("links unavailable: %v", err)
+				}
+			}
+			_, stderr, err := runCLI(t, "", "scat", "--find-only", root, "-o", output)
+			after, _ := os.ReadFile(input)
+			if err == nil || !strings.Contains(stderr, "cannot be the same") || string(after) != data {
+				t.Fatalf("input overwritten: %v %s", err, stderr)
+			}
+		})
+	}
+}
+
+// TestScatExcludesNewOutput prevents reading the growing output as another input.
+func TestScatExcludesNewOutput(t *testing.T) {
+	for _, live := range []bool{false, true} {
+		t.Run(fmt.Sprint(live), func(t *testing.T) {
+			root := t.TempDir()
+			const data = "@r1\nAC\n+\nII\n"
+			auditInput(t, root, "input.fq", data)
+			output := filepath.Join(root, "output.fq")
+			args := []string{"scat", root, "-o", output, "--time-limit", "150ms", "-D", "0ms", "-d", "0"}
+			if !live {
+				args = append(args, "--find-only")
+			}
+			_, stderr, err := runCLI(t, "", args...)
+			after, _ := os.ReadFile(output)
+			if err != nil || string(after) != data || strings.Contains(stderr, "file: "+output) {
+				t.Fatalf("output was read as input: %v %s bytes=%d", err, stderr, len(after))
+			}
+		})
 	}
 }

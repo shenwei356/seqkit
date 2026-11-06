@@ -23,14 +23,12 @@ package cmd
 import (
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"runtime"
 
 	"github.com/cespare/xxhash/v2"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
-	"github.com/shenwei356/util/pathutil"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -46,6 +44,7 @@ var renameCmd = &cobra.Command{
 Attention:
   1. This command only appends "_N" to duplicated sequence IDs to make them unique.
   2. Use "seqkit replace" for editing sequence IDs/headers using regular expression.
+  3. With -m, unrelated files in the output directory are preserved, even with --force.
 
 Example:
 
@@ -104,28 +103,10 @@ Example:
 				outputs[i] = filepath.Join(outdir, filepath.Base(file))
 			}
 			checkOutputFiles(files, outputs, !config.SkipFileCheck)
-			if force {
-				checkOutputDir(files, outdir)
+			if infileList := getFlagString(cmd, "infile-list"); infileList != "" {
+				checkOutputFiles([]string{infileList}, outputs, true)
 			}
-
-			if !isWorkingDir(outdir) {
-				existed, err := pathutil.DirExists(outdir)
-				checkError(err)
-				if existed {
-					empty, err := pathutil.IsEmpty(outdir)
-					checkError(err)
-					if !empty {
-						if force {
-							checkError(os.RemoveAll(outdir))
-							checkError(os.MkdirAll(outdir, 0755))
-						} else {
-							log.Warningf("outdir not empty: %s, you can use --force to overwrite", outdir)
-						}
-					}
-				} else {
-					checkError(os.MkdirAll(outdir, 0755))
-				}
-			}
+			prepareOutputDir(outdir, force)
 		}
 
 		var record *fastx.Record
@@ -224,5 +205,5 @@ func init() {
 	renameCmd.Flags().BoolP("by-name", "n", false, "check duplication by full name instead of just id")
 	renameCmd.Flags().BoolP("multiple-outfiles", "m", false, "write results into separated files for multiple input files")
 	renameCmd.Flags().StringP("out-dir", "O", "renamed", "output directory")
-	renameCmd.Flags().BoolP("force", "f", false, "overwrite output directory")
+	renameCmd.Flags().BoolP("force", "f", false, "overwrite matching output files without the nonempty-directory warning")
 }

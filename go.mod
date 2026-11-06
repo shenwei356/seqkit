@@ -39,6 +39,7 @@ require (
 	github.com/twotwotwo/sorts v0.0.0-20160814051341-bf5c1f2b8553
 	github.com/ulikunitz/xz v0.5.17
 	github.com/vbauerster/mpb/v5 v5.4.0
+	gopkg.in/yaml.v2 v2.4.0
 )
 
 replace github.com/miekg/dns v1.0.14 => github.com/miekg/dns v1.1.46
@@ -65,5 +66,4 @@ require (
 	golang.org/x/term v0.45.0 // indirect
 	golang.org/x/text v0.41.0 // indirect
 	gonum.org/v1/plot v0.17.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

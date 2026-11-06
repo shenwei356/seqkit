@@ -39,6 +39,9 @@ var tab2faCmd = &cobra.Command{
 	Short: "convert tabular format to FASTA/Q format",
 	Long: `convert tabular format (first two/three columns) to FASTA/Q format
 
+Columns after the third are ignored. For FASTQ output, sequence and quality
+lengths must match.
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
@@ -100,7 +103,10 @@ var tab2faCmd = &cobra.Command{
 					checkError(fmt.Errorf("at least two columns needed: %s", line))
 				}
 
-				if len(items) == 3 && (len(items[2]) > 0 || isFastq) { // fastq
+				if len(items) >= 3 && (len(items[2]) > 0 || isFastq) { // fastq
+					if len(items[1]) != len(items[2]) {
+						checkError(fmt.Errorf("sequence and quality lengths differ in %s", file))
+					}
 					isFastq = true
 					outfh.WriteString(fmt.Sprintf("@%s\n", items[0]))
 					outfh.WriteString(items[1]) // seq

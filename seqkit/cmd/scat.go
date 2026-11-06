@@ -69,6 +69,8 @@ Attention:
      for more data.
   4. In --find-only mode, file errors do not stop other files, but the final exit
      status is nonzero.
+  5. An existing output cannot also be a matching input. New outputs in watched
+     directories, including aliases of the output, are excluded from discovery.
 
 `,
 
@@ -154,25 +156,63 @@ Attention:
 			}
 		}
 		dirs = roots
+		if len(dirs) == 0 {
+			checkError(fmt.Errorf("no directories given to watch"))
+		}
+		checkError(checkScatOutput(dirs, reFilter, outFile))
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer closeOutput(outfh)
+		// Retain the open output's identity across later renames and hard links.
+		var outputInfo os.FileInfo
+		if isStdin(outFile) {
+			outputInfo, err = os.Stdout.Stat()
+		} else {
+			outputInfo, err = os.Stat(outFile)
+		}
+		checkError(err)
 		ctrlChan := make(WatchCtrlChan)
-		ndirs := []string{}
-		for _, d := range dirs {
-			if d != "-" {
-				ndirs = append(ndirs, d)
-			}
-		}
-		if len(ndirs) == 0 {
-			log.Info("No directories given to watch! Exiting.")
-			os.Exit(1)
-		}
-		err = LaunchFxWatchers(dirs, ctrlChan, reFilter, inFmt, outFmt, qBase, allowGaps, delta, timeLimit, dropString, waitPid, findOnly, outfh)
+		err = LaunchFxWatchers(dirs, ctrlChan, reFilter, inFmt, outFmt, qBase, allowGaps, delta, timeLimit, dropString, waitPid, findOnly, outfh, outputInfo)
 		closeOutput(outfh)
 		checkError(err)
 
 	},
+}
+
+// checkScatOutput protects existing matching inputs before the writer truncates them.
+// New outputs cannot alias existing input files and need no extra directory scan.
+func checkScatOutput(dirs []string, filter *regexp.Regexp, output string) error {
+	if isStdin(output) {
+		return nil
+	}
+	outputInfo, err := os.Stat(output)
+	if os.IsNotExist(err) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	for _, dir := range dirs {
+		root, err := filepath.EvalSymlinks(dir)
+		if err != nil {
+			return err
+		}
+		err = filepath.WalkDir(root, func(path string, entry fs.DirEntry, walkErr error) error {
+			// Discovery reports unreadable entries later and retains valid results.
+			if walkErr != nil || entry.IsDir() || !reFilterName(path, filter) {
+				return nil
+			}
+			info, err := os.Stat(path)
+			if err == nil && os.SameFile(info, outputInfo) {
+				return fmt.Errorf("input and output files cannot be the same: %s and %s", path, output)
+			}
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // trackedFx retains parser state and physical identity across path changes.
@@ -190,7 +230,8 @@ type trackedFx struct {
 }
 
 // LaunchFxWatchers coordinates all roots, so aliases never launch duplicate parsers.
-func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, timeout, dropString string, waitPid int, findOnly bool, outw *xopen.Writer) error {
+// excludedOutputs prevents discovery from feeding output files back into the stream.
+func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, timeout, dropString string, waitPid int, findOnly bool, outw *xopen.Writer, excludedOutputs ...os.FileInfo) error {
 	drop, err := time.ParseDuration(dropString)
 	if err != nil {
 		return err
@@ -231,6 +272,11 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 	}
 
 	add := func(path string, info fs.FileInfo) {
+		for _, output := range excludedOutputs {
+			if output != nil && os.SameFile(info, output) {
+				return
+			}
+		}
 		key, err := fileIdentity(path, info)
 		if err != nil {
 			fileError(path, err)

@@ -1,10 +1,13 @@
 package cmd
 
 import (
+	"encoding/binary"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 
@@ -89,6 +92,112 @@ func readBAMFixture(t *testing.T, path string) (*sam.Header, []*sam.Record) {
 	return r.Header(), records
 }
 
+// bamIndexFixture writes index metadata for the records in a small test BAM.
+func bamIndexFixture(t *testing.T, file string) {
+	t.Helper()
+	r, f, err := openBamReader(file, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	defer r.Close()
+	index := new(bam.Index)
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := index.Add(record, r.LastChunk()); err != nil {
+			t.Fatal(err)
+		}
+	}
+	out, err := os.Create(file + ".bai")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := bam.WriteIndex(out, index); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := index.Unmapped(); !ok {
+		if err := binary.Write(out, binary.LittleEndian, uint64(0)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := out.Close(); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// TestBamEmptyIndex handles a valid BAI with no reference sequences.
+func TestBamEmptyIndex(t *testing.T) {
+	dir := t.TempDir()
+	file := filepath.Join(dir, "empty.bam")
+	f, err := os.Create(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	header, err := sam.NewHeader(nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	w, err := bam.NewWriter(f, header, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := w.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err := f.Close(); err != nil {
+		t.Fatal(err)
+	}
+	bamIndexFixture(t, file)
+	for _, mode := range []string{"--idx-stat", "--idx-count"} {
+		_, stderr, err := runCLI(t, "", "bam", mode, file)
+		if err != nil || strings.Contains(stderr, "panic:") {
+			t.Fatalf("empty BAI %s: %v %s", mode, err, stderr)
+		}
+	}
+}
+
+// TestBamIndexReferenceMismatch rejects a BAI belonging to another BAM.
+func TestBamIndexReferenceMismatch(t *testing.T) {
+	dir := t.TempDir()
+	file := bamFixture(t, dir, "in.bam", true)
+	ref1, err := sam.NewReference("chr1", "", "", 100, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ref2, err := sam.NewReference("chr2", "", "", 100, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := sam.NewHeader(nil, []*sam.Reference{ref1, ref2}); err != nil {
+		t.Fatal(err)
+	}
+	index := new(bam.Index)
+	record := &sam.Record{Ref: ref2, Cigar: sam.Cigar{sam.NewCigarOp(sam.CigarMatch, 4)}}
+	if err := index.Add(record, bgzf.Chunk{}); err != nil {
+		t.Fatal(err)
+	}
+	f, err := os.Create(file + ".bai")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := bam.WriteIndex(f, index); err != nil {
+		t.Fatal(err)
+	}
+	if err := f.Close(); err != nil {
+		t.Fatal(err)
+	}
+	_, stderr, err := runCLI(t, "", "bam", "--idx-count", file)
+	if err == nil || !strings.Contains(stderr, "reference") || strings.Contains(stderr, "panic:") {
+		t.Fatalf("mismatched index: %v %s", err, stderr)
+	}
+}
+
 // TestBamFieldsAndPassthrough checks lazy NM access and complete BAM output.
 func TestBamFieldsAndPassthrough(t *testing.T) {
 	dir := t.TempDir()
@@ -159,5 +268,127 @@ func TestBamInputErrors(t *testing.T) {
 	_, stderr, err := runCLI(t, "", "bam", bad, "-T", "Dump: {Fields: [Read]}")
 	if err == nil || !strings.Contains(stderr, "bad.bam") || strings.Contains(stderr, "panic:") {
 		t.Fatalf("toolbox input error: %v %s", err, stderr)
+	}
+}
+
+// TestBamAuxiliaryOutputAliases rejects aliases before overwriting BAM input.
+func TestBamAuxiliaryOutputAliases(t *testing.T) {
+	for _, flag := range []string{"--count", "--top-bam", "--img"} {
+		for _, alias := range []string{"same", "symlink", "hardlink"} {
+			t.Run(flag+"/"+alias, func(t *testing.T) {
+				dir := t.TempDir()
+				in := bamFixture(t, dir, "in.png", true)
+				before, err := os.ReadFile(in)
+				if err != nil {
+					t.Fatal(err)
+				}
+				out := in
+				if alias != "same" {
+					out = filepath.Join(dir, "alias.png")
+					if alias == "symlink" {
+						err = os.Symlink(in, out)
+					} else {
+						err = os.Link(in, out)
+					}
+					if err != nil {
+						t.Fatal(err)
+					}
+				}
+				args := []string{"bam", in, "-f", "MapQual", "-Q", "--delay", "0", flag, out}
+				if flag == "--top-bam" {
+					args = append(args, "--top-size", "1")
+				}
+				_, stderr, err := runCLI(t, "", args...)
+				after, readErr := os.ReadFile(in)
+				if err == nil || readErr != nil || string(before) != string(after) || !strings.Contains(stderr, "cannot be the same") {
+					t.Fatalf("auxiliary output alias accepted: err=%v preserved=%v stderr=%s", err, string(before) == string(after), stderr)
+				}
+			})
+		}
+	}
+}
+
+// TestBamTopDashAlias treats the top-BAM destination as a literal filename.
+func TestBamTopDashAlias(t *testing.T) {
+	dir := t.TempDir()
+	in := bamFixture(t, dir, "-", true)
+	before, err := os.ReadFile(in)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, stderr, err := auditCLI(t, dir, "", "bam", in, "-f", "MapQual", "-Q", "--top-bam", "-", "--top-size", "1")
+	after, readErr := os.ReadFile(in)
+	if err == nil || readErr != nil || string(before) != string(after) || !strings.Contains(stderr, "cannot be the same") {
+		t.Fatalf("literal dash output alias: err=%v preserved=%v stderr=%s", err, string(before) == string(after), stderr)
+	}
+}
+
+// TestBamOutputFailures checks errors deferred until buffered output finalization.
+func TestBamOutputFailures(t *testing.T) {
+	if _, err := os.Stat("/dev/full"); err != nil {
+		t.Skip("/dev/full is unavailable")
+	}
+	dir := t.TempDir()
+	in := bamFixture(t, dir, "in.bam", true)
+	ref := auditInput(t, dir, "ref.fa", ">chr1\n"+strings.Repeat("ACGT", 25)+"\n")
+	for _, args := range [][]string{
+		{"--count", "/dev/full", "-Q", "--delay", "0"},
+		{"-T", "Dump: {Fields: [Read]}", "-o", "/dev/full"},
+		{"-T", "Dump: {Fields: [Read], Tsv: /dev/full}\nSink: true"},
+		{"-T", "AccStats: {Tsv: /dev/full}\nSink: true"},
+		{"-T", fmt.Sprintf("AlnContext: {Ref: %q, LeftShift: 0, RightShift: 1, RegexStart: A, Tsv: /dev/full}\nSink: true", ref)},
+	} {
+		t.Run(strings.Join(args, " "), func(t *testing.T) {
+			_, stderr, err := runCLI(t, "", append([]string{"bam", in}, args...)...)
+			if err == nil || !strings.Contains(stderr, "no space left") || strings.Contains(stderr, "panic:") {
+				t.Fatalf("write failure was not reported: %v %s", err, stderr)
+			}
+		})
+	}
+}
+
+// TestBamTopOrder preserves stable ordering and evicts the oldest tied record.
+func TestBamTopOrder(t *testing.T) {
+	for _, size := range []int{0, 1, 5, 100} {
+		got := make(TopBuffer, size)
+		want := make(TopBuffer, size)
+		for i := range got {
+			got[i].Value, want[i].Value = math.Inf(-1), math.Inf(-1)
+		}
+		for i := 0; i < 500; i++ {
+			r := &sam.Record{Name: fmt.Sprint(i)}
+			value := float64((i*19)%61 - 30)
+			got = updateTop(r, value, got, "top.bam")
+			want = append(want, topEntry{Record: r, Value: value})
+			sort.SliceStable(want, func(i, j int) bool { return want[i].Value < want[j].Value })
+			want = want[1:]
+			if len(got) != len(want) {
+				t.Fatalf("top size %d: got %d entries", size, len(got))
+			}
+			for j := range want {
+				if got[j] != want[j] {
+					t.Fatalf("top size %d, input %d, entry %d: got %+v, want %+v", size, i, j, got[j], want[j])
+				}
+			}
+		}
+	}
+}
+
+// BenchmarkBamTop includes initialization and updates over tied mapping qualities.
+func BenchmarkBamTop(b *testing.B) {
+	for _, size := range []int{100, 1000} {
+		b.Run(fmt.Sprint(size), func(b *testing.B) {
+			r := &sam.Record{Name: "r"}
+			b.ReportAllocs()
+			for n := 0; n < b.N; n++ {
+				top := make(TopBuffer, size)
+				for i := range top {
+					top[i].Value = math.Inf(-1)
+				}
+				for i := 0; i < 10000; i++ {
+					top = updateTop(r, float64((i*19)%61), top, "top.bam")
+				}
+			}
+		})
 	}
 }

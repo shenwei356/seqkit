@@ -98,40 +98,31 @@ func (d *SeqDetector) Detect(r *Reference, rec bool) []*AlignedSeq {
 // actualRange applies a range to a sequence with a given length.
 func actualRange(rr Range, l int) Range {
 	s, e := rr.Start, rr.End
-	if s == e {
-		return rr
-	}
 	if math.IsNaN(rr.Start) {
 		s = 0
 	} else if rr.Start < 0 {
 		s = float64(l) + rr.Start
-	}
-	if s < 0 {
-		s = 0
 	}
 	if math.IsNaN(rr.End) {
 		e = float64(l)
 	} else if rr.End < 0 {
 		e = float64(l) + rr.End
 	}
-	if e > float64(l) {
-		e = float64(l)
-	}
-	if s > e {
-		s, e = 0, float64(l)
-	}
-
+	// Intersect with the record; disjoint ranges must not search the whole record.
+	s = max(0, min(s, float64(l)))
+	e = max(s, min(e, float64(l)))
 	return Range{s, e}
 }
 
 // detectOnce aligns queries to the reference sequence at specified ranges.
 func (d *SeqDetector) detectOnce(r *Reference, rr Range) []*AlignedSeq {
 	var hits []*AlignedSeq
+	rr = actualRange(rr, len(r.Seq))
 	if rr.Len() == 0 {
 		return hits
 	}
 	for _, q := range d.Queries {
-		nr := &Reference{r.Name, r.Seq, Ranges{actualRange(rr, len(r.Seq))}}
+		nr := &Reference{r.Name, r.Seq, Ranges{rr}}
 		h := PairwiseAlignSW(nr, q, d.AlnParams)
 		h.Detector = d
 		if (h.Score / q.NullScore) > d.Cutoff {
@@ -145,11 +136,12 @@ func (d *SeqDetector) detectOnce(r *Reference, rr Range) []*AlignedSeq {
 // to return all matches above the threshold.
 func (d *SeqDetector) detectRec(r *Reference, rr Range) []*AlignedSeq {
 	var hits []*AlignedSeq
+	rr = actualRange(rr, len(r.Seq))
 	if rr.Len() == 0 {
 		return hits
 	}
 	for _, q := range d.Queries {
-		nr := &Reference{r.Name, r.Seq, Ranges{actualRange(rr, len(r.Seq))}}
+		nr := &Reference{r.Name, r.Seq, Ranges{rr}}
 		h := PairwiseAlignSW(nr, q, d.AlnParams)
 		h.Detector = d
 		if (h.Score / q.NullScore) > d.Cutoff {
@@ -213,7 +205,7 @@ func (d *SeqDetector) LoadQueries(fx string) {
 		}
 
 		seq := string(record.Seq.Seq)
-		name := strings.Split(string(record.Name), " ")[0]
+		name := string(record.ID)
 		ns := d.nullScore(seq)
 		d.Queries = append(d.Queries, &Query{name, seq, "+", ns})
 		if !d.Stranded {
@@ -258,25 +250,36 @@ func NewAnonLinearSeq(s string) *linear.Seq {
 // PairwiseAlignSW performs pairwise local alignment of two sequences using the biogo implementation of the Smith-Waterman algorithm.
 func PairwiseAlignSW(r *Reference, q *Query, alnParams *AlnParams) *AlignedSeq {
 	ref := NewAnonLinearSeq(r.Seq[int(r.Ranges[0].Start):int(r.Ranges[0].End)])
-	ref.Alpha = alphabet.DNAgapped
+	ref.Alpha = alphabet.DNAredundant
 	query := NewAnonLinearSeq(q.Seq)
-	query.Alpha = alphabet.DNAgapped
+	query.Alpha = alphabet.DNAredundant
 
 	m := alnParams.Match
 	s := alnParams.Mismatch
 	o := alnParams.GapOpen
 	e := alnParams.GapExtend
 
-	smith := align.SWAffine{
-		Matrix: align.Linear{
-			{0, e, e, e, e},
-			{e, m, s, s, s},
-			{e, s, m, s, s},
-			{e, s, s, m, s},
-			{e, s, s, s, m},
-		},
-		GapOpen: o,
+	// Only identical A/C/G/T bases receive a match score. IUPAC ambiguity codes
+	// remain in alignment text but score as mismatches, symmetrically on both strands.
+	n := ref.Alpha.Len()
+	matrix := make(align.Linear, n)
+	scores := make([]int, n*n)
+	for i := range matrix {
+		matrix[i] = scores[i*n : (i+1)*n]
+		for j := range matrix[i] {
+			if i == 0 || j == 0 {
+				matrix[i][j] = e
+			} else {
+				matrix[i][j] = s
+			}
+		}
 	}
+	matrix[0][0] = 0
+	for _, base := range []byte("ACGT") {
+		i := ref.Alpha.IndexOf(alphabet.Letter(base))
+		matrix[i][i] = m
+	}
+	smith := align.SWAffine{Matrix: matrix, GapOpen: o}
 
 	aln, err := smith.Align(ref, query)
 	var res *AlignedSeq
@@ -286,7 +289,7 @@ func PairwiseAlignSW(r *Reference, q *Query, alnParams *AlnParams) *AlignedSeq {
 		res.RefAln = fmt.Sprintf("%s", fa[0])
 		res.QueryAln = fmt.Sprintf("%s", fa[1])
 	} else {
-		panic(fmt.Sprintf("Could not align sequences: %s", err))
+		checkError(fmt.Errorf("could not align sequences: %w", err))
 	}
 	return res
 }

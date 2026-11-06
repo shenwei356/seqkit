@@ -368,7 +368,7 @@ func SumInts(s []int) (r int) {
 	return
 }
 
-// RevCompDNA reverse complements a DNA sequence string.
+// RevCompDNA returns an uppercase reverse complement, preserving IUPAC DNA codes.
 func RevCompDNA(s string) string {
 	size := len(s)
 	s = strings.ToUpper(s)
@@ -380,24 +380,30 @@ func RevCompDNA(s string) string {
 		switch inBase {
 		case 'A':
 			outBase = 'T'
-		case 'a':
-			outBase = 't'
 		case 'T':
 			outBase = 'A'
-		case 't':
-			outBase = 'a'
 		case 'G':
 			outBase = 'C'
-		case 'g':
-			outBase = 'c'
 		case 'C':
 			outBase = 'G'
-		case 'c':
-			outBase = 'g'
-		case 'n':
-			outBase = 'n'
-		case 'N':
-			outBase = 'N'
+		case 'R':
+			outBase = 'Y'
+		case 'Y':
+			outBase = 'R'
+		case 'K':
+			outBase = 'M'
+		case 'M':
+			outBase = 'K'
+		case 'B':
+			outBase = 'V'
+		case 'V':
+			outBase = 'B'
+		case 'D':
+			outBase = 'H'
+		case 'H':
+			outBase = 'D'
+		case 'S', 'W', '-':
+			outBase = inBase
 		default:
 			outBase = 'N'
 		}

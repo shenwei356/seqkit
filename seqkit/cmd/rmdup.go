@@ -90,6 +90,9 @@ Attention:
 			outputs = append(outputs, numFile)
 		}
 		checkOutputFiles(files, outputs, !config.SkipFileCheck)
+		if infileList := getFlagString(cmd, "infile-list"); infileList != "" {
+			checkOutputFiles([]string{infileList}, outputs, true)
+		}
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer closeOutput(outfh)

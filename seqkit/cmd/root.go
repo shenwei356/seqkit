@@ -59,6 +59,10 @@ Stdin (-) may only appear once in the input file list, including files supplied
 via --infile-list. When --infile-list - reads the list from stdin, input data
 must come from files.
 
+Output files, including auxiliary outputs and generated indexes, cannot overwrite
+inputs or conflict with other outputs. These checks recognize symbolic and hard
+links. Commands that update indexes still replace their own existing indexes.
+
 With --skip-file-check, sequence input files are checked only for matching
 normalized paths with outputs; existence and symlink/hard-link checks are skipped.
 Auxiliary inputs (e.g., pattern, BED, and input-list files), output conflicts,

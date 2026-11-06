@@ -237,8 +237,8 @@ func TestOutputProtectsRedirectedStdin(t *testing.T) {
 	}
 }
 
-// TestSkippedFileChecksProtectInputs keeps identical path checks across commands.
-func TestSkippedFileChecksProtectInputs(t *testing.T) {
+// TestCommandOutputAliases checks common output protection across file-producing commands.
+func TestCommandOutputAliases(t *testing.T) {
 	commands := [][]string{
 		{"seq"}, {"fx2tab"}, {"fq2fa"}, {"tab2fx"}, {"convert"},
 		{"head"}, {"head-genome"}, {"range", "-r", "1:1"},
@@ -253,23 +253,39 @@ func TestSkippedFileChecksProtectInputs(t *testing.T) {
 		{"common", "EXTRA"}, {"concat", "EXTRA"}, {"fa2fq", "-f", "EXTRA"},
 	}
 	for _, args := range commands {
-		t.Run(args[0], func(t *testing.T) {
-			dir := t.TempDir()
-			const data = ">r1\nACGTACGT\n"
-			input := auditInput(t, dir, "input.fa", data)
-			extra := auditInput(t, dir, "extra.fa", data)
-			command := append([]string(nil), args...)
-			for i := range command {
-				if command[i] == "EXTRA" {
-					command[i] = extra
+		for _, alias := range []string{"same", "symlink", "hardlink", "skip-check"} {
+			t.Run(args[0]+"/"+alias, func(t *testing.T) {
+				dir := t.TempDir()
+				const data = ">r1\nACGTACGT\n"
+				input := auditInput(t, dir, "input.fa", data)
+				extra := auditInput(t, dir, "extra.fa", data)
+				command := append([]string(nil), args...)
+				for i := range command {
+					if command[i] == "EXTRA" {
+						command[i] = extra
+					}
 				}
-			}
-			_, stderr, err := runCLI(t, "", append(command, "--skip-file-check", input, "-o", input)...)
-			got, readErr := os.ReadFile(input)
-			if err == nil || !strings.Contains(stderr, "cannot be the same") || readErr != nil || string(got) != data {
-				t.Fatalf("input not protected: err=%v stderr=%s read=%v changed=%v", err, stderr, readErr, string(got) != data)
-			}
-		})
+				output := input
+				if alias == "symlink" || alias == "hardlink" {
+					output = filepath.Join(dir, "output")
+					link := os.Link
+					if alias == "symlink" {
+						link = os.Symlink
+					}
+					if err := link(input, output); err != nil {
+						t.Skipf("links unavailable: %v", err)
+					}
+				}
+				if alias == "skip-check" {
+					command = append(command, "--skip-file-check")
+				}
+				_, stderr, err := runCLI(t, "", append(command, input, "-o", output)...)
+				got, readErr := os.ReadFile(input)
+				if err == nil || !strings.Contains(stderr, "cannot be the same") || readErr != nil || string(got) != data {
+					t.Fatalf("input not protected: err=%v stderr=%s read=%v changed=%v", err, stderr, readErr, string(got) != data)
+				}
+			})
+		}
 	}
 }
 
@@ -428,5 +444,26 @@ func TestSkippedFileChecksProtectAuxiliaryOutputs(t *testing.T) {
 		if err == nil || !strings.Contains(stderr, "cannot be the same") || string(got) != data {
 			t.Fatalf("%s: input not protected: %v %s", flag, err, stderr)
 		}
+	}
+}
+
+// TestTwoPassIndexProtectsSource rejects an index that is also the symlinked input.
+func TestTwoPassIndexProtectsSource(t *testing.T) {
+	for _, command := range [][]string{{"sort", "-2"}, {"shuffle", "-2"}, {"split", "-2", "-s", "1"}, {"split", "-2", "-p", "1"}, {"split", "-2", "-i"}, {"split", "-2", "-r", "1:2"}} {
+		t.Run(strings.Join(command, "_"), func(t *testing.T) {
+			dir := t.TempDir()
+			const data = ">r1\nACGT\n"
+			input := filepath.Join(dir, "input.fa")
+			index := auditInput(t, dir, "input.fa.seqkit.fai", data)
+			if err := os.Symlink(index, input); err != nil {
+				t.Skipf("symlinks unavailable: %v", err)
+			}
+			args := append(append([]string(nil), command...), input, "-U")
+			_, stderr, err := runCLI(t, "", args...)
+			after, _ := os.ReadFile(input)
+			if err == nil || !strings.Contains(stderr, "cannot be the same") || string(after) != data {
+				t.Fatalf("source replaced by index: %v %s", err, stderr)
+			}
+		})
 	}
 }

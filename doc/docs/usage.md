@@ -64,6 +64,13 @@ When `--infile-list -` reads the list from stdin, input data must come from file
 
 Result are printed to standard ouput (STDOUT) by default, you can also specify the output file
 via the flag `-o/--out-file`. The file name extension `.gz` is automatically recognized.
+Main and auxiliary outputs, generated filenames, and indexes are checked for
+conflicts with inputs and other outputs, including symbolic and hard links.
+Auxiliary inputs such as pattern files and `--infile-list` files are also protected.
+Index updates may replace their own existing indexes.
+With `--skip-file-check`, named sequence inputs receive normalized-path checks
+only; auxiliary inputs and output conflicts retain full checks.
+
 For example:
 
     seqkit seq a.fasta -o a.fasta.gz
@@ -211,6 +218,10 @@ Bzip2 format is supported since v2.4.0.
 Stdin (-) may only appear once in the input file list, including files supplied
 via --infile-list. When --infile-list - reads the list from stdin, input data
 must come from files.
+
+Output files, including auxiliary outputs and generated indexes, cannot overwrite
+inputs or conflict with other outputs. These checks recognize symbolic and hard
+links. Commands that update indexes still replace their own existing indexes.
 
 With --skip-file-check, sequence input files are checked only for matching
 normalized paths with outputs; existence and symlink/hard-link checks are skipped.
@@ -1302,6 +1313,8 @@ Attention:
      for more data.
   4. In --find-only mode, file errors do not stop other files, but the final exit
      status is nonzero.
+  5. An existing output cannot also be a matching input. New outputs in watched
+     directories, including aliases of the output, are excluded from discovery.
 
 Usage:
   seqkit scat [flags]
@@ -1439,6 +1452,9 @@ Usage (tab2fx)
 $ seqkit tab2fx -h
 
 convert tabular format (first two/three columns) to FASTA/Q format
+
+Columns after the third are ignored. For FASTQ output, sequence and quality
+lengths must match.
 
 Usage:
   seqkit tab2fx [flags]
@@ -2271,6 +2287,8 @@ Attention:
   4. Accuracy and NM statistics ignore case.
   5. BAM reference names use sequence IDs; -D affects only the full-header
      display in text results.
+  6. IUPAC ambiguity codes score as mismatches. Search ranges are clipped to
+     each record; ranges outside the record produce no hits.
 
 Usage:
   seqkit fish [flags]
@@ -2281,7 +2299,7 @@ Flags:
                                  "<match>,<mismatch>,<gap_open>,<gap_extend>" (default "4,-4,-2,-1")
   -h, --help                     help for fish
   -i, --invert                   print out references not matching with any query
-  -q, --min-qual float           minimum mapping quality (default 5)
+  -q, --min-qual float           minimum mapping quality (finite and nonnegative) (default 5)
   -b, --out-bam string           save alignments to this BAM file (memory intensive)
   -x, --pass                     pass through mode (write input to stdout)
   -g, --print-aln                print sequence alignments
@@ -3834,6 +3852,7 @@ rename duplicated IDs
 Attention:
   1. This command only appends "_N" to duplicated sequence IDs to make them unique.
   2. Use "seqkit replace" for editing sequence IDs/headers using regular expression.
+  3. With -m, unrelated files in the output directory are preserved, even with --force.
 
 Example:
 
@@ -3854,7 +3873,7 @@ Usage:
 
 Flags:
   -n, --by-name             check duplication by full name instead of just id
-  -f, --force               overwrite output directory
+  -f, --force               overwrite matching output files without the nonempty-directory warning
   -h, --help                help for rename
   -m, --multiple-outfiles   write results into separated files for multiple input files
   -O, --out-dir string      output directory (default "renamed")
@@ -4442,6 +4461,9 @@ Attention:
   4. --top-bam requires a single numeric --field in record mode; --top-size 0
      writes a header-only BAM.
   5. Empty histograms are skipped.
+  6. Toolbox stages run in the order written in the YAML configuration.
+     Output paths and required parameters are checked before processing.
+  7. Toolbox Match/Mismatch counts exclude insertions and deletions.
 
 Usage:
   seqkit bam [flags]
@@ -4524,6 +4546,13 @@ Dump        dump various record properties in TSV format
 help        list all tools with description
 ```
 
+Toolbox stages run in the order written in the YAML configuration. Place a filtering
+stage before a statistics stage to report only retained records. `Sink` applies
+to the whole pipeline; `Tsv: "-"` writes to stderr.
+
+`Match` and `Mismatch` count aligned bases, excluding insertions and deletions.
+`AlnContext` clips context windows at the reference boundaries.
+
 Example YAML configs:
 
 Invoking the AccStats tool directly from the command line or YAML config:
@@ -4554,7 +4583,7 @@ Invoking the Dump tool using YAML:
 ```text
 Dump:
   Tsv: "-"
-  Fields: ["Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "Match", "Mismatch", "Ins", "Del", "AlnLen", "  ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "  IsSup", "ReadSeq", "ReadAlnSeq", "LeftSoftClipSeq", "RightSoftClip", "LeftHardClip", "RightHardClip"]
+  Fields: ["Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "Match", "Mismatch", "Ins", "Del", "AlnLen", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "IsSup", "ReadSeq", "ReadAlnSeq", "LeftSoftClipSeq", "RightSoftClip", "LeftHardClip", "RightHardClip"]
 Sink: True
 ```
 
@@ -4571,12 +4600,12 @@ AlnContext:
   Invert: True
 Dump:
   Tsv: "dump.tsv"
-  Fields: ["Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "Match", "Mismatch", "Ins", "Del", "AlnLen", "  ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "  IsSup", "ReadSeq", "ReadAlnSeq", "LeftSoftClipSeq", "RightSoftClip", "LeftHardClip", "RightHardClip"]
+  Fields: ["Read", "Ref", "Pos", "EndPos", "MapQual", "Acc", "Match", "Mismatch", "Ins", "Del", "AlnLen", "ReadLen", "RefLen", "RefAln", "RefCov", "ReadAln", "ReadCov", "Strand", "MeanQual", "LeftClip", "RightClip", "Flags", "IsSec", "IsSup", "ReadSeq", "ReadAlnSeq", "LeftSoftClipSeq", "RightSoftClip", "LeftHardClip", "RightHardClip"]
 AccStats:
   Tsv: "-"
 ```
 
-If the "Sink" parameter is not specified in the last pipeline step, the output BAM records are streamed to the standard output and can be piped into standard tools, for example:
+When `Sink` is absent or false, the final BAM stream is written to `-o` (stdout by default) and can be piped into other tools:
 ```text
 seqkit bam -T '{Yaml: "bam_tool_pipeline.yml"}' ../pcs109_5k_spliced.bam | samtools flagstat -
 ```

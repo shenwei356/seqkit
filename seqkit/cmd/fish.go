@@ -97,12 +97,18 @@ func parseRanges(rf string) Ranges {
 		} else {
 			s, err = strconv.ParseFloat(ts, 64)
 			checkError(err)
+			if math.IsNaN(s) || math.IsInf(s, 0) || math.Trunc(s) != s {
+				checkError(fmt.Errorf("invalid range: %s (coordinates must be finite integers)", t))
+			}
 		}
 		if len(te) == 0 {
 			e = math.NaN()
 		} else {
 			e, err = strconv.ParseFloat(te, 64)
 			checkError(err)
+			if math.IsNaN(e) || math.IsInf(e, 0) || math.Trunc(e) != e {
+				checkError(fmt.Errorf("invalid range: %s (coordinates must be finite integers)", t))
+			}
 		}
 		if e > 0 && s > 0 && e < s {
 			checkError(fmt.Errorf("invalid range: %s", t))
@@ -127,6 +133,8 @@ Attention:
   4. Accuracy and NM statistics ignore case.
   5. BAM reference names use sequence IDs; -D affects only the full-header
      display in text results.
+  6. IUPAC ambiguity codes score as mismatches. Search ranges are clipped to
+     each record; ranges outside the record produce no hits.
 
 `,
 
@@ -138,6 +146,9 @@ Attention:
 		outFile := config.OutFile
 
 		flagMinQual := getFlagFloat64(cmd, "min-qual")
+		if math.IsNaN(flagMinQual) || math.IsInf(flagMinQual, 0) || flagMinQual < 0 {
+			checkError(fmt.Errorf("--min-qual must be finite and nonnegative"))
+		}
 		flagCutoff := 1 - math.Pow(10, flagMinQual/-10)
 		_ = flagCutoff
 
@@ -150,6 +161,10 @@ Attention:
 		queryFastx := getFlagString(cmd, "query-fastx")
 		flagSeq := getFlagString(cmd, "query-sequences")
 		flagBam := getFlagString(cmd, "out-bam")
+		// Unlike -o, this flag writes a named file even when its value is "-".
+		if flagBam == "-" {
+			flagBam = "." + string(os.PathSeparator) + "-"
+		}
 		flagRange := getFlagString(cmd, "ranges")
 		flagNullMode := "self"
 		flagStranded := getFlagBool(cmd, "stranded")
@@ -170,7 +185,17 @@ Attention:
 		}
 
 		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
-		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
+		outputs := []string{outFile}
+		if flagBam != "" {
+			outputs = append(outputs, flagBam)
+			checkBAMOutputPaths([]string{flagBam})
+		}
+		checkOutputFiles(files, outputs, !config.SkipFileCheck)
+		for _, auxiliary := range []string{queryFastx, getFlagString(cmd, "infile-list")} {
+			if auxiliary != "" {
+				checkOutputFiles([]string{auxiliary}, outputs, true)
+			}
+		}
 
 		var alns []*AlignedSeq
 		if len(files) == 0 {
@@ -179,7 +204,6 @@ Attention:
 
 		detector := NewSeqDetector(flagAll, flagStranded, flagNullMode, flagCutoff, alnParams)
 		if queryFastx != "" {
-			checkOutputFiles([]string{queryFastx}, []string{outFile}, true)
 			detector.LoadQueries(queryFastx)
 		}
 		if flagSeq != "" {
@@ -367,7 +391,7 @@ func init() {
 	fishCmd.Flags().BoolP("print-desc", "D", false, "print full sequence header")
 	fishCmd.Flags().BoolP("print-aln", "g", false, "print sequence alignments")
 	fishCmd.Flags().BoolP("invert", "i", false, "print out references not matching with any query")
-	fishCmd.Flags().Float64P("min-qual", "q", 5.0, "minimum mapping quality")
+	fishCmd.Flags().Float64P("min-qual", "q", 5.0, "minimum mapping quality (finite and nonnegative)")
 }
 
 // NewRecordFromAln builds a new SAM record based on the provided local alignment and its reference/query coordinates.
