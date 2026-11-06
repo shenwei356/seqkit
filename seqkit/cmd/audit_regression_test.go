@@ -291,6 +291,32 @@ func TestAuditMergeSlidesErrors(t *testing.T) {
 	}
 }
 
+// TestAuditMergeSlidesPreservesMergedEnd checks that contained windows cannot shorten a region.
+func TestAuditMergeSlidesPreservesMergedEnd(t *testing.T) {
+	for _, tt := range []struct {
+		name  string
+		input string
+		args  []string
+		want  string
+	}{
+		{"contained window", "ref_sliding:1-10\nref_sliding:2-5\n", nil, "ref\t0\t10\n"},
+		{"nested windows", "ref_sliding:1-20\nref_sliding:2-15\nref_sliding:3-10\n", nil, "ref\t0\t20\n"},
+		{"next region", "ref_sliding:1-10\nref_sliding:2-5\nref_sliding:20-30\n", nil, "ref\t0\t10\nref\t19\t30\n"},
+		{"next reference", "ref_sliding:1-10\nref_sliding:2-5\nother_sliding:1-8\n", nil, "ref\t0\t10\nother\t0\t8\n"},
+		{"extending window", "ref_sliding:1-10\nref_sliding:2-5\nref_sliding:4-20\n", nil, "ref\t0\t20\n"},
+		{"minimum overlap", "ref_sliding:1-10\nref_sliding:2-5\n", []string{"-l", "4"}, "ref\t0\t10\n"},
+		{"maximum gap", "ref_sliding:1-10\nref_sliding:3-5\n", []string{"-g", "1"}, "ref\t0\t10\nref\t2\t5\n"},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			args := append([]string{"merge-slides", "--quiet"}, tt.args...)
+			out, stderr, err := runCLI(t, tt.input, args...)
+			if err != nil || out != tt.want {
+				t.Fatalf("got %q, want %q: %v %s", out, tt.want, err, stderr)
+			}
+		})
+	}
+}
+
 // TestAuditCoordinateOverflows rejects coordinates that do not fit in int.
 func TestAuditCoordinateOverflows(t *testing.T) {
 	const tooLarge = "999999999999999999999999"
