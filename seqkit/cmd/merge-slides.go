@@ -191,7 +191,7 @@ Output (BED3 format):
 					}
 
 					if extend {
-						end0 = end
+						end0 = max(end0, end)
 					} else { // print previous region
 						fmt.Fprintf(outfh, "%s\t%d\t%d\n", ref0, begin0-1, end0)
 
