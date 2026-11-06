@@ -62,7 +62,9 @@ You may need "seqkit rename" to make the the sequence IDs unique.
 
 		var record *fastx.Record
 		var i int
+		lineWidth := config.LineWidth
 		for _, file := range files {
+			config.LineWidth = lineWidth
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 			checkAlphabet := true
@@ -76,11 +78,11 @@ You may need "seqkit rename" to make the the sequence IDs unique.
 					break
 				}
 				if checkAlphabet {
+					fastx.ForcelyOutputFastq = fastxReader.IsFastq
 					if fastxReader.IsFastq {
 						if !config.LineWidthChanged {
 							config.LineWidth = 0
 						}
-						fastx.ForcelyOutputFastq = true
 					}
 					checkAlphabet = false
 				}

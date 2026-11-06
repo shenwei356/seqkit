@@ -32,7 +32,6 @@ import (
 
 	"github.com/cespare/xxhash/v2"
 	"github.com/shenwei356/bwt"
-	"github.com/twotwotwo/sorts/sortutil"
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
@@ -373,73 +372,29 @@ Examples:
 			var wg sync.WaitGroup
 			ch := make(chan *Arecord, config.Threads)
 			tokens := make(chan int, config.Threads)
+			// Bound admitted work separately from the number of active workers.
+			pending := make(chan int, orderedOutputBatches*config.Threads)
 
 			done := make(chan int)
 			go func() {
-				writeRecord := func(r *Arecord) {
-					// Only this goroutine changes the formatter's global FASTQ override.
-					fastx.ForcelyOutputFastq = r.isFastq
-					r.record.FormatToWriter(outfh, r.lineWidth)
-				}
-				m := make(map[uint64]*Arecord, config.Threads)
-				var id, _id uint64
-				var ok bool
-				var _r *Arecord
-
-				id = 1
-				for r := range ch {
-					if justCount {
+				if justCount {
+					for r := range ch {
 						if r.ok {
 							count++
 						}
-						continue
 					}
-
-					_id = r.id
-
-					if _id == id { // right there
+				} else {
+					consumeOrdered(ch, func(r *Arecord) uint64 { return r.id }, func(r *Arecord) {
 						if r.ok {
-							writeRecord(r)
+							// Only this goroutine changes the formatter's FASTQ override.
+							fastx.ForcelyOutputFastq = r.isFastq
+							r.record.FormatToWriter(outfh, r.lineWidth)
 							if immediateOutput {
 								outfh.Flush()
 							}
 						}
-						id++
-						continue
-					}
-
-					m[_id] = r // save for later check
-
-					if _r, ok = m[id]; ok { // check buffered
-						if _r.ok {
-							writeRecord(_r)
-							if immediateOutput {
-								outfh.Flush()
-							}
-						}
-						delete(m, id)
-						id++
-					}
-				}
-
-				if len(m) > 0 {
-					ids := make([]uint64, len(m))
-					i := 0
-					for _id = range m {
-						ids[i] = _id
-						i++
-					}
-					sortutil.Uint64s(ids)
-					for _, _id = range ids {
-						_r = m[_id]
-
-						if _r.ok {
-							writeRecord(_r)
-							if immediateOutput {
-								outfh.Flush()
-							}
-						}
-					}
+						<-pending
+					})
 				}
 				done <- 1
 			}()
@@ -475,14 +430,18 @@ Examples:
 						checkAlphabet = false
 					}
 
+					if !justCount {
+						pending <- 1
+					}
+
 					tokens <- 1
 					wg.Add(1)
 					id++
 					go func(record *fastx.Record, id uint64, positiveOnly, isFastq bool, lineWidth int) {
 						var err error // Index/search errors belong to this worker.
 						defer func() {
-							wg.Done()
 							<-tokens
+							wg.Done()
 						}()
 
 						if len(record.Seq.Seq) == 0 {

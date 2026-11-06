@@ -42,6 +42,7 @@ func validateOutputPrefix(prefix string) {
 // splitOutputRegistry rejects aliases of inputs and previously opened outputs.
 type splitOutputRegistry struct {
 	inputs             []string
+	auxiliaryInputs    []string        // Indexes always retain full filesystem identity checks.
 	paths              map[string]bool // Resolved paths make the common case constant time.
 	infos              []os.FileInfo   // Physical identities also catch hard-link aliases.
 	skipInputFileCheck bool            // Compare only lexical paths for sequence inputs.
@@ -64,44 +65,51 @@ func (r *splitOutputRegistry) open(path string) (*xopen.Writer, error) {
 	if err != nil && !os.IsNotExist(err) {
 		return nil, err
 	}
-	inputTarget := resolved
+	lexicalTarget := resolved
 	var cwd string
 	if r.skipInputFileCheck {
 		cwd, err = os.Getwd()
 		if err != nil {
 			return nil, err
 		}
-		inputTarget, err = lexicalPath(path, cwd)
+		lexicalTarget, err = lexicalPath(path, cwd)
 		if err != nil {
 			return nil, err
 		}
 	}
-	for _, input := range r.inputs {
-		if isStdin(input) {
-			if info != nil && r.stdinInfo != nil && os.SameFile(info, r.stdinInfo) {
-				return nil, fmt.Errorf("input and output files cannot be the same: %s", path)
+	for group, inputs := range [][]string{r.inputs, r.auxiliaryInputs} {
+		skipCheck := group == 0 && r.skipInputFileCheck
+		inputTarget := resolved
+		if skipCheck {
+			inputTarget = lexicalTarget
+		}
+		for _, input := range inputs {
+			if isStdin(input) {
+				if info != nil && r.stdinInfo != nil && os.SameFile(info, r.stdinInfo) {
+					return nil, fmt.Errorf("input and output files cannot be the same: %s", path)
+				}
+				continue
 			}
-			continue
-		}
-		var inPath string
-		if r.skipInputFileCheck {
-			inPath, err = lexicalPath(input, cwd)
-		} else {
-			inPath, err = resolvedPath(input)
-		}
-		if err != nil {
-			return nil, err
-		}
-		if inPath == inputTarget {
-			return nil, fmt.Errorf("input and output files cannot be the same: %s", path)
-		}
-		if !r.skipInputFileCheck && info != nil {
-			inInfo, err := os.Stat(input)
+			var inPath string
+			if skipCheck {
+				inPath, err = lexicalPath(input, cwd)
+			} else {
+				inPath, err = resolvedPath(input)
+			}
 			if err != nil {
 				return nil, err
 			}
-			if os.SameFile(info, inInfo) {
+			if inPath == inputTarget {
 				return nil, fmt.Errorf("input and output files cannot be the same: %s", path)
+			}
+			if !skipCheck && info != nil {
+				inInfo, err := os.Stat(input)
+				if err != nil {
+					return nil, err
+				}
+				if os.SameFile(info, inInfo) {
+					return nil, fmt.Errorf("input and output files cannot be the same: %s", path)
+				}
 			}
 		}
 	}

@@ -219,6 +219,11 @@ Note:
 				}
 
 				if _counter, ok = counter[subject]; !ok {
+					// Only first-file candidates can belong to the intersection.
+					// Still read every record so malformed later inputs report errors.
+					if !isFirstFile {
+						continue
+					}
 					_counter = make(map[int]struct{})
 					counter[subject] = _counter
 				}

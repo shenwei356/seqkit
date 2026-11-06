@@ -5,12 +5,71 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/shenwei356/xopen"
 )
+
+// TestCompressedIndexedCommands sends every supported codec through indexed paths.
+func TestCompressedIndexedCommands(t *testing.T) {
+	const input = ">b\nTGCA\n>a\nACGT\n"
+	for _, extension := range []string{".gz", ".xz", ".zst", ".bz2", ".lz4"} {
+		t.Run(extension, func(t *testing.T) {
+			dir := t.TempDir()
+			file := filepath.Join(dir, "input.fa"+extension)
+			if err := os.WriteFile(file, compressedInput(t, extension, input), 0600); err != nil {
+				t.Fatal(err)
+			}
+			plain := auditInput(t, dir, "plain.fa", input)
+			for _, command := range [][]string{{"sort", "-2"}, {"shuffle", "-2", "-s", "23", "--tmp-dir", dir}} {
+				want, stderr, err := runCLI(t, "", append(append([]string(nil), command...), plain)...)
+				if err != nil {
+					t.Fatalf("plain input: %v %s", err, stderr)
+				}
+				out, stderr, err := runCLI(t, "", append(append([]string(nil), command...), file)...)
+				if err != nil || out != want {
+					t.Fatalf("compressed %s: %v %s", command[0], err, stderr)
+				}
+			}
+			out, stderr, err := runCLI(t, "", "subseq", "-r", "1:2", file)
+			if err != nil {
+				t.Fatalf("compressed subseq: %v %s", err, stderr)
+			}
+			sequences, stderr, err := runCLI(t, out, "seq", "-s", "-w", "0")
+			if err != nil || sequences != "TG\nAC\n" {
+				t.Fatalf("compressed regions changed: %v %s", err, stderr)
+			}
+			outdir := filepath.Join(dir, "split")
+			_, stderr, err = runCLI(t, "", "split", "-2", "-s", "1", "-O", outdir, file)
+			if err != nil {
+				t.Fatalf("compressed split: %v %s", err, stderr)
+			}
+			entries, err := os.ReadDir(outdir)
+			if err != nil || len(entries) != 2 {
+				t.Fatalf("split outputs: %d %v", len(entries), err)
+			}
+			var records []string
+			for _, entry := range entries {
+				out, stderr, err := runCLI(t, "", "seq", "-w", "0", filepath.Join(outdir, entry.Name()))
+				if err != nil {
+					t.Fatalf("read split output: %v %s", err, stderr)
+				}
+				records = append(records, out)
+			}
+			sort.Strings(records)
+			if strings.Join(records, "") != ">a\nACGT\n>b\nTGCA\n" {
+				t.Fatal("compressed split changed records")
+			}
+			leftovers, err := filepath.Glob(filepath.Join(dir, "seqkit-*"))
+			if err != nil || len(leftovers) != 0 {
+				t.Fatalf("temporary files remain: %v %v", leftovers, err)
+			}
+		})
+	}
+}
 
 // compressedInput encodes a complete fixture before tests truncate or corrupt it.
 func compressedInput(t *testing.T, extension, input string) []byte {

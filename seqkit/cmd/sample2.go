@@ -136,13 +136,18 @@ Attention:
 		// by number + 2 pass: reservior
 		n := int64(0)
 
-		outputRecord := func(rec *fastx.Record) {
-			rec.FormatToWriter(outfh, config.LineWidth)
+		outputRecord := func(rec *fastx.Record, isFastq bool) {
+			fastx.ForcelyOutputFastq = isFastq
+			width := config.LineWidth
+			if isFastq && !config.LineWidthChanged {
+				width = 0
+			}
+			rec.FormatToWriter(outfh, width)
 			n++
 		}
-		outputRecords := func(recs []*fastx.Record) {
+		outputRecords := func(recs []*fastx.Record, isFastq bool) {
 			for _, rec := range recs {
-				outputRecord(rec)
+				outputRecord(rec, isFastq)
 			}
 		}
 
@@ -151,25 +156,19 @@ Attention:
 			if !quiet {
 				log.Info("loading all sequences into memory...")
 			}
-			records, err := fastx.GetSeqs(file, alphabet, config.Threads, 10, idRegexp)
+			records, isFastq, err := readRecordsWithFormat(file, alphabet, idRegexp)
 			checkError(err)
 
 			totalSeqs := int64(len(records))
-			if totalSeqs > 0 && len(records[0].Seq.Qual) > 0 {
-				if !config.LineWidthChanged {
-					config.LineWidth = 0
-				}
-				fastx.ForcelyOutputFastq = true
-			}
 			if number >= totalSeqs {
-				outputRecords(records)
+				outputRecords(records, isFastq)
 			} else {
 				// Partial Shuffle
 				for i := int64(0); i < number; i++ {
 					j := i + _rand.Int63n(totalSeqs-i)
 					records[i], records[j] = records[j], records[i]
 				}
-				outputRecords(records[:number])
+				outputRecords(records[:number], isFastq)
 			}
 			if !quiet {
 				log.Infof("%d sequences outputted", n)
@@ -181,30 +180,19 @@ Attention:
 
 		// Branch B
 		if proportion > 0.0 && !twoPass {
-			lineWidth := config.LineWidth
 			for _, file := range files {
 				// Match separate invocations, including paired inputs and mixed formats.
 				_rand = rand.New(rand.NewSource(seed))
 				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
-				config.LineWidth = lineWidth
-				fastx.ForcelyOutputFastq = false
-				checkFormat := true
 				for {
 					record, err = fastxReader.Read()
 					if err == io.EOF {
 						break
 					}
 					checkError(err)
-					if checkFormat {
-						fastx.ForcelyOutputFastq = fastxReader.IsFastq
-						if fastxReader.IsFastq && !config.LineWidthChanged {
-							config.LineWidth = 0
-						}
-						checkFormat = false
-					}
 					if _rand.Float64() <= proportion {
-						outputRecord(record)
+						outputRecord(record, fastxReader.IsFastq)
 					}
 				}
 				fastxReader.Close()
@@ -218,12 +206,6 @@ Attention:
 		fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 		checkError(err)
 		defer fastxReader.Close()
-		if fastxReader.IsFastq {
-			if !config.LineWidthChanged {
-				config.LineWidth = 0
-			}
-			fastx.ForcelyOutputFastq = true
-		}
 
 		// Two Pass Mode, first pass
 		if !quiet {
@@ -257,7 +239,7 @@ Attention:
 					checkError(err)
 					break
 				}
-				outputRecord(record)
+				outputRecord(record, fastxReader.IsFastq)
 			}
 			if !quiet {
 				log.Infof("%d sequences outputted", n)
@@ -296,7 +278,7 @@ Attention:
 			}
 
 			if idxPtr < len(savedIndices) && currentIdx == savedIndices[idxPtr] {
-				outputRecord(record)
+				outputRecord(record, fastxReader.IsFastq)
 				idxPtr++
 			}
 			currentIdx++

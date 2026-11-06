@@ -9,7 +9,135 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/shenwei356/bio/seqio/fai"
 )
+
+// TestFASTAIndexUpdateDirectories protects direct paths and directory symlinks.
+func TestFASTAIndexUpdateDirectories(t *testing.T) {
+	commands := [][]string{
+		{"faidx"}, {"subseq", "-r", "1:2"}, {"sort", "-2"}, {"shuffle", "-2"},
+		{"split", "-2", "-s", "1"}, {"split", "-2", "-p", "2"},
+		{"split", "-2", "-i"}, {"split", "-2", "-r", "1:2"},
+	}
+	for _, command := range commands {
+		for _, alias := range []bool{false, true} {
+			t.Run(fmt.Sprintf("%s/symlink=%v", strings.Join(command, "_"), alias), func(t *testing.T) {
+				dir := t.TempDir()
+				input := auditInput(t, dir, "input.fa", ">a\nACGT\n>b\nTGCA\n")
+				index := input + ".seqkit.fai"
+				if command[0] == "faidx" {
+					index = input + ".fai"
+				}
+				target := index
+				if alias {
+					target = filepath.Join(dir, "target")
+				}
+				if err := os.Mkdir(target, 0700); err != nil {
+					t.Fatal(err)
+				}
+				marker := auditInput(t, target, "keep", "keep\n")
+				if alias {
+					if err := os.Symlink(target, index); err != nil {
+						t.Skipf("symlinks unavailable: %v", err)
+					}
+				}
+				args := append(append([]string(nil), command...), "-U", input)
+				output := filepath.Join(dir, "output")
+				if command[0] == "split" {
+					args = append(args, "-O", output)
+				} else {
+					auditInput(t, dir, "output", "keep\n")
+					args = append(args, "-o", output)
+				}
+				_, stderr, err := runCLI(t, "", args...)
+				got, readErr := os.ReadFile(marker)
+				if err == nil || !strings.Contains(stderr, "regular file") || readErr != nil || string(got) != "keep\n" {
+					t.Fatalf("index directory was not protected: %v %s; marker=%v", err, stderr, readErr)
+				}
+				if command[0] != "split" {
+					got, readErr = os.ReadFile(output)
+					if readErr != nil || string(got) != "keep\n" {
+						t.Fatalf("output changed before index validation: %v", readErr)
+					}
+				}
+			})
+		}
+	}
+}
+
+// TestFASTAIndexOutputAliases checks index identity before any output is opened.
+func TestFASTAIndexOutputAliases(t *testing.T) {
+	for _, command := range [][]string{{"faidx"}, {"subseq", "-r", "1:2"}, {"sort", "-2"}, {"shuffle", "-2"}} {
+		for _, alias := range []string{"same", "symlink", "hardlink", "new"} {
+			t.Run(command[0]+"/"+alias, func(t *testing.T) {
+				dir := t.TempDir()
+				input := auditInput(t, dir, "input.fa", ">a\nACGT\n")
+				index := input + ".seqkit.fai"
+				build := []string{"faidx", "-f", input}
+				if command[0] == "faidx" {
+					index = input + ".fai"
+					build = []string{"faidx", input}
+				}
+				var before []byte
+				if alias != "new" {
+					if _, stderr, err := runCLI(t, "", build...); err != nil {
+						t.Fatalf("build index: %v %s", err, stderr)
+					}
+					var err error
+					before, err = os.ReadFile(index)
+					if err != nil {
+						t.Fatal(err)
+					}
+				}
+				output := index
+				if alias == "symlink" || alias == "hardlink" {
+					output = filepath.Join(dir, "alias")
+					link := os.Link
+					if alias == "symlink" {
+						link = os.Symlink
+					}
+					if err := link(index, output); err != nil {
+						t.Skipf("links unavailable: %v", err)
+					}
+				}
+				for _, update := range [][]string{nil, {"-U"}} {
+					args := append(append([]string(nil), command...), input, "--skip-file-check", "-o", output)
+					_, stderr, err := runCLI(t, "", append(args, update...)...)
+					after, readErr := os.ReadFile(index)
+					if err == nil || !strings.Contains(stderr, "cannot be the same") || string(after) != string(before) {
+						t.Fatalf("index/output conflict accepted: %v %s", err, stderr)
+					}
+					if alias == "new" && !os.IsNotExist(readErr) || alias != "new" && readErr != nil {
+						t.Fatalf("index existence changed: %v", readErr)
+					}
+				}
+			})
+		}
+	}
+}
+
+// TestFASTAIndexLeadingComments follows the index builder's leading-comment rules.
+func TestFASTAIndexLeadingComments(t *testing.T) {
+	for i, prefix := range []string{";comment\n", "\n;first\n;second\r\n", "\xef\xbb\xbf;comment\n"} {
+		t.Run(fmt.Sprint(i), func(t *testing.T) {
+			file := auditInput(t, t.TempDir(), "input.fa", prefix+">a\nACGT\n>b\nTGCA\n")
+			index, err := fai.CreateWithIDRegexp(file, file+".seqkit.fai", `^(.+)$`)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := validateFASTAIndex(file, index); err != nil {
+				t.Fatalf("new index rejected: %v", err)
+			}
+			for _, args := range [][]string{{"sort", "-2", file}, {"shuffle", "-2", file}} {
+				out, stderr, err := runCLI(t, "", args...)
+				if err != nil || strings.Count(out, ">") != 2 {
+					t.Fatalf("reused index rejected: %v %s", err, stderr)
+				}
+			}
+		})
+	}
+}
 
 // TestOutputProtectsRedirectedStdin compares the open descriptor before truncation.
 func TestOutputProtectsRedirectedStdin(t *testing.T) {

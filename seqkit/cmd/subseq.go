@@ -23,7 +23,6 @@ package cmd
 import (
 	"fmt"
 	"io"
-	"os"
 	"regexp"
 	"runtime"
 	"strconv"
@@ -119,10 +118,6 @@ Examples:
 			}
 		}
 
-		outfh, err := xopen.Wopen(outFile)
-		checkError(err)
-		defer closeOutput(outfh)
-
 		idRe, err := regexp.Compile(idRegexp)
 		if err != nil {
 			checkError(fmt.Errorf("fail to compile regexp: %s", idRegexp))
@@ -211,20 +206,44 @@ Examples:
 			checkError(fmt.Errorf("one of the options needed: -r/--region, --bed, --gtf"))
 		}
 
+		// Detect indexed inputs before opening output, including indexes of later files.
+		type inputFormat struct {
+			alphabet *seq.Alphabet
+			fastq    bool
+		}
+		plainInputs := make(map[string]inputFormat)
+		for _, file := range files {
+			if isStdin(file) || !isPlainFile(file) {
+				continue
+			}
+			alphabet2, isFastq, err := fastx.GuessAlphabet(file)
+			checkError(err)
+			plainInputs[file] = inputFormat{alphabet2, isFastq}
+			if !isFastq {
+				fileFai := file + ".seqkit.fai"
+				checkError(checkFASTAIndexFile(fileFai))
+				checkOutputFiles([]string{fileFai}, []string{outFile}, true)
+			}
+		}
+
+		outfh, err := xopen.Wopen(outFile)
+		checkError(err)
+		defer closeOutput(outfh)
+
 		for _, file := range files {
 			// plain fasta, using Faidx
-			if !isStdin(file) && isPlainFile(file) {
-				// check seq format, ignoring fastq
-				alphabet2, isFastq, err := fastx.GuessAlphabet(file)
-				checkError(err)
+			if format, ok := plainInputs[file]; ok {
+				alphabet2, isFastq := format.alphabet, format.fastq
 
 				id2name := make(map[string][]byte)
 
 				if !isFastq { // ok, it's fasta!
+					// Indexed extraction bypasses the streaming format reset below.
+					fastx.ForcelyOutputFastq = false
 					fileFai := file + ".seqkit.fai"
 
 					if FileExists(fileFai) && updateFaidx {
-						checkError(os.RemoveAll(fileFai))
+						checkError(removeFASTAIndex(fileFai))
 						if !quiet {
 							log.Infof("delete the old FASTA index file: %s", fileFai)
 						}
@@ -354,11 +373,11 @@ Examples:
 					break
 				}
 				if checkAlphabet {
+					fastx.ForcelyOutputFastq = fastxReader.IsFastq
 					if fastxReader.IsFastq {
 						if !config.LineWidthChanged {
 							config.LineWidth = 0
 						}
-						fastx.ForcelyOutputFastq = true
 					}
 					checkAlphabet = false
 				}

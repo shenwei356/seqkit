@@ -10,6 +10,35 @@ import (
 	"testing"
 )
 
+// TestSplitProtectsInputIndex catches generated outputs aliased to the active index.
+func TestSplitProtectsInputIndex(t *testing.T) {
+	dir := t.TempDir()
+	file := auditInput(t, dir, "input.fa", ">a\nACGT\n>b\nTGCA\n")
+	if _, stderr, err := runCLI(t, "", "faidx", "-f", file); err != nil {
+		t.Fatalf("build index: %v %s", err, stderr)
+	}
+	index := file + ".seqkit.fai"
+	before, err := os.ReadFile(index)
+	if err != nil {
+		t.Fatal(err)
+	}
+	outdir := filepath.Join(dir, "out")
+	if err := os.Mkdir(outdir, 0700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Link(index, filepath.Join(outdir, "piece_001.fa")); err != nil {
+		t.Skipf("hard links unavailable: %v", err)
+	}
+	for _, skip := range [][]string{nil, {"--skip-file-check"}} {
+		args := append([]string{"split", "-2", "-s", "1", "-P", "piece_", "-O", outdir, file}, skip...)
+		_, stderr, err := runCLI(t, "", args...)
+		after, readErr := os.ReadFile(index)
+		if err == nil || !strings.Contains(stderr, "cannot be the same") || readErr != nil || string(after) != string(before) {
+			t.Fatalf("index alias was overwritten: %v %s; read=%v", err, stderr, readErr)
+		}
+	}
+}
+
 // TestSplitTwoPassNamesAndCompression compares every grouping mode with single-pass output.
 func TestSplitTwoPassNamesAndCompression(t *testing.T) {
 	dir := t.TempDir()

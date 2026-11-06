@@ -19,6 +19,30 @@ var indexHeaderTabs = regexp.MustCompile(`\t+`)
 // closeOutput reports buffered write and compression-finalization failures.
 func closeOutput(w io.Closer) { checkError(w.Close()) }
 
+// checkFASTAIndexFile rejects directories and special files before index updates.
+// Follow symlinks so a directory alias is rejected without removing the link.
+func checkFASTAIndexFile(file string) error {
+	info, err := os.Stat(file)
+	if os.IsNotExist(err) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if !info.Mode().IsRegular() {
+		return fmt.Errorf("FASTA index must be a regular file: %s", file)
+	}
+	return nil
+}
+
+// removeFASTAIndex never recursively removes an index path or its contents.
+func removeFASTAIndex(file string) error {
+	if err := checkFASTAIndexFile(file); err != nil {
+		return err
+	}
+	return os.Remove(file)
+}
+
 // resolvedPath resolves parent and leaf links without cleaning .. before symlinks.
 func resolvedPath(path string) (string, error) {
 	paths, err := filePathVariants(path)
@@ -333,6 +357,10 @@ func validateFASTAIndex(file string, index fai.Index) error {
 			line = bytes.TrimPrefix(line, []byte{0xef, 0xbb, 0xbf})
 		}
 		if len(line) == 0 {
+			continue
+		}
+		// The FASTA reader and index builder allow comments before the first record.
+		if records == 0 && line[0] == ';' {
 			continue
 		}
 		if line[0] != '>' {

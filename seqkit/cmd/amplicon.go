@@ -41,7 +41,6 @@ import (
 	"github.com/shenwei356/bwt/fmi"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
-	"github.com/twotwotwo/sorts/sortutil"
 )
 
 // appendAmpliconMismatchName formats the original name into reusable record storage.
@@ -249,72 +248,22 @@ Examples:
 			var wg sync.WaitGroup
 			ch := make(chan *Arecord, config.Threads)
 			tokens := make(chan int, config.Threads)
+			// Bound admitted work separately from the number of active workers.
+			pending := make(chan int, orderedOutputBatches*config.Threads)
 
 			done := make(chan int)
 			go func() {
-				m := make(map[uint64]*Arecord, config.Threads)
-				var id, _id uint64
-				var ok bool
-				var _r *Arecord
-				var row string
-
-				id = 1
-				for r := range ch {
-					_id = r.id
-
-					if _id == id { // right there
-						if r.ok {
-							for _, row = range r.record {
-								outfh.WriteString(row)
-							}
-
-							if immediateOutput {
-								outfh.Flush()
-							}
+				consumeOrdered(ch, func(r *Arecord) uint64 { return r.id }, func(r *Arecord) {
+					if r.ok {
+						for _, row := range r.record {
+							outfh.WriteString(row)
 						}
-						id++
-						continue
-					}
-
-					m[_id] = r // save for later check
-
-					if _r, ok = m[id]; ok { // check buffered
-						if _r.ok {
-							for _, row = range _r.record {
-								outfh.WriteString(row)
-							}
-
-							if immediateOutput {
-								outfh.Flush()
-							}
-						}
-						delete(m, id)
-						id++
-					}
-				}
-
-				if len(m) > 0 {
-					ids := make([]uint64, len(m))
-					i := 0
-					for _id = range m {
-						ids[i] = _id
-						i++
-					}
-					sortutil.Uint64s(ids)
-					for _, _id = range ids {
-						_r = m[_id]
-
-						if _r.ok {
-							for _, row = range _r.record {
-								outfh.WriteString(row)
-							}
-
-							if immediateOutput {
-								outfh.Flush()
-							}
+						if immediateOutput {
+							outfh.Flush()
 						}
 					}
-				}
+					<-pending
+				})
 				done <- 1
 			}()
 
@@ -338,20 +287,22 @@ Examples:
 						if !config.LineWidthChanged {
 							config.LineWidth = 0
 						}
-						if !fastx.ForcelyOutputFastq {
-							// Finish earlier FASTA records before changing shared output state.
-							wg.Wait()
-							fastx.ForcelyOutputFastq = true
-						}
 					}
 
+					if fastx.ForcelyOutputFastq != fastxReader.IsFastq {
+						// Workers format their own records; finish them before a format change.
+						wg.Wait()
+						fastx.ForcelyOutputFastq = fastxReader.IsFastq
+					}
+
+					pending <- 1
 					tokens <- 1
 					wg.Add(1)
 					id++
 					go func(record *fastx.Record, id uint64, width int) {
 						defer func() {
-							wg.Done()
 							<-tokens
+							wg.Done()
 						}()
 
 						var j int
@@ -493,11 +444,11 @@ Examples:
 					checkError(err)
 					break
 				}
+				fastx.ForcelyOutputFastq = fastxReader.IsFastq
 				if fastxReader.IsFastq {
 					if !config.LineWidthChanged {
 						config.LineWidth = 0
 					}
-					fastx.ForcelyOutputFastq = true
 				}
 
 				matched = false

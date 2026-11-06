@@ -194,10 +194,10 @@ Attention:
 				if !quiet {
 					log.Info("loading all sequences into memory...")
 				}
-				records, err := readRecordsChecked(file, alphabet, idRegexp)
+				records, isFastq, err := readRecordsWithFormat(file, alphabet, idRegexp)
 				checkError(err)
 
-				if len(records) > 0 && len(records[0].Seq.Qual) > 0 {
+				if isFastq {
 					if !config.LineWidthChanged {
 						config.LineWidth = 0
 					}

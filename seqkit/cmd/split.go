@@ -339,9 +339,11 @@ Examples:
 			}
 
 			fileFai := newFile + ".seqkit.fai"
+			checkError(checkFASTAIndexFile(fileFai))
+			registry.auxiliaryInputs = append(registry.auxiliaryInputs, fileFai)
 
 			if FileExists(fileFai) && updateFaidx {
-				checkError(os.RemoveAll(fileFai))
+				checkError(removeFASTAIndex(fileFai))
 				if !quiet {
 					log.Infof("delete the old FASTA index file: %s", fileFai)
 				}
@@ -470,9 +472,11 @@ Examples:
 			}
 
 			fileFai := newFile + ".seqkit.fai"
+			checkError(checkFASTAIndexFile(fileFai))
+			registry.auxiliaryInputs = append(registry.auxiliaryInputs, fileFai)
 
 			if FileExists(fileFai) && updateFaidx {
-				checkError(os.RemoveAll(fileFai))
+				checkError(removeFASTAIndex(fileFai))
 				if !quiet {
 					log.Infof("delete the old FASTA index file: %s", fileFai)
 				}
@@ -603,9 +607,11 @@ Examples:
 			}
 
 			fileFai := newFile + ".seqkit.fai"
+			checkError(checkFASTAIndexFile(fileFai))
+			registry.auxiliaryInputs = append(registry.auxiliaryInputs, fileFai)
 
 			if FileExists(fileFai) && updateFaidx {
-				checkError(os.RemoveAll(fileFai))
+				checkError(removeFASTAIndex(fileFai))
 				if !quiet {
 					log.Infof("delete the old FASTA index file: %s", fileFai)
 				}
@@ -847,9 +853,11 @@ Examples:
 			fastxReader.Close()
 
 			fileFai := newFile + ".seqkit.fai"
+			checkError(checkFASTAIndexFile(fileFai))
+			registry.auxiliaryInputs = append(registry.auxiliaryInputs, fileFai)
 
 			if FileExists(fileFai) && updateFaidx {
-				checkError(os.RemoveAll(fileFai))
+				checkError(removeFASTAIndex(fileFai))
 				if !quiet {
 					log.Infof("delete the old FASTA index file: %s", fileFai)
 				}

@@ -1,6 +1,25 @@
 package cmd
 
-import "testing"
+import (
+	"os"
+	"testing"
+)
+
+// TestFaidxUpdateProtectsWorkingDirectory rejects an index path equal to cwd.
+func TestFaidxUpdateProtectsWorkingDirectory(t *testing.T) {
+	dir := t.TempDir()
+	input := auditInput(t, dir, "input.fa", ">a\nACGT\n")
+	index := input + ".fai"
+	if err := os.Mkdir(index, 0700); err != nil {
+		t.Fatal(err)
+	}
+	marker := auditInput(t, index, "keep", "keep\n")
+	_, stderr, err := auditCLI(t, index, "", "faidx", "-U", "../input.fa")
+	data, readErr := os.ReadFile(marker)
+	if err == nil || readErr != nil || string(data) != "keep\n" {
+		t.Fatalf("working directory was not protected: %v %s; marker=%v", err, stderr, readErr)
+	}
+}
 
 // TestFaidxClippedStrands clips both orientations without turning empty ranges into hits.
 func TestFaidxClippedStrands(t *testing.T) {

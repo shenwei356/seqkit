@@ -29,19 +29,25 @@ func restoreDescription(record *fastx.Record) {
 
 // readRecordsChecked never returns a usable prefix of damaged input.
 func readRecordsChecked(file string, alphabet *seq.Alphabet, idRegexp string) ([]*fastx.Record, error) {
+	records, _, err := readRecordsWithFormat(file, alphabet, idRegexp)
+	return records, err
+}
+
+// readRecordsWithFormat preserves the detected format even for empty FASTQ records.
+func readRecordsWithFormat(file string, alphabet *seq.Alphabet, idRegexp string) ([]*fastx.Record, bool, error) {
 	r, err := fastx.NewReader(alphabet, file, idRegexp)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	defer r.Close()
 	var records []*fastx.Record
 	for {
 		record, err := r.Read()
 		if err == io.EOF {
-			return records, nil
+			return records, r.IsFastq, nil
 		}
 		if err != nil {
-			return nil, fmt.Errorf("%s: %w", file, err)
+			return nil, false, fmt.Errorf("%s: %w", file, err)
 		}
 		records = append(records, record.Clone())
 	}

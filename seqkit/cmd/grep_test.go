@@ -1,10 +1,90 @@
 package cmd
 
 import (
+	"bufio"
+	"bytes"
+	"context"
 	"fmt"
+	"io"
+	"os"
+	"os/exec"
 	"strings"
 	"testing"
+	"time"
 )
+
+// TestGrepImmediateOutputBeforeEOF leaves input open after one slow and many fast reads.
+func TestGrepImmediateOutputBeforeEOF(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	args := []string{"-test.run=^TestCLIProcess$", "--", "grep", "-s", "-P", "-m", "1", "-p", "TTTTTTTT", "-I", "-w", "0", "-j", "4"}
+	command := exec.CommandContext(ctx, os.Args[0], args...)
+	command.Env = append(os.Environ(), "SEQKIT_CLI_TEST_HELPER=1")
+	stdin, err := command.StdinPipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	stdout, err := command.StdoutPipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var stderr bytes.Buffer
+	command.Stderr = &stderr
+	if err := command.Start(); err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		stdin.Close()
+		if command.ProcessState == nil {
+			command.Process.Kill()
+			command.Wait()
+		}
+	}()
+	const shortReads = 200
+	headers := make(chan struct{}, shortReads+1)
+	scanned := make(chan error, 1)
+	go func() {
+		scanner := bufio.NewScanner(stdout)
+		scanner.Buffer(make([]byte, 64<<10), 6<<20)
+		for scanner.Scan() {
+			if line := scanner.Bytes(); len(line) > 0 && line[0] == '>' {
+				headers <- struct{}{}
+			}
+		}
+		scanned <- scanner.Err()
+	}()
+	written := make(chan error, 1)
+	go func() {
+		var input strings.Builder
+		input.WriteString(">slow\n" + strings.Repeat("A", 5_000_000) + "TTTTTTTT\n")
+		for i := 0; i < shortReads; i++ {
+			fmt.Fprintf(&input, ">r%d\nTTTTTTTT\n", i)
+		}
+		// This header terminates the last matching record without ending stdin.
+		input.WriteString(">pending\nACGT\n")
+		_, err := io.WriteString(stdin, input.String())
+		written <- err
+	}()
+	for count := 0; count <= shortReads; count++ {
+		select {
+		case <-headers:
+		case <-ctx.Done():
+			t.Fatalf("only %d records were emitted before EOF", count)
+		}
+	}
+	if err := <-written; err != nil {
+		t.Fatal(err)
+	}
+	if err := stdin.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err := <-scanned; err != nil {
+		t.Fatal(err)
+	}
+	if err := command.Wait(); err != nil {
+		t.Fatalf("grep failed: %v %s", err, stderr.String())
+	}
+}
 
 // TestGrepPerFileStrands keeps protein detection local across all search paths.
 func TestGrepPerFileStrands(t *testing.T) {

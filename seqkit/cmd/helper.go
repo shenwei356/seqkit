@@ -434,8 +434,17 @@ func filepathTrimExtension2(file string, suffixes []string) (string, string, str
 	return name, e1, e2
 }
 
+// isPlainFile excludes every compression suffix supported by xopen.
 func isPlainFile(file string) bool {
-	return file != "" && !strings.HasSuffix(strings.ToLower(file), ".gz")
+	if isStdin(file) {
+		return false
+	}
+	switch strings.ToLower(filepath.Ext(file)) {
+	case ".gz", ".xz", ".zst", ".bz2", ".lz4":
+		return false
+	default:
+		return true
+	}
 }
 
 func fileNotExists(file string) bool {
@@ -483,6 +492,7 @@ func getFaidx(file string, idRegexp string, quiet bool) *fai.Faidx {
 	var idx fai.Index
 	var err error
 	fileFai := file + ".seqkit.fai"
+	checkError(checkFASTAIndexFile(fileFai))
 	if fileNotExists(fileFai) {
 		if !quiet {
 			log.Infof("create FASTA index for %s", file)

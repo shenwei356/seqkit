@@ -5,6 +5,37 @@ import (
 	"testing"
 )
 
+// TestCommonFirstFileCandidates retains duplicates without counting them as extra files.
+func TestCommonFirstFileCandidates(t *testing.T) {
+	dir := t.TempDir()
+	first := auditInput(t, dir, "first.fa", ">a\nAACT\n>a\nAGTT\n>b\nCCCC\n")
+	second := auditInput(t, dir, "second.fa", ">a\nAACT\n>a\nAACT\n>b\nCCCC\n>extra\nGGAA\n")
+	third := auditInput(t, dir, "third.fa", ">a\nAGTT\n>a\nAGTT\n>extra\nGGAA\n")
+	for _, flags := range [][]string{nil, {"-s"}, {"-s", "-P"}} {
+		want := ">a\nAACT\n>a\nAGTT\n"
+		if len(flags) == 2 {
+			want = ""
+		}
+		args := append(append([]string{"common"}, flags...), first, second, third)
+		out, stderr, err := runCLI(t, "", args...)
+		if err != nil || out != want {
+			t.Fatalf("flags=%v changed intersection: %v %s", flags, err, stderr)
+		}
+	}
+}
+
+// TestCommonNoCandidatesStillChecksInput preserves later read errors.
+func TestCommonNoCandidatesStillChecksInput(t *testing.T) {
+	dir := t.TempDir()
+	first := auditInput(t, dir, "first.fa", ">a\nACGT\n")
+	second := auditInput(t, dir, "second.fa", ">b\nTGCA\n")
+	bad := auditInput(t, dir, "bad.fq", "@b\nACGT\n+\nI\n")
+	_, stderr, err := runCLI(t, "", "common", first, second, bad)
+	if err == nil || !strings.Contains(stderr, "[ERRO]") {
+		t.Fatalf("later read error was lost: %v %s", err, stderr)
+	}
+}
+
 // TestCommonEmbeddedSnapshots retains independent hits in either query order.
 func TestCommonEmbeddedSnapshots(t *testing.T) {
 	dir := t.TempDir()

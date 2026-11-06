@@ -5,6 +5,29 @@ import (
 	"testing"
 )
 
+// TestShuffleMixedFileFormats retains formats after records change order.
+func TestShuffleMixedFileFormats(t *testing.T) {
+	dir := t.TempDir()
+	fasta := ">f\nACGT\n"
+	fastq := "@empty\n\n+\n\n@q\nTGCA\n+\nIIII\n"
+	fa := auditInput(t, dir, "input.fa", fasta)
+	fq := auditInput(t, dir, "input.fq", fastq)
+	for _, files := range [][]string{{fa, fq}, {fq, fa}} {
+		out, stderr, err := runCLI(t, "", append([]string{"shuffle", "-s", "23"}, files...)...)
+		if err != nil {
+			t.Fatalf("shuffle: %v %s", err, stderr)
+		}
+		for _, record := range []string{fasta, "@empty\n\n+\n\n", "@q\nTGCA\n+\nIIII\n"} {
+			if strings.Count(out, record) != 1 {
+				t.Fatal("shuffled record changed format or multiplicity")
+			}
+		}
+		if len(out) != len(fasta)+len(fastq) {
+			t.Fatal("unexpected shuffled output")
+		}
+	}
+}
+
 // TestShuffleTwoPassCRLF matches one-pass output, including a final bare CR.
 func TestShuffleTwoPassCRLF(t *testing.T) {
 	dir := t.TempDir()

@@ -7,6 +7,14 @@
         - With `--skip-file-check`, reject matching input/output path text without checking sequence input files on disk; keep full checks for auxiliary inputs and output conflicts.
     - `seqkit amplicon/fa2fq/faidx/fish/grep/locate/replace/subseq`:
         - Prevent `-o` from overwriting auxiliary input files.
+    - `seqkit amplicon/duplicate/head/head-genome/range/rename/replace/rmdup/shuffle/sliding/subseq`:
+        - Preserve each input's FASTA/FASTQ format when processing mixed inputs.
+    - `seqkit amplicon/grep/locate/sum`:
+        - Output completed results promptly in input order and reduce memory use when an earlier record or file is slow.
+    - `seqkit faidx/shuffle/sort/split/subseq`:
+        - Reject directories used as FASTA index paths and prevent output files from overwriting indexes.
+    - `seqkit shuffle/sort/split/subseq`:
+        - Read xz, zstd, bzip2, and LZ4 inputs through the appropriate decompression path.
     - `seqkit amplicon`:
         - Validate primer files and mismatch combinations, match N as a degenerate base, and omit reversed or entirely out-of-range results. [#618](https://github.com/shenwei356/seqkit/issues/618)
         - Fixed data races during parallel mismatch searches.
@@ -18,6 +26,7 @@
         - Skip empty histograms, keep automatic bin counts positive, and report image errors without truncating existing images. [#616](https://github.com/shenwei356/seqkit/issues/616)
     - `seqkit common`:
         - Make embedded-sequence intersections deterministic, slice qualities with sequences, report counts with explicit units, and preserve first-input semantics for stdin. [#620](https://github.com/shenwei356/seqkit/issues/620)
+        - Reduce memory use when later inputs contain many IDs, names, or sequences absent from the first input.
     - `seqkit concat`:
         - Preserve descriptions with custom ID parsing and ignore empty files when calculating full-join padding. [#614](https://github.com/shenwei356/seqkit/issues/614)
         - Avoid crashes when a full join has only one nonempty input containing duplicate IDs, and avoid repeating header text already included in a custom ID.
@@ -68,8 +77,10 @@
     - `seqkit sample/sample2`:
         - Reject NaN proportions. [#615](https://github.com/shenwei356/seqkit/issues/615)
         - Accept multiple inputs in single-pass proportion mode (`-p`), restarting the same seed for each file.
+        - Preserve empty FASTQ records when sampling by number.
     - `seqkit sample2`:
         - Reject multiple inputs in number mode (`-n`) and two-pass mode (`-2`), including files supplied via `--infile-list`.
+        - Preserve empty FASTQ records and default line wrapping in two-pass mode, and report malformed input when sampling by number.
     - `seqkit sana`:
         - Fixed output flushing.
     - `seqkit sana/scat`:
@@ -82,6 +93,7 @@
         - Normalize CRLF sequence lines in two-pass output. [#615](https://github.com/shenwei356/seqkit/issues/615)
     - `seqkit shuffle/sort/split`:
         - Improved two-pass processing and duplicate-header handling.
+        - Accept leading FASTA comments in two-pass mode.
     - `seqkit sliding`:
         - Skip empty circular records. [#619](https://github.com/shenwei356/seqkit/issues/619)
     - `seqkit sort`:

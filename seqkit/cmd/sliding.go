@@ -95,11 +95,11 @@ Attention:
 					break
 				}
 				if checkAlphabet {
+					fastx.ForcelyOutputFastq = fastxReader.IsFastq
 					if fastxReader.IsFastq {
 						if !config.LineWidthChanged {
 							config.LineWidth = 0
 						}
-						fastx.ForcelyOutputFastq = true
 					}
 					checkAlphabet = false
 				}

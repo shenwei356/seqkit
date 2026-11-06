@@ -105,7 +105,12 @@ Attention:
 		var err error
 
 		if !twoPass { // read all records into memory
-			sequences := make([]*fastx.Record, 0, 1024)
+			// shuffledRecord retains the source format, including zero-length FASTQ reads.
+			type shuffledRecord struct {
+				record  *fastx.Record
+				isFastq bool
+			}
+			sequences := make([]shuffledRecord, 0, 1024)
 
 			if !quiet {
 				log.Infof("read sequences ...")
@@ -113,7 +118,6 @@ Attention:
 			for _, file := range files {
 				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
-				checkAlphabet := true
 				for {
 					record, err = fastxReader.Read()
 					if err != nil {
@@ -123,17 +127,8 @@ Attention:
 						checkError(err)
 						break
 					}
-					if checkAlphabet {
-						if fastxReader.IsFastq {
-							if !config.LineWidthChanged {
-								config.LineWidth = 0
-							}
-							fastx.ForcelyOutputFastq = true
-						}
-						checkAlphabet = false
-					}
 
-					sequences = append(sequences, record.Clone())
+					sequences = append(sequences, shuffledRecord{record.Clone(), fastxReader.IsFastq})
 				}
 				fastxReader.Close()
 			}
@@ -154,8 +149,13 @@ Attention:
 			checkError(err)
 			defer closeOutput(outfh)
 
-			for _, record := range sequences {
-				record.FormatToWriter(outfh, config.LineWidth)
+			for _, item := range sequences {
+				fastx.ForcelyOutputFastq = item.isFastq
+				width := config.LineWidth
+				if item.isFastq && !config.LineWidthChanged {
+					width = 0
+				}
+				item.record.FormatToWriter(outfh, width)
 			}
 			return
 		}
@@ -194,9 +194,11 @@ Attention:
 		}
 
 		fileFai := newFile + ".seqkit.fai"
+		checkError(checkFASTAIndexFile(fileFai))
+		checkOutputFiles([]string{fileFai}, []string{outFile}, true)
 
 		if FileExists(fileFai) && updateFaidx {
-			checkError(os.RemoveAll(fileFai))
+			checkError(removeFASTAIndex(fileFai))
 			if !quiet {
 				log.Infof("delete the old FASTA index file: %s", fileFai)
 			}

@@ -6,6 +6,18 @@ import (
 	"testing"
 )
 
+// TestSampleEmptyFASTQ keeps empty records in FASTQ for number-based sampling.
+func TestSampleEmptyFASTQ(t *testing.T) {
+	input := "@empty\n\n+\n\n@full\nACGT\n+\nIIII\n"
+	file := auditInput(t, t.TempDir(), "input.fq", input)
+	for _, source := range []string{file, "-"} {
+		out, stderr, err := runCLI(t, input, "sample", "-n", "2", source)
+		if err != nil || out != input {
+			t.Fatalf("empty FASTQ record changed format: %v %s", err, stderr)
+		}
+	}
+}
+
 // TestSampleMultipleInputs compares a multi-file invocation with separate runs.
 func TestSampleMultipleInputs(t *testing.T) {
 	dir := t.TempDir()

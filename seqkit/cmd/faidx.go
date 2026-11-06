@@ -126,10 +126,6 @@ Examples:
 			}
 		}
 
-		outfh, err := xopen.Wopen(config.OutFile)
-		checkError(err)
-		defer closeOutput(outfh)
-
 		// create and read .fai
 		var idx fai.Index
 		var fileFai string
@@ -142,12 +138,20 @@ Examples:
 			idRegexp = config.IDRegexp
 		}
 
+		// Protect the index before opening an output that could truncate it.
+		checkError(checkFASTAIndexFile(fileFai))
+		checkOutputFiles([]string{fileFai}, []string{config.OutFile}, true)
+
+		outfh, err := xopen.Wopen(config.OutFile)
+		checkError(err)
+		defer closeOutput(outfh)
+
 		if !quiet {
 			log.Infof("create or read FASTA index ...")
 		}
 
 		if FileExists(fileFai) && updateFaidx {
-			checkError(os.RemoveAll(fileFai))
+			checkError(removeFASTAIndex(fileFai))
 			if !quiet {
 				log.Infof("delete the old FASTA index file: %s", fileFai)
 			}

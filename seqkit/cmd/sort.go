@@ -295,9 +295,11 @@ Attention:
 		}
 
 		fileFai := newFile + ".seqkit.fai"
+		checkError(checkFASTAIndexFile(fileFai))
+		checkOutputFiles([]string{fileFai}, []string{outFile}, true)
 
 		if FileExists(fileFai) && updateFaidx {
-			checkError(os.RemoveAll(fileFai))
+			checkError(removeFASTAIndex(fileFai))
 			if !quiet {
 				log.Infof("delete the old FASTA index file: %s", fileFai)
 			}

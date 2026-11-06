@@ -173,6 +173,8 @@ Examples:
 		}()
 
 		tokens := make(chan int, config.Threads)
+		// Bound admitted work separately from the number of active workers.
+		pending := make(chan int, orderedOutputBatches*config.Threads)
 		done := make(chan int)
 		threadsFloat := float64(config.Threads) // just avoid repeated type conversion
 		var wg sync.WaitGroup
@@ -186,74 +188,25 @@ Examples:
 		ch := make(chan *Aresult, config.Threads)
 
 		go func() {
-			m := make(map[uint64]*Aresult, config.Threads)
-			var id, _id uint64
-			var ok bool
-			var _r *Aresult
-
-			id = 1
-			for r := range ch {
+			consumeOrdered(ch, func(r *Aresult) uint64 { return r.id }, func(r *Aresult) {
 				if !r.ok {
 					failed = true
-				}
-				_id = r.id
-
-				if _id == id { // right there
-					if r.ok {
-						if all {
-							fmt.Fprintf(outfh, "%s\t%s\t%d\t%d\n", r.result.Digest, r.result.File, r.result.SeqNum, r.result.SeqLen)
-						} else {
-							fmt.Fprintf(outfh, "%s\t%s\n", r.result.Digest, r.result.File)
-						}
-
-						outfh.Flush()
+				} else {
+					if all {
+						fmt.Fprintf(outfh, "%s\t%s\t%d\t%d\n", r.result.Digest, r.result.File, r.result.SeqNum, r.result.SeqLen)
+					} else {
+						fmt.Fprintf(outfh, "%s\t%s\n", r.result.Digest, r.result.File)
 					}
-					id++
-					continue
+					outfh.Flush()
 				}
-
-				m[_id] = r // save for later check
-
-				if _r, ok = m[id]; ok { // check buffered
-					if _r.ok {
-						if all {
-							fmt.Fprintf(outfh, "%s\t%s\t%d\t%d\n", _r.result.Digest, _r.result.File, _r.result.SeqNum, _r.result.SeqLen)
-						} else {
-							fmt.Fprintf(outfh, "%s\t%s\n", _r.result.Digest, _r.result.File)
-						}
-						outfh.Flush()
-					}
-					delete(m, id)
-					id++
-				}
-			}
-
-			if len(m) > 0 {
-				ids := make([]uint64, len(m))
-				i := 0
-				for _id = range m {
-					ids[i] = _id
-					i++
-				}
-				sortutil.Uint64s(ids)
-				for _, _id = range ids {
-					_r = m[_id]
-
-					if _r.ok {
-						if all {
-							fmt.Fprintf(outfh, "%s\t%s\t%d\t%d\n", _r.result.Digest, _r.result.File, _r.result.SeqNum, _r.result.SeqLen)
-						} else {
-							fmt.Fprintf(outfh, "%s\t%s\n", _r.result.Digest, _r.result.File)
-						}
-						outfh.Flush()
-					}
-				}
-			}
+				<-pending
+			})
 			done <- 1
 		}()
 
 		var id uint64
 		for _, file := range files {
+			pending <- 1
 			tokens <- 1
 			wg.Add(1)
 			id++

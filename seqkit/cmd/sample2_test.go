@@ -7,6 +7,39 @@ import (
 	"testing"
 )
 
+// TestSample2EmptyFASTQ covers both branches of two-pass sampling and stdin loading.
+func TestSample2EmptyFASTQ(t *testing.T) {
+	input := "@empty\n\n+\n\n@full\n" + strings.Repeat("ACGT", 20) + "\n+\n" + strings.Repeat("I", 80) + "\n"
+	file := auditInput(t, t.TempDir(), "input.fq", input)
+	for _, mode := range [][]string{{"-n", "2"}, {"-n", "2", "-2"}, {"-p", "1", "-2"}} {
+		args := append([]string{"sample2", file}, mode...)
+		out, stderr, err := runCLI(t, "", args...)
+		if err != nil || out != input {
+			t.Fatalf("mode=%v changed FASTQ format or wrapping: %v %s", mode, err, stderr)
+		}
+	}
+	out, stderr, err := runCLI(t, input, "sample2", "-n", "2", "-")
+	if err != nil || out != input {
+		t.Fatalf("stdin format changed: %v %s", err, stderr)
+	}
+	emptyReads := "@a\n\n+\n\n@b\n\n+\n\n@c\n\n+\n\n"
+	emptyFile := auditInput(t, t.TempDir(), "empty.fq", emptyReads)
+	for _, mode := range [][]string{{"-n", "2"}, {"-n", "2", "-2"}, {"-p", "0.8", "-2"}} {
+		out, stderr, err := runCLI(t, "", append([]string{"sample2", emptyFile}, mode...)...)
+		if err != nil || strings.Count(out, "@") != 2 || strings.Count(out, "\n+\n\n") != 2 || strings.Contains(out, ">") {
+			t.Fatalf("mode=%v lost empty read format: %v %s", mode, err, stderr)
+		}
+	}
+}
+
+// TestSample2NumberReadErrors rejects a malformed suffix before selecting records.
+func TestSample2NumberReadErrors(t *testing.T) {
+	out, stderr, err := runCLI(t, "@good\nAC\n+\nII\n@bad\nACGT\n+\nII\n", "sample2", "-n", "1")
+	if err == nil || out != "" {
+		t.Fatalf("sampling accepted damaged input: %v %s", err, stderr)
+	}
+}
+
 // TestSample2MultipleInputs matches separate runs, including per-file format defaults.
 func TestSample2MultipleInputs(t *testing.T) {
 	dir := t.TempDir()

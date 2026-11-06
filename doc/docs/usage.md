@@ -123,10 +123,12 @@ the `gi` number, then use `--id-regexp "^gi\|([^\|]+)\|"`.
 
 ### FASTA index
 
-For some commands, including `subseq`, `split`, `sort` and `shuffle`,
-when input files are (plain or gzipped) FASTA files,
-FASTA index would be optional used for
-rapid access of sequences and reducing memory occupation.
+`subseq` uses a FASTA index for plain FASTA input. Two-pass `sort`, `shuffle`,
+and `split` also use an index, decompressing `.gz`, `.xz`, `.zst`, `.bz2`, and
+`.lz4` FASTA inputs into temporary files first. `subseq` streams compressed inputs.
+
+FASTA index paths (`.fai` and `.seqkit.fai`) must refer to regular files.
+Index updates reject directories, and output files cannot overwrite an index in use.
 
 ATTENTION: the `.seqkit.fai` file created by SeqKit is a little different from `.fai` file
 created by `samtools`. SeqKit uses full sequence head instead of just ID as key.
@@ -166,9 +168,13 @@ Note that when using `subseq --gtf | --bed`, if the GTF/BED files are too
 big, the memory usage will increase.
 You could use `--chr` to specify chromesomes and `--feature` to limit features.
 
-Some subcommands could either read all records or read the files twice by flag
-`-2` (`--two-pass`), including `sample`, `split`, `shuffle` and `sort`.
-They use FASTA index for rapid acccess of sequences and reducing memory occupation.
+For number-based sampling, `sample -2` and `sample2 -2` avoid keeping all records
+in memory. Two-pass `split`, `shuffle`, and `sort` use a FASTA index to reduce
+memory use.
+
+Parallel mismatch searches with `grep`, `locate`, and `amplicon` preserve input
+order and limit pending results. With `-I`, consecutive completed results are
+written without waiting for the end of the input.
 
 ### Reproducibility
 
@@ -2663,6 +2669,9 @@ Flags:
   -P, --only-positive-strand   only considering the positive strand when comparing by sequence
 ```
 
+Put the smallest suitable file first to reduce memory use, including when
+matching by ID or full name. Output records always come from that first file.
+
 Examples
 
 1. By ID (default)
@@ -3363,6 +3372,9 @@ Flags:
                             sample the same read pairs (default 11)
   -2, --two-pass            for -n, store N indices; for -p, fix the count. Requires a file
 ```
+
+Both sampling commands preserve empty FASTQ records. In `sample2`, this also
+applies to two-pass sampling by number or proportion.
 
 
 ## head
