@@ -56,6 +56,7 @@ Attention:
   1. The flag -U/--update-faidx is recommended to ensure the .fai file matches the FASTA file.
   2. Missing IDs in ordinary queries are warned about; valid queries are still
      written, and the command finishes with a nonzero exit status.
+  3. Out-of-range regions are clipped to sequence boundaries on either strand.
 
 The definition of region is 1-based and with some custom design.
 
@@ -260,21 +261,18 @@ Examples:
 		for _, faidxQ := range faidxQueries {
 			head = id2head[faidxQ.ID]
 			region = faidxQ.Region
-			// Clip a negative start before passing coordinates to the index reader.
-			if region[0] < -idx[head].Length {
-				region[0] = 1
+			// Determine orientation before clipping the lower endpoint on either strand.
+			start, end := region[0], region[1]
+			reverse := start > end && !(start > 0 && end < 0)
+			if reverse {
+				start, end = end, start
 			}
-
-			if (region[0] == 1 && region[1] == -1) || (region[0] > 0 && region[1] < 0) { // full record or region like [5, -5].
-				subseq, err = faidx.SubSeq(head, region[0], region[1])
-
-				outfh.WriteString(fmt.Sprintf(">%s%s\n", head, faidxQ.Suffix))
-			} else if region[0] <= region[1] {
-				subseq, err = faidx.SubSeq(head, region[0], region[1])
-
-				outfh.WriteString(fmt.Sprintf(">%s:%d-%d\n", head, region[0], region[1]))
-			} else { // reverse complement sequence
-				subseq, err = faidx.SubSeq(head, region[1], region[0])
+			if start < -idx[head].Length {
+				start = 1
+			}
+			subseq, err = faidx.SubSeq(head, start, end)
+			checkError(err)
+			if reverse {
 				alphabet = config.Alphabet
 				if alphabet == nil {
 					alphabet = seq.DNAredundant
@@ -287,11 +285,13 @@ Examples:
 					checkError(fmt.Errorf("fail to compute reverse complemente sequence for region: %s:%d-%d", head, region[0], region[1]))
 				}
 				subseq = _s.RevComInplace().Seq
-
-				outfh.WriteString(fmt.Sprintf(">%s:%d-%d\n", head, region[0], region[1]))
 			}
 
-			checkError(err)
+			if !reverse && start > 0 && end < 0 { // Full record or a mixed/open region.
+				outfh.WriteString(fmt.Sprintf(">%s%s\n", head, faidxQ.Suffix))
+			} else {
+				outfh.WriteString(fmt.Sprintf(">%s:%d-%d\n", head, region[0], region[1]))
+			}
 			text, buffer = wrapByteSlice(subseq, config.LineWidth, buffer)
 			outfh.Write(text)
 

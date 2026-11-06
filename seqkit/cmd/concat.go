@@ -53,6 +53,7 @@ Attention:
    2. If there are more than one sequences of the same ID, we output the Cartesian
       product of sequences.
    3. Description are also concatenated with a separator (-s/--separator).
+      Text included in a custom ID is not repeated in the description.
    4. Order of sequences with different IDs are random.
 
 `,
@@ -136,8 +137,12 @@ Attention:
 			var list *[]*fastx.Record
 			var m *map[int]int
 			for j, _seq := range seqs {
-				if idPattern.Match(_seq.Name) {
+				if match := idPattern.FindSubmatchIndex(_seq.Name); len(match) >= 4 && match[2] >= 0 {
 					restoreDescription(_seq)
+					// A custom ID may include some or all of the description.
+					if match[3] > len(_seq.Name)-len(_seq.Desc) {
+						_seq.Desc = bytes.TrimLeft(_seq.Name[match[3]:], " \t")
+					}
 				}
 				id = string(_seq.ID)
 
@@ -297,13 +302,10 @@ func init() {
 	concateCmd.Flags().StringP("separator", "s", "|", "separator for descriptions of records with the same ID")
 }
 
+// product returns one choice from each list in every possible combination.
 func product(lists ...[]int) (results [][]int) {
 	if len(lists) == 0 {
 		return nil
-	}
-	if len(lists) == 1 {
-		results = [][]int{lists[0]}
-		return results
 	}
 
 	results = make([][]int, 0, 8)

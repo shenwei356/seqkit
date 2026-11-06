@@ -178,6 +178,7 @@ Attention:
 // trackedFx retains parser state and physical identity across path changes.
 // lastSize is the size at the last parse attempt; pendingSize is the latest
 // notification size. busy lasts until EOF feedback; quitting drains exactly once.
+// removed identities are forgotten after their reader exits, allowing reuse.
 type trackedFx struct {
 	key, name                     string
 	info                          fs.FileInfo
@@ -185,6 +186,7 @@ type trackedFx struct {
 	lastSize, pendingSize         int64
 	lastTry                       time.Time
 	busy, pending, quitting, done bool
+	removed                       bool
 }
 
 // LaunchFxWatchers coordinates all roots, so aliases never launch duplicate parsers.
@@ -235,6 +237,9 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 			return
 		}
 		if previous := files[key]; previous != nil {
+			if previous.removed {
+				return // Rediscover this identity after its previous reader exits.
+			}
 			if current, err := os.Stat(previous.name); err != nil || !os.SameFile(current, previous.info) {
 				previous.name = path
 			}
@@ -369,14 +374,21 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 			if event.Op&(fsnotify.Create|fsnotify.Rename|fsnotify.Remove) != 0 {
 				// Relocate a renamed identity before deciding that it left the watched roots.
 				scan()
+				rescan := false
 				for _, item := range files {
-					if item.done || item.quitting {
-						continue
-					}
 					current, err := os.Stat(item.name)
 					if err != nil || !os.SameFile(current, item.info) {
-						quit(item)
+						item.removed = true
+						if item.done {
+							delete(files, item.key)
+							rescan = true
+						} else {
+							quit(item)
+						}
 					}
+				}
+				if rescan {
+					scan()
 				}
 			}
 			if event.Op&fsnotify.Write != 0 {
@@ -406,6 +418,7 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 				quitAll()
 			}
 		case <-tick.C:
+			rescan := false
 			for _, item := range running {
 				if item.done {
 					continue
@@ -417,8 +430,9 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 						active--
 						delete(running, item.key)
 						item.in, item.feedback = nil, nil
-						if findOnly {
+						if findOnly || item.removed {
 							delete(files, item.key)
+							rescan = rescan || item.removed
 						}
 					} else if feedback == StreamEOF {
 						item.busy = false
@@ -436,6 +450,10 @@ func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, 
 					}
 					item.pending = false
 				}
+			}
+			if rescan && !quitting {
+				// Creation may have arrived while the previous identity was draining.
+				scan()
 			}
 			if !quitting && idle > 0 && time.Since(lastActivity) >= idle {
 				quitAll()

@@ -7,6 +7,33 @@ import (
 	"testing"
 )
 
+// TestPairAlignedDuplicatesRespectPending keeps older occurrences ahead of direct pairs.
+func TestPairAlignedDuplicatesRespectPending(t *testing.T) {
+	for _, swap := range []bool{false, true} {
+		dir := t.TempDir()
+		a := auditInput(t, dir, "a.fa", ">a\nAA\n>a\nCC\n>a\nGG\n")
+		b := auditInput(t, dir, "b.fq", "@b\nTT\n+\nII\n@a\nAC\n+\nJK\n@a\nGT\n+\nLM\n")
+		first, second := a, b
+		if swap {
+			first, second = b, a
+		}
+		outdir := filepath.Join(dir, "out")
+		_, stderr, err := runCLI(t, "", "pair", "-1", first, "-2", second, "-u", "-O", outdir)
+		if err != nil {
+			t.Fatalf("pairing: %v %s", err, stderr)
+		}
+		for name, want := range map[string]string{
+			"a.fa": ">a\nAA\n>a\nCC\n", "a.unpaired.fa": ">a\nGG\n",
+			"b.fq": "@a\nAC\n+\nJK\n@a\nGT\n+\nLM\n", "b.unpaired.fq": "@b\nTT\n+\nII\n",
+		} {
+			data, err := os.ReadFile(filepath.Join(outdir, name))
+			if err != nil || string(data) != want {
+				t.Fatalf("swap=%v %s: %q %v", swap, name, data, err)
+			}
+		}
+	}
+}
+
 // TestPairDuplicateQueues keeps occurrence order and each mate's input format.
 func TestPairDuplicateQueues(t *testing.T) {
 	dir := t.TempDir()

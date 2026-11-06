@@ -65,6 +65,8 @@ Attention:
      you can increase the value of "-j/--threads" to accelerate processing.
   5. When using flag --circular, end position of matched subsequence that 
      crossing genome sequence end would be greater than sequence length.
+  6. Automatic sequence-type detection determines the strand policy separately
+     for each input file. Protein sequences are searched on the positive strand only.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -300,7 +302,6 @@ Attention:
 		// only for m > 0, where FMI is slow
 
 		var record *fastx.Record
-		_onlyPositiveStrand := onlyPositiveStrand
 
 		if mismatches > 0 || useFMI {
 			type Arecord struct {
@@ -386,6 +387,8 @@ Attention:
 				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 
+				// Alphabet detection must not change the next file's strand policy.
+				_onlyPositiveStrand := onlyPositiveStrand
 				checkAlphabet := true
 				for {
 					record, err = fastxReader.Read()
@@ -647,6 +650,7 @@ Attention:
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
+			_onlyPositiveStrand := onlyPositiveStrand
 			checkAlphabet := true
 			for {
 				record, err = fastxReader.Read()
@@ -922,7 +926,7 @@ Attention:
 						}
 					}
 
-					if onlyPositiveStrand {
+					if _onlyPositiveStrand {
 						continue
 					}
 

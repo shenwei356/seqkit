@@ -21,6 +21,7 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"path/filepath"
@@ -138,7 +139,6 @@ Tips:
 		// Validate both initial records before creating or truncating any output.
 		record1, err = reader1.Read()
 		checkError(errors.Wrap(err, read1))
-		record1 = record1.Clone()
 		record2, err = reader2.Read()
 		checkError(errors.Wrap(err, read2))
 		prepareOutputDir(outdir, force)
@@ -181,25 +181,37 @@ Tips:
 				pending[side][id] = append(pending[side][id], record.Clone())
 			}
 		}
-		consume(0, record1)
-		consume(1, record2)
+		records := [2]*fastx.Record{record1, record2}
 		readers := [2]*fastx.Reader{reader1, reader2}
-		done := [2]bool{}
-		for !done[0] || !done[1] {
+		for records[0] != nil || records[1] != nil {
+			// Write aligned mates before either reader reuses its record buffer.
+			// Older queued occurrences of this ID must still be paired first.
+			if records[0] != nil && records[1] != nil && bytes.Equal(records[0].ID, records[1].ID) &&
+				len(pending[0][string(records[0].ID)]) == 0 && len(pending[1][string(records[1].ID)]) == 0 {
+				writeFastxRecord(paired[0], records[0], formats[0], lineWidth)
+				writeFastxRecord(paired[1], records[1], formats[1], lineWidth)
+				pairs++
+			} else {
+				for side, record := range records {
+					if record != nil {
+						consume(side, record)
+					}
+				}
+			}
 			for side, reader := range readers {
-				if done[side] {
+				if records[side] == nil {
 					continue
 				}
 				record, readErr := reader.Read()
 				if readErr == io.EOF {
-					done[side] = true
+					records[side] = nil
 					continue
 				}
 				if readErr != nil {
 					closeAll()
 					checkError(errors.Wrap(readErr, []string{read1, read2}[side]))
 				}
-				consume(side, record)
+				records[side] = record
 			}
 		}
 		if saveUnpaired {

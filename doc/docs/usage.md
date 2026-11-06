@@ -1082,6 +1082,7 @@ Attention:
   1. The flag -U/--update-faidx is recommended to ensure the .fai file matches the FASTA file.
   2. Missing IDs in ordinary queries are warned about; valid queries are still
      written, and the command finishes with a nonzero exit status.
+  3. Out-of-range regions are clipped to sequence boundaries on either strand.
 
 The definition of region is 1-based and with some custom design.
 
@@ -2086,6 +2087,8 @@ Attention:
      you can increase the value of "-j/--threads" to accelerate processing.
   5. When using flag --circular, end position of matched subsequence that
      crossing genome sequence end would be greater than sequence length.
+  6. Automatic sequence-type detection determines the strand policy separately
+     for each input file. Protein sequences are searched on the positive strand only.
 
 Usage:
   seqkit locate [flags]
@@ -3938,6 +3941,7 @@ Attention:
    2. If there are more than one sequences of the same ID, we output the Cartesian
       product of sequences.
    3. Description are also concatenated with a separator (-s/--separator).
+      Text included in a custom ID is not repeated in the description.
    4. Order of sequences with different IDs are random.
 
 Usage:

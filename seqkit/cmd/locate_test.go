@@ -7,6 +7,28 @@ import (
 	"testing"
 )
 
+// TestLocatePerFileStrands keeps strand detection local in every search mode.
+func TestLocatePerFileStrands(t *testing.T) {
+	dir := t.TempDir()
+	dna := auditInput(t, dir, "dna.fa", ">dna\nACGTTGCA\n")
+	protein := auditInput(t, dir, "protein.fa", ">protein\nZZTTGCAACGZZ\n")
+	for _, mode := range [][]string{nil, {"-F"}, {"-m", "1"}, {"-r"}, {"-d"}} {
+		for _, files := range [][]string{{dna, protein}, {protein, dna}} {
+			for _, positive := range []bool{false, true} {
+				args := append([]string{"locate", "-c", "-p", "TTGCAACG"}, mode...)
+				if positive {
+					args = append(args, "-P")
+				}
+				out, stderr, err := runCLI(t, "", append(args, files...)...)
+				minus := strings.Contains(out, "dna\tTTGCAACG\tTTGCAACG\t-\t2\t9\t")
+				if err != nil || minus == positive || strings.Contains(out, "protein\tTTGCAACG\tTTGCAACG\t-\t") {
+					t.Fatalf("mode=%v positive=%v: strand mismatch: %q %v %s", mode, positive, out, err, stderr)
+				}
+			}
+		}
+	}
+}
+
 // TestLocateDuplicatePatternIDs checks warnings without losing repeated matches.
 func TestLocateDuplicatePatternIDs(t *testing.T) {
 	for _, mode := range []struct {
