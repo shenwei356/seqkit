@@ -42,9 +42,9 @@ func validateOutputPrefix(prefix string) {
 // splitOutputRegistry rejects aliases of inputs and previously opened outputs.
 type splitOutputRegistry struct {
 	inputs             []string
-	auxiliaryInputs    []string        // Indexes always retain full filesystem identity checks.
+	auxiliaryInputs    []string        // Indexes and input lists retain full identity checks.
 	paths              map[string]bool // Resolved paths make the common case constant time.
-	infos              []os.FileInfo   // Physical identities also catch hard-link aliases.
+	identities         map[string]bool // Physical identities also catch hard-link aliases.
 	skipInputFileCheck bool            // Compare only lexical paths for sequence inputs.
 	stdinInfo          os.FileInfo     // Captured before readers may close stdin.
 }
@@ -114,10 +114,12 @@ func (r *splitOutputRegistry) open(path string) (*xopen.Writer, error) {
 		}
 	}
 	if info != nil {
-		for _, previous := range r.infos {
-			if os.SameFile(info, previous) {
-				return nil, fmt.Errorf("output files cannot be the same: %s", path)
-			}
+		identity, err := fileIdentity(path, info)
+		if err != nil {
+			return nil, err
+		}
+		if r.identities[identity] {
+			return nil, fmt.Errorf("output files cannot be the same: %s", path)
 		}
 	}
 	w, err := xopen.Wopen(path)
@@ -130,7 +132,15 @@ func (r *splitOutputRegistry) open(path string) (*xopen.Writer, error) {
 		w.Close()
 		return nil, err
 	}
-	r.infos = append(r.infos, info)
+	identity, err := fileIdentity(path, info)
+	if err != nil {
+		w.Close()
+		return nil, err
+	}
+	if r.identities == nil {
+		r.identities = make(map[string]bool)
+	}
+	r.identities[identity] = true
 	return w, nil
 }
 

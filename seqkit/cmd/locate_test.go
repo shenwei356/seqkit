@@ -4,9 +4,44 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"sort"
 	"strings"
 	"testing"
 )
+
+// TestLocateMultiplePatternsAndRecords keeps cached reverse strands local to a record.
+func TestLocateMultiplePatternsAndRecords(t *testing.T) {
+	dir := t.TempDir()
+	records := []string{">a\nACGTAG\n", ">b\nttacca\n"}
+	patterns := []string{">p1\nAC\n", ">p2\nTA\n", ">p3\nGG\n"}
+	allPatterns := auditInput(t, dir, "patterns.fa", strings.Join(patterns, ""))
+	for _, mode := range [][]string{nil, {"-r"}, {"-d"}} {
+		for _, strand := range [][]string{nil, {"-c"}, {"-P"}} {
+			args := append(append([]string{"locate", "-i"}, mode...), strand...)
+			var want []string
+			for _, record := range records {
+				for _, pattern := range patterns {
+					file := auditInput(t, dir, "pattern.fa", pattern)
+					out, stderr, err := runCLI(t, record, append(append([]string(nil), args...), "-f", file)...)
+					if err != nil {
+						t.Fatalf("single search: %v %s", err, stderr)
+					}
+					want = append(want, strings.Split(strings.TrimSpace(out), "\n")[1:]...)
+				}
+			}
+			out, stderr, err := runCLI(t, strings.Join(records, ""), append(args, "-f", allPatterns)...)
+			if err != nil {
+				t.Fatalf("combined search: %v %s", err, stderr)
+			}
+			got := strings.Split(strings.TrimSpace(out), "\n")[1:]
+			sort.Strings(got)
+			sort.Strings(want)
+			if !reflect.DeepEqual(got, want) {
+				t.Fatalf("mode=%v strand=%v: combined matches differ: got=%v want=%v", mode, strand, got, want)
+			}
+		}
+	}
+}
 
 // TestLocatePerFileStrands keeps strand detection local in every search mode.
 func TestLocatePerFileStrands(t *testing.T) {

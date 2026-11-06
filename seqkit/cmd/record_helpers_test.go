@@ -3,7 +3,22 @@ package cmd
 import (
 	"strings"
 	"testing"
+
+	"github.com/shenwei356/bio/seq"
 )
+
+// TestHasComplementClones preserves nucleotide classification after cloning.
+func TestHasComplementClones(t *testing.T) {
+	for _, alphabet := range []*seq.Alphabet{seq.DNA, seq.DNAredundant, seq.RNA, seq.RNAredundant, seq.Protein, seq.Unlimit} {
+		want := alphabet != seq.Protein && alphabet != seq.Unlimit
+		if hasComplement(alphabet) != want || hasComplement(alphabet.Clone()) != want {
+			t.Fatalf("complement support changed after cloning %s", alphabet)
+		}
+	}
+	if hasComplement(nil) {
+		t.Fatal("nil alphabet has no complement")
+	}
+}
 
 // assertMixedFileFormats checks format and wrapping against independent invocations.
 func assertMixedFileFormats(t *testing.T, args ...string) {

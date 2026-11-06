@@ -776,6 +776,8 @@ Attention:
 					continue
 				}
 
+				// Reuse one reverse complement across patterns, but never across records.
+				seqRP = nil
 				for pName = range patterns {
 					// locs = locs[:0]
 
@@ -881,7 +883,9 @@ Attention:
 						continue
 					}
 
-					seqRP = record.Seq.RevCom()
+					if seqRP == nil {
+						seqRP = record.Seq.RevCom()
+					}
 
 					// locsNeg = locsNeg[:0]
 

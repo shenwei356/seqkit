@@ -296,6 +296,9 @@ Attention:
 
 		fileFai := newFile + ".seqkit.fai"
 		checkError(checkFASTAIndexFile(fileFai))
+		if infileList := getFlagString(cmd, "infile-list"); infileList != "" {
+			checkOutputFiles([]string{infileList}, []string{fileFai}, true)
+		}
 		checkOutputFiles([]string{fileFai}, []string{outFile}, true)
 
 		if FileExists(fileFai) && updateFaidx {

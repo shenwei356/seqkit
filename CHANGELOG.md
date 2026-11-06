@@ -13,6 +13,7 @@
         - Output completed results promptly in input order and reduce memory use when an earlier record or file is slow.
     - `seqkit faidx/shuffle/sort/split/subseq`:
         - Reject directories used as FASTA index paths and prevent output files from overwriting indexes.
+        - Preserve records with long IDs when reusing FASTA indexes, and report index read errors.
     - `seqkit shuffle/sort/split/subseq`:
         - Read xz, zstd, bzip2, and LZ4 inputs through the appropriate decompression path.
         - Avoid leaving input files open after detecting their format.
@@ -31,6 +32,7 @@
         - Make embedded-sequence intersections deterministic, slice qualities with sequences, report counts with explicit units, and preserve first-input semantics for stdin. [#620](https://github.com/shenwei356/seqkit/issues/620)
         - Reduce memory use when later inputs contain many IDs, names, or sequences absent from the first input.
         - Reduce memory use when comparing many records across multiple files.
+        - Preserve identical DNA/RNA matches on both strands with `-s -e`.
     - `seqkit common/rmdup`:
         - Keep reversed protein sequences distinct when comparing by sequence.
     - `seqkit concat`:
@@ -68,6 +70,7 @@
     - `seqkit locate`:
         - Combine command-line and file patterns, preserve repeated pattern records and warn about duplicate IDs, validate empty patterns, and normalize circular minus-strand coordinates. [#618](https://github.com/shenwei356/seqkit/issues/618)
         - Preserve regular-expression anchors and word boundaries when finding overlapping matches.
+        - Reduce runtime and memory use when searching both strands with many patterns without the FM-index.
     - `seqkit merge-slides`:
         - preserve merged ends for contained windows. by @sixty-66 [#624](https://github.com/shenwei356/seqkit/pull/624)
         - Validate and merge ordered intervals correctly. [#619](https://github.com/shenwei356/seqkit/issues/619)
@@ -109,6 +112,7 @@
     - `seqkit shuffle/sort/split`:
         - Improved two-pass processing and duplicate-header handling.
         - Accept leading FASTA comments in two-pass mode.
+        - Prevent index updates from overwriting `--infile-list` files.
     - `seqkit sliding`:
         - Skip empty circular records. [#619](https://github.com/shenwei356/seqkit/issues/619)
     - `seqkit sort`:
@@ -118,12 +122,15 @@
         - Preserve explicit FASTQ line widths and choose the correct output extension for stdin beginning with an empty FASTQ record.
     - `seqkit split/split2`:
         - Prevent generated output files from overwriting a file redirected to stdin.
+        - Protect `--infile-list` files from generated outputs, including lists read from redirected stdin.
+        - Speed up repeated splits into directories containing many output files.
     - `seqkit split2`:
         - Reject conflicting outputs/modes/prefixes and keep paired boundaries and record counts aligned. [#620](https://github.com/shenwei356/seqkit/issues/620)
     - `seqkit stats`:
         - Report read errors correctly while retaining valid results; `--skip-err` continues processing. [#599](https://github.com/shenwei356/seqkit/issues/599)
         - Accept valid negative Solexa scores and calculate their quality statistics correctly.
         - Reject NaN values for `-N`.
+        - Report zero `N50_num` and percentages when all sequences are empty.
     - `seqkit subseq`:
         - Handle GTF attributes with or without a trailing semicolon. [#600](https://github.com/shenwei356/seqkit/issues/600)
         - Update the FASTA index with `-U` even when `--quiet` is enabled.

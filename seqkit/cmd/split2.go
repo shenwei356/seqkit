@@ -251,10 +251,16 @@ If you want to cut a sequence into multiple segments.
 				outdir = files[0] + ".split"
 			}
 		}
-		if force {
-			checkOutputDir(files, outdir)
+		// Preserve the input list, including a file redirected to list stdin.
+		var auxiliaryInputs []string
+		if infileList := getFlagString(cmd, "infile-list"); infileList != "" {
+			auxiliaryInputs = append(auxiliaryInputs, infileList)
 		}
-		stdinInfo, err := inputStdinInfo(files)
+		allInputs := append(append([]string(nil), files...), auxiliaryInputs...)
+		if force {
+			checkOutputDir(allInputs, outdir)
+		}
+		stdinInfo, err := inputStdinInfo(allInputs)
 		checkError(err)
 		// Read mates together so all modes share one set of part boundaries.
 		readers := make([]*fastx.Reader, len(files))
@@ -304,7 +310,7 @@ If you want to cut a sequence into multiple segments.
 		if records[0] == nil {
 			return
 		}
-		registry := splitOutputRegistry{inputs: files, skipInputFileCheck: config.SkipFileCheck, stdinInfo: stdinInfo}
+		registry := splitOutputRegistry{inputs: files, auxiliaryInputs: auxiliaryInputs, skipInputFileCheck: config.SkipFileCheck, stdinInfo: stdinInfo}
 		filename := func(side, part int, record *fastx.Record) string {
 			if seqIDAsFileName {
 				return filepath.Join(outdir, pathutil.RemoveInvalidPathChars(string(record.ID), "__")+exts[side])

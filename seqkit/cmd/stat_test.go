@@ -9,6 +9,37 @@ import (
 	"testing"
 )
 
+// TestStatsZeroLengthRecords reports finite zero metrics without discarding records.
+func TestStatsZeroLengthRecords(t *testing.T) {
+	for _, test := range []struct {
+		input string
+		count int
+	}{
+		{"", 0}, {">a\n", 1}, {">a\n>b\n", 2},
+		{"@a\n\n+\n\n", 1}, {"@a\n\n+\n\n@b\n\n+\n\n", 2},
+	} {
+		out, stderr, err := runCLI(t, test.input, "stats", "-Ta", "-N", "0,50,100")
+		if err != nil {
+			t.Fatalf("empty records rejected: %v %s", err, stderr)
+		}
+		rows := strings.Split(strings.TrimSpace(out), "\n")
+		if len(rows) != 2 {
+			t.Fatalf("expected one statistics row, got %d", len(rows)-1)
+		}
+		header, values := strings.Split(rows[0], "\t"), strings.Split(rows[1], "\t")
+		for i := 3; i < len(header); i++ {
+			want := float64(0)
+			if header[i] == "num_seqs" {
+				want = float64(test.count)
+			}
+			got, err := strconv.ParseFloat(values[i], 64)
+			if err != nil || got != want {
+				t.Fatalf("count=%d %s=%s, want %g", test.count, header[i], values[i], want)
+			}
+		}
+	}
+}
+
 // TestStatsInvalidN rejects nonfinite percentiles before opening output.
 func TestStatsInvalidN(t *testing.T) {
 	for _, value := range []string{"NaN", "Inf", "-Inf"} {

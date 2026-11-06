@@ -175,14 +175,20 @@ Examples:
 		var prefix string
 		var record *fastx.Record
 
+		// Input lists are protected even when sequence file checks are disabled.
+		var auxiliaryInputs []string
+		if infileList := getFlagString(cmd, "infile-list"); infileList != "" {
+			auxiliaryInputs = append(auxiliaryInputs, infileList)
+		}
+		allInputs := append(append([]string(nil), files...), auxiliaryInputs...)
 		if force && !dryRun {
-			checkOutputDir(files, outdir)
+			checkOutputDir(allInputs, outdir)
 		}
 		var dirOnce sync.Once
 		var outputMu sync.Mutex
-		stdinInfo, stdinErr := inputStdinInfo(files)
+		stdinInfo, stdinErr := inputStdinInfo(allInputs)
 		checkError(stdinErr)
-		registry := splitOutputRegistry{inputs: files, skipInputFileCheck: config.SkipFileCheck, stdinInfo: stdinInfo}
+		registry := splitOutputRegistry{inputs: files, auxiliaryInputs: auxiliaryInputs, skipInputFileCheck: config.SkipFileCheck, stdinInfo: stdinInfo}
 		openOutput := func(path string) (*xopen.Writer, error) {
 			outputMu.Lock()
 			defer outputMu.Unlock()
@@ -340,6 +346,7 @@ Examples:
 
 			fileFai := newFile + ".seqkit.fai"
 			checkError(checkFASTAIndexFile(fileFai))
+			checkOutputFiles(auxiliaryInputs, []string{fileFai}, true)
 			registry.auxiliaryInputs = append(registry.auxiliaryInputs, fileFai)
 
 			if FileExists(fileFai) && updateFaidx {
@@ -474,6 +481,7 @@ Examples:
 
 			fileFai := newFile + ".seqkit.fai"
 			checkError(checkFASTAIndexFile(fileFai))
+			checkOutputFiles(auxiliaryInputs, []string{fileFai}, true)
 			registry.auxiliaryInputs = append(registry.auxiliaryInputs, fileFai)
 
 			if FileExists(fileFai) && updateFaidx {
@@ -610,6 +618,7 @@ Examples:
 
 			fileFai := newFile + ".seqkit.fai"
 			checkError(checkFASTAIndexFile(fileFai))
+			checkOutputFiles(auxiliaryInputs, []string{fileFai}, true)
 			registry.auxiliaryInputs = append(registry.auxiliaryInputs, fileFai)
 
 			if FileExists(fileFai) && updateFaidx {
@@ -857,6 +866,7 @@ Examples:
 
 			fileFai := newFile + ".seqkit.fai"
 			checkError(checkFASTAIndexFile(fileFai))
+			checkOutputFiles(auxiliaryInputs, []string{fileFai}, true)
 			registry.auxiliaryInputs = append(registry.auxiliaryInputs, fileFai)
 
 			if FileExists(fileFai) && updateFaidx {

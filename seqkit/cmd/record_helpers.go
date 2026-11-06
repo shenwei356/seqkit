@@ -127,8 +127,15 @@ func equalFoldBase(a, b byte) bool {
 
 // hasComplement reports whether an alphabet defines a nucleotide complement.
 func hasComplement(alphabet *seq.Alphabet) bool {
-	return alphabet == seq.DNA || alphabet == seq.DNAredundant ||
-		alphabet == seq.RNA || alphabet == seq.RNAredundant
+	if alphabet == nil {
+		return false
+	}
+	// Record clones own a copy of the alphabet, so pointer identity is not stable.
+	switch alphabet.Type() {
+	case seq.DNA.Type(), seq.DNAredundant.Type(), seq.RNA.Type(), seq.RNAredundant.Type():
+		return true
+	}
+	return false
 }
 
 // guessAlphabet closes the probe reader even when the first record is not at EOF.

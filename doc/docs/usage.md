@@ -795,6 +795,8 @@ Attention:
          seqkit seq -g input.fasta | seqkit stats
   2. Quality statistics use Phred scores. With -E solexa, Solexa scores (including
      valid negative scores) are converted through their error probabilities.
+  3. When the total sequence length is zero, N50, N50_num, and percentage metrics
+     are reported as zero.
 
 Tips:
   1. For lots of small files (especially on SSD), use a big value of '-j' to

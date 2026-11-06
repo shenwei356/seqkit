@@ -2,8 +2,20 @@ package cmd
 
 import (
 	"os"
+	"strings"
 	"testing"
 )
+
+// TestFaidxLongIndexRows keeps creation and reuse results identical.
+func TestFaidxLongIndexRows(t *testing.T) {
+	file := auditInput(t, t.TempDir(), "input.fa", ">short1\nACGT\n>"+strings.Repeat("x", 70_001)+"\nCCCC\n>short2\nTGCA\n")
+	for attempt := 0; attempt < 2; attempt++ {
+		out, stderr, err := runCLI(t, "", "faidx", file, "short1", "short2")
+		if err != nil || out != ">short1\nACGT\n>short2\nTGCA\n" {
+			t.Fatalf("attempt=%d: records lost across index reuse: %v %s", attempt, err, stderr)
+		}
+	}
+}
 
 // TestFaidxUpdateProtectsWorkingDirectory rejects an index path equal to cwd.
 func TestFaidxUpdateProtectsWorkingDirectory(t *testing.T) {

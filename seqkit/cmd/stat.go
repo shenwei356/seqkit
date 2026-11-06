@@ -88,6 +88,8 @@ Attention:
          seqkit seq -g input.fasta | seqkit stats
   2. Quality statistics use Phred scores. With -E solexa, Solexa scores (including
      valid negative scores) are converted through their error probabilities.
+  3. When the total sequence length is zero, N50, N50_num, and percentage metrics
+     are reported as zero.
 
 Tips:
   1. For lots of small files (especially on SSD), use a big value of '-j' to
@@ -451,6 +453,14 @@ Tips:
 					}
 				}
 
+				// Empty records have no bases contributing to percentage metrics.
+				var q20Percent, q30Percent, gcPercent float64
+				if total := lensStats.Sum(); total > 0 {
+					q20Percent = mathutil.Round(float64(q20)/float64(total)*100, 2)
+					q30Percent = mathutil.Round(float64(q30)/float64(total)*100, 2)
+					gcPercent = mathutil.Round(float64(gcSum)/float64(total)*100, 2)
+				}
+
 				if lensStats.Count() == 0 {
 					if basename {
 						file = filepath.Base(file)
@@ -476,10 +486,10 @@ Tips:
 						lensStats.Count(), lensStats.Sum(), gapSum, lensStats.Min(), nSum,
 						mathutil.Round(lensStats.Mean(), 1), lensStats.Max(), n50, l50,
 						q1, q2, q3,
-						mathutil.Round(float64(q20)/float64(lensStats.Sum())*100, 2),
-						mathutil.Round(float64(q30)/float64(lensStats.Sum())*100, 2),
+						q20Percent,
+						q30Percent,
 						mathutil.Round(avgQual, 2),
-						mathutil.Round(float64(gcSum)/float64(lensStats.Sum())*100, 2),
+						gcPercent,
 						nx,
 						nil, id}
 				}

@@ -13,6 +13,60 @@ import (
 	"github.com/shenwei356/bio/seqio/fai"
 )
 
+// TestFASTAIndexProtectsInputList covers every two-pass index update path.
+func TestFASTAIndexProtectsInputList(t *testing.T) {
+	commands := [][]string{
+		{"sort", "-2"}, {"shuffle", "-2"}, {"split", "-2", "-s", "1"},
+		{"split", "-2", "-p", "2"}, {"split", "-2", "-i"}, {"split", "-2", "-r", "1:2"},
+	}
+	for _, command := range commands {
+		for _, alias := range []string{"same", "symlink", "hardlink"} {
+			t.Run(strings.Join(command, "_")+"/"+alias, func(t *testing.T) {
+				dir := t.TempDir()
+				input := auditInput(t, dir, "input.fa", ">a\nACGT\n>b\nTGCA\n")
+				index := input + ".seqkit.fai"
+				list := index
+				if alias != "same" {
+					list = filepath.Join(dir, "inputs.txt")
+				}
+				data := input + "\n"
+				if err := os.WriteFile(list, []byte(data), 0600); err != nil {
+					t.Fatal(err)
+				}
+				if alias != "same" {
+					link := os.Link
+					if alias == "symlink" {
+						link = os.Symlink
+					}
+					if err := link(list, index); err != nil {
+						t.Skipf("links unavailable: %v", err)
+					}
+				}
+				args := append(append([]string(nil), command...), "-U", "--infile-list", list, "--skip-file-check")
+				output := filepath.Join(dir, "output")
+				if command[0] == "split" {
+					args = append(args, "-O", output)
+				} else {
+					auditInput(t, dir, "output", "keep\n")
+					args = append(args, "-o", output)
+				}
+				_, stderr, err := runCLI(t, "", args...)
+				got, readErr := os.ReadFile(list)
+				indexData, indexErr := os.ReadFile(index)
+				if err == nil || !strings.Contains(stderr, "cannot be the same") || readErr != nil || indexErr != nil || string(got) != data || string(indexData) != data {
+					t.Fatalf("index update changed input list: %v %s; read=%v index=%v", err, stderr, readErr, indexErr)
+				}
+				if command[0] != "split" {
+					got, readErr = os.ReadFile(output)
+					if readErr != nil || string(got) != "keep\n" {
+						t.Fatalf("output opened before index validation: %v", readErr)
+					}
+				}
+			})
+		}
+	}
+}
+
 // TestFASTAIndexUpdateDirectories protects direct paths and directory symlinks.
 func TestFASTAIndexUpdateDirectories(t *testing.T) {
 	commands := [][]string{

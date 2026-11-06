@@ -5,6 +5,42 @@ import (
 	"testing"
 )
 
+// TestCommonEmbeddedExactStrands keeps equal-length matches in both orientations.
+func TestCommonEmbeddedExactStrands(t *testing.T) {
+	for _, test := range []struct{ alphabet, forward, reverse string }{
+		{"dna", "TCGT", "ACGA"}, {"rna", "UCGU", "ACGA"},
+	} {
+		for _, firstSeq := range []string{test.forward, test.reverse} {
+			for _, query := range []string{test.forward, test.reverse} {
+				for _, positive := range []bool{false, true} {
+					for _, ignoreCase := range []bool{false, true} {
+						dir := t.TempDir()
+						first := auditInput(t, dir, "a.fa", ">a\n"+firstSeq+"\n")
+						text := query
+						args := []string{"common", "-s", "-e", "-t", test.alphabet}
+						if positive {
+							args = append(args, "-P")
+						}
+						if ignoreCase {
+							text = strings.ToLower(text)
+							args = append(args, "-i")
+						}
+						second := auditInput(t, dir, "b.fa", ">b\n"+text+"\n")
+						want := ">a\n" + firstSeq + "\n"
+						if positive && firstSeq != query {
+							want = ""
+						}
+						out, stderr, err := runCLI(t, "", append(args, first, second)...)
+						if err != nil || out != want {
+							t.Fatalf("%s %s/%s positive=%v ignoreCase=%v: output=%q: %v %s", test.alphabet, firstSeq, query, positive, ignoreCase, out, err, stderr)
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 // TestCommonFirstFileCandidates retains duplicates without counting them as extra files.
 func TestCommonFirstFileCandidates(t *testing.T) {
 	dir := t.TempDir()
