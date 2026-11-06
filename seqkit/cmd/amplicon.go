@@ -136,12 +136,8 @@ Examples:
 		runtime.GOMAXPROCS(config.Threads)
 		bwt.CheckEndSymbol = false
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		if !config.SkipFileCheck {
-			for _, file := range files {
-				checkIfFilesAreTheSame(file, outFile, "input", "output")
-			}
-		}
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 
 		var err error
 
@@ -164,6 +160,7 @@ Examples:
 		var primers [][3][]byte
 
 		if primerFile != "" {
+			checkOutputFiles([]string{primerFile}, []string{outFile}, true)
 			list, err = loadPrimers(primerFile)
 			checkError(err)
 		} else {

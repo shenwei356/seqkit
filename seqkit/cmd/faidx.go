@@ -82,6 +82,7 @@ Examples:
 		files := getFileListFromArgsAndFile(cmd, args, false, "infile-list", false)
 
 		file := files[0]
+		checkOutputFiles([]string{file}, []string{config.OutFile}, !config.SkipFileCheck)
 
 		if file == "-" {
 			checkError(fmt.Errorf("stdin not supported"))
@@ -100,6 +101,7 @@ Examples:
 		var err error
 		regions := make([]string, 0, 256)
 		if regionFile != "" {
+			checkOutputFiles([]string{regionFile}, []string{config.OutFile}, true)
 			var reader *breader.BufferedReader
 			reader, err = breader.NewDefaultBufferedReader(regionFile)
 			checkError(err)

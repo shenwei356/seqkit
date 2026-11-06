@@ -73,16 +73,12 @@ Attention:
 		fill := fillBase != ""
 		separator := getFlagString(cmd, "separator")
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
 
 		if len(files) < 2 {
 			checkError(errors.New("at least 2 files needed"))
 		}
-		if !config.SkipFileCheck {
-			for _, file := range files {
-				checkIfFilesAreTheSame(file, outFile, "input", "output")
-			}
-		}
+		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 
 		idPattern, err := regexp.Compile(idRegexp)
 		checkError(err)

@@ -140,12 +140,8 @@ Tips:
 			}
 		}
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !(skipFileCheck || config.SkipFileCheck))
-		if !config.SkipFileCheck {
-			for _, file := range files {
-				checkIfFilesAreTheSame(file, outFile, "input", "output")
-			}
-		}
+		files := getFileListFromArgsAndFile(cmd, args, !(skipFileCheck || config.SkipFileCheck), "infile-list", !(skipFileCheck || config.SkipFileCheck))
+		checkOutputFiles(files, []string{outFile}, !(skipFileCheck || config.SkipFileCheck))
 
 		style := &stable.TableStyle{
 			Name: "plain",
@@ -617,7 +613,7 @@ func init() {
 	statCmd.Flags().BoolP("basename", "b", false, "only output basename of files")
 	statCmd.Flags().StringP("stdin-label", "i", "-", `label for replacing default "-" for stdin`)
 	statCmd.Flags().StringSliceP("N", "N", []string{}, `append other N50-like stats as new columns. value range [0, 100], multiple values supported, e.g., -N 50,90 or -N 50 -N 90`)
-	statCmd.Flags().BoolP("skip-file-check", "S", false, `skip input file checking when given files or a file list.`)
+	statCmd.Flags().BoolP("skip-file-check", "S", false, `skip sequence input file checks; compare input/output path text only`)
 
 }
 

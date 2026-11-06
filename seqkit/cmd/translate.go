@@ -146,8 +146,8 @@ Translate Tables/Genetic Codes:
 
 		var files []string
 		if listTable < 0 && listTableAmb < 0 {
-			files = getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-			checkOutputFiles(files, []string{outFile})
+			files = getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+			checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 		}
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

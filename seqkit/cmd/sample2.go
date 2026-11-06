@@ -64,14 +64,14 @@ Results are deterministic for the same input and seed. To vary results across
 runs, add '-r/--non-deterministic' for a time-based seed.
 
 Attention:
-  1. Duplicate headers are allowed in both single-pass and two-pass sampling.
+  1. Single-pass proportion mode (-p without -2) accepts multiple inputs,
+     including --infile-list. Each file restarts the same random seed, as if
+     sampled separately. With -r, one time-based seed is reused for each file.
+  2. Number mode (-n) and two-pass mode (-2) accept one input file.
+  3. Duplicate headers are allowed in both single-pass and two-pass sampling.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 1 {
-			checkError(fmt.Errorf("no more than one file needed (%d)", len(args)))
-		}
-
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
@@ -82,12 +82,8 @@ Attention:
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		if !config.SkipFileCheck {
-			for _, file := range files {
-				checkIfFilesAreTheSame(file, outFile, "input", "output")
-			}
-		}
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 
 		seed := getFlagInt64(cmd, "rand-seed")
 		nonDeterministic := getFlagBool(cmd, "non-deterministic")
@@ -120,17 +116,18 @@ Attention:
 		if math.IsNaN(proportion) || proportion < 0 || proportion > 1 {
 			checkError(fmt.Errorf("value of -p (--proportion) (%f) should be in range of (0, 1]", proportion))
 		}
+		if len(files) > 1 && (number > 0 || twoPass) {
+			checkError(fmt.Errorf("number mode (-n) and two-pass mode (-2) accept only one file (%d given)", len(files)))
+		}
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer closeOutput(outfh)
 
-		var _rand *rand.Rand
 		if nonDeterministic {
-			_rand = rand.New(rand.NewSource(time.Now().UnixNano()))
-		} else {
-			_rand = rand.New(rand.NewSource(seed))
+			seed = time.Now().UnixNano()
 		}
+		_rand := rand.New(rand.NewSource(seed))
 
 		// 4 branches:
 		// by number + memory: reservior
@@ -180,39 +177,52 @@ Attention:
 			return
 		}
 
-		fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
-		checkError(err)
-		defer fastxReader.Close()
-
-		if fastxReader.IsFastq {
-			if !config.LineWidthChanged {
-				config.LineWidth = 0
-			}
-			fastx.ForcelyOutputFastq = true
-		}
 		var record *fastx.Record
 
 		// Branch B
 		if proportion > 0.0 && !twoPass {
-			for {
-				record, err = fastxReader.Read()
-				if err != nil {
+			lineWidth := config.LineWidth
+			for _, file := range files {
+				// Match separate invocations, including paired inputs and mixed formats.
+				_rand = rand.New(rand.NewSource(seed))
+				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
+				checkError(err)
+				config.LineWidth = lineWidth
+				fastx.ForcelyOutputFastq = false
+				checkFormat := true
+				for {
+					record, err = fastxReader.Read()
 					if err == io.EOF {
 						break
 					}
 					checkError(err)
-					break
+					if checkFormat {
+						fastx.ForcelyOutputFastq = fastxReader.IsFastq
+						if fastxReader.IsFastq && !config.LineWidthChanged {
+							config.LineWidth = 0
+						}
+						checkFormat = false
+					}
+					if _rand.Float64() <= proportion {
+						outputRecord(record)
+					}
 				}
-
-				// if <-randg <= proportion {
-				if _rand.Float64() <= proportion {
-					outputRecord(record)
-				}
+				fastxReader.Close()
 			}
 			if !quiet {
 				log.Infof("%d sequences outputted", n)
 			}
 			return
+		}
+
+		fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
+		checkError(err)
+		defer fastxReader.Close()
+		if fastxReader.IsFastq {
+			if !config.LineWidthChanged {
+				config.LineWidth = 0
+			}
+			fastx.ForcelyOutputFastq = true
 		}
 
 		// Two Pass Mode, first pass

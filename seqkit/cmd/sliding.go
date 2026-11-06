@@ -54,12 +54,8 @@ Attention:
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		if !config.SkipFileCheck {
-			for _, file := range files {
-				checkIfFilesAreTheSame(file, outFile, "input", "output")
-			}
-		}
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 
 		greedy := getFlagBool(cmd, "greedy")
 		circular := getFlagBool(cmd, "circular-genome") || getFlagBool(cmd, "circular")

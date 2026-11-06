@@ -41,9 +41,11 @@ func validateOutputPrefix(prefix string) {
 
 // splitOutputRegistry rejects aliases of inputs and previously opened outputs.
 type splitOutputRegistry struct {
-	inputs []string
-	paths  map[string]bool // Resolved paths make the common case constant time.
-	infos  []os.FileInfo   // Physical identities also catch hard-link aliases.
+	inputs             []string
+	paths              map[string]bool // Resolved paths make the common case constant time.
+	infos              []os.FileInfo   // Physical identities also catch hard-link aliases.
+	skipInputFileCheck bool            // Compare only lexical paths for sequence inputs.
+	stdinInfo          os.FileInfo     // Captured before readers may close stdin.
 }
 
 // open registers each logical output before truncating any existing file.
@@ -62,18 +64,38 @@ func (r *splitOutputRegistry) open(path string) (*xopen.Writer, error) {
 	if err != nil && !os.IsNotExist(err) {
 		return nil, err
 	}
-	for _, input := range r.inputs {
-		if isStdin(input) {
-			continue
-		}
-		inPath, err := resolvedPath(input)
+	inputTarget := resolved
+	var cwd string
+	if r.skipInputFileCheck {
+		cwd, err = os.Getwd()
 		if err != nil {
 			return nil, err
 		}
-		if inPath == resolved {
+		inputTarget, err = lexicalPath(path, cwd)
+		if err != nil {
+			return nil, err
+		}
+	}
+	for _, input := range r.inputs {
+		if isStdin(input) {
+			if info != nil && r.stdinInfo != nil && os.SameFile(info, r.stdinInfo) {
+				return nil, fmt.Errorf("input and output files cannot be the same: %s", path)
+			}
+			continue
+		}
+		var inPath string
+		if r.skipInputFileCheck {
+			inPath, err = lexicalPath(input, cwd)
+		} else {
+			inPath, err = resolvedPath(input)
+		}
+		if err != nil {
+			return nil, err
+		}
+		if inPath == inputTarget {
 			return nil, fmt.Errorf("input and output files cannot be the same: %s", path)
 		}
-		if info != nil {
+		if !r.skipInputFileCheck && info != nil {
 			inInfo, err := os.Stat(input)
 			if err != nil {
 				return nil, err

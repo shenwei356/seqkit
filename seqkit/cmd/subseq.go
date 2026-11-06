@@ -77,12 +77,8 @@ Examples:
 		Threads = config.Threads
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		if !config.SkipFileCheck {
-			for _, file := range files {
-				checkIfFilesAreTheSame(file, outFile, "input", "output")
-			}
-		}
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 
 		chrs := getFlagStringSlice(cmd, "chr")
 		chrsMap := make(map[string]struct{}, len(chrs))
@@ -117,6 +113,11 @@ Examples:
 		}
 
 		updateFaidx := getFlagBool(cmd, "update-faidx")
+		for _, auxiliary := range []string{bedFile, gtfFile} {
+			if auxiliary != "" {
+				checkOutputFiles([]string{auxiliary}, []string{outFile}, true)
+			}
+		}
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
@@ -223,8 +224,8 @@ Examples:
 					fileFai := file + ".seqkit.fai"
 
 					if FileExists(fileFai) && updateFaidx {
+						checkError(os.RemoveAll(fileFai))
 						if !quiet {
-							checkError(os.RemoveAll(fileFai))
 							log.Infof("delete the old FASTA index file: %s", fileFai)
 						}
 					}

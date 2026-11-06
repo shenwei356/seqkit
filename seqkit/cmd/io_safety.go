@@ -19,38 +19,90 @@ var indexHeaderTabs = regexp.MustCompile(`\t+`)
 // closeOutput reports buffered write and compression-finalization failures.
 func closeOutput(w io.Closer) { checkError(w.Close()) }
 
-// resolvedPath resolves existing parents as well as not-yet-created output names.
+// resolvedPath resolves parent and leaf links without cleaning .. before symlinks.
 func resolvedPath(path string) (string, error) {
-	if path == "" {
-		path = "."
-	}
-	resolved, err := filepath.EvalSymlinks(path)
-	if err == nil {
-		return filepath.Abs(resolved)
-	}
-	if !os.IsNotExist(err) {
-		return "", err
-	}
-	if target, linkErr := os.Readlink(path); linkErr == nil {
-		if !filepath.IsAbs(target) {
-			parent, _ := filepath.Split(path)
-			target = parent + target // Do not clean away symlink/.. before resolving it.
-		}
-		return resolvedPath(target)
-	}
-	separators := string(filepath.Separator)
-	if filepath.Separator == '\\' {
-		separators += "/"
-	}
-	parent, base := filepath.Split(strings.TrimRight(path, separators))
-	if base == "" {
-		return "", err
-	}
-	parent, err = resolvedPath(parent)
+	paths, err := filePathVariants(path)
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(parent, base), nil
+	return paths[len(paths)-1], nil
+}
+
+// Adapted from LexicMap's file path checks.
+// filePathVariants preserves every symlink entry traversed on the way to a file.
+// Directory cleanup can remove an intermediate entry even if the target is outside.
+func filePathVariants(path string) ([]string, error) {
+	absolute, err := filepath.Abs(path)
+	if err != nil {
+		return nil, err
+	}
+	paths := []string{absolute}
+	// Keep .. components until preceding links have been followed.
+	if filepath.IsAbs(path) {
+		absolute = path
+	} else if filepath.VolumeName(path) == "" {
+		cwd, err := os.Getwd()
+		if err != nil {
+			return nil, err
+		}
+		absolute = cwd + string(filepath.Separator) + path
+	}
+	volume := filepath.VolumeName(absolute)
+	parent := volume + string(filepath.Separator)
+	components := func(p string) []string {
+		return strings.FieldsFunc(p, func(c rune) bool { return c < 128 && os.IsPathSeparator(uint8(c)) })
+	}
+	pending := components(absolute[len(volume):])
+	links := 0
+	for len(pending) > 0 {
+		part := pending[0]
+		pending = pending[1:]
+		if part == "." {
+			continue
+		}
+		if part == ".." {
+			parent = filepath.Dir(parent)
+			continue
+		}
+		named := filepath.Join(parent, part)
+		info, err := os.Lstat(named)
+		if os.IsNotExist(err) {
+			// Auxiliary outputs may not exist yet; their existing parents matter.
+			// Continue through .. and later symlinks after a missing component.
+			parent = named
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		if info.Mode()&os.ModeSymlink == 0 {
+			if len(pending) > 0 && !info.IsDir() {
+				return nil, fmt.Errorf("path component %s is not a directory", named)
+			}
+			parent = named
+			continue
+		}
+		paths = append(paths, named)
+		links++
+		if links > 255 {
+			return nil, fmt.Errorf("too many symbolic links in %s", path)
+		}
+		target, err := os.Readlink(named)
+		if err != nil {
+			return nil, err
+		}
+		// Resolve one link at a time; EvalSymlinks on the parent would hide
+		// entries in chains such as alias/db/inputs -> outside -> elsewhere.
+		v := filepath.VolumeName(target)
+		if filepath.IsAbs(target) {
+			parent = v + string(filepath.Separator)
+		} else if len(target) > len(v) && os.IsPathSeparator(target[len(v)]) {
+			parent = filepath.VolumeName(parent) + string(filepath.Separator)
+		}
+		pending = append(components(target[len(v):]), pending...)
+	}
+	paths = append(paths, parent)
+	return paths, nil
 }
 
 // isWorkingDir also recognizes absolute, relative, and symlink aliases of cwd.
@@ -62,55 +114,119 @@ func isWorkingDir(dir string) bool {
 	return resolved == cwd
 }
 
-// checkOutputFiles rejects input/output and output/output aliases before writing.
-func checkOutputFiles(inputs, outputs []string) {
-	paths := make(map[string]string, len(inputs)+len(outputs))
-	for _, in := range inputs {
-		if isStdin(in) {
-			continue
-		}
-		path, err := resolvedPath(in)
-		checkError(err)
-		paths[path] = "input"
+// lexicalPath normalizes paths without probing their components. Cache cwd once
+// for large input lists; filepath.Abs would look it up for every relative path.
+func lexicalPath(path, cwd string) (string, error) {
+	if filepath.IsAbs(path) {
+		return filepath.Clean(path), nil
 	}
-	var infos []os.FileInfo // Cache metadata; new outputs need no pairwise file checks.
-	var kinds []string
-	loadedInputs := false
+	if filepath.VolumeName(path) != "" || (len(path) > 0 && os.IsPathSeparator(path[0])) {
+		// Windows drive-relative and rooted paths use the platform's cwd rules.
+		return filepath.Abs(path)
+	}
+	return filepath.Join(cwd, path), nil
+}
+
+// checkOutputFiles rejects input/output and output/output aliases before writing.
+// With checkInputFiles disabled, named inputs use only lexical path comparisons.
+// Outputs and redirected stdin retain their filesystem identity checks.
+func checkOutputFiles(inputs, outputs []string, checkInputFiles bool) {
+	checkOutputFilesWithStdin(inputs, outputs, checkInputFiles, nil)
+}
+
+// inputStdinInfo captures stdin identity before sequence readers may close it.
+func inputStdinInfo(inputs []string) (os.FileInfo, error) {
+	for _, input := range inputs {
+		if isStdin(input) {
+			return os.Stdin.Stat()
+		}
+	}
+	return nil, nil
+}
+
+// checkOutputFilesWithStdin accepts an earlier stdin snapshot for outputs whose
+// names cannot be determined until the first input record has been read.
+func checkOutputFilesWithStdin(inputs, outputs []string, checkInputFiles bool, stdinInfo os.FileInfo) {
+	// outputFile retains only the few output identities, not every input's metadata.
+	type outputFile struct {
+		path     string
+		absolute string // Lexical identity for inputs whose metadata checks are disabled.
+		resolved string
+		info     os.FileInfo // Nil for a new output, which cannot have hard-link aliases.
+	}
+	files := make([]outputFile, 0, len(outputs))
 	for _, out := range outputs {
 		if isStdin(out) {
 			continue
 		}
 		path, err := resolvedPath(out)
 		checkError(err)
-		if kind, exists := paths[path]; exists {
-			checkError(fmt.Errorf("%s and output files cannot be the same", kind))
-		}
-		paths[path] = "output"
 		info, err := os.Stat(out)
-		if os.IsNotExist(err) {
+		if err != nil && !os.IsNotExist(err) {
+			checkError(err)
+		}
+		for _, previous := range files {
+			if path == previous.resolved || (info != nil && previous.info != nil && os.SameFile(info, previous.info)) {
+				checkError(fmt.Errorf("output and output files cannot be the same: %s and %s", previous.path, out))
+			}
+		}
+		absolute, err := filepath.Abs(out)
+		checkError(err)
+		files = append(files, outputFile{path: out, absolute: absolute, resolved: path, info: info})
+	}
+	// Streaming to stdout needs no filesystem checks, even for large input lists.
+	if len(files) == 0 {
+		return
+	}
+	var cwd string
+	if !checkInputFiles {
+		var err error
+		cwd, err = os.Getwd()
+		checkError(err)
+	}
+	for _, input := range inputs {
+		if !checkInputFiles && !isStdin(input) {
+			path, err := lexicalPath(input, cwd)
+			checkError(err)
+			for _, output := range files {
+				if path == output.absolute {
+					checkError(fmt.Errorf("input and output files cannot be the same: %s and %s", input, output.path))
+				}
+			}
 			continue
 		}
-		checkError(err)
-		if !loadedInputs {
-			for _, in := range inputs {
-				if isStdin(in) {
-					continue
-				}
-				inputInfo, err := os.Stat(in)
-				if os.IsNotExist(err) {
-					continue
-				}
+		var path string
+		var info os.FileInfo
+		var err error
+		statDone := false
+		if isStdin(input) {
+			// Redirected stdin can be the same file that -o is about to truncate.
+			info = stdinInfo
+			if info == nil {
+				info, err = os.Stdin.Stat()
 				checkError(err)
-				infos, kinds = append(infos, inputInfo), append(kinds, "input")
 			}
-			loadedInputs = true
+			statDone = true
+		} else {
+			path, err = resolvedPath(input)
+			checkError(err)
 		}
-		for i, previous := range infos {
-			if os.SameFile(info, previous) {
-				checkError(fmt.Errorf("%s and output files cannot be the same", kinds[i]))
+		for _, output := range files {
+			same := path != "" && path == output.resolved
+			if !same && output.info != nil {
+				if !statDone {
+					info, err = os.Stat(input)
+					if err != nil && !os.IsNotExist(err) {
+						checkError(err)
+					}
+					statDone = true
+				}
+				same = info != nil && os.SameFile(info, output.info)
+			}
+			if same {
+				checkError(fmt.Errorf("input and output files cannot be the same: %s and %s", input, output.path))
 			}
 		}
-		infos, kinds = append(infos, info), append(kinds, "output")
 	}
 }
 

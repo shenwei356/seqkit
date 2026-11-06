@@ -59,6 +59,11 @@ Stdin (-) may only appear once in the input file list, including files supplied
 via --infile-list. When --infile-list - reads the list from stdin, input data
 must come from files.
 
+With --skip-file-check, sequence input files are checked only for matching
+normalized paths with outputs; existence and symlink/hard-link checks are skipped.
+Auxiliary inputs (e.g., pattern, BED, and input-list files), output conflicts,
+redirected stdin, and output-directory cleanup retain their full checks.
+
 Compression level:
   format   range   default  comment
   gzip     1-9     5        https://github.com/klauspost/pgzip sets 5 as the default value.
@@ -137,7 +142,7 @@ func init() {
 	RootCmd.PersistentFlags().BoolP("quiet", "", false, "be quiet and do not show extra information")
 	RootCmd.PersistentFlags().IntP("alphabet-guess-seq-length", "", 10000, "length of sequence prefix of the first FASTA record based on which seqkit guesses the sequence type (0 for whole seq)")
 	RootCmd.PersistentFlags().StringP("infile-list", "X", "", "file of input files list (one file per line), if given, they are appended to files from cli arguments")
-	RootCmd.PersistentFlags().BoolP("skip-file-check", "", false, `skip input file checking when given a file list if you believe these files do exist`)
+	RootCmd.PersistentFlags().BoolP("skip-file-check", "", false, `skip sequence input file checks; compare input/output path text only`)
 	RootCmd.PersistentFlags().IntP("compress-level", "", -1, `compression level for gzip, zstd, xz and bzip2. type "seqkit -h" for the range and default value for each format`)
 
 	RootCmd.CompletionOptions.DisableDefaultCmd = true

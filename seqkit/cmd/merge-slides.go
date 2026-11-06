@@ -105,12 +105,8 @@ Output (BED3 format):
 			checkError(fmt.Errorf("regular expression must contain at least three capturing groups"))
 		}
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		if !config.SkipFileCheck {
-			for _, file := range files {
-				checkIfFilesAreTheSame(file, outFile, "input", "output")
-			}
-		}
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 
 		if !config.Quiet {
 			if len(files) == 1 && isStdin(files[0]) {

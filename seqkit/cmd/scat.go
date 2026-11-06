@@ -132,7 +132,7 @@ Attention:
 		reFilter, err := regexp.Compile(reStr)
 		checkError(err)
 
-		dirs := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+		dirs := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
 		roots := make([]string, 0, len(dirs))
 		seenDirs := make(map[string]bool)
 		for _, dir := range dirs {

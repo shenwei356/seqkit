@@ -4,6 +4,9 @@
         - Report compressed-input read errors instead of treating damaged files as empty input. [#610](https://github.com/shenwei356/seqkit/issues/610)
         - Accept leading `;` comment lines before the first FASTA record; comments are discarded when writing sequences. [bio#12](https://github.com/shenwei356/bio/pull/12)
         - Reject repeated stdin input across command-line arguments, `--infile-list`, and paired-read inputs. [#613](https://github.com/shenwei356/seqkit/issues/613)
+        - With `--skip-file-check`, reject matching input/output path text without checking sequence input files on disk; keep full checks for auxiliary inputs and output conflicts.
+    - `seqkit amplicon/fa2fq/faidx/fish/grep/locate/replace/subseq`:
+        - Prevent `-o` from overwriting auxiliary input files.
     - `seqkit amplicon`:
         - Validate primer files and mismatch combinations, match N as a degenerate base, and omit reversed or entirely out-of-range results. [#618](https://github.com/shenwei356/seqkit/issues/618)
         - Fixed data races during parallel mismatch searches.
@@ -31,13 +34,18 @@
         - Validate alignment parameters, compare bases without case in accuracy/NM statistics, and correct BAM reference names and program tags. [#618](https://github.com/shenwei356/seqkit/issues/618)
     - `seqkit fx2tab/seq/stats`:
         - Report invalid quality scores without panicking or emitting partial output. [#598](https://github.com/shenwei356/seqkit/issues/598)
+    - `seqkit fx2tab`:
+        - Include the file column in the header when using `-H -f`.
     - `seqkit grep`:
         - Added a fast bit-parallel search path for a single pattern of up to 64 characters with 1-4 mismatches, avoiding FM-index construction for each record. by @DylanCosto [#621](https://github.com/shenwei356/seqkit/pull/621)
+        - Fixed data races and preserved each file's FASTA/FASTQ formatting during parallel mismatch searches.
+        - Reduce memory use for sequence/regular-expression searches and small command-line pattern sets.
+    - `seqkit grep/locate`:
+        - Preserve DNA reverse-strand matches after protein input files, and search protein sequences only on the positive strand in all search modes.
     - `seqkit head/split2`:
         - Use base-1000 K/M/G/T suffixes for sequence lengths. Buffer sizes and file-growth thresholds retain base 1024; help now identifies each base.
     - `seqkit locate`:
         - Combine command-line and file patterns, preserve repeated pattern records and warn about duplicate IDs, validate empty patterns, and normalize circular minus-strand coordinates. [#618](https://github.com/shenwei356/seqkit/issues/618)
-        - Preserve DNA reverse-strand matches after protein input files, and search protein sequences only on the positive strand in all search modes.
     - `seqkit merge-slides`:
         - preserve merged ends for contained windows. by @sixty-66 [#624](https://github.com/shenwei356/seqkit/pull/624)
         - Validate and merge ordered intervals correctly. [#619](https://github.com/shenwei356/seqkit/issues/619)
@@ -52,10 +60,16 @@
         - Preserve unrelated output-directory files and check initial input before writing. [#620](https://github.com/shenwei356/seqkit/issues/620)
     - `seqkit replace`:
         - Reject FASTQ replacements that borrow qualities outside the current match; document per-file record numbering. [#620](https://github.com/shenwei356/seqkit/issues/620)
+    - `seqkit restart`:
+        - Process each record independently with `-s`, avoiding skipped records and crashes on multi-record input.
+        - Detect overlapping start matches as ambiguous.
     - `seqkit sample`:
-        - Report loading errors and accept multiple inputs with `-p`, restarting the same seed for each file. [#615](https://github.com/shenwei356/seqkit/issues/615)
+        - Report loading errors. [#615](https://github.com/shenwei356/seqkit/issues/615)
     - `seqkit sample/sample2`:
         - Reject NaN proportions. [#615](https://github.com/shenwei356/seqkit/issues/615)
+        - Accept multiple inputs in single-pass proportion mode (`-p`), restarting the same seed for each file.
+    - `seqkit sample2`:
+        - Reject multiple inputs in number mode (`-n`) and two-pass mode (`-2`), including files supplied via `--infile-list`.
     - `seqkit sana`:
         - Fixed output flushing.
     - `seqkit sana/scat`:
@@ -74,12 +88,15 @@
         - Fixed sorting and output issues involving mixed formats, case-insensitive comparisons, sequence prefixes, and empty sequences. [#602](https://github.com/shenwei356/seqkit/issues/602), [#603](https://github.com/shenwei356/seqkit/issues/603), [#604](https://github.com/shenwei356/seqkit/issues/604), [#605](https://github.com/shenwei356/seqkit/issues/605), [#606](https://github.com/shenwei356/seqkit/issues/606)
     - `seqkit split`:
         - With `-p`, create balanced nonempty parts. [#620](https://github.com/shenwei356/seqkit/issues/620)
+    - `seqkit split/split2`:
+        - Prevent generated output files from overwriting a file redirected to stdin.
     - `seqkit split2`:
         - Reject conflicting outputs/modes/prefixes and keep paired boundaries and record counts aligned. [#620](https://github.com/shenwei356/seqkit/issues/620)
     - `seqkit stats`:
         - Report read errors correctly while retaining valid results; `--skip-err` continues processing. [#599](https://github.com/shenwei356/seqkit/issues/599)
     - `seqkit subseq`:
         - Handle GTF attributes with or without a trailing semicolon. [#600](https://github.com/shenwei356/seqkit/issues/600)
+        - Update the FASTA index with `-U` even when `--quiet` is enabled.
     - `seqkit sum`:
         - Return a non-zero exit status for failed files while retaining valid results; reject invalid ID regular expressions before processing. [#613](https://github.com/shenwei356/seqkit/issues/613)
     - `seqkit translate`:

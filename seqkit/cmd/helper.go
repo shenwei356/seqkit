@@ -99,6 +99,10 @@ func getFileListFromFile(file string, checkFile bool) ([]string, error) {
 		return nil, fmt.Errorf("read file list from '%s': %s", file, err)
 	}
 
+	// Keep caller-owned stdin available for output identity checks.
+	if file == "-" {
+		return lists, nil
+	}
 	return lists, fh.Close()
 }
 
@@ -124,6 +128,9 @@ func getFileListFromArgsAndFile(cmd *cobra.Command, args []string, checkFileFrom
 		inputFiles = files[:1]
 	}
 	checkError(validateStdinUsage(inputFiles, isStdin(infileList)))
+	if infileList != "" {
+		checkOutputFiles([]string{infileList}, []string{getFlagString(cmd, "out-file")}, true)
+	}
 	return files
 }
 

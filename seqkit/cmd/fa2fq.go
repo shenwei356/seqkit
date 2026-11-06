@@ -62,12 +62,9 @@ Attention:
 		}
 		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		if !config.SkipFileCheck {
-			for _, file := range files {
-				checkIfFilesAreTheSame(file, outFile, "input", "output")
-			}
-		}
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
+		checkOutputFiles([]string{fileFasta}, []string{outFile}, true)
 
 		records, err := fastx.GetSeqsMap(fileFasta, seq.Unlimit, config.Threads, 10, "")
 		checkError(err)

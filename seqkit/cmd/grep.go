@@ -99,7 +99,6 @@ Examples:
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
 		outFile := config.OutFile
-		lineWidth := config.LineWidth
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
 		usingDefaultIDRegexp := config.IDRegexp == fastx.DefaultIDRegexp
@@ -108,12 +107,8 @@ Examples:
 
 		bwt.CheckEndSymbol = false
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		if !config.SkipFileCheck {
-			for _, file := range files {
-				checkIfFilesAreTheSame(file, outFile, "input", "output")
-			}
-		}
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 
 		justCount := getFlagBool(cmd, "count")
 		pattern := getFlagStringSlice(cmd, "pattern")
@@ -208,13 +203,19 @@ Examples:
 
 		// prepare pattern
 		patternsR := make(map[uint64]*regexp.Regexp, 1<<10)
-		patternsN := make(map[uint64]int, 1<<20)
+		// Reserve large ID tables only for pattern files that use ID/name matching.
+		patternCapacity := len(pattern)
+		if patternFile != "" && !degenerate && !useRegexp && !bySeq {
+			patternCapacity = 1 << 20
+		}
+		patternsN := make(map[uint64]int, patternCapacity)
 		// patternsS := make(map[string]interface{}, 1<<10)
 		patternsS := make([][]byte, 0, 16)
 
 		var pattern2seq *seq.Seq
 		var pbyte []byte
 		if patternFile != "" {
+			checkOutputFiles([]string{patternFile}, []string{outFile}, true)
 			var reader *breader.BufferedReader
 			reader, err = breader.NewDefaultBufferedReader(patternFile)
 			checkError(err)
@@ -360,10 +361,13 @@ Examples:
 			if len(patternsS) == 1 {
 				shortMatcher = newShortMismatchMatcher(patternsS[0], mismatches)
 			}
+			// Arecord carries the input format to the ordered output goroutine.
 			type Arecord struct {
-				id     uint64
-				ok     bool
-				record *fastx.Record
+				id        uint64
+				ok        bool
+				record    *fastx.Record
+				isFastq   bool // Preserve empty FASTQ records as well as nonempty reads.
+				lineWidth int  // The effective width for this record's input file.
 			}
 
 			var wg sync.WaitGroup
@@ -372,6 +376,11 @@ Examples:
 
 			done := make(chan int)
 			go func() {
+				writeRecord := func(r *Arecord) {
+					// Only this goroutine changes the formatter's global FASTQ override.
+					fastx.ForcelyOutputFastq = r.isFastq
+					r.record.FormatToWriter(outfh, r.lineWidth)
+				}
 				m := make(map[uint64]*Arecord, config.Threads)
 				var id, _id uint64
 				var ok bool
@@ -390,7 +399,7 @@ Examples:
 
 					if _id == id { // right there
 						if r.ok {
-							r.record.FormatToWriter(outfh, config.LineWidth)
+							writeRecord(r)
 							if immediateOutput {
 								outfh.Flush()
 							}
@@ -403,7 +412,7 @@ Examples:
 
 					if _r, ok = m[id]; ok { // check buffered
 						if _r.ok {
-							_r.record.FormatToWriter(outfh, config.LineWidth)
+							writeRecord(_r)
 							if immediateOutput {
 								outfh.Flush()
 							}
@@ -425,7 +434,7 @@ Examples:
 						_r = m[_id]
 
 						if _r.ok {
-							_r.record.FormatToWriter(outfh, config.LineWidth)
+							writeRecord(_r)
 							if immediateOutput {
 								outfh.Flush()
 							}
@@ -440,6 +449,9 @@ Examples:
 				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 
+				// Alphabet detection applies only to this file's workers.
+				positiveOnly := onlyPositiveStrand
+				lineWidth := config.LineWidth
 				checkAlphabet := true
 				for {
 					record, err = fastxReader.Read()
@@ -453,13 +465,12 @@ Examples:
 
 					if checkAlphabet {
 						if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
-							onlyPositiveStrand = true
+							positiveOnly = true
 						}
 						if fastxReader.IsFastq {
 							if !config.LineWidthChanged {
-								config.LineWidth = 0
+								lineWidth = 0
 							}
-							fastx.ForcelyOutputFastq = true
 						}
 						checkAlphabet = false
 					}
@@ -467,7 +478,8 @@ Examples:
 					tokens <- 1
 					wg.Add(1)
 					id++
-					go func(record *fastx.Record, id uint64) {
+					go func(record *fastx.Record, id uint64, positiveOnly, isFastq bool, lineWidth int) {
+						var err error // Index/search errors belong to this worker.
 						defer func() {
 							wg.Done()
 							<-tokens
@@ -475,7 +487,7 @@ Examples:
 
 						if len(record.Seq.Seq) == 0 {
 							if invertMatch {
-								ch <- &Arecord{record: record, ok: true, id: id}
+								ch <- &Arecord{record: record, ok: true, id: id, isFastq: isFastq, lineWidth: lineWidth}
 							} else {
 								ch <- &Arecord{record: nil, ok: false, id: id}
 							}
@@ -499,7 +511,7 @@ Examples:
 								break
 							}
 
-							if strand == '-' && onlyPositiveStrand {
+							if strand == '-' && positiveOnly {
 								break
 							}
 
@@ -561,9 +573,9 @@ Examples:
 							}
 						}
 
-						ch <- &Arecord{record: record, ok: true, id: id}
+						ch <- &Arecord{record: record, ok: true, id: id, isFastq: isFastq, lineWidth: lineWidth}
 
-					}(record.Clone(), id)
+					}(record.Clone(), id, positiveOnly, fastxReader.IsFastq, lineWidth)
 				}
 				fastxReader.Close()
 			}
@@ -593,6 +605,9 @@ Examples:
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
+			positiveOnly := onlyPositiveStrand // Do not carry protein detection to later files.
+			lineWidth := config.LineWidth
+			fastx.ForcelyOutputFastq = false
 			checkAlphabet := true
 			for {
 				if deleteMatched && len(patternsR)+len(patternsN)+len(patternsS) == 0 {
@@ -610,11 +625,11 @@ Examples:
 
 				if checkAlphabet {
 					if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
-						onlyPositiveStrand = true
+						positiveOnly = true
 					}
 					if fastxReader.IsFastq {
 						if !config.LineWidthChanged {
-							config.LineWidth = 0
+							lineWidth = 0
 						}
 						fastx.ForcelyOutputFastq = true
 					}
@@ -640,7 +655,7 @@ Examples:
 
 					if strand == '-' {
 						if bySeq {
-							if onlyPositiveStrand {
+							if positiveOnly {
 								break
 							}
 						} else {
@@ -723,10 +738,10 @@ Examples:
 						count += n - 1
 					}
 				} else {
-					record.FormatToWriter(outfh, config.LineWidth)
+					record.FormatToWriter(outfh, lineWidth)
 					if allowDups && n > 1 {
 						for i = 0; i < n-1; i++ {
-							record.FormatToWriter(outfh, config.LineWidth)
+							record.FormatToWriter(outfh, lineWidth)
 						}
 					}
 				}
@@ -737,7 +752,6 @@ Examples:
 			}
 			fastxReader.Close()
 
-			config.LineWidth = lineWidth
 		}
 
 		if justCount {

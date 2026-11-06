@@ -55,6 +55,8 @@ Attention:
      an error probability, 3) take the mean of those, 4) and then convert that
      mean error back into a qscore.
      Reference: https://github.com/shenwei356/seqkit/issues/448
+  3. With -f/--file-name, the final column contains the input file name;
+     -H/--header-line names this column "file".
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -66,12 +68,8 @@ Attention:
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		if !config.SkipFileCheck {
-			for _, file := range files {
-				checkIfFilesAreTheSame(file, outFile, "input", "output")
-			}
-		}
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 
 		onlyID := getFlagBool(cmd, "only-id")
 		printLength := getFlagBool(cmd, "length")
@@ -146,6 +144,9 @@ Attention:
 			}
 			if printSeqHash {
 				outfh.WriteString("\tseq.hash")
+			}
+			if printFile {
+				outfh.WriteString("\tfile")
 			}
 
 			outfh.WriteString("\n")

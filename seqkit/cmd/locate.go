@@ -83,12 +83,8 @@ Attention:
 
 		bwt.CheckEndSymbol = false
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		if !config.SkipFileCheck {
-			for _, file := range files {
-				checkIfFilesAreTheSame(file, outFile, "input", "output")
-			}
-		}
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 
 		pattern := getFlagStringSlice(cmd, "pattern")
 		patternFile := getFlagString(cmd, "pattern-file")
@@ -161,6 +157,7 @@ Attention:
 		patternNames := make(map[string]string) // Internal keys preserve duplicate display names.
 		var s string
 		if patternFile != "" {
+			checkOutputFiles([]string{patternFile}, []string{outFile}, true)
 			records, err := readRecordsChecked(patternFile, seq.Unlimit, "")
 			checkError(err)
 			if len(records) == 0 {

@@ -81,19 +81,7 @@ Attention:
 			checkError(fmt.Errorf("flag -s (--by-seq) needed when using -P (--only-positive-strand)"))
 		}
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		if !config.SkipFileCheck {
-			// Validate auxiliary outputs before opening any file for writing.
-			for _, file := range files {
-				checkIfFilesAreTheSame(file, outFile, "input", "output")
-				if saveDupFile {
-					checkIfFilesAreTheSame(file, dupFile, "input", "output")
-				}
-				if saveNumFile {
-					checkIfFilesAreTheSame(file, numFile, "input", "output")
-				}
-			}
-		}
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
 		outputs := []string{outFile}
 		if saveDupFile {
 			outputs = append(outputs, dupFile)
@@ -101,7 +89,7 @@ Attention:
 		if saveNumFile {
 			outputs = append(outputs, numFile)
 		}
-		checkOutputFiles(nil, outputs)
+		checkOutputFiles(files, outputs, !config.SkipFileCheck)
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer closeOutput(outfh)

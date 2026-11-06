@@ -70,12 +70,8 @@ The --force flag only clips scores > 40 for Illumina-1.8+ -> Sanger.
 		seq.NMostCommonThreshold = getFlagPositiveInt(cmd, "thresh-B-in-n-most-common")
 		threshIllumina1p5Frac := getFlagFloat64(cmd, "thresh-illumina1.5-frac")
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		if !config.SkipFileCheck {
-			for _, file := range files {
-				checkIfFilesAreTheSame(file, outFile, "input", "output")
-			}
-		}
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer closeOutput(outfh)

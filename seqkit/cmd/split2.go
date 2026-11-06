@@ -101,17 +101,13 @@ If you want to cut a sequence into multiple segments.
 		fai.MapWholeFile = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
 
 		if len(files) > 1 {
 			checkError(fmt.Errorf("no more than one file should be given"))
 		}
 
-		if !config.SkipFileCheck {
-			for _, file := range files {
-				checkIfFilesAreTheSame(file, outFile, "input", "output")
-			}
-		}
+		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 
 		read1 := getFlagString(cmd, "read1")
 		read2 := getFlagString(cmd, "read2")
@@ -258,6 +254,8 @@ If you want to cut a sequence into multiple segments.
 		if force {
 			checkOutputDir(files, outdir)
 		}
+		stdinInfo, err := inputStdinInfo(files)
+		checkError(err)
 		// Read mates together so all modes share one set of part boundaries.
 		readers := make([]*fastx.Reader, len(files))
 		records := make([]*fastx.Record, len(files))
@@ -306,7 +304,7 @@ If you want to cut a sequence into multiple segments.
 		if records[0] == nil {
 			return
 		}
-		registry := splitOutputRegistry{inputs: files}
+		registry := splitOutputRegistry{inputs: files, skipInputFileCheck: config.SkipFileCheck, stdinInfo: stdinInfo}
 		filename := func(side, part int, record *fastx.Record) string {
 			if seqIDAsFileName {
 				return filepath.Join(outdir, pathutil.RemoveInvalidPathChars(string(record.ID), "__")+exts[side])
@@ -327,7 +325,7 @@ If you want to cut a sequence into multiple segments.
 			return filepath.Join(outdir, fmt.Sprintf(fileFmt, prefix, part, exts[side]))
 		}
 		if pairedEnd {
-			checkOutputFiles(files, []string{filename(0, 1, records[0]), filename(1, 1, records[1])})
+			checkOutputFilesWithStdin(files, []string{filename(0, 1, records[0]), filename(1, 1, records[1])}, !config.SkipFileCheck, stdinInfo)
 		}
 		prepareOutputDir(outdir, force)
 		writers := make(map[int][]*xopen.Writer)

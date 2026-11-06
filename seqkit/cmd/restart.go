@@ -42,6 +42,10 @@ var restartCmd = &cobra.Command{
 	Short:   "reset start position (rotate) for circular genomes",
 	Long: `reset start position (rotate) for circular genomes
 
+Each input record is treated as an independent circular sequence. Multiple
+records and input files are supported with both -i and -s. With -s, records
+with no match or multiple matches on the searched strand are skipped with a warning.
+
 Examples
   1. Specify a new start position.
 
@@ -84,12 +88,8 @@ Examples
 		seq.ValidateSeq = false
 		runtime.GOMAXPROCS(config.BufferSize)
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		if !config.SkipFileCheck {
-			for _, file := range files {
-				checkIfFilesAreTheSame(file, outFile, "input", "output")
-			}
-		}
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 
 		newstart := getFlagInt(cmd, "new-start")
 		startSeq := []byte(getFlagString(cmd, "start-with"))
@@ -120,6 +120,7 @@ Examples
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
+			fastx.ForcelyOutputFastq = false
 			checkAlphabet := true
 			for {
 				record, err = fastxReader.Read()
@@ -192,13 +193,15 @@ Examples
 							}
 						}
 					} else {
+						i = 0 // Search each record from its own first base.
 						for {
 							newstart = bytes.Index(sequence[i:], startSeq)
 							if newstart < 0 {
 								break
 							}
+							newstart += i
 							positions = append(positions, newstart)
-							i += newstart + len(startSeq)
+							i = newstart + 1 // Include overlapping matches when checking uniqueness.
 						}
 
 						if len(positions) > 1 {
@@ -214,13 +217,15 @@ Examples
 								sequence = bytes.ToUpper(sequence0)
 							}
 
+							i = 0
 							for {
 								newstart = bytes.Index(sequence[i:], startSeq)
 								if newstart < 0 {
 									break
 								}
+								newstart += i
 								positions = append(positions, newstart)
-								i += newstart + len(startSeq)
+								i = newstart + 1
 							}
 							if len(positions) > 1 {
 								log.Warningf("the given subsequence is found at %d positions in the reverse complement sequence of %s, please give a longer one to increase the specificity", len(positions), record.ID)

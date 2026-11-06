@@ -169,12 +169,8 @@ Attention:
 			seq.ValidateSeq = true
 		}
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
-		if !config.SkipFileCheck {
-			for _, file := range files {
-				checkIfFilesAreTheSame(file, outFile, "input", "output")
-			}
-		}
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 
 		var alns []*AlignedSeq
 		if len(files) == 0 {
@@ -183,6 +179,7 @@ Attention:
 
 		detector := NewSeqDetector(flagAll, flagStranded, flagNullMode, flagCutoff, alnParams)
 		if queryFastx != "" {
+			checkOutputFiles([]string{queryFastx}, []string{outFile}, true)
 			detector.LoadQueries(queryFastx)
 		}
 		if flagSeq != "" {

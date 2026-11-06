@@ -206,6 +206,11 @@ Stdin (-) may only appear once in the input file list, including files supplied
 via --infile-list. When --infile-list - reads the list from stdin, input data
 must come from files.
 
+With --skip-file-check, sequence input files are checked only for matching
+normalized paths with outputs; existence and symlink/hard-link checks are skipped.
+Auxiliary inputs (e.g., pattern, BED, and input-list files), output conflicts,
+redirected stdin, and output-directory cleanup retain their full checks.
+
 Compression level:
   format   range   default  comment
   gzip     1-9     5        https://github.com/klauspost/pgzip sets 5 as the default value.
@@ -292,8 +297,7 @@ Flags:
       --quiet                           be quiet and do not show extra information
   -t, --seq-type string                 sequence type (dna|rna|protein|unlimit|auto) (for auto, it
                                         automatically detect by the first sequence) (default "auto")
-      --skip-file-check                 skip input file checking when given a file list if you believe
-                                        these files do exist
+      --skip-file-check                 skip sequence input file checks; compare input/output path text only
   -j, --threads int                     number of CPUs. can also set with environment variable
                                         SEQKIT_THREADS) (default 4)
 
@@ -805,10 +809,9 @@ Flags:
   -G, --gap-letters string   gap letters (default "- .")
   -h, --help                 help for stats
   -e, --skip-err             skip error, only show warning message
-  -S, --skip-file-check      skip input file checking when given files or a file list.
+  -S, --skip-file-check      skip sequence input file checks; compare input/output path text only
   -i, --stdin-label string   label for replacing default "-" for stdin (default "-")
   -T, --tabular              output in machine-friendly tabular format
-
 ```
 
 Eexamples
@@ -1391,9 +1394,11 @@ Attention:
      an error probability, 3) take the mean of those, 4) and then convert that
      mean error back into a qscore.
      Reference: https://github.com/shenwei356/seqkit/issues/448
+  3. With -f/--file-name, the final column contains the input file name;
+     -H/--header-line names this column "file".
 
 Usage:
-  seqkit fx2tab [flags] 
+  seqkit fx2tab [flags]
 
 Flags:
   -a, --alphabet               print alphabet letters
@@ -1415,7 +1420,6 @@ Flags:
   -b, --qual-ascii-base int    ASCII BASE, 33 for Phred+33 (default 33)
   -s, --seq-hash               print hash (MD5) of sequence
       --stdin-label string     label for replacing default "-" for stdin (default "-")
-
 ```
 
 Usage (tab2fx)
@@ -3341,7 +3345,11 @@ Results are deterministic for the same input and seed. To vary results across
 runs, add '-r/--non-deterministic' for a time-based seed.
 
 Attention:
-  1. Duplicate headers are allowed in both single-pass and two-pass sampling.
+  1. Single-pass proportion mode (-p without -2) accepts multiple inputs,
+     including --infile-list. Each file restarts the same random seed, as if
+     sampled separately. With -r, one time-based seed is reused for each file.
+  2. Number mode (-n) and two-pass mode (-2) accept one input file.
+  3. Duplicate headers are allowed in both single-pass and two-pass sampling.
 
 Usage:
   seqkit sample2 [flags]
@@ -3875,6 +3883,10 @@ $ seqkit restart -h
 
 reset start position (rotate) for circular genomes
 
+Each input record is treated as an independent circular sequence. Multiple
+records and input files are supported with both -i and -s. With -s, records
+with no match or multiple matches on the searched strand are skipped with a warning.
+
 Examples
   1. Specify a new start position.
 
@@ -3919,7 +3931,6 @@ Flags:
   -i, --new-start int       new start position (1-based, supporting negative value counting from the
                             end) (default 1)
   -s, --start-with string   rotate the genome to make it starting with the given subsequence
-
 ```
 
 ## concat

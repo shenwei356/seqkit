@@ -120,7 +120,7 @@ Tips:
 		if saveUnpaired {
 			outputs = append(outputs, outFile1U, outFile2U)
 		}
-		checkOutputFiles([]string{read1, read2}, outputs)
+		checkOutputFiles([]string{read1, read2}, outputs, !config.SkipFileCheck)
 		if force && !addSuffix {
 			checkOutputDir([]string{read1, read2}, outdir)
 		}

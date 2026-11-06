@@ -96,7 +96,7 @@ Examples:
 		fai.MapWholeFile = false
 		runtime.GOMAXPROCS(config.Threads)
 
-		files := getFileListFromArgsAndFile(cmd, args, true, "infile-list", !config.SkipFileCheck)
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
 
 		if len(files) > 1 {
 			checkError(fmt.Errorf("no more than one file should be given"))
@@ -180,7 +180,9 @@ Examples:
 		}
 		var dirOnce sync.Once
 		var outputMu sync.Mutex
-		registry := splitOutputRegistry{inputs: files}
+		stdinInfo, stdinErr := inputStdinInfo(files)
+		checkError(stdinErr)
+		registry := splitOutputRegistry{inputs: files, skipInputFileCheck: config.SkipFileCheck, stdinInfo: stdinInfo}
 		openOutput := func(path string) (*xopen.Writer, error) {
 			outputMu.Lock()
 			defer outputMu.Unlock()
