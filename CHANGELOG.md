@@ -5,7 +5,7 @@
         - Accept leading `;` comment lines before the first FASTA record; comments are discarded when writing sequences. [bio#12](https://github.com/shenwei356/bio/pull/12)
         - Reject repeated stdin input across command-line arguments, `--infile-list`, and paired-read inputs. [#613](https://github.com/shenwei356/seqkit/issues/613)
         - With `--skip-file-check`, reject matching input/output path text without checking sequence input files on disk; keep full checks for auxiliary inputs and output conflicts.
-    - `seqkit amplicon/fa2fq/faidx/fish/grep/locate/replace/subseq`:
+    - `seqkit amplicon/fa2fq/faidx/fish/grep/locate/mutate/replace/seq/subseq`:
         - Prevent `-o` from overwriting auxiliary input files.
     - `seqkit amplicon/duplicate/head/head-genome/range/rename/replace/rmdup/shuffle/sliding/subseq`:
         - Preserve each input's FASTA/FASTQ format when processing mixed inputs.
@@ -15,9 +15,12 @@
         - Reject directories used as FASTA index paths and prevent output files from overwriting indexes.
     - `seqkit shuffle/sort/split/subseq`:
         - Read xz, zstd, bzip2, and LZ4 inputs through the appropriate decompression path.
+        - Avoid leaving input files open after detecting their format.
     - `seqkit amplicon`:
         - Validate primer files and mismatch combinations, match N as a degenerate base, and omit reversed or entirely out-of-range results. [#618](https://github.com/shenwei356/seqkit/issues/618)
         - Fixed data races during parallel mismatch searches.
+        - Omit false matches on empty records and return the longest amplicon when degenerate primers have overlapping matches.
+        - Reduce repeated primer setup when reads do not match or BED output is requested.
     - `seqkit bam`:
         - Validate fields and top-output combinations before processing; require NM only for dependent statistics; fix BAM pass-through, toolbox errors, and retention of completed file statistics on failure. [#616](https://github.com/shenwei356/seqkit/issues/616)
     - `seqkit bam/faidx/shuffle/sort/split`:
@@ -27,11 +30,18 @@
     - `seqkit common`:
         - Make embedded-sequence intersections deterministic, slice qualities with sequences, report counts with explicit units, and preserve first-input semantics for stdin. [#620](https://github.com/shenwei356/seqkit/issues/620)
         - Reduce memory use when later inputs contain many IDs, names, or sequences absent from the first input.
+        - Reduce memory use when comparing many records across multiple files.
+    - `seqkit common/rmdup`:
+        - Keep reversed protein sequences distinct when comparing by sequence.
     - `seqkit concat`:
         - Preserve descriptions with custom ID parsing and ignore empty files when calculating full-join padding. [#614](https://github.com/shenwei356/seqkit/issues/614)
         - Avoid crashes when a full join has only one nonempty input containing duplicate IDs, and avoid repeating header text already included in a custom ID.
+        - Reject multi-character padding that would produce incorrect sequence or quality lengths.
+        - Reduce peak memory use when duplicate IDs produce many concatenated combinations.
     - `seqkit concat/head-genome/rename`:
         - Preserve descriptions after repeated header separators with the default ID parser. [#614](https://github.com/shenwei356/seqkit/issues/614)
+    - `seqkit concat/split`:
+        - Preserve empty FASTQ records without changing the output format or losing qualities.
     - `seqkit convert`:
         - Reject invalid quality scores and conversions outside printable ASCII. [#612](https://github.com/shenwei356/seqkit/issues/612)
     - `seqkit convert/locate/merge-slides/range/replace/sliding/split/split2/sum`:
@@ -39,6 +49,8 @@
     - `seqkit faidx`:
         - Clip negative starts, retain region suffixes, and return failure for missing IDs while preserving valid query results. [#618](https://github.com/shenwei356/seqkit/issues/618)
         - Clip out-of-range negative coordinates in reverse-complement queries as well as forward queries.
+    - `seqkit faidx/subseq`:
+        - Prevent index updates from overwriting sequence inputs or auxiliary files.
     - `seqkit fish`:
         - Validate alignment parameters, compare bases without case in accuracy/NM statistics, and correct BAM reference names and program tags. [#618](https://github.com/shenwei356/seqkit/issues/618)
     - `seqkit fx2tab/seq/stats`:
@@ -55,9 +67,12 @@
         - Use base-1000 K/M/G/T suffixes for sequence lengths. Buffer sizes and file-growth thresholds retain base 1024; help now identifies each base.
     - `seqkit locate`:
         - Combine command-line and file patterns, preserve repeated pattern records and warn about duplicate IDs, validate empty patterns, and normalize circular minus-strand coordinates. [#618](https://github.com/shenwei356/seqkit/issues/618)
+        - Preserve regular-expression anchors and word boundaries when finding overlapping matches.
     - `seqkit merge-slides`:
         - preserve merged ends for contained windows. by @sixty-66 [#624](https://github.com/shenwei356/seqkit/pull/624)
         - Validate and merge ordered intervals correctly. [#619](https://github.com/shenwei356/seqkit/issues/619)
+    - `seqkit merge-slides/tab2fx`:
+        - Reject invalid or overflowing buffer sizes before opening output files.
     - `seqkit mutate`:
         - Skip invalid edit boundaries without changing valid edits. [#619](https://github.com/shenwei356/seqkit/issues/619)
     - `seqkit pair`:
@@ -100,15 +115,20 @@
         - Fixed sorting and output issues involving mixed formats, case-insensitive comparisons, sequence prefixes, and empty sequences. [#602](https://github.com/shenwei356/seqkit/issues/602), [#603](https://github.com/shenwei356/seqkit/issues/603), [#604](https://github.com/shenwei356/seqkit/issues/604), [#605](https://github.com/shenwei356/seqkit/issues/605), [#606](https://github.com/shenwei356/seqkit/issues/606)
     - `seqkit split`:
         - With `-p`, create balanced nonempty parts. [#620](https://github.com/shenwei356/seqkit/issues/620)
+        - Preserve explicit FASTQ line widths and choose the correct output extension for stdin beginning with an empty FASTQ record.
     - `seqkit split/split2`:
         - Prevent generated output files from overwriting a file redirected to stdin.
     - `seqkit split2`:
         - Reject conflicting outputs/modes/prefixes and keep paired boundaries and record counts aligned. [#620](https://github.com/shenwei356/seqkit/issues/620)
     - `seqkit stats`:
         - Report read errors correctly while retaining valid results; `--skip-err` continues processing. [#599](https://github.com/shenwei356/seqkit/issues/599)
+        - Accept valid negative Solexa scores and calculate their quality statistics correctly.
+        - Reject NaN values for `-N`.
     - `seqkit subseq`:
         - Handle GTF attributes with or without a trailing semicolon. [#600](https://github.com/shenwei356/seqkit/issues/600)
         - Update the FASTA index with `-U` even when `--quiet` is enabled.
+        - Avoid exhausting file descriptors when extracting from many indexed FASTA files.
+        - Avoid loading or creating an unused index for `-r` without `--chr`, while honoring explicit `-U`.
     - `seqkit sum`:
         - Return a non-zero exit status for failed files while retaining valid results; reject invalid ID regular expressions before processing. [#613](https://github.com/shenwei356/seqkit/issues/613)
     - `seqkit translate`:

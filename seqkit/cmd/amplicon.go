@@ -65,6 +65,8 @@ var ampliconCmd = &cobra.Command{
 
 Attention:
   1. Only one (the longest) matching location is returned for every primer pair.
+     Overlapping primer matches are included. Empty records have no matches and
+     are retained only with -u/--save-unmatched.
   2. Mismatch is allowed, but the mismatch location (5' or 3') is not controlled.
      You can increase the value of "-j/--threads" to accelerate processing.
      You can switch "-M/--output-mismatches" to append total mismatches and
@@ -230,7 +232,7 @@ Examples:
 			copy(r, primer[2])
 
 			finderPools[i] = &sync.Pool{New: func() interface{} {
-				finder, _ := NewAmpliconFinder([]byte{'A'}, f, r, maxMismatch)
+				finder, _ := NewAmpliconFinder([]byte{'A'}, f, r, 0)
 				return finder
 			}}
 		}
@@ -320,6 +322,9 @@ Examples:
 						name0 := record.Name
 
 						for _, strand = range strands {
+							if len(record.Seq.Seq) == 0 {
+								break
+							}
 							if strand == "-" {
 								if onlyPositiveStrand {
 									continue
@@ -331,13 +336,14 @@ Examples:
 								// finder, err = NewAmpliconFinder(record.Seq.Seq, primer[1], primer[2], maxMismatch)
 								// checkError(err)
 								finder = finderPools[j].Get().(*AmpliconFinder)
-								finder.Reset(record.Seq.Seq, maxMismatch)
+								checkError(finder.Reset(record.Seq.Seq, maxMismatch))
 
 								if usingRegion {
 									loc, mis, err = finder.LocateRange(begin, end, fregion, strict)
 								} else {
 									loc, mis, err = finder.Locate()
 								}
+								recycleAmpliconFinder(finderPools[j], finder)
 								checkError(err)
 
 								if loc == nil {
@@ -386,7 +392,6 @@ Examples:
 
 								record.Seq = tmpSeq
 
-								finderPools[j].Put(finder)
 							}
 						}
 
@@ -455,6 +460,9 @@ Examples:
 				name0 = record.Name
 
 				for _, strand = range strands {
+					if len(record.Seq.Seq) == 0 {
+						break
+					}
 					if strand == "-" {
 						if onlyPositiveStrand {
 							continue
@@ -466,13 +474,14 @@ Examples:
 						// finder, err = NewAmpliconFinder(record.Seq.Seq, primer[1], primer[2], maxMismatch)
 						// checkError(err)
 						finder = finderPools[j].Get().(*AmpliconFinder)
-						finder.Reset(record.Seq.Seq, maxMismatch)
+						checkError(finder.Reset(record.Seq.Seq, maxMismatch))
 
 						if usingRegion {
 							loc, _, err = finder.LocateRange(begin, end, fregion, strict)
 						} else {
 							loc, _, err = finder.Locate()
 						}
+						recycleAmpliconFinder(finderPools[j], finder)
 						checkError(err)
 
 						if loc == nil {
@@ -524,7 +533,6 @@ Examples:
 
 						record.Seq = tmpSeq
 
-						finderPools[j].Put(finder)
 					}
 				}
 
@@ -660,7 +668,12 @@ type AmpliconFinder struct {
 	rF, rR *regexp.Regexp
 }
 
+// Reset invalidates old results before accepting a new sequence.
 func (finder *AmpliconFinder) Reset(sequence []byte, maxMismatch int) error {
+	finder.Seq, finder.FMindex = nil, nil
+	finder.MaxMismatch = maxMismatch
+	finder.searched, finder.found = true, false
+	finder.iBegin, finder.iEnd, finder.mis5, finder.mis3 = 0, 0, 0, 0
 	if len(sequence) == 0 {
 		return fmt.Errorf("non-blank sequence needed")
 	}
@@ -917,7 +930,7 @@ func SubLocationFlanking(length, B, E, begin, end int, strictMode bool) (int, in
 func (finder *AmpliconFinder) Locate() ([]int, []int, error) {
 	if finder.searched {
 		if finder.found {
-			return []int{finder.iBegin, finder.iEnd}, []int{finder.mis5, finder.mis3}, nil
+			return []int{finder.iBegin + 1, finder.iEnd + 1}, []int{finder.mis5, finder.mis3}, nil
 		}
 		return nil, nil, nil
 	}
@@ -952,31 +965,20 @@ func (finder *AmpliconFinder) Locate() ([]int, []int, error) {
 		}
 
 		// two primers given, need to search R
-		var j int
+		j := -1
 		if finder.rR == nil {
-			j = bytes.Index(finder.Seq, finder.R)
-			if j < 0 {
-				finder.searched, finder.found = true, false
-				return nil, nil, nil
-			}
-
-			for {
-				if j+1 >= len(finder.Seq) {
-					break
-				}
-				k := bytes.Index(finder.Seq[j+1:], finder.R)
-				if k < 0 {
-					break
-				}
-				j += k + 1
-			}
+			j = bytes.LastIndex(finder.Seq, finder.R)
 		} else {
-			loc := finder.rR.FindAllSubmatchIndex(finder.Seq, -1)
-			if len(loc) == 0 {
-				finder.searched, finder.found = true, false
-				return nil, nil, nil
+			// Degenerate primers have fixed width. Advance by one start position
+			// to include overlaps and retain the rightmost hit.
+			for offset := 0; offset <= len(finder.Seq)-len(finder.R); {
+				loc := finder.rR.FindIndex(finder.Seq[offset:])
+				if loc == nil {
+					break
+				}
+				j = offset + loc[0]
+				offset = j + 1
 			}
-			j = loc[len(loc)-1][0]
 		}
 
 		if j < i { // wrong location of F and R:  5' ---R-----F---- 3'
@@ -1060,4 +1062,11 @@ func hasDegeneratePrimer(p []byte) bool {
 		}
 	}
 	return false
+}
+
+// recycleAmpliconFinder retains compiled primers without retaining a read or index.
+func recycleAmpliconFinder(pool *sync.Pool, finder *AmpliconFinder) {
+	finder.Seq, finder.FMindex = nil, nil
+	finder.searched, finder.found = true, false
+	pool.Put(finder)
 }

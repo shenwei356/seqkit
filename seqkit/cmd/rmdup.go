@@ -46,7 +46,7 @@ var rmdupCmd = &cobra.Command{
 Attention:
   1. When comparing by sequences, both positive and negative strands are
      compared. Switch on -P/--only-positive-strand for considering the
-     positive strand only.
+     positive strand only. Protein sequences are compared without reversal.
   2. Only the first record is saved for duplicates.
      
 `,
@@ -165,7 +165,7 @@ Attention:
 					continue
 				}
 
-				if bySeq && revcom {
+				if bySeq && revcom && hasComplement(record.Seq.Alphabet) {
 					if ignoreCase {
 						subject = xxhash.Sum64(bytes.ToLower(record.Seq.RevCom().Seq))
 					} else {

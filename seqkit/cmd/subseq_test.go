@@ -54,3 +54,52 @@ func TestSubseqIndexedMixedFileFormats(t *testing.T) {
 		}
 	}
 }
+
+// TestSubseqStreamingIndexLifecycle avoids unused indexes but honors explicit -U.
+func TestSubseqStreamingIndexLifecycle(t *testing.T) {
+	dir := t.TempDir()
+	input := auditInput(t, dir, "input.fa", ">r\nACGT\n")
+	out, stderr, err := runCLI(t, "", "subseq", "-r", "1:2", input)
+	if err != nil || out != ">r\nAC\n" {
+		t.Fatalf("streaming extraction: %v %s", err, stderr)
+	}
+	if _, err := os.Stat(input + ".seqkit.fai"); !os.IsNotExist(err) {
+		t.Fatal("unused index was created")
+	}
+	out, stderr, err = runCLI(t, "", "subseq", "-r", "1:2", "-U", input)
+	if err != nil || out != ">r\nAC\n" {
+		t.Fatalf("explicit index update: %v %s", err, stderr)
+	}
+	if _, err := os.Stat(input + ".seqkit.fai"); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// TestSubseqIndexAuxiliaryAliases protects annotations and later sequence inputs.
+func TestSubseqIndexAuxiliaryAliases(t *testing.T) {
+	for _, mode := range []string{"--bed", "--gtf", "sequence"} {
+		dir := t.TempDir()
+		input := auditInput(t, dir, "input.fa", ">r\nACGT\n")
+		data := "r\t0\t2\n"
+		if mode == "--gtf" {
+			data = "r\ttest\tCDS\t1\t2\t.\t+\t.\tgene_id \"r\";\n"
+		}
+		if mode == "sequence" {
+			data = ">s\nTGCA\n"
+		}
+		index := auditInput(t, dir, "input.fa.seqkit.fai", data)
+		output := auditInput(t, dir, "out.fa", "keep\n")
+		args := []string{"subseq", "-U", "-o", output, input}
+		if mode == "sequence" {
+			args = append(args, "-r", "1:2", index)
+		} else {
+			args = append(args, mode, index)
+		}
+		_, stderr, err := runCLI(t, "", args...)
+		after, _ := os.ReadFile(index)
+		out, _ := os.ReadFile(output)
+		if err == nil || string(after) != data || string(out) != "keep\n" {
+			t.Fatalf("index replaced input: %v %s", err, stderr)
+		}
+	}
+}

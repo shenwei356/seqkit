@@ -175,6 +175,7 @@ Examples:
 		// prepare pattern
 		patterns := make(map[string]*regexp.Regexp)
 		if patternFile != "" {
+			checkOutputFiles([]string{patternFile}, []string{outFile}, true)
 			var reader *breader.BufferedReader
 			reader, err = breader.NewDefaultBufferedReader(patternFile)
 			checkError(err)

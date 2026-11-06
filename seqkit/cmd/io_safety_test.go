@@ -309,6 +309,8 @@ func TestAuxiliaryInputOutputAliases(t *testing.T) {
 		data string
 	}{
 		{"grep", []string{"grep", "-f", "AUX"}, "r1\n"},
+		{"seq-filter", []string{"seq", "-r", "--f-pattern-file", "AUX"}, "r1\n"},
+		{"mutate-filter", []string{"mutate", "-p", "1:T", "-f", "AUX"}, "r1\n"},
 		{"locate", []string{"locate", "-f", "AUX"}, ">p1\nAC\n"},
 		{"fa2fq", []string{"fa2fq", "-f", "AUX"}, ">r1\nAC\n"},
 		{"bed", []string{"subseq", "--bed", "AUX"}, "r1\t0\t2\n"},

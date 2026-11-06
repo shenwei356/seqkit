@@ -87,8 +87,8 @@ Output (BED3 format):
 			checkError(fmt.Errorf("value of buffer size. supported unit: K, M, G"))
 		}
 		bufferSize, err := ParseByteSize(bufferSizeS)
-		if err != nil {
-			checkError(fmt.Errorf("invalid value of buffer size. supported unit: K, M, G"))
+		if err != nil || bufferSize <= 0 || bufferSize > int64(^uint(0)>>1) {
+			checkError(fmt.Errorf("invalid buffer size: require a positive size within the platform integer range; units: K, M, G"))
 		}
 
 		maxGap := getFlagNonNegativeInt(cmd, "max-gap")

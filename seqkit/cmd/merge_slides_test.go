@@ -22,3 +22,6 @@ func TestMergeSlidesIntervals(t *testing.T) {
 		t.Fatalf("short regexp accepted: %v %s", err, stderr)
 	}
 }
+
+// TestMergeSlidesBufferValidation preserves output for invalid buffer limits.
+func TestMergeSlidesBufferValidation(t *testing.T) { assertInvalidBufferSizes(t, "merge-slides") }

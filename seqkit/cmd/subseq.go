@@ -52,6 +52,8 @@ Attention:
   2. Use "seqkit grep" for extracting subsets of sequences.
      "seqtk subseq seqs.fasta id.txt" equals to
      "seqkit grep -f id.txt seqs.fasta"
+  3. With -r and no --chr, sequences are read in input order without loading or
+     creating an index, unless -U/--update-faidx is given.
 
 Recommendation:
   1. Use plain FASTA file, so seqkit could utilize FASTA index.
@@ -206,6 +208,8 @@ Examples:
 			checkError(fmt.Errorf("one of the options needed: -r/--region, --bed, --gtf"))
 		}
 
+		// Streaming region extraction needs no index unless -U explicitly requests one.
+		useIndex := region == "" || len(chrs) > 0 || updateFaidx
 		// Detect indexed inputs before opening output, including indexes of later files.
 		type inputFormat struct {
 			alphabet *seq.Alphabet
@@ -216,13 +220,23 @@ Examples:
 			if isStdin(file) || !isPlainFile(file) {
 				continue
 			}
-			alphabet2, isFastq, err := fastx.GuessAlphabet(file)
+			alphabet2, isFastq, err := guessAlphabet(file)
 			checkError(err)
-			plainInputs[file] = inputFormat{alphabet2, isFastq}
+			if useIndex {
+				plainInputs[file] = inputFormat{alphabet2, isFastq}
+			}
 			if !isFastq {
 				fileFai := file + ".seqkit.fai"
 				checkError(checkFASTAIndexFile(fileFai))
 				checkOutputFiles([]string{fileFai}, []string{outFile}, true)
+				if useIndex && (updateFaidx || fileNotExists(fileFai)) {
+					checkOutputFiles(files, []string{fileFai}, !config.SkipFileCheck)
+					for _, input := range []string{bedFile, gtfFile, getFlagString(cmd, "infile-list")} {
+						if input != "" {
+							checkOutputFiles([]string{input}, []string{fileFai}, true)
+						}
+					}
+				}
 			}
 		}
 
@@ -258,6 +272,7 @@ Examples:
 					faidx := getFaidx(file, idRegexp, quiet)
 
 					if len(faidx.Index) == 0 {
+						checkError(faidx.Close())
 						log.Warningf("  0 records loaded from %s, please check if it matches the fasta file, or switch on the flag -U/--update-faidx", fileFai)
 						return
 					} else if !quiet {
@@ -288,6 +303,7 @@ Examples:
 								outfh.Write(byteutil.WrapByteSlice(subseq, config.LineWidth))
 								outfh.WriteString("\n")
 							}
+							checkError(faidx.Close())
 							continue
 						} else {
 							// read all sequence
@@ -318,6 +334,7 @@ Examples:
 								onlyFlank, upStream, downStream, gtfTag)
 						}
 
+						checkError(faidx.Close())
 						continue
 					} else if bedFile != "" {
 						for chr := range bedFeatureMap {
@@ -344,6 +361,7 @@ Examples:
 								onlyFlank, upStream, downStream)
 						}
 
+						checkError(faidx.Close())
 						continue
 					}
 

@@ -3,6 +3,7 @@ package cmd
 import (
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -77,5 +78,68 @@ func TestLocateUniquePatternIDs(t *testing.T) {
 	out, stderr, err := runCLI(t, ">s\nAC\n", "locate", "-P", "-f", file)
 	if err != nil || stderr != "" || strings.Count(out, "\tAC\t+\t1\t2\tAC\n") != 2 {
 		t.Fatalf("unique IDs: out=%q, err=%v, stderr=%s", out, err, stderr)
+	}
+}
+
+// TestLocateRegexpBoundaries preserves assertions while retaining overlapping matches.
+func TestLocateRegexpBoundaries(t *testing.T) {
+	for _, test := range []struct {
+		pattern string
+		starts  []string
+	}{
+		{`^A`, []string{"1"}}, {`\AA`, []string{"1"}}, {`\bA`, []string{"1"}},
+		{`\BA`, []string{"2", "3", "4", "5"}}, {`AA`, []string{"1", "2", "3", "4"}},
+		{`^AA|AA$`, []string{"1", "4"}}, {`A$`, []string{"5"}},
+	} {
+		for _, greedy := range []bool{false, true} {
+			args := []string{"locate", "-P", "-r", "-p", test.pattern}
+			if greedy {
+				args = append(args, "-G")
+			}
+			out, stderr, err := runCLI(t, ">r\nAAAAA\n", args...)
+			if err != nil {
+				t.Fatalf("pattern=%s: %v %s", test.pattern, err, stderr)
+			}
+			var starts []string
+			for _, line := range strings.Split(strings.TrimSpace(out), "\n")[1:] {
+				starts = append(starts, strings.Split(line, "\t")[4])
+			}
+			want := test.starts
+			if greedy && test.pattern == "AA" {
+				want = []string{"1", "3"}
+			}
+			if !reflect.DeepEqual(starts, want) {
+				t.Fatalf("pattern=%s -G=%v: %v want %v", test.pattern, greedy, starts, want)
+			}
+		}
+	}
+	out, stderr, err := runCLI(t, ">r\nTTTTT\n", "locate", "-r", "-p", "^A")
+	if err != nil || strings.Count(out, "\n") != 2 || !strings.Contains(out, "\t-\t5\t5\tA\n") {
+		t.Fatalf("reverse anchor: %v %s", err, stderr)
+	}
+}
+
+// TestLocateRegexpContext covers multiline, alternatives, captures and Unicode context.
+func TestLocateRegexpContext(t *testing.T) {
+	for _, test := range []struct {
+		pattern, text string
+		offset        int
+		want          []int
+	}{
+		{`(?m)^A`, "AA\nAA", 1, []int{2, 3}},
+		{`^A|A`, "AAA", 1, []int{0, 1}},
+		{`(\bA)|(AA)`, "AAAA", 1, []int{0, 2}},
+		{`\BA`, "AAA", 1, []int{0, 1}},
+		{`\bA`, "éAA", 2, []int{0, 1}},
+		{`\bA`, "AAA", 1, nil},
+		{`\AA`, "AAA", 1, nil},
+	} {
+		re, err := newLocateRegexp(test.pattern)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got := re.findFrom([]byte(test.text), test.offset); !reflect.DeepEqual(got, test.want) {
+			t.Fatalf("%s at %d: %v want %v", test.pattern, test.offset, got, test.want)
+		}
 	}
 }

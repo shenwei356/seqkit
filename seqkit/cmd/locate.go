@@ -25,8 +25,10 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"regexp/syntax"
 	"runtime"
 	"sync"
+	"unicode/utf8"
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
@@ -66,6 +68,8 @@ Attention:
      crossing genome sequence end would be greater than sequence length.
   6. Automatic sequence-type detection determines the strand policy separately
      for each input file. Protein sequences are searched on the positive strand only.
+  7. Regular-expression anchors and word boundaries refer to the full searched
+     strand, including when reporting overlapping matches.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -151,7 +155,7 @@ Attention:
 		if len(pattern) == 0 && cmd.Flags().Changed("pattern") {
 			log.Warningf("empty pattern skipped")
 		}
-		regexps := make(map[string]*regexp.Regexp)
+		regexps := make(map[string]*locateRegexp)
 		patterns := make(map[string][]byte)
 		patternNames := make(map[string]string) // Internal keys preserve duplicate display names.
 		var s string
@@ -209,7 +213,7 @@ Attention:
 						if ignoreCase {
 							s = "(?i)" + s
 						}
-						re, err := regexp.Compile(s)
+						re, err := newLocateRegexp(s)
 						checkError(err)
 						regexps[name] = re
 					} else if bytes.Contains(record.Seq.Seq, []byte(".")) ||
@@ -265,7 +269,7 @@ Attention:
 						if ignoreCase {
 							s = "(?i)" + s
 						}
-						re, err := regexp.Compile(s)
+						re, err := newLocateRegexp(s)
 						checkError(err)
 						regexps[p] = re
 					} else if bytes.Contains(patterns[p], []byte(".")) ||
@@ -587,7 +591,7 @@ Attention:
 		// var flag bool
 		var pSeq, p []byte
 		var pName string
-		var re *regexp.Regexp
+		var re *locateRegexp
 		var sfmi *fmi.FMIndex
 		if mismatches > 0 || useFMI {
 			sfmi = fmi.NewFMIndex()
@@ -783,7 +787,7 @@ Attention:
 					for {
 						if useRegexp || degenerate {
 							re = regexps[pName]
-							loc = re.FindSubmatchIndex(record.Seq.Seq[offset:])
+							loc = re.findFrom(record.Seq.Seq, offset)
 							if loc == nil {
 								break
 							}
@@ -886,7 +890,7 @@ Attention:
 					for {
 						if useRegexp || degenerate {
 							re = regexps[pName]
-							loc = re.FindSubmatchIndex(seqRP.Seq[offset:])
+							loc = re.findFrom(seqRP.Seq, offset)
 							if loc == nil {
 								break
 							}
@@ -1021,4 +1025,59 @@ func prune(s []byte, n int) []byte {
 	}
 
 	return []byte(string(s[:n]) + "...")
+}
+
+// locateRegexp preserves left-boundary assertions when searching overlapping hits.
+type locateRegexp struct {
+	re      *regexp.Regexp // Ordinary motifs use the direct suffix-search fast path.
+	context *regexp.Regexp // Consumes the preceding rune before searching the motif.
+}
+
+// newLocateRegexp compiles a contextual search only for patterns that need it.
+func newLocateRegexp(pattern string) (*locateRegexp, error) {
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		return nil, err
+	}
+	r := &locateRegexp{re: re}
+	tree, err := syntax.Parse(pattern, syntax.Perl)
+	if err != nil {
+		return nil, err
+	}
+	if regexpNeedsLeftContext(tree) {
+		// The non-greedy prefix starts the original pattern at or after the
+		// requested offset. Its enclosing capture supplies the actual hit.
+		r.context, err = regexp.Compile(`(?s:\A..*?)(` + pattern + `)`)
+	}
+	return r, err
+}
+
+// regexpNeedsLeftContext detects assertions affected by dropping the prior rune.
+func regexpNeedsLeftContext(r *syntax.Regexp) bool {
+	switch r.Op {
+	case syntax.OpBeginLine, syntax.OpBeginText, syntax.OpWordBoundary, syntax.OpNoWordBoundary:
+		return true
+	}
+	for _, sub := range r.Sub {
+		if regexpNeedsLeftContext(sub) {
+			return true
+		}
+	}
+	return false
+}
+
+// findFrom returns byte offsets relative to offset, retaining the original
+// beginning-of-text, beginning-of-line and word-boundary semantics.
+func (r *locateRegexp) findFrom(text []byte, offset int) []int {
+	if offset == 0 || r.context == nil {
+		return r.re.FindIndex(text[offset:])
+	}
+	_, width := utf8.DecodeLastRune(text[:offset])
+	loc := r.context.FindSubmatchIndex(text[offset-width:])
+	if loc == nil {
+		return nil
+	}
+	loc[2] -= width
+	loc[3] -= width
+	return loc[2:4]
 }

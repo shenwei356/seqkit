@@ -86,6 +86,8 @@ Attention:
   1. Sequence length metrics (sum_len, min_len, avg_len, max_len, Q1, Q2, Q3)
      count the number of gaps or spaces. You can remove them with "seqkit seq -g":
          seqkit seq -g input.fasta | seqkit stats
+  2. Quality statistics use Phred scores. With -E solexa, Solexa scores (including
+     valid negative scores) are converted through their error probabilities.
 
 Tips:
   1. For lots of small files (especially on SSD), use a big value of '-j' to
@@ -135,7 +137,7 @@ Tips:
 			if err != nil {
 				checkError(fmt.Errorf("the value of -N/--N should be a float: %s", x))
 			}
-			if NX[i] < 0 || NX[i] > 100 {
+			if math.IsNaN(NX[i]) || NX[i] < 0 || NX[i] > 100 {
 				checkError(fmt.Errorf("the value of -N/--N should be in the range of [0, 100]: %s", x))
 			}
 		}
@@ -324,6 +326,15 @@ Tips:
 				var q20, q30 int64
 				var qual int
 				var encodeOffset int = fqEncoding.Offset()
+				minimumQuality := 0
+				qualityError := seq.ErrInvalidPhredQuality
+				if fqEncoding == seq.Solexa {
+					minimumQuality, qualityError = -5, seq.ErrInvalidSolexaQuality
+					// Solexa encodes odds; build its probability table once per file.
+					for i := range qual_map {
+						qual_map[i] = 1 / (1 + math.Pow(10, float64(i+minimumQuality)/10))
+					}
+				}
 				var seqFormat, t string
 				var record *fastx.Record
 				var fastxReader *fastx.Reader
@@ -378,14 +389,15 @@ Tips:
 						if fastxReader.IsFastq {
 							for i, q := range record.Seq.Qual {
 								qual = int(q) - encodeOffset
-								if qual < 0 {
-									err = fmt.Errorf("%s: %w: quality character %q (ASCII %d) at position %d is below ASCII base %d", record.ID, seq.ErrInvalidPhredQuality, q, q, i+1, encodeOffset)
+								if qual < minimumQuality {
+									err = fmt.Errorf("%s: %w: quality character %q (ASCII %d) at position %d is below score %d for ASCII base %d", record.ID, qualityError, q, q, i+1, minimumQuality, encodeOffset)
 									if replaceStdinLabel && isStdin(file) {
 										file = stdinLabel
 									}
 									ch <- statInfo{file: file, err: err, id: id}
 									return
 								}
+								// Integer Solexa and Phred scores share the Q20/Q30 cutoffs.
 								if qual >= 20 {
 									q20++
 									if qual >= 30 {
@@ -393,7 +405,7 @@ Tips:
 									}
 								}
 
-								errSum += qual_map[qual]
+								errSum += qual_map[qual-minimumQuality]
 							}
 						}
 

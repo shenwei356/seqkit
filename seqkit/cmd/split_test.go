@@ -274,3 +274,30 @@ func TestSequenceLengthUnits(t *testing.T) {
 		}
 	}
 }
+
+// TestSplitEmptyFASTQAndWrapping preserves empty records and explicit line widths.
+func TestSplitEmptyFASTQAndWrapping(t *testing.T) {
+	for i, mode := range [][]string{{"-p", "1"}, {"-i"}, {"-s", "2"}} {
+		for _, stdin := range []bool{false, true} {
+			dir := t.TempDir()
+			input := "@r\n\n+\n\n@r\nACGT\n+\nIJKL\n"
+			file := auditInput(t, dir, "input.fq", input)
+			outdir := filepath.Join(dir, "out")
+			args := append([]string{"split", "-w", "2", "-O", outdir}, mode...)
+			if stdin {
+				args = append(args, "-")
+			} else {
+				args = append(args, file)
+			}
+			_, stderr, err := runCLI(t, input, args...)
+			paths, _ := filepath.Glob(filepath.Join(outdir, "*"))
+			if err != nil || len(paths) != 1 {
+				t.Fatalf("mode=%d stdin=%v: %v %s", i, stdin, err, stderr)
+			}
+			data, err := os.ReadFile(paths[0])
+			if err != nil || !strings.HasSuffix(paths[0], ".fq") && !strings.HasSuffix(paths[0], ".fastq") || string(data) != "@r\n\n+\n\n@r\nAC\nGT\n+\nIJ\nKL\n" {
+				t.Fatalf("format, extension or wrapping changed: mode=%d stdin=%v file=%s", i, stdin, paths[0])
+			}
+		}
+	}
+}

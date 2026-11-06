@@ -550,6 +550,8 @@ Attention:
   2. Use "seqkit grep" for extracting subsets of sequences.
      "seqtk subseq seqs.fasta id.txt" equals to
      "seqkit grep -f id.txt seqs.fasta"
+  3. With -r and no --chr, sequences are read in input order without loading or
+     creating an index, unless -U/--update-faidx is given.
 
 Recommendation:
   1. Use plain FASTA file, so seqkit could utilize FASTA index.
@@ -573,7 +575,7 @@ negative index    0-9-8-7-6-5-4-3-2-1
         -12:-1    A C G T N a c g t n
 
 Usage:
-  seqkit subseq [flags] 
+  seqkit subseq [flags]
 
 Flags:
       --bed string        by tab-delimited BED file
@@ -592,7 +594,6 @@ Flags:
   -u, --up-stream int     up stream length
   -U, --update-faidx      update the fasta index file if it exists. Use this if you are not sure whether
                           the fasta file changed
-
 ```
 
 Examples
@@ -792,6 +793,8 @@ Attention:
   1. Sequence length metrics (sum_len, min_len, avg_len, max_len, Q1, Q2, Q3)
      count the number of gaps or spaces. You can remove them with "seqkit seq -g":
          seqkit seq -g input.fasta | seqkit stats
+  2. Quality statistics use Phred scores. With -E solexa, Solexa scores (including
+     valid negative scores) are converted through their error probabilities.
 
 Tips:
   1. For lots of small files (especially on SSD), use a big value of '-j' to
@@ -2099,6 +2102,8 @@ Attention:
      crossing genome sequence end would be greater than sequence length.
   6. Automatic sequence-type detection determines the strand policy separately
      for each input file. Protein sequences are searched on the positive strand only.
+  7. Regular-expression anchors and word boundaries refer to the full searched
+     strand, including when reporting overlapping matches.
 
 Usage:
   seqkit locate [flags]
@@ -2324,6 +2329,8 @@ extract amplicon (or specific region around it) via primer(s).
 
 Attention:
   1. Only one (the longest) matching location is returned for every primer pair.
+     Overlapping primer matches are included. Empty records have no matches and
+     are retained only with -u/--save-unmatched.
   2. Mismatch is allowed, but the mismatch location (5' or 3') is not controlled.
      You can increase the value of "-j/--threads" to accelerate processing.
      You can switch "-M/--output-mismatches" to append total mismatches and
@@ -2582,7 +2589,7 @@ remove duplicated sequences by ID/name/sequence
 Attention:
   1. When comparing by sequences, both positive and negative strands are
      compared. Switch on -P/--only-positive-strand for considering the
-     positive strand only.
+     positive strand only. Protein sequences are compared without reversal.
   2. Only the first record is saved for duplicates.
 
 Usage:
@@ -2596,7 +2603,6 @@ Flags:
   -h, --help                   help for rmdup
   -i, --ignore-case            ignore case
   -P, --only-positive-strand   only considering positive strand when comparing by sequence
-
 ```
 
 Examples
@@ -2637,6 +2643,7 @@ Note:
   2. When comparing by sequences,
      a) Both positive and negative strands are compared. You can switch on
         -P/--only-positive-strand for considering the positive strand only.
+        Protein sequences are compared without reversal.
      b) You can switch on -e/--check-embedded-seqs to check embedded sequences.
           e.g, for file A and B, the reverse complement sequence of CCCC from file B
           is a part of TTGGGGTT from file A, we will extract and output GGGG from file A.
@@ -3974,7 +3981,8 @@ Aliases:
   concat, concate
 
 Flags:
-  -F, --fill string        fill with N bases/residues for IDs missing in some files when using -f/--full
+  -F, --fill string        fill with one ASCII character (e.g., N) for IDs missing in some files when
+                           using -f/--full
   -f, --full               keep all sequences, like full/outer join
   -h, --help               help for concat
   -s, --separator string   separator for descriptions of records with the same ID (default "|")

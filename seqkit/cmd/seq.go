@@ -177,6 +177,7 @@ Filtering records to edit:
 
 		var pbyte []byte
 		if fpatternFile != "" {
+			checkOutputFiles([]string{fpatternFile}, []string{outFile}, true)
 			var reader *breader.BufferedReader
 			var err error
 			reader, err = breader.NewDefaultBufferedReader(fpatternFile)

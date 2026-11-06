@@ -269,7 +269,7 @@ Examples:
 					}
 
 					if renameFileExt && isstdin {
-						if len(record.Seq.Qual) > 0 {
+						if fastxReader.IsFastq {
 							fileExt = suffixFQ + extension
 						} else {
 							fileExt = suffixFA + extension
@@ -322,7 +322,7 @@ Examples:
 
 				var isFastq bool
 				var err error
-				_, isFastq, err = fastx.GuessAlphabet(newFile)
+				_, isFastq, err = guessAlphabet(newFile)
 				checkError(err)
 				if renameFileExt && isstdin {
 					if isFastq {
@@ -388,13 +388,14 @@ Examples:
 				if !quiet {
 					log.Info("read sequences ...")
 				}
-				allRecords, err := readRecordsChecked(file, alphabet, idRegexp)
+				allRecords, inputFastq, err := readRecordsWithFormat(file, alphabet, idRegexp)
 				checkError(err)
 				if !quiet {
 					log.Infof("read %d sequences", len(allRecords))
 				}
 
-				if len(allRecords) > 0 && len(allRecords[0].Seq.Qual) > 0 {
+				fastx.ForcelyOutputFastq = inputFastq
+				if inputFastq && !config.LineWidthChanged {
 					config.LineWidth = 0
 				}
 
@@ -403,7 +404,7 @@ Examples:
 
 				for _, record := range allRecords {
 					if renameFileExt && isstdin {
-						if len(record.Seq.Qual) > 0 {
+						if inputFastq {
 							fileExt = suffixFQ + extension
 						} else {
 							fileExt = suffixFA + extension
@@ -455,7 +456,7 @@ Examples:
 
 				var isFastq bool
 				var err error
-				_, isFastq, err = fastx.GuessAlphabet(newFile)
+				_, isFastq, err = guessAlphabet(newFile)
 				checkError(err)
 				if renameFileExt && isstdin {
 					if isFastq {
@@ -519,13 +520,14 @@ Examples:
 				if !quiet {
 					log.Info("read sequences ...")
 				}
-				allRecords, err := readRecordsChecked(file, alphabet, idRegexp)
+				allRecords, inputFastq, err := readRecordsWithFormat(file, alphabet, idRegexp)
 				checkError(err)
 				if !quiet {
 					log.Infof("read %d sequences", len(allRecords))
 				}
 
-				if len(allRecords) > 0 && len(allRecords[0].Seq.Qual) > 0 {
+				fastx.ForcelyOutputFastq = inputFastq
+				if inputFastq && !config.LineWidthChanged {
 					config.LineWidth = 0
 				}
 
@@ -534,7 +536,7 @@ Examples:
 				var id string
 				for _, record := range allRecords {
 					if renameFileExt && isstdin {
-						if len(record.Seq.Qual) > 0 {
+						if inputFastq {
 							fileExt = suffixFQ + extension
 						} else {
 							fileExt = suffixFA + extension
@@ -590,7 +592,7 @@ Examples:
 
 				var isFastq bool
 				var err error
-				alphabet2, isFastq, err = fastx.GuessAlphabet(newFile)
+				alphabet2, isFastq, err = guessAlphabet(newFile)
 				checkError(err)
 				if renameFileExt && isstdin {
 					if isFastq {
@@ -733,13 +735,14 @@ Examples:
 				if !quiet {
 					log.Info("read sequences ...")
 				}
-				allRecords, err := readRecordsChecked(file, alphabet, idRegexp)
+				allRecords, inputFastq, err := readRecordsWithFormat(file, alphabet, idRegexp)
 				checkError(err)
 				if !quiet {
 					log.Infof("read %d sequences", len(allRecords))
 				}
 
-				if len(allRecords) > 0 && len(allRecords[0].Seq.Qual) > 0 {
+				fastx.ForcelyOutputFastq = inputFastq
+				if inputFastq && !config.LineWidthChanged {
 					config.LineWidth = 0
 				}
 
@@ -750,7 +753,7 @@ Examples:
 				var ok bool
 				for _, record := range allRecords {
 					if renameFileExt && isstdin {
-						if len(record.Seq.Qual) > 0 {
+						if inputFastq {
 							fileExt = suffixFQ + extension
 						} else {
 							fileExt = suffixFA + extension
@@ -803,7 +806,7 @@ Examples:
 
 				var isFastq bool
 				var err error
-				alphabet2, isFastq, err = fastx.GuessAlphabet(newFile)
+				alphabet2, isFastq, err = guessAlphabet(newFile)
 				if renameFileExt && isstdin {
 					if isFastq {
 						fileExt = suffixFQ + extension

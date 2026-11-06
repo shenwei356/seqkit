@@ -141,6 +141,14 @@ Examples:
 		// Protect the index before opening an output that could truncate it.
 		checkError(checkFASTAIndexFile(fileFai))
 		checkOutputFiles([]string{fileFai}, []string{config.OutFile}, true)
+		if updateFaidx || fileNotExists(fileFai) {
+			checkOutputFiles([]string{file}, []string{fileFai}, !config.SkipFileCheck)
+			for _, input := range []string{regionFile, getFlagString(cmd, "infile-list")} {
+				if input != "" {
+					checkOutputFiles([]string{input}, []string{fileFai}, true)
+				}
+			}
+		}
 
 		outfh, err := xopen.Wopen(config.OutFile)
 		checkError(err)

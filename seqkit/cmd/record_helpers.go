@@ -124,3 +124,22 @@ func equalFoldBase(a, b byte) bool {
 	}
 	return a == b
 }
+
+// hasComplement reports whether an alphabet defines a nucleotide complement.
+func hasComplement(alphabet *seq.Alphabet) bool {
+	return alphabet == seq.DNA || alphabet == seq.DNAredundant ||
+		alphabet == seq.RNA || alphabet == seq.RNAredundant
+}
+
+// guessAlphabet closes the probe reader even when the first record is not at EOF.
+func guessAlphabet(file string) (*seq.Alphabet, bool, error) {
+	r, err := fastx.NewDefaultReader(file)
+	if err != nil {
+		return nil, false, err
+	}
+	defer r.Close()
+	if _, err := r.Read(); err != nil {
+		return r.Alphabet(), false, err
+	}
+	return r.Alphabet(), r.IsFastq, nil
+}

@@ -286,7 +286,7 @@ Attention:
 
 			var isFastq bool
 			var err error
-			alphabet2, isFastq, err = fastx.GuessAlphabet(newFile)
+			alphabet2, isFastq, err = guessAlphabet(newFile)
 			checkError(err)
 			if isFastq {
 				checkError(os.Remove(newFile))

@@ -91,3 +91,23 @@ func TestCommonExactAndEmbeddedHits(t *testing.T) {
 		t.Fatalf("exact hit hid embedded hit: %q %v %s", out, err, stderr)
 	}
 }
+
+// TestCommonProteinStrands rejects reversed proteins, including embedded matches.
+func TestCommonProteinStrands(t *testing.T) {
+	dir := t.TempDir()
+	first := auditInput(t, dir, "a.fa", ">p1\nMELK\n")
+	for _, text := range []string{"KLEM", "XXKLEMXX", "MELK"} {
+		second := auditInput(t, dir, "b.fa", ">p2\n"+text+"\n")
+		for _, extra := range [][]string{nil, {"-e"}, {"-t", "protein"}, {"-e", "-t", "protein"}} {
+			args := append([]string{"common", "-s"}, extra...)
+			out, stderr, err := runCLI(t, "", append(args, first, second)...)
+			want := ""
+			if text == "MELK" {
+				want = ">p1\nMELK\n"
+			}
+			if err != nil || out != want {
+				t.Fatalf("protein intersection changed: %v %s", err, stderr)
+			}
+		}
+	}
+}

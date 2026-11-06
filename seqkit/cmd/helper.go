@@ -24,6 +24,8 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"math"
+	"math/big"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -672,29 +674,25 @@ func ParseByteSize(val string) (int64, error) {
 		noUnit = true
 		u = 1
 	}
-	var size float64
-	var err error
-	if noUnit {
-		size, err = strconv.ParseFloat(val, 10)
-		if err != nil {
-			return 0, fmt.Errorf("invalid byte size: %s", val)
-		}
-		if size < 0 {
-			size = 0
-		}
-		return int64(size), nil
+	if !noUnit {
+		val = strings.TrimSpace(val[:len(val)-1])
 	}
-
-	if len(val) == 1 { // no value
-		return 0, nil
-	}
-
-	size, err = strconv.ParseFloat(strings.Trim(val[0:len(val)-1], " \t\r\n"), 10)
-	if err != nil {
+	size, err := strconv.ParseFloat(val, 64)
+	if err != nil || math.IsNaN(size) || math.IsInf(size, 0) {
 		return 0, fmt.Errorf("invalid byte size: %s", val)
 	}
-	if size < 0 {
-		size = 0
+	if size <= 0 {
+		return 0, nil
 	}
-	return int64(size * float64(u)), nil
+	// Check the exact scaled integer, including values near MaxInt64.
+	amount, ok := new(big.Rat).SetString(val)
+	if !ok {
+		return 0, fmt.Errorf("invalid byte size: %s", val)
+	}
+	amount.Mul(amount, new(big.Rat).SetInt64(u))
+	integer := new(big.Int).Quo(amount.Num(), amount.Denom())
+	if !integer.IsInt64() {
+		return 0, fmt.Errorf("byte size out of range: %s", val)
+	}
+	return integer.Int64(), nil
 }

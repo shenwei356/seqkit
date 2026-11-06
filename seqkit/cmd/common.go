@@ -50,6 +50,7 @@ Note:
   2. When comparing by sequences,
      a) Both positive and negative strands are compared. You can switch on
         -P/--only-positive-strand for considering the positive strand only.
+        Protein sequences are compared without reversal.
      b) You can switch on -e/--check-embedded-seqs to check embedded sequences.
           e.g, for file A and B, the reverse complement sequence of CCCC from file B
           is a part of TTGGGGTT from file A, we will extract and output GGGG from file A.
@@ -151,17 +152,17 @@ Note:
 		var subject, subjectRC uint64
 		isFirstFile := true
 		firstFile := files[0]
-		var ok bool
 
 		// ------------------------- for other situations  --------------------------------
 
-		// target -> file idx -> struct{}
-		counter := make(map[uint64]map[int]struct{}, 1000)
-		var _counter map[int]struct{} // file idx -> struct{}
-
-		// target -> seqnames in firstFile
-		// note that it's []string, i.e., records may have same sequences
-		names := make(map[uint64][]string, 1024)
+		// Each candidate needs only a file count, the last file seen, and the
+		// first input's multiplicity; output records are read again below.
+		type presence struct {
+			lastFile     int // Prevent duplicates within one file from increasing files.
+			files        int // Number of distinct inputs containing this candidate.
+			firstRecords int // Number of matching records in the first input.
+		}
+		counter := make(map[uint64]presence, 1000)
 
 		for i, file := range files {
 			if !quiet {
@@ -192,7 +193,7 @@ Note:
 					}
 					subject = xxhash.Sum64(_seq)
 
-					if revcom {
+					if revcom && hasComplement(record.Seq.Alphabet) {
 						rc = record.Seq.RevCom()
 						_seqRC = rc.Seq
 						if ignoreCase {
@@ -218,23 +219,23 @@ Note:
 					}
 				}
 
-				if _counter, ok = counter[subject]; !ok {
-					// Only first-file candidates can belong to the intersection.
-					// Still read every record so malformed later inputs report errors.
+				count, exists := counter[subject]
+				if !exists {
+					// Later-only records cannot enter the intersection. Still read
+					// every input record so malformed files remain errors.
 					if !isFirstFile {
 						continue
 					}
-					_counter = make(map[int]struct{})
-					counter[subject] = _counter
+					count.lastFile = -1
 				}
-				_counter[i] = struct{}{}
-
+				if count.lastFile != i {
+					count.lastFile = i
+					count.files++
+				}
 				if isFirstFile {
-					if _, ok = names[subject]; !ok {
-						names[subject] = make([]string, 0, 1)
-					}
-					names[subject] = append(names[subject], string(record.Name))
+					count.firstRecords++
 				}
+				counter[subject] = count
 			}
 			fastxReader.Close()
 
@@ -250,13 +251,13 @@ Note:
 		fileNum := len(files)
 
 		var nHashes, nOriginalRecords, nOutput int
-		for subject, presence := range counter {
-			if len(presence) != fileNum {
+		for _, count := range counter {
+			if count.files != fileNum {
 				continue
 			}
 
-			nHashes++                               // number of hash values
-			nOriginalRecords += len(names[subject]) // number of records
+			nHashes++                              // number of hash values
+			nOriginalRecords += count.firstRecords // number of records
 
 		}
 
@@ -301,7 +302,7 @@ Note:
 			}
 
 			subject = commonRecordHash(record, bySeq, byName, revcom, ignoreCase)
-			if len(counter[subject]) == fileNum {
+			if counter[subject].files == fileNum {
 				nOutput++
 				record.FormatToWriter(outfh, config.LineWidth)
 			}
@@ -337,7 +338,7 @@ func commonRecordHash(record *fastx.Record, bySeq, byName, revcom, ignoreCase bo
 		text = bytes.ToLower(text)
 	}
 	hash := xxhash.Sum64(text)
-	if bySeq && revcom {
+	if bySeq && revcom && hasComplement(record.Seq.Alphabet) {
 		rc := record.Seq.RevCom().Seq
 		if ignoreCase {
 			rc = bytes.ToLower(rc)
@@ -424,29 +425,30 @@ func commonEmbedded(files []string, firstLabel string, out *xopen.Writer, config
 				continue
 			}
 			query := normalize(record.Seq.Seq)
+			queryRevcom := revcom && hasComplement(record.Seq.Alphabet)
 			var queryRC []byte
-			if revcom {
+			if queryRevcom {
 				queryRC = normalize(record.Seq.RevCom().Seq)
 			}
 			key := query
-			if revcom && bytes.Compare(queryRC, key) < 0 {
+			if queryRevcom && bytes.Compare(queryRC, key) < 0 {
 				key = queryRC
 			}
 			for _, target := range exact[xxhash.Sum64(key)] {
-				if bytes.Equal(target.text, query) || revcom && bytes.Equal(target.text, queryRC) {
+				if bytes.Equal(target.text, query) || queryRevcom && bytes.Equal(target.text, queryRC) {
 					keep(target, target.span)
 				}
 			}
 			shorter := sort.Search(len(targets), func(i int) bool { return len(targets[i].text) >= len(query) })
 			longer := sort.Search(len(targets), func(i int) bool { return len(targets[i].text) > len(query) })
 			for _, target := range targets[:shorter] {
-				if bytes.Contains(query, target.text) || revcom && bytes.Contains(queryRC, target.text) {
+				if bytes.Contains(query, target.text) || queryRevcom && bytes.Contains(queryRC, target.text) {
 					keep(target, target.span)
 				}
 			}
 			for _, target := range targets[longer:] {
 				position := bytes.Index(target.text, query)
-				if position < 0 && revcom {
+				if position < 0 && queryRevcom {
 					position = bytes.Index(target.text, queryRC)
 				}
 				if position >= 0 {
@@ -546,7 +548,7 @@ func commonEmbedded(files []string, firstLabel string, out *xopen.Writer, config
 
 // canonicalCommonSequence returns a view or reverse complement for exact comparison.
 func canonicalCommonSequence(text []byte, alphabet *seq.Alphabet, revcom bool) []byte {
-	if !revcom {
+	if !revcom || !hasComplement(alphabet) {
 		return text
 	}
 	sequence := &seq.Seq{Alphabet: alphabet, Seq: text}

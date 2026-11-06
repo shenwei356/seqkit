@@ -44,3 +44,27 @@ func TestFaidxClippedStrands(t *testing.T) {
 		}
 	}
 }
+
+// TestFaidxIndexAuxiliaryAliases protects region and input lists during index updates.
+func TestFaidxIndexAuxiliaryAliases(t *testing.T) {
+	for _, flag := range []string{"-l", "--infile-list"} {
+		dir := t.TempDir()
+		input := auditInput(t, dir, "input.fa", ">r\nACGT\n")
+		data := "r\n"
+		if flag == "--infile-list" {
+			data = input + "\n"
+		}
+		index := auditInput(t, dir, "input.fa.fai", data)
+		output := auditInput(t, dir, "out.fa", "keep\n")
+		args := []string{"faidx", "-U", flag, index, "-o", output}
+		if flag == "-l" {
+			args = append(args, input)
+		}
+		_, stderr, err := runCLI(t, "", args...)
+		after, _ := os.ReadFile(index)
+		out, _ := os.ReadFile(output)
+		if err == nil || string(after) != data || string(out) != "keep\n" {
+			t.Fatalf("auxiliary input overwritten: %v %s", err, stderr)
+		}
+	}
+}

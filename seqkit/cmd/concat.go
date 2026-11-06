@@ -71,6 +71,9 @@ Attention:
 		full := getFlagBool(cmd, "full")
 		fillBase := getFlagString(cmd, "fill")
 		fill := fillBase != ""
+		if fill && (len(fillBase) != 1 || fillBase[0] < '!' || fillBase[0] > '~') {
+			checkError(fmt.Errorf("--fill must be a single printable ASCII character"))
+		}
 		separator := getFlagString(cmd, "separator")
 
 		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
@@ -103,7 +106,7 @@ Attention:
 				log.Infof("read file: %s", file)
 			}
 
-			seqs, err := fastx.GetSeqs(file, alphabet, config.Threads, 1024, idRegexp)
+			seqs, inputFastq, err := readRecordsWithFormat(file, alphabet, idRegexp)
 			checkError(err)
 
 			if len(seqs) == 0 {
@@ -116,13 +119,13 @@ Attention:
 			}
 
 			if first {
-				isFastq = len(seqs[0].Seq.Qual) > 0
+				isFastq = inputFastq
 				if isFastq {
 					fastx.ForcelyOutputFastq = true
 				}
 				first = false
 			} else {
-				if len(seqs[0].Seq.Qual) > 0 != isFastq {
+				if inputFastq != isFastq {
 					checkError(fmt.Errorf("concatenating FASTA and FASTQ is not allowed"))
 				}
 			}
@@ -213,9 +216,7 @@ Attention:
 				lists = append(lists, vs)
 			}
 
-			prod := product(lists...)
-
-			for _, locs := range prod {
+			for locs := range product(lists...) {
 				bufName.Reset()
 				bufSeq.Reset()
 				bufQual.Reset()
@@ -294,35 +295,39 @@ func init() {
 	RootCmd.AddCommand(concateCmd)
 
 	concateCmd.Flags().BoolP("full", "f", false, "keep all sequences, like full/outer join")
-	concateCmd.Flags().StringP("fill", "F", "", "fill with N bases/residues for IDs missing in some files when using -f/--full")
+	concateCmd.Flags().StringP("fill", "F", "", "fill with one ASCII character (e.g., N) for IDs missing in some files when using -f/--full")
 	concateCmd.Flags().StringP("separator", "s", "|", "separator for descriptions of records with the same ID")
 }
 
-// product returns one choice from each list in every possible combination.
-func product(lists ...[]int) (results [][]int) {
-	if len(lists) == 0 {
-		return nil
-	}
-
-	results = make([][]int, 0, 8)
-	for _, list := range lists {
-		if len(results) == 0 {
-			for _, e := range list {
-				results = append(results, []int{e})
+// product yields combinations in input order with O(len(lists)) scratch space.
+// The yielded slice is reused and must not be retained by the caller.
+func product(lists ...[]int) func(func([]int) bool) {
+	return func(yield func([]int) bool) {
+		if len(lists) == 0 {
+			return
+		}
+		positions := make([]int, len(lists)) // Current choice in each list.
+		values := make([]int, len(lists))
+		for i, list := range lists {
+			if len(list) == 0 {
+				return
 			}
-		} else {
-			results2 := make([][]int, 0, len(results)*len(list))
-			for _, l := range results {
-				for _, e := range list {
-					l2 := make([]int, len(l)+1)
-					copy(l2[:len(l)], l)
-					l2[len(l2)-1] = e
-					results2 = append(results2, l2)
+			values[i] = list[0]
+		}
+		for yield(values) {
+			// Carry from the last list, preserving the former nested-loop order.
+			i := len(lists) - 1
+			for ; i >= 0; i-- {
+				positions[i]++
+				if positions[i] < len(lists[i]) {
+					values[i] = lists[i][positions[i]]
+					break
 				}
+				positions[i], values[i] = 0, lists[i][0]
 			}
-			results = results2
+			if i < 0 {
+				return
+			}
 		}
 	}
-
-	return results
 }
