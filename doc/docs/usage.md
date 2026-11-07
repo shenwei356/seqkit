@@ -1560,7 +1560,7 @@ Usage:
   seqkit convert [flags]
 
 Flags:
-  -d, --dry-run                         dry run
+  -d, --dry-run                         report quality encodings without writing output files
   -f, --force                           for Illumina-1.8+ -> Sanger, truncate scores > 40 to 40
       --from string                     source quality encoding. if not given, we'll guess it
   -h, --help                            help for convert

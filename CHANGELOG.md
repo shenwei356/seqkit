@@ -64,6 +64,7 @@
     - `seqkit convert`:
         - Reject invalid quality scores and conversions outside printable ASCII. [#612](https://github.com/shenwei356/seqkit/issues/612)
         - Reject nonfinite or out-of-range quality-encoding guess fractions.
+        - Leave output files and directories untouched with `--dry-run`.
     - `seqkit convert/locate/merge-slides/range/replace/sliding/split/split2/sum`:
         - Fixed record handling, validation, and concurrency issues.
     - `seqkit faidx`:

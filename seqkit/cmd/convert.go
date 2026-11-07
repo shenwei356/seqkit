@@ -76,9 +76,14 @@ The --force flag only clips scores > 40 for Illumina-1.8+ -> Sanger.
 
 		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
 		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
-		outfh, err := xopen.Wopen(outFile)
-		checkError(err)
-		defer closeOutput(outfh)
+		// Dry runs only report encodings; opening output would truncate files.
+		var outfh *xopen.Writer
+		if !dryRun {
+			var err error
+			outfh, err = xopen.Wopen(outFile)
+			checkError(err)
+			defer closeOutput(outfh)
+		}
 		lineWidth := config.LineWidth
 		if !config.LineWidthChanged {
 			lineWidth = 0
@@ -230,7 +235,7 @@ func init() {
 
 	convertCmd.Flags().StringP("from", "", "", `source quality encoding. if not given, we'll guess it`)
 	convertCmd.Flags().StringP("to", "", "Sanger", `target quality encoding`)
-	convertCmd.Flags().BoolP("dry-run", "d", false, `dry run`)
+	convertCmd.Flags().BoolP("dry-run", "d", false, `report quality encodings without writing output files`)
 	convertCmd.Flags().BoolP("force", "f", false, `for Illumina-1.8+ -> Sanger, truncate scores > 40 to 40`)
 	convertCmd.Flags().IntP("nrecords", "n", 1000, "number of records for guessing quality encoding")
 
