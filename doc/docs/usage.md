@@ -410,15 +410,16 @@ Flags:
                                  limit (-1 for no limit) (default -1)
   -n, --name                     only print names/sequence headers
   -i, --only-id                  print IDs instead of full headers
-  -q, --qual                     only print qualities
+  -q, --qual                     only print qualities (unwrapped unless -w is set)
   -b, --qual-ascii-base int      ASCII BASE, 33 for Phred+33 (default 33)
   -g, --remove-gaps              remove gaps letters seft by -G/--gap-letters, e.g., spaces, tabs, and
                                  dashes (gaps "-" in aligned sequences)
   -r, --reverse                  reverse sequence
       --rna2dna                  RNA to DNA
-  -s, --seq                      only print sequences
+  -s, --seq                      only print sequences (unwrapped unless -w is set)
   -u, --upper-case               print sequences in upper case
   -v, --validate-seq             validate bases according to the alphabet
+
 ```
 
 Examples

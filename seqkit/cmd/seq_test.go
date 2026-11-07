@@ -160,3 +160,34 @@ func TestSeqValidateLeadingEmptyRecords(t *testing.T) {
 		}
 	}
 }
+
+// TestSeqOnlySequenceQualityLineWidth preserves single-line defaults while
+// honoring explicit widths for raw sequence and quality output.
+func TestSeqOnlySequenceQualityLineWidth(t *testing.T) {
+	bases := strings.Repeat("ACGT", 20)
+	quality := strings.Repeat("!#%&", 20)
+	for _, tc := range []struct{ flag, input, want string }{
+		{"-s", ">r\n" + bases + "\n", bases},
+		{"-s", "@r\n" + bases + "\n+\n" + quality + "\n", bases},
+		{"-q", "@r\n" + bases + "\n+\n" + quality + "\n", quality},
+	} {
+		for _, width := range []string{"", "0", "7"} {
+			args := []string{"seq", tc.flag}
+			want := tc.want + "\n"
+			if width != "" {
+				args = append(args, "-w", width)
+			}
+			if width == "7" {
+				var lines []string
+				for i := 0; i < len(tc.want); i += 7 {
+					lines = append(lines, tc.want[i:min(i+7, len(tc.want))])
+				}
+				want = strings.Join(lines, "\n") + "\n"
+			}
+			got, stderr, err := runCLI(t, tc.input, args...)
+			if err != nil || got != want {
+				t.Errorf("%v: got %q, want %q: %v %s", args, got, want, err, stderr)
+			}
+		}
+	}
+}

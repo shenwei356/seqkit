@@ -223,6 +223,7 @@
     - `seqkit seq/replace`:
         - Avoid crashes with empty filter patterns; search reverse complements for DNA/RNA regular-expression filters and avoid reversed protein matches.
     - `seqkit seq`:
+        - Honor explicit line widths with `-s/--seq` and `-q/--qual`, while keeping single-line output by default.
         - Correct the error message when the minimum length exceeds the maximum length.
         - Keep quality background colors aligned after gaps or other uncolored characters with `-k/--color`, including wrapped FASTQ output.
         - Convert every selected record with `--rna2dna` or `--dna2rna`, even when the first record already has the target alphabet.

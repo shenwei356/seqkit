@@ -462,7 +462,8 @@ Filtering records to edit:
 
 			checkSeqType = true
 			printQual = false
-			if onlySeq || onlyQual {
+			// Raw output defaults to one line, but explicit widths still apply.
+			if (onlySeq || onlyQual) && !config.LineWidthChanged {
 				config.LineWidth = 0
 			}
 			for {
@@ -704,8 +705,8 @@ func init() {
 	seqCmd.Flags().BoolP("reverse", "r", false, "reverse sequence")
 	seqCmd.Flags().BoolP("complement", "p", false, "complement sequence, flag '-v' is recommended to switch on")
 	seqCmd.Flags().BoolP("name", "n", false, "only print names/sequence headers")
-	seqCmd.Flags().BoolP("seq", "s", false, "only print sequences")
-	seqCmd.Flags().BoolP("qual", "q", false, "only print qualities")
+	seqCmd.Flags().BoolP("seq", "s", false, "only print sequences (unwrapped unless -w is set)")
+	seqCmd.Flags().BoolP("qual", "q", false, "only print qualities (unwrapped unless -w is set)")
 	seqCmd.Flags().BoolP("only-id", "i", false, "print IDs instead of full headers")
 	seqCmd.Flags().BoolP("remove-gaps", "g", false, `remove gaps letters seft by -G/--gap-letters, e.g., spaces, tabs, and dashes (gaps "-" in aligned sequences)`)
 	seqCmd.Flags().StringP("gap-letters", "G", "- 	.", `gap letters to be removed with -g/--remove-gaps`)
