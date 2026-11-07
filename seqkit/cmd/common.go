@@ -175,6 +175,7 @@ Note:
 
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			check(err)
+			fileAlphabet := alphabet
 
 			for {
 				record, err = fastxReader.Read()
@@ -185,6 +186,7 @@ Note:
 					check(err)
 					break
 				}
+				fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
 
 				if bySeq {
 					_seq = record.Seq.Seq
@@ -281,6 +283,7 @@ Note:
 		// retrieve
 		fastxReader, err = fastx.NewReader(alphabet, firstFile, idRegexp)
 		check(err)
+		fileAlphabet := alphabet
 		checkFormat := true
 		for {
 			record, err = fastxReader.Read()
@@ -291,6 +294,7 @@ Note:
 				check(err)
 				break
 			}
+			fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
 			if checkFormat {
 				checkFormat = false
 				if fastxReader.IsFastq {
@@ -386,6 +390,7 @@ func commonEmbedded(files []string, firstLabel string, out *xopen.Writer, config
 		if err != nil {
 			return err
 		}
+		fileAlphabet := config.Alphabet
 		next := make([]map[commonSpan]bool, len(originals))
 		// Equal-length candidates use hashes; only unequal lengths need containment scans.
 		type targetSpan struct {
@@ -421,6 +426,7 @@ func commonEmbedded(files []string, firstLabel string, out *xopen.Writer, config
 				reader.Close()
 				return fmt.Errorf("%s: %w", file, err)
 			}
+			fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
 			if len(record.Seq.Seq) == 0 {
 				continue
 			}

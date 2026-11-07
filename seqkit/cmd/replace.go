@@ -358,6 +358,7 @@ Filtering records to edit:
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
+			fileAlphabet := alphabet
 
 			nr := 0
 			// File names pass through placeholder expansion and then pattern expansion.
@@ -382,6 +383,7 @@ Filtering records to edit:
 					checkError(err)
 					break
 				}
+				fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
 
 				if checkAlphabet {
 					fastx.ForcelyOutputFastq = fastxReader.IsFastq

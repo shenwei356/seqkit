@@ -336,10 +336,10 @@ Attention:
 			for _, file := range files {
 				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
+				fileAlphabet := alphabet
 
 				// Alphabet detection must not change the next file's strand policy.
 				_onlyPositiveStrand := onlyPositiveStrand
-				checkAlphabet := true
 				for {
 					record, err = fastxReader.Read()
 					if err != nil {
@@ -349,17 +349,13 @@ Attention:
 						checkError(err)
 						break
 					}
+					fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
 
 					if len(record.Seq.Seq) == 0 {
 						continue
 					}
 
-					if checkAlphabet {
-						if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
-							_onlyPositiveStrand = true
-						}
-						checkAlphabet = false
-					}
+					_onlyPositiveStrand = onlyPositiveStrand || !hasComplement(record.Seq.Alphabet)
 
 					pending <- 1
 					tokens <- 1
@@ -600,9 +596,9 @@ Attention:
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
+			fileAlphabet := alphabet
 
 			_onlyPositiveStrand := onlyPositiveStrand
-			checkAlphabet := true
 			for {
 				record, err = fastxReader.Read()
 				if err != nil {
@@ -612,17 +608,13 @@ Attention:
 					checkError(err)
 					break
 				}
+				fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
 
 				if len(record.Seq.Seq) == 0 {
 					continue
 				}
 
-				if checkAlphabet {
-					if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
-						_onlyPositiveStrand = true
-					}
-					checkAlphabet = false
-				}
+				_onlyPositiveStrand = onlyPositiveStrand || !hasComplement(record.Seq.Alphabet)
 
 				if !(degenerate || useRegexp) && ignoreCase {
 					record.Seq.Seq = bytes.ToLower(record.Seq.Seq)

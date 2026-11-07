@@ -276,6 +276,7 @@ Examples:
 
 				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
+				fileAlphabet := alphabet
 
 				for {
 					record, err = fastxReader.Read()
@@ -286,6 +287,7 @@ Examples:
 						checkError(err)
 						break
 					}
+					fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
 					if fastxReader.IsFastq {
 						if !config.LineWidthChanged {
 							config.LineWidth = 0
@@ -442,6 +444,7 @@ Examples:
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
+			fileAlphabet := alphabet
 
 			for {
 				record, err = fastxReader.Read()
@@ -452,6 +455,7 @@ Examples:
 					checkError(err)
 					break
 				}
+				fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
 				fastx.ForcelyOutputFastq = fastxReader.IsFastq
 				if fastxReader.IsFastq {
 					if !config.LineWidthChanged {

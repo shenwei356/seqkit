@@ -65,6 +65,19 @@ func assertEditFilterContracts(t *testing.T, command []string) {
 // TestSeqEditFilters covers filter behavior through the sequence-editing command.
 func TestSeqEditFilters(t *testing.T) { assertEditFilterContracts(t, []string{"seq", "-l"}) }
 
+// TestSeqLeadingEmptyRecords preserves complements and sequence-edit filters.
+func TestSeqLeadingEmptyRecords(t *testing.T) {
+	for _, args := range [][]string{
+		{"seq", "-r", "-p"},
+		{"seq", "-l", "--f-by-seq", "--f-pattern", "GAAA"},
+		{"seq", "-l", "--f-by-seq", "--f-pattern", "GAAA", "--f-use-regexp"},
+		{"seq", "-r", "-p", "-t", "unlimit"},
+	} {
+		assertLeadingEmptyRecords(t, ">r\nTTTC\n", args...)
+		assertLeadingEmptyRecords(t, "@r\nUUUC\n+\nabcd\n", args...)
+	}
+}
+
 // TestSeqDamagedAuxiliaryInput rejects incomplete auxiliary data.
 func TestSeqDamagedAuxiliaryInput(t *testing.T) {
 	assertDamagedTextInput(t, "r\n", "seq", "--f-pattern-file")

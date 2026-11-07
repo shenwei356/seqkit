@@ -68,6 +68,15 @@ func TestRestartEmptySearchRecords(t *testing.T) {
 	}
 }
 
+// TestRestartLeadingEmptyRecords keeps reverse circular searches after empty reads.
+func TestRestartLeadingEmptyRecords(t *testing.T) {
+	for _, mismatch := range []string{"0", "1"} {
+		args := []string{"restart", "-s", "GAAA", "-m", mismatch}
+		assertLeadingEmptyRecords(t, ">r\nTTTC\n", args...)
+		assertLeadingEmptyRecords(t, "@r\nUUUC\n+\nabcd\n", args...)
+	}
+}
+
 // TestRestartProteinStrands never reverses a protein to invent a matching start.
 func TestRestartProteinStrands(t *testing.T) {
 	for _, mismatch := range []string{"0", "1"} {

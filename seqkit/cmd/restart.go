@@ -121,6 +121,7 @@ Examples
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
+			fileAlphabet := alphabet
 
 			fastx.ForcelyOutputFastq = false
 			checkAlphabet := true
@@ -133,6 +134,7 @@ Examples
 					checkError(err)
 					break
 				}
+				fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
 
 				if checkAlphabet {
 					if fastxReader.IsFastq {

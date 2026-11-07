@@ -376,3 +376,20 @@ func TestSubseqMissingIndexedID(t *testing.T) {
 		}
 	}
 }
+
+// TestSubseqLeadingEmptyRecords keeps indexed and streamed negative-strand output equal.
+func TestSubseqLeadingEmptyRecords(t *testing.T) {
+	dir := t.TempDir()
+	bed := auditInput(t, dir, "regions.bed", "r\t0\t4\t\t0\t-\n")
+	const input = ">r\nTTTC\n"
+	assertLeadingEmptyRecords(t, input, "subseq", "--bed", bed)
+	want, stderr, err := runCLI(t, input, "subseq", "--bed", bed)
+	if err != nil {
+		t.Fatalf("baseline failed: %v %s", err, stderr)
+	}
+	file := auditInput(t, dir, "input.fa", ">empty\n"+input)
+	got, stderr, err := runCLI(t, "", "subseq", "--bed", bed, file)
+	if err != nil || got != want {
+		t.Fatalf("indexed negative strand differs: %v %s", err, stderr)
+	}
+}

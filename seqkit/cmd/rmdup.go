@@ -113,6 +113,7 @@ Attention:
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
+			fileAlphabet := alphabet
 
 			checkAlphabet := true
 			for {
@@ -124,6 +125,7 @@ Attention:
 					checkError(err)
 					break
 				}
+				fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
 
 				if checkAlphabet {
 					fastx.ForcelyOutputFastq = fastxReader.IsFastq

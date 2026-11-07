@@ -7,6 +7,25 @@ import (
 	"github.com/shenwei356/bio/seq"
 )
 
+// assertLeadingEmptyRecords checks that empty prefixes do not change processing
+// of later records. Commands may preserve or omit the empty records themselves.
+func assertLeadingEmptyRecords(t *testing.T, input string, args ...string) {
+	t.Helper()
+	want, stderr, err := runCLI(t, input, args...)
+	if err != nil {
+		t.Fatalf("baseline failed: %v %s", err, stderr)
+	}
+	empty1, empty2 := ">leading1\n\n", ">leading2\n\n"
+	if strings.HasPrefix(input, "@") {
+		empty1, empty2 = "@leading1\n\n+\n\n", "@leading2\n\n+\n\n"
+	}
+	got, stderr, err := runCLI(t, empty1+empty2+input, args...)
+	got = strings.ReplaceAll(strings.ReplaceAll(got, empty1, ""), empty2, "")
+	if err != nil || got != want {
+		t.Fatalf("leading empty records changed results for %v: %v %s", args, err, stderr)
+	}
+}
+
 // TestHasComplementClones preserves nucleotide classification after cloning.
 func TestHasComplementClones(t *testing.T) {
 	for _, alphabet := range []*seq.Alphabet{seq.DNA, seq.DNAredundant, seq.RNA, seq.RNAredundant, seq.Protein, seq.Unlimit} {

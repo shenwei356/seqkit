@@ -71,6 +71,9 @@ redirected stdin, and output-directory cleanup retain their full checks.
 Custom ID regular expressions must contain a capturing group for the ID.
 They are validated before output files or indexes are changed.
 
+Leading empty records are skipped when inferring sequence type for strand-aware
+processing. Set --seq-type to override automatic detection.
+
 Compression level:
   format   range   default  comment
   gzip     1-9     5        https://github.com/klauspost/pgzip sets 5 as the default value.

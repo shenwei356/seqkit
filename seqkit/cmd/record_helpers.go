@@ -49,6 +49,7 @@ func readRecordsWithFormat(file string, alphabet *seq.Alphabet, idRegexp string)
 		if err != nil {
 			return nil, false, fmt.Errorf("%s: %w", file, err)
 		}
+		alphabet = inferRecordAlphabet(record, alphabet)
 		records = append(records, record.Clone())
 	}
 }
@@ -148,15 +149,42 @@ func hasComplement(alphabet *seq.Alphabet) bool {
 	return false
 }
 
-// guessAlphabet closes the probe reader even when the first record is not at EOF.
+// inferRecordAlphabet keeps per-file type inference pending through empty records.
+// Apply it before cloning or dispatching a record; explicit alphabets are retained.
+func inferRecordAlphabet(record *fastx.Record, alphabet *seq.Alphabet) *seq.Alphabet {
+	if alphabet == nil && len(record.Seq.Seq) > 0 {
+		// Reuse the reader's normal first-record guess; only an unrestricted
+		// guess may have come from a leading empty record.
+		alphabet = record.Seq.Alphabet
+		if alphabet == nil || alphabet == seq.Unlimit {
+			alphabet = seq.GuessAlphabetLessConservatively(record.Seq.Seq)
+		}
+	}
+	if alphabet != nil {
+		record.Seq.Alphabet = alphabet
+	}
+	return alphabet
+}
+
+// guessAlphabet probes through leading empty records and always closes its reader.
 func guessAlphabet(file string) (*seq.Alphabet, bool, error) {
 	r, err := fastx.NewDefaultReader(file)
 	if err != nil {
 		return nil, false, err
 	}
 	defer r.Close()
-	if _, err := r.Read(); err != nil {
-		return r.Alphabet(), false, err
+	seenRecord := false
+	for {
+		record, err := r.Read()
+		if err != nil {
+			if err == io.EOF && seenRecord {
+				return r.Alphabet(), r.IsFastq, nil
+			}
+			return r.Alphabet(), false, err
+		}
+		seenRecord = true
+		if len(record.Seq.Seq) > 0 {
+			return inferRecordAlphabet(record, nil), r.IsFastq, nil
+		}
 	}
-	return r.Alphabet(), r.IsFastq, nil
 }

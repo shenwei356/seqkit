@@ -401,6 +401,7 @@ Examples:
 			// Parse all sequences
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
+			fileAlphabet := alphabet
 			checkAlphabet := true
 
 			var seqname string
@@ -416,6 +417,7 @@ Examples:
 					checkError(err)
 					break
 				}
+				fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
 				if checkAlphabet {
 					fastx.ForcelyOutputFastq = fastxReader.IsFastq
 					if fastxReader.IsFastq {

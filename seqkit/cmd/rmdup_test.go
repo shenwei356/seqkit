@@ -64,3 +64,9 @@ func TestRmdupAuxiliaryOutputsProtectInputList(t *testing.T) {
 		}
 	}
 }
+
+// TestRmdupLeadingEmptyRecords recognizes reverse-complement duplicates.
+func TestRmdupLeadingEmptyRecords(t *testing.T) {
+	assertLeadingEmptyRecords(t, ">a\nTTTC\n>b\nGAAA\n", "rmdup", "-s")
+	assertLeadingEmptyRecords(t, "@a\nUUUC\n+\nabcd\n@b\nGAAA\n+\ndcba\n", "rmdup", "-s")
+}

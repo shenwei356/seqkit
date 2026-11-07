@@ -401,6 +401,7 @@ Examples:
 			for _, file := range files {
 				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
+				fileAlphabet := alphabet
 
 				// Alphabet detection applies only to this file's workers.
 				positiveOnly := onlyPositiveStrand
@@ -415,11 +416,10 @@ Examples:
 						checkError(err)
 						break
 					}
+					fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
+					positiveOnly = onlyPositiveStrand || !hasComplement(record.Seq.Alphabet)
 
 					if checkAlphabet {
-						if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
-							positiveOnly = true
-						}
 						if fastxReader.IsFastq {
 							if !config.LineWidthChanged {
 								lineWidth = 0
@@ -563,6 +563,7 @@ Examples:
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
+			fileAlphabet := alphabet
 
 			positiveOnly := onlyPositiveStrand // Do not carry protein detection to later files.
 			lineWidth := config.LineWidth
@@ -582,11 +583,10 @@ Examples:
 					checkError(err)
 					break
 				}
+				fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
+				positiveOnly = onlyPositiveStrand || !hasComplement(record.Seq.Alphabet)
 
 				if checkAlphabet {
-					if fastxReader.Alphabet() == seq.Unlimit || fastxReader.Alphabet() == seq.Protein {
-						positiveOnly = true
-					}
 					if fastxReader.IsFastq {
 						if !config.LineWidthChanged {
 							lineWidth = 0

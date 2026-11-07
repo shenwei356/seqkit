@@ -234,3 +234,14 @@ func TestGrepExtremeRegionCoordinates(t *testing.T) {
 func TestGrepDamagedAuxiliaryInput(t *testing.T) {
 	assertDamagedTextInput(t, "r\n", "grep", "-f")
 }
+
+// TestGrepLeadingEmptyRecords preserves negative-strand hits in every search mode.
+func TestGrepLeadingEmptyRecords(t *testing.T) {
+	for _, mode := range [][]string{nil, {"-r"}, {"-d"}, {"-m", "1"}, {"-m", "1", "-p", "CCCC"}} {
+		for _, input := range []string{">r\nTTTC\n", "@r\nUUUC\n+\nabcd\n"} {
+			args := append([]string{"grep", "-s", "-p", "GAAA", "-j", "2"}, mode...)
+			assertLeadingEmptyRecords(t, input, args...)
+			assertLeadingEmptyRecords(t, input, append(args, "-P")...)
+		}
+	}
+}

@@ -43,6 +43,15 @@ func TestLocateMultiplePatternsAndRecords(t *testing.T) {
 	}
 }
 
+// TestLocateLeadingEmptyRecords covers indexed, literal, and regexp searches.
+func TestLocateLeadingEmptyRecords(t *testing.T) {
+	for _, mode := range [][]string{nil, {"-r"}, {"-d"}, {"-F"}, {"-m", "1"}} {
+		args := append([]string{"locate", "-p", "GAAA", "-j", "2"}, mode...)
+		assertLeadingEmptyRecords(t, ">r\nTTTC\n", args...)
+		assertLeadingEmptyRecords(t, "@r\nUUUC\n+\nabcd\n", args...)
+	}
+}
+
 // TestLocatePerFileStrands keeps strand detection local in every search mode.
 func TestLocatePerFileStrands(t *testing.T) {
 	dir := t.TempDir()

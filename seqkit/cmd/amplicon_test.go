@@ -39,6 +39,15 @@ func TestAmpliconParallelMixedFileFormats(t *testing.T) {
 	assertMixedFileFormats(t, "amplicon", "-P", "-F", "ACGT", "-u", "-m", "1", "-j", "4")
 }
 
+// TestAmpliconLeadingEmptyRecords preserves reverse hits and their qualities.
+func TestAmpliconLeadingEmptyRecords(t *testing.T) {
+	for _, mismatch := range []string{"0", "1"} {
+		args := []string{"amplicon", "-F", "GAAA", "-m", mismatch, "-j", "2"}
+		assertLeadingEmptyRecords(t, ">r\nTTTC\n", args...)
+		assertLeadingEmptyRecords(t, "@r\nUUUC\n+\nabcd\n", args...)
+	}
+}
+
 // TestAmpliconProteinStrands preserves unmatched input without reversing proteins.
 func TestAmpliconProteinStrands(t *testing.T) {
 	const input = "@s\nEACG\n+\n1234\n"

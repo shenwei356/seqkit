@@ -86,3 +86,12 @@ func TestReplaceKeepKeyLiteral(t *testing.T) {
 		})
 	}
 }
+
+// TestReplaceLeadingEmptyRecords keeps sequence filters aware of the reverse strand.
+func TestReplaceLeadingEmptyRecords(t *testing.T) {
+	for _, mode := range [][]string{nil, {"--f-use-regexp"}} {
+		args := append([]string{"replace", "-p", "r", "-r", "edited", "--f-by-seq", "--f-pattern", "GAAA"}, mode...)
+		assertLeadingEmptyRecords(t, ">r\nTTTC\n", args...)
+		assertLeadingEmptyRecords(t, "@r\nUUUC\n+\nabcd\n", args...)
+	}
+}

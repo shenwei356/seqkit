@@ -72,3 +72,9 @@ func TestFa2fqProteinStrands(t *testing.T) {
 		}
 	}
 }
+
+// TestFa2fqLeadingEmptyRecords keeps reverse matches and reverses quality scores.
+func TestFa2fqLeadingEmptyRecords(t *testing.T) {
+	ref := auditInput(t, t.TempDir(), "query.fa", ">r\nGAAA\n")
+	assertLeadingEmptyRecords(t, "@r\nTTTC\n+\nabcd\n", "fa2fq", "-f", ref)
+}

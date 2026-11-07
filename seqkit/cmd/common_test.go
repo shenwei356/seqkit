@@ -147,3 +147,25 @@ func TestCommonProteinStrands(t *testing.T) {
 		}
 	}
 }
+
+// TestCommonLeadingEmptyRecords covers both passes and embedded intersections.
+func TestCommonLeadingEmptyRecords(t *testing.T) {
+	for _, mode := range [][]string{{"-s"}, {"-s", "-e"}} {
+		for _, leadingFirst := range []bool{false, true} {
+			dir := t.TempDir()
+			first, second := ">r\nTTTC\n", ">s\nGAAA\n"
+			if leadingFirst {
+				first = ">empty\n" + first
+			} else {
+				second = ">empty\n" + second
+			}
+			a := auditInput(t, dir, "a.fa", first)
+			b := auditInput(t, dir, "b.fa", second)
+			args := append([]string{"common", a, b}, mode...)
+			out, stderr, err := runCLI(t, "", args...)
+			if err != nil || out != ">r\nTTTC\n" {
+				t.Fatalf("leading empty changed intersection: %v %s", err, stderr)
+			}
+		}
+	}
+}
