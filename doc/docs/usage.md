@@ -4613,6 +4613,9 @@ to the whole pipeline; `Tsv: "-"` writes to stderr.
 
 `Match` and `Mismatch` count aligned bases, excluding insertions and deletions.
 `AlnContext` clips context windows at the reference boundaries.
+It accepts both ID-only and full-header `.seqkit.fai` indexes, uses the first
+record for repeated reference IDs, and creates full-header indexes for reuse by
+other commands.
 
 Example YAML configs:
 

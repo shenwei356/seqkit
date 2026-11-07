@@ -442,19 +442,32 @@ func (idx *RefWithFaidx) IdxSubSeq(chrom string, start, end int) (string, error)
 
 func NewRefWitdFaidx(file string, cache bool, quiet bool) *RefWithFaidx {
 	fileFai := file + ".seqkit.fai"
-	idRegexp := fastx.DefaultIDRegexp
 	var idx fai.Index
 	var err error
 	if fileNotExists(fileFai) {
 		if !quiet {
 			log.Infof("create FASTA index for %s", file)
 		}
-		idx, err = fai.CreateWithIDRegexp(file, fileFai, idRegexp)
+		// Shared indexes retain headers for other commands that need them.
+		idx, err = fai.CreateWithIDRegexp(file, fileFai, `^(.+)$`)
 		checkError(err)
 	} else {
 		idx, err = fai.Read(fileFai)
 		checkError(err)
 	}
+	// BAM references use IDs even when another command created a full-header index.
+	// Preserve the first physical record for repeated IDs, as ID-only indexes do.
+	byID := make(fai.Index, len(idx))
+	idRegexp := regexp.MustCompile(fastx.DefaultIDRegexp)
+	for head, record := range idx {
+		id := string(fastx.ParseHeadID(idRegexp, []byte(head)))
+		if previous, exists := byID[id]; exists && previous.Start < record.Start {
+			continue
+		}
+		record.Name = id
+		byID[id] = record
+	}
+	idx = byID
 
 	var faidx *fai.Faidx
 	faidx, err = fai.NewWithIndex(file, idx)

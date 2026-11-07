@@ -192,3 +192,42 @@ func TestBamContextBounds(t *testing.T) {
 		}
 	}
 }
+
+// TestBamContextSharedIndex resolves reference IDs in indexes made by other commands.
+func TestBamContextSharedIndex(t *testing.T) {
+	for _, mode := range []string{"new", "full", "legacy"} {
+		t.Run(mode, func(t *testing.T) {
+			dir := t.TempDir()
+			in := bamFixture(t, dir, "in.bam", true)
+			// Generated suffixes exercise full-header keys without using real metadata.
+			header := "chr1 " + strings.Repeat("x", 3)
+			other := "chr1 " + strings.Repeat("y", 3)
+			ref := auditInput(t, dir, "ref.fa", ">"+header+"\n"+strings.Repeat("ACGT", 25)+"\n>"+other+"\n"+strings.Repeat("T", 100)+"\n")
+			if mode != "new" {
+				key := "chr1"
+				if mode == "full" {
+					key = header
+				}
+				index := fmt.Sprintf("%s\t100\t%d\t100\t101\n", key, len(header)+2)
+				if mode == "full" {
+					index += fmt.Sprintf("%s\t100\t%d\t100\t101\n", other, len(header)+2+101+len(other)+2)
+				}
+				auditInput(t, dir, "ref.fa.seqkit.fai", index)
+			}
+			dump := filepath.Join(dir, "reads.tsv")
+			config := fmt.Sprintf("AlnContext: {Ref: %q, LeftShift: 0, RightShift: 1, RegexStart: '^A$'}\nDump: {Fields: [Read], Tsv: %q}\nSink: true", ref, dump)
+			_, _, err := runCLI(t, "", "bam", in, "--quiet", "-T", config)
+			data, readErr := os.ReadFile(dump)
+			if err != nil || readErr != nil || string(data) != "Read\nr1\nr2\n" {
+				t.Fatalf("reference IDs were not resolved with %s index: %v", mode, err)
+			}
+			if mode == "new" {
+				// A newly created shared index must also work for full-header consumers.
+				_, _, err = runCLI(t, "", "sort", "-2", "-n", "--quiet", ref)
+				if err != nil {
+					t.Fatalf("new context index cannot be reused by sort: %v", err)
+				}
+			}
+		})
+	}
+}

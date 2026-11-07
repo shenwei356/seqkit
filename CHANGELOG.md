@@ -30,6 +30,7 @@
     - `seqkit amplicon/grep/range/split/subseq`:
         - Reject regions with extra coordinate fields.
     - `seqkit bam`:
+        - Reuse full-header FASTA indexes in `AlnContext` and create indexes compatible with other commands, retaining the first record for repeated reference IDs.
         - Fix pass-through output, validate field/option combinations, require NM only where needed, and retain completed statistics if a later file fails. [#616](https://github.com/shenwei356/seqkit/issues/616)
         - Run toolbox stages in YAML order; reject invalid pipelines and report failed BAM, TSV, and count-file writes.
         - Correct alignment statistics for indels and omitted sequences; preserve percent signs in file names with `--pretty`.
