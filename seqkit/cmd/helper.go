@@ -587,7 +587,8 @@ func getSeqIDAndLengthFromFaidxFile(file string) ([]string, []int, error) {
 	return ids, lengths, nil
 }
 
-var reRegion = regexp.MustCompile(`\-?\d+:\-?\d+`)
+// reRegion requires exactly two coordinates so callers cannot ignore extra fields.
+var reRegion = regexp.MustCompile(`^\-?\d+:\-?\d+$`)
 
 var regionExample = `
  1-based index    1 2 3 4 5 6 7 8 9 10

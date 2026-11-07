@@ -5,10 +5,45 @@ import (
 	"compress/gzip"
 	"math"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
 )
+
+// TestRegionSyntax rejects extra coordinate fields before writing results.
+func TestRegionSyntax(t *testing.T) {
+	commands := [][]string{
+		{"subseq", "-r"}, {"range", "-r"}, {"grep", "-p", "AC", "-R"},
+		{"amplicon", "-F", "AC", "-r"}, {"split", "-r"},
+	}
+	for _, command := range commands {
+		for _, region := range []string{"1:2:3", "1:2:", "1:2:invalid"} {
+			t.Run(command[0]+"/"+region, func(t *testing.T) {
+				dir := t.TempDir()
+				output := filepath.Join(dir, "output")
+				args := append(append([]string(nil), command...), region)
+				if command[0] == "split" {
+					args = append(args, "-O", output)
+				} else {
+					auditInput(t, dir, "output", "keep\n")
+					args = append(args, "-o", output)
+				}
+				_, stderr, err := runCLI(t, ">r\nACGT\n", args...)
+				if err == nil || !strings.Contains(stderr, "invalid") || strings.Contains(stderr, "panic:") {
+					t.Errorf("extra coordinate fields accepted: %v %s", err, stderr)
+				}
+				if command[0] == "split" {
+					if _, err := os.Stat(output); !os.IsNotExist(err) {
+						t.Errorf("output directory created before validation: %v", err)
+					}
+				} else if data, err := os.ReadFile(output); err != nil || string(data) != "keep\n" {
+					t.Errorf("output changed before validation: %v", err)
+				}
+			})
+		}
+	}
+}
 
 // TestInvalidIDRegexpPreflight rejects invalid global parsers before opening
 // outputs or replacing indexes, even on paths that bypass the FASTX reader.

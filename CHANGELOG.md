@@ -27,6 +27,8 @@
         - Reduce repeated primer setup when reads do not match or BED output is requested.
     - `seqkit amplicon/fa2fq`:
         - Avoid false matches from reversed protein or unrestricted sequences.
+    - `seqkit amplicon/grep/range/split/subseq`:
+        - Reject malformed regions with extra coordinate fields instead of silently ignoring them.
     - `seqkit bam`:
         - Preserve percent signs in file names when displaying statistics with `--pretty`.
         - Validate fields and top-output combinations before processing; require NM only for dependent statistics; fix BAM pass-through, toolbox errors, and retention of completed file statistics on failure. [#616](https://github.com/shenwei356/seqkit/issues/616)
