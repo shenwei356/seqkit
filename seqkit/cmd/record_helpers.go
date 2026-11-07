@@ -185,22 +185,21 @@ func inferAndValidateRecordAlphabet(record *fastx.Record, alphabet *seq.Alphabet
 }
 
 // guessAlphabet probes through leading empty records and always closes its reader.
+// An empty stream has no inferred alphabet and is not a read error.
 func guessAlphabet(file string) (*seq.Alphabet, bool, error) {
 	r, err := fastx.NewDefaultReader(file)
 	if err != nil {
 		return nil, false, err
 	}
 	defer r.Close()
-	seenRecord := false
 	for {
 		record, err := r.Read()
 		if err != nil {
-			if err == io.EOF && seenRecord {
+			if err == io.EOF {
 				return r.Alphabet(), r.IsFastq, nil
 			}
 			return r.Alphabet(), false, err
 		}
-		seenRecord = true
 		if len(record.Seq.Seq) > 0 {
 			return inferRecordAlphabet(record, nil), r.IsFastq, nil
 		}

@@ -161,6 +161,7 @@
     - `seqkit shuffle/sort`:
         - Create valid empty output files in two-pass mode.
     - `seqkit shuffle/sort/split`:
+        - Accept empty compressed files and empty stdin in two-pass mode without errors or leftover temporary files.
         - Improve two-pass processing, including duplicate headers and leading FASTA comments.
     - `seqkit sliding`:
         - Skip empty circular records and avoid crashes with large greedy windows. [#619](https://github.com/shenwei356/seqkit/issues/619)

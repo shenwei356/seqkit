@@ -10,6 +10,30 @@ import (
 	"testing"
 )
 
+// TestSplitEmptyTwoPassInput accepts empty compressed input in every grouping mode.
+func TestSplitEmptyTwoPassInput(t *testing.T) {
+	for _, flags := range [][]string{{"-s", "1"}, {"-p", "2"}, {"-i"}, {"-r", "1:2"}} {
+		t.Run(strings.Join(flags, " "), func(t *testing.T) {
+			dir := t.TempDir()
+			file := auditInput(t, dir, "empty.fa.gz", string(compressedInput(t, ".gz", "")))
+			outdir := filepath.Join(dir, "parts")
+			args := append([]string{"split", "-2", file, "-O", outdir}, flags...)
+			_, stderr, err := runCLI(t, "", args...)
+			if err != nil {
+				t.Fatalf("empty input: %v %s", err, stderr)
+			}
+			entries, err := os.ReadDir(outdir)
+			if (err != nil && !os.IsNotExist(err)) || len(entries) != 0 {
+				t.Fatalf("unexpected split output: %v %v", entries, err)
+			}
+			leftovers, err := filepath.Glob(filepath.Join(dir, "seqkit-*"))
+			if err != nil || len(leftovers) != 0 {
+				t.Fatalf("temporary files remain: %v %v", leftovers, err)
+			}
+		})
+	}
+}
+
 // TestSplitCompressedFilenames keeps sequence and compression extensions separate.
 func TestSplitCompressedFilenames(t *testing.T) {
 	const input = ">r\nACGT\n"

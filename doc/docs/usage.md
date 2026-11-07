@@ -2876,6 +2876,8 @@ Examples
 
 ## split
 
+Empty input, including compressed files and stdin, produces no parts in two-pass mode.
+
 For `split`, `split2`, and `pair`, output filenames keep the sequence extension
 before the compression suffix (`.gz`, `.xz`, `.zst`, `.bz2`, or `.lz4`).
 For example, `reads.fa.bz2` split with `-e .gz` produces `reads.part_001.fa.gz`.
@@ -4350,6 +4352,8 @@ Examples:
 
 ## shuffle
 
+Empty input, including compressed files and stdin, produces empty output in two-pass mode.
+
 Usage
 
 ``` text
@@ -4417,6 +4421,8 @@ Note that when sampling on FASTQ files, make sure using same random seed by
 flag `-s` (`--rand-seed`) for read 1 and 2 files.
 
 ## sort
+
+Empty input, including compressed files and stdin, produces empty output in two-pass mode.
 
 Usage
 

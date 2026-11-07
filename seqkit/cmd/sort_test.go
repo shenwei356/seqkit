@@ -15,19 +15,25 @@ func TestSortEmptyOutput(t *testing.T) {
 }
 
 // assertEmptyOrderingOutput checks output creation, replacement and compression
-// with both newly built and reused empty indexes.
+// with newly built/reused empty indexes and empty compressed inputs.
 func assertEmptyOrderingOutput(t *testing.T, command string) {
 	t.Helper()
-	for _, mode := range []string{"one-pass", "new-index", "reused-index"} {
+	for _, mode := range []string{"one-pass", "new-index", "reused-index", "compressed-input"} {
 		for _, suffix := range []string{".fa", ".fa.gz"} {
 			for _, existing := range []bool{false, true} {
 				dir := t.TempDir()
 				input := auditInput(t, dir, "empty.fa", "")
+				if mode == "compressed-input" {
+					input = auditInput(t, dir, "empty.fa.gz", string(compressedInput(t, ".gz", "")))
+				}
 				output := filepath.Join(dir, "output"+suffix)
 				if existing {
 					auditInput(t, dir, filepath.Base(output), "stale output\n")
 				}
 				args := []string{command, input, "-o", output}
+				if command == "shuffle" {
+					args = append(args, "--tmp-dir", dir)
+				}
 				if mode != "one-pass" {
 					args = append(args, "-2")
 				}
@@ -57,6 +63,10 @@ func assertEmptyOrderingOutput(t *testing.T, command string) {
 				}
 				if len(data) != 0 {
 					t.Errorf("%s %s: stale output retained", command, mode)
+				}
+				leftovers, err := filepath.Glob(filepath.Join(dir, "seqkit-*"))
+				if err != nil || len(leftovers) != 0 {
+					t.Fatalf("temporary files remain: %v %v", leftovers, err)
 				}
 			}
 		}
