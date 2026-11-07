@@ -139,6 +139,7 @@ Attention:
      hit across all references and ranges, with ties resolved by output order.
   8. Empty reference records are omitted from BAM headers and retained with -x.
      Nonempty reference records must have unique IDs when writing BAM.
+  9. With -x, FASTQ is unwrapped by default; use -w to set a line width.
 
 `,
 
@@ -256,7 +257,9 @@ Attention:
 				if checkSeqType {
 					isFastq = fastxReader.IsFastq
 					if isFastq {
-						config.LineWidth = 0
+						if !config.LineWidthChanged {
+							config.LineWidth = 0
+						}
 						printQual = true
 					}
 					checkSeqType = false

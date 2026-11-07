@@ -1226,6 +1226,7 @@ Attention:
      still written in pass-through mode.
   3. Without valid statistics, plotting and image generation are skipped successfully.
   4. Invalid qualities in MeanQual and image-writing failures are reported as errors.
+  5. With -x, FASTQ is unwrapped by default; use -w to set a line width.
 
 Usage:
   seqkit watch [flags]
@@ -1246,6 +1247,7 @@ Flags:
   -Q, --quiet-mode            suppress all plotting to stderr
   -R, --reset                 reset histogram after every report
   -v, --validate-seq          validate bases according to the alphabet
+
 ```
 
 Examples
@@ -2324,6 +2326,7 @@ Attention:
      hit across all references and ranges, with ties resolved by output order.
   8. Empty reference records are omitted from BAM headers and retained with -x.
      Nonempty reference records must have unique IDs when writing BAM.
+  9. With -x, FASTQ is unwrapped by default; use -w to set a line width.
 
 Usage:
   seqkit fish [flags]
@@ -2344,6 +2347,7 @@ Flags:
   -r, --ranges string            target ranges, for example: ":10,30:40,-20:"
   -s, --stranded                 search + strand only
   -v, --validate-seq             validate bases according to the alphabet
+
 ```
 
 Examples

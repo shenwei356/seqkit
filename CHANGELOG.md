@@ -216,6 +216,8 @@
         - Correct negative-frame subsequence coordinates and failed-frame headers, validate table/frame selections, and clarify truncation and minimum-length options. [#619](https://github.com/shenwei356/seqkit/issues/619)
     - `seqkit grep/subseq`:
         - Avoid crashes with extremely negative region coordinates.
+    - `seqkit fish/watch`:
+        - Honor explicit line widths for FASTQ sequences and qualities in pass-through mode (`-x`).
     - `seqkit fa2fq`:
         - Reject damaged FASTA references and repeated stdin use before opening output files.
     - `seqkit seq/replace`:

@@ -97,3 +97,26 @@ func TestWatchImageAliases(t *testing.T) {
 func TestWatchValidateLeadingEmptyRecords(t *testing.T) {
 	assertLeadingEmptyValidation(t, "watch", "-v", "-Q")
 }
+
+// TestWatchPassThroughLineWidth honors explicit FASTQ wrapping across mixed inputs.
+func TestWatchPassThroughLineWidth(t *testing.T) {
+	dir := t.TempDir()
+	fasta := auditInput(t, dir, "input.fa", ">r\nACGTAC\n")
+	fastq := auditInput(t, dir, "input.fq", "@empty\n\n+\n\n@r\nACGTAC\n+\n!#%&()\n")
+	for _, width := range [][]string{nil, {"-w", "2"}, {"-w", "0"}} {
+		for _, files := range [][]string{{fastq}, {fastq, fasta}, {fasta, fastq}} {
+			args := append([]string{"seq"}, width...)
+			args = append(args, files...)
+			want, stderr, err := runCLI(t, "", args...)
+			if err != nil {
+				t.Fatalf("reference formatting failed: %v %s", err, stderr)
+			}
+			args = append([]string{"watch", "-x", "-Q"}, width...)
+			args = append(args, files...)
+			got, stderr, err := runCLI(t, "", args...)
+			if err != nil || got != want {
+				t.Errorf("width %v, files %v: got %q, want %q: %v %s", width, files, got, want, err, stderr)
+			}
+		}
+	}
+}

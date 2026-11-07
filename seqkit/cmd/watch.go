@@ -50,6 +50,7 @@ Attention:
      still written in pass-through mode.
   3. Without valid statistics, plotting and image generation are skipped successfully.
   4. Invalid qualities in MeanQual and image-writing failures are reported as errors.
+  5. With -x, FASTQ is unwrapped by default; use -w to set a line width.
 
 `,
 
@@ -223,7 +224,9 @@ Attention:
 				if checkSeqType {
 					isFastq = fastxReader.IsFastq
 					if isFastq {
-						config.LineWidth = 0
+						if !config.LineWidthChanged {
+							config.LineWidth = 0
+						}
 						printQual = true
 					}
 					checkSeqType = false
