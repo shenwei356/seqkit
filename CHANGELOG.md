@@ -63,6 +63,7 @@
     - `seqkit convert/locate/merge-slides/range/replace/sliding/split/split2/sum`:
         - Fixed record handling, validation, and concurrency issues.
     - `seqkit faidx`:
+        - Reject invalid ID regular expressions before changing output files or indexes, avoiding crashes with `-f`.
         - Clip negative starts, retain region suffixes, and return failure for missing IDs while preserving valid query results. [#618](https://github.com/shenwei356/seqkit/issues/618)
         - Clip out-of-range negative coordinates in reverse-complement queries as well as forward queries.
     - `seqkit fish`:

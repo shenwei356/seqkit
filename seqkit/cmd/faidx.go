@@ -69,6 +69,15 @@ Examples:
 		fai.MapWholeFile = false
 		quiet := config.Quiet
 
+		// Validate before opening output or replacing an index, including full-head mode.
+		idRe, err := regexp.Compile(config.IDRegexp)
+		if err != nil {
+			checkError(fmt.Errorf("fail to compile ID regexp %q: %w", config.IDRegexp, err))
+		}
+		if idRe.NumSubexp() == 0 {
+			checkError(fmt.Errorf("regular expression must contain a capturing group for the ID; default: %s", fastx.DefaultIDRegexp))
+		}
+
 		fullHead := getFlagBool(cmd, "full-head")
 		ignoreCase := getFlagBool(cmd, "ignore-case")
 		useRegexp := getFlagBool(cmd, "use-regexp")
@@ -97,7 +106,6 @@ Examples:
 			checkError(fmt.Errorf("zstd compressed file not supported"))
 		}
 
-		var err error
 		regions := make([]string, 0, 256)
 		if regionFile != "" {
 			checkOutputFiles([]string{regionFile}, []string{config.OutFile}, true)
@@ -189,10 +197,6 @@ Examples:
 
 		// save id and header in a map(id:head)
 		id2head := make(map[string]string)
-		var idRe *regexp.Regexp
-		if fullHead {
-			idRe, _ = regexp.Compile(config.IDRegexp)
-		}
 		var id string
 		for head := range idx {
 			if fullHead {

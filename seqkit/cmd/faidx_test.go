@@ -6,6 +6,45 @@ import (
 	"testing"
 )
 
+// TestFaidxInvalidIDRegexp rejects invalid parsers before touching outputs or indexes.
+func TestFaidxInvalidIDRegexp(t *testing.T) {
+	for _, fullHead := range []bool{false, true} {
+		for _, reuse := range []bool{false, true} {
+			for _, pattern := range []string{"[", "r"} {
+				dir := t.TempDir()
+				input := auditInput(t, dir, "input.fa", ">r\nACGT\n")
+				output := auditInput(t, dir, "out.fa", "keep\n")
+				index := input + ".fai"
+				args := []string{"faidx"}
+				if fullHead {
+					args = append(args, "-f")
+					index = input + ".seqkit.fai"
+				}
+				const indexData = "r\t4\t3\t4\t5\n"
+				if reuse {
+					if err := os.WriteFile(index, []byte(indexData), 0600); err != nil {
+						t.Fatal(err)
+					}
+					args = append(args, "-U")
+				}
+				args = append(args, "--id-regexp", pattern, "-o", output, input, "r")
+				_, stderr, err := runCLI(t, "", args...)
+				if err == nil || strings.Contains(stderr, "panic:") || !strings.Contains(stderr, "[ERRO]") {
+					t.Fatalf("invalid parser %q (full=%v reuse=%v): %v %s", pattern, fullHead, reuse, err, stderr)
+				}
+				data, readErr := os.ReadFile(output)
+				if readErr != nil || string(data) != "keep\n" {
+					t.Fatalf("output changed: %q %v", data, readErr)
+				}
+				data, readErr = os.ReadFile(index)
+				if reuse && (readErr != nil || string(data) != indexData) || !reuse && !os.IsNotExist(readErr) {
+					t.Fatalf("index changed: %q %v", data, readErr)
+				}
+			}
+		}
+	}
+}
+
 // TestFaidxLongIndexRows keeps creation and reuse results identical.
 func TestFaidxLongIndexRows(t *testing.T) {
 	file := auditInput(t, t.TempDir(), "input.fa", ">short1\nACGT\n>"+strings.Repeat("x", 70_001)+"\nCCCC\n>short2\nTGCA\n")
