@@ -259,8 +259,8 @@ Examples:
 					// var ok bool
 
 					// var iter *sketches.Iterator
-					var rc *seq.Seq
-					var s, src []byte
+					var rc []byte
+					var wrapped xxhash.Digest // Hash boundary-spanning windows without copying bases.
 					var h2 uint64
 					var i, j, e, l, end, originalLen int
 					for {
@@ -361,7 +361,7 @@ Examples:
 						// }
 
 						if !singleStrand {
-							rc = _seq.RevCom()
+							rc = reverseComplementBases(_seq)
 						}
 
 						l = len(_seq.Seq)
@@ -376,30 +376,30 @@ Examples:
 							e = i + k
 
 							if e > originalLen {
-								e = e - originalLen
-								s = _seq.Seq[i:]
-								s = append(s, _seq.Seq[0:e]...)
+								e -= originalLen
+								wrapped.Reset()
+								wrapped.Write(_seq.Seq[i:])
+								wrapped.Write(_seq.Seq[:e])
+								h = wrapped.Sum64()
 
 								if !singleStrand {
 									j = l - i
-									src = rc.Seq[l-e:]
-									src = append(src, rc.Seq[0:j]...)
+									wrapped.Reset()
+									wrapped.Write(rc[l-e:])
+									wrapped.Write(rc[:j])
+									h2 = wrapped.Sum64()
 								}
 							} else {
-								s = _seq.Seq[i : i+k]
-
+								h = xxhash.Sum64(_seq.Seq[i:e])
 								if !singleStrand {
 									j = l - i
-									src = rc.Seq[j-k : j]
+									h2 = xxhash.Sum64(rc[j-k : j])
 								}
 							}
-							// fmt.Println(i, string(s), string(src))
 
-							h = xxhash.Sum64(s)
 							if singleStrand {
 								hashes = append(hashes, h)
 							} else {
-								h2 = xxhash.Sum64(src)
 								if h < h2 {
 									hashes = append(hashes, h)
 								} else {

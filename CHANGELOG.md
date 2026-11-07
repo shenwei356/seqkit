@@ -191,6 +191,7 @@
         - Continue after empty inputs, honor FASTQ line widths for BED/GTF regions, and use less memory for large intervals.
         - Avoid unnecessary indexing for `-r` without `--chr` and file-descriptor exhaustion across many indexed inputs.
     - `seqkit sum`:
+        - Reduce memory use and speed up circular digests with large k-mers while preserving digest values.
         - Include the sequence type in digests of empty files, honoring `-t` and `--rna2dna`.
         - Return failure for unreadable or unprocessable files while retaining valid results. [#613](https://github.com/shenwei356/seqkit/issues/613)
         - Keep digests stable when empty records are reordered and preserve percent signs in error paths.
