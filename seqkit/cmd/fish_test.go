@@ -10,6 +10,39 @@ import (
 	"github.com/biogo/hts/sam"
 )
 
+// TestFishBAMEmptyReferences skips zero-length BAM references without shifting
+// later reference IDs or dropping empty records from pass-through output.
+func TestFishBAMEmptyReferences(t *testing.T) {
+	for _, tc := range []struct {
+		name, input string
+		wantRefs    []string
+	}{
+		{"no records", "", nil},
+		{"empty records", ">empty\n\n", nil},
+		{"mixed", ">empty\n\n>r1\nACGT\n>empty2\n\n>r2\nACGT\n", []string{"r1", "r2"}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "hits.bam")
+			output, stderr, err := runCLI(t, tc.input, "fish", "-F", "ACGT", "-s", "-x", "-b", path)
+			if err != nil {
+				t.Fatalf("empty reference rejected: %v %s", err, stderr)
+			}
+			if output != tc.input {
+				t.Fatal("pass-through records changed")
+			}
+			header, records := readBAMFixture(t, path)
+			if len(header.Refs()) != len(tc.wantRefs) || len(records) != len(tc.wantRefs) {
+				t.Fatalf("got %d references and %d records, want %d", len(header.Refs()), len(records), len(tc.wantRefs))
+			}
+			for i, name := range tc.wantRefs {
+				if header.Refs()[i].Name() != name || records[i].Ref.Name() != name || records[i].Ref.ID() != i {
+					t.Errorf("incorrect BAM reference for record %d", i)
+				}
+			}
+		})
+	}
+}
+
 // TestFishBAMPrimaryAlignments requires one best alignment per query across
 // references, search ranges, and recursive searches for repeated matches.
 func TestFishBAMPrimaryAlignments(t *testing.T) {

@@ -74,6 +74,7 @@
         - Clip out-of-range negative coordinates in reverse-complement queries as well as forward queries.
     - `seqkit fish`:
         - Write one highest-scoring primary BAM alignment per query ID across all references, ranges, and repeated matches.
+        - Continue processing empty reference records when writing BAM, while preserving them in pass-through output.
         - Validate alignment parameters, compare bases without case in accuracy/NM statistics, and correct BAM reference names and program tags. [#618](https://github.com/shenwei356/seqkit/issues/618)
         - Accept IUPAC ambiguity codes as mismatches instead of crashing.
         - Clip search ranges to each record and return no hits for disjoint ranges; reject nonfinite or fractional coordinates and invalid mapping-quality thresholds.

@@ -137,6 +137,7 @@ Attention:
      each record; ranges outside the record produce no hits.
   7. BAM output has one primary alignment per query ID: the highest-scoring
      hit across all references and ranges, with ties resolved by output order.
+  8. Empty reference records are omitted from BAM headers and retained with -x.
 
 `,
 
@@ -223,7 +224,6 @@ Attention:
 		var buffer *bytes.Buffer
 		var record *fastx.Record
 		var sequence *seq.Seq
-		var count int
 		var refMap map[string]int
 		var samRefs []*sam.Reference
 		if flagBam != "" {
@@ -278,11 +278,12 @@ Attention:
 						h.Ref.Seq = ""
 					}
 
-					if flagBam != "" {
+					// Empty records cannot match and BAM reference lengths must be positive.
+					if flagBam != "" && len(record.Seq.Seq) > 0 {
 						nr, err := sam.NewReference(string(record.ID), "", "", len(record.Seq.Seq), nil, nil)
 						checkError(err)
+						refMap[refId] = len(samRefs)
 						samRefs = append(samRefs, nr)
-						refMap[refId] = count
 						alns = append(alns, hits...)
 					}
 				} else {
@@ -295,7 +296,6 @@ Attention:
 					}
 				}
 
-				count++
 				if !flagPass {
 					continue
 				}
