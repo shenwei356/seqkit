@@ -104,6 +104,7 @@
         - Handle extremely negative ranges without integer overflow, and preserve FASTA line wrapping after skipped FASTQ inputs.
         - Reduce memory allocations when selecting trailing records.
     - `seqkit replace`:
+        - Report damaged key-value files before modifying output files.
         - Preserve dollar signs in file names inserted with `{fn}`, `{fbn}`, or `{fbne}`.
         - Reject invalid key capture indices before modifying output files.
         - Reject FASTQ replacements that borrow qualities outside the current match; document per-file record numbering. [#620](https://github.com/shenwei356/seqkit/issues/620)
@@ -133,6 +134,7 @@
     - `seqkit shuffle`:
         - Normalize CRLF sequence lines in two-pass output. [#615](https://github.com/shenwei356/seqkit/issues/615)
     - `seqkit shuffle/sort/split`:
+        - Report errors when reading sequence IDs and lengths from FASTA indexes.
         - Improved two-pass processing and duplicate-header handling.
         - Accept leading FASTA comments in two-pass mode.
     - `seqkit sliding`:

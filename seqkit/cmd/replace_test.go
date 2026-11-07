@@ -7,6 +7,20 @@ import (
 	"testing"
 )
 
+// TestReplaceDamagedKeyValueFile rejects incomplete mappings before opening output.
+func TestReplaceDamagedKeyValueFile(t *testing.T) {
+	data := compressedInput(t, ".gz", strings.Repeat("r\treplacement\n", 10000))
+	data[len(data)-8] ^= 0xff
+	dir := t.TempDir()
+	kv := auditInput(t, dir, "bad.tsv.gz", string(data))
+	output := auditInput(t, dir, "out.fa", "keep\n")
+	_, stderr, err := runCLI(t, ">r\nACGT\n", "replace", "-p", "(.*)", "-r", "{kv}", "-k", kv, "-o", output)
+	got, readErr := os.ReadFile(output)
+	if err == nil || !strings.Contains(stderr, "read key-value file:") || readErr != nil || string(got) != "keep\n" {
+		t.Fatalf("damaged mapping did not fail safely: %v %s", err, stderr)
+	}
+}
+
 // TestReplaceMixedFileFormats preserves each input file's format.
 func TestReplaceMixedFileFormats(t *testing.T) {
 	assertMixedFileFormats(t, "replace", "-p", "^", "-r", "x")

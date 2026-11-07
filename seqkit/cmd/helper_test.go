@@ -1,12 +1,36 @@
 package cmd
 
 import (
+	"bytes"
+	"compress/gzip"
 	"math"
 	"os"
 	"strconv"
 	"strings"
 	"testing"
 )
+
+// TestAuxiliaryReaderErrors preserves errors delivered after reader construction.
+func TestAuxiliaryReaderErrors(t *testing.T) {
+	badIndex := auditInput(t, t.TempDir(), "bad.fai", "r\tinvalid\t3\t4\t5\n")
+	if _, _, err := getSeqIDAndLengthFromFaidxFile(badIndex); err == nil {
+		t.Error("invalid index length was accepted")
+	}
+	var compressed bytes.Buffer
+	w := gzip.NewWriter(&compressed)
+	if _, err := w.Write([]byte(strings.Repeat("r\treplacement\n", 10000))); err != nil {
+		t.Fatal(err)
+	}
+	if err := w.Close(); err != nil {
+		t.Fatal(err)
+	}
+	data := compressed.Bytes()
+	data[len(data)-8] ^= 0xff // Corrupt the CRC after a valid compressed payload.
+	path := auditInput(t, t.TempDir(), "bad.tsv.gz", string(data))
+	if _, err := readKVs(path, false); err == nil {
+		t.Fatal("key-value checksum error was swallowed")
+	}
+}
 
 // TestParseByteSizeBounds rejects nonfinite and overflowing values before conversion.
 func TestParseByteSizeBounds(t *testing.T) {

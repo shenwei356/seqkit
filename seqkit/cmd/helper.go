@@ -37,7 +37,6 @@ import (
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
-	"github.com/shenwei356/breader"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -559,17 +558,16 @@ func getSeqIDAndLengthFromFaidxFile(file string) ([]string, []int, error) {
 		}
 		return idAndLength{id: items[0], length: length}, true, nil
 	}
-	reader, err := breader.NewBufferedReader(file, 2, 10, fn)
-	if err != nil {
-		return ids, lengths, err
-	}
-	var info idAndLength
-	for chunk := range reader.Ch {
-		if chunk.Err != nil {
+	for line, err := range readTextLines(file) {
+		if err != nil {
 			return ids, lengths, err
 		}
-		for _, data := range chunk.Data {
-			info = data.(idAndLength)
+		data, ok, err := fn(line)
+		if err != nil {
+			return ids, lengths, err
+		}
+		if ok {
+			info := data.(idAndLength)
 			ids = append(ids, info.id)
 			lengths = append(lengths, info.length)
 		}
@@ -634,17 +632,16 @@ func readKVs(file string, ignoreCase bool) (map[string]string, error) {
 		return KV([2]string{items[0], items[1]}), true, nil
 	}
 	kvs := make(map[string]string)
-	reader, err := breader.NewBufferedReader(file, 2, 10, fn)
-	if err != nil {
-		return kvs, err
-	}
-	var items KV
-	for chunk := range reader.Ch {
-		if chunk.Err != nil {
+	for line, err := range readTextLines(file) {
+		if err != nil {
 			return kvs, err
 		}
-		for _, data := range chunk.Data {
-			items = data.(KV)
+		data, ok, err := fn(line)
+		if err != nil {
+			return kvs, err
+		}
+		if ok {
+			items := data.(KV)
 			kvs[items[0]] = items[1]
 		}
 	}
