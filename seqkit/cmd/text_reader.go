@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"io"
+	"bufio"
 	"iter"
 	"strings"
 
@@ -21,18 +21,21 @@ func readTextLines(file string) iter.Seq2[string, error] {
 			return
 		}
 		defer reader.Close()
-		for {
-			line, err := reader.ReadString('\n')
-			if err != nil && err != io.EOF {
+		scanner := bufio.NewScanner(reader)
+		// Grow for long lines without imposing Scanner's default 64 KiB limit.
+		scanner.Buffer(make([]byte, 64<<10), int(^uint(0)>>1))
+		for scanner.Scan() {
+			// Check errors before parsing a trailing token from a failed read.
+			if err := scanner.Err(); err != nil {
 				yield("", err)
 				return
 			}
-			if len(line) > 0 && !yield(strings.TrimRight(line, "\r\n"), nil) {
+			if !yield(strings.TrimRight(scanner.Text(), "\r\n"), nil) {
 				return
 			}
-			if err == io.EOF {
-				return
-			}
+		}
+		if err := scanner.Err(); err != nil {
+			yield("", err)
 		}
 	}
 }
