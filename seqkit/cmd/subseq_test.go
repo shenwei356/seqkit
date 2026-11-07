@@ -361,3 +361,18 @@ func TestSubseqAnnotationChromosomeCase(t *testing.T) {
 		}
 	}
 }
+
+// TestSubseqMissingIndexedID reports the requested ID when no index entry exists.
+func TestSubseqMissingIndexedID(t *testing.T) {
+	dir := t.TempDir()
+	fasta := auditInput(t, dir, "input.fa", ">present\nACGT\n")
+	bed := auditInput(t, dir, "regions.bed", "missing\t0\t2\n")
+	gtf := auditInput(t, dir, "regions.gtf", "missing\ttest\tCDS\t1\t2\t.\t+\t.\tgene_id \"a\";\n")
+	for _, mode := range [][]string{{"-r", "1:2", "--chr", "missing"}, {"--bed", bed}, {"--gtf", gtf}} {
+		args := append([]string{"subseq"}, mode...)
+		out, stderr, err := runCLI(t, "", append(args, fasta)...)
+		if err != nil || out != "" || !strings.Contains(stderr, "sequence (missing) not found") {
+			t.Fatalf("%s: missing ID was not reported: %v %s", mode[0], err, stderr)
+		}
+	}
+}

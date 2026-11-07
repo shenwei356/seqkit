@@ -321,10 +321,11 @@ Examples:
 					if region != "" {
 						if len(chrs) > 0 {
 							for _, chr := range chrs {
-								chr2 = string(id2name[chr])
+								head, found := id2name[chr]
+								chr2 = string(head)
 								r, ok := faidx.Index[chr2]
-								if !ok {
-									log.Warningf(`sequence (%s) not found in file: %s`, chr2, file)
+								if !found || !ok {
+									log.Warningf(`sequence (%s) not found in file: %s`, chr, file)
 									continue
 								}
 
@@ -346,16 +347,16 @@ Examples:
 						for chr := range gtfFeaturesMap {
 							// Annotation readers already applied the case-insensitive --chr filter.
 
-							chr = string(id2name[chr])
-
-							r, ok := faidx.Index[chr]
-							if !ok {
+							head, found := id2name[chr]
+							chr2 = string(head)
+							r, ok := faidx.Index[chr2]
+							if !found || !ok {
 								log.Warningf(`sequence (%s) not found in file: %s`, chr, file)
 								continue
 							}
 
-							subseq := subseqByFaix(faidx, chr, r, 1, -1)
-							record, err := fastx.NewRecord(alphabet2, fastx.ParseHeadID(idRe, []byte(chr)), []byte(chr), []byte{}, subseq)
+							subseq := subseqByFaix(faidx, chr2, r, 1, -1)
+							record, err := fastx.NewRecord(alphabet2, []byte(chr), head, []byte{}, subseq)
 							checkError(err)
 
 							subseqByGTFFile(outfh, record, config.LineWidth,
@@ -369,16 +370,16 @@ Examples:
 						for chr := range bedFeatureMap {
 							// Annotation readers already applied the case-insensitive --chr filter.
 
-							chr = string(id2name[chr])
-
-							r, ok := faidx.Index[chr]
-							if !ok {
+							head, found := id2name[chr]
+							chr2 = string(head)
+							r, ok := faidx.Index[chr2]
+							if !found || !ok {
 								log.Warningf(`sequence (%s) not found in file: %s`, chr, file)
 								continue
 							}
 
-							subseq := subseqByFaix(faidx, chr, r, 1, -1)
-							record, err := fastx.NewRecord(alphabet2, fastx.ParseHeadID(idRe, []byte(chr)), []byte(chr), []byte{}, subseq)
+							subseq := subseqByFaix(faidx, chr2, r, 1, -1)
+							record, err := fastx.NewRecord(alphabet2, []byte(chr), head, []byte{}, subseq)
 							checkError(err)
 
 							subSeqByBEDFile(outfh, record, config.LineWidth,
