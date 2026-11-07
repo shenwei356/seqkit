@@ -87,7 +87,7 @@ Examples:
 
 		updateFaidx := getFlagBool(cmd, "update-faidx")
 
-		files := getFileListFromArgsAndFile(cmd, args, false, "infile-list", false)
+		files := getFileListFromArgsAndFile(cmd, args, false, "infile-list", false, getFlagString(cmd, "region-file"))
 
 		file := files[0]
 		checkOutputFiles([]string{file}, []string{config.OutFile}, !config.SkipFileCheck)
@@ -104,24 +104,6 @@ Examples:
 		}
 		if strings.HasSuffix(strings.ToLower(file), ".zst") {
 			checkError(fmt.Errorf("zstd compressed file not supported"))
-		}
-
-		regions := make([]string, 0, 256)
-		if regionFile != "" {
-			checkOutputFiles([]string{regionFile}, []string{config.OutFile}, true)
-			for region, readErr := range readTextLines(regionFile) {
-				checkError(readErr)
-				if region != "" {
-					regions = append(regions, region)
-				}
-			}
-			if !quiet {
-				if len(regions) == 0 {
-					log.Warningf("%d patterns loaded from file", len(regions))
-				} else {
-					log.Infof("%d patterns loaded from file", len(regions))
-				}
-			}
 		}
 
 		// create and read .fai
@@ -144,6 +126,24 @@ Examples:
 			for _, input := range []string{regionFile, getFlagString(cmd, "infile-list")} {
 				if input != "" {
 					checkOutputFiles([]string{input}, []string{fileFai}, true)
+				}
+			}
+		}
+
+		regions := make([]string, 0, 256)
+		if regionFile != "" {
+			checkOutputFiles([]string{regionFile}, []string{config.OutFile}, true)
+			for region, readErr := range readTextLines(regionFile) {
+				checkError(readErr)
+				if region != "" {
+					regions = append(regions, region)
+				}
+			}
+			if !quiet {
+				if len(regions) == 0 {
+					log.Warningf("%d patterns loaded from file", len(regions))
+				} else {
+					log.Infof("%d patterns loaded from file", len(regions))
 				}
 			}
 		}

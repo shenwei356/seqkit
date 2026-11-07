@@ -74,7 +74,7 @@ Examples:
 		runtime.GOMAXPROCS(config.Threads)
 		quiet := config.Quiet
 
-		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck, getFlagString(cmd, "pattern-file"))
 		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 
 		var err error

@@ -108,8 +108,15 @@ func getFileListFromFile(file string, checkFile bool) ([]string, error) {
 }
 
 // getFileListFromArgsAndFile merges input sources and rejects repeated stdin use.
-func getFileListFromArgsAndFile(cmd *cobra.Command, args []string, checkFileFromArgs bool, flag string, checkFileFromFile bool) []string {
+// auxiliaryInputs includes only active auxiliary paths whose readers accept stdin.
+// Call before reading auxiliaries so validation cannot consume another input's data.
+func getFileListFromArgsAndFile(cmd *cobra.Command, args []string, checkFileFromArgs bool, flag string, checkFileFromFile bool, auxiliaryInputs ...string) []string {
 	infileList := getFlagString(cmd, flag)
+	stdinUsed := isStdin(infileList)
+	checkError(validateStdinUsage(auxiliaryInputs, stdinUsed))
+	for _, input := range auxiliaryInputs {
+		stdinUsed = stdinUsed || isStdin(input)
+	}
 	files := getFileList(args, checkFileFromArgs)
 	if infileList != "" {
 		_files, err := getFileListFromFile(infileList, checkFileFromFile)
@@ -128,7 +135,7 @@ func getFileListFromArgsAndFile(cmd *cobra.Command, args []string, checkFileFrom
 		// faidx takes one input file followed by query IDs, which may be "-".
 		inputFiles = files[:1]
 	}
-	checkError(validateStdinUsage(inputFiles, isStdin(infileList)))
+	checkError(validateStdinUsage(inputFiles, stdinUsed))
 	if infileList != "" {
 		checkOutputFiles([]string{infileList}, []string{getFlagString(cmd, "out-file")}, true)
 	}

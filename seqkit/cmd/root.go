@@ -55,9 +55,9 @@ therefore there's no need to pipe the result to gzip/pigz.
 Seqkit also supports reading and writing xz (.xz) and zstd (.zst) formats since v2.2.0.
 Bzip2 format is supported since v2.4.0.
 
-Stdin (-) may only appear once in the input file list, including files supplied
-via --infile-list. When --infile-list - reads the list from stdin, input data
-must come from files.
+Stdin (-) may only be consumed once, including sequence inputs, --infile-list,
+and auxiliary inputs that support stdin (e.g., patterns, queries, or key-value
+pairs). When one of these reads stdin, all other inputs must come from files.
 
 Output files, including auxiliary outputs and generated indexes, cannot overwrite
 inputs or conflict with other outputs. These checks recognize symbolic and hard

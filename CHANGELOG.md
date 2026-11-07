@@ -6,6 +6,7 @@
         - Report compressed-input read errors instead of treating damaged files as empty input. [#610](https://github.com/shenwei356/seqkit/issues/610)
         - Accept leading `;` comment lines before the first FASTA record; comments are discarded when writing sequences. [bio#12](https://github.com/shenwei356/bio/pull/12)
         - Reject repeated stdin input across command-line arguments, `--infile-list`, and paired-read inputs. [#613](https://github.com/shenwei356/seqkit/issues/613)
+        - Reject conflicting stdin use by sequence, pattern, query, key-value, and region-list inputs before reading data or changing output files.
         - With `--skip-file-check`, reject matching input/output path text without checking sequence input files on disk; keep full checks for auxiliary inputs and output conflicts.
     - `seqkit amplicon/duplicate/head/head-genome/range/rename/replace/rmdup/shuffle/sliding/subseq`:
         - Preserve each input's FASTA/FASTQ format when processing mixed inputs.
@@ -66,6 +67,7 @@
     - `seqkit convert/locate/merge-slides/range/replace/sliding/split/split2/sum`:
         - Fixed record handling, validation, and concurrency issues.
     - `seqkit faidx`:
+        - Accept region lists from stdin when creating or updating the FASTA index.
         - Reject invalid ID regular expressions before changing output files or indexes, avoiding crashes with `-f`.
         - Return failure for missing IDs when reusing an empty index, matching newly created indexes.
         - Clip negative starts, retain region suffixes, and return failure for missing IDs while preserving valid query results. [#618](https://github.com/shenwei356/seqkit/issues/618)

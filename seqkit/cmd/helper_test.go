@@ -11,6 +11,65 @@ import (
 	"testing"
 )
 
+// TestAuxiliaryStdinPreflight rejects competing stdin consumers before reading
+// auxiliary data or truncating output, while permitting one auxiliary stream.
+func TestAuxiliaryStdinPreflight(t *testing.T) {
+	for _, tc := range []struct {
+		name, data string
+		args       []string
+	}{
+		{"grep", "r\n", []string{"grep", "-f", "-"}},
+		{"locate", ">p\nAC\n", []string{"locate", "-f", "-"}},
+		{"fish", ">p\nAC\n", []string{"fish", "-f", "-"}},
+		{"seq", "r\n", []string{"seq", "--f-pattern-file", "-"}},
+		{"replace-filter", "r\n", []string{"replace", "-p", "r", "-r", "s", "--f-pattern-file", "-"}},
+		{"replace-kv", "r\ts\n", []string{"replace", "-p", "(r)", "-r", "{kv}", "-k", "-"}},
+		{"mutate", "r\n", []string{"mutate", "-p", "1:T", "-f", "-"}},
+		{"fa2fq", ">r\nAC\n", []string{"fa2fq", "-f", "-"}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			dir := t.TempDir()
+			input := auditInput(t, dir, "input.fq", "@r\nACGT\n+\nIIII\n")
+			if tc.name == "mutate" {
+				input = auditInput(t, dir, "input.fa", ">r\nACGT\n")
+			}
+			list := auditInput(t, dir, "inputs.list", "-\n")
+			for _, extra := range [][]string{nil, {"-"}, {"--infile-list", list}, {"--skip-file-check"}, {input, "--infile-list", "-"}} {
+				output := auditInput(t, dir, "output", "keep\n")
+				args := append(append([]string(nil), tc.args...), extra...)
+				args = append(args, "-o", output)
+				_, stderr, err := runCLI(t, tc.data, args...)
+				data, readErr := os.ReadFile(output)
+				if err == nil || !strings.Contains(stderr, "stdin may only be specified once") || readErr != nil || string(data) != "keep\n" {
+					t.Errorf("stdin conflict %v was not rejected before writing: %v %s", extra, err, stderr)
+				}
+			}
+			args := append(append([]string(nil), tc.args...), input)
+			if _, stderr, err := runCLI(t, tc.data, args...); err != nil {
+				t.Fatalf("single auxiliary stdin rejected: %v %s", err, stderr)
+			}
+		})
+	}
+}
+
+// TestAuxiliaryStdinConflicts also covers multiple auxiliaries and faidx's
+// region-list stream, without treating positional faidx query IDs as inputs.
+func TestAuxiliaryStdinConflicts(t *testing.T) {
+	dir := t.TempDir()
+	input := auditInput(t, dir, "input.fa", ">r\nACGT\n")
+	for _, args := range [][]string{
+		{"replace", input, "-p", "(r)", "-r", "{kv}", "-k", "-", "--f-pattern-file", "-"},
+		{"faidx", input, "--region-file", "-", "--infile-list", "-"},
+	} {
+		output := auditInput(t, dir, "output", "keep\n")
+		_, stderr, err := runCLI(t, "", append(args, "-o", output)...)
+		data, readErr := os.ReadFile(output)
+		if err == nil || !strings.Contains(stderr, "stdin may only be specified once") || readErr != nil || string(data) != "keep\n" {
+			t.Errorf("auxiliary conflict not rejected: %v %s", err, stderr)
+		}
+	}
+}
+
 // TestRegionSyntax rejects extra coordinate fields before writing results.
 func TestRegionSyntax(t *testing.T) {
 	commands := [][]string{

@@ -65,8 +65,7 @@ Attention:
 		}
 		onlyPositiveStrand := getFlagBool(cmd, "only-positive-strand")
 
-		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
-		checkError(validateStdinUsage(append([]string{fileFasta}, files...), isStdin(getFlagString(cmd, "infile-list"))))
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck, getFlagString(cmd, "fasta-file"))
 		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 		checkOutputFiles([]string{fileFasta}, []string{outFile}, true)
 

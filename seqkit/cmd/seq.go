@@ -69,6 +69,9 @@ Filtering records to edit:
 		seq.ComplementSeqLenThreshold = 1000000
 		runtime.GOMAXPROCS(config.Threads)
 
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck, getFlagString(cmd, "f-pattern-file"))
+		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
+
 		reverse := getFlagBool(cmd, "reverse")
 		complement := getFlagBool(cmd, "complement")
 		onlyName := getFlagBool(cmd, "name")
@@ -284,9 +287,6 @@ Filtering records to edit:
 		// -----------------------------------------------------------------------------
 
 		// ---------------------------------------------------------------------------------------------
-
-		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
-		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 
 		var seqCol *SeqColorizer
 		if color {

@@ -91,6 +91,9 @@ Filtering records to edit:
 		quiet := config.Quiet
 		runtime.GOMAXPROCS(config.Threads)
 
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck, getFlagString(cmd, "kv-file"), getFlagString(cmd, "f-pattern-file"))
+		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
+
 		pattern := getFlagString(cmd, "pattern")
 		replacement := []byte(getFlagString(cmd, "replacement"))
 		nrWidth := getFlagPositiveInt(cmd, "nr-width")
@@ -327,9 +330,6 @@ Filtering records to edit:
 		useFilter := len(fpattern) > 0 || fpatternFile != ""
 
 		// -------------------
-
-		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
-		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)

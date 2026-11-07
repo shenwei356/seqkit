@@ -186,7 +186,7 @@ Attention:
 			seq.ValidateSeq = true
 		}
 
-		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck, getFlagString(cmd, "query-fastx"))
 		outputs := []string{outFile}
 		if flagBam != "" {
 			outputs = append(outputs, flagBam)

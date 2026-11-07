@@ -109,7 +109,7 @@ Examples:
 
 		bwt.CheckEndSymbol = false
 
-		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck, getFlagString(cmd, "pattern-file"))
 		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 
 		justCount := getFlagBool(cmd, "count")

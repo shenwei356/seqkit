@@ -1,10 +1,45 @@
 package cmd
 
 import (
+	"context"
 	"os"
+	"os/exec"
 	"strings"
 	"testing"
+	"time"
 )
+
+// TestFaidxRegionStdin validates index paths before the region reader closes stdin.
+func TestFaidxRegionStdin(t *testing.T) {
+	dir := t.TempDir()
+	input := auditInput(t, dir, "input.fa", ">r\nACGT\n")
+	for _, flags := range [][]string{nil, nil, {"-U"}} {
+		args := append([]string{"faidx", input, "-l", "-"}, flags...)
+		output, stderr, err := runCLI(t, "r:1-2\n", args...)
+		if err != nil || output != ">r:1-2\nAC\n" {
+			t.Fatalf("region stdin failed with index creation/reuse/update: %v %s", err, stderr)
+		}
+	}
+	// A redirected region stream must still be protected from index replacement.
+	index := auditInput(t, dir, "input.fa.fai", "r:1-2\n")
+	output := auditInput(t, dir, "out.fa", "keep\n")
+	f, err := os.Open(index)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	command := exec.CommandContext(ctx, os.Args[0], "-test.run=^TestCLIProcess$", "--", "faidx", input, "-U", "-l", "-", "-o", output)
+	command.Env = append(os.Environ(), "SEQKIT_CLI_TEST_HELPER=1")
+	command.Stdin = f
+	message, err := command.CombinedOutput()
+	data, readErr := os.ReadFile(index)
+	out, outErr := os.ReadFile(output)
+	if err == nil || !strings.Contains(string(message), "cannot be the same") || readErr != nil || string(data) != "r:1-2\n" || outErr != nil || string(out) != "keep\n" {
+		t.Fatalf("region stdin was not protected: %v %s", err, message)
+	}
+}
 
 // TestFaidxInvalidIDRegexp rejects invalid parsers before touching outputs or indexes.
 func TestFaidxInvalidIDRegexp(t *testing.T) {
