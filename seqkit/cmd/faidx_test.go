@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"sort"
 	"strings"
 	"testing"
@@ -263,5 +264,64 @@ func TestFaidxRegexpIgnoreCase(t *testing.T) {
 				}
 			}
 		}
+	}
+}
+
+// TestFaidxQueryPreflight rejects malformed queries before creating or replacing
+// outputs and indexes, including errors after a valid query and list-file input.
+func TestFaidxQueryPreflight(t *testing.T) {
+	for _, tc := range []struct {
+		name, query string
+		regex       bool
+	}{
+		{"regex", "[", true},
+		{"start-overflow", "r:999999999999999999999999-2", false},
+		{"end-overflow", "r:1-999999999999999999999999", false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			for _, full := range []bool{false, true} {
+				for _, fromFile := range []bool{false, true} {
+					for _, existing := range []bool{false, true} {
+						dir := t.TempDir()
+						file := auditInput(t, dir, "input.fa", ">r\nACGT\n")
+						output := auditInput(t, dir, "out.fa", "keep output\n")
+						suffix := ".fai"
+						args := []string{"faidx", file, "-U", "-o", output}
+						if full {
+							suffix = ".seqkit.fai"
+							args = append(args, "-f")
+						}
+						index := file + suffix
+						if existing {
+							auditInput(t, dir, filepath.Base(index), "keep index\n")
+						}
+						if tc.regex {
+							args = append(args, "-r")
+						}
+						if fromFile {
+							args = append(args, "-l", auditInput(t, dir, "queries.txt", "r\n"+tc.query+"\n"))
+						} else {
+							args = append(args, "r", tc.query)
+						}
+						_, stderr, err := runCLI(t, "", args...)
+						if err == nil || !strings.Contains(stderr, "invalid") {
+							t.Errorf("query not rejected: %v %s", err, stderr)
+						}
+						data, readErr := os.ReadFile(output)
+						if readErr != nil || string(data) != "keep output\n" {
+							t.Errorf("output changed: full=%v fromFile=%v existing=%v: %v", full, fromFile, existing, readErr)
+						}
+						data, readErr = os.ReadFile(index)
+						if existing {
+							if readErr != nil || string(data) != "keep index\n" {
+								t.Errorf("index replaced: %v", readErr)
+							}
+						} else if !os.IsNotExist(readErr) {
+							t.Errorf("index created: %v", readErr)
+						}
+					}
+				}
+			}
+		})
 	}
 }

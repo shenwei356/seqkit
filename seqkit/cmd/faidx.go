@@ -144,6 +144,32 @@ Examples:
 			}
 		}
 
+		// Validate every query before opening output or replacing an index.
+		queries := append(regions, files[1:]...)
+		faidxQueries := make([]faidxQuery, 0, len(queries))
+		var queriesRe []*regexp.Regexp
+		for _, query := range queries {
+			if useRegexp {
+				pattern := query
+				if ignoreCase {
+					pattern = "(?i)" + pattern
+				}
+				re, err := regexp.Compile(pattern)
+				if err != nil {
+					checkError(fmt.Errorf("invalid regular expression: %s", query))
+				}
+				queriesRe = append(queriesRe, re)
+			} else {
+				id, begin, end, err := parseRegion(query)
+				checkError(err)
+				suffix := query[len(id):]
+				if ignoreCase {
+					id = strings.ToLower(id)
+				}
+				faidxQueries = append(faidxQueries, faidxQuery{ID: id, Region: [2]int{begin, end}, Suffix: suffix})
+			}
+		}
+
 		outfh, err := xopen.Wopen(config.OutFile)
 		checkError(err)
 		defer closeOutput(outfh)
@@ -206,51 +232,23 @@ Examples:
 			id2head[id] = head
 		}
 
-		// handle queries
-		queries := make([]string, len(regions), len(regions)+len(files)-1)
-		if len(regions) > 0 {
-			copy(queries, regions)
-		}
-		queries = append(queries, files[1:]...)
-
-		faidxQueries := make([]faidxQuery, 0, len(queries))
-		var region [2]int
-
+		// Resolve parsed queries only after the index is available. Missing IDs
+		// still allow valid queries to be written before the final failure status.
 		missing := false
-		var ok bool
 		if !useRegexp {
-			var begin, end int
-			for _, query := range queries {
-				id, begin, end, err = parseRegion(query)
-				checkError(err)
-				suffix := query[len(id):]
-
-				if ignoreCase {
-					id = strings.ToLower(id)
-				}
-				if _, ok = id2head[id]; !ok {
+			matched := faidxQueries[:0]
+			for _, query := range faidxQueries {
+				if _, ok := id2head[query.ID]; !ok {
 					missing = true
-					log.Warningf("sequence not found: %s", id)
+					log.Warningf("sequence not found: %s", query.ID)
 					continue
 				}
-
-				faidxQueries = append(faidxQueries, faidxQuery{ID: id, Region: [2]int{begin, end}, Suffix: suffix})
+				matched = append(matched, query)
 			}
+			faidxQueries = matched
 		} else {
-			queriesRe := make([]*regexp.Regexp, len(queries))
-			for i, query := range queries {
-				if ignoreCase {
-					query = "(?i)" + query
-				}
-				queriesRe[i], err = regexp.Compile(query)
-				if err != nil {
-					checkError(fmt.Errorf("invalid regular expression: %s", query))
-				}
-			}
-			var re *regexp.Regexp
-			// no need for optimization with goroutine
 			for id = range id2head {
-				for _, re = range queriesRe {
+				for _, re := range queriesRe {
 					if re.MatchString(id) {
 						faidxQueries = append(faidxQueries, faidxQuery{ID: id, Region: [2]int{1, -1}})
 						break
@@ -259,6 +257,7 @@ Examples:
 			}
 		}
 
+		var region [2]int
 		var head string
 		var subseq []byte
 		var text []byte
