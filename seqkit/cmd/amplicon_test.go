@@ -1,11 +1,65 @@
 package cmd
 
 import (
+	"bytes"
+	"context"
+	"io"
+	"os"
+	"os/exec"
 	"reflect"
 	"strings"
 	"sync"
 	"testing"
+	"time"
 )
+
+// TestAmpliconImmediateOutput requires a result while the input pipe remains open.
+func TestAmpliconImmediateOutput(t *testing.T) {
+	for _, tt := range []struct {
+		name, input, want string
+		args              []string
+	}{
+		{"exact", ">r1\nACGT\n>r2\n", ">r1\nAC\n", nil},
+		{"degenerate", ">r1\nACGT\n>r2\n", ">r1\nAC\n", []string{"-F", "AN"}},
+		{"fastq", "@r1\nACGT\n+\n!#$%\n@r2\n", "@r1\nAC\n+\n!#\n", nil},
+		{"bed", ">r1\nACGT\n>r2\n", "r1\t0\t2\t.\t0\t+\tAC\n", []string{"--bed"}},
+		{"unmatched", ">r1\nTTTT\n>r2\n", ">r1\nTTTT\n", []string{"-u"}},
+		{"mismatch", ">r1\nACGT\n>r2\n", ">r1\nAC\n", []string{"-m", "1"}},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			args := append([]string{"-test.run=^TestCLIProcess$", "--", "amplicon", "-F", "AC", "-P", "-I"}, tt.args...)
+			command := exec.CommandContext(ctx, os.Args[0], args...)
+			command.Env = append(os.Environ(), "SEQKIT_CLI_TEST_HELPER=1")
+			var stderr bytes.Buffer
+			command.Stderr = &stderr
+			stdin, err := command.StdinPipe()
+			if err != nil {
+				t.Fatal(err)
+			}
+			stdout, err := command.StdoutPipe()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err = command.Start(); err != nil {
+				t.Fatal(err)
+			}
+			defer func() {
+				stdin.Close()
+				command.Process.Kill()
+				command.Wait()
+			}()
+			if _, err = io.WriteString(stdin, tt.input); err != nil {
+				t.Fatal(err)
+			}
+			got := make([]byte, len(tt.want))
+			if _, err = io.ReadFull(stdout, got); err != nil || string(got) != tt.want {
+				t.Fatalf("output before EOF = %q, want %q; error: %v", got, tt.want, err)
+			}
+		})
+	}
+}
 
 // TestSubLocationFlankingOverflow checks clipping before adding large offsets.
 func TestSubLocationFlankingOverflow(t *testing.T) {

@@ -262,7 +262,7 @@ Examples:
 							outfh.WriteString(row)
 						}
 						if immediateOutput {
-							outfh.Flush()
+							checkError(outfh.Flush())
 						}
 					}
 					<-pending
@@ -550,6 +550,10 @@ Examples:
 						record.Seq.RevComInplace()
 					}
 					record.FormatToWriter(outfh, config.LineWidth)
+				}
+				// Flush each emitted record before waiting for more input, as in mismatch mode.
+				if immediateOutput && (matched || saveUnmatched) {
+					checkError(outfh.Flush())
 				}
 			}
 			fastxReader.Close()

@@ -21,6 +21,7 @@
     - `seqkit shuffle/sort/split/subseq`:
         - Correctly read xz, zstd, bzip2, and LZ4 input and avoid leaving files open after format detection.
     - `seqkit amplicon`:
+        - Honor `-I/--immediate-output` in exact and degenerate searches, including BED and unmatched output.
         - Match N as a degenerate base, choose the longest amplicon for overlapping primer matches, and reject invalid primers and mismatch settings. [#618](https://github.com/shenwei356/seqkit/issues/618)
         - Skip false matches on empty records and invalid regions; clip large flanking regions correctly.
         - Fix parallel mismatch searches and reduce repeated work for nonmatching reads and BED output.
