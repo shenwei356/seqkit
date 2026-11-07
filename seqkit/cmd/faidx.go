@@ -199,7 +199,8 @@ Examples:
 			} else {
 				id = head
 			}
-			if ignoreCase {
+			// Regex matching must retain case-distinct IDs and the original text.
+			if ignoreCase && !useRegexp {
 				id = strings.ToLower(id)
 			}
 			id2head[id] = head
@@ -238,6 +239,9 @@ Examples:
 		} else {
 			queriesRe := make([]*regexp.Regexp, len(queries))
 			for i, query := range queries {
+				if ignoreCase {
+					query = "(?i)" + query
+				}
 				queriesRe[i], err = regexp.Compile(query)
 				if err != nil {
 					checkError(fmt.Errorf("invalid regular expression: %s", query))

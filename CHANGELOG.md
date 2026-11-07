@@ -71,6 +71,7 @@
     - `seqkit fa2fq/tab2fx`:
         - Honor explicit FASTQ line widths for both sequences and qualities.
     - `seqkit faidx`:
+        - Honor `-i` in regular-expression queries and retain matching IDs that differ only in case.
         - Reject bzip2 and LZ4 input before changing outputs or indexes.
         - Accept region lists from stdin while creating or updating indexes.
         - Clip negative coordinates on both strands, retain region suffixes, and return failure for missing IDs while preserving valid results, including with reused empty indexes. [#618](https://github.com/shenwei356/seqkit/issues/618)

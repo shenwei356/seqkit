@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"os/exec"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -212,6 +213,55 @@ func TestFaidxEmptyIndexQueries(t *testing.T) {
 		out, stderr, err := runCLI(t, "", args...)
 		if err != nil || out != "" {
 			t.Fatalf("index-only command failed: %q %v %s", out, err, stderr)
+		}
+	}
+}
+
+// TestFaidxRegexpIgnoreCase keeps case-distinct IDs and applies case folding to
+// the pattern, preserving regexp escapes and explicitly scoped case flags.
+func TestFaidxRegexpIgnoreCase(t *testing.T) {
+	for _, full := range []bool{false, true} {
+		dir := t.TempDir()
+		file := auditInput(t, dir, "input.fa", ">AbC\nACGT\n>abc\nTGCA\n>other\nAAAA\n")
+		for _, tc := range []struct {
+			pattern string
+			ignore  bool
+			want    string
+		}{
+			{"^ABC$", true, ">AbC\nACGT\n>abc\nTGCA"},
+			{"^abc$", true, ">AbC\nACGT\n>abc\nTGCA"},
+			{"^AbC$", false, ">AbC\nACGT"},
+			{"(?-i)^AbC$", true, ">AbC\nACGT"},
+			{`^\QAbC\E$`, true, ">AbC\nACGT\n>abc\nTGCA"},
+		} {
+			for _, fromFile := range []bool{false, true} {
+				args := []string{"faidx", file, "-r"}
+				if full {
+					args = append(args, "-f")
+				}
+				if tc.ignore {
+					args = append(args, "-i")
+				}
+				if fromFile {
+					args = append(args, "-l", auditInput(t, dir, "patterns.txt", tc.pattern+"\n"))
+				} else {
+					args = append(args, tc.pattern)
+				}
+				out, stderr, err := runCLI(t, "", args...)
+				records := strings.Split(strings.TrimSpace(out), ">")
+				for i := range records {
+					records[i] = strings.TrimSpace(records[i])
+				}
+				sort.Strings(records)
+				want := strings.Split(tc.want, ">")
+				for i := range want {
+					want[i] = strings.TrimSpace(want[i])
+				}
+				sort.Strings(want)
+				if err != nil || strings.Join(records, ">") != strings.Join(want, ">") {
+					t.Fatalf("full=%v file=%v pattern=%q: got %q, want %q; %v %s", full, fromFile, tc.pattern, out, tc.want, err, stderr)
+				}
+			}
 		}
 	}
 }
