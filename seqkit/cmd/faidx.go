@@ -178,7 +178,6 @@ Examples:
 
 			if len(idx) == 0 {
 				log.Warningf("0 records loaded from %s, please check if it matches the FASTA file, or switch on the flag -U/--update-faidx", fileFai)
-				return
 			} else if !quiet {
 				log.Infof("  %d records loaded from %s", len(idx), fileFai)
 			}

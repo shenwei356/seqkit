@@ -124,3 +124,26 @@ func TestFaidxIndexAuxiliaryAliases(t *testing.T) {
 func TestFaidxDamagedAuxiliaryInput(t *testing.T) {
 	assertDamagedTextInput(t, "r\n", "faidx", "-l")
 }
+
+// TestFaidxEmptyIndexQueries keeps missing-ID failures consistent across index reuse.
+func TestFaidxEmptyIndexQueries(t *testing.T) {
+	for _, fullHead := range []bool{false, true} {
+		input := auditInput(t, t.TempDir(), "empty.fa", "")
+		args := []string{"faidx", "--quiet"}
+		if fullHead {
+			args = append(args, "-f")
+		}
+		args = append(args, input)
+		for attempt := 0; attempt < 2; attempt++ {
+			out, stderr, err := runCLI(t, "", append(args, "missing")...)
+			if err == nil || out != "" || !strings.Contains(stderr, "sequence not found: missing") {
+				t.Fatalf("full=%v attempt=%d: missing query succeeded: %q %v %s", fullHead, attempt, out, err, stderr)
+			}
+		}
+		// Creating or reusing an empty index without queries is still valid.
+		out, stderr, err := runCLI(t, "", args...)
+		if err != nil || out != "" {
+			t.Fatalf("index-only command failed: %q %v %s", out, err, stderr)
+		}
+	}
+}
