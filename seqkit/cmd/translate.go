@@ -60,6 +60,9 @@ Note:
         MGR -> R
         YTR -> L
 
+  2. With -e, records that cannot be translated produce empty sequences.
+     Empty records do not determine the guessed sequence type.
+
 Translate Tables/Genetic Codes:
 
     # https://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/index.cgi?chapter=tgencodes
@@ -180,12 +183,13 @@ Translate Tables/Genetic Codes:
 		var record *fastx.Record
 		var _seq *seq.Seq
 		var frame int
-		once := true
 		var i, start, _start, _end, _len int
 		var a byte
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
+			// Empty leading records cannot determine this file's nucleotide alphabet.
+			translationAlphabet := alphabet
 
 			for {
 				record, err = fastxReader.Read()
@@ -197,12 +201,14 @@ Translate Tables/Genetic Codes:
 					break
 				}
 
-				if once {
-					if !(record.Seq.Alphabet == seq.DNA || record.Seq.Alphabet == seq.DNAredundant ||
-						record.Seq.Alphabet == seq.RNA || record.Seq.Alphabet == seq.RNAredundant) {
-						checkError(fmt.Errorf(`command 'seqkit translate' only apply to DNA/RNA sequences`))
-					}
-					once = false
+				if translationAlphabet == nil && len(record.Seq.Seq) > 0 {
+					translationAlphabet = seq.GuessAlphabetLessConservatively(record.Seq.Seq)
+				}
+				if translationAlphabet != nil {
+					record.Seq.Alphabet = translationAlphabet
+				}
+				if !skipTranslateErrors && !hasComplement(record.Seq.Alphabet) {
+					checkError(fmt.Errorf(`command 'seqkit translate' only apply to DNA/RNA sequences`))
 				}
 
 				// Reuse one alphabet-aware reverse complement across negative frames.

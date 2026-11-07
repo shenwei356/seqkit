@@ -1697,6 +1697,9 @@ Note:
         MGR -> R
         YTR -> L
 
+  2. With -e, records that cannot be translated produce empty sequences.
+     Empty records do not determine the guessed sequence type.
+
 Translate Tables/Genetic Codes:
 
     # https://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/index.cgi?chapter=tgencodes

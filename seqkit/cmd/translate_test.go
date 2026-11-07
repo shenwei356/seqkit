@@ -50,3 +50,45 @@ func TestTranslateSixFrames(t *testing.T) {
 		t.Fatalf("reverse subsequence coordinates: %q %v %s", out, err, stderr)
 	}
 }
+
+// TestTranslateLeadingEmptyRecords allows -e to recover from empty records
+// without assigning their unrestricted alphabet to later nucleotide records.
+func TestTranslateLeadingEmptyRecords(t *testing.T) {
+	for _, tt := range []struct {
+		name, input string
+	}{
+		{"FASTA DNA", ">empty\n\n>valid\nCAT\n"},
+		{"FASTA RNA", ">empty\n\n>valid\nCAU\n"},
+		{"FASTQ RNA", "@empty\n\n+\n\n@valid\nCAU\n+\nIII\n"},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			out, stderr, err := runCLI(t, tt.input, "translate", "-e", "-f", "-1")
+			if err != nil || out != ">empty\n\n>valid\nM\n" {
+				t.Fatalf("leading empty record: %q %v %s", out, err, stderr)
+			}
+			_, _, err = runCLI(t, tt.input, "translate", "-f", "-1")
+			if err == nil {
+				t.Fatal("empty record accepted without -e")
+			}
+		})
+	}
+	out, stderr, err := runCLI(t, ">a\n\n>b\n\n", "translate", "-e")
+	if err != nil || out != ">a\n\n>b\n\n" {
+		t.Fatalf("all empty: %q %v %s", out, err, stderr)
+	}
+}
+
+// TestTranslateAlphabetPerFile resets guesses between inputs and honors -t.
+func TestTranslateAlphabetPerFile(t *testing.T) {
+	dir := t.TempDir()
+	dna := auditInput(t, dir, "dna.fa", ">a\nCAT\n")
+	rna := auditInput(t, dir, "rna.fa", ">empty\n\n>b\nCAU\n")
+	out, stderr, err := runCLI(t, "", "translate", "-e", "-f", "-1", dna, rna)
+	if err != nil || out != ">a\nM\n>empty\n\n>b\nM\n" {
+		t.Fatalf("per-file guess: %q %v %s", out, err, stderr)
+	}
+	out, stderr, err = runCLI(t, ">empty\n\n>valid\nATG\n", "translate", "-e", "-t", "protein")
+	if err != nil || out != ">empty\n\n>valid\n\n" {
+		t.Fatalf("explicit alphabet: %q %v %s", out, err, stderr)
+	}
+}
