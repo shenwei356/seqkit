@@ -587,7 +587,8 @@ Filtering records to edit:
 							} else if keepUntouch {
 								doNotChange = true
 							} else if keepKey {
-								r = reKV.ReplaceAll(r, found[keyCaptIdx])
+								// The original key is literal data through both replacement stages.
+								r = reKV.ReplaceAll(r, bytes.ReplaceAll(found[keyCaptIdx], []byte("$"), []byte("$$$$")))
 							} else {
 								r = reKV.ReplaceAll(r, []byte(keyMissRepl))
 							}

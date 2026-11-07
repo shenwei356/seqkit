@@ -71,3 +71,18 @@ func TestReplaceLiteralFileNames(t *testing.T) {
 func TestReplaceDamagedAuxiliaryInput(t *testing.T) {
 	assertDamagedTextInput(t, "r\n", "replace", "-p", "^", "-r", "x", "--f-pattern-file")
 }
+
+// TestReplaceKeepKeyLiteral preserves unmatched keys through both expansion stages.
+func TestReplaceKeepKeyLiteral(t *testing.T) {
+	kv := auditInput(t, t.TempDir(), "kv.tsv", "other\tvalue\n")
+	for _, id := range []string{"a$1", "a${name}", "a$$", "a$"} {
+		t.Run(id, func(t *testing.T) {
+			input := ">" + id + "\nAC\n"
+			out, stderr, err := runCLI(t, input, "replace", "-p", "^(.+)$", "-r", "prefix_{kv}_${1}", "-k", kv, "-K")
+			want := ">prefix_" + id + "_" + id + "\nAC\n"
+			if err != nil || out != want {
+				t.Fatalf("kept key changed: %q, want %q: %v %s", out, want, err, stderr)
+			}
+		})
+	}
+}

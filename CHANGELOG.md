@@ -127,6 +127,7 @@
     - `seqkit replace`:
         - Report damaged key-value files before modifying output files.
         - Preserve dollar signs in file names inserted with `{fn}`, `{fbn}`, or `{fbne}`.
+        - Preserve dollar signs in unmatched keys with `-K/--keep-key`.
         - Reject invalid key capture indices before modifying output files.
         - Reject FASTQ replacements that borrow qualities outside the current match; document per-file record numbering. [#620](https://github.com/shenwei356/seqkit/issues/620)
     - `seqkit restart`:

@@ -3663,6 +3663,9 @@ Flags:
                                  replacement symbols.
 ```
 
+With `-K/--keep-key`, unmatched keys are inserted literally, including dollar signs.
+Capture references in `-r/--replacement` still work as documented above.
+
 Examples
 
 1. Prepend or append to the header
