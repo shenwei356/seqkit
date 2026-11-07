@@ -960,6 +960,7 @@ Attention:
   1. By default, sequence headers and qualities are skipped, only sequences matter.
      Optionally, the sequence ID can be included with the flag -i/--include-id.
   2. The order of sequences records does not matter.
+     When guessing the sequence type, leading empty records are skipped.
   3. Circular complete genomes are supported with the flag -c/--circular.
      - The same double-stranded genomes with different start positions or
        in reverse complement strand will not affect the result.
@@ -1000,7 +1001,7 @@ Examples:
     seqkit.v0.1_DCS_k31_dd050490cd62ea5f94d73d4d636b7d60   single-stranded-circular DNA.fasta
 
 Usage:
-  seqkit sum [flags] 
+  seqkit sum [flags]
 
 Flags:
   -a, --all                  show all information, including the sequences length and the number of sequences
@@ -1014,7 +1015,6 @@ Flags:
       --rna2dna              convert RNA to DNA
   -s, --single-strand        only consider the positive strand of a circular genome, e.g., ssRNA virus
                              genomes
-
 ```
 
 Examples:

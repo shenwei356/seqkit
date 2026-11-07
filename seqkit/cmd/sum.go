@@ -54,6 +54,7 @@ Attention:
   1. By default, sequence headers and qualities are skipped, only sequences matter.
      Optionally, the sequence ID can be included with the flag -i/--include-id.
   2. The order of sequences records does not matter.
+     When guessing the sequence type, leading empty records are skipped.
   3. Circular complete genomes are supported with the flag -c/--circular.
      - The same double-stranded genomes with different start positions or
        in reverse complement strand will not affect the result.
@@ -436,6 +437,11 @@ Examples:
 
 						if checkAlphabet {
 							ab = fastxReader.Alphabet()
+							// The reader guesses from the first record, which may be empty.
+							// Re-guess only after leading empty records, preserving explicit types.
+							if alphabet == nil && n > 0 && len(_seq.Seq) > 0 {
+								ab = seq.GuessAlphabetLessConservatively(_seq.Seq)
+							}
 							switch ab {
 							case seq.Protein:
 								seqType = "P"
@@ -447,7 +453,7 @@ Examples:
 								seqType = "N"
 							}
 
-							checkAlphabet = false
+							checkAlphabet = alphabet == nil && len(_seq.Seq) == 0
 						}
 
 						if removeGaps {
