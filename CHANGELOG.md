@@ -82,6 +82,7 @@
         - Reduce processing time when reporting GC skew with `-G` without `-g`.
     - `seqkit grep`:
         - Preserve all nonmatching records with `-v --delete-matched` when the pattern file is empty.
+        - Honor `--delete-matched` for literal sequence patterns, including searches with mismatches, retaining the first matching records in input order.
         - Added a fast bit-parallel search path for a single pattern of up to 64 characters with 1-4 mismatches, avoiding FM-index construction for each record. by @DylanCosto [#621](https://github.com/shenwei356/seqkit/pull/621)
         - Fixed data races and preserved each file's FASTA/FASTQ formatting during parallel mismatch searches.
         - Reduce memory use for sequence/regular-expression searches and small command-line pattern sets.

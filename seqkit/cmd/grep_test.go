@@ -34,6 +34,54 @@ func TestGrepDeleteMatchedEmptyPatterns(t *testing.T) {
 	}
 }
 
+// TestGrepDeleteMatchedSequences consumes patterns in input order in every search mode.
+func TestGrepDeleteMatchedSequences(t *testing.T) {
+	for _, tc := range []struct {
+		name, pattern, sequence string
+		flags                   []string
+	}{
+		{"literal", "ACG", "ACG", nil},
+		{"reverse", "ACG", "CGT", nil},
+		{"empty", "", "", nil},
+		{"case", "ACG", "acg", []string{"-i"}},
+		{"circular", "GAC", "ACG", []string{"-c", "-P"}},
+		{"region", "ACG", "TTACGTT", []string{"-R", "3:5"}},
+		{"short mismatch", "ACG", "ATG", []string{"-m", "1"}},
+		{"long mismatch", strings.Repeat("A", 65), strings.Repeat("A", 64) + "C", []string{"-m", "1"}},
+		{"reverse mismatch", "ACG", "CAT", []string{"-m", "1"}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			first := ">first\n" + tc.sequence + "\n"
+			input := first + ">second\n" + tc.sequence + "\n"
+			args := append([]string{"grep", "-s", "-p", tc.pattern, "--delete-matched", "-j", "4", "-w", "0"}, tc.flags...)
+			out, stderr, err := runCLI(t, input, args...)
+			if err != nil || out != first {
+				t.Fatalf("got %q, want first record only: %v %s", out, err, stderr)
+			}
+			out, stderr, err = runCLI(t, input, append(args, "-C")...)
+			if err != nil || out != "1\n" {
+				t.Fatalf("count=%q: %v %s", out, err, stderr)
+			}
+		})
+	}
+	for _, mode := range [][]string{nil, {"-m", "1"}} {
+		// A later file must see the remaining patterns and retain its FASTQ format.
+		dir := t.TempDir()
+		fa := auditInput(t, dir, "first.fa", ">a\nAAAA\n>b\nAAAA\n")
+		fq := auditInput(t, dir, "second.fq", "@c\nCCCC\n+\n1234\n@d\nCCCC\n+\n5678\n")
+		args := append([]string{"grep", "-s", "-P", "-p", "AAAA,CCCC", "--delete-matched", fa, fq}, mode...)
+		out, stderr, err := runCLI(t, "", args...)
+		if err != nil || out != ">a\nAAAA\n@c\nCCCC\n+\n1234\n" {
+			t.Fatalf("remaining patterns across files: %q %v %s", out, err, stderr)
+		}
+		// Inversion must use the full pattern set for every record.
+		out, stderr, err = runCLI(t, "", append(args, "-v")...)
+		if err != nil || out != "" {
+			t.Fatalf("inverted matches changed: %q %v %s", out, err, stderr)
+		}
+	}
+}
+
 // TestGrepImmediateOutputBeforeEOF leaves input open after one slow and many fast reads.
 func TestGrepImmediateOutputBeforeEOF(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)

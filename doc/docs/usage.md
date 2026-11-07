@@ -1908,6 +1908,9 @@ Attention:
         seqkit faidx seqs.fasta --infile-list IDs.txt
   6. For multiple patterns, you can either set "-p" multiple times, i.e.,
      -p pattern1 -p pattern2, or give a file of patterns via "-f/--pattern-file".
+  7. --delete-matched removes one matched pattern per selected record across
+     all input files. It is ignored with -v/--invert-match. With mismatches,
+     records are searched sequentially so the first matching record wins.
 
 Tips:
   1. Use an empty pattern to select records with an empty ID or sequence.

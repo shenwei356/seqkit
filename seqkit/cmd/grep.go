@@ -26,6 +26,7 @@ import (
 	"io"
 	"regexp"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -76,6 +77,9 @@ Attention:
         seqkit faidx seqs.fasta --infile-list IDs.txt
   6. For multiple patterns, you can either set "-p" multiple times, i.e.,
      -p pattern1 -p pattern2, or give a file of patterns via "-f/--pattern-file".
+  7. --delete-matched removes one matched pattern per selected record across
+     all input files. It is ignored with -v/--invert-match. With mismatches,
+     records are searched sequentially so the first matching record wins.
 
 Tips:
   1. Use an empty pattern to select records with an empty ID or sequence.
@@ -343,16 +347,17 @@ Examples:
 		strands := []byte{'+', '-'}
 
 		var count int
+		// Reuse the single-pattern matcher in both parallel and consuming searches.
+		var shortMatcher *shortMismatchMatcher
+		if bySeq && mismatches > 0 && len(patternsS) == 1 {
+			shortMatcher = newShortMismatchMatcher(patternsS[0], mismatches)
+		}
 
 		// -------------------------------------------------------------------
 		// only for searching with sequences and mismatch > 0, were FMI is very slow
 
-		if bySeq && mismatches > 0 {
-			// Precompute masks once for all read workers; nil selects the FM-index fallback.
-			var shortMatcher *shortMismatchMatcher
-			if len(patternsS) == 1 {
-				shortMatcher = newShortMismatchMatcher(patternsS[0], mismatches)
-			}
+		// Pattern deletion must follow input order, before searching the next record.
+		if bySeq && mismatches > 0 && !(deleteMatched && !invertMatch) {
 			// Arecord carries the input format to the ordered output goroutine.
 			type Arecord struct {
 				id        uint64
@@ -547,8 +552,10 @@ Examples:
 		var sequence *seq.Seq
 		var target []byte
 		var ok, hit bool
-		// var k string
-		var k []byte
+		var sfmi *fmi.FMIndex
+		if bySeq && mismatches > 0 && shortMatcher == nil {
+			sfmi = fmi.NewFMIndex()
+		}
 		var re *regexp.Regexp
 		var h uint64
 		var strand byte
@@ -650,15 +657,31 @@ Examples:
 						if ignoreCase {
 							target = bytes.ToLower(target)
 						}
-						if mismatches == 0 {
-							for _, k = range patternsS {
-								if (len(k) == 0 && len(target) == 0) || // both target and pattern are empty
-									(len(k) > 0 && bytes.Contains(target, k)) { // non-empty target and pattern
-									hit = true
-									break
-								}
+						if mismatches > 0 {
+							if len(target) == 0 {
+								continue
 							}
-						} else { // never reached here, as (bySeq && mismatches > 0) is handled in a early step
+							if sfmi != nil {
+								_, err = sfmi.Transform(target)
+								checkError(err)
+							}
+						}
+						for patternIndex, k := range patternsS {
+							if mismatches == 0 {
+								hit = (len(k) == 0 && len(target) == 0) ||
+									(len(k) > 0 && bytes.Contains(target, k))
+							} else if shortMatcher != nil {
+								hit = shortMatcher.match(target)
+							} else {
+								hit, err = sfmi.Match(k, mismatches)
+								checkError(err)
+							}
+							if hit {
+								if deleteMatched && !invertMatch {
+									patternsS = slices.Delete(patternsS, patternIndex, patternIndex+1)
+								}
+								break
+							}
 						}
 					} else {
 						h = xxhash.Sum64(target)
