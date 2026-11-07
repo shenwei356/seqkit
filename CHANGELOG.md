@@ -1,6 +1,7 @@
 - [SeqKit v2.15.0](https://github.com/shenwei356/seqkit/releases/tag/v2.15.0) - 2026-xx-xx
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.15.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.15.0)
     - `seqkit`:
+        - Fix the exported Go helpers `ReverseInt` and `MaxInts` to preserve input slices when reversing and return correct maxima for all-negative values.
         - Reject invalid ID regular expressions before changing output files or indexes.
         - Prevent main and auxiliary outputs, including generated files and indexes, from overwriting inputs or conflicting with other outputs.
         - Report compressed-input read errors instead of treating damaged files as empty input. [#610](https://github.com/shenwei356/seqkit/issues/610)

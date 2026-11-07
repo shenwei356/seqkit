@@ -325,10 +325,10 @@ func FileSize(file string) int {
 	return int(info.Size())
 }
 
-// ReverseInt revsrees a slice of integers.
+// ReverseInt returns a reversed copy without changing the input slice.
 func ReverseInt(d []int) []int {
 	s := make([]int, len(d))
-	copy(d, s)
+	copy(s, d)
 	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
 		s[i], s[j] = s[j], s[i]
 	}
@@ -355,8 +355,12 @@ func MinInts(s []int) (m int) {
 	return
 }
 
-// MaxInts calculates the maximum of a slice of integers.
+// MaxInts returns the maximum integer, or zero for an empty slice.
 func MaxInts(s []int) (m int) {
+	if len(s) == 0 {
+		return 0
+	}
+	m = s[0]
 	for _, e := range s {
 		if e > m {
 			m = e
