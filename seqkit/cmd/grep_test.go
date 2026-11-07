@@ -14,6 +14,26 @@ import (
 	"time"
 )
 
+// TestGrepDeleteMatchedEmptyPatterns keeps all nonmatches when the pattern set is empty.
+func TestGrepDeleteMatchedEmptyPatterns(t *testing.T) {
+	patterns := auditInput(t, t.TempDir(), "patterns.txt", "\n\n")
+	const input = ">a\nAC\n>b\nGT\n"
+	for _, mode := range [][]string{nil, {"-r"}, {"-s"}, {"-d"}} {
+		for _, count := range []bool{false, true} {
+			args := append([]string{"grep", "-f", patterns, "--delete-matched", "-v"}, mode...)
+			want := input
+			if count {
+				args = append(args, "-C")
+				want = "2\n"
+			}
+			out, stderr, err := runCLI(t, input, args...)
+			if err != nil || out != want {
+				t.Fatalf("mode=%v count=%v: got %q, want %q: %v %s", mode, count, out, want, err, stderr)
+			}
+		}
+	}
+}
+
 // TestGrepImmediateOutputBeforeEOF leaves input open after one slow and many fast reads.
 func TestGrepImmediateOutputBeforeEOF(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)

@@ -562,7 +562,8 @@ Examples:
 			fastx.ForcelyOutputFastq = false
 			checkAlphabet := true
 			for {
-				if deleteMatched && len(patternsR)+len(patternsN)+len(patternsS) == 0 {
+				// An empty pattern set still accepts every record in inverted mode.
+				if deleteMatched && !invertMatch && len(patternsR)+len(patternsN)+len(patternsS) == 0 {
 					break
 				}
 
