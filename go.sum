@@ -86,8 +86,6 @@ github.com/google/go-cmp v0.5.7/go.mod h1:n+brtR0CgQNWTVd5ZUFpTBC8YFBDLK/h/bpaJ8
 github.com/google/go-cmp v0.5.8/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/iafan/cwalk v0.0.0-20210125030640-586a8832a711 h1:UnfAf/kLhzHd6UQ6nyum/cCqBImrlrpq8rHLVjaKerA=
-github.com/iafan/cwalk v0.0.0-20210125030640-586a8832a711/go.mod h1:9NZZY8JKo3RhqKRYhRWMgCO4S4adM76u8w4gGUMnlig=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/jezek/xgb v1.0.0/go.mod h1:nrhwO0FX/enq75I7Y7G8iN1ubpSGZEiA3v9e9GyRFlk=
@@ -142,10 +140,8 @@ github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQD
 github.com/ruudk/golang-pdf417 v0.0.0-20181029194003-1af4ab5afa58/go.mod h1:6lfFZQK844Gfx8o5WFuvpxWRwnSoipWe/p622j1v06w=
 github.com/ruudk/golang-pdf417 v0.0.0-20201230142125-a7e3863a1245/go.mod h1:pQAZKsJ8yyVxGRWYNEm9oFB8ieLgKFnamEyDmSA0BRk=
 github.com/scylladb/termtables v0.0.0-20191203121021-c4c0b6d42ff4/go.mod h1:C1a7PQSMz9NShzorzCiG2fk9+xuCgLkPeCvMHYR2OWg=
-github.com/shenwei356/bio v0.16.0 h1:PsqP9u4B3nXOx33mLaz6+5ACI/xtT9lgXharkqhtoOM=
-github.com/shenwei356/bio v0.16.0/go.mod h1:rofglqh33O9xh263UzgIth8UWMykDn25lbiYi9CRWBI=
-github.com/shenwei356/breader v0.3.2 h1:GLy2clIMck6FdTwj8WLnmhv0PW/7Pp+Wcx7TVEHG0ks=
-github.com/shenwei356/breader v0.3.2/go.mod h1:BimwolkMTIr/O4iX7xXtjEB1z5y39G+8I5Tsm9guC3E=
+github.com/shenwei356/bio v0.16.1 h1:oGiBkh9/R1aC8+BaXQO1czqZVDU1YJ9fJ+yQnOQiLA4=
+github.com/shenwei356/bio v0.16.1/go.mod h1:rofglqh33O9xh263UzgIth8UWMykDn25lbiYi9CRWBI=
 github.com/shenwei356/bwt v0.6.1 h1:BDS1nhhIxiC284OKtLBUgy+U5L/7WrvT/ehOExB/DSA=
 github.com/shenwei356/bwt v0.6.1/go.mod h1:2pciIGqLh9Xl3NhbPHAie69rigG0W7xDa0gVHLT+G7g=
 github.com/shenwei356/go-logging v0.0.0-20171012171522-c6b9702d88ba h1:UvnrxFDPmz7agYX0eQ2JEorTKn1ORnZ9dT5OzbjPvK8=
