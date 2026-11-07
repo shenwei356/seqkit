@@ -57,6 +57,8 @@ Attention:
      Reference: https://github.com/shenwei356/seqkit/issues/448
   3. With -f/--file-name, the final column contains the input file name;
      -H/--header-line names this column "file".
+  4. Repeated letters in each -B/--base-content or -C/--base-count value count
+     only once. Case variants count as the same letter unless -I is set.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -151,6 +153,10 @@ Attention:
 
 			outfh.WriteString("\n")
 		}
+
+		// Preserve requested column labels, but count each effective base only once.
+		baseCounts = distinctBaseQueries(baseCounts, caseSensitive)
+		baseContents = distinctBaseQueries(baseContents, caseSensitive)
 
 		var name []byte
 		var g, c, a, t int
@@ -299,8 +305,40 @@ func init() {
 	fx2tabCmd.Flags().StringP("stdin-label", "", "-", `label for replacing default "-" for stdin`)
 }
 
+// distinctBaseQueries removes duplicates after applying the requested ASCII case rule.
+func distinctBaseQueries(queries []string, caseSensitive bool) []string {
+	result := make([]string, len(queries))
+	for i, query := range queries {
+		bases := []byte(query)
+		if !caseSensitive {
+			for j, b := range bases {
+				if b >= 'a' && b <= 'z' {
+					bases[j] = b - ('a' - 'A')
+				}
+			}
+		}
+		result[i] = alphabetStr(bases)
+	}
+	return result
+}
+
+// alphabetStr returns all distinct sequence bytes in ascending order.
 func alphabetStr(s []byte) string {
-	m, _ := asciiset.MakeASCIISet(string(s))
+	m, ok := asciiset.MakeASCIISet(string(s))
+	if !ok {
+		// ASCIISet stops at the first high byte; rescan unrestricted input in full.
+		var seen [256]bool
+		for _, b := range s {
+			seen[b] = true
+		}
+		alphabet := make([]byte, 0, 256)
+		for b, present := range seen {
+			if present {
+				alphabet = append(alphabet, byte(b))
+			}
+		}
+		return string(alphabet)
+	}
 	alphabet := make([]string, m.Size())
 	i := 0
 	m.Visit(func(a byte) bool {

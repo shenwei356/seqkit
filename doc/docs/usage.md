@@ -1448,6 +1448,8 @@ Attention:
      Reference: https://github.com/shenwei356/seqkit/issues/448
   3. With -f/--file-name, the final column contains the input file name;
      -H/--header-line names this column "file".
+  4. Repeated letters in each -B/--base-content or -C/--base-count value count
+     only once. Case variants count as the same letter unless -I is set.
 
 Usage:
   seqkit fx2tab [flags]

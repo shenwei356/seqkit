@@ -75,6 +75,7 @@
         - Report invalid quality scores without crashes or partial output. [#598](https://github.com/shenwei356/seqkit/issues/598)
     - `seqkit fx2tab`:
         - Include the file column in headers with `-H -f` and speed up GC-skew reporting with `-G` alone.
+        - Count repeated letters only once in `-B/-C` values, respecting `-I`, and report the complete alphabet with `-a` when input contains non-ASCII bytes.
     - `seqkit grep`:
         - Speed up searches for a single pattern of up to 64 characters with 1-4 mismatches. By @DylanCosto. [#621](https://github.com/shenwei356/seqkit/pull/621)
         - Honor `--delete-matched` in literal and mismatch sequence searches; retain all nonmatches with `-v` and an empty pattern file.

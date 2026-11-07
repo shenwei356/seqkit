@@ -5,6 +5,44 @@ import (
 	"testing"
 )
 
+// TestFx2tabRepeatedBases counts each requested base once without changing column labels.
+func TestFx2tabRepeatedBases(t *testing.T) {
+	for _, tt := range []struct {
+		query, count, content string
+		caseSensitive         bool
+	}{
+		{"Aa", "2", "100.00", false},
+		{"AAA", "2", "100.00", false},
+		{"Aa", "2", "100.00", true},
+		{"AA", "1", "50.00", true},
+		{"aa", "1", "50.00", true},
+	} {
+		args := []string{"fx2tab", "-n", "-i", "-H", "-B", tt.query, "-C", tt.query}
+		if tt.caseSensitive {
+			args = append(args, "-I")
+		}
+		out, stderr, err := runCLI(t, ">s\nAa\n", args...)
+		want := "#id\t" + tt.query + "\t" + tt.query + "\ns\t" + tt.count + "\t" + tt.content + "\n"
+		if err != nil || out != want {
+			t.Fatalf("query=%q case-sensitive=%v: got %q, want %q; error: %v; stderr: %s", tt.query, tt.caseSensitive, out, want, err, stderr)
+		}
+	}
+}
+
+// TestFx2tabAlphabetBytes reports all distinct bytes, even around non-ASCII input.
+func TestFx2tabAlphabetBytes(t *testing.T) {
+	for _, input := range []string{"\x80ACGT", "AC\x80GT", "ACGT\x80", "TGCAACGT"} {
+		want := "s\tACGT"
+		if strings.Contains(input, "\x80") {
+			want += "\x80"
+		}
+		out, stderr, err := runCLI(t, ">s\n"+input+"\n", "fx2tab", "-t", "unlimit", "-n", "-i", "-a")
+		if err != nil || out != want+"\n" {
+			t.Fatalf("alphabet of %q = %q, want %q; error: %v; stderr: %s", input, out, want, err, stderr)
+		}
+	}
+}
+
 // TestFx2tabFileHeader keeps the last column named in every tabular output mode.
 func TestFx2tabFileHeader(t *testing.T) {
 	for _, mode := range [][]string{nil, {"-n"}, {"-Q"}, {"-l", "-g", "-s"}} {
