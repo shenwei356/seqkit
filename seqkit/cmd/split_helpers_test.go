@@ -204,3 +204,31 @@ func TestSplitRedirectedStdin(t *testing.T) {
 		}
 	}
 }
+
+// TestSplitOutputFileComponents rejects path-valued flags before creating outputs.
+func TestSplitOutputFileComponents(t *testing.T) {
+	for _, command := range []string{"split", "split2"} {
+		flags := []string{"--extension", "--out-prefix", "--by-size-prefix", "--by-part-prefix"}
+		if command == "split" {
+			flags = append(flags, "--by-id-prefix", "--by-region-prefix")
+		} else {
+			flags = append(flags, "--by-length-prefix")
+		}
+		for _, flag := range flags {
+			for _, value := range []string{"/../../victim", `..\victim`} {
+				t.Run(command+flag+value, func(t *testing.T) {
+					dir := t.TempDir()
+					input := auditInput(t, dir, "input.fa", ">r\nACGT\n")
+					victim := auditInput(t, dir, "victim", "keep")
+					outdir := filepath.Join(dir, "out")
+					_, stderr, err := runCLI(t, "", command, input, "-s", "1", "-O", outdir, flag, value)
+					data, readErr := os.ReadFile(victim)
+					_, statErr := os.Stat(outdir)
+					if err == nil || !strings.Contains(stderr, "not a path") || readErr != nil || string(data) != "keep" || !os.IsNotExist(statErr) {
+						t.Fatalf("path component accepted or outputs changed: %v %s", err, stderr)
+					}
+				})
+			}
+		}
+	}
+}

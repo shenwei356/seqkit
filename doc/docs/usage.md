@@ -2893,6 +2893,8 @@ Attention:
   3. -p produces min(N, P) balanced, nonempty parts in input order.
   4. Existing matching outputs are overwritten; -f suppresses the directory
      warning. Other files, including old parts not produced this time, are retained.
+  5. Output prefixes and extensions must not contain directory paths.
+     With -r, region strings are percent-escaped in output filenames.
 
 The definition of region is 1-based and with some custom design.
 
@@ -3046,6 +3048,7 @@ Attention:
   3. Lengths use K/M/G/T suffixes with base 1000; fractional bases are truncated.
   4. Existing matching outputs are overwritten; -f suppresses the directory
      warning. Other files, including old parts not produced this time, are retained.
+  5. Output prefixes and extensions must not contain directory paths.
 
 The prefix of output files:
   1. For stdin: stdin
@@ -3055,7 +3058,6 @@ The prefix of output files:
   4. Use the ID of the first sequence in each subset.
      Output names must be unique; -N does not group records with the same ID.
      Conflicting output names are errors, including repeated names produced by -N.
-  5. Prefix flags accept file names only, not directory paths.
 
 The extension of output files:
   1. For stdin: .fast[aq]

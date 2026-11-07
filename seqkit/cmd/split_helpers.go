@@ -31,11 +31,11 @@ func writeFastxRecord(w *xopen.Writer, record *fastx.Record, fastq bool, width i
 	record.FormatToWriter(w, width)
 }
 
-// validateOutputPrefix restricts prefix flags to filenames on every platform.
-func validateOutputPrefix(prefix string) {
-	drive := len(prefix) >= 2 && prefix[1] == ':' && (prefix[0] >= 'a' && prefix[0] <= 'z' || prefix[0] >= 'A' && prefix[0] <= 'Z')
-	if strings.ContainsAny(prefix, "/\\") || drive || filepath.IsAbs(prefix) || filepath.VolumeName(prefix) != "" {
-		checkError(fmt.Errorf("output prefix must be a file name, not a path: %q", prefix))
+// validateOutputFileComponent keeps prefix and extension flags within a filename.
+func validateOutputFileComponent(value, kind string) {
+	drive := len(value) >= 2 && value[1] == ':' && (value[0] >= 'a' && value[0] <= 'z' || value[0] >= 'A' && value[0] <= 'Z')
+	if strings.ContainsAny(value, "/\\") || drive || filepath.IsAbs(value) || filepath.VolumeName(value) != "" {
+		checkError(fmt.Errorf("output %s must be a file name component, not a path: %q", kind, value))
 	}
 }
 

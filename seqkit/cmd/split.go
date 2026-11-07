@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -74,6 +75,8 @@ Attention:
   3. -p produces min(N, P) balanced, nonempty parts in input order.
   4. Existing matching outputs are overwritten; -f suppresses the directory
      warning. Other files, including old parts not produced this time, are retained.
+  5. Output prefixes and extensions must not contain directory paths.
+     With -r, region strings are percent-escaped in output filenames.
 
 The definition of region is 1-based and with some custom design.
 
@@ -124,6 +127,7 @@ Examples:
 		force := getFlagBool(cmd, "force")
 
 		extension := getFlagString(cmd, "extension")
+		validateOutputFileComponent(extension, "extension")
 
 		prefixAll := getFlagString(cmd, "out-prefix")
 		prefixAllSet := cmd.Flags().Lookup("out-prefix").Changed
@@ -143,6 +147,9 @@ Examples:
 			prefixByPart = prefixAll
 			prefixByID = prefixAll
 			prefixByRegion = prefixAll
+		}
+		for _, prefix := range []string{prefixAll, prefixBySize, prefixByPart, prefixByID, prefixByRegion} {
+			validateOutputFileComponent(prefix, "prefix")
 		}
 
 		partNumberWidth := getFlagPositiveInt(cmd, "part-width")
@@ -791,7 +798,8 @@ Examples:
 					} else {
 						prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 					}
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s%d:%d_%s%s", prefix, start, end, subseq, fileExt))
+					// Unrestricted sequences may contain path separators or percent signs.
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s%d:%d_%s%s", prefix, start, end, url.PathEscape(subseq), fileExt))
 					writeSeqs(records, outfile, config.LineWidth, quiet, dryRun)
 				}
 				return
@@ -918,7 +926,7 @@ Examples:
 					} else {
 						prefix = fmt.Sprintf("%s.part_", filepath.Base(fileName))
 					}
-					outfile = filepath.Join(outdir, fmt.Sprintf("%s%d:%d_%s%s", prefix, start, end, subseq, fileExt))
+					outfile = filepath.Join(outdir, fmt.Sprintf("%s%d:%d_%s%s", prefix, start, end, url.PathEscape(subseq), fileExt))
 
 					if !dryRun {
 						outfh, err = openOutput(outfile)

@@ -301,3 +301,48 @@ func TestSplitEmptyFASTQAndWrapping(t *testing.T) {
 		}
 	}
 }
+
+// TestSplitRegionFilenames keeps unrestricted sequence bytes inside one filename
+// without merging distinct regions or changing the output records.
+func TestSplitRegionFilenames(t *testing.T) {
+	for _, twoPass := range []bool{false, true} {
+		t.Run(fmt.Sprint(twoPass), func(t *testing.T) {
+			dir := t.TempDir()
+			victim := auditInput(t, dir, "victim.fa", "keep")
+			cases := []struct{ bases, escaped string }{
+				{"x/../../victim", "x%2F..%2F..%2Fvictim"},
+				{`x\victim`, "x%5Cvictim"},
+				{"x%2Fvictim", "x%252Fvictim"},
+				{"ACGT", "ACGT"},
+			}
+			var input strings.Builder
+			for i, tc := range cases {
+				fmt.Fprintf(&input, ">r%d\n%s\n", i, tc.bases)
+			}
+			file := auditInput(t, dir, "input.fa", input.String())
+			outdir := filepath.Join(dir, "out")
+			args := []string{"split", file, "-r", "1:-1", "-O", outdir, "-j", "2"}
+			if twoPass {
+				args = append(args, "-2")
+			}
+			_, stderr, err := runCLI(t, "", args...)
+			data, readErr := os.ReadFile(victim)
+			if readErr != nil || string(data) != "keep" {
+				t.Fatal("region output overwrote a file outside its directory")
+			}
+			if err != nil {
+				t.Fatalf("splitting failed: %v %s", err, stderr)
+			}
+			entries, err := os.ReadDir(outdir)
+			if err != nil || len(entries) != len(cases) {
+				t.Fatalf("expected %d output files: %v", len(cases), err)
+			}
+			for i, tc := range cases {
+				data, err := os.ReadFile(filepath.Join(outdir, "input.part_1:-1_"+tc.escaped+".fa"))
+				if err != nil || string(data) != fmt.Sprintf(">r%d\n%s\n", i, tc.bases) {
+					t.Fatalf("region %d output changed: %v", i, err)
+				}
+			}
+		})
+	}
+}

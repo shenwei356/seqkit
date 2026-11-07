@@ -150,9 +150,11 @@
     - `seqkit sort`:
         - Correct sorting and output for mixed formats, case-insensitive comparisons, sequence prefixes, and empty sequences. [#602](https://github.com/shenwei356/seqkit/issues/602), [#603](https://github.com/shenwei356/seqkit/issues/603), [#604](https://github.com/shenwei356/seqkit/issues/604), [#605](https://github.com/shenwei356/seqkit/issues/605), [#606](https://github.com/shenwei356/seqkit/issues/606)
     - `seqkit split`:
+        - Escape region strings in output filenames so unrestricted sequences cannot write outside the output directory.
         - Create balanced nonempty parts with `-p`. [#620](https://github.com/shenwei356/seqkit/issues/620)
         - Honor FASTQ line widths and choose the correct extension for stdin starting with an empty FASTQ record.
     - `seqkit split/split2`:
+        - Reject directory paths in output prefixes and extensions before creating files.
         - Speed up repeated splits into directories with many files.
     - `seqkit split2`:
         - Reject conflicting modes/prefixes and keep paired boundaries and record counts aligned. [#620](https://github.com/shenwei356/seqkit/issues/620)
