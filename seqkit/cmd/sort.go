@@ -350,6 +350,12 @@ Attention:
 				}
 				id2name[name] = []byte(head)
 
+				// Keep only the keys consumed by the selected sorting mode.
+				if byLength {
+					name2length = append(name2length,
+						stringutil.StringCount{Key: name, Count: lengths[i]})
+					continue
+				}
 				comparison := name
 				if ignoreCase {
 					comparison = strings.ToLower(name)
@@ -357,8 +363,6 @@ Attention:
 
 				name2sequence = append(name2sequence,
 					sequenceSortKey{Key: name, Name: comparison})
-				name2length = append(name2length,
-					stringutil.StringCount{Key: name, Count: lengths[i]})
 			}
 		} else { // have to read the sequences
 			if !quiet {

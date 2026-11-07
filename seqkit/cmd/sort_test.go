@@ -10,6 +10,23 @@ import (
 	"testing"
 )
 
+// TestSortTwoPassLengthOrder retains empty records and ID tie-breaks in both directions.
+func TestSortTwoPassLengthOrder(t *testing.T) {
+	file := auditInput(t, t.TempDir(), "input.fa", ">c\nACG\n>a\nT\n>b\nGTA\n>e\n\n")
+	for _, reverse := range []bool{false, true} {
+		args := []string{"sort", "-2", "-l", file}
+		want := ">e\n\n>a\nT\n>b\nGTA\n>c\nACG\n"
+		if reverse {
+			args = append(args, "-r")
+			want = ">b\nGTA\n>c\nACG\n>a\nT\n>e\n\n"
+		}
+		out, stderr, err := runCLI(t, "", args...)
+		if err != nil || out != want {
+			t.Fatalf("indexed length order changed: reverse=%v: %v %s", reverse, err, stderr)
+		}
+	}
+}
+
 // TestSortTwoPassHeaderTabs uses the same full-header keys as index creation.
 func TestSortTwoPassHeaderTabs(t *testing.T) {
 	for _, separator := range []string{"\t", "\t\t"} {
