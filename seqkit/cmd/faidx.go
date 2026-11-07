@@ -56,6 +56,7 @@ Attention:
   2. Missing IDs in ordinary queries are warned about; valid queries are still
      written, and the command finishes with a nonzero exit status.
   3. Out-of-range regions are clipped to sequence boundaries on either strand.
+  4. Only uncompressed FASTA files are supported.
 
 The definition of region is 1-based and with some custom design.
 
@@ -96,14 +97,9 @@ Examples:
 			checkError(fmt.Errorf("stdin not supported"))
 		}
 
-		if strings.HasSuffix(strings.ToLower(file), ".gz") {
-			checkError(fmt.Errorf("gzipped file not supported"))
-		}
-		if strings.HasSuffix(strings.ToLower(file), ".xz") {
-			checkError(fmt.Errorf("xz compressed file not supported"))
-		}
-		if strings.HasSuffix(strings.ToLower(file), ".zst") {
-			checkError(fmt.Errorf("zstd compressed file not supported"))
+		// Reject every supported compression suffix before opening output or updating indexes.
+		if !isPlainFile(file) {
+			checkError(fmt.Errorf("compressed file not supported; use an uncompressed FASTA file"))
 		}
 
 		// create and read .fai

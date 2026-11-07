@@ -9,6 +9,39 @@ import (
 	"time"
 )
 
+// TestFaidxCompressedPreflight preserves outputs and indexes for unsupported inputs.
+func TestFaidxCompressedPreflight(t *testing.T) {
+	for _, extension := range []string{".gz", ".xz", ".zst", ".bz2", ".lz4"} {
+		encoded := compressedInput(t, extension, ">r\nACGT\n")
+		for _, suffix := range []string{extension, strings.ToUpper(extension)} {
+			for _, fullHead := range []bool{false, true} {
+				t.Run(suffix+"/"+map[bool]string{false: "id", true: "full"}[fullHead], func(t *testing.T) {
+					dir := t.TempDir()
+					input := auditInput(t, dir, "input.fa"+suffix, string(encoded))
+					output := auditInput(t, dir, "output.fa", "keep output\n")
+					indexSuffix := ".fai"
+					flags := []string{"faidx", input, "-U", "--skip-file-check", "-o", output}
+					if fullHead {
+						indexSuffix = ".seqkit.fai"
+						flags = append(flags, "-f")
+					}
+					index := auditInput(t, dir, "input.fa"+suffix+indexSuffix, "keep index\n")
+					_, stderr, err := runCLI(t, "", flags...)
+					if err == nil || !strings.Contains(stderr, "not supported") {
+						t.Errorf("compressed input was not rejected early: %v %s", err, stderr)
+					}
+					for path, want := range map[string]string{output: "keep output\n", index: "keep index\n"} {
+						data, err := os.ReadFile(path)
+						if err != nil || string(data) != want {
+							t.Errorf("file changed before compression validation: %s: %v", path, err)
+						}
+					}
+				})
+			}
+		}
+	}
+}
+
 // TestFaidxRegionStdin validates index paths before the region reader closes stdin.
 func TestFaidxRegionStdin(t *testing.T) {
 	dir := t.TempDir()

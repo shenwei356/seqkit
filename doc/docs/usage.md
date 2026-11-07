@@ -1131,6 +1131,7 @@ Attention:
   2. Missing IDs in ordinary queries are warned about; valid queries are still
      written, and the command finishes with a nonzero exit status.
   3. Out-of-range regions are clipped to sequence boundaries on either strand.
+  4. Only uncompressed FASTA files are supported.
 
 The definition of region is 1-based and with some custom design.
 
