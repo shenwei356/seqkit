@@ -325,3 +325,40 @@ func TestFaidxQueryPreflight(t *testing.T) {
 		})
 	}
 }
+
+// TestFaidxAmbiguousIDs selects the first physical record consistently for
+// case-folded and custom IDs, with both index formats and reused indexes.
+func TestFaidxAmbiguousIDs(t *testing.T) {
+	for _, tc := range []struct {
+		ids   []string
+		query string
+		flags []string
+	}{
+		{[]string{"AbC", "abc"}, "ABC", []string{"-i"}},
+		{[]string{"r.first", "r.second"}, "r", []string{"--id-regexp", `^([^.]+)`}},
+	} {
+		for _, reverse := range []bool{false, true} {
+			for _, full := range []bool{false, true} {
+				ids := append([]string(nil), tc.ids...)
+				if reverse {
+					ids[0], ids[1] = ids[1], ids[0]
+				}
+				file := auditInput(t, t.TempDir(), "input.fa", ">"+ids[0]+"\nACGT\n>"+ids[1]+"\nTGCA\n")
+				args := append([]string{"faidx", file, tc.query}, tc.flags...)
+				head := ids[0]
+				if full {
+					args = append(args, "-f")
+				} else if tc.query == "r" {
+					head = "r"
+				}
+				want := ">" + head + "\nACGT\n"
+				for attempt := 0; attempt < 6; attempt++ {
+					out, stderr, err := runCLI(t, "", args...)
+					if err != nil || out != want {
+						t.Fatalf("query=%s reverse=%v full=%v attempt=%d: got %q, want %q; %v %s", tc.query, reverse, full, attempt, out, want, err, stderr)
+					}
+				}
+			}
+		}
+	}
+}

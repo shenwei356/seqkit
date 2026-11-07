@@ -57,6 +57,8 @@ Attention:
      written, and the command finishes with a nonzero exit status.
   3. Out-of-range regions are clipped to sequence boundaries on either strand.
   4. Only uncompressed FASTA files are supported.
+  5. If multiple records share an ID, the first record is used. For ordinary
+     queries, -i also treats IDs differing only in case as the same ID.
 
 The definition of region is 1-based and with some custom design.
 
@@ -228,6 +230,10 @@ Examples:
 			// Regex matching must retain case-distinct IDs and the original text.
 			if ignoreCase && !useRegexp {
 				id = strings.ToLower(id)
+			}
+			// Match ID-only index creation by retaining the first physical record.
+			if previous, exists := id2head[id]; exists && idx[previous].Start < idx[head].Start {
+				continue
 			}
 			id2head[id] = head
 		}
