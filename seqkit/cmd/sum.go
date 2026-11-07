@@ -55,6 +55,7 @@ Attention:
      Optionally, the sequence ID can be included with the flag -i/--include-id.
   2. The order of sequences records does not matter.
      When guessing the sequence type, leading empty records are skipped.
+     Empty files use the specified sequence type, or 'N' when guessing.
   3. Circular complete genomes are supported with the flag -c/--circular.
      - The same double-stranded genomes with different start positions or
        in reverse complement strand will not affect the result.
@@ -529,6 +530,22 @@ Examples:
 				includeIDStr := ""
 				if includeID {
 					includeIDStr = "I"
+				}
+				// No record was available to infer a type; retain explicit type metadata.
+				if seqType == "" {
+					switch alphabet {
+					case seq.DNA, seq.DNAredundant:
+						seqType = "D"
+					case seq.RNA, seq.RNAredundant:
+						seqType = "R"
+						if rna2dna {
+							seqType = "D"
+						}
+					case seq.Protein:
+						seqType = "P"
+					default:
+						seqType = "N"
+					}
 				}
 				sum := fmt.Sprintf("seqkit.v%s_%s%s%s%s_k%d_%s",
 					sumVersion,

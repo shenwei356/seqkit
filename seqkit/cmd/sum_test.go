@@ -5,6 +5,38 @@ import (
 	"testing"
 )
 
+// TestSumEmptyFiles retains every digest metadata field without any input records.
+func TestSumEmptyFiles(t *testing.T) {
+	empty := auditInput(t, t.TempDir(), "empty.fa", "")
+	for _, tt := range []struct {
+		name, tag string
+		args      []string
+	}{
+		{"auto", "NLS_k0", nil},
+		{"dna", "DLS_k0", []string{"-t", "dna"}},
+		{"rna", "RLS_k0", []string{"-t", "rna"}},
+		{"protein", "PLS_k0", []string{"-t", "protein"}},
+		{"unlimit", "NLS_k0", []string{"-t", "unlimit"}},
+		{"rna2dna", "DLS_k0", []string{"-t", "rna", "--rna2dna"}},
+		{"circular", "NCD_k31", []string{"-c"}},
+		{"circular dna", "DCD_k31", []string{"-c", "-t", "dna"}},
+		{"circular rna2dna", "DCS_k31", []string{"-c", "-s", "-t", "rna", "--rna2dna"}},
+	} {
+		for _, input := range []string{"-", empty} {
+			t.Run(tt.name+"/"+input, func(t *testing.T) {
+				args := append([]string{"sum", "--quiet", "-k", "31"}, tt.args...)
+				out, stderr, err := runCLI(t, "", append(args, input)...)
+				// The metadata changes; the digest of zero records remains stable.
+				want := "seqkit.v0.1_" + tt.tag + "_56fc8fa222734a7d4b9ddedcca604bbf"
+				fields := strings.Fields(out)
+				if err != nil || len(fields) == 0 || fields[0] != want {
+					t.Fatalf("empty digest = %q, want %q; error: %v; stderr: %s", out, want, err, stderr)
+				}
+			})
+		}
+	}
+}
+
 // TestSumErrorFileNames keeps percent signs literal in circular-input diagnostics.
 func TestSumErrorFileNames(t *testing.T) {
 	for _, tc := range []struct{ bases, k, message string }{

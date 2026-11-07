@@ -970,6 +970,7 @@ Attention:
      Optionally, the sequence ID can be included with the flag -i/--include-id.
   2. The order of sequences records does not matter.
      When guessing the sequence type, leading empty records are skipped.
+     Empty files use the specified sequence type, or 'N' when guessing.
   3. Circular complete genomes are supported with the flag -c/--circular.
      - The same double-stranded genomes with different start positions or
        in reverse complement strand will not affect the result.
