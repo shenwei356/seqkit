@@ -156,6 +156,7 @@
         - Honor `-R` consistently for indexed and streamed regions, and continue to later files after empty inputs.
         - Preserve full headers and custom IDs in indexed extraction; rebuild older ID-only indexes with `-U`.
         - Honor explicit FASTQ line widths when extracting BED/GTF regions, and use less memory for large intervals.
+        - Preserve BED intervals whose reference IDs begin with `track` or `browser`.
     - `seqkit sum`:
         - Return a non-zero exit status for failed files while retaining valid results; reject invalid ID regular expressions before processing. [#613](https://github.com/shenwei356/seqkit/issues/613)
     - `seqkit tab2fx`:

@@ -64,7 +64,8 @@ func ReadBedFilteredFeatures(file string, chrs []string) ([]BedFeature, error) {
 	fn := func(line string) (interface{}, bool, error) {
 		line = strings.TrimRight(line, "\r\n")
 
-		if line == "" || line[0] == '#' || (len(line) > 7 && string(line[0:7]) == "browser") || (len(line) > 5 && string(line[0:5]) == "track") {
+		// Metadata keywords need a separator; reference IDs may share their prefix.
+		if line == "" || line[0] == '#' || strings.HasPrefix(line, "browser ") || strings.HasPrefix(line, "browser\t") || strings.HasPrefix(line, "track ") || strings.HasPrefix(line, "track\t") {
 			return nil, false, nil
 		}
 

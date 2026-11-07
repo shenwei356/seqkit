@@ -674,6 +674,9 @@ Examples
 
 1. Get subsequences by BED file.
 
+    BED metadata lines beginning with `track` or `browser` followed by a space
+    or tab are skipped. Reference IDs such as `track1` and `browser1` are retained.
+
     ***AVOID loading all data from Homo_sapiens.GRCh38.84.gtf.gz,
     the uncompressed data are so big and may exhaust your RAM.***
 
