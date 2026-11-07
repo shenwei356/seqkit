@@ -56,7 +56,7 @@ func ReadBedFilteredFeatures(file string, chrs []string) ([]BedFeature, error) {
 	}
 	chrsMap := make(map[string]struct{}, len(chrs))
 	for _, chr := range chrs {
-		chrsMap[chr] = struct{}{}
+		chrsMap[strings.ToLower(chr)] = struct{}{}
 	}
 
 	fn := func(line string) (interface{}, bool, error) {
@@ -74,7 +74,7 @@ func ReadBedFilteredFeatures(file string, chrs []string) ([]BedFeature, error) {
 		}
 
 		if len(chrs) > 0 { // selected chrs
-			if _, ok := chrsMap[items[0]]; !ok {
+			if _, ok := chrsMap[strings.ToLower(items[0])]; !ok {
 				return nil, false, nil
 			}
 		}

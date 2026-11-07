@@ -335,3 +335,29 @@ func TestSubseqDamagedAuxiliaryInput(t *testing.T) {
 func TestSubseqDamagedGTF(t *testing.T) {
 	assertDamagedTextInput(t, "r\ttest\tCDS\t1\t2\t.\t+\t.\tgene_id \"r\";\n", "subseq", "--gtf")
 }
+
+// TestSubseqAnnotationChromosomeCase keeps --chr filtering case-insensitive
+// without changing the exact ID match between annotations and sequences.
+func TestSubseqAnnotationChromosomeCase(t *testing.T) {
+	dir := t.TempDir()
+	input := ">ChrA\nACGT\n>other\nTTTT\n"
+	fasta := auditInput(t, dir, "input.fa", input)
+	bed := auditInput(t, dir, "regions.bed", "ChrA\t0\t2\nother\t0\t2\n")
+	gtf := auditInput(t, dir, "regions.gtf", "ChrA\ttest\tCDS\t1\t2\t.\t+\t.\tgene_id \"a\";\nother\ttest\tCDS\t1\t2\t.\t+\t.\tgene_id \"b\";\n")
+	for _, annotation := range [][]string{{"--bed", bed}, {"--gtf", gtf}} {
+		for _, indexed := range []bool{false, true} {
+			for _, chr := range []string{"ChrA", "chra", "CHRA"} {
+				args := append([]string{"subseq", "--quiet", "--chr", chr}, annotation...)
+				stdin := input
+				if indexed {
+					args = append(args, fasta)
+					stdin = ""
+				}
+				out, stderr, err := runCLI(t, stdin, args...)
+				if err != nil || strings.Count(out, ">") != 1 || !strings.HasPrefix(out, ">ChrA_1-2:") || !strings.HasSuffix(out, "\nAC\n") {
+					t.Fatalf("%s indexed=%v chr=%s: incorrect selection: %v %s", annotation[0], indexed, chr, err, stderr)
+				}
+			}
+		}
+	}
+}

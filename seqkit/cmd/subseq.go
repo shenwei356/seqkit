@@ -344,11 +344,7 @@ Examples:
 
 					} else if gtfFile != "" {
 						for chr := range gtfFeaturesMap {
-							if len(chrs) > 0 { // selected chrs
-								if _, ok := chrsMap[chr]; !ok {
-									continue
-								}
-							}
+							// Annotation readers already applied the case-insensitive --chr filter.
 
 							chr = string(id2name[chr])
 
@@ -371,11 +367,7 @@ Examples:
 						continue
 					} else if bedFile != "" {
 						for chr := range bedFeatureMap {
-							if len(chrs) > 0 { // selected chrs
-								if _, ok := chrsMap[chr]; !ok {
-									continue
-								}
-							}
+							// Annotation readers already applied the case-insensitive --chr filter.
 
 							chr = string(id2name[chr])
 
