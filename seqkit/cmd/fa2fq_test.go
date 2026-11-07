@@ -55,3 +55,20 @@ func TestFa2fqStrands(t *testing.T) {
 		}
 	}
 }
+
+// TestFa2fqProteinStrands never invents matches by reversing proteins or unrestricted input.
+func TestFa2fqProteinStrands(t *testing.T) {
+	for _, alphabet := range []string{"protein", "unlimit"} {
+		for _, referenceSequence := range []string{"MELK", "KLEM"} {
+			reference := auditInput(t, t.TempDir(), "reference.fa", ">s\n"+referenceSequence+"\n")
+			out, stderr, err := runCLI(t, "@s\nMELK\n+\n1234\n", "fa2fq", "-t", alphabet, "-f", reference)
+			want := ""
+			if referenceSequence == "MELK" {
+				want = "@s\nMELK\n+\n1234\n"
+			}
+			if err != nil || out != want {
+				t.Fatalf("%s reference %s: got %q, want %q: %v %s", alphabet, referenceSequence, out, want, err, stderr)
+			}
+		}
+	}
+}

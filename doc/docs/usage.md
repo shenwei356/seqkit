@@ -1399,6 +1399,7 @@ Attention:
      should be subseq of sequences in FASTQ file.
   2. The complete FASTA reference is checked before output is written.
      The FASTA reference and FASTQ input cannot both be stdin.
+  3. Protein and unrestricted alphabets are searched only in their original orientation.
 
 Usage:
   seqkit fa2fq [flags]

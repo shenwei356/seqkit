@@ -168,6 +168,7 @@
         - Avoid crashes with extremely negative region coordinates.
     - `seqkit fa2fq`:
         - Reject damaged FASTA references and repeated stdin use before opening output files.
+        - Avoid false matches from reversed protein or unrestricted sequences.
     - `seqkit seq/replace`:
         - Avoid crashes with empty filter patterns; search reverse complements for DNA/RNA regular-expression filters and avoid reversed protein matches.
     - `seqkit seq`:
