@@ -3,7 +3,32 @@ package cmd
 import (
 	"strings"
 	"testing"
+
+	"github.com/shenwei356/bio/seq"
+	"github.com/shenwei356/bio/seqio/fastx"
 )
+
+// BenchmarkCommonRecordHash includes the reverse-complement allocation lifecycle.
+func BenchmarkCommonRecordHash(b *testing.B) {
+	for _, size := range []struct {
+		name   string
+		length int
+	}{{"short", 150}, {"long", 10000}} {
+		b.Run(size.name, func(b *testing.B) {
+			record := &fastx.Record{Seq: &seq.Seq{
+				Alphabet: seq.DNAredundant,
+				Seq:      []byte(strings.Repeat("ACGT", (size.length+3)/4)[:size.length]),
+				Qual:     []byte(strings.Repeat("I", size.length)),
+			}}
+			b.ReportAllocs()
+			b.SetBytes(int64(size.length))
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				commonRecordHash(record, true, false, true, false)
+			}
+		})
+	}
+}
 
 // TestCommonEmbeddedExactStrands keeps equal-length matches in both orientations.
 func TestCommonEmbeddedExactStrands(t *testing.T) {

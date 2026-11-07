@@ -50,6 +50,7 @@
         - Preserve identical DNA/RNA matches on both strands with `-s -e` and use less memory for comparisons across files.
     - `seqkit common/rmdup`:
         - Keep reversed protein sequences distinct when comparing by sequence.
+        - Speed up sequence comparisons on both strands, especially for short FASTQ reads.
     - `seqkit concat`:
         - Preserve descriptions with custom IDs, avoid repeating text already included in an ID, and ignore empty files when calculating full-join padding. [#614](https://github.com/shenwei356/seqkit/issues/614)
         - Fix full joins with duplicate IDs and only one nonempty input; use less memory when duplicate IDs produce many combinations.

@@ -172,9 +172,9 @@ Attention:
 
 				if bySeq && revcom && hasComplement(record.Seq.Alphabet) {
 					if ignoreCase {
-						subject = xxhash.Sum64(bytes.ToLower(record.Seq.RevCom().Seq))
+						subject = xxhash.Sum64(bytes.ToLower(reverseComplementBases(record.Seq)))
 					} else {
-						subject = xxhash.Sum64(record.Seq.RevCom().Seq)
+						subject = xxhash.Sum64(reverseComplementBases(record.Seq))
 					}
 
 					if _, ok := counter[subject]; ok { // duplicated

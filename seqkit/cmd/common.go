@@ -147,7 +147,6 @@ Note:
 		}
 		var fastxReader *fastx.Reader
 		var record *fastx.Record
-		var rc *seq.Seq
 		var _seq, _seqRC []byte
 		var subject, subjectRC uint64
 		isFirstFile := true
@@ -196,8 +195,7 @@ Note:
 					subject = xxhash.Sum64(_seq)
 
 					if revcom && hasComplement(record.Seq.Alphabet) {
-						rc = record.Seq.RevCom()
-						_seqRC = rc.Seq
+						_seqRC = reverseComplementBases(record.Seq)
 						if ignoreCase {
 							_seqRC = bytes.ToLower(_seqRC)
 						}
@@ -343,7 +341,7 @@ func commonRecordHash(record *fastx.Record, bySeq, byName, revcom, ignoreCase bo
 	}
 	hash := xxhash.Sum64(text)
 	if bySeq && revcom && hasComplement(record.Seq.Alphabet) {
-		rc := record.Seq.RevCom().Seq
+		rc := reverseComplementBases(record.Seq)
 		if ignoreCase {
 			rc = bytes.ToLower(rc)
 		}
@@ -434,7 +432,7 @@ func commonEmbedded(files []string, firstLabel string, out *xopen.Writer, config
 			queryRevcom := revcom && hasComplement(record.Seq.Alphabet)
 			var queryRC []byte
 			if queryRevcom {
-				queryRC = normalize(record.Seq.RevCom().Seq)
+				queryRC = normalize(reverseComplementBases(record.Seq))
 			}
 			key := query
 			if queryRevcom && bytes.Compare(queryRC, key) < 0 {
@@ -558,7 +556,7 @@ func canonicalCommonSequence(text []byte, alphabet *seq.Alphabet, revcom bool) [
 		return text
 	}
 	sequence := &seq.Seq{Alphabet: alphabet, Seq: text}
-	rc := sequence.RevCom().Seq
+	rc := reverseComplementBases(sequence)
 	if bytes.Compare(rc, text) < 0 {
 		return rc
 	}

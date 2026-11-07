@@ -149,6 +149,13 @@ func hasComplement(alphabet *seq.Alphabet) bool {
 	return false
 }
 
+// reverseComplementBases copies only bases for comparisons, leaving the input
+// sequence, qualities, and shared read-only alphabet unchanged.
+func reverseComplementBases(sequence *seq.Seq) []byte {
+	copy := &seq.Seq{Alphabet: sequence.Alphabet, Seq: bytes.Clone(sequence.Seq)}
+	return copy.RevComInplace().Seq
+}
+
 // inferRecordAlphabet keeps per-file type inference pending through empty records.
 // Apply it before cloning or dispatching a record; explicit alphabets are retained.
 func inferRecordAlphabet(record *fastx.Record, alphabet *seq.Alphabet) *seq.Alphabet {

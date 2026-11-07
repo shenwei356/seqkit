@@ -1,11 +1,40 @@
 package cmd
 
 import (
+	"bytes"
+	"slices"
 	"strings"
 	"testing"
 
 	"github.com/shenwei356/bio/seq"
 )
+
+// TestReverseComplementBases preserves bases, qualities, and alphabet ownership.
+func TestReverseComplementBases(t *testing.T) {
+	for _, alphabet := range []*seq.Alphabet{seq.DNAredundant, seq.RNAredundant} {
+		bases := "AaCGTrykmbvdhswn-"
+		if alphabet == seq.RNAredundant {
+			bases = strings.ReplaceAll(bases, "T", "U")
+		}
+		for _, text := range []string{"", bases} {
+			original := &seq.Seq{Alphabet: alphabet, Seq: []byte(text),
+				Qual: []byte(strings.Repeat("I", len(text))), QualValue: make([]int, len(text))}
+			before := original.Clone()
+			want := original.RevCom().Seq
+			got := reverseComplementBases(original)
+			if !bytes.Equal(got, want) {
+				t.Fatalf("reverse complement = %q, want %q", got, want)
+			}
+			if len(got) > 0 {
+				got[0] = '!'
+			}
+			if !bytes.Equal(original.Seq, before.Seq) || !bytes.Equal(original.Qual, before.Qual) ||
+				!slices.Equal(original.QualValue, before.QualValue) || original.Alphabet != alphabet {
+				t.Fatal("reverse complement changed its input")
+			}
+		}
+	}
+}
 
 // assertLeadingEmptyRecords checks that empty prefixes do not change processing
 // of later records. Commands may preserve or omit the empty records themselves.
