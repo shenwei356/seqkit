@@ -51,6 +51,7 @@ Note:
      a) Both positive and negative strands are compared. You can switch on
         -P/--only-positive-strand for considering the positive strand only.
         Protein sequences are compared without reversal.
+        Identical sequences match even when input files have different sequence types.
      b) You can switch on -e/--check-embedded-seqs to check embedded sequences.
           e.g, for file A and B, the reverse complement sequence of CCCC from file B
           is a part of TTGGGGTT from file A, we will extract and output GGGG from file A.
@@ -147,7 +148,7 @@ Note:
 		}
 		var fastxReader *fastx.Reader
 		var record *fastx.Record
-		var _seq, _seqRC []byte
+		var comparisonAlphabet *seq.Alphabet // First-file alphabet defines canonical keys.
 		var subject, subjectRC uint64
 		isFirstFile := true
 		firstFile := files[0]
@@ -187,55 +188,44 @@ Note:
 				}
 				fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
 
-				if bySeq {
-					_seq = record.Seq.Seq
-					if ignoreCase {
-						_seq = bytes.ToLower(_seq)
-					}
-					subject = xxhash.Sum64(_seq)
-
-					if revcom && hasComplement(record.Seq.Alphabet) {
-						_seqRC = reverseComplementBases(record.Seq)
-						if ignoreCase {
-							_seqRC = bytes.ToLower(_seqRC)
-						}
-						subjectRC = xxhash.Sum64(_seqRC)
-
-						if subjectRC < subject { // only save the smaller one, like keeping canonical k-mers
-							subject = subjectRC
-						}
-					}
-				} else if byName {
-					if ignoreCase {
-						subject = xxhash.Sum64(bytes.ToLower(record.Name))
-					} else {
-						subject = xxhash.Sum64(record.Name)
-					}
-				} else { // byID
-					if ignoreCase {
-						subject = xxhash.Sum64(bytes.ToLower(record.ID))
-					} else {
-						subject = xxhash.Sum64(record.ID)
+				if isFirstFile && len(record.Seq.Seq) > 0 {
+					comparisonAlphabet = fileAlphabet
+				}
+				subject = commonRecordHash(record, bySeq, byName, revcom, ignoreCase)
+				subjectRC = subject
+				if bySeq && revcom && fileAlphabet != comparisonAlphabet {
+					// Canonicalize against the first file, so identical text keeps
+					// its identity across types. A different native complement can
+					// also match another first-file candidate.
+					subject = commonSequenceHash(record.Seq.Seq, comparisonAlphabet, revcom, ignoreCase)
+					subjectRC = subject
+					if hasComplement(fileAlphabet) {
+						subjectRC = commonSequenceHash(reverseComplementBases(record.Seq), comparisonAlphabet, revcom, ignoreCase)
 					}
 				}
 
-				count, exists := counter[subject]
-				if !exists {
-					// Later-only records cannot enter the intersection. Still read
-					// every input record so malformed files remain errors.
-					if !isFirstFile {
+				for j, key := range [2]uint64{subject, subjectRC} {
+					if j == 1 && key == subject {
 						continue
 					}
-					count.lastFile = -1
+					count, exists := counter[key]
+					if !exists {
+						// Later-only records cannot enter the intersection. Still read
+						// every input record so malformed files remain errors.
+						if !isFirstFile {
+							continue
+						}
+						count.lastFile = -1
+					}
+					if count.lastFile != i {
+						count.lastFile = i
+						count.files++
+					}
+					if isFirstFile {
+						count.firstRecords++
+					}
+					counter[key] = count
 				}
-				if count.lastFile != i {
-					count.lastFile = i
-					count.files++
-				}
-				if isFirstFile {
-					count.firstRecords++
-				}
-				counter[subject] = count
 			}
 			fastxReader.Close()
 
@@ -330,21 +320,27 @@ func init() {
 
 // commonRecordHash uses the same canonical comparison for input and retrieval.
 func commonRecordHash(record *fastx.Record, bySeq, byName, revcom, ignoreCase bool) uint64 {
+	if bySeq {
+		return commonSequenceHash(record.Seq.Seq, record.Seq.Alphabet, revcom, ignoreCase)
+	}
 	text := record.ID
 	if byName {
 		text = record.Name
-	} else if bySeq {
-		text = record.Seq.Seq
 	}
 	if ignoreCase {
 		text = bytes.ToLower(text)
 	}
+	return xxhash.Sum64(text)
+}
+
+// commonSequenceHash uses one alphabet's canonical orientation for every lookup.
+func commonSequenceHash(text []byte, alphabet *seq.Alphabet, revcom, ignoreCase bool) uint64 {
+	if ignoreCase {
+		text = bytes.ToLower(text)
+	}
 	hash := xxhash.Sum64(text)
-	if bySeq && revcom && hasComplement(record.Seq.Alphabet) {
-		rc := reverseComplementBases(record.Seq)
-		if ignoreCase {
-			rc = bytes.ToLower(rc)
-		}
+	if revcom && hasComplement(alphabet) {
+		rc := reverseComplementBases(&seq.Seq{Alphabet: alphabet, Seq: text})
 		hash = min(hash, xxhash.Sum64(rc))
 	}
 	return hash
@@ -362,6 +358,7 @@ func commonEmbedded(files []string, firstLabel string, out *xopen.Writer, config
 	}
 	candidates := make([][]commonSpan, len(originals))
 	normalized := make([][]byte, len(originals))
+	var comparisonAlphabet *seq.Alphabet // All candidates inherit the first input's type.
 	seenIDs := make(map[string]bool)
 	normalize := func(text []byte) []byte {
 		if ignoreCase {
@@ -373,6 +370,7 @@ func commonEmbedded(files []string, firstLabel string, out *xopen.Writer, config
 		if len(record.Seq.Seq) == 0 {
 			continue
 		}
+		comparisonAlphabet = record.Seq.Alphabet
 		if seenIDs[string(record.ID)] {
 			return fmt.Errorf("duplicated ID not allowed: %s", record.ID)
 		}
@@ -400,9 +398,9 @@ func commonEmbedded(files []string, firstLabel string, out *xopen.Writer, config
 		exact := make(map[uint64][]targetSpan)
 		for i, spans := range candidates {
 			for _, span := range spans {
-				target := targetSpan{i, span, normalized[i][span.begin:span.end]}
-				targets = append(targets, target)
+				target := targetSpan{record: i, span: span, text: normalized[i][span.begin:span.end]}
 				key := canonicalCommonSequence(target.text, originals[i].Seq.Alphabet, revcom)
+				targets = append(targets, target)
 				hash := xxhash.Sum64(key)
 				exact[hash] = append(exact[hash], target)
 			}
@@ -414,6 +412,7 @@ func commonEmbedded(files []string, firstLabel string, out *xopen.Writer, config
 			}
 			next[target.record][span] = true
 		}
+		var reverseTargets [][]byte // Built only for comparisons across different alphabets.
 
 		for {
 			record, err := reader.Read()
@@ -434,26 +433,57 @@ func commonEmbedded(files []string, firstLabel string, out *xopen.Writer, config
 			if queryRevcom {
 				queryRC = normalize(reverseComplementBases(record.Seq))
 			}
+			mixedAlphabet := comparisonAlphabet != nil && fileAlphabet.Type() != comparisonAlphabet.Type()
 			key := query
-			if queryRevcom && bytes.Compare(queryRC, key) < 0 {
+			if queryRevcom && bytes.Compare(queryRC, query) < 0 {
 				key = queryRC
 			}
-			for _, target := range exact[xxhash.Sum64(key)] {
-				if bytes.Equal(target.text, query) || queryRevcom && bytes.Equal(target.text, queryRC) {
-					keep(target, target.span)
+			keys := [][]byte{key}
+			if revcom && mixedAlphabet {
+				keys[0] = canonicalCommonSequence(query, comparisonAlphabet, revcom)
+				if queryRevcom {
+					keys = append(keys, canonicalCommonSequence(queryRC, comparisonAlphabet, revcom))
+				}
+				if hasComplement(comparisonAlphabet) && reverseTargets == nil {
+					reverseTargets = make([][]byte, len(targets))
+					for i := range targets {
+						reverseTargets[i] = reverseComplementBases(&seq.Seq{Alphabet: comparisonAlphabet, Seq: targets[i].text})
+					}
+				}
+			}
+			for _, key := range keys {
+				for _, target := range exact[xxhash.Sum64(key)] {
+					matches := bytes.Equal(target.text, query) || queryRevcom && bytes.Equal(target.text, queryRC)
+					if !matches && revcom && mixedAlphabet {
+						matches = bytes.Equal(canonicalCommonSequence(target.text, comparisonAlphabet, revcom), key)
+					}
+					if matches {
+						keep(target, target.span)
+					}
 				}
 			}
 			shorter := sort.Search(len(targets), func(i int) bool { return len(targets[i].text) >= len(query) })
 			longer := sort.Search(len(targets), func(i int) bool { return len(targets[i].text) > len(query) })
-			for _, target := range targets[:shorter] {
-				if bytes.Contains(query, target.text) || queryRevcom && bytes.Contains(queryRC, target.text) {
+			for i, target := range targets[:shorter] {
+				if bytes.Contains(query, target.text) || queryRevcom && bytes.Contains(queryRC, target.text) ||
+					reverseTargets != nil && (bytes.Contains(query, reverseTargets[i]) || queryRevcom && bytes.Contains(queryRC, reverseTargets[i])) {
 					keep(target, target.span)
 				}
 			}
-			for _, target := range targets[longer:] {
+			for i, target := range targets[longer:] {
 				position := bytes.Index(target.text, query)
 				if position < 0 && queryRevcom {
 					position = bytes.Index(target.text, queryRC)
+				}
+				if position < 0 && reverseTargets != nil {
+					reverse := reverseTargets[longer+i]
+					position = bytes.Index(reverse, query)
+					if position < 0 && queryRevcom {
+						position = bytes.Index(reverse, queryRC)
+					}
+					if position >= 0 {
+						position = len(target.text) - position - len(query)
+					}
 				}
 				if position >= 0 {
 					keep(target, commonSpan{target.span.begin + position, target.span.begin + position + len(query)})

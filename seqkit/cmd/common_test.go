@@ -1,12 +1,103 @@
 package cmd
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
 )
+
+// TestCommonMixedAlphabets compares supported orientations without losing exact matches.
+func TestCommonMixedAlphabets(t *testing.T) {
+	for _, second := range []struct{ name, prefix, sequence string }{
+		{"protein-identical", ">p0\nMELK\n", "AAG"},
+		{"protein-complement", ">p0\nMELK\n", "CTT"},
+		{"rna-identical", ">p0\nUUUU\n", "AAG"},
+		{"rna-complement", ">p0\nUUUU\n", "CUU"},
+	} {
+		for _, reverseOrder := range []bool{false, true} {
+			for _, embedded := range []bool{false, true} {
+				for _, positive := range []bool{false, true} {
+					t.Run(fmt.Sprintf("%s/reverse=%v/embedded=%v/positive=%v", second.name, reverseOrder, embedded, positive), func(t *testing.T) {
+						dir := t.TempDir()
+						first := auditInput(t, dir, "first.fa", ">d\nAAG\n")
+						last := auditInput(t, dir, "last.fa", second.prefix+">p1\n"+strings.ToLower(second.sequence)+"\n")
+						files := []string{first, last}
+						want := ">d\nAAG\n"
+						if reverseOrder {
+							files = []string{last, first}
+							want = ">p1\n" + strings.ToLower(second.sequence) + "\n"
+						}
+						args := []string{"common", "-s", "-i"}
+						if embedded {
+							args = append(args, "-e")
+						}
+						if positive {
+							args = append(args, "-P")
+							if second.sequence != "AAG" {
+								want = ""
+							}
+						}
+						out, stderr, err := runCLI(t, "", append(args, files...)...)
+						if err != nil || out != want {
+							t.Fatalf("output=%q want=%q: %v %s", out, want, err, stderr)
+						}
+					})
+				}
+			}
+		}
+	}
+}
+
+// TestCommonMixedAlphabetFileCounts counts each candidate once per file, even
+// when a different alphabet can match two distinct first-file candidates.
+func TestCommonMixedAlphabetFileCounts(t *testing.T) {
+	dir := t.TempDir()
+	first := auditInput(t, dir, "first.fa", ">p0\nMELK\n>p1\nAAG\n>p2\nCTT\n")
+	second := auditInput(t, dir, "second.fa", ">d\nAAG\n>d2\nAAG\n")
+	third := auditInput(t, dir, "third.fa", ">r0\nUUUU\n>r1\nAAG\n")
+	for _, embedded := range []bool{false, true} {
+		args := []string{"common", "-s"}
+		if embedded {
+			args = append(args, "-e")
+		}
+		out, stderr, err := runCLI(t, "", append(args, first, second)...)
+		if err != nil || out != ">p1\nAAG\n>p2\nCTT\n" {
+			t.Fatalf("two candidates: %q %v %s", out, err, stderr)
+		}
+		out, stderr, err = runCLI(t, "", append(args, first, second, third)...)
+		if err != nil || out != ">p1\nAAG\n" {
+			t.Fatalf("three-file intersection: %q %v %s", out, err, stderr)
+		}
+	}
+}
+
+// TestCommonEmbeddedMixedAlphabetRegions maps reverse-strand hits back to the
+// first record's coordinates and preserves the matching quality slice.
+func TestCommonEmbeddedMixedAlphabetRegions(t *testing.T) {
+	for _, tc := range []struct{ name, first, second, want string }{
+		{"dna-longer", "@d\nCCAAGG\n+\n123456\n", ">p0\nMELK\n>p1\nCTT\n", "@d:3-5\nAAG\n+\n345\n"},
+		{"dna-shorter", "@d\nAAG\n+\n123\n", ">p0\nMELK\n>p1\nMCTTK\n", "@d\nAAG\n+\n123\n"},
+		{"rna-longer", "@r0\nUUUU\n+\nIIII\n@r\nCCAAGG\n+\n123456\n", ">p0\nMELK\n>p1\nCUU\n", "@r:3-5\nAAG\n+\n345\n"},
+		{"protein-longer", "@p0\nMELK\n+\nIIII\n@p1\nMCTTK\n+\n12345\n", ">d\nAAG\n", "@p1:2-4\nCTT\n+\n234\n"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			dir := t.TempDir()
+			first := auditInput(t, dir, "first.fq", tc.first)
+			second := auditInput(t, dir, "second.fa", tc.second)
+			out, stderr, err := runCLI(t, "", "common", "-s", "-e", first, second)
+			if err != nil || out != tc.want {
+				t.Fatalf("output=%q want=%q: %v %s", out, tc.want, err, stderr)
+			}
+			out, stderr, err = runCLI(t, "", "common", "-s", "-e", "-P", first, second)
+			if err != nil || out != "" {
+				t.Fatalf("positive-only output=%q: %v %s", out, err, stderr)
+			}
+		})
+	}
+}
 
 // BenchmarkCommonRecordHash includes the reverse-complement allocation lifecycle.
 func BenchmarkCommonRecordHash(b *testing.B) {

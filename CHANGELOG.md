@@ -47,9 +47,10 @@
         - Skip empty histograms, handle narrow terminals, and report image errors without truncating existing images. [#616](https://github.com/shenwei356/seqkit/issues/616)
     - `seqkit common`:
         - Make embedded-sequence intersections deterministic, keep qualities aligned, clarify result counts, and preserve first-input behavior with stdin. [#620](https://github.com/shenwei356/seqkit/issues/620)
-        - Preserve identical DNA/RNA matches on both strands with `-s -e` and use less memory for comparisons across files.
+        - Preserve exact and embedded matches across sequence types on both strands with `-s -e` and use less memory for comparisons across files.
     - `seqkit common/rmdup`:
         - Keep reversed protein sequences distinct when comparing by sequence.
+        - Preserve identical-sequence and reverse-complement matches across inputs with different sequence types.
     - `seqkit common/grep/locate/replace/rmdup/seq`:
         - Speed up sequence comparisons on both strands, especially for short FASTQ reads.
     - `seqkit concat`:

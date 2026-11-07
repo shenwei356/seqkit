@@ -47,6 +47,7 @@ Attention:
   1. When comparing by sequences, both positive and negative strands are
      compared. Switch on -P/--only-positive-strand for considering the
      positive strand only. Protein sequences are compared without reversal.
+     Identical sequences match even when input files have different sequence types.
   2. Only the first record is saved for duplicates.
      
 `,
@@ -104,7 +105,11 @@ Attention:
 			defer closeOutput(outfhDup)
 		}
 
-		counter := make(map[uint64]int)
+		// Keep the original hash as the identity and its reverse complement as
+		// the value. Identical sequences must match even across inferred types.
+		counter := make(map[uint64]uint64)
+		var comparisonAlphabet *seq.Alphabet
+		var reverseIndex map[uint64]uint64 // Reverse hash -> first retained identity, for mixed types.
 		names := make(map[uint64][]string)
 
 		var subject uint64
@@ -126,6 +131,18 @@ Attention:
 					break
 				}
 				fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
+				if bySeq && revcom && len(record.Seq.Seq) > 0 {
+					if comparisonAlphabet == nil {
+						comparisonAlphabet = fileAlphabet
+					} else if fileAlphabet != comparisonAlphabet && reverseIndex == nil {
+						// Same-type comparisons can look up the query's reverse hash
+						// directly. Mixed alphabets also need the retained orientation.
+						reverseIndex = make(map[uint64]uint64, len(counter))
+						for forward, reverse := range counter {
+							reverseIndex[reverse] = forward
+						}
+					}
+				}
 
 				if checkAlphabet {
 					fastx.ForcelyOutputFastq = fastxReader.IsFastq
@@ -157,41 +174,40 @@ Attention:
 					}
 				}
 
-				if _, ok := counter[subject]; ok { // duplicated
-					counter[subject]++
+				matched := subject
+				_, duplicated := counter[subject]
+				subjectRC := subject
+				if !duplicated && bySeq && revcom && hasComplement(record.Seq.Alphabet) {
+					if ignoreCase {
+						subjectRC = xxhash.Sum64(bytes.ToLower(reverseComplementBases(record.Seq)))
+					} else {
+						subjectRC = xxhash.Sum64(reverseComplementBases(record.Seq))
+					}
+					matched = subjectRC
+					_, duplicated = counter[subjectRC]
+				}
+				if !duplicated && reverseIndex != nil {
+					matched, duplicated = reverseIndex[subject]
+					if !duplicated {
+						matched, duplicated = reverseIndex[subjectRC]
+					}
+				}
+				if duplicated {
 					removed++
 					if saveDupFile {
 						outfhDup.Write(record.Format(config.LineWidth))
 					}
 					if saveNumFile {
-						names[subject] = append(names[subject], string(record.ID))
+						names[matched] = append(names[matched], string(record.ID))
 					}
-
 					continue
 				}
 
-				if bySeq && revcom && hasComplement(record.Seq.Alphabet) {
-					if ignoreCase {
-						subject = xxhash.Sum64(bytes.ToLower(reverseComplementBases(record.Seq)))
-					} else {
-						subject = xxhash.Sum64(reverseComplementBases(record.Seq))
-					}
-
-					if _, ok := counter[subject]; ok { // duplicated
-						counter[subject]++
-						removed++
-						if saveDupFile {
-							outfhDup.Write(record.Format(config.LineWidth))
-						}
-						if saveNumFile {
-							names[subject] = append(names[subject], string(record.ID))
-						}
-						continue
-					}
-				}
-
 				record.FormatToWriter(outfh, config.LineWidth)
-				counter[subject]++
+				counter[subject] = subjectRC
+				if reverseIndex != nil {
+					reverseIndex[subjectRC] = subject
+				}
 
 				if saveNumFile {
 					names[subject] = []string{string(record.ID)}

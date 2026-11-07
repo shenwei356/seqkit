@@ -1,11 +1,66 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
+
+// TestRmdupMixedAlphabets matches either supported orientation across file types.
+func TestRmdupMixedAlphabets(t *testing.T) {
+	for _, second := range []struct{ name, prefix, sequence string }{
+		{"protein-identical", ">p0\nMELK\n", "AAG"},
+		{"protein-complement", ">p0\nMELK\n", "CTT"},
+		{"rna-identical", ">p0\nUUUU\n", "AAG"},
+		{"rna-complement", ">p0\nUUUU\n", "CUU"},
+	} {
+		for _, reverseOrder := range []bool{false, true} {
+			for _, ignoreCase := range []bool{false, true} {
+				for _, positive := range []bool{false, true} {
+					t.Run(fmt.Sprintf("%s/reverse=%v/ignore=%v/positive=%v", second.name, reverseOrder, ignoreCase, positive), func(t *testing.T) {
+						dir := t.TempDir()
+						firstText := ">d\nAAG\n"
+						text := second.sequence
+						if ignoreCase {
+							text = strings.ToLower(text)
+						}
+						secondText := second.prefix + ">p1\n" + text + "\n"
+						first := auditInput(t, dir, "first.fa", firstText)
+						last := auditInput(t, dir, "last.fa", secondText)
+						files := []string{first, last}
+						want := firstText + second.prefix
+						wantDup, wantIDs := ">p1\n"+text+"\n", "2\td, p1\n"
+						if reverseOrder {
+							files = []string{last, first}
+							want, wantDup, wantIDs = secondText, firstText, "2\tp1, d\n"
+						}
+						args := []string{"rmdup", "-s"}
+						if ignoreCase {
+							args = append(args, "-i")
+						}
+						if positive {
+							args = append(args, "-P")
+							if second.sequence != "AAG" {
+								want += wantDup
+								wantDup, wantIDs = "", ""
+							}
+						}
+						duplicates, ids := filepath.Join(dir, "duplicates.fa"), filepath.Join(dir, "ids.tsv")
+						args = append(args, "-d", duplicates, "-D", ids)
+						out, stderr, err := runCLI(t, "", append(args, files...)...)
+						dup, dupErr := os.ReadFile(duplicates)
+						idText, idErr := os.ReadFile(ids)
+						if err != nil || dupErr != nil || idErr != nil || out != want || string(dup) != wantDup || string(idText) != wantIDs {
+							t.Fatalf("output=%q duplicates=%q ids=%q: %v %s", out, dup, idText, err, stderr)
+						}
+					})
+				}
+			}
+		}
+	}
+}
 
 // TestRmdupMixedFileFormats preserves each input file's format.
 func TestRmdupMixedFileFormats(t *testing.T) {

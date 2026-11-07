@@ -2654,6 +2654,7 @@ Attention:
   1. When comparing by sequences, both positive and negative strands are
      compared. Switch on -P/--only-positive-strand for considering the
      positive strand only. Protein sequences are compared without reversal.
+     Identical sequences match even when input files have different sequence types.
   2. Only the first record is saved for duplicates.
 
 Usage:
@@ -2708,6 +2709,7 @@ Note:
      a) Both positive and negative strands are compared. You can switch on
         -P/--only-positive-strand for considering the positive strand only.
         Protein sequences are compared without reversal.
+        Identical sequences match even when input files have different sequence types.
      b) You can switch on -e/--check-embedded-seqs to check embedded sequences.
           e.g, for file A and B, the reverse complement sequence of CCCC from file B
           is a part of TTGGGGTT from file A, we will extract and output GGGG from file A.
