@@ -60,19 +60,13 @@ For returning the last N records, use:
 
 		var length int64
 		var err error
-		if setLength && lengthS != "" {
+		if setLength {
 			length, err = parseSequenceLength(lengthS)
-			if err != nil {
-				checkError(fmt.Errorf("parsing length: %s", lengthS))
+			if err != nil || length < 1 {
+				checkError(fmt.Errorf("invalid sequence length: %q", lengthS))
 			}
-
-			if length > 0 {
-				number = 0
-			}
-		}
-
-		if number > 0 && length > 0 {
-			checkError(fmt.Errorf("-n/--number is incompatible with -l/--length"))
+			// An explicitly supplied length overrides the record count.
+			number = 0
 		}
 		byRecords := number > 0
 

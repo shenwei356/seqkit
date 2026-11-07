@@ -3417,6 +3417,9 @@ applies to two-pass sampling by number or proportion.
 
 ## head
 
+When using `-l/--length`, the length must be at least 1 bp after unit conversion.
+This option overrides `-n/--number`.
+
 Usage
 
 ```text

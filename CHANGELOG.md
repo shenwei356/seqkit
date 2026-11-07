@@ -82,6 +82,8 @@
         - Reduce memory use when searching a region with `-R`.
     - `seqkit grep/locate`:
         - Preserve DNA reverse-strand matches after protein input files, and search protein sequences only on the positive strand in all search modes.
+    - `seqkit head`:
+        - Reject empty or nonpositive length limits, including values below 1 bp, before modifying output files.
     - `seqkit head/split2`:
         - Use base-1000 K/M/G/T suffixes for sequence lengths. Buffer sizes and file-growth thresholds retain base 1024; help now identifies each base.
     - `seqkit locate`:
