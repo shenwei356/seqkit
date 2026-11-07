@@ -225,16 +225,20 @@ func (p *SeqColorizer) ColorNucleic(seq []byte) []byte {
 	return res
 }
 
-// ColorNucleic adds ANSI colors to DNA/RNA, use quality palette as background.
+// ColorNucleicWithQuals colors wrapped DNA/RNA with the corresponding quality backgrounds.
 func (p *SeqColorizer) ColorNucleicWithQuals(seq []byte, quals []byte) []byte {
 	res := make([]byte, 0, len(seq)*4)
 	qIdx := 0
 	for _, base := range seq {
 		if color, ok := p.NucPalette[base]; ok {
 			res = append(res, []byte(au.Sprintf("%s", au.Colorize(string(base), color|p.QualBgPalette[quals[qIdx]])))...)
-			qIdx++
 		} else {
 			res = append(res, base)
+		}
+		// Wrapping inserts newlines; every original character consumes a quality,
+		// including gaps and other characters without a foreground color.
+		if base != '\n' {
+			qIdx++
 		}
 	}
 	return res

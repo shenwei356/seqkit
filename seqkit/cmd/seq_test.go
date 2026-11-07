@@ -103,3 +103,21 @@ func TestSeqNucleotideConversion(t *testing.T) {
 		})
 	}
 }
+
+// TestSeqColorQualityPositions keeps qualities aligned after uncolored bases and wrapping.
+func TestSeqColorQualityPositions(t *testing.T) {
+	for _, width := range []string{"0", "2"} {
+		t.Run(width, func(t *testing.T) {
+			// Compare C's ANSI style with its standalone rendering at the same quality.
+			reference, stderr, err := runCLI(t, "@s\nC\n+\nI\n", "seq", "-k", "-s")
+			if err != nil {
+				t.Fatalf("reference: %v %s", err, stderr)
+			}
+			want := strings.TrimSuffix(reference, "\n")
+			out, stderr, err := runCLI(t, "@s\nA-C\n+\nI!I\n", "seq", "-k", "-w", width)
+			if err != nil || !strings.Contains(out, want) {
+				t.Fatalf("quality color shifted after gap: %q, want style %q: %v %s", out, want, err, stderr)
+			}
+		})
+	}
+}
