@@ -10,6 +10,33 @@ import (
 	"github.com/biogo/hts/sam"
 )
 
+// TestFishBAMDuplicateReferenceIDs rejects ambiguous BAM dictionaries before
+// replacing an existing BAM, including duplicates supplied through separate files.
+func TestFishBAMDuplicateReferenceIDs(t *testing.T) {
+	for _, fullHeader := range []bool{false, true} {
+		for _, separateFiles := range []bool{false, true} {
+			dir := t.TempDir()
+			output := auditInput(t, dir, "hits.bam", "keep\n")
+			args := []string{"fish", "-F", "ACGT", "-s", "-b", output}
+			if fullHeader {
+				args = append(args, "-D")
+			}
+			input := ">r\nACGT\n>r\nACGTT\n"
+			if separateFiles {
+				first := auditInput(t, dir, "first.fa", ">r\nACGT\n")
+				second := auditInput(t, dir, "second.fa", ">r\nACGTT\n")
+				args = append(args, first, second)
+				input = ""
+			}
+			_, stderr, err := runCLI(t, input, args...)
+			data, readErr := os.ReadFile(output)
+			if err == nil || !strings.Contains(stderr, "duplicate reference ID") || readErr != nil || string(data) != "keep\n" {
+				t.Fatalf("duplicate reference IDs corrupted BAM: %v %s", err, stderr)
+			}
+		}
+	}
+}
+
 // TestFishBAMEmptyReferences skips zero-length BAM references without shifting
 // later reference IDs or dropping empty records from pass-through output.
 func TestFishBAMEmptyReferences(t *testing.T) {

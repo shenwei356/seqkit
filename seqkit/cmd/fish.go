@@ -138,6 +138,7 @@ Attention:
   7. BAM output has one primary alignment per query ID: the highest-scoring
      hit across all references and ranges, with ties resolved by output order.
   8. Empty reference records are omitted from BAM headers and retained with -x.
+     Nonempty reference records must have unique IDs when writing BAM.
 
 `,
 
@@ -280,10 +281,18 @@ Attention:
 
 					// Empty records cannot match and BAM reference lengths must be positive.
 					if flagBam != "" && len(record.Seq.Seq) > 0 {
-						nr, err := sam.NewReference(string(record.ID), "", "", len(record.Seq.Seq), nil, nil)
+						// BAM identity uses the ID even when -D changes the text display.
+						name := string(record.ID)
+						if _, exists := refMap[name]; exists {
+							checkError(fmt.Errorf("duplicate reference ID %q: BAM output requires unique reference IDs", name))
+						}
+						nr, err := sam.NewReference(name, "", "", len(record.Seq.Seq), nil, nil)
 						checkError(err)
-						refMap[refId] = len(samRefs)
+						refMap[name] = len(samRefs)
 						samRefs = append(samRefs, nr)
+						for _, hit := range hits {
+							hit.Ref.Name = name
+						}
 						alns = append(alns, hits...)
 					}
 				} else {

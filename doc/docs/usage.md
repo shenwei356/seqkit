@@ -2311,6 +2311,7 @@ Attention:
   7. BAM output has one primary alignment per query ID: the highest-scoring
      hit across all references and ranges, with ties resolved by output order.
   8. Empty reference records are omitted from BAM headers and retained with -x.
+     Nonempty reference records must have unique IDs when writing BAM.
 
 Usage:
   seqkit fish [flags]
