@@ -1,11 +1,33 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 )
+
+// TestRenameLargeStartNumber keeps suffixes increasing past the platform int limit.
+func TestRenameLargeStartNumber(t *testing.T) {
+	start := int(^uint(0) >> 1)
+	for _, first := range []bool{false, true} {
+		args := []string{"rename", "-N", strconv.Itoa(start)}
+		want := ">r\nAC\n"
+		if first {
+			args = append(args, "-1")
+			want = fmt.Sprintf(">r_%d\nAC\n", uint64(start)-1)
+		}
+		for i := uint64(0); i < 3; i++ {
+			want += fmt.Sprintf(">r_%d\nAC\n", uint64(start)+i)
+		}
+		out, stderr, err := runCLI(t, strings.Repeat(">r\nAC\n", 4), args...)
+		if err != nil || out != want {
+			t.Fatalf("first=%v: %q, want %q: %v %s", first, out, want, err, stderr)
+		}
+	}
+}
 
 // TestRenameMixedFileFormats preserves each input file's format.
 func TestRenameMixedFileFormats(t *testing.T) {

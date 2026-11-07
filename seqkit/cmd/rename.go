@@ -79,7 +79,7 @@ Example:
 		force := getFlagBool(cmd, "force")
 
 		separator := getFlagString(cmd, "separator")
-		startNum := getFlagPositiveInt(cmd, "start-num")
+		startNum := uint64(getFlagPositiveInt(cmd, "start-num"))
 		rename1st := getFlagBool(cmd, "rename-1st-rec")
 
 		var outfh *xopen.Writer
@@ -113,7 +113,8 @@ Example:
 		var newID string
 		var k uint64
 		var ok bool
-		numbers := make(map[uint64]int)
+		// Suffixes may exceed MaxInt when a valid starting number is near the limit.
+		numbers := make(map[uint64]uint64)
 		emitted := make(map[uint64]struct{}) // Reserve actual output IDs/names, including generated suffixes.
 		for _, file := range files {
 			func(file string) {
@@ -160,7 +161,7 @@ Example:
 					numbers[k]++
 					_, ok = emitted[k]
 					if numbers[k] > 1 || rename1st || ok {
-						count := numbers[k] - 2 + startNum
+						count := numbers[k] - 1 + (startNum - 1)
 						if numbers[k] == 1 && !rename1st {
 							count++
 						}
@@ -175,7 +176,7 @@ Example:
 								outputKey = xxhash.Sum64String(name)
 							}
 							if _, exists := emitted[outputKey]; !exists {
-								numbers[k] = count - startNum + 2
+								numbers[k] = count - (startNum - 1) + 1
 								record.Name = []byte(name)
 								emitted[outputKey] = struct{}{}
 								break

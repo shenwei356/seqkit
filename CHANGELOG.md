@@ -125,6 +125,8 @@
         - Stop reading at the requested positive end, without parsing later records.
         - Handle extremely negative ranges without integer overflow, and preserve FASTA line wrapping after skipped FASTQ inputs.
         - Reduce memory allocations when selecting trailing records.
+    - `seqkit rename`:
+        - Keep duplicate suffixes increasing when `-N/--start-num` is near the platform integer limit.
     - `seqkit replace`:
         - Report damaged key-value files before modifying output files.
         - Preserve dollar signs in file names inserted with `{fn}`, `{fbn}`, or `{fbne}`.
