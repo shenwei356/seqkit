@@ -187,6 +187,7 @@
     - `seqkit seq/replace`:
         - Avoid crashes with empty filter patterns; search reverse complements for DNA/RNA regular-expression filters and avoid reversed protein matches.
     - `seqkit seq`:
+        - Convert every selected record with `--rna2dna` or `--dna2rna`, even when the first record already has the target alphabet.
         - Apply a zero maximum-quality threshold and reject nonfinite quality limits.
 - [SeqKit v2.14.0](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0) - 2026-09-24
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.14.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0)

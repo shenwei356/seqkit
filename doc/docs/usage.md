@@ -359,6 +359,9 @@ Only DNA and gtf/bed data of Chr1 were used:
 
 ## seq
 
+`--dna2rna` replaces T/t with U/u, and `--rna2dna` replaces U/u with T/t,
+in every selected record. Both preserve letter case and FASTQ qualities.
+
 Usage
 
 ``` text

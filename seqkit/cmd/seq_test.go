@@ -69,3 +69,37 @@ func TestSeqEditFilters(t *testing.T) { assertEditFilterContracts(t, []string{"s
 func TestSeqDamagedAuxiliaryInput(t *testing.T) {
 	assertDamagedTextInput(t, "r\n", "seq", "--f-pattern-file")
 }
+
+// TestSeqNucleotideConversion checks every selected record, not the first alphabet guess.
+func TestSeqNucleotideConversion(t *testing.T) {
+	for _, tc := range []struct{ flag, input, want string }{
+		{"--rna2dna", "ACG", "ACG"},
+		{"--rna2dna", "AUgu", "ATgt"},
+		{"--dna2rna", "AUgu", "AUgu"},
+		{"--dna2rna", "ATgt", "AUgu"},
+	} {
+		t.Run(tc.flag+tc.input, func(t *testing.T) {
+			// The first record already has the target alphabet, but later records may not.
+			first := "ACG"
+			if tc.flag == "--dna2rna" {
+				first = "AUG"
+			}
+			input := ">first\n" + first + "\n>second\n" + tc.input + "\n"
+			want := ">first\n" + first + "\n>second\n" + tc.want + "\n"
+			out, stderr, err := runCLI(t, input, "seq", tc.flag)
+			if err != nil || out != want {
+				t.Fatalf("conversion: %q %v %s", out, err, stderr)
+			}
+			out, stderr, err = runCLI(t, input, "seq", tc.flag, "--f-pattern", "first")
+			if err != nil || out != input {
+				t.Fatalf("unselected record changed: %q %v %s", out, err, stderr)
+			}
+			fq := "@first\n" + first + "\n+\nABC\n@second\n" + tc.input + "\n+\n" + strings.Repeat("I", len(tc.input)) + "\n"
+			fqWant := strings.Replace(fq, "\n"+tc.input+"\n+", "\n"+tc.want+"\n+", 1)
+			out, stderr, err = runCLI(t, fq, "seq", tc.flag)
+			if err != nil || out != fqWant {
+				t.Fatalf("FASTQ conversion: %q %v %s", out, err, stderr)
+			}
+		})
+	}
+}

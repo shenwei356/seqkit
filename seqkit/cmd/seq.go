@@ -461,7 +461,6 @@ Filtering records to edit:
 
 			checkSeqType = true
 			printQual = false
-			once := true
 			if onlySeq || onlyQual {
 				config.LineWidth = 0
 			}
@@ -629,39 +628,25 @@ Filtering records to edit:
 				}
 
 				if printSeq {
+					// The reader guesses an alphabet from only the first record; convert
+					// actual bases in every selected record, preserving case and qualities.
 					if matched && dna2rna {
-						ab := fastxReader.Alphabet()
-						if ab == seq.RNA || ab == seq.RNAredundant {
-							if once {
-								log.Warningf("it's already RNA, no need to convert")
-								once = false
-							}
-						} else {
-							for i, b := range sequence.Seq {
-								switch b {
-								case 't':
-									sequence.Seq[i] = 'u'
-								case 'T':
-									sequence.Seq[i] = 'U'
-								}
+						for i, b := range sequence.Seq {
+							switch b {
+							case 't':
+								sequence.Seq[i] = 'u'
+							case 'T':
+								sequence.Seq[i] = 'U'
 							}
 						}
 					}
 					if matched && rna2dna {
-						ab := fastxReader.Alphabet()
-						if ab == seq.DNA || ab == seq.DNAredundant {
-							if once {
-								log.Warningf("it's already DNA, no need to convert")
-								once = false
-							}
-						} else {
-							for i, b := range sequence.Seq {
-								switch b {
-								case 'u':
-									sequence.Seq[i] = 't'
-								case 'U':
-									sequence.Seq[i] = 'T'
-								}
+						for i, b := range sequence.Seq {
+							switch b {
+							case 'u':
+								sequence.Seq[i] = 't'
+							case 'U':
+								sequence.Seq[i] = 'T'
 							}
 						}
 					}
