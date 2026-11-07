@@ -21,6 +21,8 @@
         - Fixed data races during parallel mismatch searches.
         - Omit false matches on empty records and return the longest amplicon when degenerate primers have overlapping matches.
         - Reduce repeated primer setup when reads do not match or BED output is requested.
+    - `seqkit amplicon/fa2fq`:
+        - Avoid false matches from reversed protein or unrestricted sequences.
     - `seqkit bam`:
         - Validate fields and top-output combinations before processing; require NM only for dependent statistics; fix BAM pass-through, toolbox errors, and retention of completed file statistics on failure. [#616](https://github.com/shenwei356/seqkit/issues/616)
         - Run toolbox stages in YAML order, and reject invalid or empty pipelines before writing output.
@@ -168,7 +170,6 @@
         - Avoid crashes with extremely negative region coordinates.
     - `seqkit fa2fq`:
         - Reject damaged FASTA references and repeated stdin use before opening output files.
-        - Avoid false matches from reversed protein or unrestricted sequences.
     - `seqkit seq/replace`:
         - Avoid crashes with empty filter patterns; search reverse complements for DNA/RNA regular-expression filters and avoid reversed protein matches.
     - `seqkit seq`:

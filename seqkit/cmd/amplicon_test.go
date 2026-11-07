@@ -17,6 +17,39 @@ func TestAmpliconParallelMixedFileFormats(t *testing.T) {
 	assertMixedFileFormats(t, "amplicon", "-P", "-F", "ACGT", "-u", "-m", "1", "-j", "4")
 }
 
+// TestAmpliconProteinStrands preserves unmatched input without reversing proteins.
+func TestAmpliconProteinStrands(t *testing.T) {
+	const input = "@s\nEACG\n+\n1234\n"
+	for _, alphabet := range []string{"protein", "unlimit"} {
+		for _, mismatch := range []string{"0", "1"} {
+			for _, mode := range []string{"", "--bed", "-u"} {
+				args := []string{"amplicon", "-t", alphabet, "-F", "GCA", "-m", mismatch, "-j", "2"}
+				want := ""
+				if mode != "" {
+					args = append(args, mode)
+					if mode == "-u" {
+						want = input
+					}
+				}
+				out, stderr, err := runCLI(t, input, args...)
+				if err != nil || out != want {
+					t.Fatalf("%v: got %q, want %q: %v %s", args, out, want, err, stderr)
+				}
+			}
+		}
+	}
+	// Alphabet restrictions from one file must not suppress later DNA reverse hits.
+	dir := t.TempDir()
+	protein := auditInput(t, dir, "protein.fq", input)
+	dna := auditInput(t, dir, "dna.fq", "@dna\nTTGC\n+\n1234\n")
+	for _, mismatch := range []string{"0", "1"} {
+		out, stderr, err := runCLI(t, "", "amplicon", "-F", "GCA", "-m", mismatch, "-j", "2", protein, dna)
+		if err != nil || out != "@dna\nGCA\n+\n432\n" {
+			t.Fatalf("mixed alphabets with -m %s: %q %v %s", mismatch, out, err, stderr)
+		}
+	}
+}
+
 // TestAmpliconEmptyRecords never searches empty input and preserves -u formatting.
 func TestAmpliconEmptyRecords(t *testing.T) {
 	for _, mismatch := range []string{"0", "1"} {

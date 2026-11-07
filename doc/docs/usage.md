@@ -2361,6 +2361,7 @@ Attention:
   1. Only one (the longest) matching location is returned for every primer pair.
      Overlapping primer matches are included. Empty records have no matches and
      are retained only with -u/--save-unmatched.
+     Protein and unrestricted alphabets are searched only in their original orientation.
   2. Mismatch is allowed, but the mismatch location (5' or 3') is not controlled.
      You can increase the value of "-j/--threads" to accelerate processing.
      You can switch "-M/--output-mismatches" to append total mismatches and
