@@ -20,3 +20,21 @@ func TestFx2tabFileHeader(t *testing.T) {
 		}
 	}
 }
+
+// TestFx2tabGCStatistics preserves mixed-case DNA/RNA counts and zero denominators.
+func TestFx2tabGCStatistics(t *testing.T) {
+	input := ">r\nGggCAaTtUuN\n>empty\n>unknown\nNN\n"
+	for _, tc := range []struct {
+		flags []string
+		want  string
+	}{
+		{[]string{"-G"}, "r\t50.00\nempty\tNaN\nunknown\tNaN\n"},
+		{[]string{"-g"}, "r\t40.00\nempty\tNaN\nunknown\tNaN\n"},
+		{[]string{"-g", "-G"}, "r\t40.00\t50.00\nempty\tNaN\tNaN\nunknown\tNaN\tNaN\n"},
+	} {
+		out, stderr, err := runCLI(t, input, append([]string{"fx2tab", "-i", "-n"}, tc.flags...)...)
+		if err != nil || out != tc.want {
+			t.Fatalf("GC statistics changed: %q %v %s", out, err, stderr)
+		}
+	}
+}

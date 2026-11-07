@@ -215,11 +215,12 @@ Attention:
 				if printGC || printGCSkew {
 					g = record.Seq.BaseCount("G")
 					c = record.Seq.BaseCount("C")
-					a = record.Seq.BaseCount("A")
-					t = record.Seq.BaseCount("TU")
 				}
 
 				if printGC {
+					// GC skew needs only G and C, so count the other bases only for GC content.
+					a = record.Seq.BaseCount("A")
+					t = record.Seq.BaseCount("TU")
 					fmt.Fprintf(outfh, "\t%.2f", float64(g+c)/float64(g+c+a+t)*100)
 				}
 				if printGCSkew {

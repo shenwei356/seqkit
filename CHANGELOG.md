@@ -73,6 +73,7 @@
         - Report invalid quality scores without panicking or emitting partial output. [#598](https://github.com/shenwei356/seqkit/issues/598)
     - `seqkit fx2tab`:
         - Include the file column in the header when using `-H -f`.
+        - Reduce processing time when reporting GC skew with `-G` without `-g`.
     - `seqkit grep`:
         - Added a fast bit-parallel search path for a single pattern of up to 64 characters with 1-4 mismatches, avoiding FM-index construction for each record. by @DylanCosto [#621](https://github.com/shenwei356/seqkit/pull/621)
         - Fixed data races and preserved each file's FASTA/FASTQ formatting during parallel mismatch searches.
