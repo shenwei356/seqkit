@@ -137,8 +137,6 @@ Attention:
 		name2sequence := make([]sequenceSortKey, 0, 1024)
 		name2length := []stringutil.StringCount{}
 
-		// for indexing when output and duplicated sequences checking
-		id2name := make(map[string][]byte)
 		var record *fastx.Record
 		var err error
 
@@ -186,11 +184,10 @@ Attention:
 						name = string(record.ID)
 					}
 
-					if _, ok := id2name[name]; ok {
+					// The record table also detects duplicates without a second name map.
+					if _, ok := sequences[name]; ok {
 						checkError(fmt.Errorf(`duplicated sequences found: %s. use "seqkit rename" to rename duplicated IDs`, name))
 					}
-					id2name[name] = []byte(string(record.Name))
-
 					record2 := record.Clone()
 					sequences[name] = record2
 					if byLength {
@@ -264,6 +261,8 @@ Attention:
 			checkError(fmt.Errorf("no more than one file should be given"))
 		}
 
+		// Indexed output needs full headers to retrieve records by their sort keys.
+		id2name := make(map[string][]byte)
 		file := files[0]
 
 		var alphabet2 *seq.Alphabet

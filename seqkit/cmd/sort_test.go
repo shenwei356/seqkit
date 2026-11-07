@@ -6,8 +6,34 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
+
+// TestSortDuplicatesAcrossFiles keeps duplicate validation ahead of output creation.
+func TestSortDuplicatesAcrossFiles(t *testing.T) {
+	for _, flags := range [][]string{nil, {"-n"}, {"-s"}, {"-l"}, {"-b"}, {"--id-regexp", "^(r[0-9]+)"}} {
+		t.Run(strings.Join(flags, " "), func(t *testing.T) {
+			dir := t.TempDir()
+			first := auditInput(t, dir, "first.fa", ">r1_a\nACGT\n")
+			id := "r1_a"
+			if len(flags) == 2 {
+				id = "r1_b"
+			}
+			second := auditInput(t, dir, "second.fa", ">"+id+"\nTGCA\n")
+			output := auditInput(t, dir, "out.fa", "keep\n")
+			args := append([]string{"sort", first, second, "-o", output}, flags...)
+			_, stderr, err := runCLI(t, "", args...)
+			if err == nil || !strings.Contains(stderr, "duplicated sequences found") {
+				t.Fatalf("duplicate not rejected: %v %s", err, stderr)
+			}
+			data, err := os.ReadFile(output)
+			if err != nil || string(data) != "keep\n" {
+				t.Fatalf("output changed before validation: %v", err)
+			}
+		})
+	}
+}
 
 // TestSortEmptyOutput keeps empty two-pass results consistent with one-pass output.
 func TestSortEmptyOutput(t *testing.T) {
