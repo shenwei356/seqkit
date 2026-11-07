@@ -13,6 +13,39 @@ import (
 	"time"
 )
 
+// TestScatCompressedFileDiscovery covers every supported codec and --gz-only.
+func TestScatCompressedFileDiscovery(t *testing.T) {
+	for _, format := range []string{"fasta", "fastq"} {
+		for _, extension := range []string{".gz", ".xz", ".zst", ".bz2", ".lz4"} {
+			t.Run(format+extension, func(t *testing.T) {
+				dir := t.TempDir()
+				input, suffix := ">r\nACGT\n", ".fa"
+				if format == "fastq" {
+					input, suffix = "@r\nACGT\n+\n!I?J\n", ".fq"
+				}
+				file := filepath.Join(dir, "input"+suffix+extension)
+				if err := os.WriteFile(file, compressedInput(t, extension, input), 0600); err != nil {
+					t.Fatal(err)
+				}
+				for _, gzipOnly := range []bool{false, true} {
+					args := []string{"scat", "-f", "-i", format, dir, "--quiet"}
+					want := input
+					if gzipOnly {
+						args = append(args, "-g")
+						if extension != ".gz" {
+							want = ""
+						}
+					}
+					out, stderr, err := runCLI(t, "", args...)
+					if err != nil || out != want {
+						t.Fatalf("gz-only=%v output=%q want=%q: %v %s", gzipOnly, out, want, err, stderr)
+					}
+				}
+			})
+		}
+	}
+}
+
 // TestScatScanErrorsAndDirectoryAliases retains good records and reports bad links.
 func TestScatScanErrorsAndDirectoryAliases(t *testing.T) {
 	dir := t.TempDir()

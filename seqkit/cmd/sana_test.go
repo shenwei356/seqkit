@@ -1,10 +1,52 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
 )
+
+// TestSimpleSeqQualityFormatting preserves quality offsets and rune conversion.
+func TestSimpleSeqQualityFormatting(t *testing.T) {
+	for _, tc := range []struct {
+		base      int
+		qualities []int
+		want      string
+	}{
+		{33, []int{0, 40, 93}, "!I~"},
+		{64, []int{0, 1, 40}, "@Ah"},
+		{33, []int{200, -34, 0x110000}, "é��"},
+	} {
+		record := &simpleSeq{Id: "r", Seq: "ACG", Sep: "+", Qual: tc.qualities, QBase: tc.base}
+		want := "@r\nACG\n+\n" + tc.want
+		if got := record.FastqString(); got != want || record.String() != want {
+			t.Fatalf("quality formatting changed: got %q, want %q", got, want)
+		}
+	}
+}
+
+// BenchmarkSimpleSeqFastqString includes reconstruction of a complete FASTQ record.
+func BenchmarkSimpleSeqFastqString(b *testing.B) {
+	for _, length := range []int{150, 10000} {
+		b.Run(fmt.Sprint(length), func(b *testing.B) {
+			record := &simpleSeq{Id: "r", Seq: strings.Repeat("A", length), Sep: "+", QBase: 33, Qual: make([]int, length)}
+			for i := range record.Qual {
+				record.Qual[i] = 40
+			}
+			b.ReportAllocs()
+			b.SetBytes(int64(length * 2))
+			b.ResetTimer()
+			var output string
+			for i := 0; i < b.N; i++ {
+				output = record.FastqString()
+			}
+			if len(output) != length*2+6 {
+				b.Fatal("incomplete FASTQ output")
+			}
+		})
+	}
+}
 
 // TestSanaFASTARecovery checks CRLF, empty IDs and complete physical-line logs.
 func TestSanaFASTARecovery(t *testing.T) {

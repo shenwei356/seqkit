@@ -180,11 +180,7 @@ func (s *simpleSeq) String() string {
 	if len(s.Qual) == 0 {
 		return fmt.Sprintf(">%s\n%s", s.Id, s.Seq)
 	}
-	qs := make([]string, len(s.Qual))
-	for i, qq := range s.Qual {
-		qs[i] = string(rune(qq + s.QBase))
-	}
-	return fmt.Sprintf("@%s\n%s\n%s\n%s", s.Id, s.Seq, s.Sep, strings.Join(qs, ""))
+	return s.FastqString()
 }
 
 // Format generates a string representation in the specified format of a pointer to simpleSeq.
@@ -203,11 +199,21 @@ func (s *simpleSeq) FastqString() string {
 	if len(s.Qual) == 0 {
 		return fmt.Sprintf("@%s\n%s\n+\n%s", s.Id, s.Seq, strings.Repeat("I", len(s.Seq)))
 	}
-	qs := make([]string, len(s.Qual))
-	for i, qq := range s.Qual {
-		qs[i] = string(rune(qq + s.QBase))
+	// Build the complete record once instead of allocating a string per quality.
+	// WriteRune preserves the existing conversion for non-ASCII and invalid runes.
+	var output strings.Builder
+	output.Grow(len(s.Id) + len(s.Seq) + len(s.Sep) + len(s.Qual) + 4)
+	output.WriteByte('@')
+	output.WriteString(s.Id)
+	output.WriteByte('\n')
+	output.WriteString(s.Seq)
+	output.WriteByte('\n')
+	output.WriteString(s.Sep)
+	output.WriteByte('\n')
+	for _, quality := range s.Qual {
+		output.WriteRune(rune(quality + s.QBase))
 	}
-	return fmt.Sprintf("@%s\n%s\n%s\n%s", s.Id, s.Seq, s.Sep, strings.Join(qs, ""))
+	return output.String()
 }
 
 // String generates a fasta string representation of a pointer to simpleSeq.

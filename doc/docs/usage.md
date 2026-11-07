@@ -1360,6 +1360,8 @@ Flags:
   -p, --wait-pid int          after process with this PID exited (default -1)
 ```
 
+Default file discovery includes `.gz`, `.xz`, `.zst`, `.bz2`, and `.lz4` inputs. Use `-g` to restrict discovery to `.gz` files.
+
 Examples
 
 1. Concatenate all fastq files recursively under a directory

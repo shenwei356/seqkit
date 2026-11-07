@@ -110,7 +110,7 @@ Attention:
 		delta := getFlagInt(cmd, "delta") * 1024
 		reStr := getFlagString(cmd, "regexp")
 		var err error
-		compressionSuffix := `(\.(gz|xz|zst|bz2))?`
+		compressionSuffix := `(\.(gz|xz|zst|bz2|lz4))?`
 		if gzOnly {
 			compressionSuffix = `\.gz`
 		}
