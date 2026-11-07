@@ -143,6 +143,8 @@
         - Exclude newly created output files and their aliases from watched inputs to avoid repeated output.
     - `seqkit shuffle`:
         - Normalize CRLF sequence lines in two-pass output. [#615](https://github.com/shenwei356/seqkit/issues/615)
+    - `seqkit shuffle/sort`:
+        - Create valid empty output files in two-pass mode instead of leaving missing files or stale output.
     - `seqkit shuffle/sort/split`:
         - Report errors when reading sequence IDs and lengths from FASTA indexes.
         - Improved two-pass processing and duplicate-header handling.

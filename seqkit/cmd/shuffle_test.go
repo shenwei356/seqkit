@@ -5,6 +5,11 @@ import (
 	"testing"
 )
 
+// TestShuffleEmptyOutput creates valid empty output in both processing modes.
+func TestShuffleEmptyOutput(t *testing.T) {
+	assertEmptyOrderingOutput(t, "shuffle")
+}
+
 // TestShuffleMixedFileFormats retains formats after records change order.
 func TestShuffleMixedFileFormats(t *testing.T) {
 	dir := t.TempDir()

@@ -218,7 +218,7 @@ Attention:
 
 		if len(faidx.Index) == 0 {
 			log.Warningf("  0 records loaded from %s, please check if it matches the fasta file, or switch on the flag -U/--update-faidx", fileFai)
-			return
+			// Continue to create or truncate output, including compression headers.
 		} else if !quiet {
 			log.Infof("  %d records loaded from %s", len(faidx.Index), fileFai)
 		}
