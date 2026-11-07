@@ -66,11 +66,18 @@ fish:
 		outfile := getFlagString(cmd, "file")
 		shell := getFlagString(cmd, "shell")
 
+		// Validate the shell before creating output directories or files.
+		switch shell {
+		case "bash", "zsh", "fish", "powershell":
+		default:
+			checkError(fmt.Errorf("unsupported shell: %s", shell))
+		}
+
 		dir := filepath.Dir(outfile)
 		ok, err := pathutil.DirExists(dir)
 		checkError(err)
 		if !ok {
-			os.MkdirAll(dir, 0744)
+			checkError(os.MkdirAll(dir, 0744))
 		}
 
 		switch shell {
@@ -82,8 +89,6 @@ fish:
 			checkError(cmd.Root().GenFishCompletionFile(outfile, true))
 		case "powershell":
 			checkError(cmd.Root().GenPowerShellCompletionFile(outfile))
-		default:
-			checkError(fmt.Errorf("unsupported shell: %s", shell))
 		}
 
 		log.Infof("%s completion file for seqkit saved to %s", shell, outfile)
