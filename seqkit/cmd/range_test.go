@@ -1,12 +1,41 @@
 package cmd
 
 import (
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/shenwei356/bio/seqio/fastx"
 )
+
+// TestRangeReversedBounds rejects invalid order before touching output files.
+func TestRangeReversedBounds(t *testing.T) {
+	for _, region := range []string{"2:1", "-1:-2"} {
+		t.Run(region, func(t *testing.T) {
+			output := filepath.Join(t.TempDir(), "output.fa")
+			if err := os.WriteFile(output, []byte("keep\n"), 0600); err != nil {
+				t.Fatal(err)
+			}
+			_, stderr, err := runCLI(t, ">r1\nAC\n>r2\nGT\n", "range", "-r", region, "-o", output)
+			if err == nil || !strings.Contains(stderr, "start should be <= end") {
+				t.Fatalf("expected invalid range error: %v %s", err, stderr)
+			}
+			data, err := os.ReadFile(output)
+			if err != nil || string(data) != "keep\n" {
+				t.Fatalf("output changed: %q %v", data, err)
+			}
+		})
+	}
+	// Equal endpoints remain valid for selecting one record from either end.
+	for _, region := range []string{"2:2", "-1:-1"} {
+		out, stderr, err := runCLI(t, ">r1\nAC\n>r2\nGT\n", "range", "-r", region)
+		if err != nil || out != ">r2\nGT\n" {
+			t.Fatalf("range %s: %q %v %s", region, out, err, stderr)
+		}
+	}
+}
 
 // TestRangeMixedFileFormats preserves each input file's format.
 func TestRangeMixedFileFormats(t *testing.T) {

@@ -124,6 +124,7 @@
     - `seqkit pair/rename/split/split2`:
         - Preserve unrelated output-directory files, even with `--force`. [#620](https://github.com/shenwei356/seqkit/issues/620)
     - `seqkit range`:
+        - Reject reversed positive ranges before changing output files, consistently with negative ranges.
         - Stop reading at the requested positive end without parsing later records.
         - Handle extremely negative ranges and preserve FASTA wrapping after skipped FASTQ inputs.
     - `seqkit rename`:

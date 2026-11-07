@@ -41,6 +41,8 @@ var rangeCmd = &cobra.Command{
 	Short: "print FASTA/Q records in a range (start:end)",
 	Long: `print FASTA/Q records in a range (start:end)
 
+When start and end have the same sign, start must be <= end.
+
 Examples:
   1. leading 100 records (head -n 100)
       seqkit range -r 1:100
@@ -84,8 +86,9 @@ Examples:
 		if start < 0 && end > 0 {
 			checkError(fmt.Errorf("when start < 0, end should not > 0"))
 		}
-		if start < 0 && end < 0 && start > end {
-			checkError(fmt.Errorf("when start < 0 and end < 0, start should be < end"))
+		// Validate either coordinate convention before opening the output.
+		if (start > 0 && end > 0 || start < 0 && end < 0) && start > end {
+			checkError(fmt.Errorf("when start and end have the same sign, start should be <= end"))
 		}
 		if start > 0 && end < 0 && end != -1 {
 			checkError(fmt.Errorf("not supported range: %d:%d, the end needs to be -1 when start > 0 and end < 0", start, end))

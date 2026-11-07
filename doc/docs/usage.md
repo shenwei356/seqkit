@@ -3574,6 +3574,8 @@ $ seqkit range -h
 
 print FASTA/Q records in a range (start:end)
 
+When start and end have the same sign, start must be <= end.
+
 Examples:
   1. leading 100 records (head -n 100)
       seqkit range -r 1:100
