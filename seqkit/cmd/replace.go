@@ -33,7 +33,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
-	"github.com/shenwei356/breader"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -228,55 +227,49 @@ Filtering records to edit:
 		var pbyte []byte
 		if fpatternFile != "" {
 			checkOutputFiles([]string{fpatternFile}, []string{outFile}, true)
-			var reader *breader.BufferedReader
-			reader, err = breader.NewDefaultBufferedReader(fpatternFile)
-			checkError(err)
-			for chunk := range reader.Ch {
-				checkError(chunk.Err)
-				for _, data := range chunk.Data {
-					p := data.(string)
-					if p == "" {
-						continue
-					}
+			for p, readErr := range readTextLines(fpatternFile) {
+				checkError(readErr)
+				if p == "" {
+					continue
+				}
 
-					if !quiet {
-						if p[0] == '>' {
-							log.Warningf(`symbol ">" detected, it should not be a part of the sequence ID/name: %s`, p)
-						} else if p[0] == '@' {
-							log.Warningf(`symbol "@" detected, it should not be a part of the sequence ID/name. %s`, p)
-						} else if !fbyName && usingDefaultIDRegexp && strings.ContainsAny(p, "\t ") {
-							log.Warningf("space found in pattern, you may need use --f-by-name: %s", p)
-						}
+				if !quiet {
+					if p[0] == '>' {
+						log.Warningf(`symbol ">" detected, it should not be a part of the sequence ID/name: %s`, p)
+					} else if p[0] == '@' {
+						log.Warningf(`symbol "@" detected, it should not be a part of the sequence ID/name. %s`, p)
+					} else if !fbyName && usingDefaultIDRegexp && strings.ContainsAny(p, "\t ") {
+						log.Warningf("space found in pattern, you may need use --f-by-name: %s", p)
 					}
+				}
 
-					if fuseRegexp {
+				if fuseRegexp {
+					if fignoreCase {
+						p = "(?i)" + p
+					}
+					r, err := regexp.Compile(p)
+					checkError(err)
+					patternsR[xxhash.Sum64String(p)] = r
+				} else if fbySeq {
+					pbyte = []byte(p)
+					if seq.DNAredundant.IsValid(pbyte) == nil ||
+						seq.RNAredundant.IsValid(pbyte) == nil ||
+						seq.Protein.IsValid(pbyte) == nil { // legal sequence
 						if fignoreCase {
-							p = "(?i)" + p
-						}
-						r, err := regexp.Compile(p)
-						checkError(err)
-						patternsR[xxhash.Sum64String(p)] = r
-					} else if fbySeq {
-						pbyte = []byte(p)
-						if seq.DNAredundant.IsValid(pbyte) == nil ||
-							seq.RNAredundant.IsValid(pbyte) == nil ||
-							seq.Protein.IsValid(pbyte) == nil { // legal sequence
-							if fignoreCase {
-								// patternsS[strings.ToLower(p)] = struct{}{}
-								patternsS = append(patternsS, bytes.ToLower(pbyte))
-							} else {
-								// patternsS[p] = struct{}{}
-								patternsS = append(patternsS, pbyte)
-							}
+							// patternsS[strings.ToLower(p)] = struct{}{}
+							patternsS = append(patternsS, bytes.ToLower(pbyte))
 						} else {
-							checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", p))
+							// patternsS[p] = struct{}{}
+							patternsS = append(patternsS, pbyte)
 						}
 					} else {
-						if fignoreCase {
-							patternsN[xxhash.Sum64String(strings.ToLower(p))] = struct{}{}
-						} else {
-							patternsN[xxhash.Sum64String(p)] = struct{}{}
-						}
+						checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", p))
+					}
+				} else {
+					if fignoreCase {
+						patternsN[xxhash.Sum64String(strings.ToLower(p))] = struct{}{}
+					} else {
+						patternsN[xxhash.Sum64String(p)] = struct{}{}
 					}
 				}
 			}

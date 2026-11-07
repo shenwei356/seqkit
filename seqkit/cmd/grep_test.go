@@ -161,3 +161,8 @@ func TestGrepExtremeRegionCoordinates(t *testing.T) {
 		}
 	}
 }
+
+// TestGrepDamagedAuxiliaryInput rejects incomplete auxiliary data.
+func TestGrepDamagedAuxiliaryInput(t *testing.T) {
+	assertDamagedTextInput(t, "r\n", "grep", "-f")
+}

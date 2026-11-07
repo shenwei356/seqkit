@@ -32,7 +32,6 @@ import (
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
-	"github.com/shenwei356/breader"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -102,19 +101,10 @@ Examples:
 		regions := make([]string, 0, 256)
 		if regionFile != "" {
 			checkOutputFiles([]string{regionFile}, []string{config.OutFile}, true)
-			var reader *breader.BufferedReader
-			reader, err = breader.NewDefaultBufferedReader(regionFile)
-			checkError(err)
-			var data interface{}
-			var r string
-			for chunk := range reader.Ch {
-				checkError(chunk.Err)
-				for _, data = range chunk.Data {
-					r = data.(string)
-					if r == "" {
-						continue
-					}
-					regions = append(regions, r)
+			for region, readErr := range readTextLines(regionFile) {
+				checkError(readErr)
+				if region != "" {
+					regions = append(regions, region)
 				}
 			}
 			if !quiet {

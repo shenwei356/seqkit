@@ -325,3 +325,8 @@ func TestSubseqRepeatedIndexedID(t *testing.T) {
 		}
 	}
 }
+
+// TestSubseqDamagedAuxiliaryInput rejects incomplete auxiliary data.
+func TestSubseqDamagedAuxiliaryInput(t *testing.T) {
+	assertDamagedTextInput(t, "r\t0\t2\n", "subseq", "--bed")
+}

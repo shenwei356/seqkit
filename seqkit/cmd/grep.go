@@ -35,7 +35,6 @@ import (
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
-	"github.com/shenwei356/breader"
 	"github.com/shenwei356/bwt/fmi"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
@@ -215,65 +214,59 @@ Examples:
 		var pbyte []byte
 		if patternFile != "" {
 			checkOutputFiles([]string{patternFile}, []string{outFile}, true)
-			var reader *breader.BufferedReader
-			reader, err = breader.NewDefaultBufferedReader(patternFile)
-			checkError(err)
-			for chunk := range reader.Ch {
-				checkError(chunk.Err)
-				for _, data := range chunk.Data {
-					p := data.(string)
-					if p == "" {
-						continue
-					}
+			for p, readErr := range readTextLines(patternFile) {
+				checkError(readErr)
+				if p == "" {
+					continue
+				}
 
-					if !quiet {
-						if p[0] == '>' {
-							log.Warningf(`symbol ">" detected, it should not be a part of the sequence ID/name: %s`, p)
-						} else if p[0] == '@' {
-							log.Warningf(`symbol "@" detected, it should not be a part of the sequence ID/name. %s`, p)
-						} else if !byName && usingDefaultIDRegexp && strings.ContainsAny(p, "\t ") {
-							log.Warningf("space found in pattern, you may need use -n/--by-name: %s", p)
-						}
+				if !quiet {
+					if p[0] == '>' {
+						log.Warningf(`symbol ">" detected, it should not be a part of the sequence ID/name: %s`, p)
+					} else if p[0] == '@' {
+						log.Warningf(`symbol "@" detected, it should not be a part of the sequence ID/name. %s`, p)
+					} else if !byName && usingDefaultIDRegexp && strings.ContainsAny(p, "\t ") {
+						log.Warningf("space found in pattern, you may need use -n/--by-name: %s", p)
 					}
+				}
 
-					if degenerate || useRegexp {
-						if degenerate {
-							pattern2seq, err = seq.NewSeq(alphabet, []byte(p))
-							if err != nil {
-								checkError(fmt.Errorf("it seems that flag -d is given, but you provide regular expression instead of available %s sequence", alphabet.String()))
-							}
-							p = pattern2seq.Degenerate2Regexp()
+				if degenerate || useRegexp {
+					if degenerate {
+						pattern2seq, err = seq.NewSeq(alphabet, []byte(p))
+						if err != nil {
+							checkError(fmt.Errorf("it seems that flag -d is given, but you provide regular expression instead of available %s sequence", alphabet.String()))
 						}
+						p = pattern2seq.Degenerate2Regexp()
+					}
+					if ignoreCase {
+						p = "(?i)" + p
+					}
+					r, err := regexp.Compile(p)
+					checkError(err)
+					patternsR[xxhash.Sum64String(p)] = r
+				} else if bySeq {
+					pbyte = []byte(p)
+					if mismatches > 0 && mismatches > len(p) {
+						checkError(fmt.Errorf("mismatch should be <= length of sequence: %s", p))
+					}
+					if seq.DNAredundant.IsValid(pbyte) == nil ||
+						seq.RNAredundant.IsValid(pbyte) == nil ||
+						seq.Protein.IsValid(pbyte) == nil { // legal sequence
 						if ignoreCase {
-							p = "(?i)" + p
-						}
-						r, err := regexp.Compile(p)
-						checkError(err)
-						patternsR[xxhash.Sum64String(p)] = r
-					} else if bySeq {
-						pbyte = []byte(p)
-						if mismatches > 0 && mismatches > len(p) {
-							checkError(fmt.Errorf("mismatch should be <= length of sequence: %s", p))
-						}
-						if seq.DNAredundant.IsValid(pbyte) == nil ||
-							seq.RNAredundant.IsValid(pbyte) == nil ||
-							seq.Protein.IsValid(pbyte) == nil { // legal sequence
-							if ignoreCase {
-								// patternsS[strings.ToLower(p)] = struct{}{}
-								patternsS = append(patternsS, bytes.ToLower(pbyte))
-							} else {
-								// patternsS[p] = struct{}{}
-								patternsS = append(patternsS, pbyte)
-							}
+							// patternsS[strings.ToLower(p)] = struct{}{}
+							patternsS = append(patternsS, bytes.ToLower(pbyte))
 						} else {
-							checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", p))
+							// patternsS[p] = struct{}{}
+							patternsS = append(patternsS, pbyte)
 						}
 					} else {
-						if ignoreCase {
-							patternsN[xxhash.Sum64String(strings.ToLower(p))]++
-						} else {
-							patternsN[xxhash.Sum64String(p)]++
-						}
+						checkError(fmt.Errorf("illegal DNA/RNA/Protein sequence: %s", p))
+					}
+				} else {
+					if ignoreCase {
+						patternsN[xxhash.Sum64String(strings.ToLower(p))]++
+					} else {
+						patternsN[xxhash.Sum64String(p)]++
 					}
 				}
 			}

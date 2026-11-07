@@ -64,3 +64,8 @@ func assertEditFilterContracts(t *testing.T, command []string) {
 
 // TestSeqEditFilters covers filter behavior through the sequence-editing command.
 func TestSeqEditFilters(t *testing.T) { assertEditFilterContracts(t, []string{"seq", "-l"}) }
+
+// TestSeqDamagedAuxiliaryInput rejects incomplete auxiliary data.
+func TestSeqDamagedAuxiliaryInput(t *testing.T) {
+	assertDamagedTextInput(t, "r\n", "seq", "--f-pattern-file")
+}

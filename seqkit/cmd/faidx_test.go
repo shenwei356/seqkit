@@ -80,3 +80,8 @@ func TestFaidxIndexAuxiliaryAliases(t *testing.T) {
 		}
 	}
 }
+
+// TestFaidxDamagedAuxiliaryInput rejects incomplete auxiliary data.
+func TestFaidxDamagedAuxiliaryInput(t *testing.T) {
+	assertDamagedTextInput(t, "r\n", "faidx", "-l")
+}

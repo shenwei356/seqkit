@@ -30,7 +30,6 @@ import (
 
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fastx"
-	"github.com/shenwei356/breader"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
 )
@@ -180,29 +179,23 @@ Examples:
 		patterns := make(map[string]*regexp.Regexp)
 		if patternFile != "" {
 			checkOutputFiles([]string{patternFile}, []string{outFile}, true)
-			var reader *breader.BufferedReader
-			reader, err = breader.NewDefaultBufferedReader(patternFile)
-			checkError(err)
-			for chunk := range reader.Ch {
-				checkError(chunk.Err)
-				for _, data := range chunk.Data {
-					p := data.(string)
-					if p == "" {
-						continue
+			for p, readErr := range readTextLines(patternFile) {
+				checkError(readErr)
+				if p == "" {
+					continue
+				}
+				if useRegexp {
+					if ignoreCase {
+						p = "(?i)" + p
 					}
-					if useRegexp {
-						if ignoreCase {
-							p = "(?i)" + p
-						}
-						r, err := regexp.Compile(p)
-						checkError(err)
-						patterns[p] = r
+					r, err := regexp.Compile(p)
+					checkError(err)
+					patterns[p] = r
+				} else {
+					if ignoreCase {
+						patterns[strings.ToLower(p)] = nil
 					} else {
-						if ignoreCase {
-							patterns[strings.ToLower(p)] = nil
-						} else {
-							patterns[p] = nil
-						}
+						patterns[p] = nil
 					}
 				}
 			}

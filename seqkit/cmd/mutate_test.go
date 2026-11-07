@@ -34,3 +34,8 @@ func TestMutateNonASCIIPoint(t *testing.T) {
 		t.Fatalf("invalid point did not fail safely: %v %s", err, stderr)
 	}
 }
+
+// TestMutateDamagedAuxiliaryInput rejects incomplete auxiliary data.
+func TestMutateDamagedAuxiliaryInput(t *testing.T) {
+	assertDamagedTextInput(t, "r\n", "mutate", "-p", "1:T", "-f")
+}

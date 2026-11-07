@@ -66,3 +66,8 @@ func TestReplaceLiteralFileNames(t *testing.T) {
 		})
 	}
 }
+
+// TestReplaceDamagedAuxiliaryInput rejects incomplete auxiliary data.
+func TestReplaceDamagedAuxiliaryInput(t *testing.T) {
+	assertDamagedTextInput(t, "r\n", "replace", "-p", "^", "-r", "x", "--f-pattern-file")
+}

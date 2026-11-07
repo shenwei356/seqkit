@@ -26,8 +26,6 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-
-	"github.com/shenwei356/breader"
 )
 
 // BedFeature is the gff BedFeature struct
@@ -127,16 +125,16 @@ func ReadBedFilteredFeatures(file string, chrs []string) ([]BedFeature, error) {
 
 		return BedFeature{items[0], start + 1, end, name, strand}, true, nil
 	}
-	reader, err := breader.NewBufferedReader(file, Threads, 100, fn)
-	if err != nil {
-		return nil, err
-	}
 	BedFeatures := make([]BedFeature, 0, 1024)
-	for chunk := range reader.Ch {
-		if chunk.Err != nil {
-			return nil, chunk.Err
+	for line, err := range readTextLines(file) {
+		if err != nil {
+			return nil, err
 		}
-		for _, data := range chunk.Data {
+		data, ok, err := fn(line)
+		if err != nil {
+			return nil, err
+		}
+		if ok {
 			BedFeatures = append(BedFeatures, data.(BedFeature))
 		}
 	}
