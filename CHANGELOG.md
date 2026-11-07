@@ -14,7 +14,7 @@
         - Reject directories used as FASTA index paths.
         - Preserve records with long IDs when reusing FASTA indexes, and report index read errors.
     - `seqkit faidx/grep/mutate/replace/seq/subseq`:
-        - Report damaged compressed auxiliary files before modifying output files (region lists, patterns, or BED annotations).
+        - Report damaged compressed auxiliary files before modifying output files (region lists, patterns, or BED/GTF annotations).
     - `seqkit shuffle/sort/split/subseq`:
         - Read xz, zstd, bzip2, and LZ4 inputs through the appropriate decompression path.
         - Avoid leaving input files open after detecting their format.

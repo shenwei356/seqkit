@@ -330,3 +330,8 @@ func TestSubseqRepeatedIndexedID(t *testing.T) {
 func TestSubseqDamagedAuxiliaryInput(t *testing.T) {
 	assertDamagedTextInput(t, "r\t0\t2\n", "subseq", "--bed")
 }
+
+// TestSubseqDamagedGTF rejects incomplete annotations from the GTF dependency.
+func TestSubseqDamagedGTF(t *testing.T) {
+	assertDamagedTextInput(t, "r\ttest\tCDS\t1\t2\t.\t+\t.\tgene_id \"r\";\n", "subseq", "--gtf")
+}
