@@ -4464,6 +4464,8 @@ Examples
 
 ## bam
 
+With `--pretty`, statistics tables preserve literal percent signs in file names.
+
 ``` text
 $ seqkit bam -h
 

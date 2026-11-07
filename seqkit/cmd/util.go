@@ -94,7 +94,8 @@ func (p *ColorCycler) Colorize(s string) string {
 	if p.Dummy {
 		return s
 	}
-	return au.Sprintf(au.Colorize(s, p.Palette[p.Index]))
+	// Render the value directly; input text is not a format string.
+	return au.Colorize(s, p.Palette[p.Index]).String()
 }
 
 // Colorize adds the current ANSI color to the text with a header style.
@@ -102,7 +103,7 @@ func (p *ColorCycler) Header(s string) string {
 	if p.Dummy {
 		return s
 	}
-	return au.Sprintf(au.BgGray(5, au.Colorize(s, p.Palette[p.Index]|au.BoldFm)))
+	return au.BgGray(5, au.Colorize(s, p.Palette[p.Index]|au.BoldFm)).String()
 }
 
 // Fancy colorizes text with normal or header styles.

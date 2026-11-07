@@ -24,6 +24,7 @@
     - `seqkit amplicon/fa2fq`:
         - Avoid false matches from reversed protein or unrestricted sequences.
     - `seqkit bam`:
+        - Preserve percent signs in file names when displaying statistics with `--pretty`.
         - Validate fields and top-output combinations before processing; require NM only for dependent statistics; fix BAM pass-through, toolbox errors, and retention of completed file statistics on failure. [#616](https://github.com/shenwei356/seqkit/issues/616)
         - Run toolbox stages in YAML order, and reject invalid or empty pipelines before writing output.
         - Report failed BAM, TSV, and count-file writes instead of returning success with incomplete output.
