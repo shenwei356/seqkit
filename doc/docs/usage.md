@@ -785,6 +785,8 @@ $ seqkit stats -h
 
 simple statistics of FASTA/Q files
 
+Sequence type is inferred from the first nonempty record unless --seq-type is set.
+
 Columns:
 
   1.  file      input file, "-" for STDIN

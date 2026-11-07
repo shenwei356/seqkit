@@ -9,6 +9,55 @@ import (
 	"testing"
 )
 
+// TestStatsLeadingEmptyRecords keeps alphabet-dependent counts independent of
+// where empty records occur, while preserving explicitly selected alphabets.
+func TestStatsLeadingEmptyRecords(t *testing.T) {
+	for _, tc := range []struct {
+		bases, alphabet, gc, unknown string
+		flags                        []string
+	}{
+		{"GCNN", "DNA", "50.00", "2", nil},
+		{"GUNN", "RNA", "25.00", "2", nil},
+		{"EFXX", "Protein", "0.00", "2", nil},
+		{"GCNN", "Unlimit", "0.00", "0", []string{"-t", "unlimit"}},
+	} {
+		for _, fastq := range []bool{false, true} {
+			t.Run(fmt.Sprintf("%s/fastq=%t", tc.alphabet, fastq), func(t *testing.T) {
+				empty, record := ">empty\n", ">r\n"+tc.bases+"\n"
+				if fastq {
+					empty, record = "@empty\n\n+\n\n", "@r\n"+tc.bases+"\n+\nIIII\n"
+				}
+				args := append([]string{"stats", "-Ta"}, tc.flags...)
+				var baseline string
+				for _, input := range []string{record + empty, empty + record} {
+					out, stderr, err := runCLI(t, input, args...)
+					if err != nil {
+						t.Fatalf("stats failed: %v %s", err, stderr)
+					}
+					rows := strings.Split(strings.TrimSpace(out), "\n")
+					if len(rows) != 2 {
+						t.Fatalf("expected one statistics row, got %d", len(rows)-1)
+					}
+					fields := make(map[string]string)
+					values := strings.Split(rows[1], "\t")
+					for i, name := range strings.Split(rows[0], "\t") {
+						fields[name] = values[i]
+					}
+					for name, want := range map[string]string{"type": tc.alphabet, "GC(%)": tc.gc, "sum_n": tc.unknown, "num_seqs": "2"} {
+						if fields[name] != want {
+							t.Errorf("%s=%s, want %s", name, fields[name], want)
+						}
+					}
+					if baseline != "" && out != baseline {
+						t.Error("moving the empty record changed statistics")
+					}
+					baseline = out
+				}
+			})
+		}
+	}
+}
+
 // TestStatsZeroLengthRecords reports finite zero metrics without discarding records.
 func TestStatsZeroLengthRecords(t *testing.T) {
 	for _, test := range []struct {

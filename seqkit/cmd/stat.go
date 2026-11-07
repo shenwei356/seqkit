@@ -54,6 +54,8 @@ var statCmd = &cobra.Command{
 	Short:   "simple statistics of FASTA/Q files",
 	Long: `simple statistics of FASTA/Q files
 
+Sequence type is inferred from the first nonempty record unless --seq-type is set.
+
 Columns:
 
   1.  file      input file, "-" for STDIN
@@ -342,7 +344,9 @@ Tips:
 				var fastxReader *fastx.Reader
 				var err error
 				checkSeqType := true
-				var isNucleotide bool
+				// Empty records cannot determine the alphabet used for base counts.
+				statsAlphabet := alphabet
+				isNucleotide := hasComplement(statsAlphabet)
 
 				fastxReader, err = fastx.NewReader(alphabet, file, idRegexp)
 				if err != nil {
@@ -379,10 +383,10 @@ Tips:
 						} else {
 							seqFormat = "FASTA"
 						}
-
-						isNucleotide = fastxReader.Alphabet() == seq.DNA ||
-							fastxReader.Alphabet() == seq.DNAredundant ||
-							fastxReader.Alphabet() == seq.RNA || fastxReader.Alphabet() == seq.RNAredundant
+					}
+					if statsAlphabet == nil && len(record.Seq.Seq) > 0 {
+						statsAlphabet = seq.GuessAlphabetLessConservatively(record.Seq.Seq)
+						isNucleotide = hasComplement(statsAlphabet)
 					}
 
 					lensStats.Add(uint64(len(record.Seq.Seq)))
@@ -421,14 +425,17 @@ Tips:
 					}
 				}
 
-				if fastxReader.Alphabet() == seq.DNAredundant {
+				if statsAlphabet == nil {
+					statsAlphabet = fastxReader.Alphabet()
+				}
+				if statsAlphabet == seq.DNAredundant {
 					t = "DNA"
-				} else if fastxReader.Alphabet() == seq.RNAredundant {
+				} else if statsAlphabet == seq.RNAredundant {
 					t = "RNA"
-				} else if seqFormat == "" && fastxReader.Alphabet() == seq.Unlimit {
+				} else if seqFormat == "" && statsAlphabet == seq.Unlimit {
 					t = ""
 				} else {
-					t = fastxReader.Alphabet().String()
+					t = statsAlphabet.String()
 				}
 
 				var n50 uint64

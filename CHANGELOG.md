@@ -180,6 +180,7 @@
     - `seqkit split2`:
         - Reject conflicting modes/prefixes and keep paired boundaries and record counts aligned. [#620](https://github.com/shenwei356/seqkit/issues/620)
     - `seqkit stats`:
+        - Infer sequence type from the first nonempty record, preserving GC and unknown-base counts after leading empty records.
         - Report read errors correctly while retaining valid results; `--skip-err` continues processing. [#599](https://github.com/shenwei356/seqkit/issues/599)
         - Accept valid negative Solexa scores and calculate their quality statistics correctly.
         - Reject NaN values for `-N`.
