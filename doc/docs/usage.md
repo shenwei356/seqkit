@@ -3708,6 +3708,8 @@ Flags:
 ```
 
 With `-K/--keep-key`, unmatched keys are inserted literally, including dollar signs.
+Replacement symbols are expanded only in the original template; symbol-like text
+in inserted filenames or values is preserved.
 Capture references in `-r/--replacement` still work as documented above.
 
 Examples

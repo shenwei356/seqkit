@@ -127,6 +127,8 @@ Filtering records to edit:
 		patternRegexp, err := regexp.Compile(p)
 		checkError(err)
 		qualityParts := parseQualityReplacement(replacement)
+		// Locate template symbols once; inserted values are never scanned for symbols.
+		symbolMatches := reReplacementSymbol.FindAllIndex(replacement, -1)
 
 		if kvFile != "" {
 			checkOutputFiles([]string{kvFile}, []string{outFile}, true)
@@ -137,29 +139,9 @@ Filtering records to edit:
 				checkError(fmt.Errorf(`replacement symbol "{kv}"/"{KV}" not found in value of flag -r (--replacement) when flag -k (--kv-file) given`))
 			}
 		}
-		var replaceWithNR bool
-		if reNR.Match(replacement) {
-			replaceWithNR = true
-		}
-
 		var replaceWithUUID bool
 		if reUUID.Match(replacement) {
 			replaceWithUUID = true
-		}
-
-		var replaceWithFN bool
-		if reFN.Match(replacement) {
-			replaceWithFN = true
-		}
-
-		var replaceWithFBN bool
-		if reFBN.Match(replacement) {
-			replaceWithFBN = true
-		}
-
-		var replaceWithFBNE bool
-		if reFBNE.Match(replacement) {
-			replaceWithFBNE = true
 		}
 
 		var replaceWithKV bool
@@ -335,7 +317,7 @@ Filtering records to edit:
 		checkError(err)
 		defer closeOutput(outfh)
 
-		var r []byte
+		var r, kvReplacement []byte
 		var founds [][][]byte
 		var found [][]byte
 		var k, v string
@@ -361,14 +343,14 @@ Filtering records to edit:
 			fileAlphabet := alphabet
 
 			nr := 0
-			// File names pass through placeholder expansion and then pattern expansion.
-			// Escape dollars for both stages so names remain literal text.
-			bFile := []byte(strings.ReplaceAll(file, "$", "$$$$"))
+			// Symbol replacement inserts file names literally; escape dollars for
+			// the subsequent pattern expansion only.
+			bFile := []byte(strings.ReplaceAll(file, "$", "$$"))
 			fileBase = filepath.Base(file)
-			bFileBase := []byte(strings.ReplaceAll(fileBase, "$", "$$$$"))
+			bFileBase := []byte(strings.ReplaceAll(fileBase, "$", "$$"))
 			var bFileBaseWithoutExtension []byte
 			if i := strings.Index(fileBase, "."); i >= 0 {
-				bFileBaseWithoutExtension = []byte(strings.ReplaceAll(fileBase[:i], "$", "$$$$"))
+				bFileBaseWithoutExtension = []byte(strings.ReplaceAll(fileBase[:i], "$", "$$"))
 			} else {
 				bFileBaseWithoutExtension = bFileBase
 			}
@@ -548,28 +530,11 @@ Filtering records to edit:
 				} else {
 					doNotChange = false
 
-					r = replacement
-
-					if replaceWithNR {
-						r = reNR.ReplaceAll(r, fmt.Appendf(nil, nrFormat, nr))
-					}
-
 					if replaceWithUUID {
 						_uuid, err = uuid.NewV7()
 						if err != nil {
 							_uuid = uuid.New()
 						}
-						r = reUUID.ReplaceAll(r, []byte(_uuid.String()))
-					}
-
-					if replaceWithFN {
-						r = reFN.ReplaceAll(r, bFile)
-					}
-					if replaceWithFBN {
-						r = reFBN.ReplaceAll(r, bFileBase)
-					}
-					if replaceWithFBNE {
-						r = reFBNE.ReplaceAll(r, bFileBaseWithoutExtension)
 					}
 
 					if replaceWithKV {
@@ -585,14 +550,14 @@ Filtering records to edit:
 								k = strings.ToLower(k)
 							}
 							if v, ok = kvs[k]; ok {
-								r = reKV.ReplaceAll(r, []byte(v))
+								kvReplacement = []byte(v)
 							} else if keepUntouch {
 								doNotChange = true
 							} else if keepKey {
 								// The original key is literal data through both replacement stages.
-								r = reKV.ReplaceAll(r, bytes.ReplaceAll(found[keyCaptIdx], []byte("$"), []byte("$$$$")))
+								kvReplacement = bytes.ReplaceAll(found[keyCaptIdx], []byte("$"), []byte("$$$$"))
 							} else {
-								r = reKV.ReplaceAll(r, []byte(keyMissRepl))
+								kvReplacement = []byte(keyMissRepl)
 							}
 						} else {
 							doNotChange = true
@@ -600,6 +565,34 @@ Filtering records to edit:
 					}
 
 					if !doNotChange {
+						if len(symbolMatches) == 0 {
+							r = replacement
+						} else {
+							// Pattern expansion copies the result, so this buffer is reusable.
+							r = r[:0]
+							last := 0
+							for _, match := range symbolMatches {
+								r = append(r, replacement[last:match[0]]...)
+								symbol := replacement[match[0]:match[1]]
+								switch string(symbol) {
+								case "{nr}", "{NR}":
+									r = fmt.Appendf(r, nrFormat, nr)
+								case "{uuid}", "{UUID}":
+									r = append(r, _uuid.String()...)
+								case "{fn}", "{FN}":
+									r = append(r, bFile...)
+								case "{fbn}", "{FBN}":
+									r = append(r, bFileBase...)
+								case "{fbne}", "{FBNE}":
+									r = append(r, bFileBaseWithoutExtension...)
+								case "{kv}", "{KV}":
+									// Preserve the documented first expansion of KV dollar escapes.
+									r = append(r, reKV.ReplaceAll(symbol, kvReplacement)...)
+								}
+								last = match[1]
+							}
+							r = append(r, replacement[last:]...)
+						}
 						record.Name = patternRegexp.ReplaceAll(record.Name, r)
 					}
 				}
@@ -649,11 +642,7 @@ func init() {
 	replaceCmd.Flags().BoolP("f-only-positive-strand", "", false, "[target filter] only search on positive strand")
 }
 
-var reNR = regexp.MustCompile(`\{(NR|nr)\}`)
 var reKV = regexp.MustCompile(`\{(KV|kv)\}`)
-var reFN = regexp.MustCompile(`\{(FN|fn)\}`)
-var reFBN = regexp.MustCompile(`\{(FBN|fbn)\}`)
-var reFBNE = regexp.MustCompile(`\{(FBNE|fbne)\}`)
 var reUUID = regexp.MustCompile(`\{(UUID|uuid)\}`)
 
 // qualityReplacementPart is either an expansion reference or decoded literal text.
@@ -686,3 +675,6 @@ func parseQualityReplacement(replacement []byte) []qualityReplacementPart {
 	}
 	return parts
 }
+
+// reReplacementSymbol matches only supported upper- and lowercase template symbols.
+var reReplacementSymbol = regexp.MustCompile(`\{(NR|nr|KV|kv|FN|fn|FBN|fbn|FBNE|fbne|UUID|uuid)\}`)

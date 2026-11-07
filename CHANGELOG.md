@@ -123,6 +123,8 @@
     - `seqkit rename`:
         - Keep duplicate suffixes increasing near the integer limit with `-N/--start-num`.
     - `seqkit replace`:
+        - Preserve placeholder-like text in filenames when combining replacement symbols.
+        - Speed up name replacements that use record numbers or filename symbols.
         - Validate key-value files and capture indices before changing outputs; preserve dollar signs in inserted file names and unmatched keys with `-K`.
         - Reject FASTQ replacements that borrow qualities outside the match; clarify per-file record numbering. [#620](https://github.com/shenwei356/seqkit/issues/620)
     - `seqkit restart`:

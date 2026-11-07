@@ -67,6 +67,26 @@ func TestReplaceLiteralFileNames(t *testing.T) {
 	}
 }
 
+// TestReplaceSymbolsAreNotRecursive keeps placeholder text in inserted values literal.
+func TestReplaceSymbolsAreNotRecursive(t *testing.T) {
+	dir := t.TempDir()
+	const base = "{fn}-{fbn}-{fbne}-{nr}-{kv}-{uuid}-$1.fa"
+	input := auditInput(t, dir, base, ">a\nAC\n>a\nGT\n")
+	// KV values retain the documented two stages of dollar escaping.
+	kv := auditInput(t, dir, "kv.tsv", "a\t{fn}-$$$$value\n")
+	for _, template := range []string{
+		"{nr}|{fn}|{fbn}|{fbne}|{kv}|${1}",
+		"{NR}|{FN}|{FBN}|{FBNE}|{KV}|${1}",
+	} {
+		out, stderr, err := runCLI(t, "", "replace", input, "-p", "^(a)$", "-r", template, "-k", kv)
+		want := ">1|" + input + "|" + base + "|" + strings.TrimSuffix(base, ".fa") + "|{fn}-$value|a\nAC\n"
+		want += ">2|" + input + "|" + base + "|" + strings.TrimSuffix(base, ".fa") + "|{fn}-$value|a\nGT\n"
+		if err != nil || out != want {
+			t.Fatalf("inserted placeholder text was expanded: got=%q want=%q err=%v %s", out, want, err, stderr)
+		}
+	}
+}
+
 // TestReplaceDamagedAuxiliaryInput rejects incomplete auxiliary data.
 func TestReplaceDamagedAuxiliaryInput(t *testing.T) {
 	assertDamagedTextInput(t, "r\n", "replace", "-p", "^", "-r", "x", "--f-pattern-file")
