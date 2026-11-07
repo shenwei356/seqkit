@@ -4512,6 +4512,7 @@ With `--pretty`, statistics tables preserve literal percent signs in file names.
 With `--bundle`, reference IDs are percent-escaped in output filenames so path
 separators cannot create files outside the output directory. Reference names in
 the BAM records remain unchanged.
+Inputs with no mapped records produce no bundle files.
 
 ``` text
 $ seqkit bam -h

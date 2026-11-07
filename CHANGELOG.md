@@ -30,6 +30,7 @@
     - `seqkit amplicon/grep/range/split/subseq`:
         - Reject regions with extra coordinate fields.
     - `seqkit bam`:
+        - Report zero bundles for empty input and reject invalid negative bundle sizes before creating output directories.
         - Keep bundle files inside the output directory when reference IDs contain path separators; escape reference IDs in bundle filenames.
         - Reuse full-header FASTA indexes in `AlnContext` and create indexes compatible with other commands, retaining the first record for repeated reference IDs.
         - Fix pass-through output, validate field/option combinations, require NM only where needed, and retain completed statistics if a later file fails. [#616](https://github.com/shenwei356/seqkit/issues/616)

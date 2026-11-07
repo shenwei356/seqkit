@@ -576,6 +576,9 @@ Attention:
 		rangeMax := getFlagFloat64(cmd, "range-max")
 		printCount := getFlagString(cmd, "count")
 		printBundle := getFlagInt(cmd, "bundle")
+		if printBundle < -1 {
+			checkError(fmt.Errorf("--bundle must be -1 for loci, 0 to disable, or a positive minimum size"))
+		}
 		printPdf := getFlagString(cmd, "img")
 		checkError(validateHistogramImage(printPdf))
 		//printScatter := getFlagString(cmd, "scatter")
@@ -1479,10 +1482,11 @@ func Bam2Bundles(inBam string, outDir string, minBundle int, nrProcBam int, quie
 		checkError(bamWriter.Close())
 		checkError(outFh.Close())
 		recCache = nil
+		bundleCount++ // Count the final bundle only after it has been written.
 	}
 
 	if !silent {
-		log.Info(fmt.Sprintf("Written %d BAM records to %d loci and %d bundles.", recCount, locusCount, bundleCount+1))
+		log.Info(fmt.Sprintf("Written %d BAM records to %d loci and %d bundles.", recCount, locusCount, bundleCount))
 	}
 }
 

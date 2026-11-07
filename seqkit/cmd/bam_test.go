@@ -131,8 +131,8 @@ func bamIndexFixture(t *testing.T, file string) {
 	}
 }
 
-// TestBamEmptyIndex handles a valid BAI with no reference sequences.
-func TestBamEmptyIndex(t *testing.T) {
+// TestBamEmptyInput handles a valid BAM/BAI with no reference sequences.
+func TestBamEmptyInput(t *testing.T) {
 	dir := t.TempDir()
 	file := filepath.Join(dir, "empty.bam")
 	f, err := os.Create(file)
@@ -159,6 +159,12 @@ func TestBamEmptyIndex(t *testing.T) {
 		if err != nil || strings.Contains(stderr, "panic:") {
 			t.Fatalf("empty BAI %s: %v %s", mode, err, stderr)
 		}
+	}
+	outdir := filepath.Join(dir, "bundles")
+	_, stderr, err := runCLI(t, "", "bam", "-N", "-1", "-o", outdir, file)
+	entries, readErr := os.ReadDir(outdir)
+	if err != nil || readErr != nil || len(entries) != 0 || !strings.Contains(stderr, "0 BAM records to 0 loci and 0 bundles") {
+		t.Fatalf("empty BAM bundle count is incorrect: %v %s", err, stderr)
 	}
 }
 
@@ -458,6 +464,9 @@ func TestBamBundleReferencePaths(t *testing.T) {
 				if err != nil {
 					t.Fatalf("bundling failed: %v %s", err, stderr)
 				}
+				if !strings.Contains(stderr, "2 BAM records to 2 loci and 2 bundles") {
+					t.Fatalf("incorrect bundle counts: %s", stderr)
+				}
 				entries, err := os.ReadDir(outdir)
 				if err != nil || len(entries) != 2 {
 					t.Fatalf("expected two bundle files: %v", err)
@@ -469,6 +478,20 @@ func TestBamBundleReferencePaths(t *testing.T) {
 					}
 				}
 			})
+		}
+	}
+}
+
+// TestBamInvalidBundleSize rejects undefined negative sizes before creating output.
+func TestBamInvalidBundleSize(t *testing.T) {
+	dir := t.TempDir()
+	input := bamFixture(t, dir, "in.bam", true)
+	for _, size := range []string{"-2", "-100"} {
+		outdir := filepath.Join(dir, size)
+		_, stderr, err := runCLI(t, "", "bam", input, "-N", size, "-o", outdir)
+		_, statErr := os.Stat(outdir)
+		if err == nil || !strings.Contains(stderr, "--bundle") || !os.IsNotExist(statErr) {
+			t.Fatalf("invalid bundle size changed output: %v %s", err, stderr)
 		}
 	}
 }
