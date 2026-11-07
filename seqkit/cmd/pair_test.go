@@ -7,6 +7,28 @@ import (
 	"testing"
 )
 
+// TestPairCompressedFilenames inserts paired/unpaired markers before FASTQ extensions.
+func TestPairCompressedFilenames(t *testing.T) {
+	const paired = "@r\nAC\n+\nIJ\n"
+	const unpaired = "@s\nGT\n+\nKL\n"
+	for _, extension := range []string{".gz", ".xz", ".zst", ".bz2", ".lz4"} {
+		t.Run(extension, func(t *testing.T) {
+			dir := t.TempDir()
+			first := auditInput(t, dir, "r1.fq"+strings.ToUpper(extension), string(compressedInput(t, extension, paired+unpaired)))
+			second := auditInput(t, dir, "r2.fq"+extension, string(compressedInput(t, extension, paired)))
+			if _, stderr, err := runCLI(t, "", "pair", "-1", first, "-2", second, "-u"); err != nil {
+				t.Fatalf("pair: %v %s", err, stderr)
+			}
+			for name, want := range map[string]string{"r1.paired.fq": paired, "r2.paired.fq": paired, "r1.unpaired.fq": unpaired} {
+				out, stderr, err := runCLI(t, "", "seq", filepath.Join(dir, name+extension))
+				if err != nil || out != want {
+					t.Errorf("incorrect compressed output name or content: %v %s", err, stderr)
+				}
+			}
+		})
+	}
+}
+
 // TestPairAlignedDuplicatesRespectPending keeps older occurrences ahead of direct pairs.
 func TestPairAlignedDuplicatesRespectPending(t *testing.T) {
 	for _, swap := range []bool{false, true} {

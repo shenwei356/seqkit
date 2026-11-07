@@ -10,6 +10,37 @@ import (
 	"testing"
 )
 
+// TestSplitCompressedFilenames keeps sequence and compression extensions separate.
+func TestSplitCompressedFilenames(t *testing.T) {
+	const input = ">r\nACGT\n"
+	for _, extension := range []string{".gz", ".xz", ".zst", ".bz2", ".lz4"} {
+		encoded := compressedInput(t, extension, input)
+		for _, command := range []string{"split", "split2"} {
+			for _, outputExtension := range []string{"", ".gz"} {
+				t.Run(command+extension+outputExtension, func(t *testing.T) {
+					dir := t.TempDir()
+					file := auditInput(t, dir, "reads.fa"+strings.ToUpper(extension), string(encoded))
+					outdir := filepath.Join(dir, "out")
+					args := []string{command, file, "-s", "1", "-O", outdir}
+					suffix := extension
+					if outputExtension != "" {
+						args = append(args, "-e", outputExtension)
+						suffix = outputExtension
+					}
+					if _, stderr, err := runCLI(t, "", args...); err != nil {
+						t.Fatalf("split: %v %s", err, stderr)
+					}
+					path := filepath.Join(outdir, "reads.part_001.fa"+suffix)
+					out, stderr, err := runCLI(t, "", "seq", path)
+					if err != nil || out != input {
+						t.Fatalf("incorrect compressed output name or content: %v %s", err, stderr)
+					}
+				})
+			}
+		}
+	}
+}
+
 // TestSplitProtectsInputIndex catches generated outputs aliased to the active index.
 func TestSplitProtectsInputIndex(t *testing.T) {
 	dir := t.TempDir()

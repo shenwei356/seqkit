@@ -113,6 +113,7 @@
         - Preserve duplicate IDs and each mate's format. [#620](https://github.com/shenwei356/seqkit/issues/620)
         - Speed up reads paired in input order and reduce memory use, including for unequal inputs when unpaired reads are not saved.
     - `seqkit pair/split/split2`:
+        - Keep FASTA/FASTQ extensions in output filenames for bzip2 and LZ4 inputs.
         - Check initial input before writing. [#620](https://github.com/shenwei356/seqkit/issues/620)
     - `seqkit pair/rename/split/split2`:
         - Preserve unrelated output-directory files, even with `--force`. [#620](https://github.com/shenwei356/seqkit/issues/620)

@@ -2876,6 +2876,10 @@ Examples
 
 ## split
 
+For `split`, `split2`, and `pair`, output filenames keep the sequence extension
+before the compression suffix (`.gz`, `.xz`, `.zst`, `.bz2`, or `.lz4`).
+For example, `reads.fa.bz2` split with `-e .gz` produces `reads.part_001.fa.gz`.
+
 Usage
 
 ``` text

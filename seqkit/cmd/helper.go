@@ -402,38 +402,16 @@ func sortRecordChunkMapID(chunks map[uint64]fastx.RecordChunk) sortutil.Uint64Sl
 	return ids
 }
 
+// filepathTrimExtension retains the sequence extension and optional compression suffix.
 func filepathTrimExtension(file string) (string, string) {
-	var _gz, _xz, _zst bool
-	_gz = strings.HasSuffix(file, ".gz") || strings.HasSuffix(file, ".GZ")
-	if _gz {
-		file = file[0 : len(file)-3]
-	} else {
-		_xz = strings.HasSuffix(file, ".xz") || strings.HasSuffix(file, ".XZ")
-		if _xz {
-			file = file[0 : len(file)-3]
-		} else {
-			_zst = strings.HasSuffix(file, ".zst") || strings.HasSuffix(file, ".ZST")
-			if _zst {
-				file = file[0 : len(file)-4]
-			}
-		}
-	}
-
-	extension := filepath.Ext(file)
-	name := file[0 : len(file)-len(extension)]
-	if _gz {
-		extension += ".gz"
-	} else if _xz {
-		extension += ".xz"
-	} else if _zst {
-		extension += ".zst"
-	}
-	return name, extension
+	name, extension, compression := filepathTrimExtension2(file, nil)
+	return name, extension + compression
 }
 
+// filepathTrimExtension2 separates sequence and compression extensions for output naming.
 func filepathTrimExtension2(file string, suffixes []string) (string, string, string) {
 	if suffixes == nil {
-		suffixes = []string{".gz", ".xz", ".zst"}
+		suffixes = []string{".gz", ".xz", ".zst", ".bz2", ".lz4"}
 	}
 
 	var e, e1, e2 string
