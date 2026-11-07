@@ -164,8 +164,9 @@ Filtering records to edit:
 		var kvs map[string]string
 		if reKV.Match(replacement) {
 			replaceWithKV = true
-			if !regexp.MustCompile(`\(.+\)`).MatchString(pattern) {
-				checkError(fmt.Errorf(`value of -p (--pattern) must contains "(" and ")" to capture data which is used specify the KEY`))
+			// Validate the compiled capture count before reading keys or opening output.
+			if keyCaptIdx > patternRegexp.NumSubexp() {
+				checkError(fmt.Errorf("value of -I (--key-capt-idx) (%d) exceeds the number of capturing groups (%d)", keyCaptIdx, patternRegexp.NumSubexp()))
 			}
 			if bySeq {
 				checkError(fmt.Errorf(`replaceing with key-value pairs was not supported for sequence`))
@@ -582,9 +583,6 @@ Filtering records to edit:
 
 						if len(founds) > 0 {
 							found = founds[0]
-							if keyCaptIdx > len(found)-1 {
-								checkError(fmt.Errorf("value of flag -I (--key-capt-idx) overflows"))
-							}
 							k = string(found[keyCaptIdx])
 							if ignoreCase {
 								k = strings.ToLower(k)

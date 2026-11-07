@@ -3564,6 +3564,9 @@ Examples
 
 ## replace
 
+With `{kv}`, `--key-capt-idx` must refer to a capturing group in `--pattern`.
+Invalid capture indices are rejected before the output file is opened.
+
 Usage
 
 ``` text
