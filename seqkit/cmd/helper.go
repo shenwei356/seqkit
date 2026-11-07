@@ -262,6 +262,17 @@ func getIDRegexp(cmd *cobra.Command, flag string) string {
 	} else {
 		idRegexp = getFlagString(cmd, "id-regexp")
 	}
+	// Validate the effective parser before callers create outputs or indexes.
+	// Empty and default expressions use the FASTX reader's built-in ID parser.
+	if idRegexp != "" && idRegexp != fastx.DefaultIDRegexp {
+		r, err := regexp.Compile(idRegexp)
+		if err != nil {
+			checkError(fmt.Errorf("fail to compile ID regexp %q: %w", idRegexp, err))
+		}
+		if r.NumSubexp() == 0 {
+			checkError(fmt.Errorf("regular expression must contain a capturing group for the ID; default: %s", fastx.DefaultIDRegexp))
+		}
+	}
 	return idRegexp
 }
 

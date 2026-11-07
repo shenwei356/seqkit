@@ -10,6 +10,40 @@ import (
 	"testing"
 )
 
+// TestInvalidIDRegexpPreflight rejects invalid global parsers before opening
+// outputs or replacing indexes, even on paths that bypass the FASTX reader.
+func TestInvalidIDRegexpPreflight(t *testing.T) {
+	commands := [][]string{
+		{"seq"}, {"head"}, {"grep", "-p", "r"}, {"translate"},
+		{"sort", "-2", "-U"}, {"shuffle", "-2", "-U"},
+		{"subseq", "-r", "1:2", "-U"}, {"faidx", "-U"}, {"sum"},
+	}
+	for _, command := range commands {
+		for _, pattern := range []string{"[", "^r$"} {
+			t.Run(command[0]+"/"+pattern, func(t *testing.T) {
+				dir := t.TempDir()
+				input := auditInput(t, dir, "input.fa", ">r\nACGT\n")
+				output := auditInput(t, dir, "output.fa", "keep output\n")
+				index := auditInput(t, dir, "input.fa.seqkit.fai", "keep index\n")
+				if command[0] == "faidx" {
+					index = auditInput(t, dir, "input.fa.fai", "keep index\n")
+				}
+				args := append(append([]string(nil), command...), input, "--id-regexp", pattern, "-o", output)
+				_, stderr, err := runCLI(t, "", args...)
+				if err == nil || !strings.Contains(stderr, "[ERRO]") || strings.Contains(stderr, "panic:") {
+					t.Errorf("invalid ID parser accepted: %v %s", err, stderr)
+				}
+				for path, want := range map[string]string{output: "keep output\n", index: "keep index\n"} {
+					data, err := os.ReadFile(path)
+					if err != nil || string(data) != want {
+						t.Errorf("file changed before ID validation: %s: %v", path, err)
+					}
+				}
+			})
+		}
+	}
+}
+
 // TestAuxiliaryReaderErrors preserves errors delivered after reader construction.
 func TestAuxiliaryReaderErrors(t *testing.T) {
 	badIndex := auditInput(t, t.TempDir(), "bad.fai", "r\tinvalid\t3\t4\t5\n")

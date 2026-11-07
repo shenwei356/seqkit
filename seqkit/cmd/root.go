@@ -68,6 +68,9 @@ normalized paths with outputs; existence and symlink/hard-link checks are skippe
 Auxiliary inputs (e.g., pattern, BED, and input-list files), output conflicts,
 redirected stdin, and output-directory cleanup retain their full checks.
 
+Custom ID regular expressions must contain a capturing group for the ID.
+They are validated before output files or indexes are changed.
+
 Compression level:
   format   range   default  comment
   gzip     1-9     5        https://github.com/klauspost/pgzip sets 5 as the default value.

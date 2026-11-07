@@ -28,7 +28,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"sync"
 	"time"
@@ -114,17 +113,6 @@ Examples:
 		rna2dna := getFlagBool(cmd, "rna2dna")
 		singleStrand := getFlagBool(cmd, "single-strand")
 		includeID := getFlagBool(cmd, "include-id")
-
-		// Validate the shared ID parser once, before opening inputs or output.
-		if idRegexp != "" {
-			r, err := regexp.Compile(idRegexp)
-			if err != nil {
-				checkError(fmt.Errorf("fail to compile regexp %q: %w", idRegexp, err))
-			}
-			if r.NumSubexp() == 0 {
-				checkError(fmt.Errorf("regular expression must contain a capturing group for the ID; default: %s", fastx.DefaultIDRegexp))
-			}
-		}
 
 		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
 		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
