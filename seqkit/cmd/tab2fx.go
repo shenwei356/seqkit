@@ -101,7 +101,8 @@ lengths must match. Empty input files are skipped.
 					continue
 				}
 
-				items = strings.Split(line, "\t")
+				// Only the first three columns are used; leave extra annotations unsplit.
+				items = strings.SplitN(line, "\t", 4)
 				if len(items) < 2 {
 					checkError(fmt.Errorf("at least two columns needed: %s", line))
 				}
