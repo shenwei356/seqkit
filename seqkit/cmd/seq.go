@@ -108,7 +108,7 @@ Filtering records to edit:
 		}
 
 		if minLen >= 0 && maxLen >= 0 && minLen > maxLen {
-			checkError(fmt.Errorf("value of flag -m (--min-len) should be >= value of flag -M (--max-len)"))
+			checkError(fmt.Errorf("value of flag -m (--min-len) should be <= value of flag -M (--max-len)"))
 		}
 		if minQual >= 0 && maxQual >= 0 && minQual > maxQual {
 			checkError(fmt.Errorf("value of flag -Q (--min-qual) should be <= value of flag -R (--max-qual)"))

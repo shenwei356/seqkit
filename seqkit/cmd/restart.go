@@ -100,7 +100,7 @@ Examples
 			checkError(fmt.Errorf("one of the flags needed: -i/--new-start or -s/--start-with"))
 		}
 		if newstart == 0 {
-			checkError(fmt.Errorf("the value of flag -s (--start) should not be 0"))
+			checkError(fmt.Errorf("the value of flag -i (--new-start) should not be 0"))
 		}
 		mismatches := getFlagNonNegativeInt(cmd, "max-mismatch")
 		ignoreCase := getFlagBool(cmd, "ignore-case")

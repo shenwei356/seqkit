@@ -115,6 +115,7 @@
         - Reject invalid key capture indices before modifying output files.
         - Reject FASTQ replacements that borrow qualities outside the current match; document per-file record numbering. [#620](https://github.com/shenwei356/seqkit/issues/620)
     - `seqkit restart`:
+        - Identify `-i/--new-start` correctly when rejecting a zero start position.
         - Find starting subsequences across the circular boundary, including mismatch searches, while keeping FASTQ qualities aligned.
         - Process each record independently with `-s`, avoiding skipped records and crashes on multi-record input.
         - Detect overlapping start matches as ambiguous.
@@ -187,6 +188,7 @@
     - `seqkit seq/replace`:
         - Avoid crashes with empty filter patterns; search reverse complements for DNA/RNA regular-expression filters and avoid reversed protein matches.
     - `seqkit seq`:
+        - Correct the error message when the minimum length exceeds the maximum length.
         - Keep quality background colors aligned after gaps or other uncolored characters with `-k/--color`, including wrapped FASTQ output.
         - Convert every selected record with `--rna2dna` or `--dna2rna`, even when the first record already has the target alphabet.
         - Apply a zero maximum-quality threshold and reject nonfinite quality limits.
