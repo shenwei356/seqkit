@@ -237,6 +237,7 @@ Attention:
 		for _, file := range files {
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
+			fileAlphabet := alphabet
 
 			checkSeqType = true
 			printQual = false
@@ -249,6 +250,8 @@ Attention:
 					checkError(err)
 					break
 				}
+				fileAlphabet, err = inferAndValidateRecordAlphabet(record, fileAlphabet)
+				checkError(err)
 
 				if checkSeqType {
 					isFastq = fastxReader.IsFastq

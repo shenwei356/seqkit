@@ -474,7 +474,8 @@ Filtering records to edit:
 					checkError(err)
 					break
 				}
-				fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
+				fileAlphabet, err = inferAndValidateRecordAlphabet(record, fileAlphabet)
+				checkError(err)
 
 				if checkSeqType {
 					isFastq = fastxReader.IsFastq

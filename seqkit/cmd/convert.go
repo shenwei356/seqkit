@@ -100,6 +100,7 @@ Encoding guesses must be compatible with the quality scores of every sampled rec
 				fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 				checkError(err)
 				defer fastxReader.Close()
+				fileAlphabet := alphabet
 
 				guessing := from <= 0
 				fromEncoding = from
@@ -140,6 +141,8 @@ Encoding guesses must be compatible with the quality scores of every sampled rec
 						}
 						break
 					}
+					checkError(err)
+					fileAlphabet, err = inferAndValidateRecordAlphabet(record, fileAlphabet)
 					checkError(err)
 					if !fastxReader.IsFastq {
 						checkError(fmt.Errorf("this command only works for FASTQ format"))

@@ -187,3 +187,10 @@ func TestLocateRegexpContext(t *testing.T) {
 		}
 	}
 }
+
+// TestLocateValidateLeadingEmptyRecords keeps base validation active after empty reads.
+func TestLocateValidateLeadingEmptyRecords(t *testing.T) {
+	for _, mode := range [][]string{nil, {"-F"}, {"-m", "1"}} {
+		assertLeadingEmptyValidation(t, append([]string{"locate", "-p", "AC"}, mode...)...)
+	}
+}

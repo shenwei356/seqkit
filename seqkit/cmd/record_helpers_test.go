@@ -70,3 +70,16 @@ func assertMixedFileFormats(t *testing.T, args ...string) {
 		}
 	}
 }
+
+// assertLeadingEmptyValidation checks the actual CLI error path before and after
+// an empty prefix; an invalid base lies outside the short search range in fish.
+func assertLeadingEmptyValidation(t *testing.T, args ...string) {
+	t.Helper()
+	const input = "@r\nACGT\n+\nIIII\n@bad\nAC%T\n+\nIIII\n"
+	for _, prefix := range []string{"", "@empty\n\n+\n\n"} {
+		_, stderr, err := runCLI(t, prefix+input, args...)
+		if err == nil || !strings.Contains(stderr, "invalid DNAredundant letter: %") {
+			t.Fatalf("sequence validation failed with leading empty=%t: %v", prefix != "", err)
+		}
+	}
+}

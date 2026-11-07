@@ -349,7 +349,8 @@ Attention:
 						checkError(err)
 						break
 					}
-					fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
+					fileAlphabet, err = inferAndValidateRecordAlphabet(record, fileAlphabet)
+					checkError(err)
 
 					if len(record.Seq.Seq) == 0 {
 						continue
@@ -608,7 +609,8 @@ Attention:
 					checkError(err)
 					break
 				}
-				fileAlphabet = inferRecordAlphabet(record, fileAlphabet)
+				fileAlphabet, err = inferAndValidateRecordAlphabet(record, fileAlphabet)
+				checkError(err)
 
 				if len(record.Seq.Seq) == 0 {
 					continue

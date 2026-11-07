@@ -166,6 +166,17 @@ func inferRecordAlphabet(record *fastx.Record, alphabet *seq.Alphabet) *seq.Alph
 	return alphabet
 }
 
+// inferAndValidateRecordAlphabet also validates when the reader's initial empty
+// record left it using an unrestricted alphabet. Other records are already checked.
+func inferAndValidateRecordAlphabet(record *fastx.Record, alphabet *seq.Alphabet) (*seq.Alphabet, error) {
+	readerAlphabet := record.Seq.Alphabet
+	alphabet = inferRecordAlphabet(record, alphabet)
+	if seq.ValidateSeq && alphabet != nil && alphabet != readerAlphabet {
+		return alphabet, alphabet.IsValid(record.Seq.Seq)
+	}
+	return alphabet, nil
+}
+
 // guessAlphabet probes through leading empty records and always closes its reader.
 func guessAlphabet(file string) (*seq.Alphabet, bool, error) {
 	r, err := fastx.NewDefaultReader(file)

@@ -134,3 +134,29 @@ func TestSeqColorQualityPositions(t *testing.T) {
 		})
 	}
 }
+
+// TestSeqValidateLeadingEmptyRecords applies the inferred type to later records,
+// while leaving sequence validation optional.
+func TestSeqValidateLeadingEmptyRecords(t *testing.T) {
+	for _, bases := range []string{"ACGT", "ACGU", "EFILPQ"} {
+		for _, fastq := range []bool{false, true} {
+			input := ">r\n" + bases + "\n>bad\n%\n"
+			empty := ">empty\n"
+			if fastq {
+				input = "@r\n" + bases + "\n+\n" + strings.Repeat("I", len(bases)) + "\n@bad\n%\n+\nI\n"
+				empty = "@empty\n\n+\n\n"
+			}
+			_, baseline, err := runCLI(t, input, "seq", "-v")
+			if err == nil || !strings.Contains(baseline, "invalid") {
+				t.Fatalf("invalid baseline accepted: %v %s", err, baseline)
+			}
+			_, stderr, err := runCLI(t, empty+input, "seq", "-v")
+			if err == nil || stderr != baseline {
+				t.Errorf("leading empty record disabled validation: %v %s", err, stderr)
+			}
+			if _, stderr, err := runCLI(t, empty+input, "seq"); err != nil {
+				t.Fatalf("validation was enabled implicitly: %v %s", err, stderr)
+			}
+		}
+	}
+}

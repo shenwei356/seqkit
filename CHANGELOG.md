@@ -14,6 +14,8 @@
         - Output completed results promptly in input order and reduce memory use when an earlier record or file is slow.
     - `seqkit amplicon/common/fa2fq/grep/locate/replace/restart/rmdup/seq/subseq`:
         - Preserve reverse-complement matching and extraction after leading empty records when detecting sequence type automatically.
+    - `seqkit convert/fish/locate/seq/watch`:
+        - Keep sequence validation active after leading empty records when detecting sequence type automatically.
     - `seqkit faidx/shuffle/sort/split/subseq`:
         - Reject directories used as FASTA index paths.
         - Preserve records with long IDs when reusing FASTA indexes, and report index read errors.

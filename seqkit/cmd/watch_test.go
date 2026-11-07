@@ -92,3 +92,8 @@ func TestWatchImageAliases(t *testing.T) {
 		}
 	}
 }
+
+// TestWatchValidateLeadingEmptyRecords keeps base validation active after empty reads.
+func TestWatchValidateLeadingEmptyRecords(t *testing.T) {
+	assertLeadingEmptyValidation(t, "watch", "-v", "-Q")
+}

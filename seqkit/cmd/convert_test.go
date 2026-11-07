@@ -99,3 +99,10 @@ func TestConvertGuessCompatibleScores(t *testing.T) {
 		}
 	}
 }
+
+// TestConvertValidateLeadingEmptyRecords keeps base validation active after empty reads.
+func TestConvertValidateLeadingEmptyRecords(t *testing.T) {
+	for _, mode := range [][]string{nil, {"--from", "sanger"}} {
+		assertLeadingEmptyValidation(t, append([]string{"convert", "--to", "sanger"}, mode...)...)
+	}
+}

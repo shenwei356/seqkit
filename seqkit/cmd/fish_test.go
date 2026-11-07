@@ -241,3 +241,8 @@ func TestFishQueryIDWhitespace(t *testing.T) {
 		t.Fatalf("query ID broke result columns: %q", fields)
 	}
 }
+
+// TestFishValidateLeadingEmptyRecords keeps base validation active after empty reads.
+func TestFishValidateLeadingEmptyRecords(t *testing.T) {
+	assertLeadingEmptyValidation(t, "fish", "-v", "-F", "AC", "-r", "0:2")
+}
