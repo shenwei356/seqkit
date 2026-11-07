@@ -64,6 +64,10 @@ Encoding guesses must be compatible with the quality scores of every sampled rec
 		from := parseQualityEncoding(getFlagString(cmd, "from"))
 
 		toEncoding := parseQualityEncoding(getFlagString(cmd, "to"))
+		// Only the source encoding may be omitted for automatic detection.
+		if toEncoding == seq.Unknown {
+			checkError(fmt.Errorf("target quality encoding (--to) must not be empty"))
+		}
 
 		var fromEncoding seq.QualityEncoding
 

@@ -66,6 +66,7 @@
         - Reject nonfinite or out-of-range quality-encoding guess fractions.
         - Leave output files and directories untouched with `--dry-run`.
         - Keep quality-encoding guesses compatible with every sampled record, avoiding false Illumina guesses for Sanger input with mixed quality scores or empty records.
+        - Reject an empty target quality encoding before modifying output files.
     - `seqkit convert/locate/merge-slides/range/replace/sliding/split/split2/sum`:
         - Fixed record handling, validation, and concurrency issues.
     - `seqkit faidx`:

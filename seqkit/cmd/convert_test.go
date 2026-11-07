@@ -53,6 +53,25 @@ func TestConvertGuessFraction(t *testing.T) {
 	}
 }
 
+// TestConvertEmptyTarget rejects an unset target before truncating output, even
+// with no records or in dry-run mode; an empty source still means auto-detection.
+func TestConvertEmptyTarget(t *testing.T) {
+	for _, input := range []string{"", "@s\nAC\n+\n!!\n"} {
+		for _, dryRun := range []bool{false, true} {
+			output := auditInput(t, t.TempDir(), "out.fq", "keep\n")
+			args := []string{"convert", "--to", "", "-o", output}
+			if dryRun {
+				args = append(args, "--dry-run")
+			}
+			_, stderr, err := runCLI(t, input, args...)
+			after, readErr := os.ReadFile(output)
+			if err == nil || !strings.Contains(stderr, "target quality encoding") || readErr != nil || string(after) != "keep\n" {
+				t.Fatalf("empty target was not rejected safely: %v %s", err, stderr)
+			}
+		}
+	}
+}
+
 // TestConvertGuessCompatibleScores keeps heuristic guesses compatible with every
 // sampled quality, regardless of record order or empty records.
 func TestConvertGuessCompatibleScores(t *testing.T) {
