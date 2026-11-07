@@ -19,6 +19,7 @@
         - Read xz, zstd, bzip2, and LZ4 inputs through the appropriate decompression path.
         - Avoid leaving input files open after detecting their format.
     - `seqkit amplicon`:
+        - Correctly clip flanking regions with very large coordinates instead of dropping valid results.
         - Validate primer files and mismatch combinations, match N as a degenerate base, and omit reversed or entirely out-of-range results. [#618](https://github.com/shenwei356/seqkit/issues/618)
         - Fixed data races during parallel mismatch searches.
         - Omit false matches on empty records and return the longest amplicon when degenerate primers have overlapping matches.

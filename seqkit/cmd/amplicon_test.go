@@ -7,6 +7,28 @@ import (
 	"testing"
 )
 
+// TestSubLocationFlankingOverflow checks clipping before adding large offsets.
+func TestSubLocationFlankingOverflow(t *testing.T) {
+	maxInt := int(^uint(0) >> 1)
+	for _, strict := range []bool{false, true} {
+		for _, tt := range []struct {
+			begin, end, wantBegin, wantEnd int
+			wantOK                         bool
+		}{
+			{1, maxInt, 7, 10, !strict},
+			{maxInt, maxInt, 0, 0, false},
+			{-maxInt - 1, maxInt, 1, 10, !strict},
+			{-maxInt - 1, -1, 1, 3, !strict},
+			{1, 4, 7, 10, true},
+		} {
+			begin, end, ok := SubLocationFlanking(10, 3, 5, tt.begin, tt.end, strict)
+			if ok != tt.wantOK || ok && (begin != tt.wantBegin || end != tt.wantEnd) {
+				t.Errorf("%d:%d strict=%v: got %d:%d %v, want %d:%d %v", tt.begin, tt.end, strict, begin, end, ok, tt.wantBegin, tt.wantEnd, tt.wantOK)
+			}
+		}
+	}
+}
+
 // TestAmpliconMixedFileFormats preserves each input file's format.
 func TestAmpliconMixedFileFormats(t *testing.T) {
 	assertMixedFileFormats(t, "amplicon", "-P", "-F", "ACGT", "-u")

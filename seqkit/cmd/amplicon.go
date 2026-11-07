@@ -884,48 +884,32 @@ func SubLocationFlanking(length, B, E, begin, end int, strictMode bool) (int, in
 	}
 
 	var b, e int
-	var flag bool // 5' flanking is shorter than -begin
-
 	if begin > 0 {
+		// Check the remaining length before adding a potentially huge offset.
+		if begin > length-E-1 {
+			return 0, 0, false
+		}
 		b = E + begin + 1
 	} else {
 		b = B + begin + 1
 	}
-	if b > length {
-		// b = length
-		return 0, 0, false
-	} else if b < 1 {
-		if strictMode {
-			return 0, 0, false
-		}
-		b = 1
-		flag = true
-		// return 0, 0, false
-	}
-
 	if end > 0 {
-		e = E + end + 1
+		if end > length-E-1 {
+			if strictMode {
+				return 0, 0, false
+			}
+			e = length
+		} else {
+			e = E + end + 1
+		}
 	} else {
 		e = B + end + 1
 	}
-	if e > length {
-		if strictMode {
-			return 0, 0, false
-		}
-		e = length
-	} else if e < 1 {
-		if strictMode {
-			return 0, 0, false
-		}
-		if flag {
-			return 0, 0, false
-		}
-		e = 1
-	}
-
-	if b > e {
+	// Reject empty intersections before clipping to the sequence boundaries.
+	if b > e || e < 1 || strictMode && b < 1 {
 		return b, e, false
 	}
+	b = max(1, b)
 
 	return b, e, true
 }
