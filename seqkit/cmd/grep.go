@@ -451,7 +451,7 @@ Examples:
 							return
 						}
 
-						var sequence *seq.Seq
+						var sequence []byte
 						var target []byte
 						var hit bool
 						// var k string
@@ -472,22 +472,22 @@ Examples:
 								break
 							}
 
-							sequence = record.Seq
+							sequence = record.Seq.Seq
 							if strand == '-' {
-								sequence = record.Seq.RevCom()
+								sequence = reverseComplementBases(record.Seq)
 							}
 							if limitRegion {
-								target = sliceSequenceRegion(sequence.Seq, start, end)
+								target = sliceSequenceRegion(sequence, start, end)
 								if len(target) == 0 {
 									continue
 								}
 							} else if circular {
 								// concat two copies of sequence, and do not change orginal sequence
-								target = make([]byte, len(sequence.Seq)*2)
-								copy(target[0:len(sequence.Seq)], sequence.Seq)
-								copy(target[len(sequence.Seq):], sequence.Seq)
+								target = make([]byte, len(sequence)*2)
+								copy(target[0:len(sequence)], sequence)
+								copy(target[len(sequence):], sequence)
 							} else {
-								target = sequence.Seq
+								target = sequence
 							}
 
 							if ignoreCase {
@@ -549,7 +549,7 @@ Examples:
 
 		// -------------------------------------------------------------------
 
-		var sequence *seq.Seq
+		var sequence []byte
 		var target []byte
 		var ok, hit bool
 		var sfmi *fmi.FMIndex
@@ -624,22 +624,22 @@ Examples:
 					}
 
 					if bySeq {
-						sequence = record.Seq
+						sequence = record.Seq.Seq
 						if strand == '-' {
-							sequence = record.Seq.RevCom()
+							sequence = reverseComplementBases(record.Seq)
 						}
 						if limitRegion {
-							target = sliceSequenceRegion(sequence.Seq, start, end)
+							target = sliceSequenceRegion(sequence, start, end)
 							if len(target) == 0 {
 								continue
 							}
 						} else if circular {
 							// concat two copies of sequence, and do not change orginal sequence
-							target = make([]byte, len(sequence.Seq)*2)
-							copy(target[0:len(sequence.Seq)], sequence.Seq)
-							copy(target[len(sequence.Seq):], sequence.Seq)
+							target = make([]byte, len(sequence)*2)
+							copy(target[0:len(sequence)], sequence)
+							copy(target[len(sequence):], sequence)
 						} else {
-							target = sequence.Seq
+							target = sequence
 						}
 					}
 

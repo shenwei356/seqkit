@@ -50,6 +50,7 @@
         - Preserve identical DNA/RNA matches on both strands with `-s -e` and use less memory for comparisons across files.
     - `seqkit common/rmdup`:
         - Keep reversed protein sequences distinct when comparing by sequence.
+    - `seqkit common/grep/locate/replace/rmdup/seq`:
         - Speed up sequence comparisons on both strands, especially for short FASTQ reads.
     - `seqkit concat`:
         - Preserve descriptions with custom IDs, avoid repeating text already included in an ID, and ignore empty files when calculating full-join padding. [#614](https://github.com/shenwei356/seqkit/issues/614)
@@ -181,6 +182,7 @@
     - `seqkit translate`:
         - Correct negative-frame translation of RNA and ambiguous bases, subsequence coordinates, and failed-frame headers; validate table/frame selections. [#619](https://github.com/shenwei356/seqkit/issues/619)
         - With `-e`, emit empty sequences for untranslatable records and continue past leading empty records; clarify truncation and minimum-length options.
+        - Speed up translation of negative frames.
 - [SeqKit v2.14.0](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0) - 2026-09-24
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/shenwei356/seqkit/v2.14.0/total.svg)](https://github.com/shenwei356/seqkit/releases/tag/v2.14.0)
     - `seqkit`:

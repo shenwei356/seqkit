@@ -218,7 +218,7 @@ Translate Tables/Genetic Codes:
 					template, translateFrame := record.Seq, frame
 					if frame < 0 {
 						if reverse == nil {
-							reverse = (&seq.Seq{Alphabet: record.Seq.Alphabet, Seq: record.Seq.Seq}).RevCom()
+							reverse = &seq.Seq{Alphabet: record.Seq.Alphabet, Seq: reverseComplementBases(record.Seq)}
 						}
 						template, translateFrame = reverse, -frame
 					}

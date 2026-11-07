@@ -511,7 +511,7 @@ Filtering records to edit:
 							}
 						}
 						if !matched && fbySeq && !fbyName && !fonlyPositiveStrand && hasComplement(record.Seq.Alphabet) {
-							target = record.Seq.RevCom().Seq
+							target = reverseComplementBases(record.Seq)
 							for _, re = range patternsR {
 								if re.Match(target) {
 									matched = true
@@ -531,7 +531,7 @@ Filtering records to edit:
 						}
 						// search the reverse complement seq
 						if !matched && !fonlyPositiveStrand && hasComplement(record.Seq.Alphabet) {
-							target = record.Seq.RevCom().Seq
+							target = reverseComplementBases(record.Seq)
 							if fignoreCase {
 								target = bytes.ToLower(target)
 							}

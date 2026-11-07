@@ -370,7 +370,7 @@ Attention:
 							wg.Done()
 						}()
 
-						var seqRP *seq.Seq
+						var seqRP []byte
 						var l int
 						var sfmi *fmi.FMIndex
 						sfmi = fmi.NewFMIndex()
@@ -482,9 +482,9 @@ Attention:
 
 						var _wg2 sync.WaitGroup
 
-						seqRP = record.Seq.RevCom()
+						seqRP = reverseComplementBases(record.Seq)
 
-						_, err = sfmi.Transform(seqRP.Seq)
+						_, err = sfmi.Transform(seqRP)
 						if err != nil {
 							checkError(fmt.Errorf("fail to build FMIndex for reverse complement sequence: %s", record.Name))
 						}
@@ -549,7 +549,7 @@ Attention:
 												"-",
 												begin,
 												end,
-												prune(seqRP.Seq[i:i+len(pSeq)], len2show)) // seqRP.Seq[i:i+len(pSeq)])
+												prune(seqRP[i:i+len(pSeq)], len2show)) // seqRP[i:i+len(pSeq)])
 										}
 									}
 								}
@@ -578,7 +578,7 @@ Attention:
 
 		// -------------------------------------------------------------------
 
-		var seqRP *seq.Seq
+		var seqRP []byte
 		var offset, l, lpatten int
 		var loc []int
 		// var locs, locsNeg [][2]int
@@ -696,9 +696,9 @@ Attention:
 						continue
 					}
 
-					seqRP = record.Seq.RevCom()
+					seqRP = reverseComplementBases(record.Seq)
 
-					_, err = sfmi.Transform(seqRP.Seq)
+					_, err = sfmi.Transform(seqRP)
 					if err != nil {
 						checkError(fmt.Errorf("fail to build FMIndex for reverse complement sequence: %s", record.Name))
 					}
@@ -757,7 +757,7 @@ Attention:
 										"-",
 										begin,
 										end,
-										prune(seqRP.Seq[i:i+len(pSeq)], len2show))) // seqRP.Seq[i:i+len(pSeq)]))
+										prune(seqRP[i:i+len(pSeq)], len2show))) // seqRP[i:i+len(pSeq)]))
 								}
 							}
 						}
@@ -878,7 +878,7 @@ Attention:
 					}
 
 					if seqRP == nil {
-						seqRP = record.Seq.RevCom()
+						seqRP = reverseComplementBases(record.Seq)
 					}
 
 					// locsNeg = locsNeg[:0]
@@ -888,12 +888,12 @@ Attention:
 					for {
 						if useRegexp || degenerate {
 							re = regexps[pName]
-							loc = re.findFrom(seqRP.Seq, offset)
+							loc = re.findFrom(seqRP, offset)
 							if loc == nil {
 								break
 							}
 						} else {
-							i = bytes.Index(seqRP.Seq[offset:], p)
+							i = bytes.Index(seqRP[offset:], p)
 							if i < 0 {
 								break
 							}
@@ -902,7 +902,7 @@ Attention:
 
 						if loc[0] == loc[1] {
 							offset += loc[1] + 1
-							if offset >= len(seqRP.Seq) {
+							if offset >= len(seqRP) {
 								break
 							}
 							continue
@@ -965,7 +965,7 @@ Attention:
 									"-",
 									begin,
 									end,
-									prune(seqRP.Seq[offset+loc[0]:offset+loc[1]], len2show))) // seqRP.Seq[offset+loc[0]:offset+loc[1]]))
+									prune(seqRP[offset+loc[0]:offset+loc[1]], len2show))) // seqRP[offset+loc[0]:offset+loc[1]]))
 							}
 						}
 						// locsNeg = append(locsNeg, [2]int{begin, end})
