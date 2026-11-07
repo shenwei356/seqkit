@@ -168,6 +168,8 @@
     - `seqkit sort`:
         - Use less memory when sorting without `--two-pass`.
         - Correct sorting and output for mixed formats, case-insensitive comparisons, sequence prefixes, and empty sequences. [#602](https://github.com/shenwei356/seqkit/issues/602), [#603](https://github.com/shenwei356/seqkit/issues/603), [#604](https://github.com/shenwei356/seqkit/issues/604), [#605](https://github.com/shenwei356/seqkit/issues/605), [#606](https://github.com/shenwei356/seqkit/issues/606)
+    - `seqkit sort/split`:
+        - Accept headers containing tabs when sorting by sequence or splitting by region in two-pass mode.
     - `seqkit split`:
         - Escape region strings in output filenames so unrestricted sequences cannot write outside the output directory.
         - Create balanced nonempty parts with `-p`. [#620](https://github.com/shenwei356/seqkit/issues/620)

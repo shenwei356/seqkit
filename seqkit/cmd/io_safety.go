@@ -16,6 +16,14 @@ import (
 // indexHeaderTabs matches FAI's normalization of consecutive header tabs.
 var indexHeaderTabs = regexp.MustCompile(`\t+`)
 
+// fastaIndexName matches the FAI writer's replacement of tab runs with one space.
+func fastaIndexName(name string) string {
+	if strings.IndexByte(name, '\t') < 0 {
+		return name
+	}
+	return indexHeaderTabs.ReplaceAllString(name, " ")
+}
+
 // closeOutput reports buffered write and compression-finalization failures.
 func closeOutput(w io.Closer) { checkError(w.Close()) }
 
@@ -366,10 +374,7 @@ func validateFASTAIndex(file string, index fai.Index) error {
 		if line[0] != '>' {
 			return fmt.Errorf("FASTA index does not match %s; use --update-faidx", file)
 		}
-		name := string(line[1:])
-		if strings.ContainsRune(name, '\t') {
-			name = indexHeaderTabs.ReplaceAllString(name, " ")
-		}
+		name := fastaIndexName(string(line[1:]))
 		r, ok := index[name]
 		if !ok {
 			return fmt.Errorf("FASTA index does not match %s; use --update-faidx", file)

@@ -10,6 +10,35 @@ import (
 	"testing"
 )
 
+// TestSplitTwoPassRegionHeaderTabs retrieves records through normalized index keys.
+func TestSplitTwoPassRegionHeaderTabs(t *testing.T) {
+	for _, separator := range []string{"\t", "\t\t"} {
+		for _, extension := range []string{"", ".gz"} {
+			dir := t.TempDir()
+			input := ">a" + separator + "x\nACGT\n>b" + separator + "x\nACTG\n"
+			if extension != "" {
+				input = string(compressedInput(t, extension, input))
+			}
+			file := auditInput(t, dir, "input.fa"+extension, input)
+			for attempt := 0; attempt < 2; attempt++ {
+				outdir := filepath.Join(dir, fmt.Sprintf("parts-%d", attempt))
+				_, _, err := runCLI(t, "", "split", "-2", "-r", "1:2", file, "-O", outdir)
+				if err != nil {
+					t.Fatalf("two-pass region split failed: extension=%q attempt=%d: %v", extension, attempt, err)
+				}
+				entries, err := os.ReadDir(outdir)
+				if err != nil || len(entries) != 1 {
+					t.Fatalf("expected one region group: %d files, %v", len(entries), err)
+				}
+				table, stderr, err := runCLI(t, "", "fx2tab", "-i", "-Q", filepath.Join(outdir, entries[0].Name()))
+				if err != nil || table != "a\tACGT\nb\tACTG\n" {
+					t.Fatalf("split group changed records: %v %s", err, stderr)
+				}
+			}
+		}
+	}
+}
+
 // TestSplitEmptyTwoPassInput accepts empty compressed input in every grouping mode.
 func TestSplitEmptyTwoPassInput(t *testing.T) {
 	for _, flags := range [][]string{{"-s", "1"}, {"-p", "2"}, {"-i"}, {"-r", "1:2"}} {

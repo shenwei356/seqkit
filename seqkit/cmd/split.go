@@ -867,7 +867,7 @@ Examples:
 					checkError(fmt.Errorf("region (%s) not match sequence (%s) with length of %d", region, record.Name, len(record.Seq.Seq)))
 				}
 				subseq = string(record.Seq.SubSeq(s, e).Seq)
-				name = string(record.Name)
+				name = fastaIndexName(string(record.Name))
 				if _, ok := region2name[subseq]; !ok {
 					region2name[subseq] = []string{}
 				}

@@ -10,6 +10,31 @@ import (
 	"testing"
 )
 
+// TestSortTwoPassHeaderTabs uses the same full-header keys as index creation.
+func TestSortTwoPassHeaderTabs(t *testing.T) {
+	for _, separator := range []string{"\t", "\t\t"} {
+		for _, extension := range []string{"", ".gz"} {
+			dir := t.TempDir()
+			input := ">a" + separator + "x\nTGCA\n>b" + separator + "x\nACGT\n"
+			if extension != "" {
+				input = string(compressedInput(t, extension, input))
+			}
+			file := auditInput(t, dir, "input.fa"+extension, input)
+			// Plain input reuses its index on the second invocation.
+			for attempt := 0; attempt < 2; attempt++ {
+				out, _, err := runCLI(t, "", "sort", "-2", "-s", file)
+				if err != nil {
+					t.Fatalf("two-pass sequence sort failed: extension=%q attempt=%d: %v", extension, attempt, err)
+				}
+				table, stderr, err := runCLI(t, out, "fx2tab", "-i", "-Q")
+				if err != nil || table != "b\tACGT\na\tTGCA\n" {
+					t.Fatalf("sequence order or content changed: %v %s", err, stderr)
+				}
+			}
+		}
+	}
+}
+
 // TestSortDuplicatesAcrossFiles keeps duplicate validation ahead of output creation.
 func TestSortDuplicatesAcrossFiles(t *testing.T) {
 	for _, flags := range [][]string{nil, {"-n"}, {"-s"}, {"-l"}, {"-b"}, {"--id-regexp", "^(r[0-9]+)"}} {

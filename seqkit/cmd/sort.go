@@ -387,7 +387,7 @@ Attention:
 				if _, ok := id2name[name]; ok {
 					checkError(fmt.Errorf(`duplicated sequences found: %s. use "seqkit rename" to rename duplicated IDs`, name))
 				}
-				id2name[name] = []byte(string(record.Name))
+				id2name[name] = []byte(fastaIndexName(string(record.Name)))
 
 				if seqPrefixLength == 0 || len(record.Seq.Seq) <= seqPrefixLength {
 					prefix = record.Seq.Seq

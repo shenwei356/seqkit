@@ -2877,6 +2877,7 @@ Examples
 ## split
 
 Empty input, including compressed files and stdin, produces no parts in two-pass mode.
+Two-pass mode represents consecutive tabs in headers as one space, as stored in the FASTA index.
 
 For `split`, `split2`, and `pair`, output filenames keep the sequence extension
 before the compression suffix (`.gz`, `.xz`, `.zst`, `.bz2`, or `.lz4`).
@@ -4423,6 +4424,7 @@ flag `-s` (`--rand-seed`) for read 1 and 2 files.
 ## sort
 
 Empty input, including compressed files and stdin, produces empty output in two-pass mode.
+Two-pass mode represents consecutive tabs in headers as one space, as stored in the FASTA index.
 
 Usage
 
