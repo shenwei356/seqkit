@@ -9,6 +9,23 @@ import (
 	"testing"
 )
 
+// TestLocateDisplayLimit marks only genuinely truncated patterns and matches.
+func TestLocateDisplayLimit(t *testing.T) {
+	for _, mode := range [][]string{nil, {"-r"}, {"-F"}, {"-m", "1"}} {
+		for _, tc := range []struct{ limit, want string }{
+			{"0", "ACGT"}, {"3", "ACG..."}, {"4", "ACGT"}, {"5", "ACGT"},
+		} {
+			args := append([]string{"locate", "-P", "-p", "ACGT", "-s", tc.limit}, mode...)
+			out, stderr, err := runCLI(t, ">r1\nACGT\n", args...)
+			want := "seqID\tpatternName\tpattern\tstrand\tstart\tend\tmatched\n" +
+				"r1\tACGT\t" + tc.want + "\t+\t1\t4\t" + tc.want + "\n"
+			if err != nil || out != want {
+				t.Fatalf("%v: output %q, want %q; %v %s", args, out, want, err, stderr)
+			}
+		}
+	}
+}
+
 // TestLocateMultiplePatternsAndRecords keeps cached reverse strands local to a record.
 func TestLocateMultiplePatternsAndRecords(t *testing.T) {
 	dir := t.TempDir()

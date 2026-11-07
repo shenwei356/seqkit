@@ -1012,13 +1012,14 @@ func init() {
 	locateCmd.Flags().BoolP("immediate-output", "I", false, "print output immediately, do not use write buffer")
 }
 
+// prune adds an ellipsis only when the display limit omits sequence characters.
 func prune(s []byte, n int) []byte {
 	if n == 0 {
 		return s
 	}
 
 	n0 := len(s)
-	if n0 < n {
+	if n0 <= n {
 		return s
 	}
 

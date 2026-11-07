@@ -104,6 +104,7 @@
     - `seqkit head/split2`:
         - Use base-1000 K/M/G/T suffixes for sequence lengths; document base-1024 buffer sizes and file-growth thresholds.
     - `seqkit locate`:
+        - Avoid adding an ellipsis to complete patterns and matches whose length equals `--max-len-to-show`.
         - Combine command-line and file patterns, retain duplicate pattern IDs with a warning, reject empty patterns, and correct circular minus-strand coordinates. [#618](https://github.com/shenwei356/seqkit/issues/618)
         - Preserve regex anchors and word boundaries in overlapping matches; speed up searches on both strands with many patterns when not using the FM-index.
     - `seqkit merge-slides`:
