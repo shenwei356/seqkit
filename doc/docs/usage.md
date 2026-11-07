@@ -3253,6 +3253,8 @@ Flags:
   -u, --save-unpaired    save unpaired reads if there are
 ```
 
+Without `-u/--save-unpaired`, reads that can no longer find a mate after the other input ends are discarded instead of buffered.
+
 Examples
 
 1. Simple one

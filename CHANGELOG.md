@@ -114,6 +114,7 @@
         - Skip invalid edit boundaries without changing valid edits. [#619](https://github.com/shenwei356/seqkit/issues/619)
         - Preserve colons in edit content without crashing or truncating insertions, and reject non-ASCII point replacements before writing output.
     - `seqkit pair`:
+        - Reduce memory use for unequal input lengths when unpaired reads are not saved.
         - Preserve duplicate IDs and each mate's format. [#620](https://github.com/shenwei356/seqkit/issues/620)
         - Restore faster processing and lower memory use for reads paired in input order.
     - `seqkit pair/split/split2`:

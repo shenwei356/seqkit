@@ -70,3 +70,50 @@ func TestPairInitialReadProtection(t *testing.T) {
 		t.Fatalf("initial failure changed target: %q %v %s", data, err, stderr)
 	}
 }
+
+// TestPairUnequalInputLengths keeps pending mates matchable after either input ends.
+func TestPairUnequalInputLengths(t *testing.T) {
+	for _, swap := range []bool{false, true} {
+		for _, save := range []bool{false, true} {
+			dir := t.TempDir()
+			a := auditInput(t, dir, "a.fa", ">a\nAA\n>a\nCC\n>b\nGG\n")
+			b := auditInput(t, dir, "b.fq", "@x\nAA\n+\nII\n@b\nTT\n+\nJK\n@a\nAC\n+\nLM\n@a\nGT\n+\nNO\n@z\nCC\n+\nPQ\n")
+			first, second := a, b
+			if swap {
+				first, second = b, a
+			}
+			outdir := filepath.Join(dir, "out")
+			args := []string{"pair", "-1", first, "-2", second, "-O", outdir}
+			if save {
+				args = append(args, "-u")
+			}
+			_, stderr, err := runCLI(t, "", args...)
+			if err != nil {
+				t.Fatalf("swap=%v save=%v: %v %s", swap, save, err, stderr)
+			}
+			wantPaired := map[string]string{
+				"a.fa": ">b\nGG\n>a\nAA\n>a\nCC\n",
+				"b.fq": "@b\nTT\n+\nJK\n@a\nAC\n+\nLM\n@a\nGT\n+\nNO\n",
+			}
+			if swap {
+				wantPaired["a.fa"] = ">a\nAA\n>b\nGG\n>a\nCC\n"
+				wantPaired["b.fq"] = "@a\nAC\n+\nLM\n@b\nTT\n+\nJK\n@a\nGT\n+\nNO\n"
+			}
+			for name, want := range wantPaired {
+				data, err := os.ReadFile(filepath.Join(outdir, name))
+				if err != nil || string(data) != want {
+					t.Fatalf("%s: %q, want %q: %v", name, data, want, err)
+				}
+			}
+			data, err := os.ReadFile(filepath.Join(outdir, "b.unpaired.fq"))
+			if save {
+				x, z := "@x\nAA\n+\nII\n", "@z\nCC\n+\nPQ\n"
+				if err != nil || (string(data) != x+z && string(data) != z+x) {
+					t.Fatalf("unpaired reads lost: %q %v", data, err)
+				}
+			} else if !os.IsNotExist(err) {
+				t.Fatalf("unexpected unpaired output: %v", err)
+			}
+		}
+	}
+}

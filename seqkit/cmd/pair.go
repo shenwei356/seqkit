@@ -164,6 +164,7 @@ Tips:
 				}
 			}
 		}
+		records := [2]*fastx.Record{record1, record2}
 		consume := func(side int, record *fastx.Record) {
 			id := string(record.ID)
 			other := 1 - side
@@ -177,11 +178,11 @@ Tips:
 					pending[other][id] = queue[1:]
 				}
 				pairs++
-			} else {
+			} else if saveUnpaired || records[other] != nil {
+				// After the other input ends, only its queued records can still match.
 				pending[side][id] = append(pending[side][id], record.Clone())
 			}
 		}
-		records := [2]*fastx.Record{record1, record2}
 		readers := [2]*fastx.Reader{reader1, reader2}
 		for records[0] != nil || records[1] != nil {
 			// Write aligned mates before either reader reuses its record buffer.
@@ -205,6 +206,10 @@ Tips:
 				record, readErr := reader.Read()
 				if readErr == io.EOF {
 					records[side] = nil
+					if !saveUnpaired {
+						// The opposite queue cannot find any more mates in this input.
+						clear(pending[1-side])
+					}
 					continue
 				}
 				if readErr != nil {
