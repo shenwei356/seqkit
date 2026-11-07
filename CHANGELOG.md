@@ -113,6 +113,7 @@
         - Reject invalid key capture indices before modifying output files.
         - Reject FASTQ replacements that borrow qualities outside the current match; document per-file record numbering. [#620](https://github.com/shenwei356/seqkit/issues/620)
     - `seqkit restart`:
+        - Find starting subsequences across the circular boundary, including mismatch searches, while keeping FASTQ qualities aligned.
         - Process each record independently with `-s`, avoiding skipped records and crashes on multi-record input.
         - Detect overlapping start matches as ambiguous.
         - Honor the thread limit set with `-j/--threads`.

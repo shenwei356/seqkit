@@ -77,3 +77,27 @@ func TestRestartProteinStrands(t *testing.T) {
 		}
 	}
 }
+
+// TestRestartCircularStarts finds boundary-spanning starts and rotates qualities with bases.
+func TestRestartCircularStarts(t *testing.T) {
+	for _, tt := range []struct {
+		name, input, pattern, mismatch, want string
+	}{
+		{"forward", "@r\nACGATGCA\n+\nABCDEFGH\n", "CAAC", "0", "@r\nCAACGATG\n+\nGHABCDEF\n"},
+		{"reverse", "@r\nTGCATCGT\n+\nHGFEDCBA\n", "CAAC", "0", "@r\nCAACGATG\n+\nGHABCDEF\n"},
+		{"mismatch", ">r\nACGATGCA\n", "GAAC", "1", ">r\nCAACGATG\n"},
+		{"reverse mismatch", "@r\nTGCATCGT\n+\nHGFEDCBA\n", "GAAC", "1", "@r\nCAACGATG\n+\nGHABCDEF\n"},
+		{"full rotation", ">r\nACGA\n", "GAAC", "0", ">r\nGAAC\n"},
+		{"single base", ">r\nACGA\n", "G", "0", ">r\nGAAC\n"},
+		{"ignore case", ">r\nacgatgca\n", "CAAC", "0", ">r\ncaacgatg\n"},
+		{"ambiguous across boundary", ">r\nAACA\n", "AA", "0", ""},
+		{"too long", ">r\nAC\n", "ACA", "0", ""},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			out, stderr, err := runCLI(t, tt.input, "restart", "-I", "-s", tt.pattern, "-m", tt.mismatch)
+			if err != nil || out != tt.want {
+				t.Fatalf("got %q, want %q: %v %s", out, tt.want, err, stderr)
+			}
+		})
+	}
+}

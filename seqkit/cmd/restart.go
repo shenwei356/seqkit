@@ -45,7 +45,8 @@ var restartCmd = &cobra.Command{
 Each input record is treated as an independent circular sequence. Multiple
 records and input files are supported with both -i and -s. With -s, records
 with no match or multiple matches on the searched strand are skipped with a warning.
-Empty records are skipped with -s. Protein and unrestricted alphabets are searched
+Matches may span the circular boundary. Empty records and records shorter than
+the starting subsequence are skipped with -s. Protein and unrestricted alphabets are searched
 only in their original orientation.
 
 Examples
@@ -111,7 +112,7 @@ Examples
 		defer closeOutput(outfh)
 
 		var sequence0, sequence, qual []byte
-		var bufSeq, bufQual bytes.Buffer
+		var bufSeq, bufQual, bufSearch bytes.Buffer
 		var l int
 		var record *fastx.Record
 		var i int
@@ -151,8 +152,8 @@ Examples
 				// ----------------------------------------------------
 				// find the position of subsequence
 				if len(startSeq) > 0 {
-					// Empty records cannot match and cannot be indexed by the FM-index.
-					if l == 0 {
+					// A starting subsequence must fit within one rotation of the record.
+					if l == 0 || len(startSeq) > l {
 						log.Warningf("the given subsequence is not found in sequence: %s", record.ID)
 						continue
 					}
@@ -162,6 +163,8 @@ Examples
 						sequence = bytes.ToUpper(sequence0)
 						startSeq = bytes.ToUpper(startSeq)
 					}
+
+					sequence = restartCircularSearchSequence(sequence, len(startSeq), &bufSearch)
 
 					positions = positions[:0]
 					if mismatches > 0 {
@@ -186,6 +189,7 @@ Examples
 							if ignoreCase {
 								sequence = bytes.ToUpper(sequence0)
 							}
+							sequence = restartCircularSearchSequence(sequence, len(startSeq), &bufSearch)
 
 							_, err = sfmi.Transform(sequence)
 							if err != nil {
@@ -225,6 +229,7 @@ Examples
 							if ignoreCase {
 								sequence = bytes.ToUpper(sequence0)
 							}
+							sequence = restartCircularSearchSequence(sequence, len(startSeq), &bufSearch)
 
 							i = 0
 							for {
@@ -298,4 +303,16 @@ func init() {
 	restartCmd.Flags().BoolP("ignore-case", "I", false, "ignore case when searching the custom starting subsequence")
 	restartCmd.Flags().IntP("max-mismatch", "m", 0, "max mismatch when searching the custom starting subsequence")
 
+}
+
+// restartCircularSearchSequence exposes boundary-spanning matches exactly once.
+// Callers ensure 1 <= patternLength <= len(sequence); only the needed prefix is copied.
+func restartCircularSearchSequence(sequence []byte, patternLength int, buffer *bytes.Buffer) []byte {
+	if patternLength == 1 {
+		return sequence
+	}
+	buffer.Reset()
+	buffer.Write(sequence)
+	buffer.Write(sequence[:patternLength-1])
+	return buffer.Bytes()
 }
