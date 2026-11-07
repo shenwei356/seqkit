@@ -52,3 +52,31 @@ func TestConvertGuessFraction(t *testing.T) {
 		}
 	}
 }
+
+// TestConvertGuessCompatibleScores keeps heuristic guesses compatible with every
+// sampled quality, regardless of record order or empty records.
+func TestConvertGuessCompatibleScores(t *testing.T) {
+	for _, quality := range []string{"II", "BB", ""} {
+		for _, reverse := range []bool{false, true} {
+			first := "@a\n" + strings.Repeat("A", len(quality)) + "\n+\n" + quality + "\n"
+			second := "@b\nAC\n+\n!!\n"
+			if reverse {
+				first, second = second, first
+			}
+			input := first + second
+			for _, fraction := range []string{"0", "0.1", "1"} {
+				out, stderr, err := runCLI(t, input, "convert", "-F", fraction)
+				if err != nil || out != input || !strings.Contains(stderr, "guessed quality encoding: Sanger") {
+					t.Fatalf("incompatible guess for %q (reverse=%v, fraction=%s): %v %s", quality, reverse, fraction, err, stderr)
+				}
+			}
+		}
+	}
+	// Retain the Illumina 1.5 heuristic when every record is compatible.
+	for _, fraction := range []string{"0.1", "1"} {
+		out, stderr, err := runCLI(t, "@a\nAA\n+\nBB\n@b\nCC\n+\nCC\n", "convert", "-F", fraction)
+		if err != nil || out != "@a\nAA\n+\n!!\n@b\nCC\n+\n$$\n" {
+			t.Fatalf("compatible Illumina guess changed: %v %s", err, stderr)
+		}
+	}
+}

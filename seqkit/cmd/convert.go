@@ -45,6 +45,7 @@ Quality conversion rejects invalid source scores and results outside printable
 ASCII (33-126), returning a non-zero exit status without writing the invalid record.
 Phred scores must be non-negative; Solexa scores must be at least -5.
 The --force flag only clips scores > 40 for Illumina-1.8+ -> Sanger.
+Encoding guesses must be compatible with the quality scores of every sampled record.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -99,7 +100,6 @@ The --force flag only clips scores > 40 for Illumina-1.8+ -> Sanger.
 				guessing := from <= 0
 				fromEncoding = from
 				var records []*fastx.Record // Only the current file's unconverted sample.
-				marks := make([]int, seq.NQualityEncoding)
 				reportEncoding := func() {
 					if !quiet {
 						log.Infof("converting %s -> %s", fromEncoding, toEncoding)
@@ -109,7 +109,7 @@ The --force flag only clips scores > 40 for Illumina-1.8+ -> Sanger.
 					}
 				}
 				finishGuessing := func() {
-					fromEncoding, err = guessQualityEncoding(marks, len(records), threshIllumina1p5Frac)
+					fromEncoding, err = guessQualityEncoding(records, threshIllumina1p5Frac)
 					checkError(err)
 					if !quiet {
 						log.Infof("guessed quality encoding: %s", fromEncoding)
@@ -142,9 +142,6 @@ The --force flag only clips scores > 40 for Illumina-1.8+ -> Sanger.
 					}
 					if guessing {
 						records = append(records, record.Clone())
-						for _, encoding := range seq.GuessQualityEncoding(record.Seq.Qual) {
-							marks[encoding]++
-						}
 						if len(records) == nrecords {
 							finishGuessing()
 							if dryRun {
@@ -201,16 +198,39 @@ func validateQualityEncoding(encoding seq.QualityEncoding, quality []byte) error
 	return nil
 }
 
-// guessQualityEncoding intersects sample candidates and resolves equivalent encodings.
-func guessQualityEncoding(marks []int, n int, illuminaFraction float64) (seq.QualityEncoding, error) {
-	candidates := make([]seq.QualityEncoding, 0, seq.NQualityEncoding)
-	for e, count := range marks {
-		if count == n {
-			candidates = append(candidates, seq.QualityEncoding(e))
+// guessQualityEncoding constrains heuristic guesses to the entire sample's byte
+// range, then resolves encodings with equivalent offsets and score definitions.
+func guessQualityEncoding(records []*fastx.Record, illuminaFraction float64) (seq.QualityEncoding, error) {
+	minQuality, maxQuality := byte(126), byte(0)
+	marks := make([]int, seq.NQualityEncoding)
+	for _, record := range records {
+		for _, q := range record.Seq.Qual {
+			minQuality = min(minQuality, q)
+			maxQuality = max(maxQuality, q)
+		}
+		for _, encoding := range seq.GuessQualityEncoding(record.Seq.Qual) {
+			marks[encoding]++
 		}
 	}
-	if float64(marks[seq.Illumina1p5])/float64(n) > illuminaFraction {
-		candidates = []seq.QualityEncoding{seq.Illumina1p5}
+	candidates := make([]seq.QualityEncoding, 0, seq.NQualityEncoding)
+	consistent := make([]seq.QualityEncoding, 0, seq.NQualityEncoding)
+	for e := seq.Sanger; int(e) < seq.NQualityEncoding; e++ {
+		bounds := e.QualityRange()
+		if int(minQuality) >= bounds[0] && int(maxQuality) <= bounds[1] {
+			candidates = append(candidates, e)
+			if marks[e] == len(records) {
+				consistent = append(consistent, e)
+			}
+			// B-enrichment cannot override incompatible scores in another record.
+			if e == seq.Illumina1p5 && float64(marks[e])/float64(len(records)) > illuminaFraction {
+				return e, nil
+			}
+		}
+	}
+	// Keep unanimous heuristic guesses when compatible. If they conflict,
+	// fall back to the encodings supported by the observed quality range.
+	if len(consistent) > 0 {
+		candidates = consistent
 	}
 	if len(candidates) == 0 {
 		return seq.Unknown, fmt.Errorf("quality encoding not consistent")

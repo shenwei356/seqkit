@@ -1555,6 +1555,7 @@ Quality conversion rejects invalid source scores and results outside printable
 ASCII (33-126), returning a non-zero exit status without writing the invalid record.
 Phred scores must be non-negative; Solexa scores must be at least -5.
 The --force flag only clips scores > 40 for Illumina-1.8+ -> Sanger.
+Encoding guesses must be compatible with the quality scores of every sampled record.
 
 Usage:
   seqkit convert [flags]
