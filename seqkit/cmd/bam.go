@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -1416,7 +1417,8 @@ func Bam2Bundles(inBam string, outDir string, minBundle int, nrProcBam int, quie
 			locusCount++
 			bundleLoci++
 			if minBundle == -1 || len(recCache) >= minBundle {
-				bundleName := fmt.Sprintf("%09d_%s:%d:%d_bundle.bam", bundleCount, chrom, bStart, bEnd)
+				// Reference IDs may contain path separators; keep them in one filename.
+				bundleName := fmt.Sprintf("%09d_%s:%d:%d_bundle.bam", bundleCount, url.PathEscape(chrom), bStart, bEnd)
 				outName := path.Join(outDir, bundleName)
 				outFh, err := os.Create(outName)
 				checkError(err)
@@ -1460,7 +1462,7 @@ func Bam2Bundles(inBam string, outDir string, minBundle int, nrProcBam int, quie
 	if len(recCache) > 0 {
 		bundleLoci++
 		locusCount++
-		bundleName := fmt.Sprintf("%09d_%s:%d:%d_bundle.bam", bundleCount, chrom, bStart, bEnd)
+		bundleName := fmt.Sprintf("%09d_%s:%d:%d_bundle.bam", bundleCount, url.PathEscape(chrom), bStart, bEnd)
 		outName := path.Join(outDir, bundleName)
 		outFh, err := os.Create(outName)
 		checkError(err)

@@ -392,3 +392,83 @@ func BenchmarkBamTop(b *testing.B) {
 		})
 	}
 }
+
+// TestBamBundleReferencePaths keeps reference names inside the output directory
+// in both the intermediate-flush and final-bundle paths.
+func TestBamBundleReferencePaths(t *testing.T) {
+	for _, tc := range []struct{ name, escaped string }{
+		{"x/../../victim", "x%2F..%2F..%2Fvictim"},
+		{"part/name", "part%2Fname"},
+		{`part\name`, "part%5Cname"},
+		{"part%2Fname", "part%252Fname"},
+	} {
+		for _, last := range []bool{false, true} {
+			t.Run(fmt.Sprintf("%s/last=%t", tc.escaped, last), func(t *testing.T) {
+				dir := t.TempDir()
+				victim := auditInput(t, dir, "victim:0:4_bundle.bam", "keep")
+				names := []string{tc.name, "plain"}
+				escaped := []string{tc.escaped, "plain"}
+				if last {
+					names[0], names[1] = names[1], names[0]
+					escaped[0], escaped[1] = escaped[1], escaped[0]
+				}
+				refs := make([]*sam.Reference, len(names))
+				for i, name := range names {
+					var err error
+					refs[i], err = sam.NewReference(name, "", "", 100, nil, nil)
+					if err != nil {
+						t.Fatal(err)
+					}
+				}
+				header, err := sam.NewHeader(nil, refs)
+				if err != nil {
+					t.Fatal(err)
+				}
+				input := filepath.Join(dir, "in.bam")
+				f, err := os.Create(input)
+				if err != nil {
+					t.Fatal(err)
+				}
+				w, err := bam.NewWriter(f, header, 1)
+				if err != nil {
+					t.Fatal(err)
+				}
+				for i, ref := range refs {
+					r, err := sam.NewRecord(fmt.Sprintf("r%d", i), ref, nil, 0, -1, 0, 60,
+						[]sam.CigarOp{sam.NewCigarOp(sam.CigarMatch, 4)}, []byte("ACGT"), nil, nil)
+					if err != nil {
+						t.Fatal(err)
+					}
+					if err := w.Write(r); err != nil {
+						t.Fatal(err)
+					}
+				}
+				if err := w.Close(); err != nil {
+					t.Fatal(err)
+				}
+				if err := f.Close(); err != nil {
+					t.Fatal(err)
+				}
+				outdir := filepath.Join(dir, "bundles")
+				_, stderr, err := runCLI(t, "", "bam", input, "-N", "-1", "-o", outdir)
+				data, readErr := os.ReadFile(victim)
+				if readErr != nil || string(data) != "keep" {
+					t.Fatal("bundle output overwrote a file outside its directory")
+				}
+				if err != nil {
+					t.Fatalf("bundling failed: %v %s", err, stderr)
+				}
+				entries, err := os.ReadDir(outdir)
+				if err != nil || len(entries) != 2 {
+					t.Fatalf("expected two bundle files: %v", err)
+				}
+				for i, name := range escaped {
+					_, records := readBAMFixture(t, filepath.Join(outdir, fmt.Sprintf("%09d_%s:0:4_bundle.bam", i, name)))
+					if len(records) != 1 || records[0].Ref.Name() != names[i] {
+						t.Fatal("escaping filenames changed the BAM records")
+					}
+				}
+			})
+		}
+	}
+}

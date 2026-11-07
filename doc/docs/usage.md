@@ -4507,6 +4507,9 @@ Examples
 ## bam
 
 With `--pretty`, statistics tables preserve literal percent signs in file names.
+With `--bundle`, reference IDs are percent-escaped in output filenames so path
+separators cannot create files outside the output directory. Reference names in
+the BAM records remain unchanged.
 
 ``` text
 $ seqkit bam -h
