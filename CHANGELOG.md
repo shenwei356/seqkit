@@ -166,6 +166,7 @@
     - `seqkit sliding`:
         - Skip empty circular records and avoid crashes with large greedy windows. [#619](https://github.com/shenwei356/seqkit/issues/619)
     - `seqkit sort`:
+        - Sort arbitrarily long numbers correctly with `-N` and speed up natural sorting.
         - Use less memory for single-pass sorting and two-pass sorting by ID/name or length.
         - Correct sorting and output for mixed formats, case-insensitive comparisons, sequence prefixes, and empty sequences. [#602](https://github.com/shenwei356/seqkit/issues/602), [#603](https://github.com/shenwei356/seqkit/issues/603), [#604](https://github.com/shenwei356/seqkit/issues/604), [#605](https://github.com/shenwei356/seqkit/issues/605), [#606](https://github.com/shenwei356/seqkit/issues/606)
     - `seqkit sort/split`:

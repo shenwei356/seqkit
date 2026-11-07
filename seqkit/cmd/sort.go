@@ -33,7 +33,6 @@ import (
 	"github.com/shenwei356/bio/seq"
 	"github.com/shenwei356/bio/seqio/fai"
 	"github.com/shenwei356/bio/seqio/fastx"
-	"github.com/shenwei356/natsort"
 	"github.com/shenwei356/util/stringutil"
 	"github.com/shenwei356/xopen"
 	"github.com/spf13/cobra"
@@ -64,6 +63,8 @@ Attention:
      Two-pass mode requires unique complete FASTA headers (ID and description).
   2. When sorting by sequence (-s), -L applies in both modes. Records with equal
      sequence prefixes retain their input order.
+  3. Natural order (-N) compares numbers of any length. Numerically equal ID/name
+     keys (such as r1 and r01) retain their input order, including with -r.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -500,11 +501,42 @@ func sortBySequenceName(records []sequenceSortKey, natural, reverse bool) {
 			a, b = b, a
 		}
 		if natural {
-			// Numerically equal spellings must not precede each other in both directions.
-			return natsort.Compare(a, b, false) && !natsort.Compare(b, a, false)
+			return naturalNameLess(a, b)
 		}
 		return a < b
 	})
+}
+
+// naturalNameLess compares alternating ASCII digit and text runs without integer
+// conversion or allocation. Equal numeric spellings remain tied for stable sorts.
+func naturalNameLess(a, b string) bool {
+	for len(a) > 0 && len(b) > 0 {
+		ac, ar, an := naturalNameChunk(a)
+		bc, br, bn := naturalNameChunk(b)
+		if an && bn {
+			ac = strings.TrimLeft(ac, "0")
+			bc = strings.TrimLeft(bc, "0")
+			if len(ac) != len(bc) {
+				return len(ac) < len(bc)
+			}
+		}
+		if ac != bc {
+			return ac < bc
+		}
+		a, b = ar, br
+	}
+	return len(a) == 0 && len(b) > 0
+}
+
+// naturalNameChunk splits a nonempty name at its first digit/text boundary.
+// Text runs retain the lexical ordering used by the original natural comparator.
+func naturalNameChunk(s string) (chunk, rest string, numeric bool) {
+	numeric = s[0] >= '0' && s[0] <= '9'
+	i := 1
+	for i < len(s) && (s[i] >= '0' && s[i] <= '9') == numeric {
+		i++
+	}
+	return s[:i], s[i:], numeric
 }
 
 func init() {

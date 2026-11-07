@@ -4450,6 +4450,8 @@ Attention:
      Two-pass mode requires unique complete FASTA headers (ID and description).
   2. When sorting by sequence (-s), -L applies in both modes. Records with equal
      sequence prefixes retain their input order.
+  3. Natural order (-N) compares numbers of any length. Numerically equal ID/name
+     keys (such as r1 and r01) retain their input order, including with -r.
 
 Usage:
   seqkit sort [flags]
