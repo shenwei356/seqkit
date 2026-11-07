@@ -40,7 +40,7 @@ var tab2faCmd = &cobra.Command{
 	Long: `convert tabular format (first two/three columns) to FASTA/Q format
 
 Columns after the third are ignored. For FASTQ output, sequence and quality
-lengths must match.
+lengths must match. Empty input files are skipped.
 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -74,6 +74,9 @@ lengths must match.
 		buf := make([]byte, min(bufferSize, 64<<10)) // Preserve the limit without eagerly reserving 1 GiB.
 		for _, file := range files {
 			fh, err = xopen.Ropen(file)
+			if err == xopen.ErrNoContent {
+				continue
+			}
 			checkError(err)
 
 			scanner = bufio.NewScanner(fh)

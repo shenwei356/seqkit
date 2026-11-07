@@ -45,6 +45,8 @@ var restartCmd = &cobra.Command{
 Each input record is treated as an independent circular sequence. Multiple
 records and input files are supported with both -i and -s. With -s, records
 with no match or multiple matches on the searched strand are skipped with a warning.
+Empty records are skipped with -s. Protein and unrestricted alphabets are searched
+only in their original orientation.
 
 Examples
   1. Specify a new start position.
@@ -149,6 +151,13 @@ Examples
 				// ----------------------------------------------------
 				// find the position of subsequence
 				if len(startSeq) > 0 {
+					// Empty records cannot match and cannot be indexed by the FM-index.
+					if l == 0 {
+						log.Warningf("the given subsequence is not found in sequence: %s", record.ID)
+						continue
+					}
+					// Protein and unrestricted alphabets have no complementary strand.
+					searchReverse := record.Seq.Alphabet != seq.Protein && record.Seq.Alphabet != seq.Unlimit
 					if ignoreCase {
 						sequence = bytes.ToUpper(sequence0)
 						startSeq = bytes.ToUpper(startSeq)
@@ -170,7 +179,7 @@ Examples
 							continue
 						}
 
-						if len(positions) == 0 { // not found in the current strand
+						if len(positions) == 0 && searchReverse { // not found in the current strand
 							record.Seq.RevComInplace()
 							sequence0 = record.Seq.Seq
 							sequence = record.Seq.Seq
@@ -209,7 +218,7 @@ Examples
 							continue
 						}
 
-						if len(positions) == 0 { // not found in the current strand
+						if len(positions) == 0 && searchReverse { // not found in the current strand
 							record.Seq.RevComInplace()
 							sequence0 = record.Seq.Seq
 							sequence = record.Seq.Seq
@@ -235,7 +244,7 @@ Examples
 					}
 
 					if len(positions) == 0 {
-						log.Warningf("the given subsequence is not found in both strands of sequence: %s", record.ID)
+						log.Warningf("the given subsequence is not found in sequence: %s", record.ID)
 						continue
 					}
 

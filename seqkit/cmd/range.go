@@ -101,7 +101,12 @@ Examples:
 		var bufSize int
 		var buf *RecordLoopBuffer
 		if start < 0 && end < 0 {
-			bufSize = -start
+			// Saturate the minimum integer's magnitude; no input can contain
+			// more than MaxInt records in this int-indexed buffer.
+			bufSize = -(start + 1)
+			if bufSize < int(^uint(0)>>1) {
+				bufSize++
+			}
 		}
 
 		var rangePP bool
@@ -119,6 +124,8 @@ Examples:
 
 		var record *fastx.Record
 		for _, file := range files {
+			// Reset before reading, including after a file with no selected records.
+			config.LineWidth = lineWidth
 			fastxReader, err := fastx.NewReader(alphabet, file, idRegexp)
 			checkError(err)
 
@@ -159,6 +166,10 @@ Examples:
 						break
 					}
 					record.FormatToWriter(outfh, config.LineWidth)
+					// Do not parse a record outside the requested range.
+					if n == end {
+						break
+					}
 					continue
 				}
 
@@ -177,11 +188,11 @@ Examples:
 			fastxReader.Close()
 
 			if rangeNN {
-				if buf.Size < -end {
+				if end < -buf.Size {
 					continue
 				}
 				current0 := buf.Current
-				buf.Backward(-end - 1)
+				buf.Backward(-(end + 1))
 				tail := buf.Current
 				// fmt.Println(current0, tail, buf.Size, buf.Capacity)
 				buf.Current = current0
@@ -200,7 +211,6 @@ Examples:
 				}
 			}
 
-			config.LineWidth = lineWidth
 		}
 	},
 }

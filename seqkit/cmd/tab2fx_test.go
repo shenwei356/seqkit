@@ -31,3 +31,21 @@ func TestTab2fxQualityLength(t *testing.T) {
 		}
 	}
 }
+
+// TestTab2fxEmptyInputs skips empty files and accepts an empty stdin stream.
+func TestTab2fxEmptyInputs(t *testing.T) {
+	dir := t.TempDir()
+	empty := auditInput(t, dir, "empty.tsv", "")
+	records := auditInput(t, dir, "records.tsv", "r1\tAC\t!!\n")
+	for _, tc := range []struct {
+		files []string
+		want  string
+	}{
+		{nil, ""}, {[]string{empty, records, empty}, "@r1\nAC\n+\n!!\n"},
+	} {
+		out, stderr, err := runCLI(t, "", append([]string{"tab2fx"}, tc.files...)...)
+		if err != nil || out != tc.want {
+			t.Fatalf("empty input: %q %v %s", out, err, stderr)
+		}
+	}
+}

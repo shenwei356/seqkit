@@ -1460,7 +1460,7 @@ $ seqkit tab2fx -h
 convert tabular format (first two/three columns) to FASTA/Q format
 
 Columns after the third are ignored. For FASTQ output, sequence and quality
-lengths must match.
+lengths must match. Empty input files are skipped.
 
 Usage:
   seqkit tab2fx [flags]
@@ -3932,6 +3932,8 @@ reset start position (rotate) for circular genomes
 Each input record is treated as an independent circular sequence. Multiple
 records and input files are supported with both -i and -s. With -s, records
 with no match or multiple matches on the searched strand are skipped with a warning.
+Empty records are skipped with -s. Protein and unrestricted alphabets are searched
+only in their original orientation.
 
 Examples
   1. Specify a new start position.

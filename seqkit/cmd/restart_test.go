@@ -57,3 +57,23 @@ func TestRestartThreads(t *testing.T) {
 		t.Fatalf("thread limit: %v %s", err, output)
 	}
 }
+
+// TestRestartEmptySearchRecords skips empty records in both exact and mismatch searches.
+func TestRestartEmptySearchRecords(t *testing.T) {
+	for _, mismatch := range []string{"0", "1"} {
+		out, stderr, err := runCLI(t, ">empty\n\n>r1\nACGTT\n", "restart", "-s", "ACG", "-m", mismatch)
+		if err != nil || out != ">r1\nACGTT\n" || !strings.Contains(stderr, "not found") {
+			t.Fatalf("empty record with -m %s: %q %v %s", mismatch, out, err, stderr)
+		}
+	}
+}
+
+// TestRestartProteinStrands never reverses a protein to invent a matching start.
+func TestRestartProteinStrands(t *testing.T) {
+	for _, mismatch := range []string{"0", "1"} {
+		out, stderr, err := runCLI(t, ">p1\nMELK\n>p2\nKLEM\n", "restart", "-t", "protein", "-s", "KLEM", "-m", mismatch)
+		if err != nil || out != ">p2\nKLEM\n" || !strings.Contains(stderr, "not found") {
+			t.Fatalf("protein with -m %s: %q %v %s", mismatch, out, err, stderr)
+		}
+	}
+}

@@ -95,12 +95,16 @@
         - Check initial input before writing. [#620](https://github.com/shenwei356/seqkit/issues/620)
     - `seqkit pair/rename/split/split2`:
         - Preserve unrelated output-directory files, including with `--force`. [#620](https://github.com/shenwei356/seqkit/issues/620)
+    - `seqkit range`:
+        - Stop reading at the requested positive end, without parsing later records.
+        - Handle extremely negative ranges without integer overflow, and preserve FASTA line wrapping after skipped FASTQ inputs.
     - `seqkit replace`:
         - Reject FASTQ replacements that borrow qualities outside the current match; document per-file record numbering. [#620](https://github.com/shenwei356/seqkit/issues/620)
     - `seqkit restart`:
         - Process each record independently with `-s`, avoiding skipped records and crashes on multi-record input.
         - Detect overlapping start matches as ambiguous.
         - Honor the thread limit set with `-j/--threads`.
+        - Skip empty records during mismatch searches, and avoid false matches from reversed protein sequences.
     - `seqkit sample`:
         - Report loading errors. [#615](https://github.com/shenwei356/seqkit/issues/615)
     - `seqkit sample/sample2`:
@@ -154,6 +158,7 @@
         - Return a non-zero exit status for failed files while retaining valid results; reject invalid ID regular expressions before processing. [#613](https://github.com/shenwei356/seqkit/issues/613)
     - `seqkit tab2fx`:
         - Preserve FASTQ qualities when additional columns follow the quality column, and reject records with unequal sequence and quality lengths.
+        - Accept empty input streams and continue processing after empty files.
     - `seqkit translate`:
         - Correct negative-frame subsequence coordinates and failed-frame headers, validate table/frame selections, and clarify truncation and minimum-length options. [#619](https://github.com/shenwei356/seqkit/issues/619)
     - `seqkit grep/subseq`:
