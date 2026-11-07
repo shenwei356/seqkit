@@ -205,8 +205,18 @@ Translate Tables/Genetic Codes:
 					once = false
 				}
 
+				// Reuse one alphabet-aware reverse complement across negative frames.
+				// Qualities are not needed for translation.
+				var reverse *seq.Seq
 				for _, frame = range frames {
-					_seq, err = record.Seq.Translate(translTable, frame, trim, clean, allowUnknownCodon, markInitCodonAsM)
+					template, translateFrame := record.Seq, frame
+					if frame < 0 {
+						if reverse == nil {
+							reverse = (&seq.Seq{Alphabet: record.Seq.Alphabet, Seq: record.Seq.Seq}).RevCom()
+						}
+						template, translateFrame = reverse, -frame
+					}
+					_seq, err = template.Translate(translTable, translateFrame, trim, clean, allowUnknownCodon, markInitCodonAsM)
 
 					if err != nil {
 						if skipTranslateErrors {

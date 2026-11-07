@@ -204,6 +204,7 @@
         - Accept empty input streams and continue processing after empty files.
         - Reduce processing time for tables with many extra columns after the quality column.
     - `seqkit translate`:
+        - Correct negative-frame translation of RNA and sequences containing IUPAC ambiguity codes.
         - Correct negative-frame subsequence coordinates and failed-frame headers, validate table/frame selections, and clarify truncation and minimum-length options. [#619](https://github.com/shenwei356/seqkit/issues/619)
     - `seqkit grep/subseq`:
         - Avoid crashes with extremely negative region coordinates.
