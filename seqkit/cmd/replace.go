@@ -367,14 +367,16 @@ Filtering records to edit:
 			checkError(err)
 
 			nr := 0
-			bFile := []byte(file)
+			// File names pass through placeholder expansion and then pattern expansion.
+			// Escape dollars for both stages so names remain literal text.
+			bFile := []byte(strings.ReplaceAll(file, "$", "$$$$"))
 			fileBase = filepath.Base(file)
-			bFileBase := []byte(fileBase)
+			bFileBase := []byte(strings.ReplaceAll(fileBase, "$", "$$$$"))
 			var bFileBaseWithoutExtension []byte
 			if i := strings.Index(fileBase, "."); i >= 0 {
-				bFileBaseWithoutExtension = []byte(fileBase[:i])
+				bFileBaseWithoutExtension = []byte(strings.ReplaceAll(fileBase[:i], "$", "$$$$"))
 			} else {
-				bFileBaseWithoutExtension = []byte(fileBase)
+				bFileBaseWithoutExtension = bFileBase
 			}
 
 			checkAlphabet := true

@@ -103,6 +103,7 @@
         - Handle extremely negative ranges without integer overflow, and preserve FASTA line wrapping after skipped FASTQ inputs.
         - Reduce memory allocations when selecting trailing records.
     - `seqkit replace`:
+        - Preserve dollar signs in file names inserted with `{fn}`, `{fbn}`, or `{fbne}`.
         - Reject invalid key capture indices before modifying output files.
         - Reject FASTQ replacements that borrow qualities outside the current match; document per-file record numbering. [#620](https://github.com/shenwei356/seqkit/issues/620)
     - `seqkit restart`:

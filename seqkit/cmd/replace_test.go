@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -30,6 +31,23 @@ func TestReplaceInvalidCapturePreservesOutput(t *testing.T) {
 			data, err := os.ReadFile(output)
 			if err != nil || string(data) != "keep\n" {
 				t.Fatalf("output changed: %q, %v", data, err)
+			}
+		})
+	}
+}
+
+// TestReplaceLiteralFileNames preserves dollar signs through both replacement stages.
+func TestReplaceLiteralFileNames(t *testing.T) {
+	dir := t.TempDir()
+	const base = "sample$1${tag}$$.fa"
+	input := auditInput(t, dir, base, ">a\nAC\n")
+	for _, tt := range []struct{ symbol, want string }{
+		{"{fn}", input}, {"{fbn}", filepath.Base(input)}, {"{fbne}", strings.TrimSuffix(base, ".fa")},
+	} {
+		t.Run(tt.symbol, func(t *testing.T) {
+			out, stderr, err := runCLI(t, "", "replace", "-p", "^(a)$", "-r", tt.symbol+"_${1}", input)
+			if err != nil || out != ">"+tt.want+"_a\nAC\n" {
+				t.Fatalf("out=%q err=%v stderr=%s", out, err, stderr)
 			}
 		})
 	}

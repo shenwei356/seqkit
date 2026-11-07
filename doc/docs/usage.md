@@ -3566,6 +3566,7 @@ Examples
 
 With `{kv}`, `--key-capt-idx` must refer to a capturing group in `--pattern`.
 Invalid capture indices are rejected before the output file is opened.
+Dollar signs in file names inserted with `{fn}`, `{fbn}`, or `{fbne}` are preserved literally.
 
 Usage
 
