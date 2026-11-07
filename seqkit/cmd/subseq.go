@@ -59,6 +59,8 @@ Attention:
       produces an empty sequence.
    5. With -r, coordinate suffixes are added only with -R, including with --chr.
       Rebuild older ID-only .seqkit.fai indexes with -U to retain full headers.
+   6. --seq-type applies to both indexed and streamed input, including reverse
+      complements.
 
 Recommendation:
   1. Use plain FASTA file, so seqkit could utilize FASTA index.
@@ -234,6 +236,10 @@ Examples:
 			alphabet2, isFastq, err := guessAlphabet(file)
 			if err != io.EOF {
 				checkError(err)
+			}
+			// Indexed records must use the same explicit alphabet as streamed records.
+			if alphabet != nil {
+				alphabet2 = alphabet
 			}
 			if useIndex {
 				plainInputs[file] = inputFormat{alphabet2, isFastq}

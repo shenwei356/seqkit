@@ -188,6 +188,7 @@
         - Reject NaN values for `-N`.
         - Report zero `N50_num` and percentages when all sequences are empty.
     - `seqkit subseq`:
+        - Honor `--seq-type` when extracting from indexed FASTA files, matching streamed input on the negative strand.
         - Include the requested sequence ID in warnings when indexed region, BED, or GTF extraction cannot find it.
         - Honor case-insensitive `--chr` filtering with BED and GTF annotations for both plain and streamed inputs.
         - Handle GTF attributes with or without a trailing semicolon. [#600](https://github.com/shenwei356/seqkit/issues/600)

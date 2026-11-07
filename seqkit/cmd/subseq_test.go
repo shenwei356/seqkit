@@ -393,3 +393,29 @@ func TestSubseqLeadingEmptyRecords(t *testing.T) {
 		t.Fatalf("indexed negative strand differs: %v %s", err, stderr)
 	}
 }
+
+// TestSubseqIndexedExplicitAlphabet keeps user-selected complements identical
+// for indexed files and streaming input, including after empty records.
+func TestSubseqIndexedExplicitAlphabet(t *testing.T) {
+	for _, tc := range []struct{ alphabet, want string }{
+		{"dna", "GGTT"}, {"rna", "GGUU"}, {"protein", "CCAA"}, {"unlimit", "CCAA"},
+	} {
+		t.Run(tc.alphabet, func(t *testing.T) {
+			dir := t.TempDir()
+			bed := auditInput(t, dir, "regions.bed", "r\t0\t4\t\t0\t-\n")
+			for _, prefix := range []string{"", ">empty\n"} {
+				input := prefix + ">r\nAACC\n"
+				file := auditInput(t, dir, "input.fa", input)
+				args := []string{"subseq", "-t", tc.alphabet, "--bed", bed}
+				want, stderr, err := runCLI(t, input, args...)
+				if err != nil || !strings.HasSuffix(want, "\n"+tc.want+"\n") {
+					t.Fatalf("unexpected streaming complement: %v %s", err, stderr)
+				}
+				got, stderr, err := runCLI(t, "", append(args, "-U", file)...)
+				if err != nil || got != want {
+					t.Errorf("indexed input ignored -t %s: %v %s", tc.alphabet, err, stderr)
+				}
+			}
+		})
+	}
+}
