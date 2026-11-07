@@ -184,6 +184,7 @@
     - `seqkit sum`:
         - Return a non-zero exit status for failed files while retaining valid results; reject invalid ID regular expressions before processing. [#613](https://github.com/shenwei356/seqkit/issues/613)
         - Keep digests unchanged when empty records move before nonempty records.
+        - Preserve percent signs in file names when reporting invalid circular inputs.
     - `seqkit tab2fx`:
         - Preserve FASTQ qualities when additional columns follow the quality column, and reject records with unequal sequence and quality lengths.
         - Accept empty input streams and continue processing after empty files.

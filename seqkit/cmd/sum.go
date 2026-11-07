@@ -303,7 +303,7 @@ Examples:
 								ok:     false,
 								result: nil,
 							}
-							log.Errorf(fmt.Sprintf("k (%d) is too big for sequence of %d bp: %s", k, len(record.Seq.Seq), file))
+							log.Errorf("k (%d) is too big for sequence of %d bp: %s", k, len(record.Seq.Seq), file)
 							return
 						}
 
@@ -318,7 +318,7 @@ Examples:
 									ok:     false,
 									result: nil,
 								}
-								log.Errorf(fmt.Sprintf("the flag -c/--circular does not support protein sequences: %s", file))
+								log.Errorf("the flag -c/--circular does not support protein sequences: %s", file)
 								return
 							case seq.RNA, seq.RNAredundant:
 								seqType = "R"
