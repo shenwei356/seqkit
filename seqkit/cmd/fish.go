@@ -135,6 +135,8 @@ Attention:
      display in text results.
   6. IUPAC ambiguity codes score as mismatches. Search ranges are clipped to
      each record; ranges outside the record produce no hits.
+  7. BAM output has one primary alignment per query ID: the highest-scoring
+     hit across all references and ranges, with ties resolved by output order.
 
 `,
 
@@ -353,7 +355,16 @@ func saveBam(bamFile string, refs []*sam.Reference, refMap map[string]int, alns 
 	h.AddProgram(fish)
 	bamWriter, err = bam.NewWriter(fh, h, 50)
 	checkError(err)
-	for _, a := range alns {
+	// Local search winners may belong to different queries or repeated regions.
+	// Select primary alignments across the complete output, retaining the first tie.
+	primary := make(map[string]int)
+	for i, a := range alns {
+		best, ok := primary[a.Query.Name]
+		if !ok || a.Score > alns[best].Score {
+			primary[a.Query.Name] = i
+		}
+	}
+	for i, a := range alns {
 		mq := -10 * math.Log10(1.0-(a.Score/a.Query.NullScore))
 		if math.IsNaN(mq) || mq > 60 {
 			mq = 60
@@ -365,7 +376,7 @@ func saveBam(bamFile string, refs []*sam.Reference, refMap map[string]int, alns 
 		if !sam.IsValidRecord(record) {
 			panic("failed to build BAM record from raw alignment: \n" + a.String() + "\n" + record.String())
 		}
-		if !a.Best {
+		if primary[a.Query.Name] != i {
 			record.Flags |= sam.Secondary
 		}
 

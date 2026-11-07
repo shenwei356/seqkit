@@ -2308,6 +2308,8 @@ Attention:
      display in text results.
   6. IUPAC ambiguity codes score as mismatches. Search ranges are clipped to
      each record; ranges outside the record produce no hits.
+  7. BAM output has one primary alignment per query ID: the highest-scoring
+     hit across all references and ranges, with ties resolved by output order.
 
 Usage:
   seqkit fish [flags]

@@ -6,7 +6,56 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/biogo/hts/sam"
 )
+
+// TestFishBAMPrimaryAlignments requires one best alignment per query across
+// references, search ranges, and recursive searches for repeated matches.
+func TestFishBAMPrimaryAlignments(t *testing.T) {
+	for _, tc := range []struct {
+		name, input, queries string
+		flags                []string
+		wantRecords          int
+		wantPrimary          map[string]string
+	}{
+		{"repeated", ">r\nACGTAAAAACGT\n", "ACGT", []string{"-a", "-s", "-q", "5"}, 2, map[string]string{"q0": "r"}},
+		{"references", ">partial\nACGA\n>exact\nACGT\n", "ACGT", []string{"-s"}, 2, map[string]string{"q0": "exact"}},
+		{"queries", ">r\nACGTAAAA\n", "ACGT,AAAA", []string{"-s"}, 2, map[string]string{"q0": "r", "q1": "r"}},
+		{"ranges", ">r\nACGTAAAAACGT\n", "ACGT", []string{"-s", "-r", "0:4,8:12"}, 2, map[string]string{"q0": "r"}},
+		{"strands", ">r\nACGT\n", "ACGT", nil, 2, map[string]string{"q0": "r"}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			output := filepath.Join(t.TempDir(), "hits.bam")
+			args := append([]string{"fish", "-F", tc.queries, "-q", "0", "-b", output}, tc.flags...)
+			_, stderr, err := runCLI(t, tc.input, args...)
+			if err != nil {
+				t.Fatalf("fish failed: %v %s", err, stderr)
+			}
+			_, records := readBAMFixture(t, output)
+			if len(records) != tc.wantRecords {
+				t.Fatalf("got %d alignments, want %d", len(records), tc.wantRecords)
+			}
+			if tc.name != "references" && records[0].Flags&sam.Secondary != 0 {
+				t.Error("the first equally scoring alignment should remain primary")
+			}
+			primary := make(map[string]int)
+			for _, record := range records {
+				if record.Flags&sam.Secondary == 0 {
+					primary[record.Name]++
+					if record.Ref.Name() != tc.wantPrimary[record.Name] {
+						t.Errorf("primary for %s maps to %s, want %s", record.Name, record.Ref.Name(), tc.wantPrimary[record.Name])
+					}
+				}
+			}
+			for query := range tc.wantPrimary {
+				if primary[query] != 1 {
+					t.Errorf("query %s has %d primary alignments, want 1", query, primary[query])
+				}
+			}
+		})
+	}
+}
 
 // TestFishCaseAndBAMMetadata checks statistics and the reference/program links.
 func TestFishCaseAndBAMMetadata(t *testing.T) {
