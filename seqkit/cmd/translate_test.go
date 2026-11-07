@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -90,5 +91,31 @@ func TestTranslateAlphabetPerFile(t *testing.T) {
 	out, stderr, err = runCLI(t, ">empty\n\n>valid\nATG\n", "translate", "-e", "-t", "protein")
 	if err != nil || out != ">empty\n\n>valid\n\n" {
 		t.Fatalf("explicit alphabet: %q %v %s", out, err, stderr)
+	}
+}
+
+// TestTranslateTableOutputProtection keeps table listings from overwriting inputs.
+func TestTranslateTableOutputProtection(t *testing.T) {
+	for _, flag := range []string{"-l", "-L"} {
+		for _, viaList := range []bool{false, true} {
+			dir := t.TempDir()
+			input := auditInput(t, dir, "input.fa", ">s\nACGT\n")
+			args := []string{"translate", flag, "1", "-o", input}
+			if viaList {
+				list := auditInput(t, dir, "inputs.txt", input+"\n")
+				args = append(args, "--infile-list", list)
+			} else {
+				args = append(args, input)
+			}
+			_, stderr, err := runCLI(t, "", args...)
+			data, readErr := os.ReadFile(input)
+			if err == nil || !strings.Contains(stderr, "cannot be the same") || readErr != nil || string(data) != ">s\nACGT\n" {
+				t.Fatalf("table listing overwrote input: %v %s", err, stderr)
+			}
+		}
+		out, stderr, err := runCLI(t, "", "translate", flag, "1")
+		if err != nil || out == "" {
+			t.Fatalf("standalone table listing failed: %v %s", err, stderr)
+		}
 	}
 }

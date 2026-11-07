@@ -147,11 +147,9 @@ Translate Tables/Genetic Codes:
 			appendFrame = true
 		}
 
-		var files []string
-		if listTable < 0 && listTableAmb < 0 {
-			files = getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
-			checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
-		}
+		// Table listings must protect supplied inputs before opening their output too.
+		files := getFileListFromArgsAndFile(cmd, args, !config.SkipFileCheck, "infile-list", !config.SkipFileCheck)
+		checkOutputFiles(files, []string{outFile}, !config.SkipFileCheck)
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer closeOutput(outfh)

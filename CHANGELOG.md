@@ -203,6 +203,7 @@
         - Preserve qualities with extra columns, reject unequal sequence/quality lengths, and process tables with many extra columns faster.
         - Accept empty streams and continue after empty files.
     - `seqkit translate`:
+        - Protect input files from being overwritten when listing translation tables with `-l/-L`.
         - Correct negative-frame translation of RNA and ambiguous bases, subsequence coordinates, and failed-frame headers; validate table/frame selections. [#619](https://github.com/shenwei356/seqkit/issues/619)
         - With `-e`, emit empty sequences for untranslatable records and continue past leading empty records; clarify truncation and minimum-length options.
         - Speed up translation of negative frames.
