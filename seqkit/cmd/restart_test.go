@@ -101,3 +101,34 @@ func TestRestartCircularStarts(t *testing.T) {
 		})
 	}
 }
+
+// TestRestartExactMatchCounts preserves overlapping counts on both strands and
+// still processes the next record after skipping a highly repetitive record.
+func TestRestartExactMatchCounts(t *testing.T) {
+	for _, base := range []string{"A", "T"} {
+		input := ">repeat\n" + strings.Repeat(base, 10000) + "\n>unique\nCCAAAG\n"
+		out, stderr, err := runCLI(t, input, "restart", "-s", "AAA")
+		if err != nil || out != ">unique\nAAAGCC\n" || !strings.Contains(stderr, "found at 10000 positions") {
+			t.Fatalf("repeated %s: %q %v %s", base, out, err, stderr)
+		}
+	}
+}
+
+// TestRestartExactMatches covers the first position and overlapping multiplicity.
+func TestRestartExactMatches(t *testing.T) {
+	for _, tt := range []struct {
+		sequence, pattern string
+		first, count      int
+	}{
+		{"", "A", -1, 0},
+		{"AC", "AAA", -1, 0},
+		{"AC", "C", 1, 1},
+		{"AAAAA", "AAA", 0, 3},
+		{"CACA", "CA", 0, 2},
+	} {
+		first, count := restartExactMatches([]byte(tt.sequence), []byte(tt.pattern))
+		if first != tt.first || count != tt.count {
+			t.Errorf("%q / %q = (%d, %d), want (%d, %d)", tt.sequence, tt.pattern, first, count, tt.first, tt.count)
+		}
+	}
+}

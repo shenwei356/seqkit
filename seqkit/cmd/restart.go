@@ -115,7 +115,6 @@ Examples
 		var bufSeq, bufQual, bufSearch bytes.Buffer
 		var l int
 		var record *fastx.Record
-		var i int
 		var sfmi *fmi.FMIndex
 		sfmi = fmi.NewFMIndex()
 		positions := make([]int, 0, 8)
@@ -206,23 +205,13 @@ Examples
 							}
 						}
 					} else {
-						i = 0 // Search each record from its own first base.
-						for {
-							newstart = bytes.Index(sequence[i:], startSeq)
-							if newstart < 0 {
-								break
-							}
-							newstart += i
-							positions = append(positions, newstart)
-							i = newstart + 1 // Include overlapping matches when checking uniqueness.
-						}
-
-						if len(positions) > 1 {
-							log.Warningf("the given subsequence is found at %d positions in sequence: %s, please give a longer one to increase the specificity", len(positions), record.ID)
+						first, count := restartExactMatches(sequence, startSeq)
+						if count > 1 {
+							log.Warningf("the given subsequence is found at %d positions in sequence: %s, please give a longer one to increase the specificity", count, record.ID)
 							continue
 						}
 
-						if len(positions) == 0 && searchReverse { // not found in the current strand
+						if count == 0 && searchReverse { // not found in the current strand
 							record.Seq.RevComInplace()
 							sequence0 = record.Seq.Seq
 							sequence = record.Seq.Seq
@@ -231,20 +220,14 @@ Examples
 							}
 							sequence = restartCircularSearchSequence(sequence, len(startSeq), &bufSearch)
 
-							i = 0
-							for {
-								newstart = bytes.Index(sequence[i:], startSeq)
-								if newstart < 0 {
-									break
-								}
-								newstart += i
-								positions = append(positions, newstart)
-								i = newstart + 1
-							}
-							if len(positions) > 1 {
-								log.Warningf("the given subsequence is found at %d positions in the reverse complement sequence of %s, please give a longer one to increase the specificity", len(positions), record.ID)
+							first, count = restartExactMatches(sequence, startSeq)
+							if count > 1 {
+								log.Warningf("the given subsequence is found at %d positions in the reverse complement sequence of %s, please give a longer one to increase the specificity", count, record.ID)
 								continue
 							}
+						}
+						if count == 1 {
+							positions = append(positions, first)
 						}
 					}
 
@@ -292,6 +275,25 @@ Examples
 			config.LineWidth = lineWidth
 		}
 	},
+}
+
+// restartExactMatches counts overlapping matches of a nonempty pattern while
+// retaining only the first position; repeated matches are reported, not used.
+func restartExactMatches(sequence, pattern []byte) (first, count int) {
+	first = -1
+	for offset := 0; offset < len(sequence); {
+		position := bytes.Index(sequence[offset:], pattern)
+		if position < 0 {
+			break
+		}
+		position += offset
+		if count == 0 {
+			first = position
+		}
+		count++
+		offset = position + 1
+	}
+	return first, count
 }
 
 func init() {
