@@ -125,3 +125,25 @@ func TestRmdupLeadingEmptyRecords(t *testing.T) {
 	assertLeadingEmptyRecords(t, ">a\nTTTC\n>b\nGAAA\n", "rmdup", "-s")
 	assertLeadingEmptyRecords(t, "@a\nUUUC\n+\nabcd\n@b\nGAAA\n+\ndcba\n", "rmdup", "-s")
 }
+
+// TestRmdupDuplicateFASTQWidth applies the same explicit width to both outputs.
+func TestRmdupDuplicateFASTQWidth(t *testing.T) {
+	for _, width := range []string{"", "0", "2", "20"} {
+		dir := t.TempDir()
+		duplicates := filepath.Join(dir, "duplicates.fq")
+		input := "@r\nACGT\n+\n1234\n"
+		want := input
+		args := []string{"rmdup", "-d", duplicates}
+		if width != "" {
+			args = append(args, "-w", width)
+		}
+		if width == "2" {
+			want = "@r\nAC\nGT\n+\n12\n34\n"
+		}
+		out, stderr, err := runCLI(t, input+input, args...)
+		dup, readErr := os.ReadFile(duplicates)
+		if err != nil || readErr != nil || out != want || string(dup) != want {
+			t.Fatalf("width=%q output=%q duplicates=%q: %v %s", width, out, dup, err, stderr)
+		}
+	}
+}

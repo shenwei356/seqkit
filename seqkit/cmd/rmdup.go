@@ -195,7 +195,7 @@ Attention:
 				if duplicated {
 					removed++
 					if saveDupFile {
-						outfhDup.Write(record.Format(config.LineWidth))
+						record.FormatToWriter(outfhDup, config.LineWidth)
 					}
 					if saveNumFile {
 						names[matched] = append(names[matched], string(record.ID))

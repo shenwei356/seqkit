@@ -393,7 +393,7 @@ Examples:
 								if outputMismatches {
 									record.Name = appendAmpliconMismatchName(record.Name, name0, mis[0]+mis[1], mis[0], mis[1])
 								}
-								results = append(results, string(record.Format(width)))
+								results = append(results, formatAmpliconRecord(record, width))
 
 								record.Seq = tmpSeq
 
@@ -404,10 +404,10 @@ Examples:
 							ch <- &Arecord{record: results, id: id, ok: true}
 						} else if saveUnmatched {
 							if !searchReverse {
-								results = append(results, string(record.Format(width)))
+								results = append(results, formatAmpliconRecord(record, width))
 							} else {
 								record.Seq.RevComInplace()
-								results = append(results, string(record.Format(width)))
+								results = append(results, formatAmpliconRecord(record, width))
 							}
 							ch <- &Arecord{record: results, id: id, ok: true}
 						} else {
@@ -561,6 +561,25 @@ Examples:
 			config.LineWidth = lineWidth
 		}
 	},
+}
+
+// formatAmpliconRecord honors FASTQ line widths in buffered worker results.
+// Record.Format wraps FASTA only; its fast path still covers unwrapped and empty records.
+func formatAmpliconRecord(record *fastx.Record, width int) string {
+	if width < 1 || len(record.Seq.Qual) <= width {
+		return string(record.Format(width))
+	}
+	var output strings.Builder
+	output.WriteByte('@')
+	output.Write(record.Name)
+	output.WriteByte('\n')
+	text, buffer := wrapByteSlice(record.Seq.Seq, width, nil)
+	output.Write(text)
+	output.WriteString("\n+\n")
+	text, _ = wrapByteSlice(record.Seq.Qual, width, buffer)
+	output.Write(text)
+	output.WriteByte('\n')
+	return output.String()
 }
 
 func init() {

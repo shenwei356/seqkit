@@ -46,6 +46,10 @@ lengths must match. Empty input files are skipped.
 	Run: func(cmd *cobra.Command, args []string) {
 		config := getConfigs(cmd)
 		lineWidth := config.LineWidth
+		fastqWidth := 0 // FASTQ stays unwrapped unless the user specifies a width.
+		if config.LineWidthChanged {
+			fastqWidth = lineWidth
+		}
 		outFile := config.OutFile
 		runtime.GOMAXPROCS(config.Threads)
 
@@ -113,9 +117,17 @@ lengths must match. Empty input files are skipped.
 					}
 					isFastq = true
 					outfh.WriteString(fmt.Sprintf("@%s\n", items[0]))
-					outfh.WriteString(items[1]) // seq
+					if fastqWidth > 0 {
+						outfh.Write(byteutil.WrapByteSlice([]byte(items[1]), fastqWidth))
+					} else {
+						outfh.WriteString(items[1])
+					}
 					outfh.WriteString("\n+\n")
-					outfh.WriteString(items[2]) // qual
+					if fastqWidth > 0 {
+						outfh.Write(byteutil.WrapByteSlice([]byte(items[2]), fastqWidth))
+					} else {
+						outfh.WriteString(items[2])
+					}
 
 					outfh.WriteString("\n")
 				} else {

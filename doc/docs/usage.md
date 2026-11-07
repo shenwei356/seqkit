@@ -1427,6 +1427,8 @@ Flags:
   -h, --help                   help for fa2fq
   -P, --only-positive-strand   only search on positive strand
 ```
+
+FASTQ output stays on single sequence and quality lines by default. Use `-w` to wrap both to an explicit line width.
     
 ## fx2tab & tab2fx
 
@@ -1496,6 +1498,8 @@ Flags:
   -p, --comment-line-prefix strings   comment line prefix (default [#,//])
   -h, --help                          help for tab2fx
 ```
+
+FASTQ output stays on single sequence and quality lines by default. Use `-w` to wrap both to an explicit line width.
 
 Examples
 
@@ -2470,6 +2474,8 @@ Flags:
                                region range
 ```
 
+Explicit line widths (`-w`) apply to FASTQ output in both exact and mismatch searches, including unmatched records saved with `-u`.
+
 Examples
 
 1. No region given.
@@ -2669,6 +2675,8 @@ Flags:
   -i, --ignore-case            ignore case
   -P, --only-positive-strand   only considering positive strand when comparing by sequence
 ```
+
+Explicit line widths (`-w`) also apply to FASTQ records saved with `-d`.
 
 Examples
 

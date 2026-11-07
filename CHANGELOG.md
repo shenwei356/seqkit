@@ -21,6 +21,7 @@
     - `seqkit shuffle/sort/split/subseq`:
         - Correctly read xz, zstd, bzip2, and LZ4 input and avoid leaving files open after format detection.
     - `seqkit amplicon`:
+        - Honor explicit FASTQ line widths in mismatch searches, including unmatched records.
         - Honor `-I/--immediate-output` in exact and degenerate searches, including BED and unmatched output.
         - Match N as a degenerate base, choose the longest amplicon for overlapping primer matches, and reject invalid primers and mismatch settings. [#618](https://github.com/shenwei356/seqkit/issues/618)
         - Skip false matches on empty records and invalid regions; clip large flanking regions correctly.
@@ -67,6 +68,8 @@
         - Validate guess fractions and target encodings before changing outputs; leave files and directories untouched with `--dry-run`.
     - `seqkit fa2fq`:
         - Reject damaged FASTA references before opening output files.
+    - `seqkit fa2fq/tab2fx`:
+        - Honor explicit FASTQ line widths for both sequences and qualities.
     - `seqkit faidx`:
         - Accept region lists from stdin while creating or updating indexes.
         - Clip negative coordinates on both strands, retain region suffixes, and return failure for missing IDs while preserving valid results, including with reused empty indexes. [#618](https://github.com/shenwei356/seqkit/issues/618)
@@ -124,6 +127,8 @@
         - Process records independently with `-s`, find matches across the circular boundary, and keep FASTQ qualities aligned.
         - Detect overlapping matches as ambiguous, use less memory for repeated exact matches, and honor `-j`.
         - Skip empty records in mismatch searches and avoid false reversed-protein matches.
+    - `seqkit rmdup`:
+        - Honor explicit FASTQ line widths in duplicate-sequence output (`-d`) and avoid buffering each duplicate record before writing it.
     - `seqkit sample`:
         - Report loading errors. [#615](https://github.com/shenwei356/seqkit/issues/615)
     - `seqkit sample/sample2`:

@@ -5,6 +5,24 @@ import (
 	"testing"
 )
 
+// TestTab2fxFASTQWidth retains single-line defaults and honors explicit wrapping.
+func TestTab2fxFASTQWidth(t *testing.T) {
+	for _, width := range []string{"", "0", "2", "20"} {
+		args := []string{"tab2fx"}
+		if width != "" {
+			args = append(args, "-w", width)
+		}
+		want := "@r\nACGT\n+\n1234\n@empty\n\n+\n\n"
+		if width == "2" {
+			want = "@r\nAC\nGT\n+\n12\n34\n@empty\n\n+\n\n"
+		}
+		out, stderr, err := runCLI(t, "r\tACGT\t1234\nempty\t\t\n", args...)
+		if err != nil || out != want {
+			t.Fatalf("width=%q output=%q want=%q: %v %s", width, out, want, err, stderr)
+		}
+	}
+}
+
 // TestTab2fxBufferValidation preserves existing output for invalid buffer limits.
 func TestTab2fxBufferValidation(t *testing.T) { assertInvalidBufferSizes(t, "tab2fx") }
 

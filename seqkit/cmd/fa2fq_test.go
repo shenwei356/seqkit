@@ -9,6 +9,29 @@ import (
 	"testing"
 )
 
+// TestFa2fqFASTQWidth wraps both strands without changing default output.
+func TestFa2fqFASTQWidth(t *testing.T) {
+	for _, tc := range []struct{ reference, quality string }{{"ACGT", "1234"}, {"ACT", "876"}} {
+		ref := auditInput(t, t.TempDir(), "reference.fa", ">r\n"+tc.reference+"\n")
+		for _, width := range []string{"", "0", "2", "20"} {
+			args := []string{"fa2fq", "-f", ref}
+			if width != "" {
+				args = append(args, "-w", width)
+			}
+			sequence, quality := tc.reference, tc.quality
+			if width == "2" {
+				sequence = sequence[:2] + "\n" + sequence[2:]
+				quality = quality[:2] + "\n" + quality[2:]
+			}
+			want := "@r\n" + sequence + "\n+\n" + quality + "\n"
+			out, stderr, err := runCLI(t, "@r\nACGTCAGT\n+\n12345678\n", args...)
+			if err != nil || out != want {
+				t.Fatalf("width=%q output=%q want=%q: %v %s", width, out, want, err, stderr)
+			}
+		}
+	}
+}
+
 // TestFa2fqDamagedReference rejects a partial map before opening the output.
 func TestFa2fqDamagedReference(t *testing.T) {
 	var input strings.Builder

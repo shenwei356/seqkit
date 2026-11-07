@@ -13,6 +13,25 @@ import (
 	"time"
 )
 
+// TestAmpliconMismatchFASTQWidth covers buffered matches and unmatched records.
+func TestAmpliconMismatchFASTQWidth(t *testing.T) {
+	for _, tc := range []struct{ name, input, primer, want string }{
+		{"forward", "@r\nAACT\n+\n1234\n", "AACT", "@r\nAA\nCT\n+\n12\n34\n"},
+		{"reverse", "@r\nCTT\n+\n123\n", "AAG", "@r\nAA\nG\n+\n32\n1\n"},
+		{"unmatched", "@r\nCCCC\n+\n1234\n", "AAAA", "@r\nCC\nCC\n+\n12\n34\n"},
+		{"empty", "@r\n\n+\n\n", "ACGT", "@r\n\n+\n\n"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			for _, threads := range []string{"1", "4"} {
+				out, stderr, err := runCLI(t, tc.input, "amplicon", "-F", tc.primer, "-m", "1", "-u", "-w", "2", "-j", threads)
+				if err != nil || out != tc.want {
+					t.Fatalf("threads=%s output=%q want=%q: %v %s", threads, out, tc.want, err, stderr)
+				}
+			}
+		})
+	}
+}
+
 // TestAmpliconImmediateOutput requires a result while the input pipe remains open.
 func TestAmpliconImmediateOutput(t *testing.T) {
 	for _, tt := range []struct {
@@ -217,6 +236,22 @@ func TestAmpliconFinderLifecycle(t *testing.T) {
 		finder = pool.Get().(*AmpliconFinder)
 		if finder.Seq != nil || finder.FMindex != nil {
 			t.Fatal("idle finder retains input or index")
+		}
+	}
+}
+
+// TestAmpliconWorkerState preserves formatting and order across concurrent input reads.
+func TestAmpliconWorkerState(t *testing.T) {
+	const sequence = "acgcacactgaaatga"
+	dir := t.TempDir()
+	fasta := auditInput(t, dir, "in.fa", strings.Repeat(">seq\n"+sequence+"\n", 64))
+	fastq := auditInput(t, dir, "in.fq", strings.Repeat("@seq\n"+sequence+"\n+\n"+strings.Repeat("I", len(sequence))+"\n", 64))
+	want := strings.Repeat(">seq mismatches=2(1+1)\ncgca\ncact\ngaaa\nt\n", 64) +
+		strings.Repeat("@seq mismatches=2(1+1)\n"+"cgca\ncact\ngaaa\nt"+"\n+\n"+"IIII\nIIII\nIIII\nI"+"\n", 64)
+	for _, threads := range []string{"1", "4"} {
+		out, stderr, err := runCLI(t, "", "amplicon", "-F", "ccc", "-R", "ttt", "-P", "-M", "-m", "1", "-w", "4", "-j", threads, fasta, fastq)
+		if err != nil || out != want {
+			t.Fatalf("threads=%s: output differs from expected wrapping: err=%v stderr=%s", threads, err, stderr)
 		}
 	}
 }

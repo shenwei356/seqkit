@@ -53,7 +53,10 @@ Attention:
 		config := getConfigs(cmd)
 		alphabet := config.Alphabet
 		idRegexp := config.IDRegexp
-		// lineWidth := config.LineWidth
+		lineWidth := 0
+		if config.LineWidthChanged {
+			lineWidth = config.LineWidth
+		}
 		outFile := config.OutFile
 		seq.AlphabetGuessSeqLengthThreshold = config.AlphabetGuessSeqLength
 		seq.ValidateSeq = false
@@ -86,6 +89,18 @@ Attention:
 		outfh, err := xopen.Wopen(outFile)
 		checkError(err)
 		defer closeOutput(outfh)
+
+		// Matching slices borrow the reader's storage and preserve ID-only output.
+		fastx.ForcelyOutputFastq = true
+		writeMatch := func(record *fastx.Record, start, end int) {
+			fragment := *record
+			sequence := *record.Seq
+			sequence.Seq = record.Seq.Seq[start:end]
+			sequence.Qual = record.Seq.Qual[start:end]
+			fragment.Name = record.ID
+			fragment.Seq = &sequence
+			fragment.FormatToWriter(outfh, lineWidth)
+		}
 
 		var record *fastx.Record
 		var ok bool
@@ -120,14 +135,7 @@ Attention:
 				i = bytes.Index(record.Seq.Seq, fa.Seq.Seq)
 				if i >= 0 {
 					j = i + len(fa.Seq.Seq)
-					outfh.Write(_mark_fastq)
-					outfh.Write(record.ID)
-					outfh.Write(_mark_newline)
-					outfh.Write(record.Seq.Seq[i:j])
-					outfh.Write(_mark_newline)
-					outfh.Write(_mark_plus_newline)
-					outfh.Write(record.Seq.Qual[i:j])
-					outfh.Write(_mark_newline)
+					writeMatch(record, i, j)
 					continue
 				}
 
@@ -141,14 +149,7 @@ Attention:
 				i = bytes.Index(record.Seq.Seq, fa.Seq.Seq)
 				if i >= 0 {
 					j = i + len(fa.Seq.Seq)
-					outfh.Write(_mark_fastq)
-					outfh.Write(record.ID)
-					outfh.Write(_mark_newline)
-					outfh.Write(record.Seq.Seq[i:j])
-					outfh.Write(_mark_newline)
-					outfh.Write(_mark_plus_newline)
-					outfh.Write(record.Seq.Qual[i:j])
-					outfh.Write(_mark_newline)
+					writeMatch(record, i, j)
 				}
 			}
 			fastxReader.Close()
