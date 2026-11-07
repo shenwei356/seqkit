@@ -4121,8 +4121,8 @@ Flags:
                               comma-separated (e.g., -p "p1,p2") OR use -p multiple times (e.g., -p p1
                               -p p2). Make sure to quote literal commas, e.g. in regex patterns '"A{2,}"'
   -f, --pattern-file string   [match seqs to mutate] pattern file (one record per line)
-  -p, --point strings         point mutation: changing base at given position. e.g., -p 2:C for setting
-                              2nd base as C, -p -1:A for change last base as A
+  -p, --point strings         point mutation: changing base at given position to one ASCII character.
+                              e.g., -p 2:C for setting 2nd base as C, -p -1:A for change last base as A
   -r, --use-regexp            [match seqs to mutate] search patterns are regular expression
 ```
 

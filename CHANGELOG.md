@@ -88,6 +88,7 @@
         - Reject invalid or overflowing buffer sizes before opening output files.
     - `seqkit mutate`:
         - Skip invalid edit boundaries without changing valid edits. [#619](https://github.com/shenwei356/seqkit/issues/619)
+        - Preserve colons in edit content without crashing or truncating insertions, and reject non-ASCII point replacements before writing output.
     - `seqkit pair`:
         - Preserve duplicate IDs and each mate's format. [#620](https://github.com/shenwei356/seqkit/issues/620)
         - Restore faster processing and lower memory use for reads paired in input order.
@@ -98,6 +99,7 @@
     - `seqkit range`:
         - Stop reading at the requested positive end, without parsing later records.
         - Handle extremely negative ranges without integer overflow, and preserve FASTA line wrapping after skipped FASTQ inputs.
+        - Reduce memory allocations when selecting trailing records.
     - `seqkit replace`:
         - Reject FASTQ replacements that borrow qualities outside the current match; document per-file record numbering. [#620](https://github.com/shenwei356/seqkit/issues/620)
     - `seqkit restart`:

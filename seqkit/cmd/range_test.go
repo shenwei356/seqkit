@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/shenwei356/bio/seqio/fastx"
 )
 
 // TestRangeMixedFileFormats preserves each input file's format.
@@ -42,5 +44,41 @@ func TestRangeSkippedFastqRestoresWrapping(t *testing.T) {
 	want := ">r1\n" + strings.Repeat("A", 60) + "\n" + strings.Repeat("A", 10) + "\n"
 	if err != nil || out != want {
 		t.Fatalf("FASTA wrapping after skipped FASTQ: %q %v %s", out, err, stderr)
+	}
+}
+
+// TestRecordLoopBufferWrap preserves order and links after overwriting old records.
+func TestRecordLoopBufferWrap(t *testing.T) {
+	for _, capacity := range []int{1, 3} {
+		buffer, err := NewRecordLoopBuffer(capacity)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for i := 0; i < 10; i++ {
+			buffer.Add(&fastx.Record{ID: []byte(strconv.Itoa(i))})
+		}
+		if buffer.Size != capacity {
+			t.Fatalf("size = %d", buffer.Size)
+		}
+		for i := 10 - capacity; i < 10; i++ {
+			node := buffer.Next()
+			if string(node.Value.ID) != strconv.Itoa(i) || node.next.prev != node || node.prev.next != node {
+				t.Fatalf("invalid ring at record %d", i)
+			}
+		}
+	}
+}
+
+// BenchmarkRecordLoopBufferFull isolates the steady-state node replacement cost.
+func BenchmarkRecordLoopBufferFull(b *testing.B) {
+	buffer, _ := NewRecordLoopBuffer(10)
+	record := &fastx.Record{ID: []byte("s")}
+	for i := 0; i < 10; i++ {
+		buffer.Add(record)
+	}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		buffer.Add(record)
 	}
 }

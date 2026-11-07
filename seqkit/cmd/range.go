@@ -247,6 +247,13 @@ func NewRecordLoopBuffer(capacity int) (*RecordLoopBuffer, error) {
 
 // Add add new RecordNode
 func (buf *RecordLoopBuffer) Add(value *fastx.Record) {
+	// Reuse the oldest node once full, without allocating a discarded node.
+	if buf.Size >= buf.Capacity {
+		buf.Current = buf.Current.next
+		buf.Current.Value = value
+		return
+	}
+
 	node := &RecordNode{Value: value, prev: nil, next: nil}
 
 	if buf.Size == 0 {
@@ -254,14 +261,6 @@ func (buf *RecordLoopBuffer) Add(value *fastx.Record) {
 		node.next = node
 		buf.Current = node
 		buf.Size++
-		return
-	}
-
-	// full
-	if buf.Size >= buf.Capacity {
-		buf.Current = buf.Current.next
-		buf.Current.Value = value
-		buf.Size = buf.Capacity
 		return
 	}
 

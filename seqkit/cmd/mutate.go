@@ -85,7 +85,11 @@ Examples:
 			if !reMutationPoint.MatchString(val) {
 				checkError(fmt.Errorf("invalid value of flag -p/--point : %s", val))
 			}
-			items := strings.Split(val, ":")
+			// Only the first colon separates the position from the replacement.
+			items := strings.SplitN(val, ":", 2)
+			if len(items[1]) != 1 || items[1][0] > 127 {
+				checkError(fmt.Errorf("invalid value of flag -p/--point : %s (replacement must be one ASCII character)", val))
+			}
 			pos, err := strconv.Atoi(items[0])
 			if err != nil {
 				checkError(fmt.Errorf("invalid point position %q: %w", items[0], err))
@@ -133,7 +137,7 @@ Examples:
 			if !reMutationIns.MatchString(valIns) {
 				checkError(fmt.Errorf("invalid value of flag -i/--insertion : %s", valIns))
 			}
-			items := strings.Split(valIns, ":")
+			items := strings.SplitN(valIns, ":", 2)
 			pos, err := strconv.Atoi(items[0])
 			if err != nil {
 				checkError(fmt.Errorf("invalid insertion position %q: %w", items[0], err))
@@ -355,7 +359,7 @@ Examples:
 func init() {
 	RootCmd.AddCommand(mutateCmd)
 
-	mutateCmd.Flags().StringSliceP("point", "p", []string{}, `point mutation: changing base at given position. e.g., -p 2:C for setting 2nd base as C, -p -1:A for change last base as A`)
+	mutateCmd.Flags().StringSliceP("point", "p", []string{}, `point mutation: changing base at given position to one ASCII character. e.g., -p 2:C for setting 2nd base as C, -p -1:A for change last base as A`)
 	mutateCmd.Flags().StringP("deletion", "d", "", `deletion mutation: deleting subsequence in a range. e.g., -d 1:2 for deleting leading two bases, -d -3:-1 for removing last 3 bases`)
 	mutateCmd.Flags().StringP("insertion", "i", "", `insertion mutation: inserting bases behind of given position, e.g., -i 0:ACGT for inserting ACGT at the beginning, -1:* for add * to the end`)
 
