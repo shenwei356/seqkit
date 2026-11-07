@@ -139,9 +139,11 @@
     - `seqkit sana`:
         - Flush output correctly.
     - `seqkit sana/scat`:
+        - Discard malformed FASTQ records with nonprintable or non-ASCII quality characters while preserving valid neighboring records.
         - Speed up FASTQ output by avoiding per-character allocations.
         - Recover FASTA records around junk or empty records; handle empty IDs, CRLF, line numbers, and file errors consistently. [#617](https://github.com/shenwei356/seqkit/issues/617)
     - `seqkit scat`:
+        - Reject malformed timing options before changing output files.
         - Include LZ4-compressed FASTA/FASTQ files in default file discovery.
         - Fix PID monitoring, rename/append handling, directory lists, and duplicate monitoring. [#617](https://github.com/shenwei356/seqkit/issues/617)
         - Reduce idle CPU and memory use; avoid missed files after deletions and repeated output caused by monitoring output files.

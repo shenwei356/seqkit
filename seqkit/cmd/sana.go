@@ -240,10 +240,10 @@ func validateSeqString(dna string, gaps bool) error {
 	return validateSeqBytes([]byte(dna), gaps)
 }
 
-// validateQuals checks for negative quality values.
-func validateQuals(quals []int) error {
+// validateQuals requires nonnegative scores encoded as printable ASCII bytes.
+func validateQuals(quals []int, qBase int) error {
 	for i, qual := range quals {
-		if qual < 0 {
+		if qual < max(0, 33-qBase) || qual > 126-qBase {
 			return fmt.Errorf("illegal quality value '%d' at position %d", qual, i)
 		}
 	}
@@ -258,7 +258,7 @@ func ValidateSeq(seq *simpleSeq, gaps bool) error {
 	if seqErr := validateSeqString(seq.Seq, gaps); seqErr != nil {
 		return seqErr
 	}
-	if qualErr := validateQuals(seq.Qual); qualErr != nil {
+	if qualErr := validateQuals(seq.Qual, seq.QBase); qualErr != nil {
 		return qualErr
 	}
 	return nil
@@ -652,11 +652,11 @@ func NewRawFastaStream(name string, fh *xopen.Reader, reader *bufio.Reader, sequ
 	return sequences
 }
 
-// parseQuals parses quality string into a slice of integers.
+// parseQuals decodes bytes, leaving invalid ASCII scores for validation.
 func parseQuals(qualString string, qBase int) []int {
 	quals := make([]int, len(qualString))
-	for i, char := range qualString {
-		quals[i] = int(char) - qBase
+	for i := range quals {
+		quals[i] = int(qualString[i]) - qBase
 	}
 	return quals
 }

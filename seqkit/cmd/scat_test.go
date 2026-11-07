@@ -13,6 +13,34 @@ import (
 	"time"
 )
 
+// TestScatInvalidQualityBytes exercises recovery through the watched-file path.
+func TestScatInvalidQualityBytes(t *testing.T) {
+	dir := t.TempDir()
+	auditInput(t, dir, "input.fq", "@bad\nACG\n+\néA\n@good\nACG\n+\nIII\n")
+	out, stderr, err := runCLI(t, "", "scat", "-f", "--quiet", dir)
+	if err != nil || out != "@good\nACG\n+\nIII\n" {
+		t.Fatalf("invalid record retained or valid neighbor lost: %v %s", err, stderr)
+	}
+}
+
+// TestScatDurationPreflight rejects malformed durations before opening output.
+func TestScatDurationPreflight(t *testing.T) {
+	for _, flag := range []string{"-D", "-T"} {
+		dir := t.TempDir()
+		inputDir := filepath.Join(dir, "inputs")
+		if err := os.Mkdir(inputDir, 0700); err != nil {
+			t.Fatal(err)
+		}
+		auditInput(t, inputDir, "input.fq", "@r\nAC\n+\nII\n")
+		output := auditInput(t, dir, "out.fq", "keep\n")
+		_, stderr, err := runCLI(t, "", "scat", "-f", flag, "invalid", "-o", output, inputDir)
+		data, readErr := os.ReadFile(output)
+		if err == nil || readErr != nil || string(data) != "keep\n" || !strings.Contains(stderr, "duration") {
+			t.Fatalf("%s: invalid duration changed output: %v %s", flag, err, stderr)
+		}
+	}
+}
+
 // TestScatCompressedFileDiscovery covers every supported codec and --gz-only.
 func TestScatCompressedFileDiscovery(t *testing.T) {
 	for _, format := range []string{"fasta", "fastq"} {

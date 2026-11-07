@@ -7,6 +7,18 @@ import (
 	"testing"
 )
 
+// TestSanaInvalidQualityBytes discards damaged quality lines without losing neighbors.
+func TestSanaInvalidQualityBytes(t *testing.T) {
+	for _, quality := range []string{"éA", "\x80II", "\x7fII", " II"} {
+		input := "@first\nACG\n+\nIII\n@bad\nACG\n+\n" + quality + "\n@last\nACG\n+\nIII\n"
+		want := "@first\nACG\n+\nIII\n@last\nACG\n+\nIII\n"
+		out, stderr, err := runCLI(t, input, "sana", "--quiet")
+		if err != nil || out != want {
+			t.Fatalf("quality=%q: invalid record retained or valid neighbor lost: %v %s", quality, err, stderr)
+		}
+	}
+}
+
 // TestSimpleSeqQualityFormatting preserves quality offsets and rune conversion.
 func TestSimpleSeqQualityFormatting(t *testing.T) {
 	for _, tc := range []struct {

@@ -1306,6 +1306,8 @@ Flags:
   -b, --qual-ascii-base int   ASCII BASE, 33 for Phred+33 (default 33)
 ```
 
+Records with quality characters outside printable ASCII, or below the configured quality offset (`-b`), are discarded. Valid neighboring records are retained.
+
 Examples
 
 
@@ -1359,6 +1361,8 @@ Flags:
   -T, --time-limit string     quit after inactive for this time period
   -p, --wait-pid int          after process with this PID exited (default -1)
 ```
+
+Records with quality characters outside printable ASCII, or below the configured quality offset (`-b`), are discarded. Valid neighboring records are retained.
 
 Default file discovery includes `.gz`, `.xz`, `.zst`, `.bz2`, and `.lz4` inputs. Use `-g` to restrict discovery to `.gz` files.
 

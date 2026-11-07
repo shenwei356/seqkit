@@ -105,6 +105,8 @@ Attention:
 		dropString := getFlagString(cmd, "drop-time")
 		allowGaps := getFlagBool(cmd, "allow-gaps")
 		timeLimit := getFlagString(cmd, "time-limit")
+		_, _, timingErr := parseScatDurations(dropString, timeLimit)
+		checkError(timingErr)
 		waitPid := getFlagInt(cmd, "wait-pid")
 		findOnly := getFlagBool(cmd, "find-only")
 		delta := getFlagInt(cmd, "delta") * 1024
@@ -229,19 +231,24 @@ type trackedFx struct {
 	removed                       bool
 }
 
+// parseScatDurations validates timing options before the CLI opens output files.
+func parseScatDurations(dropString, timeout string) (drop, idle time.Duration, err error) {
+	drop, err = time.ParseDuration(dropString)
+	if err != nil {
+		return 0, 0, err
+	}
+	if timeout != "" {
+		idle, err = time.ParseDuration(timeout)
+	}
+	return drop, idle, err
+}
+
 // LaunchFxWatchers coordinates all roots, so aliases never launch duplicate parsers.
 // excludedOutputs prevents discovery from feeding output files back into the stream.
 func LaunchFxWatchers(dirs []string, ctrlChan WatchCtrlChan, re *regexp.Regexp, inFmt, outFmt string, qBase int, allowGaps bool, delta int, timeout, dropString string, waitPid int, findOnly bool, outw *xopen.Writer, excludedOutputs ...os.FileInfo) error {
-	drop, err := time.ParseDuration(dropString)
+	drop, idle, err := parseScatDurations(dropString, timeout)
 	if err != nil {
 		return err
-	}
-	var idle time.Duration
-	if timeout != "" {
-		idle, err = time.ParseDuration(timeout)
-		if err != nil {
-			return err
-		}
 	}
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
