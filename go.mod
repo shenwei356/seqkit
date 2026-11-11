@@ -1,6 +1,6 @@
 module github.com/shenwei356/seqkit/v2
 
-go 1.25.14
+go 1.26.0
 
 // replace github.com/shenwei356/bio => /home/shenwei/go/src/github.com/shenwei356/bio/
 
@@ -13,14 +13,14 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/cznic/sortutil v0.0.0-20181122101858-f5f958428db8
 	github.com/dsnet/compress v0.0.1
-	github.com/dustin/go-humanize v1.0.1
-	github.com/elliotwutingfeng/asciiset v0.0.0-20260801111138-45c5fff54b41
+	github.com/dustin/go-humanize v1.1.0
+	github.com/elliotwutingfeng/asciiset v1.0.0
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/google/uuid v1.6.0
-	github.com/klauspost/compress v1.20.3
-	github.com/klauspost/pgzip v1.2.7
+	github.com/klauspost/compress v1.20.4
+	github.com/klauspost/pgzip v1.3.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
-	github.com/mattn/go-colorable v0.1.15
+	github.com/mattn/go-colorable v0.1.16
 	github.com/mattn/go-isatty v0.0.24
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pierrec/lz4/v4 v4.1.33
@@ -29,15 +29,15 @@ require (
 	github.com/shenwei356/bwt v0.6.1
 	github.com/shenwei356/go-logging v0.0.0-20171012171522-c6b9702d88ba
 	github.com/shenwei356/stable v0.3.0
-	github.com/shenwei356/util v0.5.6
+	github.com/shenwei356/util v0.5.7
 	github.com/shenwei356/xopen v0.4.1
 	github.com/smallfish/simpleyaml v0.1.0
 	github.com/spf13/cobra v1.10.2
 	github.com/twotwotwo/sorts v0.0.0-20160814051341-bf5c1f2b8553
 	github.com/ulikunitz/xz v0.5.17
 	github.com/vbauerster/mpb/v5 v5.4.0
-	golang.org/x/sys v0.47.0
-	golang.org/x/term v0.45.0
+	golang.org/x/sys v0.50.0
+	golang.org/x/term v0.48.0
 	gonum.org/v1/plot v0.17.0
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -57,11 +57,11 @@ require (
 	github.com/edsrzf/mmap-go v1.2.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/mattn/go-runewidth v0.0.28 // indirect
+	github.com/mattn/go-runewidth v0.0.31 // indirect
 	github.com/shenwei356/natsort v0.0.0-20220117010048-580176ad49fb // indirect
-	github.com/spf13/pflag v1.0.10 // indirect
+	github.com/spf13/pflag v1.1.0 // indirect
 	github.com/stretchr/testify v1.8.0 // indirect
-	golang.org/x/crypto v0.55.0 // indirect
-	golang.org/x/image v0.45.0 // indirect
-	golang.org/x/text v0.41.0 // indirect
+	golang.org/x/crypto v0.58.0 // indirect
+	golang.org/x/image v0.48.0 // indirect
+	golang.org/x/text v0.44.0 // indirect
 )
